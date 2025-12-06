@@ -144,11 +144,16 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 // ============================================
 const typewriterElement = document.getElementById('typewriter');
 const texts = [
-    'un Desarrollador FinTech',
-    'un Experto en Trading Algorítmico',
-    'un Desarrollador Blockchain',
-    'un Especialista en DeFi',
-    'un Ingeniero de IA Financiera'
+    'Economista',
+    'Administrador de Empresas',
+    'Master en Gestion Financiera',
+    'Master en Población y Desarrollo',
+    'Doctorante en Ciencias de la Ingenieria',
+    'Desarrollador FinTech',
+    'Experto en Trading Algorítmico',
+    'Desarrollador Blockchain',
+    'Especialista en DeFi',
+    'Ingeniero de IA Financiera'
 ];
 
 let textIndex = 0;
