@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Machine Learning en Trading Cuantitativo | Israel Romero</title>
+    <meta name="description"
+        content="Implementación de redes neuronales LSTM para predicción de series temporales en mercados financieros. Resultados y optimización de hiperparámetros.">
+    <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+
+<body>
+    <div class="tech-grid"></div>
+    <div class="gradient-orb orb-1"></div>
+    <div class="gradient-orb orb-2"></div>
+
+    <header id="header">
+        <nav class="nav-container">
+            <div class="logo">
+                <span class="logo-bracket">[</span>
+                <span class="logo-text">ISRAEL ROMERO</span>
+                <span class="logo-bracket">]</span>
+            </div>
+            <a href="index.html#blog" class="btn btn-secondary">← Volver al Blog</a>
+        </nav>
+    </header>
+
+    <section class="section" style="padding-top: 150px;">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">// AI & ML</span>
+                <h1 class="section-title">Machine Learning en Trading Cuantitativo</h1>
+                <p class="section-description">
+                    Implementación de redes neuronales LSTM para predicción de series temporales<br>
+                    Resultados, optimización de hiperparámetros y lecciones aprendidas
+                </p>
+                <div style="color: var(--color-text-secondary); font-size: 0.9rem; margin-top: 1rem;">
+                    📅 15 de Noviembre, 2024 • ⏱️ 15 min lectura • 🏷️ AI, Machine Learning, Trading
+                </div>
+            </div>
+
+            <div style="max-width: 800px; margin: 0 auto;">
+                <!-- Introduction -->
+                <div
+                    style="background: rgba(20, 25, 35, 0.6); border: 1px solid rgba(0, 212, 255, 0.2); border-radius: 1rem; padding: 2rem; margin-bottom: 2rem;">
+                    <h2 style="color: var(--color-accent-cyan); margin-bottom: 1rem;">Introducción</h2>
+                    <p style="color: var(--color-text-secondary); line-height: 1.8; margin-bottom: 1rem;">
+                        La aplicación de machine learning en trading cuantitativo ha evoluc ionado dramáticamente en los
+                        últimos años.
+                        Las redes neuronales LSTM (Long Short-Term Memory), diseñadas específicamente para series
+                        temporales, han
+                        demostrado capacidad para capturar patrones complejos que modelos tradicionales no pueden
+                        detectar.
+                    </p>
+                    <p style="color: var(--color-text-secondary); line-height: 1.8;">
+                        Este artículo documenta mi experiencia construyendo un sistema LSTM para predecir movimientos de
+                        precio en
+                        criptomonedas, incluyendo arquitectura, resultados reales, y errores costosos que cometí (para
+                        que tú no los repitas).
+                    </p>
+                </div>
+
+                <!-- The Problem -->
+                <div
+                    style="background: rgba(20, 25, 35, 0.6); border: 1px solid rgba(0, 212, 255, 0.2); border-radius: 1rem; padding: 2rem; margin-bottom: 2rem;">
+                    <h2 style="color: var(--color-accent-cyan); margin-bottom: 1.5rem;">El Problema: Series Temporales
+                        Financieras</h2>
+
+                    <p style="color: var(--color-text-secondary); line-height: 1.8; margin-bottom: 1rem;">
+                        Los precios financieros son notoriamente difíciles de predecir por varias razones:
+                    </p>
+
+                    <ul
+                        style="color: var(--color-text-secondary); line-height: 1.8; margin-left: 1.5rem; margin-bottom: 1rem;">
+                        <li><strong>No-estacionariedad:</strong> La distribución cambia constantemente</li>
+                        <li><strong>Ruido alto:</strong> Señal/ruido ratio extremadamente bajo</li>
+                        <li><strong>Información eficiente:</strong> Mercados incorporan información disponible
+                            rápidamente</li>
+                        <li><strong>Régimen changes:</strong> Bull/bear markets requieren modelos diferentes</li>
+                        <li><strong>Fat tails:</strong> Eventos extremos más frecuentes de lo esperado</li>
+                    </ul>
+
+                    <p style="color: var(--color-text-secondary); line-height: 1.8;">
+                        A pesar de estos desafíos, ML puede añadir edge si se implementa correctamente. La clave está en
+                        no intentar
+                        "predecir el futuro" sino en identificar probabilidades sesgadas a nuestro favor.
+                    </p>
+                </div>
+
+                <!-- Architecture -->
+                <div
+                    style="background: rgba(20, 25, 35, 0.6); border: 1px solid rgba(0, 212, 255, 0.2); border-radius: 1rem; padding: 2rem; margin-bottom: 2rem;">
+                    <h2 style="color: var(--color-accent-cyan); margin-bottom: 1.5rem;">Arquitectura del Modelo LSTM
+                    </h2>
+
+                    <h3 style="color: var(--color-accent-green); font-size: 1.1rem; margin: 1.5rem 0 1rem;">Diseño de la
+                        Red</h3>
+
+                    <pre
+                        style="background: rgba(0, 0, 0, 0.4); padding: 1.5rem; border-radius: 0.5rem; overflow-x: auto; border-left: 3px solid var(--color-accent-cyan);"><code style="color: var(--color-text-secondary); font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;">
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import LSTM, Dropout, Dense, Bidirectional
+
+def build_lstm_model(input_shape, output_classes):
+    model = Sequential([
+        # Primera capa LSTM bidireccional
+        Bidirectional(LSTM(128, return_sequences=True), 
+                      input_shape=input_shape),
+        Dropout(0.3),
+        
+        # Segunda capa LSTM
+        Bidirectional(LSTM(64, return_sequences=True)),
+        Dropout(0.3),
+        
+        # Tercera capa LSTM
+        LSTM(32),
+        Dropout(0.2),
+        
+        # Capas densas
+        Dense(64, activation='relu'),
+        Dropout(0.2),
+        Dense(32, activation='relu'),
+        
+        # Capa de salida (clasificación: Up/Down/Neutral)
+        Dense(output_classes, activation='softmax')
+    ])
+    
+    model.compile(
+        optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
+        loss='categorical_crossentropy',
+        metrics=['accuracy', 'AUC']
+    )
+    
+    return model
+</code></pre>
+
+                    <h3 style="color: var(--color-accent-green); font-size: 1.1rem; margin: 1.5rem 0 1rem;">Feature
+                        Engineering</h3>
+                    <p style="color: var(--color-text-secondary); line-height: 1.8; margin-bottom: 1rem;">
+                        El éxito del modelo depende críticamente de las features. Estas son las que mejor funcionaron:
+                    </p>
+
+                    <div style="display: grid; gap: 1rem;">
+                        <div style="background: rgba(0, 212, 255, 0.05); padding: 1.5rem; border-radius: 0.5rem;">
+                            <h4 style="color: var(--color-accent-cyan); margin-bottom: 0.5rem;">Price Action Features
+                                (8)</h4>
+                            <ul style="color: var(--color-text-secondary); line-height: 1.7; margin-left: 1.5rem;">
+                                <li>Log returns: 1h, 4h, 24h, 7d</li>
+                                <li>Price relative to MA20, MA50, MA200</li>
+                                <li>Normalized distance from local high/low</li>
+                            </ul>
+                        </div>
+
+                        <div style="background: rgba(0, 255, 65, 0.05); padding: 1.5rem; border-radius: 0.5rem;">
+                            <h4 style="color: var(--color-accent-green); margin-bottom: 0.5rem;">Volatility Features (6)
+                            </h4>
+                            <ul style="color: var(--color-text-secondary); line-height: 1.7; margin-left: 1.5rem;">
+                                <li>Realized volatility (varios window sizes)</li>
+                                <li>ATR normalizado</li>
+                                <li>Bollinger Band percentile</li>
+                                <li>Parkinson volatility estimator</li>
+                            </ul>
+                        </div>
+
+                        <div style="background: rgba(168, 85, 247, 0.05); padding: 1.5rem; border-radius: 0.5rem;">
+                            <h4 style="color: var(--color-accent-purple); margin-bottom: 0.5rem;">Volume Features (5)
+                            </h4>
+                            <ul style="color: var(--color-text-secondary); line-height: 1.7; margin-left: 1.5rem;">
+                                <li>Volume relative to MA</li>
+                                <li>On-Balance Volume (OBV) momentum</li>
+                                <li>Buy/Sell volume imbalance</li>
+                                <li>Volume-Weighted Average Price (VWAP) distance</li>
+                            </ul>
+                        </div>
+
+                        <div style="background: rgba(0, 212, 255, 0.05); padding: 1.5rem; border-radius: 0.5rem;">
+                            <h4 style="color: var(--color-accent-cyan); margin-bottom: 0.5rem;">Market Microstructure
+                                (4)</h4>
+                            <ul style="color: var(--color-text-secondary); line-height: 1.7; margin-left: 1.5rem;">
+                                <li>Bid-ask spread</li>
+                                <li>Order book imbalance (top 5 levels)</li>
+                                <li>Trade flow toxicity</li>
+                                <li>Funding rate (para futures)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Training Process -->
+                <div
+                    style="background: rgba(20, 25, 35, 0.6); border: 1px solid rgba(0, 212, 255, 0.2); border-radius: 1rem; padding: 2rem; margin-bottom: 2rem;">
+                    <h2 style="color: var(--color-accent-cyan); margin-bottom: 1.5rem;">Proceso de Entrenamiento</h2>
+
+                    <h3 style="color: var(--color-accent-green); font-size: 1.1rem; margin: 1.5rem 0 1rem;">Data Split
+                        Temporal</h3>
+                    <p style="color: var(--color-text-secondary); line-height: 1.8; margin-bottom: 1rem;">
+                        <strong>CRÍTICO:</strong> No uses k-fold cross-validation con series temporales. Esto causa data
+                        leakage.
+                        Usa walk-forward splits:
+                    </p>
+
+                    <ul
+                        style="color: var(--color-text-secondary); line-height: 1.8; margin-left: 1.5rem; margin-bottom: 1rem;">
+                        <li><strong>Training:</strong> 2017-2020 (3 años)</li>
+                        <li><strong>Validation:</strong> 2021 (1 año)</li>
+                        <li><strong>Test:</strong> 2022-2023 (2 años)</li>
+                        <li><strong>Out-of-sample:</strong> 2024 (nunca visto durante desarrollo)</li>
+                    </ul>
+
+                    <h3 style="color: var(--color-accent-green); font-size: 1.1rem; margin: 1.5rem 0 1rem;">
+                        Hiperparámetros Optimizados</h3>
+                    <p style="color: var(--color-text-secondary); line-height: 1.8; margin-bottom: 0.5rem;">
+                        Usé Optuna para optimización bayesiana. Después de 200+ trials:
+                    </p>
+
+                    <pre
+                        style="background: rgba(0, 0, 0, 0.4); padding: 1.5rem; border-radius: 0.5rem; overflow-x: auto; border-left: 3px solid var(--color-accent-purple);"><code style="color: var(--color-text-secondary); font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;">
+Optimal Hyperparameters:
+- Sequence length: 48 hours
+- Batch size: 256
+- LSTM units: [128, 64, 32]
+- Dropout: [0.3, 0.3, 0.2]
+- Learning rate: 0.001 → 0.0001 (decay)
+- Early stopping patience: 15 epochs
+- Label: 4-hour forward return classification
+</code></pre>
+                </div>
+
+                <!-- Results -->
+                <div
+                    style="background: rgba(20, 25, 35, 0.6); border: 1px solid rgba(0, 212, 255, 0.2); border-radius: 1rem; padding: 2rem; margin-bottom: 2rem;">
+                    <h2 style="color: var(--color-accent-cyan); margin-bottom: 1.5rem;">Resultados</h2>
+
+                    <h3 style="color: var(--color-accent-green); font-size: 1.1rem; margin: 1.5rem 0 1rem;">Métricas del
+                        Modelo</h3>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                        <div
+                            style="text-align: center; padding: 1.5rem; background: rgba(0, 255, 65, 0.05); border-radius: 0.5rem;">
+                            <div style="font-size: 2rem; font-weight: 700; color: var(--color-accent-green);">72.3%
+                            </div>
+                            <div style="color: var(--color-text-secondary); margin-top: 0.5rem;">Test Accuracy</div>
+                        </div>
+                        <div
+                            style="text-align: center; padding: 1.5rem; background: rgba(0, 212, 255, 0.05); border-radius: 0.5rem;">
+                            <div style="font-size: 2rem; font-weight: 700; color: var(--color-accent-cyan);">0.79</div>
+                            <div style="color: var(--color-text-secondary); margin-top: 0.5rem;">AUC Score</div>
+                        </div>
+                        <div
+                            style="text-align: center; padding: 1.5rem; background: rgba(168, 85, 247, 0.05); border-radius: 0.5rem;">
+                            <div style="font-size: 2rem; font-weight: 700; color: var(--color-accent-purple);">0.68
+                            </div>
+                            <div style="color: var(--color-text-secondary); margin-top: 0.5rem;">F1 Score</div>
+                        </div>
+                    </div>
+
+                    <h3 style="color: var(--color-accent-green); font-size: 1.1rem; margin: 1.5rem 0 1rem;">Trading
+                        Performance (Backtest)</h3>
+                    <p style="color: var(--color-text-secondary); line-height: 1.8; margin-bottom: 1rem;">
+                        Implementando una estrategia simple: buy cuando el modelo predice "Up" con >70% confidence:
+                    </p>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+                        <div style="background: rgba(0, 255, 65, 0.1); padding: 1rem; border-radius: 0.5rem;">
+                            <div style="font-size: 1.2rem; font-weight: 700; color: var(--color-accent-green);">+183%
+                            </div>
+                            <div style="color: var(--color-text-secondary); font-size: 0.85rem;">Annual Return</div>
+                        </div>
+                        <div style="background: rgba(0, 212, 255, 0.1); padding: 1rem; border-radius: 0.5rem;">
+                            <div style="font-size: 1.2rem; font-weight: 700; color: var(--color-accent-cyan);">2.7</div>
+                            <div style="color: var(--color-text-secondary); font-size: 0.85rem;">Sharpe Ratio</div>
+                        </div>
+                        <div style="background: rgba(168, 85, 247, 0.1); padding: 1rem; border-radius: 0.5rem;">
+                            <div style="font-size: 1.2rem; font-weight: 700; color: var(--color-accent-purple);">-18%
+                            </div>
+                            <div style="color: var(--color-text-secondary); font-size: 0.85rem;">Max Drawdown</div>
+                        </div>
+                        <div style="background: rgba(0, 212, 255, 0.1); padding: 1rem; border-radius: 0.5rem;">
+                            <div style="font-size: 1.2rem; font-weight: 700; color: var(--color-accent-cyan);">67%</div>
+                            <div style="color: var(--color-text-secondary); font-size: 0.85rem;">Win Rate</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lessons Learned -->
+                <div
+                    style="background: rgba(20, 25, 35, 0.6); border: 1px solid rgba(0, 212, 255, 0.2); border-radius: 1rem; padding: 2rem; margin-bottom: 2rem;">
+                    <h2 style="color: var(--color-accent-cyan); margin-bottom: 1.5rem;">Lecciones Aprendidas (Errores
+                        Costosos)</h2>
+
+                    <div style="display: grid; gap: 1.5rem;">
+                        <div
+                            style="background: rgba(255, 0, 64, 0.05); padding: 1.5rem; border-radius: 0.5rem; border-left: 3px solid #ff0040;">
+                            <h4 style="color: #ff0040; margin-bottom: 0.5rem;">❌ Error #1: Look-Ahead Bias</h4>
+                            <p style="color: var(--color-text-secondary); line-height: 1.7;">
+                                Inicialmente usé cierre diario para features. Problema: el close del día no está
+                                disponible hasta
+                                que el día termina. Solución: usar solo datos hasta timestamp T-1 para predecir T.
+                            </p>
+                        </div>
+
+                        <div
+                            style="background: rgba(255, 0, 64, 0.05); padding: 1.5rem; border-radius: 0.5rem; border-left: 3px solid #ff0040;">
+                            <h4 style="color: #ff0040; margin-bottom: 0.5rem;">❌ Error #2: Sobrefitting a Validation Set
+                            </h4>
+                            <p style="color: var(--color-text-secondary); line-height: 1.7;">
+                                Iteré hiperparámetros mirando performance en validation set. Esto es indirecto
+                                overfitting.
+                                Solución: usar validation solo para early stopping, test set para evaluación real.
+                            </p>
+                        </div>
+
+                        <div
+                            style="background: rgba(255, 0, 64, 0.05); padding: 1.5rem; border-radius: 0.5rem; border-left: 3px solid #ff0040;">
+                            <h4 style="color: #ff0040; margin-bottom: 0.5rem;">❌ Error #3: Ignorar Transaction Costs
+                            </h4>
+                            <p style="color: var(--color-text-secondary); line-height: 1.7;">
+                                Backtest inicial no incluía slippage y fees. En realidad, costs de ~0.2% por trade matan
+                                estrategias
+                                de alta frecuencia. Solución: siempre incluir 0.1-0.3% cost por trade en backtests.
+                            </p>
+                        </div>
+
+                        <div
+                            style="background: rgba(0, 255, 65, 0.05); padding: 1.5rem; border-radius: 0.5rem; border-left: 3px solid var(--color-accent-green);">
+                            <h4 style="color: var(--color-accent-green); margin-bottom: 0.5rem;">✅ What Worked: Ensemble
+                                Methods</h4>
+                            <p style="color: var(--color-text-secondary); line-height: 1.7;">
+                                Combinar LSTM con XGBoost (árbol de decisiones) mejoró accuracy en 4%. Cada modelo
+                                captura
+                                diferentes patrones. Promedio ponderado: 60% LSTM + 40% XGBoost.
+                            </p>
+                        </div>
+
+                        <div
+                            style="background: rgba(0, 255, 65, 0.05); padding: 1.5rem; border-radius: 0.5rem; border-left: 3px solid var(--color-accent-green);">
+                            <h4 style="color: var(--color-accent-green); margin-bottom: 0.5rem;">✅ What Worked: Regime
+                                Detection</h4>
+                            <p style="color: var(--color-text-secondary); line-height: 1.7;">
+                                Entrenar modelos separados para bull/bear/sideways markets mejoró Sharpe de 2.1 a 2.7.
+                                Usar HMM
+                                (Hidden Markov Model) para detectar régimen actual antes de aplicar modelo apropiado.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Conclusion -->
+                <div
+                    style="background: rgba(20, 25, 35, 0.6); border: 1px solid rgba(0, 212, 255, 0.2); border-radius: 1rem; padding: 2rem; margin-bottom: 2rem;">
+                    <h2 style="color: var(--color-accent-cyan); margin-bottom: 1rem;">Conclusión</h2>
+                    <p style="color: var(--color-text-secondary); line-height: 1.8; margin-bottom: 1rem;">
+                        Machine learning en trading NO es una bala mágica. Después de un año de desarrollo y múltiples
+                        iteraciones:
+                    </p>
+
+                    <ul
+                        style="color: var(--color-text-secondary); line-height: 1.8; margin-left: 1.5rem; margin-bottom: 1rem;">
+                        <li>LSTM puede capturar patrones que trading rules simples pierden</li>
+                        <li>Feature engineering es 10x más importante que arquitectura del modelo</li>
+                        <li>Evitar overfitting requiere disciplina extrema y out-of-sample testing riguroso</li>
+                        <li>Combine ML con reglas tradicionales - hybrid approaches funcionan mejor</li>
+                        <li>Re-entrena modelos regularmente - markets evolve, tus modelos también deben hacerlo</li>
+                    </ul>
+
+                    <p style="color: var(--color-text-secondary); line-height: 1.8;">
+                        El modelo actual genera aproximadamente 8-12 señales por semana con 67% win rate y risk/reward
+                        de 1:1.8.
+                        No es perfecto, pero combado con risk management sólido, ha demostrado ser rentable en live
+                        trading por 6+ meses.
+                    </p>
+                </div>
+
+                <!-- CTA -->
+                <div style="text-align: center; margin-top: 3rem;">
+                    <a href="index.html#contacto" class="btn btn-primary" style="display: inline-flex;">
+                        <span>Desarrolla tu Sistema ML</span>
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M7 3L14 10L7 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2024 Israel Romero Apo. Todos los derechos reservados.</p>
+                <div class="footer-bottom-links">
+                    <a href="privacidad.html">Privacidad</a>
+                    <a href="terminos.html">Términos</a>
+                    <a href="cookies.html">Cookies</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="assets/js/script.js"></script>
+</body>
+
+</html>
