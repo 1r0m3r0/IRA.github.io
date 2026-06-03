@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>🐍 Regresión con Python | Profe Regresión</title>
+  <!-- MathJax para fórmulas hermosas -->
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)']],
+        displayMath: [['\\[', '\\]']],
+        processEscapes: true
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+  <!-- Prism.js para código Python -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #fdf6e3 0%, #f9eac3 100%);
+      color: #2d3436;
+      line-height: 1.7;
+      scroll-behavior: smooth;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+    /* Header */
+    header {
+      background: #6c5ce7;
+      background: linear-gradient(135deg, #6c5ce7, #ff6b6b);
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+      border-radius: 0 0 80px 80px;
+      box-shadow: 0 20px 30px rgba(0,0,0,0.15);
+      margin-bottom: 3rem;
+    }
+    header h1 {
+      font-size: 3rem;
+      color: white;
+      text-shadow: 3px 3px 0 rgba(0,0,0,0.1);
+      margin-bottom: 0.5rem;
+    }
+    header p {
+      font-size: 1.3rem;
+      color: white;
+      font-weight: 300;
+      max-width: 700px;
+      margin: auto;
+    }
+    .prof-badge {
+      display: inline-block;
+      background: white;
+      color: #6c5ce7;
+      padding: 0.5rem 1.5rem;
+      border-radius: 30px;
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-top: 1rem;
+      box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+    }
+    /* Navegación */
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 1.2rem;
+      flex-wrap: wrap;
+      margin-bottom: 3rem;
+    }
+    nav a {
+      background: white;
+      padding: 0.8rem 1.8rem;
+      border-radius: 40px;
+      text-decoration: none;
+      color: #2d3436;
+      font-weight: 600;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+      transition: all 0.3s;
+      border: 2px solid transparent;
+    }
+    nav a:hover {
+      border-color: #6c5ce7;
+      transform: translateY(-3px);
+      box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+      color: #6c5ce7;
+    }
+    /* Tarjetas de ejemplo */
+    .example-card {
+      background: white;
+      border-radius: 40px;
+      padding: 2.5rem 2rem;
+      margin-bottom: 3rem;
+      box-shadow: 0 25px 40px rgba(0,0,0,0.1);
+      transition: transform 0.3s;
+    }
+    .example-card:hover {
+      transform: translateY(-5px);
+    }
+    h2 {
+      font-size: 2.2rem;
+      color: #6c5ce7;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+    h3 {
+      font-size: 1.5rem;
+      color: #2d3436;
+      margin: 1.5rem 0 1rem;
+    }
+    .math-box {
+      background: #f1f2f6;
+      padding: 1.2rem;
+      border-radius: 20px;
+      font-size: 1.1rem;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      text-align: center;
+    }
+    pre {
+      border-radius: 20px !important;
+      margin: 1.5rem 0 !important;
+    }
+    .code-block-wrapper {
+      margin: 1.5rem 0;
+    }
+    .toggle-code-btn {
+      background: #6c5ce7;
+      border: none;
+      color: white;
+      font-weight: bold;
+      padding: 0.7rem 1.6rem;
+      border-radius: 30px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.3s;
+      box-shadow: 0 8px 18px rgba(108,92,231,0.4);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .toggle-code-btn:hover {
+      background: #5b4cc4;
+      transform: scale(1.03);
+    }
+    .code-container {
+      display: none;
+      animation: fadeIn 0.3s ease-in;
+    }
+    .code-container.visible {
+      display: block;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .copy-code-btn {
+      background: transparent;
+      border: 1px solid #dfe6e9;
+      color: #636e72;
+      font-size: 0.85rem;
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      cursor: pointer;
+      float: right;
+      margin-bottom: 0.5rem;
+      transition: 0.2s;
+    }
+    .copy-code-btn:hover {
+      background: #f1f2f6;
+      border-color: #6c5ce7;
+      color: #6c5ce7;
+    }
+    .interactive-area {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      align-items: center;
+      justify-content: center;
+      margin: 2rem 0;
+    }
+    canvas {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+      max-width: 100%;
+    }
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      min-width: 220px;
+    }
+    label {
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.8rem;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: #6c5ce7;
+    }
+    input[type="number"], select {
+      padding: 0.6rem;
+      border-radius: 12px;
+      border: 2px solid #dfe6e9;
+      font-size: 1rem;
+      width: 100%;
+    }
+    button {
+      background: #ff6b6b;
+      border: none;
+      color: white;
+      font-weight: bold;
+      padding: 0.8rem 1.5rem;
+      border-radius: 30px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.3s;
+      box-shadow: 0 8px 18px rgba(255,107,107,0.4);
+    }
+    button:hover {
+      background: #ee5a5a;
+      transform: scale(1.03);
+    }
+    .prediction-output {
+      background: #ffeaa7;
+      border-radius: 20px;
+      padding: 1rem 1.8rem;
+      font-weight: bold;
+      font-size: 1.3rem;
+      text-align: center;
+      min-width: 200px;
+    }
+    footer {
+      text-align: center;
+      margin-top: 4rem;
+      color: #636e72;
+      font-style: italic;
+    }
+    @media (max-width: 768px) {
+      header h1 { font-size: 2rem; }
+      .example-card { padding: 1.8rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🐍 Regresión Simple y Múltiple con Python</h1>
+    <p>La guía más divertida para aprender modelado predictivo usando Google Colab, datos CSV y sklearn</p>
+    <div class="prof-badge">👨‍🏫 Profe Regresión · 30+ años enseñando Python y Estadística</div>
+  </header>
+
+  <nav>
+    <a href="#simple">🍨 Regresión Simple</a>
+    <a href="#multiple">🏡 Regresión Múltiple</a>
+    <a href="#categorica">💼 Variables Categóricas</a>
+  </nav>
+
+  <div class="container">
+
+    <!-- EJEMPLO 1: REGRESIÓN SIMPLE -->
+    <section id="simple" class="example-card">
+      <h2><span>🍨</span> 1. Regresión Lineal Simple</h2>
+      <p><strong>Objetivo:</strong> Predecir las ventas de helado según la temperatura. ¡El calor derrite hasta los bolsillos!</p>
+      <h3>📊 El modelo matemático</h3>
+      <div class="math-box">
+        \[
+        \text{Ventas} = b_0 + b_1 \times \text{Temperatura}
+        \]
+        <br>
+        📏 <strong>Coeficientes estimados:</strong> \(b_0 \approx 200\), \(b_1 \approx 12\)
+      </div>
+      <p>🎯 <strong>Interpretación:</strong> Por cada grado que sube la temperatura, las ventas aumentan ~12 dólares.</p>
+
+      <!-- CÓDIGO PYTHON -->
+      <div class="code-block-wrapper">
+        <button class="toggle-code-btn" onclick="toggleCode('code1')">🐍 Ver / Ocultar código Python</button>
+        <div id="code1" class="code-container">
+          <button class="copy-code-btn" onclick="copyCode('code1')">📋 Copiar código</button>
+          <pre><code class="language-python"># Importar librerías
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+
+# 1. Generar datos sintéticos y guardar CSV
+np.random.seed(42)
+temperaturas = np.random.uniform(15, 40, 100)
+ventas = 200 + 12 * temperaturas + np.random.normal(0, 30, 100)
+df = pd.DataFrame({'temperatura': temperaturas, 'ventas': ventas})
+df.to_csv('heladeria.csv', index=False)
+
+# 2. Cargar datos desde CSV (como en un proyecto real)
+datos = pd.read_csv('heladeria.csv')
+X = datos[['temperatura']]   # Variable independiente (debe ser 2D)
+y = datos['ventas']          # Variable dependiente
+
+# 3. Crear y entrenar el modelo
+modelo = LinearRegression()
+modelo.fit(X, y)
+
+# 4. Mostrar resultados
+print(f"Intercepto (b0): {modelo.intercept_:.2f}")
+print(f"Pendiente (b1): {modelo.coef_[0]:.2f}")
+
+# 5. Predecir para una nueva temperatura
+nueva_temp = 32
+prediccion = modelo.predict([[nueva_temp]])
+print(f"Para {nueva_temp}°C se esperan ${prediccion[0]:.2f} en ventas.")
+
+# 6. Visualización
+plt.scatter(X, y, alpha=0.6, label='Datos')
+plt.plot(X, modelo.predict(X), color='red', linewidth=2, label='Recta')
+plt.xlabel('Temperatura (°C)')
+plt.ylabel('Ventas ($)')
+plt.legend()
+plt.title('Regresión Simple - Heladería')
+plt.show()</code></pre>
+        </div>
+      </div>
+
+      <h3>🕹️ ¡Experimenta tú mismo!</h3>
+      <div class="interactive-area">
+        <canvas id="chart1" width="450" height="320"></canvas>
+        <div class="controls">
+          <label>
+            Temperatura (°C)
+            <output id="tempValue">25</output>
+          </label>
+          <input type="range" id="tempSlider" min="15" max="40" value="25" step="0.1">
+          <div class="prediction-output">
+            🍦 Ventas previstas: <span id="pred1">500.00</span> $
+          </div>
+          <button id="randomizeData1">🔄 Generar nuevos datos</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- EJEMPLO 2: REGRESIÓN MÚLTIPLE -->
+    <section id="multiple" class="example-card">
+      <h2><span>🏡</span> 2. Regresión Lineal Múltiple</h2>
+      <p><strong>Objetivo:</strong> Predecir el valor mediano de una vivienda en California usando tres variables: ingreso mediano, antigüedad de la casa y número medio de habitaciones.</p>
+      <h3>📈 Modelo matemático</h3>
+      <div class="math-box">
+        \[
+        \text{MedHouseVal} = b_0 + b_1 \cdot \text{MedInc} + b_2 \cdot \text{HouseAge} + b_3 \cdot \text{AveRooms}
+        \]
+        <br>
+        📏 Coeficientes obtenidos:
+        \(b_0 \approx -2.736\), \(b_1 \approx 0.430\), \(b_2 \approx 0.012\), \(b_3 \approx -0.143\)
+      </div>
+
+      <!-- CÓDIGO PYTHON -->
+      <div class="code-block-wrapper">
+        <button class="toggle-code-btn" onclick="toggleCode('code2')">🐍 Ver / Ocultar código Python</button>
+        <div id="code2" class="code-container">
+          <button class="copy-code-btn" onclick="copyCode('code2')">📋 Copiar código</button>
+          <pre><code class="language-python"># Importar todo lo necesario
+import pandas as pd
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+from sklearn.datasets import fetch_california_housing
+import matplotlib.pyplot as plt
+
+# 1. Obtener datos reales y guardarlos como CSV (para simular carga)
+housing = fetch_california_housing(as_frame=True)
+df = housing.frame
+df.to_csv('housing.csv', index=False)
+
+# 2. Cargar desde CSV
+datos = pd.read_csv('housing.csv')
+# Seleccionamos 3 predictores clave
+X = datos[['MedInc', 'HouseAge', 'AveRooms']]
+y = datos['MedHouseVal']
+
+# 3. Dividir en entrenamiento y prueba
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# 4. Entrenar el modelo múltiple
+modelo_multi = LinearRegression()
+modelo_multi.fit(X_train, y_train)
+
+# 5. Mostrar coeficientes
+coef = pd.DataFrame({
+    'Variable': X.columns,
+    'Coeficiente': modelo_multi.coef_
+})
+print(coef)
+print(f"Intercepto: {modelo_multi.intercept_:.3f}")
+
+# 6. Evaluación en prueba
+predicciones = modelo_multi.predict(X_test)
+r2 = modelo_multi.score(X_test, y_test)
+print(f"R² en prueba: {r2:.3f}")
+
+# 7. Visualización de predicciones vs reales
+plt.scatter(y_test, predicciones, alpha=0.4)
+plt.plot([0, 5], [0, 5], 'r--')
+plt.xlabel('Valor real (cientos de miles $)')
+plt.ylabel('Predicción')
+plt.title('Predicciones vs. Valores Reales')
+plt.show()</code></pre>
+        </div>
+      </div>
+
+      <h3>🧮 Calculadora de predicción</h3>
+      <div class="interactive-area">
+        <div class="controls" style="min-width:280px;">
+          <label>Ingreso mediano (MedInc): <input type="number" id="medInc" value="4.0" step="0.1"></label>
+          <label>Antigüedad (HouseAge): <input type="number" id="houseAge" value="20" step="0.5"></label>
+          <label>Habitaciones promedio (AveRooms): <input type="number" id="aveRooms" value="5.0" step="0.1"></label>
+          <button id="calcMulti">🔮 Predecir precio</button>
+          <div class="prediction-output">
+            💰 Valor previsto: <span id="pred2">2.137</span> cientos de miles de $
+          </div>
+        </div>
+        <p style="max-width:400px;">💡 Un mayor ingreso incrementa fuertemente el valor; la antigüedad apenas lo mueve, y más habitaciones (sin otros ajustes) pueden incluso reducirlo.</p>
+      </div>
+    </section>
+
+    <!-- EJEMPLO 3: REGRESIÓN CON CATEGÓRICAS -->
+    <section id="categorica" class="example-card">
+      <h2><span>💼</span> 3. Regresión con Variables Categóricas</h2>
+      <p><strong>Objetivo:</strong> Predecir el salario según años de experiencia y nivel educativo (Bachillerato, Licenciatura, Maestría, Doctorado).</p>
+      <h3>🧬 Codificación one‑hot</h3>
+      <p>Convertimos la educación en columnas binarias (<em>dummies</em>) y dejamos “Bachillerato” como categoría base.</p>
+      <div class="math-box">
+        \[
+        \text{Salario} = b_0 + b_1 \cdot \text{Experiencia} + b_2 \cdot \text{Licenciatura} + b_3 \cdot \text{Maestría} + b_4 \cdot \text{Doctorado}
+        \]
+        <br>
+        📏 Coeficientes del modelo entrenado:
+        \(b_0 \approx 30000\), \(b_1 \approx 5000\), \(b_2 \approx 10000\), \(b_3 \approx 25000\), \(b_4 \approx 45000\)
+      </div>
+
+      <!-- CÓDIGO PYTHON -->
+      <div class="code-block-wrapper">
+        <button class="toggle-code-btn" onclick="toggleCode('code3')">🐍 Ver / Ocultar código Python</button>
+        <div id="code3" class="code-container">
+          <button class="copy-code-btn" onclick="copyCode('code3')">📋 Copiar código</button>
+          <pre><code class="language-python">import pandas as pd
+import numpy as np
+from sklearn.linear_model import LinearRegression
+
+# 1. Generar datos sintéticos
+np.random.seed(7)
+n = 150
+experiencia = np.random.uniform(0, 20, n)
+niveles = np.random.choice(
+    ['Bachillerato', 'Licenciatura', 'Maestría', 'Doctorado'],
+    size=n, p=[0.2, 0.4, 0.25, 0.15]
+)
+# Mapa de plus salarial según nivel
+bonus_edu = {'Bachillerato': 0, 'Licenciatura': 10000,
+             'Maestría': 25000, 'Doctorado': 45000}
+salario = 30000 + 5000 * experiencia + np.vectorize(bonus_edu.get)(niveles)
+salario += np.random.normal(0, 5000, n)  # ruido
+
+df = pd.DataFrame({'experiencia': experiencia,
+                   'educacion': niveles,
+                   'salario': salario})
+df.to_csv('salarios.csv', index=False)
+
+# 2. Cargar y preparar datos
+datos = pd.read_csv('salarios.csv')
+# Crear dummies (one-hot encoding) sin la primera categoría
+df_dummies = pd.get_dummies(datos, columns=['educacion'], drop_first=True)
+X = df_dummies.drop('salario', axis=1)
+y = df_dummies['salario']
+
+# 3. Modelo de regresión
+modelo = LinearRegression()
+modelo.fit(X, y)
+
+# 4. Resultados
+coef = pd.DataFrame({
+    'Variable': X.columns,
+    'Coeficiente': modelo.coef_
+})
+print(coef)
+print(f"Intercepto (Bachillerato, 0 exp): {modelo.intercept_:.2f}")
+
+# 5. Predicción para un perfil concreto
+perfil = pd.DataFrame({
+    'experiencia': [7],
+    'educacion_Licenciatura': [1],  # Licenciatura
+    'educacion_Maestría': [0],
+    'educacion_Doctorado': [0]
+})
+pred = modelo.predict(perfil)
+print(f"Salario estimado: ${pred[0]:,.2f}")</code></pre>
+        </div>
+      </div>
+
+      <h3>🎛️ Simulador de sueldo</h3>
+      <div class="interactive-area">
+        <div class="controls">
+          <label>Años de experiencia: <input type="range" id="expSlider" min="0" max="20" value="5" step="0.5"><output id="expValue">5</output></label>
+          <label>Nivel educativo:
+            <select id="eduSelect">
+              <option value="0">Bachillerato</option>
+              <option value="10000">Licenciatura</option>
+              <option value="25000">Maestría</option>
+              <option value="45000">Doctorado</option>
+            </select>
+          </label>
+          <div class="prediction-output">
+            💵 Salario previsto: <span id="pred3">55000</span> $/año
+          </div>
+        </div>
+        <canvas id="chart3" width="400" height="300"></canvas>
+      </div>
+    </section>
+
+  </div>
+
+  <footer>
+    👨‍🏫 Profe Regresión — “Enseñar regresión es enseñar a ver patrones donde otros solo ven nubes de puntos.”  
+    <br>Pega esta página en tu sitio y comparte la pasión por los datos con Python.
+  </footer>
+
+  <script>
+    // --- Utilidades para código ---
+    function toggleCode(id) {
+      const el = document.getElementById(id);
+      el.classList.toggle('visible');
+    }
+    function copyCode(containerId) {
+      const container = document.getElementById(containerId);
+      const code = container.querySelector('code').innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        alert('¡Código copiado al portapapeles!');
+      });
+    }
+
+    // --- EJEMPLO 1: Heladería ---
+    const canvas1 = document.getElementById('chart1');
+    const ctx1 = canvas1.getContext('2d');
+    const tempSlider = document.getElementById('tempSlider');
+    const tempValue = document.getElementById('tempValue');
+    const pred1Span = document.getElementById('pred1');
+    const randomizeBtn = document.getElementById('randomizeData1');
+
+    const b0 = 200, b1 = 12;
+    let scatterPoints = [];
+
+    function mulberry32(a) {
+      return function() {
+        a |= 0; a = a + 0x6D2B79F5 | 0;
+        var t = Math.imul(a ^ a >>> 15, 1 | a);
+        t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+      };
+    }
+
+    function generateScatter() {
+      let seed = Math.floor(Math.random() * 1000000);
+      const rand = mulberry32(seed);
+      scatterPoints = [];
+      for (let i = 0; i < 100; i++) {
+        const x = 15 + rand() * 25;
+        let u = 0, v = 0;
+        while(u === 0) u = rand();
+        while(v === 0) v = rand();
+        const z = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+        const noise = z * 30;
+        const y = b0 + b1 * x + noise;
+        scatterPoints.push({x, y});
+      }
+    }
+    generateScatter();
+
+    function drawPlot1(predX) {
+      const w = canvas1.width, h = canvas1.height;
+      ctx1.clearRect(0, 0, w, h);
+      const pad = 40, xMin = 15, xMax = 40, yMin = 0, yMax = 800;
+      const scaleX = (val) => pad + (val - xMin) / (xMax - xMin) * (w - 2*pad);
+      const scaleY = (val) => h - pad - (val - yMin) / (yMax - yMin) * (h - 2*pad);
+
+      ctx1.beginPath();
+      ctx1.moveTo(scaleX(xMin), scaleY(b0 + b1 * xMin));
+      ctx1.lineTo(scaleX(xMax), scaleY(b0 + b1 * xMax));
+      ctx1.strokeStyle = '#ff6b6b';
+      ctx1.lineWidth = 3;
+      ctx1.stroke();
+
+      ctx1.fillStyle = '#74b9ff';
+      scatterPoints.forEach(p => {
+        ctx1.beginPath();
+        ctx1.arc(scaleX(p.x), scaleY(p.y), 4, 0, 2*Math.PI);
+        ctx1.fill();
+      });
+
+      const predY = b0 + b1 * predX;
+      ctx1.fillStyle = '#d63031';
+      ctx1.beginPath();
+      ctx1.arc(scaleX(predX), scaleY(predY), 8, 0, 2*Math.PI);
+      ctx1.fill();
+      ctx1.strokeStyle = 'white';
+      ctx1.lineWidth = 2;
+      ctx1.stroke();
+
+      ctx1.fillStyle = '#2d3436';
+      ctx1.font = 'bold 14px "Segoe UI"';
+      ctx1.fillText(`(${predX.toFixed(1)}, ${predY.toFixed(0)})`, scaleX(predX)+12, scaleY(predY)-12);
+    }
+
+    function updatePrediction() {
+      const temp = parseFloat(tempSlider.value);
+      const ventas = b0 + b1 * temp;
+      tempValue.textContent = temp.toFixed(1);
+      pred1Span.textContent = ventas.toFixed(2);
+      drawPlot1(temp);
+    }
+
+    tempSlider.addEventListener('input', updatePrediction);
+    randomizeBtn.addEventListener('click', () => {
+      generateScatter();
+      updatePrediction();
+    });
+    updatePrediction();
+
+    // --- EJEMPLO 2: Múltiple ---
+    document.getElementById('calcMulti').addEventListener('click', () => {
+      const medInc = parseFloat(document.getElementById('medInc').value) || 4;
+      const houseAge = parseFloat(document.getElementById('houseAge').value) || 20;
+      const aveRooms = parseFloat(document.getElementById('aveRooms').value) || 5;
+      const b0m = -2.736, b1m = 0.430, b2m = 0.012, b3m = -0.143;
+      const pred = b0m + b1m * medInc + b2m * houseAge + b3m * aveRooms;
+      document.getElementById('pred2').textContent = pred.toFixed(3);
+    });
+    document.getElementById('calcMulti').click();
+
+    // --- EJEMPLO 3: Categóricas ---
+    const expSlider = document.getElementById('expSlider');
+    const expValue = document.getElementById('expValue');
+    const eduSelect = document.getElementById('eduSelect');
+    const pred3Span = document.getElementById('pred3');
+    const canvas3 = document.getElementById('chart3');
+    const ctx3 = canvas3.getContext('2d');
+    const b0c = 30000, b1c = 5000;
+    const eduBonus = {0:0, 10000:10000, 25000:25000, 45000:45000};
+
+    function drawSalaryChart(exp, bonus) {
+      const w = canvas3.width, h = canvas3.height;
+      ctx3.clearRect(0, 0, w, h);
+      const pad = 50, xMin = 0, xMax = 20, yMin = 20000, yMax = 130000;
+      const sx = (val) => pad + (val - xMin) / (xMax - xMin) * (w - 2*pad);
+      const sy = (val) => h - pad - (val - yMin) / (yMax - yMin) * (h - 2*pad);
+
+      const levels = [
+        {label: 'Bachillerato', bonus: 0, color: '#636e72'},
+        {label: 'Licenciatura', bonus: 10000, color: '#0984e3'},
+        {label: 'Maestría', bonus: 25000, color: '#6c5ce7'},
+        {label: 'Doctorado', bonus: 45000, color: '#d63031'}
+      ];
+      levels.forEach(lv => {
+        ctx3.beginPath();
+        ctx3.moveTo(sx(xMin), sy(b0c + b1c * xMin + lv.bonus));
+        ctx3.lineTo(sx(xMax), sy(b0c + b1c * xMax + lv.bonus));
+        ctx3.strokeStyle = lv.color;
+        ctx3.lineWidth = 2;
+        ctx3.stroke();
+        ctx3.fillStyle = lv.color;
+        ctx3.font = '11px "Segoe UI"';
+        ctx3.fillText(lv.label, sx(18), sy(b0c + b1c*18 + lv.bonus)-5);
+      });
+
+      const sal = b0c + b1c * exp + bonus;
+      ctx3.fillStyle = '#e17055';
+      ctx3.beginPath();
+      ctx3.arc(sx(exp), sy(sal), 8, 0, 2*Math.PI);
+      ctx3.fill();
+      ctx3.strokeStyle = 'white';
+      ctx3.lineWidth = 2;
+      ctx3.stroke();
+
+      ctx3.fillStyle = '#2d3436';
+      ctx3.font = 'bold 13px "Segoe UI"';
+      ctx3.fillText(`(${exp} años, $${sal})`, sx(exp)+10, sy(sal)-10);
+    }
+
+    function updateSalary() {
+      const exp = parseFloat(expSlider.value);
+      const bonus = parseFloat(eduSelect.value);
+      expValue.textContent = exp;
+      const salario = b0c + b1c * exp + bonus;
+      pred3Span.textContent = salario.toLocaleString();
+      drawSalaryChart(exp, bonus);
+    }
+
+    expSlider.addEventListener('input', updateSalary);
+    eduSelect.addEventListener('change', updateSalary);
+    updateSalary();
+
+    window.addEventListener('resize', () => {
+      updatePrediction();
+      updateSalary();
+    });
+  </script>
+</body>
+</html>
