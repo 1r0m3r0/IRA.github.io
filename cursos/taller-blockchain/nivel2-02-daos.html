@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Blockchain Adventure | DAOs - Organizaciones sin jefes</title>
+  <!-- Google Fonts y Font Awesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(145deg, #1a2a3a 0%, #0f1a2a 100%);
+      font-family: 'Inter', sans-serif;
+      color: #eef5ff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    .dao-container {
+      max-width: 1300px;
+      width: 100%;
+      background: rgba(20, 30, 45, 0.85);
+      backdrop-filter: blur(12px);
+      border-radius: 3rem;
+      border: 1px solid #66ccff;
+      box-shadow: 0 25px 45px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+    }
+
+    .hero {
+      background: linear-gradient(95deg, #1a2a3a, #0f1f2f);
+      padding: 1.5rem 2rem;
+      text-align: center;
+      border-bottom: 3px solid #66ccff;
+    }
+
+    .hero h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ccf0ff, #66ccff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero p {
+      margin-top: 0.5rem;
+      font-size: 1rem;
+      color: #cceeff;
+    }
+
+    .two-columns {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      padding: 1.5rem 2rem;
+    }
+
+    .explanation {
+      flex: 1;
+      background: #1a2535d9;
+      border-radius: 2rem;
+      padding: 1.2rem;
+      border: 1px solid #66ccff;
+    }
+
+    .explanation h3 {
+      color: #88ddff;
+      margin: 0.8rem 0 0.5rem;
+    }
+
+    .dao-simulator {
+      flex: 1.5;
+      background: #0f1a2acc;
+      border-radius: 2rem;
+      padding: 1.5rem;
+      border: 1px solid #66ccff;
+    }
+
+    .token-balance {
+      background: #00000066;
+      border-radius: 1.5rem;
+      padding: 0.8rem;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    .proposal-card {
+      background: #1e2e42;
+      border-radius: 1.5rem;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+
+    .vote-buttons {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .vote-btn {
+      background: #2a3a5a;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 2rem;
+      cursor: pointer;
+      transition: 0.2s;
+      color: #eef5ff;
+    }
+
+    .vote-btn.yes:hover { background: #2ecc71; }
+    .vote-btn.no:hover { background: #e74c3c; }
+    .vote-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .results {
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .feedback {
+      background: #00000099;
+      border-radius: 1.5rem;
+      padding: 0.8rem;
+      margin-top: 1rem;
+    }
+
+    footer {
+      text-align: center;
+      padding: 0.8rem;
+      font-size: 0.7rem;
+      border-top: 1px solid #66ccff44;
+    }
+
+    .nav-links {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      padding: 1.5rem 2rem;
+    }
+
+    .nav-link {
+      background: #2c3e66;
+      border: none;
+      padding: 0.7rem 1.5rem;
+      border-radius: 3rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      color: #eef5ff;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: 0.2s;
+      font-size: 0.95rem;
+    }
+
+    .nav-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 10px rgba(0, 224, 255, 0.4);
+    }
+
+    .nav-link.next { background: linear-gradient(95deg, #f0a500, #ff6a00); color: #1e1a0c; }
+    .nav-link.menu { background: #1a2a4a; border: 1px solid #3399ff; }
+
+    .create-proposal {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .create-proposal input {
+      flex: 1;
+      padding: 0.6rem 1rem;
+      border-radius: 2rem;
+      border: 1px solid #66ccff;
+      background: #1a2a3a;
+      color: #eef5ff;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+    }
+
+    .create-proposal input::placeholder { color: #88aacc; }
+
+    .progress-bar-container {
+      background: #0a1520;
+      border-radius: 1rem;
+      height: 1.2rem;
+      margin: 0.5rem 0;
+      display: flex;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-yes {
+      background: #2ecc71;
+      height: 100%;
+      transition: width 0.6s ease;
+      border-radius: 1rem 0 0 1rem;
+    }
+
+    .progress-no {
+      background: #e74c3c;
+      height: 100%;
+      transition: width 0.6s ease;
+    }
+
+    .progress-label {
+      position: absolute;
+      width: 100%;
+      text-align: center;
+      font-size: 0.7rem;
+      line-height: 1.2rem;
+      color: #fff;
+      text-shadow: 0 0 4px rgba(0,0,0,0.8);
+    }
+
+    .execution-badge {
+      display: inline-block;
+      background: #2ecc71;
+      color: #000;
+      padding: 0.2rem 0.6rem;
+      border-radius: 1rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+
+    .countdown {
+      font-size: 0.75rem;
+      color: #88ddff;
+      margin: 0.3rem 0;
+    }
+
+    .dao-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      margin: 1rem 0;
+    }
+
+    .stat-card {
+      background: #00000044;
+      border-radius: 1rem;
+      padding: 0.6rem;
+      text-align: center;
+    }
+
+    .stat-card .stat-number {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #66ccff;
+    }
+
+    .stat-card .stat-label {
+      font-size: 0.65rem;
+      color: #aaccee;
+    }
+
+    .vote-history {
+      margin-top: 1rem;
+      padding: 0.8rem;
+      background: #00000044;
+      border-radius: 1rem;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+
+    .vote-history h4 {
+      font-size: 0.8rem;
+      color: #88ddff;
+      margin-bottom: 0.4rem;
+    }
+
+    .vote-history-item {
+      font-size: 0.7rem;
+      padding: 0.2rem 0;
+      border-bottom: 1px solid #ffffff11;
+    }
+  </style>
+</head>
+<body>
+<div class="dao-container">
+  <div class="hero">
+    <h1><i class="fas fa-users"></i> DAOs: Organizaciones sin jefes</h1>
+    <p>Decisiones colectivas con tokens de gobierno</p>
+  </div>
+
+  <div class="two-columns">
+    <div class="explanation">
+      <i class="fas fa-landmark" style="font-size: 2rem; color: #66ccff;"></i>
+      <h3>🏛️ ¿Qué es una DAO?</h3>
+      <p>Una Organización Autónoma Descentralizada (DAO) es una entidad gobernada por reglas escritas en código (contratos inteligentes) y por sus miembros, que votan con tokens. No hay CEO ni jerarquía tradicional.</p>
+      <h3>🗳️ Cómo funciona</h3>
+      <p>Los miembros proponen proyectos o cambios. Luego, votan usando sus tokens (1 token = 1 voto). Si la propuesta gana, se ejecuta automáticamente en la blockchain.</p>
+      <h3>🌰 Ejemplos reales</h3>
+      <p>Uniswap, MakerDAO, y muchos fondos de inversión comunitarios.</p>
+
+      <div id="daoStats" class="dao-stats">
+        <div class="stat-card">
+          <div class="stat-number" id="statProposals">0</div>
+          <div class="stat-label">Propuestas</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="statVotes">0</div>
+          <div class="stat-label">Votos emitidos</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="statParticipation">0%</div>
+          <div class="stat-label">Participación</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="statExecuted">0</div>
+          <div class="stat-label">Ejecutadas</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dao-simulator">
+      <h3><i class="fas fa-vote-yea"></i> Simulación: Comunidad Blockchain</h3>
+      <div class="token-balance">
+        <i class="fas fa-coins"></i> Tus tokens de gobierno: <strong id="userTokens">100</strong> GOV
+      </div>
+
+      <div class="create-proposal">
+        <input type="text" id="proposalTitleInput" placeholder="Ej: Comprar NFTs para la comunidad..." maxlength="120">
+        <button id="createProposalBtn" class="vote-btn" style="background:#2ecc71; color:#000; font-weight:600;">+ Crear</button>
+      </div>
+
+      <div id="proposalsContainer"></div>
+
+      <div id="voteHistoryContainer" class="vote-history">
+        <h4><i class="fas fa-history"></i> Tu historial de votos</h4>
+        <div id="voteHistoryList"></div>
+      </div>
+
+      <button id="resetProposalsBtn" class="vote-btn" style="background:#555;">Reiniciar votaciones</button>
+      <div id="daoFeedback" class="feedback">💡 Vota con tus tokens. Cada decisión cuenta. ¡Democracia descentralizada!</div>
+    </div>
+  </div>
+
+  <div class="nav-links">
+    <a href="../../cursos/taller-blockchain/nivel2-01-nfts.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+    <a href="../../cursos/taller-blockchain/nivel2-03-interoperabilidad.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer>
+    <i class="fas fa-chart-line"></i> Las DAOs están cambiando la forma de organizarnos. ¡Tu voto importa!
+  </footer>
+</div>
+
+<script>
+  let proposals = [
+    { id: 0, title: "📚 Financiar curso de blockchain para escuelas", yesVotes: 45, noVotes: 20, totalWeight: 100, userVoted: false, createdAt: Date.now(), executed: false, executedAt: null },
+    { id: 1, title: "💻 Desarrollar app de trading descentralizada", yesVotes: 60, noVotes: 35, totalWeight: 100, userVoted: false, createdAt: Date.now(), executed: false, executedAt: null }
+  ];
+  let userTokens = 100;
+  let voteHistory = [];
+  let proposalIdCounter = 2;
+  let countdownInterval = null;
+
+  function loadDAOState() {
+    const savedProposals = localStorage.getItem('dao_proposals_c2');
+    const savedTokens = localStorage.getItem('dao_user_tokens');
+    const savedHistory = localStorage.getItem('dao_vote_history_c2');
+    if (savedProposals) {
+      try {
+        const parsed = JSON.parse(savedProposals);
+        if (parsed.length) {
+          proposals = parsed.map(p => ({
+            ...p,
+            createdAt: p.createdAt || Date.now(),
+            executed: p.executed || false,
+            executedAt: p.executedAt || null
+          }));
+          proposalIdCounter = Math.max(...proposals.map(p => p.id), -1) + 1;
+        }
+      } catch(e) {}
+    }
+    if (savedTokens && !isNaN(parseInt(savedTokens))) userTokens = parseInt(savedTokens);
+    if (savedHistory) {
+      try { voteHistory = JSON.parse(savedHistory); } catch(e) {}
+    }
+  }
+
+  function saveDAOState() {
+    localStorage.setItem('dao_proposals_c2', JSON.stringify(proposals));
+    localStorage.setItem('dao_user_tokens', userTokens);
+    localStorage.setItem('dao_vote_history_c2', JSON.stringify(voteHistory));
+  }
+
+  function getTimeRemaining(createdAt) {
+    const deadline = createdAt + 24 * 60 * 60 * 1000;
+    const now = Date.now();
+    const diff = deadline - now;
+    if (diff <= 0) return { expired: true, text: "⏰ Finalizada" };
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+    return { expired: false, text: `⏳ ${hours}h ${minutes}m ${seconds}s restantes` };
+  }
+
+  function checkExecution(prop) {
+    const total = prop.yesVotes + prop.noVotes;
+    if (!prop.executed && prop.yesVotes > prop.noVotes && total > 5) {
+      prop.executed = true;
+      prop.executedAt = new Date().toLocaleString();
+      return true;
+    }
+    return false;
+  }
+
+  function updateStats() {
+    const totalVotes = proposals.reduce((s, p) => s + p.yesVotes + p.noVotes, 0);
+    const votedProps = proposals.filter(p => p.userVoted).length;
+    const participation = proposals.length === 0 ? 0 : (votedProps / proposals.length) * 100;
+    const executedCount = proposals.filter(p => p.executed).length;
+
+    document.getElementById('statProposals').innerText = proposals.length;
+    document.getElementById('statVotes').innerText = totalVotes;
+    document.getElementById('statParticipation').innerText = participation.toFixed(0) + '%';
+    document.getElementById('statExecuted').innerText = executedCount;
+  }
+
+  function renderProposals() {
+    const container = document.getElementById('proposalsContainer');
+    container.innerHTML = '';
+    proposals.forEach(prop => {
+      const card = document.createElement('div');
+      card.className = 'proposal-card';
+      const total = prop.yesVotes + prop.noVotes;
+      const yesPercent = total === 0 ? 0 : (prop.yesVotes / total) * 100;
+      const noPercent = total === 0 ? 0 : (prop.noVotes / total) * 100;
+      const timeLeft = getTimeRemaining(prop.createdAt);
+      const executedBadge = prop.executed ? `<span class="execution-badge">✅ Ejecutada ${prop.executedAt}</span>` : '';
+
+      card.innerHTML = `
+        <div><strong>${prop.title}</strong> ${executedBadge}</div>
+        <div class="countdown">${timeLeft.text}</div>
+        <div class="progress-bar-container">
+          <div class="progress-yes" style="width:${yesPercent}%"></div>
+          <div class="progress-no" style="width:${noPercent}%"></div>
+          <div class="progress-label">${total > 0 ? `✅ ${yesPercent.toFixed(1)}%  |  ❌ ${noPercent.toFixed(1)}%` : 'Sin votos'}</div>
+        </div>
+        <div class="results">
+          ✅ A favor: ${prop.yesVotes} votos &nbsp;&nbsp;
+          ❌ En contra: ${prop.noVotes} votos
+        </div>
+        <div class="vote-buttons">
+          <button class="vote-btn yes" data-id="${prop.id}" data-vote="yes" ${prop.userVoted || timeLeft.expired ? 'disabled' : ''}>✅ Votar a favor (10 tokens)</button>
+          <button class="vote-btn no" data-id="${prop.id}" data-vote="no" ${prop.userVoted || timeLeft.expired ? 'disabled' : ''}>❌ Votar en contra (10 tokens)</button>
+        </div>
+        ${prop.userVoted ? '<span style="font-size:0.7rem;">✔️ Ya votaste en esta propuesta</span>' : ''}
+      `;
+      container.appendChild(card);
+    });
+
+    document.querySelectorAll('.vote-btn.yes, .vote-btn.no').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const propId = parseInt(btn.dataset.id);
+        const voteType = btn.dataset.vote;
+        voteOnProposal(propId, voteType);
+      });
+    });
+
+    document.getElementById('userTokens').innerText = userTokens;
+    updateStats();
+    renderVoteHistory();
+  }
+
+  function voteOnProposal(propId, voteType) {
+    const proposal = proposals.find(p => p.id === propId);
+    if (!proposal) return;
+    if (proposal.userVoted) {
+      document.getElementById('daoFeedback').innerHTML = "⚠️ Ya votaste en esta propuesta. En una DAO real, cada token solo puede votar una vez por propuesta.";
+      return;
+    }
+    if (userTokens < 10) {
+      document.getElementById('daoFeedback').innerHTML = "❌ No tienes suficientes tokens de gobierno. Gana más tokens participando en otras actividades del curso.";
+      return;
+    }
+    userTokens -= 10;
+    if (voteType === 'yes') {
+      proposal.yesVotes += 10;
+    } else {
+      proposal.noVotes += 10;
+    }
+    proposal.userVoted = true;
+
+    voteHistory.push({
+      proposalTitle: proposal.title,
+      vote: voteType,
+      timestamp: new Date().toLocaleString(),
+      tokensUsed: 10
+    });
+
+    const justExecuted = checkExecution(proposal);
+
+    saveDAOState();
+    renderProposals();
+    document.getElementById('daoFeedback').innerHTML = `🗳️ Has votado ${voteType === 'yes' ? 'a favor' : 'en contra'} de "${proposal.title}". Te quedan ${userTokens} tokens.${justExecuted ? ' 🎉 ¡La propuesta se ha ejecutado!' : ''}`;
+  }
+
+  function renderVoteHistory() {
+    const list = document.getElementById('voteHistoryList');
+    if (voteHistory.length === 0) {
+      list.innerHTML = '<div style="font-size:0.7rem;color:#8899aa;">Aún no has votado.</div>';
+      return;
+    }
+    list.innerHTML = voteHistory.slice().reverse().map(h => `
+      <div class="vote-history-item">${h.vote === 'yes' ? '✅' : '❌'} ${h.proposalTitle} — ${h.timestamp}</div>
+    `).join('');
+  }
+
+  function createProposal() {
+    const input = document.getElementById('proposalTitleInput');
+    const title = input.value.trim();
+    if (!title) {
+      document.getElementById('daoFeedback').innerHTML = "⚠️ Escribe un título para la propuesta.";
+      return;
+    }
+    if (title.length > 120) {
+      document.getElementById('daoFeedback').innerHTML = "⚠️ El título es demasiado largo (máx. 120 caracteres).";
+      return;
+    }
+    proposals.push({
+      id: proposalIdCounter++,
+      title: title,
+      yesVotes: 0,
+      noVotes: 0,
+      totalWeight: 100,
+      userVoted: false,
+      createdAt: Date.now(),
+      executed: false,
+      executedAt: null
+    });
+    input.value = '';
+    saveDAOState();
+    renderProposals();
+    document.getElementById('daoFeedback').innerHTML = `📝 Propuesta "${title}" creada. ¡A votar!`;
+  }
+
+  function resetVotes() {
+    if (confirm("¿Reiniciar todas las votaciones? Perderás tu historial de votos.")) {
+      proposals = [
+        { id: 0, title: "📚 Financiar curso de blockchain para escuelas", yesVotes: 45, noVotes: 20, totalWeight: 100, userVoted: false, createdAt: Date.now(), executed: false, executedAt: null },
+        { id: 1, title: "💻 Desarrollar app de trading descentralizada", yesVotes: 60, noVotes: 35, totalWeight: 100, userVoted: false, createdAt: Date.now(), executed: false, executedAt: null }
+      ];
+      userTokens = 100;
+      voteHistory = [];
+      proposalIdCounter = 2;
+      saveDAOState();
+      renderProposals();
+      document.getElementById('daoFeedback').innerHTML = "🔄 Votaciones reiniciadas. Tienes 100 tokens nuevamente. ¡Decide el futuro de la comunidad!";
+    }
+  }
+
+  function tickCountdowns() {
+    renderProposals();
+  }
+
+  document.getElementById('resetProposalsBtn').addEventListener('click', resetVotes);
+  document.getElementById('createProposalBtn').addEventListener('click', createProposal);
+  document.getElementById('proposalTitleInput').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') createProposal();
+  });
+
+  loadDAOState();
+  renderProposals();
+  countdownInterval = setInterval(tickCountdowns, 1000);
+</script>
+</body>
+</html>

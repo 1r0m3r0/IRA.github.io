@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Blockchain Adventure | Mi Monedero Secreto (Wallet)</title>
+  <!-- Google Fonts y Font Awesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(145deg, #0a0f1c 0%, #0c1225 100%);
+      font-family: 'Inter', sans-serif;
+      color: #eef5ff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    .wallet-container {
+      max-width: 1300px;
+      width: 100%;
+      background: rgba(12, 22, 40, 0.8);
+      backdrop-filter: blur(10px);
+      border-radius: 3rem;
+      border: 1px solid rgba(0, 255, 200, 0.5);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+    }
+
+    .hero {
+      background: linear-gradient(95deg, #0e1628, #181f3a);
+      padding: 1.5rem 2rem;
+      text-align: center;
+      border-bottom: 3px solid #0ff;
+    }
+
+    .hero h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #aaffff, #0ff, #2a9eff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero p {
+      margin-top: 0.5rem;
+      font-size: 1rem;
+      color: #b8f2ff;
+    }
+
+    .two-columns {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      padding: 1.5rem 2rem;
+    }
+
+    .explanation {
+      flex: 1;
+      background: #0f1a2cd9;
+      border-radius: 2rem;
+      padding: 1.2rem;
+      border: 1px solid #0ff;
+    }
+
+    .explanation h3 {
+      color: #0ff;
+      margin: 0.8rem 0 0.5rem;
+    }
+
+    .wallet-simulator {
+      flex: 1.5;
+      background: #07121ecc;
+      border-radius: 2rem;
+      padding: 1.5rem;
+      text-align: center;
+      border: 1px solid #0ff;
+    }
+
+    .wallet-card {
+      background: #000000aa;
+      border-radius: 1.5rem;
+      padding: 1rem;
+      margin: 1rem 0;
+      font-family: monospace;
+      word-break: break-all;
+    }
+
+    .address {
+      font-size: 1rem;
+      background: #001e2f;
+      padding: 0.5rem;
+      border-radius: 1rem;
+    }
+
+    .private-key-area {
+      background: #2a1a1a;
+      border-left: 5px solid #ff5555;
+      margin-top: 0.5rem;
+    }
+
+    .seed-area {
+      background: #1a2a1a;
+      border-left: 5px solid #55ff55;
+    }
+
+    .btn-wallet {
+      background: linear-gradient(95deg, #0ff, #0a8faa);
+      border: none;
+      padding: 0.7rem 1.5rem;
+      border-radius: 3rem;
+      font-weight: bold;
+      cursor: pointer;
+      margin: 0.5rem;
+      transition: 0.2s;
+    }
+
+    .btn-wallet:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-danger {
+      background: linear-gradient(95deg, #ff5555, #aa3333);
+    }
+
+    .transaction-demo {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: #0a1424;
+      border-radius: 1.5rem;
+    }
+
+    .input-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .input-group input {
+      flex: 2;
+      background: #001e2f;
+      border: 1px solid #0ff;
+      padding: 0.5rem;
+      border-radius: 1rem;
+      color: white;
+    }
+
+    .balance {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #ffd966;
+      transition: color 0.3s;
+    }
+    .balance-up {
+      color: #55ff55 !important;
+    }
+    .balance-down {
+      color: #ff5555 !important;
+    }
+    @keyframes flashGreen {
+      0% { color: #55ff55; transform: scale(1.1); }
+      100% { color: #ffd966; transform: scale(1); }
+    }
+    @keyframes flashRed {
+      0% { color: #ff5555; transform: scale(1.1); }
+      100% { color: #ffd966; transform: scale(1); }
+    }
+
+    .usd-value {
+      font-size: 0.85rem;
+      color: #88bbaa;
+      margin-top: 0.2rem;
+    }
+
+    .qr-visual {
+      display: inline-block;
+      background: #0a0f1c;
+      border: 2px solid #0ff;
+      border-radius: 0.8rem;
+      padding: 0.4rem;
+      margin: 0.5rem auto;
+      width: 90px;
+      height: 90px;
+      position: relative;
+    }
+    .qr-visual .qr-inner {
+      width: 100%;
+      height: 100%;
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      grid-template-rows: repeat(6, 1fr);
+      gap: 2px;
+    }
+    .qr-visual .qr-cell {
+      border-radius: 1px;
+    }
+    .qr-cell.on { background: #0ff; }
+    .qr-cell.off { background: #0a1628; }
+
+    .feedback {
+      background: #00000099;
+      border-radius: 1.5rem;
+      padding: 0.8rem;
+      margin-top: 1rem;
+    }
+
+    .tx-history {
+      margin-top: 0.8rem;
+      text-align: left;
+    }
+    .tx-history h5 {
+      color: #0ff;
+      margin-bottom: 0.4rem;
+      font-size: 0.85rem;
+    }
+    .tx-history-item {
+      background: #00000055;
+      border-left: 3px solid #f7931a;
+      padding: 0.3rem 0.6rem;
+      margin: 0.3rem 0;
+      border-radius: 0.5rem;
+      font-size: 0.75rem;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 1rem;
+      height: 1rem;
+      border: 2px solid #ffffff33;
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      vertical-align: middle;
+      margin-right: 0.3rem;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    footer {
+      text-align: center;
+      padding: 0.8rem;
+      font-size: 0.7rem;
+      border-top: 1px solid #0ff44;
+    }
+
+    .warning {
+      color: #ffaa66;
+      font-size: 0.8rem;
+    }
+    .nav-links {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      padding: 1.5rem 2rem;
+    }
+    .nav-link {
+      background: #2c3e66;
+      border: none;
+      padding: 0.7rem 1.5rem;
+      border-radius: 3rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      color: #eef5ff;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: 0.2s;
+      font-size: 0.95rem;
+    }
+    .nav-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 10px rgba(0, 224, 255, 0.4);
+    }
+    .nav-link.next { background: linear-gradient(95deg, #f0a500, #ff6a00); color: #1e1a0c; }
+    .nav-link.menu { background: #1a2a4a; border: 1px solid #3399ff; }
+  </style>
+</head>
+<body>
+<div class="wallet-container">
+  <div class="hero">
+    <h1><i class="fas fa-wallet"></i> Mi Monedero Secreto</h1>
+    <p>Dirección pública, clave privada y frase semilla: las llaves de tu criptofuturo</p>
+  </div>
+
+  <div class="two-columns">
+    <!-- Explicación -->
+    <div class="explanation">
+      <i class="fas fa-key" style="font-size: 2rem; color: #0ff;"></i>
+      <h3>🔑 ¿Qué es una Wallet?</h3>
+      <p>Una cartera digital no guarda monedas físicas, sino <strong>claves criptográficas</strong> que te permiten firmar transacciones.</p>
+      <h3>🌐 Dirección pública</h3>
+      <p>Es como tu número de cuenta bancaria. Puedes compartirla para recibir fondos. Ejemplo: <code>1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa</code></p>
+      <h3>🔒 Clave privada</h3>
+      <p>Es tu PIN secreto. <strong class="warning">Nunca la compartas</strong>. Quien la posee controla tus fondos.</p>
+      <h3>🌱 Frase semilla (seed phrase)</h3>
+      <p>12 o 24 palabras que pueden regenerar todas tus claves. ¡Guárdala en un lugar seguro!</p>
+      <p><i class="fas fa-shield-alt"></i> En esta simulación aprenderás a generar una cartera y realizar una transacción.</p>
+    </div>
+
+    <!-- Simulador interactivo -->
+    <div class="wallet-simulator">
+      <h3><i class="fas fa-magic"></i> Genera tu Cartera de Prueba</h3>
+      <button id="generateWalletBtn" class="btn-wallet"><i class="fas fa-sync-alt"></i> Generar nueva cartera</button>
+      
+      <div id="walletInfo" class="wallet-card">
+        <div><i class="fas fa-address-card"></i> <strong>Dirección pública:</strong></div>
+        <div class="address" id="publicAddress">---</div>
+        <div id="qrVisual" class="qr-visual" style="display:none;">
+          <div class="qr-inner" id="qrGrid"></div>
+        </div>
+        <div id="privateKeyArea" class="private-key-area" style="display:none;">
+          <div><i class="fas fa-lock"></i> <strong>Clave privada (secreta):</strong></div>
+          <div id="privateKey" style="background:#331111; padding:0.5rem; border-radius:0.8rem;">---</div>
+          <div class="warning">⚠️ En la vida real, NUNCA muestres tu clave privada a nadie.</div>
+        </div>
+        <div id="seedArea" class="seed-area" style="display:none; margin-top:0.5rem;">
+          <div><i class="fas fa-seedling"></i> <strong>Frase semilla (12 palabras):</strong></div>
+          <div id="seedPhrase" style="background:#113311; padding:0.5rem; border-radius:0.8rem;">---</div>
+          <div class="warning">📝 Guárdala en papel. ¡Sin ella no podrás recuperar tus fondos!</div>
+        </div>
+      </div>
+
+      <button id="showKeysBtn" class="btn-wallet"><i class="fas fa-eye"></i> Mostrar clave privada y semilla (solo por un momento)</button>
+
+      <!-- Simulación de saldo y transacción -->
+      <div class="transaction-demo">
+        <h4><i class="fas fa-exchange-alt"></i> Simular transacción</h4>
+        <div>Saldo actual: <span id="balanceAmount" class="balance">1.5000</span> BTC</div>
+        <div class="usd-value" id="usdDisplay">≈ $0.00 USD</div>
+        <div class="input-group">
+          <input type="text" id="destAddress" placeholder="Dirección destino (ej: 1DestinoFalso...)">
+          <input type="number" id="amountToSend" placeholder="Cantidad BTC" step="0.01" value="0.1">
+          <button id="sendTxBtn" class="btn-wallet" style="background: #f7931a;">Enviar</button>
+        </div>
+        <div id="txFeedback" class="feedback"></div>
+        <div class="tx-history" id="txHistory" style="display:none;">
+          <h5><i class="fas fa-history"></i> Historial de transacciones</h5>
+          <div id="txHistoryList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-links">
+    <a href="../../cursos/taller-blockchain/05-bitcoin-mineria.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+    <a href="../../cursos/taller-blockchain/07-contratos-inteligentes.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer>
+    <i class="fas fa-shield-alt"></i> Recuerda: ¡Tu clave privada es tuya! Nunca la compartas. Esta es una simulación educativa.
+  </footer>
+</div>
+
+<script>
+  // ====================================================
+  // Simulación de cartera con localStorage y mejoras UI
+  // ====================================================
+
+  let currentWallet = {
+    publicAddress: "",
+    privateKey: "",
+    seedPhrase: "",
+    balance: 1.5,
+    txHistory: []
+  };
+
+  let btcUsdPrice = 35000;
+  let isProcessing = false;
+
+  // ---------- Palabras para seed ----------
+  const wordList = ["abandon", "ability", "able", "about", "above", "absent", "absorb", "abstract", "absurd", "abuse", "access", "accident", "account", "accuse", "achieve", "acid", "acoustic", "acquire", "across", "act", "action", "actor", "actress", "actual", "adapt", "add", "addict", "address", "adjust", "admit", "adult", "advance", "advice", "aerobic", "affair", "afford", "afraid", "africa", "africa", "after", "again", "age", "agent", "agree", "ahead", "aim", "air", "airport", "aisle", "alarm", "album", "alcohol", "alert", "alien", "all", "alley", "allow", "almost", "alone", "alpha", "already", "also", "alter", "always", "amazing", "among", "amount", "amuse", "anchor", "ancient", "anger", "angle", "angry", "animal", "ankle", "announce", "annual", "another", "answer", "antenna", "antique", "anxiety", "any", "apart", "apology", "appear", "apple", "approve", "april", "arch", "arctic", "area", "arena", "argue", "arm", "armed", "armor", "army", "around", "arrange", "arrest", "arrive", "arrow", "art", "artefact", "artist", "artwork", "ask", "aspect", "assault", "asset", "assist", "assume", "asthma", "athlete", "atom", "attack", "attend", "attitude", "attract", "auction", "audit", "august", "aunt", "author", "auto", "autumn", "average", "avocado", "avoid", "awake", "aware", "away", "awesome", "awful", "awkward", "axis", "baby", "bachelor", "bacon", "badge", "bag", "balance", "balcony", "ball", "bamboo", "banana", "banner", "bar", "barely", "bargain", "barrel", "base", "basic", "basket", "battle", "beach", "bean", "beauty", "because", "become", "beef", "before", "begin", "behave", "behind", "believe", "below", "belt", "bench", "benefit", "best", "betray", "better", "between", "beyond", "bicycle", "bid", "bike", "bind", "biology", "bird", "birth", "bitter", "black", "blade", "blame", "blanket", "blast", "bleak", "bless", "blind", "blood", "blossom", "blouse", "blue", "blur", "blush", "board", "boat", "body", "boil", "bomb", "bone", "bonus", "book", "boost", "border", "boring", "borrow", "boss", "bottom", "bounce", "box", "boy", "bracket", "brain", "brand", "brass", "brave", "bread", "breeze", "brick", "bridge", "brief", "bright", "bring", "brisk", "broccoli", "broken", "bronze", "broom", "brother", "brown", "brush", "bubble", "buddy", "budget", "buffalo", "build", "bulb", "bulk", "bullet", "bundle", "bunker", "burden", "burger", "burst", "bus", "business", "busy", "butter", "buyer", "buzz", "cabbage", "cabin", "cable", "cactus", "cage", "cake", "call", "calm", "camera", "camp", "can", "canal", "cancel", "candy", "cannon", "canoe", "canvas", "canyon", "capable", "capital", "captain", "car", "carbon", "card", "cargo", "carpet", "carry", "cart", "case", "cash", "casino", "castle", "casual", "cat", "catalog", "catch", "category", "cattle", "caught", "cause", "caution", "cave", "ceiling", "celery", "cement", "census", "century", "cereal", "certain", "chair", "chalk", "champion", "change", "chaos", "chapter", "charge", "chase", "chat", "cheap", "check", "cheese", "chef", "cherry", "chest", "chicken", "chief", "child", "chimney", "choice", "choose", "chronic", "chuckle", "chunk", "churn", "cigar", "cinnamon", "circle", "citizen", "city", "civil", "claim", "clap", "clarify", "claw", "clay", "clean", "clerk", "clever", "click", "client", "cliff", "climb", "clinic", "clip", "clock", "clog", "close", "cloth", "cloud", "clown", "club", "clump", "cluster", "clutch", "coach", "coast", "coconut", "code", "coffee", "coil", "coin", "collect", "color", "column", "combine", "come", "comfort", "comic", "common", "company", "concert", "conduct", "confirm", "congress", "connect", "consider", "control", "convince", "cook", "cool", "copper", "copy", "coral", "core", "corn", "correct", "cost", "cotton", "couch", "country", "couple", "course", "cousin", "cover", "coyote", "crack", "cradle", "craft", "cram", "crane", "crash", "crater", "crawl", "crazy", "cream", "credit", "creek", "crew", "cricket", "crime", "crisp", "critic", "crop", "cross", "crouch", "crowd", "crucial", "cruel", "cruise", "crumble", "crunch", "crush", "cry", "crystal", "cube", "culture", "cup", "cupboard", "curious", "current", "curtain", "curve", "cushion", "custom", "cute", "cycle", "dad", "damage", "damp", "dance", "danger", "daring", "dash", "daughter", "dawn", "day", "deal", "debate", "debris", "decade", "december", "decide", "decline", "decorate", "decrease", "deer", "defense", "define", "defy", "degree", "delay", "deliver", "demand", "demise", "denial", "dentist", "deny", "depart", "depend", "deposit", "depth", "deputy", "derive", "describe", "desert", "design", "desk", "despair", "destroy", "detail", "detect", "develop", "device", "devote", "diagram", "dial", "diamond", "diary", "dice", "diesel", "diet", "differ", "digital", "dignity", "dilemma", "dinner", "dinosaur", "direct", "dirt", "disagree", "discover", "disease", "dish", "dismiss", "disorder", "display", "distance", "divert", "divide", "divorce", "dizzy", "doctor", "document", "dog", "doll", "dolphin", "domain", "donate", "donkey", "donor", "door", "dose", "double", "dove", "draft", "dragon", "drama", "drastic", "draw", "dream", "dress", "drift", "drill", "drink", "drip", "drive", "drop", "drum", "dry", "duck", "dumb", "dune", "during", "dust", "dutch", "duty", "dwarf", "dynamic", "eager", "eagle", "early", "earn", "earth", "easily", "east", "easy", "echo", "ecology", "economy", "edge", "edit", "educate", "effort", "egg", "eight", "either", "elbow", "elder", "electric", "elegant", "element", "elephant", "elevator", "elite", "else", "embark", "embody", "embrace", "emerge", "emotion", "employ", "empower", "empty", "enable", "enact", "end", "endless", "endorse", "enemy", "energy", "enforce", "engage", "engine", "enhance", "enjoy", "enlist", "enough", "enrich", "enroll", "ensure", "enter", "entire", "entry", "envelope", "episode", "equal", "equip", "era", "erase", "erode", "erosion", "error", "erupt", "escape", "essay", "essence", "estate", "eternal", "ethics", "evidence", "evil", "evoke", "evolve", "exact", "examine", "example", "exceed", "exchange", "excite", "exclude", "excuse", "execute", "exercise", "exhaust", "exhibit", "exile", "exist", "exit", "exotic", "expand", "expect", "expire", "explain", "expose", "extend", "extra", "eye", "eyebrow", "fabric", "face", "faculty", "fade", "faint", "faith", "fall", "false", "fame", "family", "famous", "fan", "fancy", "fantasy", "farm", "fashion", "fat", "fatal", "father", "fatigue", "fault", "favorite", "feature", "february", "federal", "fee", "feed", "feel", "female", "fence", "festival", "fetch", "fever", "few", "fiber", "fiction", "field", "figure", "file", "film", "filter", "final", "find", "fine", "finger", "finish", "fire", "firm", "first", "fiscal", "fish", "fit", "fitness", "fix", "flag", "flame", "flash", "flat", "flavor", "flee", "flight", "flip", "float", "flock", "floor", "flower", "fluid", "flush", "fly", "foam", "focus", "fog", "foil", "fold", "follow", "food", "foot", "force", "foreign", "forest", "forget", "fork", "fortune", "forum", "forward", "fossil", "foster", "found", "fox", "fragile", "frame", "frequent", "fresh", "friend", "fringe", "frog", "front", "frost", "frown", "frozen", "fruit", "fuel", "fun", "funny", "furnace", "fury", "future", "gadget", "gain", "galaxy", "gallery", "game", "gap", "garage", "garbage", "garden", "garlic", "garment", "gas", "gasp", "gate", "gather", "gauge", "gaze", "general", "genius", "genre", "gentle", "genuine", "gesture", "ghost", "giant", "gift", "giggle", "ginger", "giraffe", "girl", "give", "glad", "glance", "glare", "glass", "glide", "glimpse", "globe", "gloom", "glory", "glove", "glow", "glue", "goat", "goddess", "gold", "good", "goose", "gorilla", "gospel", "gossip", "govern", "gown", "grab", "grace", "grain", "grant", "grape", "grass", "gravity", "great", "green", "grid", "grief", "grit", "grocery", "group", "grow", "grunt", "guard", "guess", "guide", "guilt", "guitar", "gun", "gym", "habit", "hair", "half", "hammer", "hamster", "hand", "happy", "harbor", "hard", "harsh", "harvest", "hat", "have", "hawk", "hazard", "head", "health", "heart", "heavy", "hedgehog", "height", "hello", "helmet", "help", "hen", "hero", "hidden", "high", "hill", "hint", "hip", "hire", "history", "hobby", "hockey", "hold", "hole", "holiday", "hollow", "home", "honey", "hood", "hope", "horn", "horror", "horse", "hospital", "host", "hotel", "hour", "hover", "hub", "huge", "human", "humble", "humor", "hundred", "hungry", "hunt", "hurdle", "hurry", "hurt", "husband", "hybrid", "ice", "icon", "idea", "identify", "idle", "ignore", "ill", "illegal", "illness", "image", "imitate", "immense", "immune", "impact", "impose", "improve", "impulse", "inch", "include", "income", "increase", "index", "indicate", "indoor", "industry", "infant", "inflict", "inform", "inhale", "inherit", "initial", "inject", "injury", "inmate", "inner", "innocent", "input", "inquiry", "insane", "insect", "inside", "inspire", "install", "intact", "interest", "into", "invest", "invite", "involve", "iron", "island", "isolate", "issue", "item", "ivory", "jacket", "jaguar", "jar", "jazz", "jealous", "jeans", "jelly", "jewel", "job", "join", "joke", "journey", "joy", "judge", "juice", "jump", "jungle", "junior", "junk", "just", "kangaroo", "keen", "keep", "ketchup", "key", "kick", "kid", "kidney", "kind", "kingdom", "kiss", "kit", "kitchen", "kite", "kitten", "kiwi", "knee", "knife", "knock", "know", "lab", "label", "labor", "ladder", "lady", "lake", "lamp", "language", "laptop", "large", "later", "latin", "laugh", "laundry", "lava", "law", "lawn", "lawsuit", "layer", "lazy", "leader", "leaf", "learn", "leave", "lecture", "left", "leg", "legal", "legend", "leisure", "lemon", "lend", "length", "lens", "leopard", "lesson", "letter", "level", "liar", "liberty", "library", "license", "life", "lift", "light", "like", "limb", "limit", "link", "lion", "liquid", "list", "little", "live", "lizard", "load", "loan", "lobster", "local", "lock", "logic", "lonely", "long", "loop", "lottery", "loud", "lounge", "love", "loyal", "lucky", "luggage", "lumber", "lunar", "lunch", "luxury", "lyrics", "machine", "mad", "magic", "magnet", "maid", "mail", "main", "major", "make", "mammal", "man", "manage", "mandate", "mango", "mansion", "manual", "maple", "marble", "march", "margin", "marine", "market", "marriage", "mask", "mass", "master", "match", "material", "math", "matrix", "matter", "maximum", "maze", "meadow", "mean", "measure", "meat", "mechanic", "medal", "media", "melody", "melt", "member", "memory", "mention", "menu", "mercy", "merge", "merit", "merry", "mesh", "message", "metal", "method", "middle", "midnight", "milk", "million", "mimic", "mind", "minimum", "minor", "minute", "miracle", "mirror", "misery", "miss", "mistake", "mix", "mixed", "mixture", "mobile", "model", "modify", "mom", "moment", "monitor", "monkey", "monster", "month", "moon", "moral", "more", "morning", "mosquito", "mother", "motion", "motor", "mountain", "mouse", "move", "movie", "much", "muffin", "mule", "multiply", "muscle", "museum", "mushroom", "music", "must", "mutual", "myself", "mystery", "myth", "naive", "name", "napkin", "narrow", "nasty", "nation", "nature", "near", "neck", "need", "negative", "neglect", "neither", "nephew", "nerve", "nest", "net", "network", "neutral", "never", "news", "next", "nice", "night", "noble", "noise", "nominee", "noodle", "normal", "north", "nose", "notable", "note", "nothing", "notice", "novel", "now", "nuclear", "number", "nurse", "nut", "oak", "obey", "object", "oblige", "obscure", "observe", "obtain", "obvious", "occur", "ocean", "october", "odor", "off", "offense", "offer", "office", "often", "oil", "okay", "old", "olive", "olympic", "omit", "once", "one", "onion", "online", "only", "open", "opera", "opinion", "oppose", "option", "orange", "orbit", "orchard", "order", "ordinary", "organ", "orient", "original", "orphan", "ostrich", "other", "outdoor", "outer", "output", "outside", "oval", "oven", "over", "own", "owner", "oxygen", "oyster", "ozone", "pact", "paddle", "page", "pair", "palace", "palm", "panda", "panel", "panic", "panther", "paper", "parade", "parent", "park", "parrot", "party", "pass", "patch", "path", "patient", "patrol", "pattern", "pause", "pave", "payment", "peace", "peanut", "pear", "peasant", "pelican", "pen", "penalty", "pencil", "people", "pepper", "perfect", "permit", "person", "pet", "phone", "photo", "phrase", "physical", "piano", "picnic", "picture", "piece", "pig", "pigeon", "pill", "pilot", "pink", "pioneer", "pipe", "pistol", "pitch", "pizza", "place", "planet", "plastic", "plate", "play", "please", "pledge", "pluck", "plug", "plunge", "poem", "poet", "point", "polar", "pole", "police", "pond", "pony", "pool", "popular", "portion", "position", "possible", "post", "potato", "pottery", "poverty", "powder", "power", "practice", "praise", "predict", "prefer", "prepare", "present", "pretty", "prevent", "price", "pride", "primary", "print", "priority", "prison", "private", "prize", "problem", "process", "produce", "profit", "program", "project", "promote", "proof", "property", "prosper", "protect", "proud", "provide", "public", "pudding", "pull", "pulp", "pulse", "pumpkin", "punch", "pupil", "puppy", "purchase", "purity", "purpose", "purse", "push", "put", "puzzle", "pyramid", "quality", "quantum", "quarter", "question", "quick", "quit", "quiz", "quote", "rabbit", "raccoon", "race", "rack", "radar", "radio", "rail", "rain", "raise", "rally", "ramp", "ranch", "random", "range", "rapid", "rare", "rate", "rather", "raven", "raw", "razor", "ready", "real", "reason", "rebel", "rebuild", "recall", "receive", "recipe", "record", "recycle", "reduce", "reflect", "reform", "refuse", "region", "regret", "regular", "reject", "relax", "release", "relief", "rely", "remain", "remember", "remind", "remove", "render", "renew", "rent", "reopen", "repair", "repeat", "replace", "report", "require", "rescue", "resemble", "resist", "resource", "response", "result", "retire", "retreat", "return", "reunion", "reveal", "review", "reward", "rhythm", "rib", "ribbon", "rice", "rich", "ride", "ridge", "rifle", "right", "rigid", "ring", "riot", "ripple", "risk", "ritual", "rival", "river", "road", "roast", "robot", "robust", "rocket", "romance", "roof", "rookie", "room", "rose", "rotate", "rough", "round", "route", "royal", "rubber", "rude", "rug", "rule", "run", "runway", "rural", "sad", "saddle", "sadness", "safe", "sail", "salad", "salmon", "salon", "salt", "salute", "same", "sample", "sand", "satisfy", "satoshi", "sauce", "sausage", "save", "say", "scale", "scan", "scare", "scatter", "scene", "scheme", "school", "science", "scissors", "scorpion", "scout", "scrap", "screen", "script", "scrub", "sea", "search", "season", "seat", "second", "secret", "section", "security", "seed", "seek", "segment", "select", "sell", "seminar", "senior", "sense", "sentence", "series", "service", "session", "settle", "setup", "seven", "shadow", "shaft", "shallow", "share", "shed", "shell", "sheriff", "shield", "shift", "shine", "ship", "shiver", "shock", "shoe", "shoot", "shop", "short", "shoulder", "shove", "shrimp", "shrug", "shuffle", "shy", "sibling", "sick", "side", "siege", "sight", "sign", "silent", "silk", "silly", "silver", "similar", "simple", "since", "sing", "siren", "sister", "situate", "six", "size", "skate", "sketch", "ski", "skill", "skin", "skirt", "skull", "slab", "slam", "sleep", "slender", "slice", "slide", "slight", "slim", "slogan", "slot", "slow", "slush", "small", "smart", "smile", "smoke", "smooth", "snack", "snake", "snap", "sniff", "snow", "soap", "soccer", "social", "sock", "soda", "soft", "solar", "soldier", "solid", "solution", "solve", "someone", "song", "soon", "sorry", "sort", "soul", "sound", "soup", "source", "south", "space", "spare", "spatial", "spawn", "speak", "special", "speed", "spell", "spend", "sphere", "spice", "spider", "spike", "spin", "spirit", "split", "spoil", "sponsor", "spoon", "sport", "spot", "spray", "spread", "spring", "spy", "square", "squeeze", "squirrel", "stable", "stadium", "staff", "stage", "stairs", "stamp", "stand", "start", "state", "stay", "steak", "steel", "step", "stereo", "stick", "still", "sting", "stock", "stomach", "stone", "stool", "story", "stove", "strategy", "street", "strike", "strong", "struggle", "student", "stuff", "stumble", "style", "subject", "submit", "subway", "success", "such", "sudden", "suffer", "sugar", "suggest", "suit", "sun", "sunny", "sunset", "super", "supply", "support", "suppose", "sure", "surface", "surge", "surprise", "surround", "survey", "suspect", "sustain", "swallow", "swamp", "swap", "swarm", "swear", "sweet", "swift", "swim", "swing", "switch", "sword", "symbol", "symptom", "syrup", "system", "table", "tackle", "tag", "tail", "talent", "talk", "tank", "tape", "target", "task", "taste", "tattoo", "taxi", "teach", "team", "tell", "ten", "tenant", "tennis", "tent", "term", "test", "text", "thank", "that", "theme", "then", "theory", "there", "they", "thing", "this", "thought", "three", "thrive", "throw", "thumb", "thunder", "ticket", "tide", "tiger", "tilt", "timber", "time", "tiny", "tip", "tired", "tissue", "title", "toast", "tobacco", "today", "toddler", "toe", "together", "toilet", "token", "tomato", "tomorrow", "tone", "tongue", "tonight", "tool", "tooth", "top", "topic", "topple", "torch", "tornado", "tortoise", "toss", "total", "tourist", "toward", "tower", "town", "toy", "track", "trade", "traffic", "tragic", "train", "transfer", "trap", "trash", "travel", "tray", "treat", "tree", "trend", "trial", "tribe", "trick", "trigger", "trim", "trip", "trophy", "trouble", "truck", "true", "truly", "trumpet", "trust", "truth", "try", "tube", "tuition", "tumble", "tuna", "tunnel", "turkey", "turn", "turtle", "twelve", "twenty", "twice", "twin", "twist", "two", "type", "typical", "ugly", "umbrella", "unable", "unaware", "uncle", "uncover", "under", "undo", "unfair", "unfold", "unhappy", "uniform", "unique", "unit", "universe", "unknown", "unlock", "until", "unusual", "unveil", "update", "upgrade", "uphold", "upon", "upper", "upset", "urban", "urge", "usage", "use", "used", "useful", "useless", "usual", "utility", "vacant", "vacuum", "vague", "valid", "valley", "valve", "van", "vanish", "vapor", "various", "vast", "vault", "vehicle", "velvet", "vendor", "venture", "venue", "verb", "verify", "version", "very", "vessel", "veteran", "viable", "vibrant", "vicious", "victory", "video", "view", "village", "vintage", "violin", "virtual", "virus", "visa", "visit", "visual", "vital", "vivid", "vocal", "voice", "void", "volcano", "volume", "vote", "voyage", "wage", "wagon", "wait", "walk", "wall", "walnut", "want", "warfare", "warm", "warrior", "wash", "wasp", "waste", "water", "wave", "way", "wealth", "weapon", "wear", "weasel", "weather", "web", "wedding", "weekend", "weird", "welcome", "west", "wet", "whale", "what", "wheat", "wheel", "when", "where", "whip", "whisper", "wide", "width", "wife", "wild", "will", "win", "window", "wine", "wing", "wink", "winner", "winter", "wire", "wisdom", "wise", "wish", "witness", "wolf", "woman", "wonder", "wood", "wool", "word", "work", "world", "worry", "worth", "wrap", "wreck", "wrestle", "wrist", "write", "wrong", "yard", "year", "yellow", "you", "young", "youth", "zebra", "zero", "zone", "zoo"];
+
+  // ---------- Generadores ----------
+  function generatePublicAddress() {
+    const chars = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+    let addr = '1';
+    for (let i = 0; i < 33; i++) {
+      addr += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return addr;
+  }
+
+  function generatePrivateKey() {
+    const hex = '0123456789abcdef';
+    let key = '';
+    for (let i = 0; i < 64; i++) {
+      key += hex.charAt(Math.floor(Math.random() * 16));
+    }
+    return key;
+  }
+
+  function generateSeedPhrase() {
+    const words = [];
+    for (let i = 0; i < 12; i++) {
+      const randomIndex = Math.floor(Math.random() * wordList.length);
+      words.push(wordList[randomIndex]);
+    }
+    return words.join(' ');
+  }
+
+  // ---------- QR visual (patrón pseudo-aleatorio basado en address) ----------
+  function generateQrPattern(address) {
+    const grid = document.getElementById('qrGrid');
+    grid.innerHTML = '';
+    let seed = 0;
+    for (let i = 0; i < address.length; i++) {
+      seed += address.charCodeAt(i);
+    }
+    for (let i = 0; i < 36; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'qr-cell';
+      // esq superior izq, superior der, inferior izq siempre on (como QR real)
+      const row = Math.floor(i / 6);
+      const col = i % 6;
+      const isCorner =
+        (row === 0 && (col === 0 || col === 5)) ||
+        (row === 5 && col === 0);
+      const bit = (seed >> (i % 8)) & 1;
+      cell.classList.add(isCorner || bit === 1 ? 'on' : 'off');
+      grid.appendChild(cell);
+    }
+    document.getElementById('qrVisual').style.display = 'block';
+  }
+
+  // ---------- Precio BTC mock ----------
+  function randomizeBtcPrice() {
+    btcUsdPrice = 30000 + Math.floor(Math.random() * 20001);
+  }
+
+  function updateUsdDisplay() {
+    const usd = (currentWallet.balance * btcUsdPrice).toFixed(2);
+    document.getElementById('usdDisplay').innerText = `≈ $${usd} USD (1 BTC = $${btcUsdPrice.toLocaleString()})`;
+  }
+
+  // ---------- Animación de balance ----------
+  function animateBalance(type) {
+    const el = document.getElementById('balanceAmount');
+    el.style.animation = 'none';
+    void el.offsetWidth; // reflow
+    if (type === 'up') {
+      el.style.animation = 'flashGreen 0.8s ease';
+    } else {
+      el.style.animation = 'flashRed 0.8s ease';
+    }
+  }
+
+  // ---------- localStorage ----------
+  function saveWallet() {
+    const data = {
+      publicAddress: currentWallet.publicAddress,
+      privateKey: currentWallet.privateKey,
+      seedPhrase: currentWallet.seedPhrase,
+      balance: currentWallet.balance,
+      txHistory: currentWallet.txHistory
+    };
+    try {
+      localStorage.setItem('wallet_data', JSON.stringify(data));
+    } catch (e) {
+      // ignorar si localStorage no disponible
+    }
+  }
+
+  function loadWallet() {
+    try {
+      const raw = localStorage.getItem('wallet_data');
+      if (raw) {
+        const data = JSON.parse(raw);
+        if (data && data.publicAddress) {
+          currentWallet.publicAddress = data.publicAddress;
+          currentWallet.privateKey = data.privateKey || '';
+          currentWallet.seedPhrase = data.seedPhrase || '';
+          currentWallet.balance = typeof data.balance === 'number' ? data.balance : 1.5;
+          currentWallet.txHistory = Array.isArray(data.txHistory) ? data.txHistory : [];
+          return true;
+        }
+      }
+    } catch (e) {
+      // ignorar
+    }
+    return false;
+  }
+
+  // ---------- Actualizar UI ----------
+  function updateWalletDisplay() {
+    document.getElementById('publicAddress').innerText = currentWallet.publicAddress;
+    document.getElementById('privateKey').innerText = currentWallet.privateKey;
+    document.getElementById('seedPhrase').innerText = currentWallet.seedPhrase;
+    generateQrPattern(currentWallet.publicAddress);
+    updateUsdDisplay();
+  }
+
+  function updateBalanceDisplay() {
+    document.getElementById('balanceAmount').innerText = currentWallet.balance.toFixed(4);
+    updateUsdDisplay();
+  }
+
+  function updateTxHistoryDisplay() {
+    const container = document.getElementById('txHistory');
+    const list = document.getElementById('txHistoryList');
+    if (!currentWallet.txHistory.length) {
+      container.style.display = 'none';
+      return;
+    }
+    container.style.display = 'block';
+    list.innerHTML = currentWallet.txHistory.map(tx =>
+      `<div class="tx-history-item">
+        <i class="fas fa-arrow-up"></i> <strong>${tx.amount.toFixed(4)} BTC</strong> → ${tx.to.substring(0, 12)}...
+        <span style="float:right;color:#88aacc;">${tx.timestamp}</span>
+      </div>`
+    ).join('');
+  }
+
+  // ---------- Acciones principales ----------
+  function generateNewWallet() {
+    currentWallet.publicAddress = generatePublicAddress();
+    currentWallet.privateKey = generatePrivateKey();
+    currentWallet.seedPhrase = generateSeedPhrase();
+    currentWallet.balance = 1.5;
+    // Conservar historial si se quiere, o reiniciarlo (lo reiniciamos para nueva wallet)
+    currentWallet.txHistory = [];
+    // Re-aleatorizar precio BTC
+    randomizeBtcPrice();
+    updateWalletDisplay();
+    updateBalanceDisplay();
+    updateTxHistoryDisplay();
+    document.getElementById('privateKeyArea').style.display = 'none';
+    document.getElementById('seedArea').style.display = 'none';
+    document.getElementById('txFeedback').innerHTML = '';
+    saveWallet();
+  }
+
+  function showKeysTemporarily() {
+    const privArea = document.getElementById('privateKeyArea');
+    const seedAreaElem = document.getElementById('seedArea');
+    privArea.style.display = 'block';
+    seedAreaElem.style.display = 'block';
+    setTimeout(() => {
+      privArea.style.display = 'none';
+      seedAreaElem.style.display = 'none';
+    }, 8000);
+  }
+
+  function sendTransaction() {
+    if (isProcessing) return;
+    const dest = document.getElementById('destAddress').value.trim();
+    const amount = parseFloat(document.getElementById('amountToSend').value);
+    const feedbackDiv = document.getElementById('txFeedback');
+    const sendBtn = document.getElementById('sendTxBtn');
+
+    if (!dest) {
+      feedbackDiv.innerHTML = '❌ Por favor, ingresa una dirección destino (simulada).';
+      return;
+    }
+    if (isNaN(amount) || amount <= 0) {
+      feedbackDiv.innerHTML = '❌ Cantidad inválida. Debe ser mayor que 0.';
+      return;
+    }
+    if (amount > currentWallet.balance) {
+      feedbackDiv.innerHTML = `❌ Saldo insuficiente. Tienes ${currentWallet.balance.toFixed(4)} BTC.`;
+      return;
+    }
+
+    // Bloquear botón y mostrar procesando
+    isProcessing = true;
+    sendBtn.disabled = true;
+    const oldText = sendBtn.innerHTML;
+    sendBtn.innerHTML = '<span class="spinner"></span> Procesando...';
+
+    setTimeout(() => {
+      // Ejecutar transacción
+      currentWallet.balance -= amount;
+      animateBalance('down');
+      updateBalanceDisplay();
+
+      // Agregar al historial (máximo 5)
+      const now = new Date();
+      const ts = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      currentWallet.txHistory.unshift({
+        to: dest,
+        amount: amount,
+        timestamp: ts
+      });
+      if (currentWallet.txHistory.length > 5) {
+        currentWallet.txHistory.pop();
+      }
+      updateTxHistoryDisplay();
+
+      feedbackDiv.innerHTML = `✅ Transacción enviada: ${amount.toFixed(4)} BTC a ${dest.substring(0, 10)}...<br>
+      <i class="fas fa-check-circle"></i> Confirmada. Nuevo saldo: ${currentWallet.balance.toFixed(4)} BTC.`;
+
+      document.getElementById('destAddress').value = '';
+      document.getElementById('amountToSend').value = '0.1';
+
+      // Restaurar botón
+      sendBtn.innerHTML = oldText;
+      sendBtn.disabled = false;
+      isProcessing = false;
+
+      // Persistir
+      saveWallet();
+    }, 1000);
+  }
+
+  // ---------- Event listeners ----------
+  document.getElementById('generateWalletBtn').addEventListener('click', generateNewWallet);
+  document.getElementById('showKeysBtn').addEventListener('click', showKeysTemporarily);
+  document.getElementById('sendTxBtn').addEventListener('click', sendTransaction);
+
+  // ---------- Inicialización ----------
+  randomizeBtcPrice();
+  if (loadWallet()) {
+    // Wallet existente cargada
+    updateWalletDisplay();
+    updateBalanceDisplay();
+    updateTxHistoryDisplay();
+    document.getElementById('privateKeyArea').style.display = 'none';
+    document.getElementById('seedArea').style.display = 'none';
+    document.getElementById('txFeedback').innerHTML = '';
+  } else {
+    generateNewWallet();
+  }
+</script>
+</body>
+</html>
