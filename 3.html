@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Blockchain Adventure | Construye tu Cadena de Bloques (LEGO Digital)</title>
+  <!-- Google Fonts y Font Awesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    input, textarea { user-select: text; }
+
+    body {
+      background: linear-gradient(145deg, #0a1120 0%, #0c1428 100%);
+      font-family: 'Inter', sans-serif;
+      color: #eef5ff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    /* contenedor principal estilo juego */
+    .lego-container {
+      max-width: 1300px;
+      width: 100%;
+      background: rgba(10, 20, 35, 0.8);
+      backdrop-filter: blur(8px);
+      border-radius: 3rem;
+      border: 1px solid rgba(0, 255, 200, 0.4);
+      box-shadow: 0 20px 35px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+    }
+
+    /* cabecera */
+    .hero {
+      background: linear-gradient(95deg, #0c1428, #111d35);
+      padding: 1.5rem 2rem;
+      text-align: center;
+      border-bottom: 3px solid #0ff;
+    }
+
+    .hero h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #aaffff, #0ff, #2a9eff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero p {
+      margin-top: 0.5rem;
+      font-size: 1rem;
+      color: #b8f2ff;
+    }
+
+    /* área de la torre blockchain */
+    .chain-area {
+      padding: 1.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.2rem;
+    }
+
+    .blocks-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.2rem;
+      background: #07121ec9;
+      border-radius: 2rem;
+      padding: 1.5rem;
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    .block-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1.5rem;
+      margin: 0.5rem 0;
+    }
+
+    /* cada bloque es como una pieza LEGO */
+    .block-card {
+      background: linear-gradient(145deg, #1f3a4b, #0f2a38);
+      border-radius: 1.2rem;
+      padding: 1rem;
+      width: 260px;
+      text-align: center;
+      border: 2px solid #2f9e7a;
+      box-shadow: 0 8px 0 #0a2a1f;
+      transition: transform 0.2s, box-shadow 0.1s;
+      cursor: pointer;
+    }
+
+    .block-card.selected {
+      border: 3px solid #ffcc00;
+      box-shadow: 0 0 15px gold;
+      background: #1f4a3e;
+    }
+
+    .block-card.invalid {
+      border-color: #ff3333;
+      background: #2a1010;
+      box-shadow: 0 0 20px rgba(255, 50, 50, 0.3);
+      animation: shake 0.4s ease;
+    }
+
+    .block-card.invalid .data-input {
+      border-color: #ff5555;
+      background: #1a0505;
+    }
+
+    @keyframes shake {
+      0%,100%{ transform: translateX(0); }
+      20%{ transform: translateX(-5px); }
+      40%{ transform: translateX(5px); }
+      60%{ transform: translateX(-3px); }
+      80%{ transform: translateX(3px); }
+    }
+
+    .block-index {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.65rem;
+      background: #00000066;
+      display: inline-block;
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+    }
+
+    .badge-valid {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.55rem;
+      background: #1a5a2a;
+      color: #6eff6e;
+      padding: 0.15rem 0.5rem;
+      border-radius: 1rem;
+      margin-left: 0.3rem;
+    }
+
+    .badge-invalid {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.55rem;
+      background: #5a1a1a;
+      color: #ff6666;
+      padding: 0.15rem 0.5rem;
+      border-radius: 1rem;
+      margin-left: 0.3rem;
+      animation: pulse-badge 1s ease infinite;
+    }
+
+    @keyframes pulse-badge {
+      0%,100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    .block-data {
+      margin: 0.8rem 0;
+      font-weight: 600;
+    }
+
+    .block-data input {
+      background: #001e2f;
+      border: 1px solid #0ff;
+      padding: 0.4rem;
+      border-radius: 1rem;
+      color: white;
+      text-align: center;
+      width: 90%;
+      margin-top: 5px;
+      transition: border-color 0.3s;
+    }
+
+    .block-data input:focus {
+      border-color: #ffcc00;
+      outline: none;
+      box-shadow: 0 0 10px rgba(255, 204, 0, 0.3);
+    }
+
+    .hash {
+      font-family: monospace;
+      font-size: 0.75rem;
+      background: #000000aa;
+      padding: 0.3rem;
+      border-radius: 1rem;
+      word-break: break-all;
+      margin: 8px 0;
+      transition: background 0.3s;
+    }
+
+    .prev-hash {
+      font-size: 0.7rem;
+      color: #aaffdd;
+    }
+
+    .mismatch {
+      color: #ff6666;
+      text-decoration: line-through;
+      text-decoration-color: #ff333388;
+    }
+
+    .hash-warn {
+      font-size: 0.6rem;
+      color: #ffaa00;
+      margin-left: 0.3rem;
+      font-weight: 600;
+    }
+
+    .lock-icon {
+      font-size: 1.5rem;
+      margin-top: 5px;
+    }
+
+    .chain-link {
+      font-size: 0.65rem;
+      font-weight: 600;
+      margin-top: 8px;
+      padding: 0.3rem;
+      border-radius: 1rem;
+      background: #00000044;
+      color: #88ccff;
+    }
+
+    .chain-link.broken {
+      color: #ff6666;
+      background: #33000088;
+      animation: pulse-badge 1s ease infinite;
+    }
+
+    .button-group {
+      display: flex;
+      justify-content: center;
+      gap: 0.8rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-action {
+      background: linear-gradient(95deg, #f0a500, #ff6a30);
+      border: none;
+      padding: 0.7rem 1.5rem;
+      font-weight: bold;
+      border-radius: 3rem;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: 0.2s;
+    }
+
+    .btn-action:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 15px rgba(240, 165, 0, 0.5);
+    }
+
+    .btn-repair {
+      background: linear-gradient(95deg, #2ecc71, #27ae60);
+      border: none;
+      padding: 0.7rem 1.5rem;
+      font-weight: bold;
+      border-radius: 3rem;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: 0.2s;
+      color: #fff;
+    }
+
+    .btn-repair:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 15px rgba(46, 204, 113, 0.5);
+    }
+
+    .btn-reset {
+      background: #2c3e66;
+      border: none;
+      padding: 0.7rem 1.5rem;
+      font-weight: bold;
+      border-radius: 3rem;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .btn-reset:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 10px rgba(44, 62, 102, 0.5);
+    }
+
+    .feedback {
+      background: #000000aa;
+      margin: 1rem 2rem;
+      padding: 1rem;
+      border-radius: 1.5rem;
+      text-align: center;
+      border-left: 4px solid #0ff;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.7rem;
+      border-top: 1px solid #2a4a6a;
+    }
+    .nav-links {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      padding: 1.5rem 2rem;
+    }
+    .nav-link {
+      background: #2c3e66;
+      border: none;
+      padding: 0.7rem 1.5rem;
+      border-radius: 3rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      color: #eef5ff;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: 0.2s;
+      font-size: 0.95rem;
+    }
+    .nav-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 10px rgba(0, 224, 255, 0.4);
+    }
+    .nav-link.next { background: linear-gradient(95deg, #f0a500, #ff6a00); color: #1e1a0c; }
+    .nav-link.menu { background: #1a2a4a; border: 1px solid #3399ff; }
+  </style>
+</head>
+<body>
+<div class="lego-container">
+  <div class="hero">
+    <h1>🧱 CADENA DE BLOQUES: TORRE LEGO DIGITAL 🧱</h1>
+    <p>Cada bloque se conecta al anterior mediante un hash. <strong>¡Si cambias un dato, la torre se rompe!</strong></p>
+    <p style="font-size:0.85rem; color:#88ddff; margin-top:0.3rem;">✏️ Edita el texto de cualquier bloque → el hash cambia → el enlace se rompe → la cadena queda inválida</p>
+  </div>
+
+  <div class="chain-area">
+    <div class="blocks-wrapper" id="blocksWrapper">
+      <!-- Los bloques se generarán dinámicamente con JS -->
+    </div>
+    <div class="button-group">
+      <button id="addBlockBtn" class="btn-action"><i class="fas fa-plus-circle"></i> Añadir bloque</button>
+      <button id="validateChainBtn" class="btn-action"><i class="fas fa-shield-alt"></i> Verificar integridad</button>
+      <button id="repairChainBtn" class="btn-repair" style="display:none;"><i class="fas fa-wrench"></i> Reparar cadena</button>
+      <button id="resetChainBtn" class="btn-reset"><i class="fas fa-trash-alt"></i> Reiniciar</button>
+    </div>
+  </div>
+
+  <div id="feedbackMsg" class="feedback">
+    💡 <strong>Pruébalo:</strong> edita el texto de un bloque → cambia el hash → pulsa "Verificar integridad" → verás la cadena rota → pulsa "Reparar cadena" para arreglarla.
+  </div>
+
+  <div class="nav-links">
+    <a href="2.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+    <a href="4.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer>
+    <i class="fas fa-cubes"></i> Cada bloque contiene un hash único que depende de los datos y del hash anterior. ¡Así se forma una cadena inmutable!
+  </footer>
+</div>
+
+<script>
+  // ------------------------------
+  // Simulador de blockchain educativa (estilo LEGO)
+  // ------------------------------
+  // Definimos función hash simple (solo para simulación didáctica, pero consistente)
+  // En realidad usaremos un pseudo-hash basado en djb2 + timestamp para que sea reproducible pero con cambios evidentes.
+  // Para que sea educativo, usamos una función que genere un "hash" hexadecimal de 8 caracteres.
+  function simpleHash(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = ((hash << 5) - hash) + str.charCodeAt(i);
+      hash |= 0; // convertir a entero de 32 bits
+    }
+    // Convertir a hexadecimal de 8 dígitos (colorido)
+    return (hash >>> 0).toString(16).padStart(8, '0').slice(0, 8);
+  }
+
+  // Datos del bloque: índice, data (texto), prevHash (hash del bloque anterior)
+  let blocks = [];
+
+  function saveChain() {
+    localStorage.setItem('lego_chain_3', JSON.stringify(blocks));
+  }
+
+  function loadChain() {
+    const saved = localStorage.getItem('lego_chain_3');
+    if (saved) {
+      try { blocks = JSON.parse(saved); } catch(e) { blocks = []; }
+      if (blocks.length > 0) { renderBlocks(); return true; }
+    }
+    return false;
+  }
+
+  // Función para recalcular hash de un bloque (según su data y prevHash)
+  function computeBlockHash(block) {
+    const input = block.data + "|" + block.prevHash;
+    return simpleHash(input);
+  }
+
+  // Actualizar la representación visual y los hashes de todos los bloques (en cascada)
+  function recalcChain() {
+    // Recorrer bloques a partir del primero (bloque génesis tiene prevHash fijo "0")
+    for (let i = 0; i < blocks.length; i++) {
+      if (i === 0) {
+        blocks[i].prevHash = "00000000"; // bloque génesis
+      } else {
+        blocks[i].prevHash = blocks[i-1].hash;
+      }
+      blocks[i].hash = computeBlockHash(blocks[i]);
+    }
+    renderBlocks();
+    return true;
+  }
+
+  // Agregar un nuevo bloque al final con datos por defecto
+  function addBlock() {
+    const newIndex = blocks.length;
+    let prevHash = newIndex === 0 ? "00000000" : blocks[blocks.length-1].hash;
+    const newBlock = {
+      index: newIndex,
+      data: `Transacción: Alice → Bob ${Math.floor(Math.random() * 20) + 1} BTC`,
+      prevHash: prevHash,
+      hash: ""
+    };
+    newBlock.hash = computeBlockHash(newBlock);
+    blocks.push(newBlock);
+    renderBlocks();
+    saveChain();
+    document.getElementById('repairChainBtn').style.display = 'none';
+    showFeedback(`🧱 ¡Nuevo bloque #${newIndex} añadido! Es como una pieza LEGO nueva. Ahora la cadena tiene ${blocks.length} bloques.`);
+  }
+
+  // Editar datos de un bloque (simula modificar transacción)
+  function editBlockData(blockIdx, newData) {
+    if (blockIdx >= 0 && blockIdx < blocks.length) {
+      blocks[blockIdx].data = newData;
+      // SOLO recalculamos el hash del bloque editado (no cascade)
+      // Así el bloque editado muestra un hash diferente,
+      // y el siguiente bloque aún apunta al VIEJO hash → enlace roto
+      blocks[blockIdx].hash = computeBlockHash(blocks[blockIdx]);
+      renderBlocks();
+      saveChain();
+      showFeedback(`✏️ Has modificado el Bloque #${blockIdx}. El hash cambió → el enlace con el bloque siguiente se ha roto. Pulsa "Verificar integridad" para confirmar.`);
+    }
+  }
+
+  // Validar integridad de toda la cadena
+  function validateChain() {
+    let valid = true;
+    let errorMsg = "";
+    let firstInvalid = -1;
+    for (let i = 0; i < blocks.length; i++) {
+      const block = blocks[i];
+      const recomputedHash = computeBlockHash(block);
+      if (recomputedHash !== block.hash) {
+        valid = false;
+        firstInvalid = i;
+        errorMsg = `❌ Bloque #${i}: el hash almacenado (${block.hash}) no coincide con el hash calculado (${recomputedHash}). ¡La cadena está corrupta!`;
+        break;
+      }
+      if (i > 0 && block.prevHash !== blocks[i-1].hash) {
+        valid = false;
+        firstInvalid = i;
+        errorMsg = `❌ Bloque #${i}: su prevHash (${block.prevHash}) no es igual al hash del bloque anterior (${blocks[i-1].hash}). Enlace roto.`;
+        break;
+      }
+    }
+    renderBlocks(valid ? undefined : firstInvalid);
+    const repairBtn = document.getElementById('repairChainBtn');
+    if (valid && blocks.length > 0) {
+      repairBtn.style.display = 'none';
+      showFeedback("✅ ¡Cadena de bloques completamente válida! Todos los hashes y enlaces son correctos. ¡Tu torre LEGO es segura!");
+    } else if (blocks.length === 0) {
+      repairBtn.style.display = 'none';
+      showFeedback("⛔ No hay bloques todavía. Agrega al menos un bloque para validar.");
+    } else {
+      repairBtn.style.display = 'inline-block';
+      showFeedback(errorMsg + " 🔨 Esto pasa cuando alguien modifica los datos de un bloque sin recalcular los siguientes. En blockchain real es imposible sin ser detectado.");
+    }
+  }
+
+  // Reparar la cadena: recalcula todos los hashes en cascada
+  function repairChain() {
+    recalcChain();
+    saveChain();
+    document.getElementById('repairChainBtn').style.display = 'none';
+    showFeedback("🔧 Cadena reparada. Todos los hashes han sido recalculados. ¡La torre LEGO está segura de nuevo!");
+  }
+
+  // Resetear toda la cadena
+  function resetChain() {
+    blocks = [];
+    localStorage.removeItem('lego_chain_3');
+    // Crear bloque génesis por defecto para que haya contenido
+    const genesis = {
+      index: 0,
+      data: "Bloque Génesis: ¡Satoshi mina el primer bloque! 🏆",
+      prevHash: "00000000",
+      hash: ""
+    };
+    genesis.hash = computeBlockHash(genesis);
+    blocks.push(genesis);
+    // Opcional: añadir un segundo bloque para demostrar
+    const block1 = {
+      index: 1,
+      data: "Transacción: Satoshi → Hal Finney 10 BTC",
+      prevHash: genesis.hash,
+      hash: ""
+    };
+    block1.hash = computeBlockHash(block1);
+    blocks.push(block1);
+    recalcChain();
+    saveChain();
+    document.getElementById('repairChainBtn').style.display = 'none';
+    showFeedback("🔄 Cadena reiniciada con bloque génesis + un bloque de ejemplo. ¡Puedes añadir más o modificar datos!");
+  }
+
+  // Renderizar visualmente los bloques
+  function renderBlocks(invalidBlock) {
+    const wrapper = document.getElementById('blocksWrapper');
+    wrapper.innerHTML = '';
+    if (blocks.length === 0) {
+      wrapper.innerHTML = '<div style="text-align:center; padding:2rem;">✨ Aún no hay bloques. Haz clic en "Añadir bloque" para construir tu cadena. ✨</div>';
+      return;
+    }
+    const container = document.createElement('div');
+    container.className = 'block-row';
+    blocks.forEach((block, idx) => {
+      const blockDiv = document.createElement('div');
+      blockDiv.className = 'block-card';
+      blockDiv.dataset.index = idx;
+
+      // Detectar si este bloque o su enlace están rotos
+      const hashMismatch = (idx > 0 && block.prevHash !== blocks[idx-1].hash);
+      const isInvalidBlock = (invalidBlock !== undefined && idx >= invalidBlock);
+      const isBroken = hashMismatch || isInvalidBlock;
+
+      if (isBroken) {
+        blockDiv.classList.add('invalid');
+      }
+
+      // Recalcular el hash real para mostrarlo comparado
+      const computedHash = computeBlockHash(block);
+      const hashChanged = (computedHash !== block.hash);
+
+      blockDiv.innerHTML = `
+        <div class="block-index">
+          ${isBroken ? '🔴' : '🔷'} BLOQUE #${block.index}
+          ${isBroken ? '<span class="badge-invalid">⚠ INVÁLIDO</span>' : '<span class="badge-valid">✓ VÁLIDO</span>'}
+        </div>
+        <div class="block-data">
+          <label>📦 Datos / Transacción:</label><br>
+          <input type="text" value="${escapeHtml(block.data)}" class="data-input" data-idx="${idx}">
+        </div>
+        <div class="prev-hash">
+          <i class="fas fa-link"></i> Hash anterior:
+          <span class="prev-hash-val ${isBroken ? 'mismatch' : ''}">${block.prevHash}</span>
+          ${hashChanged ? '<span class="hash-warn">⚠ hash desactualizado</span>' : ''}
+        </div>
+        <div class="hash">
+          <i class="fas fa-fingerprint"></i> Hash actual:
+          <span class="hash-val ${hashChanged ? 'mismatch' : ''}">${block.hash}</span>
+        </div>
+        <div class="lock-icon">
+          ${isBroken
+            ? '<i class="fas fa-lock-open" style="color:#ff6666; text-shadow:0 0 8px #ff3333;"></i> ENLACE ROTO'
+            : '<i class="fas fa-lock" style="color:#6eff6e;"></i> SEGURO'}
+        </div>
+        <div class="chain-link ${isBroken ? 'broken' : ''}">
+          ${idx < blocks.length - 1 ? (isBroken ? '╳ ENLACE CORRUPTO' : '⬇ SIGUIENTE BLOQUE') : '🔚 FIN DE CADENA'}
+        </div>
+      `;
+      const inputField = blockDiv.querySelector('.data-input');
+      inputField.addEventListener('change', (e) => {
+        const newData = e.target.value;
+        editBlockData(parseInt(e.target.dataset.idx), newData);
+      });
+      blockDiv.addEventListener('click', (e) => {
+        if (e.target.tagName !== 'INPUT') {
+          showFeedback(`📝 Bloque #${block.index} seleccionado. Edita su texto y pulsa "Verificar integridad".`);
+        }
+      });
+      container.appendChild(blockDiv);
+    });
+    wrapper.appendChild(container);
+  }
+
+  function escapeHtml(str) {
+    return str.replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    });
+  }
+
+  function showFeedback(msg) {
+    const feedbackDiv = document.getElementById('feedbackMsg');
+    const isError = msg.includes('❌');
+    feedbackDiv.innerHTML = `<i class="fas fa-comment-dots"></i> ${msg}`;
+    feedbackDiv.style.borderLeftColor = isError ? '#ff4444' : '#0ff';
+  }
+
+  // Inicialización
+  function init() {
+    if (!loadChain()) {
+      resetChain();
+    }
+    document.getElementById('addBlockBtn').addEventListener('click', () => addBlock());
+    document.getElementById('validateChainBtn').addEventListener('click', () => validateChain());
+    document.getElementById('repairChainBtn').addEventListener('click', () => repairChain());
+    document.getElementById('resetChainBtn').addEventListener('click', () => resetChain());
+  }
+
+  init();
+</script>
+</body>
+</html>

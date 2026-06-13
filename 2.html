@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Blockchain Adventure | El Problema de la Confianza</title>
+  <!-- Google Fonts y Font Awesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(145deg, #0b1424 0%, #09101c 100%);
+      font-family: 'Inter', sans-serif;
+      color: #eef5ff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    .game-container {
+      max-width: 1300px;
+      width: 100%;
+      background: rgba(12, 22, 40, 0.75);
+      backdrop-filter: blur(10px);
+      border-radius: 3rem;
+      border: 1px solid rgba(255, 200, 87, 0.4);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255,255,255,0.05);
+      overflow: hidden;
+    }
+
+    .hero {
+      background: linear-gradient(95deg, #0a111f, #141e32);
+      padding: 1.8rem 2rem;
+      text-align: center;
+      border-bottom: 3px solid #ffb347;
+    }
+
+    .hero h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffe6b3, #ffb347);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      letter-spacing: -0.5px;
+    }
+
+    .hero p {
+      margin-top: 0.5rem;
+      font-size: 1.1rem;
+      color: #ffd9a5;
+    }
+
+    .analogy-card {
+      background: #1e2a3acc;
+      margin: 1.5rem 2rem;
+      padding: 1.2rem 1.8rem;
+      border-radius: 2rem;
+      border-left: 8px solid #ff914d;
+      font-size: 1rem;
+      line-height: 1.4;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .analogy-text i {
+      font-size: 2rem;
+      margin-right: 0.5rem;
+      color: #ffaa33;
+    }
+
+    .analogy-highlight {
+      background: #00000066;
+      padding: 0.5rem 1rem;
+      border-radius: 2rem;
+      font-weight: bold;
+      color: #ffcc77;
+    }
+
+    .decision-panel {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      padding: 0 2rem 1rem 2rem;
+    }
+
+    .card-option {
+      flex: 1;
+      min-width: 260px;
+      background: #0f1a2be0;
+      border-radius: 2rem;
+      padding: 1.5rem;
+      transition: all 0.2s;
+      cursor: pointer;
+      border: 2px solid transparent;
+      backdrop-filter: blur(4px);
+      position: relative;
+    }
+
+    .card-option:hover {
+      transform: translateY(-8px);
+      background: #17273f;
+      border-color: #ffaa44;
+    }
+
+    .card-option.selected {
+      border-color: #0ff;
+      box-shadow: 0 0 15px cyan;
+      background: #0f2740;
+    }
+
+    .card-icon {
+      font-size: 3rem;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    .card-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 0.8rem;
+    }
+
+    .card-desc {
+      font-size: 0.9rem;
+      text-align: center;
+      margin-bottom: 1.2rem;
+      color: #ccdeff;
+    }
+
+    .stats {
+      background: #00000066;
+      border-radius: 1.5rem;
+      padding: 0.8rem;
+      text-align: center;
+      margin-top: 0.8rem;
+    }
+
+    .stat-number {
+      font-size: 2rem;
+      font-weight: 800;
+      font-family: monospace;
+    }
+
+    .badge-risk {
+      font-size: 0.8rem;
+      background: #a1220a;
+      border-radius: 1rem;
+      display: inline-block;
+      padding: 0.2rem 0.8rem;
+    }
+
+    .action-area {
+      text-align: center;
+      padding: 1rem 2rem 2rem;
+    }
+
+    .btn-play {
+      background: linear-gradient(95deg, #f0a500, #ff6a30);
+      border: none;
+      padding: 0.9rem 2.2rem;
+      font-weight: bold;
+      font-size: 1.2rem;
+      border-radius: 3rem;
+      cursor: pointer;
+      transition: 0.2s;
+      color: #1e1a0c;
+      margin: 0 0.5rem;
+    }
+
+    .btn-play:active {
+      transform: scale(0.97);
+    }
+
+    .reset-btn {
+      background: #2c3e66;
+      border: none;
+      padding: 0.9rem 2rem;
+      font-weight: bold;
+      border-radius: 3rem;
+      cursor: pointer;
+    }
+
+    .feedback {
+      background: #00000099;
+      margin: 0 2rem 1.5rem 2rem;
+      padding: 1rem;
+      border-radius: 1.5rem;
+      text-align: center;
+      font-weight: 500;
+      border-left: 4px solid gold;
+    }
+
+    /* Card result badge (checkmark / X) */
+    .card-result-badge {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      font-size: 2rem;
+      opacity: 0;
+      transition: opacity 0.3s, transform 0.3s;
+      pointer-events: none;
+      z-index: 2;
+      transform: scale(0.5);
+    }
+    .card-result-badge.show {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* Stats bar (streak + trust score) */
+    .stats-bar {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      padding: 0 2rem 1rem 2rem;
+      flex-wrap: wrap;
+    }
+    .stat-item {
+      background: #00000066;
+      padding: 0.4rem 1.2rem;
+      border-radius: 2rem;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .stat-item .value {
+      font-weight: 800;
+      font-size: 1.2rem;
+      font-family: monospace;
+    }
+    .streak-fire { color: #ff6a00; }
+    .trust-pct { color: #00d4aa; }
+
+    /* Flash animations for feedback area */
+    @keyframes flashSuccess {
+      0% { box-shadow: 0 0 0 4px rgba(0, 200, 80, 0), 0 0 30px rgba(0, 200, 80, 0.7); }
+      50% { box-shadow: 0 0 0 4px rgba(0, 200, 80, 0.3), 0 0 30px rgba(0, 200, 80, 0.7); }
+      100% { box-shadow: 0 0 0 4px rgba(0, 200, 80, 0), 0 0 0 rgba(0, 200, 80, 0); }
+    }
+    @keyframes flashDanger {
+      0% { box-shadow: 0 0 0 4px rgba(255, 50, 50, 0), 0 0 30px rgba(255, 50, 50, 0.7); }
+      50% { box-shadow: 0 0 0 4px rgba(255, 50, 50, 0.3), 0 0 30px rgba(255, 50, 50, 0.7); }
+      100% { box-shadow: 0 0 0 4px rgba(255, 50, 50, 0), 0 0 0 rgba(255, 50, 50, 0); }
+    }
+    @keyframes flashWarning {
+      0% { box-shadow: 0 0 0 4px rgba(255, 200, 0, 0), 0 0 30px rgba(255, 200, 0, 0.7); }
+      50% { box-shadow: 0 0 0 4px rgba(255, 200, 0, 0.3), 0 0 30px rgba(255, 200, 0, 0.7); }
+      100% { box-shadow: 0 0 0 4px rgba(255, 200, 0, 0), 0 0 0 rgba(255, 200, 0, 0); }
+    }
+    .flash-success { animation: flashSuccess 0.8s ease-out; }
+    .flash-danger { animation: flashDanger 0.8s ease-out; }
+    .flash-warning { animation: flashWarning 0.8s ease-out; }
+
+    footer {
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.75rem;
+      border-top: 1px solid #2a3a55;
+    }
+
+    .nav-links {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      padding: 1.5rem 2rem;
+    }
+    .nav-link {
+      background: #2c3e66;
+      border: none;
+      padding: 0.7rem 1.5rem;
+      border-radius: 3rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      color: #eef5ff;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: 0.2s;
+      font-size: 0.95rem;
+    }
+    .nav-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 10px rgba(0, 224, 255, 0.4);
+    }
+    .nav-link.next { background: linear-gradient(95deg, #f0a500, #ff6a00); color: #1e1a0c; }
+    .nav-link.menu { background: #1a2a4a; border: 1px solid #3399ff; }
+    @media (max-width: 750px) {
+      .hero h1 { font-size: 1.6rem; }
+      .card-title { font-size: 1.3rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="game-container">
+  <div class="hero">
+    <h1><i class="fas fa-handshake-slash"></i> El Problema de la Confianza</h1>
+    <p>¿Quién vigila al vigilante? Descúbrelo con la historia del "matón del patio"</p>
+  </div>
+
+  <div class="analogy-card">
+    <div class="analogy-text">
+      <i class="fas fa-school"></i> <strong>🏫 El Patio del Colegio:</strong> Los niños quieren intercambiar cromos. Pero aparece <span class="analogy-highlight">"Matías el Matón"</span> que exige un cromo por "proteger" cada trueque. Si no lo usas, te puede robar. ¿Confías en él?
+    </div>
+    <div><i class="fas fa-dice-d6"></i> <strong>El doble gasto:</strong> Sin un libro público, alguien podría gastar dos veces el mismo cromo digital.</div>
+  </div>
+
+  <div class="decision-panel">
+    <div id="optionBank" class="card-option" data-choice="bank">
+      <span class="card-result-badge" id="bankResultBadge"></span>
+      <div class="card-icon"><i class="fas fa-university"></i> <i class="fas fa-skull"></i></div>
+      <div class="card-title">🏦 El Banco (El Matón)</div>
+      <div class="card-desc">Un intermediario poderoso que cobra comisiones altas y puede cambiar las reglas. "Te protejo, pero te cobro".</div>
+      <div class="stats">
+        <div><i class="fas fa-coins"></i> Comisión por transacción: <strong>10% + 5€ fijos</strong></div>
+        <div><i class="fas fa-handcuffs"></i> Riesgo de abuso: <span class="badge-risk">ALTO</span></div>
+        <div class="stat-number" id="bankCheatCount">0</div>
+        <div>veces que te ha estafado / censurado</div>
+      </div>
+    </div>
+
+    <div id="optionFriends" class="card-option" data-choice="friends">
+      <span class="card-result-badge" id="friendsResultBadge"></span>
+      <div class="card-icon"><i class="fas fa-users"></i> <i class="fas fa-hand-peace"></i></div>
+      <div class="card-title">👥 Red de Amigos (Descentralizado)</div>
+      <div class="card-desc">Todos tienen una copia del libro de transacciones. Nadie tiene poder absoluto, pero requiere coordinación.</div>
+      <div class="stats">
+        <div><i class="fas fa-check-circle"></i> Comisión: <strong>voluntaria (0.1%)</strong></div>
+        <div><i class="fas fa-shield-alt"></i> Riesgo de trampa: <span class="badge-risk" style="background:#2a6b2a;">BAJO (cooperativo)</span></div>
+        <div class="stat-number" id="friendsCheatCount">0</div>
+        <div>intentos de fraude detectados y bloqueados</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="action-area">
+    <button id="simulateTransactionBtn" class="btn-play"><i class="fas fa-exchange-alt"></i> ¡Realizar trueque! (Simular)</button>
+    <button id="resetStatsBtn" class="reset-btn"><i class="fas fa-sync-alt"></i> Reiniciar estadísticas</button>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat-item">🔥 Racha honesta: <span class="value streak-fire" id="streakCount">0</span></div>
+    <div class="stat-item">⭐ Confianza: <span class="value trust-pct" id="trustScore">100</span>%</div>
+  </div>
+
+  <div id="feedbackMsg" class="feedback">
+    💡 Elige un sistema de confianza (clic en una tarjeta) y luego pulsa "Realizar trueque" para ver cómo actúa.
+  </div>
+
+  <div class="nav-links">
+    <a href="1.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+    <a href="3.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer>
+    <i class="fas fa-brain"></i> Juego de roles: ¿Central o descentralizado? Cada decisión tiene consecuencias. ¡Aprende jugando!
+  </footer>
+</div>
+
+<script>
+  // Estado del juego
+  let selectedSystem = null;
+  let bankCheats = 0;
+  let friendsFraudDetected = 0;
+  let transactionCount = 0;
+  let consecutiveHonest = 0;
+
+  // Elementos
+  const bankCard = document.getElementById('optionBank');
+  const friendsCard = document.getElementById('optionFriends');
+  const simulateBtn = document.getElementById('simulateTransactionBtn');
+  const resetBtn = document.getElementById('resetStatsBtn');
+  const bankCheatSpan = document.getElementById('bankCheatCount');
+  const friendsCheatSpan = document.getElementById('friendsCheatCount');
+  const feedbackDiv = document.getElementById('feedbackMsg');
+  const streakSpan = document.getElementById('streakCount');
+  const trustScoreSpan = document.getElementById('trustScore');
+  const bankResultBadge = document.getElementById('bankResultBadge');
+  const friendsResultBadge = document.getElementById('friendsResultBadge');
+
+  // ---- localStorage persistence ----
+  function saveStats() {
+    const data = {
+      bankCheats,
+      fraudDetected: friendsFraudDetected,
+      totalTrades: transactionCount,
+      currentSystem: selectedSystem,
+      consecutiveHonest
+    };
+    try { localStorage.setItem('trust_game_stats', JSON.stringify(data)); } catch (e) {}
+  }
+
+  function loadStats() {
+    try {
+      const raw = localStorage.getItem('trust_game_stats');
+      if (!raw) return;
+      const data = JSON.parse(raw);
+      bankCheats = data.bankCheats ?? 0;
+      friendsFraudDetected = data.fraudDetected ?? 0;
+      transactionCount = data.totalTrades ?? 0;
+      selectedSystem = data.currentSystem ?? null;
+      consecutiveHonest = data.consecutiveHonest ?? 0;
+      if (selectedSystem) {
+        if (selectedSystem === 'bank') bankCard.classList.add('selected');
+        else if (selectedSystem === 'friends') friendsCard.classList.add('selected');
+      }
+      updateStatsDisplay();
+      updateStreakAndTrust();
+    } catch (e) {}
+  }
+
+  // ---- UI helpers ----
+  function triggerFlash(type) {
+    feedbackDiv.classList.remove('flash-success', 'flash-danger', 'flash-warning');
+    void feedbackDiv.offsetWidth;
+    const cls = type === 'success' ? 'flash-success' : type === 'danger' ? 'flash-danger' : 'flash-warning';
+    feedbackDiv.classList.add(cls);
+  }
+
+  function setCardResult(choice, success) {
+    const badge = choice === 'bank' ? bankResultBadge : friendsResultBadge;
+    badge.textContent = success ? '✅' : '❌';
+    badge.classList.add('show');
+    clearTimeout(badge._timeout);
+    badge._timeout = setTimeout(() => badge.classList.remove('show'), 2500);
+  }
+
+  function updateStatsDisplay() {
+    bankCheatSpan.textContent = bankCheats;
+    friendsCheatSpan.textContent = friendsFraudDetected;
+  }
+
+  function updateStreakAndTrust() {
+    streakSpan.textContent = consecutiveHonest;
+    let trustPct = 100;
+    if (transactionCount > 0) {
+      const issues = bankCheats + friendsFraudDetected;
+      trustPct = Math.max(0, Math.round(((transactionCount - issues) / transactionCount) * 100));
+    }
+    trustScoreSpan.textContent = trustPct;
+  }
+
+  // Seleccionar sistema
+  function setSelected(choice) {
+    selectedSystem = choice;
+    if (choice === 'bank') {
+      bankCard.classList.add('selected');
+      friendsCard.classList.remove('selected');
+      feedbackDiv.innerHTML = '🏦 Has elegido al <strong>Banco/Matón</strong>. Cada transacción tendrá altas comisiones y existe riesgo de que te censure o te quite fondos. ¡Cuidado!';
+    } else if (choice === 'friends') {
+      friendsCard.classList.add('selected');
+      bankCard.classList.remove('selected');
+      feedbackDiv.innerHTML = '👥 Has elegido la <strong>Red de Amigos (descentralizada)</strong>. Todos vigilan el libro de cuentas. Nadie puede hacer trampa sin ser descubierto. ¡La confianza está distribuida!';
+    }
+    updateStatsDisplay();
+    saveStats();
+  }
+
+  // Simular transacción
+  function simulateTransaction() {
+    if (!selectedSystem) {
+      feedbackDiv.innerHTML = '⚠️ ¡Primero elige un sistema de confianza! Haz clic en "El Banco" o en "Red de Amigos". ⚠️';
+      triggerFlash('warning');
+      return;
+    }
+
+    transactionCount++;
+
+    if (selectedSystem === 'bank') {
+      const randomAbuse = Math.random();
+      let abuseMessage = '';
+      let extraCheat = 0;
+      if (randomAbuse < 0.4) {
+        extraCheat = 1;
+        bankCheats += extraCheat;
+        consecutiveHonest = 0;
+        if (randomAbuse < 0.2) {
+          abuseMessage = '😠 El banco ha "congelado" tu transferencia y te ha cobrado una multa oculta. ¡Abuso de poder!';
+        } else if (randomAbuse < 0.3) {
+          abuseMessage = '🔍 El intermediario modificó el registro a su favor y te quitó 5 monedas. ¡Corrupción!';
+        } else {
+          abuseMessage = '📉 El banco decidió bloquear tu pago porque no le gustó el destinatario. ¡Censura centralizada!';
+        }
+        feedbackDiv.innerHTML = `🏦 TRANSACCIÓN #${transactionCount}: ${abuseMessage} <br> <span style="color:#ffaa66;">Comisión abusiva: 12% + 8€ fijos</span>. Total trampas acumuladas: ${bankCheats}.`;
+        setCardResult('bank', false);
+        triggerFlash('danger');
+      } else {
+        consecutiveHonest++;
+        feedbackDiv.innerHTML = `🏦 TRANSACCIÓN #${transactionCount}: ¡Transacción completada! Pero pagaste comisiones del 10% + 5€ fijos. Esta vez no hubo censura... pero el matón sigue vigilando. Trampas totales: ${bankCheats}.`;
+        setCardResult('bank', true);
+        triggerFlash('success');
+      }
+    } else if (selectedSystem === 'friends') {
+      const fraudAttempt = Math.random();
+      if (fraudAttempt < 0.25) {
+        friendsFraudDetected++;
+        consecutiveHonest = 0;
+        feedbackDiv.innerHTML = `👥 🔒 TRANSACCIÓN #${transactionCount}: ¡Un nodo malicioso intentó gastar dos veces el mismo cromo! Pero la red de amigos detectó el fraude al instante y lo rechazó. <strong>Fraudes bloqueados: ${friendsFraudDetected}</strong>. ¡La descentralización gana!`;
+        setCardResult('friends', false);
+        triggerFlash('warning');
+      } else {
+        consecutiveHonest++;
+        feedbackDiv.innerHTML = `👥 ✅ TRANSACCIÓN #${transactionCount}: Trueque exitoso. Todos los amigos anotan la transacción en su libreta. Sin comisiones abusivas, sin intermediarios. Confianza colectiva. ¡Así funciona blockchain! (Intentos de fraude detectados hasta ahora: ${friendsFraudDetected})`;
+        setCardResult('friends', true);
+        triggerFlash('success');
+      }
+    }
+
+    updateStatsDisplay();
+    updateStreakAndTrust();
+    saveStats();
+
+    // Mensajes de umbral
+    if (selectedSystem === 'bank' && bankCheats >= 5) {
+      feedbackDiv.innerHTML += `<br><span style="color:red; font-weight:bold;">⚠️ ¡El matón ha abusado demasiado! ¿Seguirás confiando en un sistema centralizado? ⚠️</span>`;
+    }
+    if (selectedSystem === 'friends' && friendsFraudDetected >= 3) {
+      feedbackDiv.innerHTML += `<br><span style="color:lightgreen;">✨ ¡La red de amigos ha demostrado su robustez! Ningún fraude ha prosperado. Este es el poder de la descentralización. ✨</span>`;
+    }
+  }
+
+  // Reiniciar
+  function resetStats() {
+    bankCheats = 0;
+    friendsFraudDetected = 0;
+    transactionCount = 0;
+    consecutiveHonest = 0;
+    updateStatsDisplay();
+    updateStreakAndTrust();
+    saveStats();
+
+    bankResultBadge.classList.remove('show');
+    friendsResultBadge.classList.remove('show');
+
+    if (selectedSystem === 'bank') {
+      feedbackDiv.innerHTML = '🔄 Estadísticas reiniciadas. El banco vuelve a su comportamiento... pero sigue siendo un intermediario opaco. ¡Sigue simulando y aprende!';
+    } else if (selectedSystem === 'friends') {
+      feedbackDiv.innerHTML = '🔄 Estadísticas reiniciadas. La red de amigos sigue siendo transparente y segura. ¡Perfecto para entender blockchain!';
+    } else {
+      feedbackDiv.innerHTML = '🔄 Contadores a cero. Elige un sistema y empieza de nuevo.';
+    }
+  }
+
+  // Eventos
+  bankCard.addEventListener('click', () => setSelected('bank'));
+  friendsCard.addEventListener('click', () => setSelected('friends'));
+  simulateBtn.addEventListener('click', simulateTransaction);
+  resetBtn.addEventListener('click', resetStats);
+
+  // Cargar estado guardado al iniciar
+  loadStats();
+
+  setTimeout(() => {
+    if (!selectedSystem) {
+      feedbackDiv.innerHTML = '🎮 ¡Haz clic en una tarjeta para elegir tu sistema de confianza! Luego simula trueques y observa la diferencia. 🎮';
+    }
+  }, 500);
+</script>
+</body>
+</html>
