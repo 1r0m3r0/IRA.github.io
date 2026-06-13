@@ -223,52 +223,6 @@ filterButtons.forEach(button => {
 });
 
 // ============================================
-// FORM VALIDATION & SUBMISSION
-// ============================================
-const contactForm = document.getElementById('contactForm');
-
-if (contactForm) {
-    contactForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        // Get form data
-        const formData = {
-            name: document.getElementById('name').value,
-            email: document.getElementById('email').value,
-            subject: document.getElementById('subject').value,
-            message: document.getElementById('message').value
-        };
-
-        // Basic validation
-        if (!formData.name || !formData.email || !formData.subject || !formData.message) {
-            showNotification('Por favor completa todos los campos', 'error');
-            return;
-        }
-
-        // Email validation
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(formData.email)) {
-            showNotification('Por favor ingresa un email válido', 'error');
-            return;
-        }
-
-        // Simulate form submission
-        const submitButton = contactForm.querySelector('button[type="submit"]');
-        const originalText = submitButton.innerHTML;
-        submitButton.innerHTML = '<span>Enviando...</span>';
-        submitButton.disabled = true;
-
-        // Simulate API call
-        setTimeout(() => {
-            showNotification('¡Mensaje enviado exitosamente!', 'success');
-            contactForm.reset();
-            submitButton.innerHTML = originalText;
-            submitButton.disabled = false;
-        }, 1500);
-    });
-}
-
-// ============================================
 // NOTIFICATION SYSTEM
 // ============================================
 function showNotification(message, type = 'info') {
