@@ -315,41 +315,43 @@ animateOnScroll.forEach(el => observer.observe(el));
 // ============================================
 // TICKER ANIMATION WITH LIVE PRICES
 // ============================================
-const tickerContent = document.getElementById('tickerContent');
+const tickerTrackTop = document.getElementById('tickerTrackTop');
+const tickerTrackBottom = document.getElementById('tickerTrackBottom');
 
-// Function to fetch live crypto prices (Multiple coins)
+// CoinGecko id for each ticker symbol shown on the page
+const TICKER_COINS = {
+    btc: 'bitcoin',
+    eth: 'ethereum',
+    bnb: 'binancecoin',
+    sol: 'solana',
+    ada: 'cardano',
+    dot: 'polkadot',
+    xrp: 'ripple',
+    doge: 'dogecoin',
+    avax: 'avalanche-2',
+    matic: 'matic-network',
+    link: 'chainlink',
+    ltc: 'litecoin'
+};
+
+// Function to fetch live crypto prices (all coins shown in the ticker)
 async function fetchCryptoPrices() {
     try {
         // Using CoinGecko API (free, no API key required)
-        const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,binancecoin,solana,cardano,polkadot&vs_currencies=usd&include_24hr_change=true');
+        const ids = Object.values(TICKER_COINS).join(',');
+        const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true`);
         const data = await response.json();
 
-        return {
-            btc: {
-                price: data.bitcoin.usd,
-                change: data.bitcoin.usd_24h_change
-            },
-            eth: {
-                price: data.ethereum.usd,
-                change: data.ethereum.usd_24h_change
-            },
-            bnb: {
-                price: data.binancecoin.usd,
-                change: data.binancecoin.usd_24h_change
-            },
-            sol: {
-                price: data.solana.usd,
-                change: data.solana.usd_24h_change
-            },
-            ada: {
-                price: data.cardano.usd,
-                change: data.cardano.usd_24h_change
-            },
-            dot: {
-                price: data.polkadot.usd,
-                change: data.polkadot.usd_24h_change
+        const prices = {};
+        for (const [symbol, id] of Object.entries(TICKER_COINS)) {
+            if (data[id] && typeof data[id].usd === 'number') {
+                prices[symbol] = {
+                    price: data[id].usd,
+                    change: typeof data[id].usd_24h_change === 'number' ? data[id].usd_24h_change : 0
+                };
             }
-        };
+        }
+        return prices;
     } catch (error) {
         console.error('Error fetching crypto prices:', error);
         return null;
@@ -362,7 +364,7 @@ function formatPrice(price) {
         style: 'currency',
         currency: 'USD',
         minimumFractionDigits: 2,
-        maximumFractionDigits: 2
+        maximumFractionDigits: price < 1 ? 4 : 2
     }).format(price);
 }
 
@@ -372,50 +374,33 @@ function formatPercentage(change) {
     return `${sign}${change.toFixed(2)}%`;
 }
 
+// Update the price/change text of every ticker item for a given coin,
+// without touching the surrounding DOM so the scroll animation never restarts
+function updateTickerItem(symbol, data) {
+    const isUp = data.change >= 0;
+    document.querySelectorAll(`.ticker-item[data-coin="${symbol}"]`).forEach((item) => {
+        item.querySelector('.ticker-price').textContent = formatPrice(data.price);
+        const changeEl = item.querySelector('.ticker-change');
+        changeEl.textContent = `${isUp ? '▲' : '▼'} ${formatPercentage(data.change)}`;
+        changeEl.classList.toggle('up', isUp);
+        changeEl.classList.toggle('down', !isUp);
+    });
+}
+
 // Function to update ticker with live prices
 async function updateTicker() {
-    if (!tickerContent) return;
+    if (!tickerTrackTop && !tickerTrackBottom) return;
 
     const prices = await fetchCryptoPrices();
+    if (!prices) return;
 
-    if (prices) {
-        // Create ticker items for all cryptocurrencies
-        const tickerHTML = `
-            <span class="ticker-item ${prices.btc.change >= 0 ? 'up' : 'down'}">
-                BTC/USD: ${formatPrice(prices.btc.price)} ${prices.btc.change >= 0 ? '▲' : '▼'} ${formatPercentage(prices.btc.change)}
-            </span>
-            <span class="ticker-item ${prices.eth.change >= 0 ? 'up' : 'down'}">
-                ETH/USD: ${formatPrice(prices.eth.price)} ${prices.eth.change >= 0 ? '▲' : '▼'} ${formatPercentage(prices.eth.change)}
-            </span>
-            <span class="ticker-item ${prices.bnb.change >= 0 ? 'up' : 'down'}">
-                BNB/USD: ${formatPrice(prices.bnb.price)} ${prices.bnb.change >= 0 ? '▲' : '▼'} ${formatPercentage(prices.bnb.change)}
-            </span>
-            <span class="ticker-item ${prices.sol.change >= 0 ? 'up' : 'down'}">
-                SOL/USD: ${formatPrice(prices.sol.price)} ${prices.sol.change >= 0 ? '▲' : '▼'} ${formatPercentage(prices.sol.change)}
-            </span>
-            <span class="ticker-item ${prices.ada.change >= 0 ? 'up' : 'down'}">
-                ADA/USD: ${formatPrice(prices.ada.price)} ${prices.ada.change >= 0 ? '▲' : '▼'} ${formatPercentage(prices.ada.change)}
-            </span>
-            <span class="ticker-item ${prices.dot.change >= 0 ? 'up' : 'down'}">
-                DOT/USD: ${formatPrice(prices.dot.price)} ${prices.dot.change >= 0 ? '▲' : '▼'} ${formatPercentage(prices.dot.change)}
-            </span>
-        `.repeat(2); // Repeat twice for seamless loop
-
-        // Update ticker content
-        tickerContent.innerHTML = tickerHTML;
-
-        // Clone for seamless loop
-        const existingClone = tickerContent.parentElement.querySelector('.ticker-content:nth-child(2)');
-        if (existingClone) {
-            existingClone.remove();
-        }
-        const tickerClone = tickerContent.cloneNode(true);
-        tickerContent.parentElement.appendChild(tickerClone);
+    for (const [symbol, data] of Object.entries(prices)) {
+        updateTickerItem(symbol, data);
     }
 }
 
 // Initialize ticker with live prices
-if (tickerContent) {
+if (tickerTrackTop || tickerTrackBottom) {
     updateTicker(); // Initial load
     setInterval(updateTicker, 60000); // Update every 60 seconds
 }
