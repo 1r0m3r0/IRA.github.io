@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Estadística Descriptiva | Series de Tiempo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+    body {
+      background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #111a2e 100%);
+      background-size: 200% 200%;
+      animation: gradientShift 20s ease infinite;
+      font-family: 'Inter', sans-serif;
+      color: #eef5ff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+    .modulo-container {
+      max-width: 1300px; width: 100%;
+      background: rgba(15,25,45,0.65); backdrop-filter: blur(12px);
+      border-radius: 3rem; border: 1px solid rgba(255,215,0,0.25);
+      box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden;
+    }
+    .hero-header {
+      background: linear-gradient(95deg,#0b1120,#111a2e); padding: 2rem 2rem 1.5rem;
+      text-align: center; border-bottom: 2px solid #ffd700;
+    }
+    .hero-header h1 {
+      font-size: 2.6rem; font-weight: 800;
+      background: linear-gradient(135deg,#FFF,#ffeb3b,#ffd700);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .hero-header p { color: #ffe082; margin-top: 0.5rem; font-weight: 500; }
+    .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1.2rem; flex-wrap: wrap; }
+    .chip {
+      background: rgba(255,215,0,0.15); border: 1px solid #ffd700;
+      padding: 0.4rem 1rem; border-radius: 40px; font-size: 0.8rem; font-weight: 600;
+    }
+    .analogy-card {
+      background: #1e2a3acc; margin: 1.5rem 2rem; padding: 1.2rem 1.8rem;
+      border-radius: 2rem; border-left: 8px solid #ffd700; font-size: 1rem; line-height: 1.6;
+    }
+    .main-area { padding: 0 2rem 1.5rem; display: flex; flex-wrap: wrap; gap: 1.5rem; }
+    .plot-section { flex: 2; min-width: 320px; }
+    .ctrl-section { flex: 1; min-width: 280px; }
+    .canvas-wrap {
+      background: #0a0f1e; border-radius: 2rem; padding: 1rem;
+      border: 1px solid #ffd70044; text-align: center;
+    }
+    .canvas-wrap canvas { width: 100%; height: auto; aspect-ratio: 2/1; border-radius: 1rem; max-height: 320px; }
+    .ctrl-panel {
+      background: #0f1a2ccc; border-radius: 2rem; padding: 1.2rem;
+      border: 1px solid #ffd70033;
+    }
+    .ctrl-panel h3 { color: #ffd700; margin-bottom: 0.8rem; font-size: 1.1rem; }
+    .ctrl-row { margin: 0.6rem 0; }
+    .ctrl-row label { font-size: 0.85rem; color: #ffe082; display: block; margin-bottom: 0.2rem; }
+    .ctrl-row input[type="range"] { width: 100%; accent-color: #ffd700; }
+    .ctrl-row .val { font-family: monospace; color: #ffd700; }
+    .checkbox-row { display: flex; gap: 1rem; flex-wrap: wrap; margin: 0.6rem 0; }
+    .checkbox-row label { font-size: 0.8rem; display: flex; align-items: center; gap: 0.3rem; cursor: pointer; }
+    .checkbox-row input { accent-color: #ffd700; }
+    .stat-row { display: flex; justify-content: space-between; padding: 0.3rem 0; font-size: 0.85rem; border-bottom: 1px solid #ffffff0a; }
+    .stat-row .val { font-family: monospace; color: #ffd700; }
+    .btn-sm {
+      background: #1a2a4a; border: 1px solid #ffd70066; color: #eef5ff;
+      padding: 0.4rem 0.8rem; border-radius: 2rem; font-size: 0.75rem; cursor: pointer; font-weight: 600; transition: 0.2s;
+    }
+    .btn-sm:hover { background: #ffd70033; transform: translateY(-1px); }
+    .feedback {
+      background: #00000099; margin: 0 2rem 1.5rem; padding: 1rem; border-radius: 1.5rem;
+      text-align: center; font-weight: 500; border-left: 4px solid #ffd700;
+    }
+    .insignia {
+      text-align: center; background: #0c1b2f; border-radius: 2rem;
+      margin: 0 2rem 1.5rem; padding: 1rem; border: 1px dashed gold;
+    }
+    .insignia i { font-size: 2.5rem; color: gold; }
+    .hidden { display: none; }
+    .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
+    .nav-link {
+      background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem; font-weight: 600;
+      text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s;
+    }
+    .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(255,215,0,0.4); }
+    .nav-link.next { background: linear-gradient(95deg,#f0a500,#ff6a00); color: #1e1a0c; }
+    .nav-link.menu { background: #1a2a4a; border: 1px solid #3399ff; }
+    footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
+    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+<nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+
+<div class="modulo-container">
+  <div class="hero-header">
+    <h1>📅 SERIES DE TIEMPO 📅</h1>
+    <p>Analiza cómo evolucionan las variables a lo largo del tiempo</p>
+    <div class="badge-area">
+      <span class="chip"><i class="fas fa-chart-line"></i> Tendencia</span>
+      <span class="chip"><i class="fas fa-wave-square"></i> Estacionalidad</span>
+      <span class="chip"><i class="fas fa-window-minimize"></i> Media Móvil</span>
+    </div>
+  </div>
+
+  <div class="analogy-card">
+    <strong>📓 Piénsalo así:</strong> Las series de tiempo son como el diario de vida de una variable. Así como guardas fotos de cada cumpleaños para ver cómo has cambiado, una serie de tiempo guarda el valor de algo (ventas, temperatura, precio) en cada momento. Puede tener tendencia (creces), estacionalidad (cada diciembre te da gripe), ciclos (cada 7 años cambias de casa) y ruido (el día que te tropezaste).
+  </div>
+
+  <div class="main-area">
+    <div class="plot-section">
+      <div class="canvas-wrap">
+        <canvas id="tsCanvas" width="800" height="320"></canvas>
+        <p style="font-size:0.75rem;color:#8899bb;margin-top:0.3rem;">Azul=Serie completa, Naranja=Media móvil, Verde=Tendencia extraída</p>
+      </div>
+    </div>
+    <div class="ctrl-section">
+      <div class="ctrl-panel">
+        <h3><i class="fas fa-sliders-h"></i> Controles</h3>
+        <div class="ctrl-row">
+          <label>Ventana de media móvil: <span class="val" id="windowVal">5</span></label>
+          <input type="range" id="windowSlider" min="3" max="21" value="5" step="2">
+        </div>
+        <div class="checkbox-row">
+          <label><input type="checkbox" id="showTrend" checked> Tendencia lineal</label>
+          <label><input type="checkbox" id="showMA" checked> Media móvil</label>
+        </div>
+        <div class="btn-row" style="margin-top:0.5rem;">
+          <button class="btn-sm" id="genTrendBtn"><i class="fas fa-chart-line"></i> Tendencia + estacional</button>
+          <button class="btn-sm" id="genRandomBtn"><i class="fas fa-random"></i> Ruido puro</button>
+          <button class="btn-sm" id="genStepBtn"><i class="fas fa-arrow-up"></i> Cambio abrupto</button>
+        </div>
+        <div style="margin-top:0.8rem;border-top:1px solid #ffd70033;padding-top:0.6rem;">
+          <div class="stat-row"><span>Media</span><span class="val" id="meanVal">—</span></div>
+          <div class="stat-row"><span>Desv. estándar</span><span class="val" id="stdVal">—</span></div>
+          <div class="stat-row"><span>Mín / Máx</span><span class="val" id="minmaxVal">—</span></div>
+          <div class="stat-row"><span>Componentes</span><span class="val" id="compVal">—</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="feedbackMsg" class="feedback">
+    💡 Explora la serie de tiempo. Ajusta la ventana de media móvil con el slider. Prueba diferentes tipos de series con los botones. Observa cómo la tendencia y estacionalidad se combinan.
+  </div>
+
+  <div id="insigniaArea" class="insignia hidden">
+    <i class="fas fa-medal"></i>
+    <h3>🏅 ANALISTA DE SERIES TEMPORALES 🏅</h3>
+    <p>¡Sabes descomponer una serie de tiempo en tendencia, estacionalidad y ruido! Has explorado diferentes tipos de series y dominas el suavizamiento por medias móviles.</p>
+  </div>
+
+  <div class="nav-links">
+    <a href="12-regresion-simple.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+    <a href="14-numeros-indice.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Estadística Descriptiva Interactiva · Nivel 13: Series de Tiempo</footer>
+</div>
+
+<script>
+const STORAGE_KEY = 'est_desc_lvl13';
+
+const canvas = document.getElementById('tsCanvas');
+const ctx = canvas.getContext('2d');
+const W = 800, H = 320;
+const PAD = { l: 50, r: 20, t: 20, b: 35 };
+
+let data = [];
+let interacted = false;
+
+function generateData(trend = 1, seasonal = 1, noise = 1, n = 60) {
+  data = [];
+  for (let i = 0; i < n; i++) {
+    const t = trend * 0.3 * i;
+    const s = seasonal * 15 * Math.sin(2 * Math.PI * i / 12);
+    const c = seasonal * 8 * Math.sin(2 * Math.PI * i / 36);
+    const r = noise * (Math.random() - 0.5) * 12;
+    data.push({ t: i, y: 50 + t + s + c + r });
+  }
+  interacted = true;
+}
+
+function movingAverage(window) {
+  const h = Math.floor(window / 2);
+  const result = [];
+  for (let i = 0; i < data.length; i++) {
+    let sum = 0, cnt = 0;
+    for (let j = Math.max(0, i - h); j <= Math.min(data.length - 1, i + h); j++) { sum += data[j].y; cnt++; }
+    result.push(sum / cnt);
+  }
+  return result;
+}
+
+function linearTrend() {
+  const n = data.length;
+  let sx = 0, sy = 0, sxy = 0, sx2 = 0;
+  for (let i = 0; i < n; i++) { sx += i; sy += data[i].y; sxy += i * data[i].y; sx2 += i * i; }
+  const b1 = (n * sxy - sx * sy) / (n * sx2 - sx * sx);
+  const b0 = (sy - b1 * sx) / n;
+  return data.map((d, i) => ({ x: i, y: b0 + b1 * i }));
+}
+
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+
+  const plotW = W - PAD.l - PAD.r;
+  const plotH = H - PAD.t - PAD.b;
+
+  if (data.length === 0) return;
+
+  const ys = data.map(d => d.y);
+  const yMin = Math.min(...ys);
+  const yMax = Math.max(...ys);
+  const yRange = Math.max(yMax - yMin, 1);
+
+  const scaleX = (i) => PAD.l + (i / (data.length - 1)) * plotW;
+  const scaleY = (v) => PAD.t + (1 - (v - yMin) / yRange) * plotH;
+
+  // Grid
+  ctx.strokeStyle = '#ffd70015';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    const y = PAD.t + (i / 4) * plotH;
+    ctx.beginPath(); ctx.moveTo(PAD.l, y); ctx.lineTo(W - PAD.r, y); ctx.stroke();
+    ctx.fillStyle = '#6666';
+    ctx.font = '11px monospace';
+    ctx.textAlign = 'right';
+    const val = yMax - (i / 4) * yRange;
+    ctx.fillText(val.toFixed(1), PAD.l - 5, y + 4);
+  }
+
+  // X labels
+  ctx.fillStyle = '#6666';
+  ctx.font = '11px monospace';
+  ctx.textAlign = 'center';
+  for (let i = 0; i < data.length; i += Math.max(1, Math.floor(data.length / 8))) {
+    ctx.fillText('t=' + i, scaleX(i), H - 5);
+  }
+
+  // Serie original
+  ctx.strokeStyle = '#2b9eff';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  data.forEach((d, i) => { const x = scaleX(i), y = scaleY(d.y); i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y); });
+  ctx.stroke();
+
+  // Moving average
+  const showMA = document.getElementById('showMA').checked;
+  if (showMA) {
+    const window = parseInt(document.getElementById('windowSlider').value);
+    const ma = movingAverage(window);
+    ctx.strokeStyle = '#ff6a00cc';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ma.forEach((v, i) => { const x = scaleX(i), y = scaleY(v); i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y); });
+    ctx.stroke();
+  }
+
+  // Trend
+  const showTrend = document.getElementById('showTrend').checked;
+  if (showTrend && data.length >= 3) {
+    const trend = linearTrend();
+    ctx.strokeStyle = '#00e676cc';
+    ctx.lineWidth = 2.5;
+    ctx.setLineDash([6, 4]);
+    ctx.beginPath();
+    trend.forEach((d, i) => { const x = scaleX(i), y = scaleY(d.y); i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y); });
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // Stats update
+  const mean = ys.reduce((a,b)=>a+b,0)/ys.length;
+  const std = Math.sqrt(ys.reduce((s,v)=>s+(v-mean)**2,0)/ys.length);
+  document.getElementById('meanVal').textContent = mean.toFixed(2);
+  document.getElementById('stdVal').textContent = std.toFixed(2);
+  document.getElementById('minmaxVal').textContent = `${Math.min(...ys).toFixed(1)} / ${Math.max(...ys).toFixed(1)}`;
+  document.getElementById('compVal').textContent = `Tendencia + Estacional + Ciclo + Ruido`;
+
+  checkCompletion();
+}
+
+function checkCompletion() {
+  if (interacted) {
+    insigniaArea.classList.remove('hidden');
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ completed: true })); } catch(e) {}
+    document.getElementById('feedbackMsg').innerHTML = '🎉 ¡Excelente! Has explorado las series de tiempo a fondo. Has ganado la insignia <strong>Analista de Series Temporales</strong>. ¡Puedes pasar al siguiente nivel!';
+  }
+}
+
+document.getElementById('windowSlider').addEventListener('input', function() {
+  document.getElementById('windowVal').textContent = this.value;
+  draw();
+});
+
+document.getElementById('showTrend').addEventListener('change', draw);
+document.getElementById('showMA').addEventListener('change', draw);
+
+document.getElementById('genTrendBtn').addEventListener('click', () => {
+  generateData(1, 1, 0.5);
+  draw();
+  document.getElementById('feedbackMsg').innerHTML = '📈 Serie con <strong>tendencia</strong> creciente y <strong>estacionalidad</strong> anual. Observa cómo la media móvil suaviza el ruido.';
+});
+
+document.getElementById('genRandomBtn').addEventListener('click', () => {
+  generateData(0, 0, 3);
+  draw();
+  document.getElementById('feedbackMsg').innerHTML = '🎲 Serie de <strong>ruido puro</strong> (sin tendencia ni estacionalidad). No hay patrón predecible.';
+});
+
+document.getElementById('genStepBtn').addEventListener('click', () => {
+  data = [];
+  for (let i = 0; i < 60; i++) {
+    const step = i >= 25 ? 30 : 0;
+    const r = (Math.random() - 0.5) * 8;
+    data.push({ t: i, y: 30 + step + r });
+  }
+  interacted = true;
+  draw();
+  document.getElementById('feedbackMsg').innerHTML = '⬆️ Serie con <strong>cambio abrupto</strong> en t=25. La media móvil tarda en adaptarse al nuevo nivel.';
+});
+
+// Initial data
+generateData(1, 1, 0.5);
+draw();
+
+(function load() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) { const d = JSON.parse(saved); if (d.completed) insigniaArea.classList.remove('hidden'); }
+  } catch(e) {}
+})();
+</script>
+</body>
+</html>

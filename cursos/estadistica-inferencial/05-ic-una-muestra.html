@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Estadística Inferencial | IC I: Una Muestra</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #111a2e 100%); background-size: 200% 200%; animation: gradientShift 20s ease infinite; font-family: 'Inter', sans-serif; color: #eef5ff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; }
+    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+    .modulo-container { max-width: 1300px; width: 100%; background: rgba(15,25,45,0.65); backdrop-filter: blur(12px); border-radius: 3rem; border: 1px solid rgba(0,230,118,0.25); box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden; }
+    .hero-header { background: linear-gradient(95deg,#0b1120,#111a2e); padding: 2rem 2rem 1.5rem; text-align: center; border-bottom: 2px solid #00e676; }
+    .hero-header h1 { font-size: 2.6rem; font-weight: 800; background: linear-gradient(135deg,#FFF,#a0ffb0,#00e676); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .hero-header p { color: #b9ffd0; margin-top: 0.5rem; font-weight: 500; }
+    .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1.2rem; flex-wrap: wrap; }
+    .chip { background: rgba(0,230,118,0.15); border: 1px solid #00e676; padding: 0.4rem 1rem; border-radius: 40px; font-size: 0.8rem; font-weight: 600; }
+    .analogy-card { background: #1e2a3acc; margin: 1.5rem 2rem; padding: 1.2rem 1.8rem; border-radius: 2rem; border-left: 8px solid #00e676; font-size: 1rem; line-height: 1.6; }
+    .main-area { padding: 0 2rem 1.5rem; display: flex; flex-wrap: wrap; gap: 1.5rem; }
+    .controls-section { flex: 1; min-width: 300px; }
+    .vis-section { flex: 1.5; min-width: 380px; }
+    .control-card { background: #0f1a2ccc; border-radius: 2rem; padding: 1.2rem; border: 1px solid #00e67633; margin-bottom: 1rem; }
+    .control-card h3 { color: #00e676; margin-bottom: 0.8rem; font-size: 1.1rem; }
+    .control-card label { display: block; font-size: 0.85rem; margin: 0.6rem 0 0.2rem; color: #b0ffd0; }
+    .control-card input, .control-card select { width: 100%; padding: 0.5rem 0.8rem; border-radius: 1rem; background: #0a0f1e; border: 1px solid #00e67644; color: #eef5ff; font-family: 'Inter', sans-serif; font-size: 0.9rem; }
+    .control-card input:focus, .control-card select:focus { outline: none; border-color: #00e676; }
+    .ci-vis { background: #0a0f1e; border-radius: 2rem; padding: 1rem; border: 1px solid #00e67633; overflow: hidden; }
+    .ci-vis canvas { width: 100%; height: auto; border-radius: 1rem; }
+    .stat-row { display: flex; justify-content: space-between; padding: 0.4rem 0; border-bottom: 1px solid #ffffff0a; font-size: 0.9rem; }
+    .stat-row .val { font-family: monospace; font-weight: 700; color: #a0ffb0; }
+    .btn-action { background: linear-gradient(95deg,#f0a500,#ff6a00); border: none; padding: 0.8rem 1.8rem; font-weight: bold; border-radius: 3rem; cursor: pointer; font-size: 1rem; transition: 0.2s; color: #1e1a0c; margin-top: 0.5rem; }
+    .btn-action:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(240,165,0,0.5); }
+    .btn-secondary { background: #2c3e66; border: none; padding: 0.7rem 1.5rem; font-weight: 600; border-radius: 3rem; cursor: pointer; font-size: 0.95rem; color: #eef5ff; }
+    .btn-secondary:hover { background: #3a5080; }
+    .feedback { background: #00000099; margin: 0 2rem 1.5rem; padding: 1rem; border-radius: 1.5rem; text-align: center; font-weight: 500; border-left: 4px solid #00e676; }
+    .insignia { text-align: center; background: #0c1b2f; border-radius: 2rem; margin: 0 2rem 1.5rem; padding: 1rem; border: 1px dashed gold; }
+    .insignia i { font-size: 2.5rem; color: gold; }
+    .hidden { display: none; }
+    .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
+    .nav-link { background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem; font-weight: 600; text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; }
+    .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(0,230,118,0.4); }
+    .nav-link.next { background: linear-gradient(95deg,#f0a500,#ff6a00); color: #1e1a0c; }
+    .nav-link.menu { background: #1a2a4a; border: 1px solid #3399ff; }
+    footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
+    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+<nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+<div class="modulo-container">
+  <div class="hero-header">
+    <h1><i class="fas fa-bullseye"></i> IC I: Una Muestra</h1>
+    <p>Intervalos de confianza para media, proporción y varianza</p>
+    <div class="badge-area">
+      <span class="chip"><i class="fas fa-chart-line"></i> z / t / χ²</span>
+      <span class="chip"><i class="fas fa-sliders-h"></i> Nivel de confianza</span>
+      <span class="chip"><i class="fas fa-fish"></i> Cobertura</span>
+    </div>
+  </div>
+  <div class="analogy-card">
+    <i class="fas fa-lightbulb" style="color:#00e676"></i>
+    <strong>Analogía:</strong> Un intervalo de confianza es como una red de pesca: una red más grande (mayor nivel de confianza) atrapa más peces (incluye más valores posibles del parámetro), pero es menos precisa (intervalo más ancho). Una red más pequeña es más precisa pero corres el riesgo de no atrapar el pez (no contener el parámetro). ¡El 95% de confianza significa que 95 de cada 100 redes atrapan el pez!
+  </div>
+  <div class="main-area">
+    <div class="controls-section">
+      <div class="control-card">
+        <h3><i class="fas fa-cog"></i> Configuración</h3>
+        <label>Tipo de intervalo</label>
+        <select id="intervalType">
+          <option value="z">z-interval (media, σ conocida)</option>
+          <option value="t">t-interval (media, σ desconocida)</option>
+          <option value="prop">Proporción (p)</option>
+          <option value="var">Varianza (χ²)</option>
+        </select>
+        <div id="meanControls">
+          <label>Media muestral (x̄)</label>
+          <input type="number" id="sampleMean" step="0.1" value="100">
+          <label>n (tamaño muestral)</label>
+          <input type="number" id="sampleSize" step="1" min="3" value="30">
+          <label id="sigmaLabel">σ (desviación poblacional)</label>
+          <input type="number" id="sigma" step="0.1" value="15">
+          <label id="sLabel" style="display:none">s (desviación muestral)</label>
+          <input type="number" id="s" step="0.1" value="16" style="display:none">
+        </div>
+        <div id="propControls" style="display:none">
+          <label>Proporción muestral (p̂)</label>
+          <input type="number" id="sampleProp" step="0.01" min="0" max="1" value="0.6">
+          <label>n (tamaño muestral)</label>
+          <input type="number" id="propN" step="1" min="10" value="100">
+        </div>
+        <div id="varControls" style="display:none">
+          <label>Varianza muestral (s²)</label>
+          <input type="number" id="sampleVar" step="0.1" min="0.1" value="25">
+          <label>n (tamaño muestral)</label>
+          <input type="number" id="varN" step="1" min="3" value="30">
+        </div>
+        <label>Nivel de confianza</label>
+        <select id="confidenceLevel">
+          <option value="0.80">80%</option>
+          <option value="0.90">90%</option>
+          <option value="0.95" selected>95%</option>
+          <option value="0.99">99%</option>
+        </select>
+        <button class="btn-action" id="calcBtn"><i class="fas fa-sync"></i> Calcular intervalo</button>
+      </div>
+      <div class="control-card">
+        <h3><i class="fas fa-chart-bar"></i> Resultados</h3>
+        <div class="stat-row"><span>Límite inferior</span><span class="val" id="lowerVal">—</span></div>
+        <div class="stat-row"><span>Límite superior</span><span class="val" id="upperVal">—</span></div>
+        <div class="stat-row"><span>Amplitud</span><span class="val" id="widthVal">—</span></div>
+        <div class="stat-row"><span>Contiene μ/p/σ²?</span><span class="val" id="containsVal">—</span></div>
+      </div>
+    </div>
+    <div class="vis-section">
+      <div class="control-card">
+        <h3><i class="fas fa-eye"></i> Visualización: 100 intervalos</h3>
+        <p style="font-size:0.8rem;color:#8899bb;margin-bottom:0.5rem;">Cada línea horizontal es un IC. Los verdes contienen el parámetro verdadero; los rojos no. Para un 95% de confianza, ~5 de cada 100 fallan.</p>
+        <div class="ci-vis">
+          <canvas id="ciCanvas" width="600" height="420"></canvas>
+        </div>
+        <div style="display:flex;gap:1rem;justify-content:center;margin-top:0.5rem;font-size:0.85rem;">
+          <span><span style="color:#00e676;">■</span> Contienen parámetro: <strong id="containCount">0</strong></span>
+          <span><span style="color:#ff5050;">■</span> No contienen: <strong id="missCount">0</strong></span>
+        </div>
+        <button class="btn-secondary" id="simulateBtn"><i class="fas fa-random"></i> Simular 100 nuevos ICs</button>
+      </div>
+    </div>
+  </div>
+  <div id="feedbackMsg" class="feedback">
+    <i class="fas fa-info-circle"></i> Configura los parámetros y haz clic en "Calcular intervalo". Luego simula 100 intervalos para ver la cobertura.
+  </div>
+  <div id="insigniaArea" class="insignia hidden">
+    <i class="fas fa-medal"></i>
+    <h3><i class="fas fa-award"></i> MAESTRO DE INTERVALOS</h3>
+    <p>Has explorado cómo funcionan los intervalos de confianza. Entiendes que la confianza está en el método, no en el intervalo individual. ¡Sigue así!</p>
+  </div>
+  <div class="nav-links">
+    <a href="04-estimacion-puntual.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+    <a href="06-ic-dos-muestras.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Estadística Inferencial Interactiva · Nivel 5: IC I — Una Muestra</footer>
+</div>
+<script>
+const STORAGE_KEY = 'est_inf_lvl5';
+const canvas = document.getElementById('ciCanvas');
+const ctx = canvas.getContext('2d');
+const W = 600, H = 420;
+
+function jStatNormalQuant(p) {
+  const a = [-3.969683028665376e1,2.209460984245205e2,-2.759285104469687e2,1.383577518672690e2,-3.066479806614716e1,2.506628277459239];
+  const b = [-5.447609879822406e1,1.615858368580409e2,-1.556989798598866e2,6.680131188771972e1,-1.328068155288572e1];
+  const c = [-7.784894002430293e-3,-3.223964580411365e-1,-2.400758277161838,-2.549732539343734,4.374664141464968,2.938163982698783];
+  const d = [7.784695709041462e-3,3.224671290700398e-1,2.445134137142996,3.754408661907416];
+  if (p<0.02425) { const q=Math.sqrt(-2*Math.log(p)); return (((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1); }
+  if (p<0.97575) { const q=p-0.5,r=q*q; return (((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q/(((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1); }
+  const q=Math.sqrt(-2*Math.log(1-p)); return -(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
+}
+function zCritical(alpha) { return -jStatNormalQuant(alpha/2); }
+function tCritical(alpha, df) {
+  if (df>200) return zCritical(alpha);
+  let a=0.5,b=5;
+  for(let iter=0;iter<60;iter++){const m=(a+b)/2;const p=tProb(m,df);if(p>alpha/2)a=m;else b=m;}
+  return (a+b)/2;
+}
+function tProb(x,df){return 1-incBeta(df/(df+x*x),df/2,0.5);}
+function lgamma(z){
+  if(z<0.5)return Math.PI/Math.sin(Math.PI*z)-lgamma(1-z);
+  z-=1;const g=7,c=[0.99999999999980993,676.5203681218851,-1259.1392167224028,771.32342877765313,-176.61502916214059,12.507343278686905,-0.13857109526572012,9.9843695780195716e-6,1.5056327351493116e-7];
+  let x=c[0];for(let i=1;i<g+2;i++)x+=c[i]/(z+i);
+  const t=z+g+0.5;return 0.5*Math.log(2*Math.PI)+(z+0.5)*Math.log(t)-t+Math.log(x);
+}
+function incBeta(x,a,b){
+  if(x<0||x>1)return x<0?0:1;
+  if(x===0||x===1)return x;
+  const bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));
+  if(x<(a+1)/(a+b+2))return bt*betaCF(x,a,b)/a;
+  return 1-bt*betaCF(1-x,b,a)/b;
+}
+function betaCF(x,a,b){
+  const MAX=200,EPS=3e-12;let qab=a+b,qap=a+1,qam=a-1;
+  let c=1,d=1-qab*x/qap;if(Math.abs(d)<1e-30)d=1e-30;d=1/d;let h=d;
+  for(let m=1;m<=MAX;m++){
+    const m2=2*m;
+    let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<1e-30)d=1e-30;c=1+aa/c;if(Math.abs(c)<1e-30)c=1e-30;d=1/d;h*=d*c;
+    aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<1e-30)d=1e-30;c=1+aa/c;if(Math.abs(c)<1e-30)c=1e-30;d=1/d;const del=d*c;h*=del;
+    if(Math.abs(del-1)<EPS)break;
+  }
+  return h;
+}
+function chi2Critical(alpha, df) { return chi2Quantile(1 - alpha/2, df); }
+function chi2CriticalLow(alpha, df) { return chi2Quantile(alpha/2, df); }
+function chi2Quantile(p, df) {
+  if (df <= 0) return 0;
+  const approx = df * Math.pow(1 - 2/(9*df) + jStatNormalQuant(p) * Math.sqrt(2/(9*df)), 3);
+  let lo = Math.max(0.001, approx * 0.5);
+  let hi = approx * 2;
+  for (let iter = 0; iter < 60; iter++) {
+    const mid = (lo + hi) / 2;
+    const cdf = chi2CDF(mid, df);
+    if (cdf > p) hi = mid;
+    else lo = mid;
+  }
+  return (lo + hi) / 2;
+}
+function chi2CDF(x, df) { if (x <= 0) return 0; return incBeta(x / (x + df), df / 2, 0.5); }
+function computeInterval(type, conf) {
+  const alpha = 1 - conf;
+  if (type === 'z') {
+    const xbar=parseFloat(document.getElementById('sampleMean').value), n=parseInt(document.getElementById('sampleSize').value), sigma=parseFloat(document.getElementById('sigma').value);
+    if (isNaN(xbar)||isNaN(n)||isNaN(sigma)||n<2||sigma<=0) return null;
+    const se=sigma/Math.sqrt(n), z=zCritical(alpha);
+    return {lower:xbar-z*se, upper:xbar+z*se, param:xbar};
+  }
+  if (type === 't') {
+    const xbar=parseFloat(document.getElementById('sampleMean').value), n=parseInt(document.getElementById('sampleSize').value), s=parseFloat(document.getElementById('s').value);
+    if (isNaN(xbar)||isNaN(n)||isNaN(s)||n<2||s<=0) return null;
+    const se=s/Math.sqrt(n), t=tCritical(alpha,n-1);
+    return {lower:xbar-t*se, upper:xbar+t*se, param:xbar};
+  }
+  if (type === 'prop') {
+    const phat=parseFloat(document.getElementById('sampleProp').value), n=parseInt(document.getElementById('propN').value);
+    if (isNaN(phat)||isNaN(n)||n<5||phat<=0||phat>=1) return null;
+    const z=zCritical(alpha), se=Math.sqrt(phat*(1-phat)/n);
+    return {lower:Math.max(0,phat-z*se), upper:Math.min(1,phat+z*se), param:phat};
+  }
+  if (type === 'var') {
+    const s2=parseFloat(document.getElementById('sampleVar').value), n=parseInt(document.getElementById('varN').value);
+    if (isNaN(s2)||isNaN(n)||n<2||s2<=0) return null;
+    const df=n-1, chi2L=chi2CriticalLow(alpha,df), chi2U=chi2Critical(alpha,df);
+    return {lower:df*s2/chi2U, upper:df*s2/chi2L, param:s2};
+  }
+  return null;
+}
+function getTrueParam(type) { if(type==='z'||type==='t')return 100; if(type==='prop')return 0.55; if(type==='var')return 20; return 100; }
+function simulateCIs(type, conf) {
+  const d=[], tv=getTrueParam(type);
+  for(let i=0;i<100;i++){
+    if(type==='z'){const n=30,s=15,x=tv+(Math.random()-0.5)*2*s/Math.sqrt(n),z=zCritical(1-conf),h=z*s/Math.sqrt(n);d.push({lower:x-h,upper:x+h});}
+    else if(type==='t'){const n=30,s=16,x=tv+(Math.random()-0.5)*2*15/Math.sqrt(n),t=tCritical(1-conf,n-1),h=t*s/Math.sqrt(n);d.push({lower:x-h,upper:x+h});}
+    else if(type==='prop'){const n=100,p=tv+(Math.random()-0.5)*2*Math.sqrt(tv*(1-tv)/n)*2,z=zCritical(1-conf),se=Math.sqrt(Math.max(0.001,p*(1-p))/n),h=z*se;d.push({lower:Math.max(0,p-h),upper:Math.min(1,p+h)});}
+    else if(type==='var'){const n=30,df=n-1,s2=20*(1+(Math.random()-0.5)*0.6),a=1-conf,cl=chi2CriticalLow(a,df),cu=chi2Critical(a,df);d.push({lower:df*s2/cu,upper:df*s2/cl});}
+  }
+  return d;
+}
+function renderCIs(d, tv) {
+  ctx.clearRect(0,0,W,H); ctx.fillStyle='#0a0f1e'; ctx.fillRect(0,0,W,H);
+  const m=50,pw=W-2*m,ph=H-2*m,lo=tv-60,hi=tv+60,rg=hi-lo;
+  let c=0,ms=0;
+  d.forEach((ci,i)=>{const bh=ph/100,xl=m+((ci.lower-lo)/rg)*pw,xu=m+((ci.upper-lo)/rg)*pw,y=m+i*bh,ok=ci.lower<=tv&&ci.upper>=tv;ok?c++:ms++;
+    ctx.strokeStyle=ok?'#00e676':'#ff5050';ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(xl,y+bh/2);ctx.lineTo(xu,y+bh/2);ctx.stroke();ctx.fillStyle=ok?'#00e676':'#ff5050';ctx.beginPath();ctx.arc(xl,y+bh/2,2,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(xu,y+bh/2,2,0,Math.PI*2);ctx.fill();
+  });
+  const xt=m+((tv-lo)/rg)*pw;ctx.strokeStyle='#ffdd00';ctx.lineWidth=2;ctx.setLineDash([6,4]);ctx.beginPath();ctx.moveTo(xt,m-5);ctx.lineTo(xt,H-m+5);ctx.stroke();ctx.setLineDash([]);
+  ctx.strokeStyle='#2b9eff33';ctx.lineWidth=1;
+  for(let i=0;i<=5;i++){const x=m+(i/5)*pw,val=lo+(i/5)*rg;ctx.fillStyle='#8899bb';ctx.font='10px Inter';ctx.textAlign='center';ctx.fillText(val.toFixed(1),x,H-10);}
+  document.getElementById('containCount').textContent=c;document.getElementById('missCount').textContent=ms;
+}
+function updateUI(){
+  const t=document.getElementById('intervalType').value;
+  document.getElementById('meanControls').style.display=(t==='z'||t==='t')?'block':'none';
+  document.getElementById('sigmaLabel').style.display=t==='z'?'block':'none';
+  document.getElementById('sigma').style.display=t==='z'?'block':'none';
+  document.getElementById('sLabel').style.display=t==='t'?'block':'none';
+  document.getElementById('s').style.display=t==='t'?'block':'none';
+  document.getElementById('propControls').style.display=t==='prop'?'block':'none';
+  document.getElementById('varControls').style.display=t==='var'?'block':'none';
+}
+document.getElementById('intervalType').addEventListener('change',updateUI);updateUI();
+document.getElementById('calcBtn').addEventListener('click',()=>{
+  const t=document.getElementById('intervalType').value,cf=parseFloat(document.getElementById('confidenceLevel').value),ci=computeInterval(t,cf),fb=document.getElementById('feedbackMsg');
+  if(!ci){fb.innerHTML='<i class="fas fa-exclamation-triangle" style="color:#ff6a6a"></i> Verifica los valores ingresados.';return;}
+  document.getElementById('lowerVal').textContent=ci.lower.toFixed(4);document.getElementById('upperVal').textContent=ci.upper.toFixed(4);document.getElementById('widthVal').textContent=(ci.upper-ci.lower).toFixed(4);
+  const tv=getTrueParam(t),contains=ci.lower<=tv&&ci.upper>=tv;
+  document.getElementById('containsVal').textContent=contains?'Sí ✓':'No ✗';document.getElementById('containsVal').style.color=contains?'#00e676':'#ff5050';
+  const tn={z:'z-interval',t:'t-interval',prop:'IC para proporción',var:'IC para varianza'};
+  fb.innerHTML='<i class="fas fa-check-circle" style="color:#00e676"></i> '+tn[t]+' al '+(cf*100).toFixed(0)+'%: ['+ci.lower.toFixed(4)+', '+ci.upper.toFixed(4)+']. El parámetro verdadero ('+tv+') '+(contains?'SÍ está':'NO está')+' contenido en el intervalo.';
+  renderCIs(simulateCIs(t,cf),tv);const ins=document.getElementById('insigniaArea');ins.classList.remove('hidden');try{localStorage.setItem(STORAGE_KEY,'true');}catch(e){}
+});
+document.getElementById('simulateBtn').addEventListener('click',()=>{
+  const t=document.getElementById('intervalType').value,cf=parseFloat(document.getElementById('confidenceLevel').value),tv=getTrueParam(t);
+  renderCIs(simulateCIs(t,cf),tv);document.getElementById('feedbackMsg').innerHTML='<i class="fas fa-random" style="color:#00e0ff"></i> 100 intervalos simulados al '+(cf*100).toFixed(0)+'% de confianza.';
+  const ins=document.getElementById('insigniaArea');ins.classList.remove('hidden');try{localStorage.setItem(STORAGE_KEY,'true');}catch(e){}
+});
+(function loadState(){try{if(localStorage.getItem(STORAGE_KEY)==='true')document.getElementById('insigniaArea').classList.remove('hidden');}catch(e){}})();
+const initType=document.getElementById('intervalType').value,initConf=parseFloat(document.getElementById('confidenceLevel').value);renderCIs(simulateCIs(initType,initConf),getTrueParam(initType));
+</script>
+<script src="../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

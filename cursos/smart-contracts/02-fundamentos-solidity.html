@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Fundamentos de Solidity | Smart Contracts DeFi</title>
+  <meta property="og:title" content="Fundamentos de Solidity | Smart Contracts DeFi">
+  <meta property="og:description" content="Aprende los fundamentos de Solidity: variables, funciones, modifiers, mappings, structs y eventos para desarrollar smart contracts en Ethereum.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Israel Romero Portfolio">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Fundamentos de Solidity | Smart Contracts DeFi">
+  <meta name="twitter:description" content="Aprende los fundamentos de Solidity: variables, funciones, modifiers, mappings, structs y eventos para desarrollar smart contracts en Ethereum.">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{background:linear-gradient(145deg,#0a0800 0%,#1a1400 100%);font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem;}
+    .container{max-width:1280px;width:100%;background:rgba(18,14,0,.8);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(255,215,0,.3);box-shadow:0 25px 45px rgba(0,0,0,.6);overflow:hidden;}
+    .hero{background:linear-gradient(95deg,#0a0800,#1a1400);padding:1.8rem 2rem;text-align:center;border-bottom:2px solid #ffd700;}
+    .hero h1{font-size:2rem;font-weight:800;background:linear-gradient(135deg,#fff8cc,#ffe066,#ffd700);-webkit-background-clip:text;background-clip:text;color:transparent;}
+    .hero p{margin-top:.5rem;font-size:1rem;color:#e8d070;}
+    .analogy-card{background:#1e1800cc;margin:1.5rem 2rem;padding:1.2rem 1.8rem;border-radius:2rem;border-left:8px solid #ffd700;font-size:.95rem;line-height:1.6;}
+    .analogy-card strong{color:#ffe066;}
+    .ide-layout{display:flex;flex-wrap:wrap;gap:1.5rem;padding:0 2rem 1.5rem;}
+    .sidebar{width:220px;flex-shrink:0;}
+    .sidebar h2{font-size:1rem;font-weight:700;color:#ffd700;margin-bottom:.8rem;}
+    .snippet-btn{display:block;width:100%;background:#1a1400;border:1px solid #3a2a00;padding:.6rem .8rem;border-radius:1rem;cursor:pointer;color:#e8d070;font-size:.82rem;text-align:left;margin-bottom:.4rem;transition:.2s;font-family:'Inter',sans-serif;}
+    .snippet-btn:hover{border-color:#ffd700;background:#2a2000;}
+    .snippet-btn.active{border-color:#ffd700;background:#2a2000;color:#ffd700;font-weight:700;}
+    .snippet-btn .tag{font-size:.7rem;background:#3a2a00;padding:.1rem .4rem;border-radius:.5rem;float:right;color:#888;}
+    .editor-area{flex:1;min-width:300px;display:flex;flex-direction:column;gap:.8rem;}
+    .code-header{display:flex;justify-content:space-between;align-items:center;background:#1a1400;border-radius:1rem 1rem 0 0;padding:.6rem 1rem;border:1px solid #3a2a00;border-bottom:none;}
+    .code-filename{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:#ffd700;}
+    .run-btn{background:linear-gradient(95deg,#ffd700,#ffaa00);border:none;padding:.4rem 1.2rem;border-radius:2rem;font-weight:700;cursor:pointer;font-size:.85rem;color:#1a1400;transition:.2s;}
+    .run-btn:hover{transform:scale(1.05);}
+    .code-block{background:#0a0800;border:1px solid #3a2a00;padding:1rem;font-family:'JetBrains Mono',monospace;font-size:.82rem;line-height:1.7;overflow-x:auto;border-top:none;white-space:pre;min-height:200px;}
+    .output-area{background:#050400;border:1px solid #2a1a00;border-radius:0 0 1rem 1rem;padding:.8rem 1rem;font-family:'JetBrains Mono',monospace;font-size:.8rem;line-height:1.6;min-height:80px;color:#88ff88;position:relative;}
+    .output-area .out-label{position:absolute;top:6px;right:10px;font-size:.7rem;color:#554400;font-family:'Inter',sans-serif;}
+    .output-area.running{color:#ffaa44;animation:blink .7s infinite;}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.6}}
+    .concepts-row{display:flex;flex-wrap:wrap;gap:1rem;padding:0 2rem 1rem;}
+    .concept-card{flex:1;min-width:180px;background:#1a1400;border-radius:1.5rem;padding:1rem;border:1px solid #3a2a00;}
+    .concept-card h3{font-size:.9rem;font-weight:700;color:#ffd700;margin-bottom:.5rem;}
+    .concept-card p{font-size:.78rem;color:#b8a060;line-height:1.4;}
+    .progress-dots{display:flex;gap:.5rem;justify-content:center;padding:.8rem 2rem 0;}
+    .dot{width:12px;height:12px;border-radius:50%;background:#3a2a00;transition:.3s;}
+    .dot.done{background:#ffd700;}
+    .feedback{background:#00000088;margin:0 2rem 1rem;padding:.9rem;border-radius:1.5rem;text-align:center;border-left:4px solid #ffd700;font-size:.9rem;line-height:1.5;}
+    .insignia{text-align:center;background:#1a1400;border-radius:2rem;margin:0 2rem 1.5rem;padding:1rem;border:1px dashed gold;}
+    .insignia i{font-size:2.5rem;color:gold;}
+    .hidden{display:none;}
+    .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.5rem 2rem;}
+    .nav-link{background:#2c3e66;padding:.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:.5rem;transition:.2s;}
+    .nav-link:hover{transform:translateY(-2px);}
+    .nav-link.next{background:linear-gradient(95deg,#f0a500,#ff6a00);color:#1e1a0c;}
+    .nav-link.menu{background:#1a2a4a;border:1px solid #ffd700;}
+    footer{text-align:center;padding:1rem;font-size:.75rem;border-top:1px solid #1a1400;}
+    @media(max-width:800px){.hero h1{font-size:1.5rem;}.sidebar{width:100%;}}
+    .kw{color:#ff79c6;}.fn{color:#50fa7b;}.str{color:#f1fa8c;}.num{color:#bd93f9;}.cm{color:#6272a4;font-style:italic;}.cls{color:#8be9fd;}
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+<div class="container">
+  <div class="hero">
+    <h1>🛠️ FUNDAMENTOS DE SOLIDITY 🛠️</h1>
+    <p>Domina el lenguaje de los smart contracts. Escribe, compila y ejecuta tu primer código en la EVM.</p>
+  </div>
+
+  <div class="analogy-card">
+    <strong>🧃 Piénsalo así:</strong> Un <strong>smart contract</strong> es como una <strong>máquina expendedora</strong>. Tú metes monedas (ETH + datos), presionas un botón (llamas a una función), y la máquina sigue reglas fijas e inmutables para darte un producto (resultado). No hay dependiente, no hay discusión — el código es la ley. La <strong>EVM</strong> es el pasillo donde están todas las máquinas. <strong>Solidity</strong> es el idioma en el que escribes las instrucciones para cada máquina.
+    <br><br>
+    <strong>📚 Fuentes:</strong> Antonopoulos, G. & Wood, G. (2018) — <em>"Mastering Ethereum"</em>. O'Reilly. / Solidity Documentation — docs.soliditylang.org.
+  </div>
+
+  <div class="progress-dots" id="progressDots"></div>
+
+  <div class="ide-layout">
+    <div class="sidebar">
+      <h2><i class="fas fa-file-code"></i> Snippets</h2>
+      <div id="snippetList"></div>
+    </div>
+    <div class="editor-area">
+      <div class="code-header">
+        <span class="code-filename" id="codeFilename">▸ HelloWorld.sol</span>
+        <button class="run-btn" id="runBtn"><i class="fas fa-play"></i> Ejecutar</button>
+      </div>
+      <div class="code-block" id="codeBlock"></div>
+      <div class="output-area" id="outputArea">
+        <span class="out-label">OUTPUT</span>
+        <span id="outputText">$ Haz clic en "Ejecutar" para desplegar el contrato...</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="concepts-row">
+    <div class="concept-card">
+      <h3>⚙️ EVM</h3>
+      <p>Ethereum Virtual Machine — computadora global descentralizada. Ejecuta bytecode de Solidity en cada nodo. Turing-completa pero con costo por operación (gas).</p>
+    </div>
+    <div class="concept-card">
+      <h3>⛽ Gas</h3>
+      <p>Combustible de la EVM. Cada instrucción (ADD, SSTORE, BALANCE) cuesta gas. Más complejidad = más gas. El precio lo paga quien envía la transacción.</p>
+    </div>
+    <div class="concept-card">
+      <h3>💾 Storage / Memory</h3>
+      <p><strong>Storage</strong> = disco duro (persistente, caro). <strong>Memory</strong> = RAM (temporal, barato). <strong>Calldata</strong> = entrada de solo lectura. Elegir bien ahorra gas.</p>
+    </div>
+    <div class="concept-card">
+      <h3>📋 ABI</h3>
+      <p>Application Binary Interface — el "contrato" que describe funciones y parámetros en JSON. Wallets y dApps lo usan para saber cómo llamar al contrato.</p>
+    </div>
+  </div>
+
+  <div id="feedbackMsg" class="feedback">🛠️ Ejecuta todos los snippets en orden. Cada uno te enseña un pilar de Solidity. ¡Completa los 6 para ganar tu insignia!</div>
+
+  <div id="insigniaArea" class="insignia hidden">
+    <i class="fas fa-tools"></i>
+    <h3>🏅 ¡INSIGNIA DE SOLIDITY DEVELOPER! 🏅</h3>
+    <p>¡Has escrito y ejecutado código real de Solidity! Variables, mapeos, modifiers, eventos y funciones payable — ya entiendes cómo piensa un smart contract.</p>
+  </div>
+
+  <div class="nav-links">
+    <a href="01-portal-inicio.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+    <a href="03-tokens-erc20.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Smart Contracts DeFi · Módulo 2 de 9 · Antonopoulos & Wood (2018) "Mastering Ethereum" / docs.soliditylang.org</footer>
+</div>
+<script>
+const STORAGE_KEY = 'sc_fund2';
+const ran = new Set();
+let completed = false;
+
+const snippets = [
+  {
+    id:'s1', title:'1. Hello World Contract', tag:'Variables',
+    filename:'01_hello_world.sol',
+    code:`<span class="cm">// SPDX-License-Identifier: MIT</span>
+<span class="kw">pragma solidity</span> <span class="num">^0.8.0</span>;
+
+<span class="kw">contract</span> <span class="cls">HelloWorld</span> {
+    <span class="cm">// Variable de estado persistente en storage</span>
+    <span class="cls">string</span> <span class="kw">public</span> greeting <span class="kw">=</span> <span class="str">"Hello, DeFi World!"</span>;
+
+    <span class="cm">// Función que modifica el estado (escribe en storage)</span>
+    <span class="kw">function</span> <span class="fn">setGreeting</span>(<span class="cls">string</span> <span class="kw">memory</span> _newGreeting) <span class="kw">public</span> {
+        greeting <span class="kw">=</span> _newGreeting;
+    }
+}`,
+    output:`🧪 Desplegando HelloWorld...
+   ✓ Transacción minada (gas usado: 124,321)
+
+   greeting → "Hello, DeFi World!"
+
+   ➜ setGreeting("Hola, Blockchain!")
+   ✓ Transacción minada (gas usado: 28,450)
+
+   greeting → "Hola, Blockchain!"
+
+   📌 Las variables public generan un getter automático.`
+  },
+  {
+    id:'s2', title:'2. Counter Increment/Decrement', tag:'Estado',
+    filename:'02_counter.sol',
+    code:`<span class="cm">// SPDX-License-Identifier: MIT</span>
+<span class="kw">pragma solidity</span> <span class="num">^0.8.0</span>;
+
+<span class="kw">contract</span> <span class="cls">Counter</span> {
+    <span class="cls">uint256</span> <span class="kw">public</span> count;
+
+    <span class="kw">function</span> <span class="fn">increment</span>() <span class="kw">public</span> {
+        count <span class="kw">+=</span> <span class="num">1</span>;
+    }
+
+    <span class="kw">function</span> <span class="fn">decrement</span>() <span class="kw">public</span> {
+        <span class="kw">require</span>(count <span class="kw">&gt;</span> <span class="num">0</span>, <span class="str">"No negative!"</span>);
+        count <span class="kw">-=</span> <span class="num">1</span>;
+    }
+
+    <span class="kw">function</span> <span class="fn">reset</span>() <span class="kw">public</span> {
+        count <span class="kw">=</span> <span class="num">0</span>;
+    }
+}`,
+    output:`🧪 Desplegando Counter...
+   ✓ count inicializado a 0
+
+   ➜ increment() llamado
+   ✓ count = 1
+
+   ➜ increment() llamado
+   ✓ count = 2
+
+   ➜ decrement() llamado
+   ✓ count = 1
+
+   ➜ decrement() llamado
+   ✓ count = 0
+
+   ➜ decrement() llamado
+   ✗ REVERT: "No negative!"
+   ⛽ Gas consumido igual (la validación cuesta)
+
+   🎯 Estado final: count = 0`
+  },
+  {
+    id:'s3', title:'3. Mapping Address => uint', tag:'Mappings',
+    filename:'03_mapping_demo.sol',
+    code:`<span class="cm">// SPDX-License-Identifier: MIT</span>
+<span class="kw">pragma solidity</span> <span class="num">^0.8.0</span>;
+
+<span class="kw">contract</span> <span class="cls">BalanceSheet</span> {
+    <span class="cm">// Mapping: address → balance en wei</span>
+    <span class="cls">mapping</span>(<span class="cls">address</span> <span class="kw">=&gt;</span> <span class="cls">uint256</span>) <span class="kw">public</span> balances;
+
+    <span class="cm">// payable permite recibir ETH</span>
+    <span class="kw">function</span> <span class="fn">deposit</span>() <span class="kw">public</span> <span class="kw">payable</span> {
+        balances[<span class="kw">msg</span>.sender] <span class="kw">+=</span> <span class="kw">msg</span>.value;
+    }
+
+    <span class="kw">function</span> <span class="fn">getBalance</span>(<span class="cls">address</span> _user) <span class="kw">public</span> <span class="kw">view</span>
+        <span class="kw">returns</span> (<span class="cls">uint256</span>)
+    {
+        <span class="kw">return</span> balances[_user];
+    }
+}`,
+    output:`🧪 Desplegando BalanceSheet...
+
+   ➜ deposit() { value: 1.5 ETH }
+   ✓ 0xAb1...f2E3 depositó 1.5 ETH
+   ✓ balances[0xAb1...f2E3] = 1,500,000,000,000,000,000 wei
+
+   ➜ deposit() { value: 0.5 ETH }
+   ✓ balances[0xAb1...f2E3] = 2,000,000,000,000,000,000 wei
+
+   ➜ getBalance(0xAb1...f2E3)
+   ✓ Returns: 2 ETH
+
+   📌 Los mappings no se iteran — solo acceso directo por clave.`
+  },
+  {
+    id:'s4', title:'4. Modifier onlyOwner', tag:'Modifiers',
+    filename:'04_only_owner.sol',
+    code:`<span class="cm">// SPDX-License-Identifier: MIT</span>
+<span class="kw">pragma solidity</span> <span class="num">^0.8.0</span>;
+
+<span class="kw">contract</span> <span class="cls">Ownable</span> {
+    <span class="cls">address</span> <span class="kw">public</span> owner;
+
+    <span class="cm">// Constructor: se ejecuta una vez al desplegar</span>
+    <span class="kw">constructor</span>() {
+        owner <span class="kw">=</span> <span class="kw">msg</span>.sender;
+    }
+
+    <span class="cm">// Modifier: validación antes de ejecutar la función</span>
+    <span class="kw">modifier</span> <span class="fn">onlyOwner</span>() {
+        <span class="kw">require</span>(<span class="kw">msg</span>.sender <span class="kw">==</span> owner, <span class="str">"Not owner!"</span>);
+        <span class="kw">_</span>;  <span class="cm">// ← aquí se ejecuta la función</span>
+    }
+
+    <span class="kw">function</span> <span class="fn">changeOwner</span>(<span class="cls">address</span> _newOwner)
+        <span class="kw">public</span> onlyOwner
+    {
+        owner <span class="kw">=</span> _newOwner;
+    }
+}`,
+    output:`🧪 Desplegando Ownable...
+   ✓ owner = 0xB0b...7dD4 (quien despliega)
+
+   ➜ changeOwner(0xAb1...f2E3) — llamado por 0xB0b...7dD4
+   ✓ owner cambiado a 0xAb1...f2E3
+
+   ➜ changeOwner(0xXx5...9fG) — llamado por 0xXx5...9fG
+   ✗ REVERT: "Not owner!"
+   ⛽ Se paga gas hasta el require (menos costo)
+
+   💡 Los modifiers son reutilizables y apilables: onlyOwner whenNotPaused`
+  },
+  {
+    id:'s5', title:'5. Payable + receive()', tag:'ETH',
+    filename:'05_vault_payable.sol',
+    code:`<span class="cm">// SPDX-License-Identifier: MIT</span>
+<span class="kw">pragma solidity</span> <span class="num">^0.8.0</span>;
+
+<span class="kw">contract</span> <span class="cls">Vault</span> {
+    <span class="cls">mapping</span>(<span class="cls">address</span> <span class="kw">=&gt;</span> <span class="cls">uint256</span>) <span class="kw">public</span> deposits;
+
+    <span class="cm">// receive(): función especial para ETH directo</span>
+    <span class="kw">receive</span>() <span class="kw">external</span> <span class="kw">payable</span> {
+        deposits[<span class="kw">msg</span>.sender] <span class="kw">+=</span> <span class="kw">msg</span>.value;
+    }
+
+    <span class="kw">function</span> <span class="fn">withdraw</span>(<span class="cls">uint256</span> _amount) <span class="kw">public</span> {
+        <span class="kw">require</span>(deposits[<span class="kw">msg</span>.sender] <span class="kw">&gt;=</span> _amount,
+                <span class="str">"Insufficient balance"</span>);
+        deposits[<span class="kw">msg</span>.sender] <span class="kw">-=</span> _amount;
+        <span class="fn">payable</span>(<span class="kw">msg</span>.sender).<span class="fn">transfer</span>(_amount);
+    }
+}`,
+    output:`🧪 Desplegando Vault...
+
+   ➜ [RECIBIDO] 2 ETH enviados al contrato
+   ✓ receive() ejecutado
+   ✓ deposits[0xAb1...f2E3] = 2 ETH
+
+   ➜ [RECIBIDO] 0.5 ETH enviados al contrato
+   ✓ deposits[0xAb1...f2E3] = 2.5 ETH
+
+   ➜ withdraw(1 ETH) — por 0xAb1...f2E3
+   ✓ Transferidos 1 ETH a 0xAb1...f2E3
+   ✓ deposits[0xAb1...f2E3] = 1.5 ETH
+
+   💡 receive() se activa con transferencias sin data.
+      fallback() maneja llamadas con data pero sin función.`
+  },
+  {
+    id:'s6', title:'6. Eventos (Transfer)', tag:'Events',
+    filename:'06_event_emit.sol',
+    code:`<span class="cm">// SPDX-License-Identifier: MIT</span>
+<span class="kw">pragma solidity</span> <span class="num">^0.8.0</span>;
+
+<span class="kw">contract</span> <span class="cls">EventEmitter</span> {
+    <span class="cm">// Evento: datos guardados en los logs de la tx</span>
+    <span class="kw">event</span> <span class="fn">Transfer</span>(
+        <span class="cls">address</span> <span class="kw">indexed</span> from,
+        <span class="cls">address</span> <span class="kw">indexed</span> to,
+        <span class="cls">uint256</span> amount
+    );
+
+    <span class="kw">function</span> <span class="fn">send</span>(<span class="cls">address</span> _to) <span class="kw">public</span> <span class="kw">payable</span> {
+        <span class="cm">// Emitir evento: queda en el log</span>
+        <span class="kw">emit</span> <span class="fn">Transfer</span>(<span class="kw">msg</span>.sender, _to, <span class="kw">msg</span>.value);
+    }
+}`,
+    output:`🧪 Desplegando EventEmitter...
+
+   ➜ send(0xB0b...7dD4) { value: 3 ETH }
+   📢 ¡Evento emitido!
+
+   Transfer(
+     from:   0xAb1...f2E3
+     to:     0xB0b...7dD4
+     amount: 3 ETH
+   )
+
+   ➜ send(0xB0b...7dD4) { value: 1.2 ETH }
+   📢 ¡Evento emitido!
+   Transfer(0xAb1...f2E3, 0xB0b...7dD4, 1.2 ETH)
+
+   📝 Logs guardados en el receipt de la transacción.
+      indexed permite filtrar búsquedas desde fuera.`
+  }
+];
+
+let currentIdx = 0;
+
+function buildDots() {
+  const d = document.getElementById('progressDots');
+  d.innerHTML = '';
+  snippets.forEach((_,i) => {
+    const dot = document.createElement('div');
+    dot.className = 'dot' + (ran.has(i)?' done':'');
+    d.appendChild(dot);
+  });
+}
+
+function loadSnippet(idx) {
+  currentIdx = idx;
+  const s = snippets[idx];
+  document.querySelectorAll('.snippet-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.snippet-btn')[idx]?.classList.add('active');
+  document.getElementById('codeFilename').textContent = '▸ ' + s.filename;
+  document.getElementById('codeBlock').innerHTML = s.code;
+  document.getElementById('outputText').textContent = '$ Haz clic en "Ejecutar" para desplegar el contrato...';
+  document.getElementById('outputArea').className = 'output-area';
+}
+
+function buildSidebar() {
+  const list = document.getElementById('snippetList');
+  list.innerHTML = '';
+  snippets.forEach((s,i) => {
+    const btn = document.createElement('button');
+    btn.className = 'snippet-btn';
+    btn.innerHTML = `${s.title}<span class="tag">${s.tag}</span>`;
+    btn.addEventListener('click',()=>loadSnippet(i));
+    list.appendChild(btn);
+  });
+}
+
+document.getElementById('runBtn').addEventListener('click',()=>{
+  const s = snippets[currentIdx];
+  const out = document.getElementById('outputArea');
+  out.className='output-area running';
+  document.getElementById('outputText').textContent='⚙️ Compilando y desplegando...';
+  setTimeout(()=>{
+    out.className='output-area';
+    document.getElementById('outputText').textContent = s.output;
+    ran.add(currentIdx);
+    buildDots();
+    document.getElementById('feedbackMsg').innerHTML=`✅ <strong>${s.title}</strong> ejecutado correctamente. ${ran.size}/${snippets.length} snippets completados.`;
+    if(ran.size>=6&&!completed){
+      completed=true;
+      localStorage.setItem(STORAGE_KEY,'true');
+      document.getElementById('insigniaArea').classList.remove('hidden');
+      document.getElementById('feedbackMsg').innerHTML+='<br><strong style="color:#ffd700">🎓 ¡Módulo completado! Ya entiendes los fundamentos de Solidity y la EVM.</strong>';
+    }
+    if(currentIdx<snippets.length-1) setTimeout(()=>loadSnippet(currentIdx+1),800);
+  },900+Math.random()*600);
+});
+
+buildSidebar();
+buildDots();
+loadSnippet(0);
+if(localStorage.getItem(STORAGE_KEY)==='true'){completed=true;document.getElementById('insigniaArea').classList.remove('hidden');}
+</script>
+  <script src="../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

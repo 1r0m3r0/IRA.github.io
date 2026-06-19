@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>MQL5 | Walk-Forward Analysis</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../assets/css/theme.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%);background-size:200% 200%;animation:gradientShift 20s ease infinite;font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
+@keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.modulo-container{max-width:1400px;width:100%;background:rgba(15,25,45,0.65);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(255,102,192,0.25);box-shadow:0 25px 45px rgba(0,0,0,0.5);overflow:hidden}
+.hero-header{background:linear-gradient(95deg,#0b1120 0%,#111a2e 100%);padding:2rem 2rem 1.5rem 2rem;text-align:center;border-bottom:2px solid #ff66c0}
+.hero-header h1{font-size:2.6rem;font-weight:800;background:linear-gradient(135deg,#FFF,#ff99d6,#ff66c0);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-header p{color:#bcc9f0;margin-top:.5rem;font-size:1.1rem}
+.badge-area{display:flex;justify-content:center;gap:1rem;margin-top:1.2rem;flex-wrap:wrap}
+.chip{background:rgba(255,102,192,0.15);border:1px solid #ff66c0;padding:0.4rem 1rem;border-radius:40px;font-size:0.8rem;font-weight:600;color:#ddd}
+.analogy-card{background:#1e2a3acc;margin:1.5rem 2rem;padding:1.2rem 1.8rem;border-radius:2rem;border-left:8px solid #ff66c0;font-size:1rem;line-height:1.6}
+.progress-section{margin:1rem 2rem 0}
+.progress-bar-outer{background:#1a2a4a;border-radius:20px;height:20px;overflow:hidden}
+.progress-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,#ff66c0,#fff);border-radius:20px;transition:width 0.5s ease}
+.progress-text{text-align:center;font-size:0.85rem;color:#8899cc;margin-bottom:.5rem}
+.main-area{padding:1rem 2rem}
+.wfa-grid{display:grid;grid-template-columns:300px 1fr;gap:1.5rem;margin-bottom:1.5rem}
+@media(max-width:900px){.wfa-grid{grid-template-columns:1fr}}
+.control-panel{background:#0a1020;border-radius:2rem;padding:1.5rem;border:1px solid #2a3a5a}
+.control-panel h3{font-size:1rem;color:#ff66c0;margin-bottom:.8rem}
+.control-panel label{font-size:.85rem;color:#bcc9f0;display:block;margin:.6rem 0 .3rem}
+.control-panel input[type=number]{width:100%;padding:.6rem;background:#1a2a4a;color:#eef5ff;border:1px solid #ff66c0;border-radius:.8rem;font-family:'Inter',sans-serif;font-size:.85rem}
+.btn-action{background:linear-gradient(95deg,#ff66c0,#d4408a);border:none;padding:0.8rem 1.8rem;font-weight:bold;border-radius:3rem;cursor:pointer;font-size:1rem;transition:0.2s;color:#fff;font-family:'Inter',sans-serif;width:100%;margin-bottom:.5rem}
+.btn-action:hover{transform:translateY(-2px);box-shadow:0 0 15px rgba(255,102,192,0.5)}
+.btn-action:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+.result-panel{background:#0a1020;border-radius:2rem;padding:1.5rem;border:1px solid #2a3a5a;min-height:500px}
+.timeline-wrap{background:#0d1525;border-radius:1rem;padding:1rem;margin-bottom:1rem;border:1px solid #2a3a5a;overflow-x:auto}
+.timeline-svg{width:100%;min-width:600px;height:120px}
+.segment-block{cursor:pointer;transition:opacity .3s}
+.segment-block:hover{opacity:.8}
+.segment-block.is{fill:rgba(255,102,192,0.3);stroke:#ff66c0}
+.segment-block.oos{fill:rgba(0,224,255,0.3);stroke:#00e0ff}
+.segment-block.active{opacity:1}
+.segment-label{font-size:9px;fill:#8899cc;text-anchor:middle}
+.wfa-progress{margin-bottom:1rem}
+.wfa-progress .step-dots{display:flex;gap:4px;justify-content:center;flex-wrap:wrap}
+.wfa-progress .dot{width:24px;height:24px;border-radius:50%;background:#1a2a4a;display:flex;align-items:center;justify-content:center;font-size:.6rem;color:#8899cc;border:1px solid #2a3a5a;transition:.3s}
+.wfa-progress .dot.active{background:#ff66c044;border-color:#ff66c0;color:#fff}
+.wfa-progress .dot.done{background:#00c85333;border-color:#00c853;color:#00c853}
+.equity-canvas-wrap{background:#0d1525;border-radius:1rem;padding:.5rem;margin-bottom:1rem;border:1px solid #2a3a5a}
+#equityCanvas{width:100%;height:180px;border-radius:.5rem}
+.dashboard-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.8rem;margin-bottom:1rem}
+.dash-card{background:#0d1525;border-radius:1rem;padding:.8rem;text-align:center;border:1px solid #2a3a5a}
+.dash-card .val{font-size:1.4rem;font-weight:800;color:#ff66c0}
+.dash-card .label{font-size:.65rem;color:#8899cc;text-transform:uppercase}
+.dash-card .sub{font-size:.7rem;color:#667799}
+.comparison-wrap{background:#0d1525;border-radius:1rem;padding:1rem;margin-bottom:1rem;border:1px solid #2a3a5a}
+.comp-row{display:flex;justify-content:space-between;padding:.6rem 0;border-bottom:1px solid #1a2a4a;font-size:.85rem}
+.comp-row:last-child{border:none}
+.comp-row .name{color:#bcc9f0}
+.comp-row .val{font-weight:700}
+.comp-row .val.win{color:#00c853}
+.comp-row .val.lose{color:#ff1744}
+.gauge-wrap{background:#0d1525;border-radius:1rem;padding:1rem;text-align:center;border:1px solid #2a3a5a;margin-bottom:1rem}
+.gauge-svg{width:200px;height:110px}
+.gauge-label{font-size:1.2rem;font-weight:800;margin-top:-1rem}
+.gauge-label.robust{color:#00c853}
+.gauge-label.overfit{color:#ff1744}
+.gauge-label.moderate{color:#ffcc00}
+.code-panel{background:#0d1525;border-radius:1rem;padding:1rem;margin-top:1rem;border:1px solid #3a4a6a;max-height:200px;overflow-y:auto}
+.code-panel pre{font-family:'Courier New',monospace;font-size:.75rem;color:#aabbdd;white-space:pre-wrap;line-height:1.5}
+.feedback{background:#00000099;margin:0 2rem 1.5rem 2rem;padding:1rem;border-radius:1.5rem;text-align:center;font-weight:500;border-left:4px solid #ff66c0;min-height:3rem}
+.insignia{text-align:center;background:#0c1b2f;border-radius:2rem;margin:0 2rem 1.5rem;padding:1rem;border:2px dashed gold}
+.insignia i{font-size:2.5rem;color:gold}
+.insignia h3{color:gold;margin:.5rem 0}
+.hidden{display:none!important}
+.nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.5rem 2rem}
+.nav-link{background:#2c3e66;padding:0.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:0.5rem;transition:0.2s}
+.nav-link:hover{transform:translateY(-2px);box-shadow:0 0 10px rgba(255,102,192,0.4)}
+.nav-link.next{background:linear-gradient(95deg,#f0a500,#ff6a00);color:#1e1a0c}
+.nav-link.menu{background:#1a2a4a;border:1px solid #3399ff}
+.nav-link.prev{background:#1a2a4a;border:1px solid #666}
+footer{text-align:center;padding:1.2rem;font-size:0.8rem;border-top:1px solid #2c3e66;color:#8899cc}
+@media(max-width:800px){
+  .hero-header h1{font-size:1.9rem}
+  .analogy-card{margin:1rem}
+  .feedback{margin:0 1rem 1rem}
+  .main-area{padding:1rem}
+  .dashboard-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div class="modulo-container">
+  <nav class="brand-return-nav">
+    <a href="../../index.html">&larr; Portfolio</a>
+    <a href="../../cursos/index.html">Cursos</a>
+  </nav>
+
+  <div class="hero-header">
+    <h1>📋 Walk-Forward Analysis</h1>
+    <p>"Si tu estrategia solo funciona en el pasado, no es una estrategia"</p>
+    <div class="badge-area">
+      <span class="chip"><i class="fas fa-calendar-alt"></i> Validación</span>
+      <span class="chip"><i class="fas fa-chart-simple"></i> Robustez</span>
+      <span class="chip"><i class="fas fa-shield-alt"></i> Forward Test</span>
+    </div>
+  </div>
+
+  <div class="progress-section">
+    <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+    <div class="progress-text" id="progressText">Módulo E11 de 26</div>
+  </div>
+
+  <div class="analogy-card">
+    <strong>🚗 Piénsalo así:</strong> Walk-forward es como probar un auto nuevo: no solo ves cómo funciona en el showroom (backtest), sino que lo manejas en diferentes condiciones (forward). Si solo funciona en el estacionamiento, no lo compres.
+  </div>
+
+  <div class="main-area">
+    <div class="wfa-grid">
+      <div class="control-panel">
+        <h3><i class="fas fa-cog"></i> Configuración</h3>
+        <label>In-Sample (meses)</label>
+        <input type="number" id="isMonths" value="12" min="3" max="36">
+        <label>Out-of-Sample (meses)</label>
+        <input type="number" id="oosMonths" value="3" min="1" max="12">
+        <label>Step Size (meses)</label>
+        <input type="number" id="stepMonths" value="3" min="1" max="12">
+        <button class="btn-action" id="runBtn" style="margin-top:1rem"><i class="fas fa-play"></i> Ejecutar WFA</button>
+        <button class="btn-action small" id="resetBtn" style="width:100%"><i class="fas fa-redo"></i> Reiniciar</button>
+      </div>
+
+      <div class="result-panel">
+        <div class="timeline-wrap">
+          <svg class="timeline-svg" id="timelineSvg" viewBox="0 0 800 120"></svg>
+        </div>
+        <div class="wfa-progress" id="wfaProgress">
+          <div class="step-dots" id="stepDots"></div>
+        </div>
+        <div class="equity-canvas-wrap">
+          <canvas id="equityCanvas" width="800" height="180"></canvas>
+        </div>
+        <div class="dashboard-grid" id="dashGrid" style="display:none">
+          <div class="dash-card"><div class="val" id="wfeVal">0%</div><div class="label">WFE</div><div class="sub">Walk-Forward Efficiency</div></div>
+          <div class="dash-card"><div class="val" id="annVal">0%</div><div class="label">Retorno Anual</div><div class="sub" id="annSub">—</div></div>
+          <div class="dash-card"><div class="val" id="ddVal">0%</div><div class="label">Max DD</div><div class="sub" id="ddSub">—</div></div>
+          <div class="dash-card"><div class="val" id="stabVal">0</div><div class="label">Estabilidad</div><div class="sub">1-10</div></div>
+        </div>
+        <div class="comparison-wrap" id="comparisonWrap" style="display:none">
+          <h3 style="font-size:.9rem;color:#bcc9f0;margin-bottom:.5rem"><i class="fas fa-balance-scale"></i> Robustness Check</h3>
+          <div class="comp-row"><span class="name">Optimización única (IS)</span><span class="val" id="staticIS">$0</span></div>
+          <div class="comp-row"><span class="name">Optimización única (OOS)</span><span class="val" id="staticOOS">$0</span></div>
+          <div class="comp-row"><span class="name">Walk-Forward (IS promedio)</span><span class="val" id="wfIS">$0</span></div>
+          <div class="comp-row"><span class="name">Walk-Forward (OOS promedio)</span><span class="val" id="wfOOS">$0</span></div>
+          <div class="comp-row"><span class="name" style="font-weight:700">¿WFA supera a estática?</span><span class="val" id="wfaWinner">—</span></div>
+        </div>
+        <div class="gauge-wrap" id="gaugeWrap" style="display:none">
+          <svg class="gauge-svg" id="gaugeSvg" viewBox="0 0 200 110"></svg>
+          <div class="gauge-label" id="gaugeLabel">—</div>
+        </div>
+        <div class="code-panel" id="codePanel" style="display:none">
+          <pre id="codeContent">// MQL5 Walk-Forward code will appear here</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="feedbackMsg" class="feedback">💡 Configura las ventanas temporales y presiona "Ejecutar WFA" para validar tu estrategia en el tiempo.</div>
+
+  <div id="insigniaArea" class="insignia hidden">
+    <i class="fas fa-medal"></i>
+    <h3>🏅 Validador de Estrategias 🏅</h3>
+    <p>¡Has dominado el Walk-Forward Analysis! Ahora puedes separar estrategias robustas de simples overfits. 🚀</p>
+  </div>
+
+  <div class="nav-links">
+    <a href="e10-genetico.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+    <a href="e12-market.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> MQL5 Trading Algorítmico · Domina el arte del trading automatizado</footer>
+</div>
+<script>
+const STORAGE_KEY = 'mql5_e11';
+const TOTAL_MONTHS = 60;
+let completed = false;
+let segments = [];
+let currentStep = -1;
+let wfaData = {};
+
+function initProgress(){
+  const p = JSON.parse(localStorage.getItem('mql5_progress')) || [];
+  const pf = document.getElementById('progressFill');
+  const pt = document.getElementById('progressText');
+  if(pf) pf.style.width = Math.round((p.length/26)*100)+'%';
+  if(pt) pt.textContent = p.length+' de 26 módulos';
+  if(p.includes(STORAGE_KEY)){
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    completed = true;
+  }
+}
+
+function saveProgress(){
+  let p = JSON.parse(localStorage.getItem('mql5_progress')) || [];
+  if(!p.includes(STORAGE_KEY)){p.push(STORAGE_KEY);localStorage.setItem('mql5_progress',JSON.stringify(p));}
+  const pf = document.getElementById('progressFill');
+  const pt = document.getElementById('progressText');
+  if(pf) pf.style.width = Math.round((p.length/26)*100)+'%';
+  if(pt) pt.textContent = p.length+' de 26 módulos';
+}
+
+function drawTimeline(){
+  const svg = document.getElementById('timelineSvg');
+  const isM = parseInt(document.getElementById('isMonths').value);
+  const oosM = parseInt(document.getElementById('oosMonths').value);
+  const stepM = parseInt(document.getElementById('stepMonths').value);
+  const w = 800, h = 120;
+  const padL = 30, padR = 20;
+  const plotW = w - padL - padR;
+  const monthW = plotW / TOTAL_MONTHS;
+  
+  let html = '';
+  segments = [];
+  let pos = 0;
+  let segIdx = 0;
+  while(pos + isM + oosM <= TOTAL_MONTHS){
+    const isX = padL + pos * monthW;
+    const isW = isM * monthW;
+    const oosX = isX + isW;
+    const oosW = oosM * monthW;
+    segments.push({isStart: pos, isEnd: pos+isM, oosStart: pos+isM, oosEnd: pos+isM+oosM, idx: segIdx});
+    html += `<rect class="segment-block is" x="${isX}" y="20" width="${isW}" height="40" rx="4" data-idx="${segIdx}" data-type="is"/>
+      <text class="segment-label" x="${isX+isW/2}" y="45">IS ${segIdx+1}</text>
+      <rect class="segment-block oos" x="${oosX}" y="20" width="${oosW}" height="40" rx="4" data-idx="${segIdx}" data-type="oos"/>
+      <text class="segment-label" x="${oosX+oosW/2}" y="45">OOS ${segIdx+1}</text>`;
+    pos += stepM;
+    segIdx++;
+  }
+  
+  // month labels
+  for(let m=0;m<=TOTAL_MONTHS;m+=12){
+    const x = padL + m * monthW;
+    html += `<text class="segment-label" x="${x}" y="80">Año ${Math.floor(m/12)+1}</text>`;
+  }
+  
+  // legend
+  html += `<rect x="20" y="95" width="12" height="8" rx="2" fill="rgba(255,102,192,0.3)" stroke="#ff66c0"/>
+    <text x="36" y="103" fill="#8899cc" font-size="8">In-Sample</text>
+    <rect x="100" y="95" width="12" height="8" rx="2" fill="rgba(0,224,255,0.3)" stroke="#00e0ff"/>
+    <text x="116" y="103" fill="#8899cc" font-size="8">Out-of-Sample</text>`;
+  
+  svg.innerHTML = html;
+}
+
+function runWFA(){
+  document.getElementById('runBtn').disabled = true;
+  const isM = parseInt(document.getElementById('isMonths').value);
+  const oosM = parseInt(document.getElementById('oosMonths').value);
+  const stepM = parseInt(document.getElementById('stepMonths').value);
+  
+  let pos = 0;
+  let segIdx = 0;
+  const stepResults = [];
+  
+  while(pos + isM + oosM <= TOTAL_MONTHS){
+    const isReturn = 5 + Math.random()*15 + (segIdx * 0.5);
+    const oosReturn = 2 + Math.random()*10 + Math.random()*3 - 2;
+    const isSharpe = 0.5 + Math.random()*1.5 + segIdx*0.05;
+    const oosSharpe = 0.2 + Math.random()*1.0 + Math.random()*0.5 - 0.3;
+    stepResults.push({
+      isReturn, oosReturn, isSharpe, oosSharpe,
+      isEquity: generateEquity(isM, isReturn),
+      oosEquity: generateEquity(oosM, oosReturn)
+    });
+    pos += stepM;
+    segIdx++;
+  }
+  
+  wfaData = stepResults;
+  animateWFA(stepResults);
+}
+
+function generateEquity(months, totalReturn){
+  const eq = [10000];
+  const monthlyReturn = totalReturn / months;
+  for(let i=0;i<months;i++){
+    const r = monthlyReturn/100 + (Math.random()-0.5)*0.03;
+    eq.push(eq[eq.length-1] * (1+r));
+  }
+  return eq;
+}
+
+function animateWFA(results){
+  const dotsDiv = document.getElementById('stepDots');
+  dotsDiv.innerHTML = results.map((_,i)=>'<div class="dot" id="dot'+i+'">'+(i+1)+'</div>').join('');
+  
+  currentStep = 0;
+  document.getElementById('dashGrid').style.display = 'none';
+  document.getElementById('comparisonWrap').style.display = 'none';
+  document.getElementById('gaugeWrap').style.display = 'none';
+  document.getElementById('codePanel').style.display = 'none';
+  
+  function stepAnimation(){
+    if(currentStep >= results.length){
+      finishWFA(results);
+      return;
+    }
+    document.getElementById('dot'+currentStep).classList.add('active');
+    setTimeout(()=>{
+      document.getElementById('dot'+currentStep).classList.remove('active');
+      document.getElementById('dot'+currentStep).classList.add('done');
+      
+      drawEquityChart(results, currentStep);
+      document.getElementById('feedbackMsg').innerHTML = '🔍 Ventana '+(currentStep+1)+'/'+results.length+': IS Sharpe '+results[currentStep].isSharpe.toFixed(2)+' | OOS Sharpe '+results[currentStep].oosSharpe.toFixed(2);
+      
+      highlightSegment(currentStep);
+      currentStep++;
+      setTimeout(stepAnimation, 800);
+    }, 600);
+  }
+  stepAnimation();
+}
+
+function highlightSegment(idx){
+  const blocks = document.querySelectorAll('.segment-block');
+  blocks.forEach(b=>b.style.opacity='0.3');
+  document.querySelectorAll('.segment-block[data-idx="'+idx+'"]').forEach(b=>b.style.opacity='1');
+}
+
+function drawEquityChart(results, upTo){
+  const canvas = document.getElementById('equityCanvas');
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle = '#0d1525';
+  ctx.fillRect(0,0,w,h);
+  
+  const colors = ['#ff66c0','#00e0ff','#aaff00','#ffcc00','#ff6644','#9c64ff','#66ccff','#ff9900'];
+  const pad = 15;
+  
+  for(let i=0;i<=upTo;i++){
+    const data = results[i].isEquity.concat(results[i].oosEquity);
+    const allVals = results.slice(0,i+1).flatMap(r=>r.isEquity.concat(r.oosEquity));
+    const maxV = Math.max(...allVals)*1.05;
+    const minV = Math.min(...allVals)*0.95;
+    const range = maxV-minV||1;
+    const plotH = h-pad*2;
+    const color = colors[i%colors.length];
+    
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.5;
+    ctx.globalAlpha = 0.5;
+    ctx.beginPath();
+    data.forEach((v,j)=>{
+      const x = pad + j/(data.length-1||1)*(w-pad*2);
+      const y = pad + (maxV-v)/range*plotH;
+      j===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    });
+    ctx.stroke();
+    
+    const splitX = pad + (results[i].isEquity.length-1)/(data.length-1||1)*(w-pad*2);
+    ctx.strokeStyle = '#ffffff33';
+    ctx.setLineDash([3,3]);
+    ctx.beginPath();
+    ctx.moveTo(splitX, pad);
+    ctx.lineTo(splitX, h-pad);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    
+    ctx.fillStyle = color;
+    ctx.font = '7px Inter';
+    ctx.globalAlpha = 0.8;
+    ctx.fillText('Ventana '+(i+1), pad+5, pad + i*12 + 10);
+  }
+  ctx.globalAlpha = 1;
+}
+
+function finishWFA(results){
+  const totalIS = results.reduce((s,r)=>s+r.isReturn,0);
+  const totalOOS = results.reduce((s,r)=>s+r.oosReturn,0);
+  const avgOOSSharpe = results.reduce((s,r)=>s+r.oosSharpe,0)/results.length;
+  const avgISSharpe = results.reduce((s,r)=>s+r.isSharpe,0)/results.length;
+  const wfe = totalOOS/totalIS;
+  
+  document.getElementById('wfeVal').textContent = (wfe*100).toFixed(1)+'%';
+  document.getElementById('annVal').textContent = (totalOOS/5).toFixed(1)+'%';
+  document.getElementById('annSub').textContent = 'OOS promedio anual';
+  const maxDD = Math.min(...results.map(r=>{
+    const eq = r.oosEquity;
+    const peak = Math.max(...eq);
+    const trough = Math.min(...eq);
+    return (trough-peak)/peak;
+  }));
+  document.getElementById('ddVal').textContent = (maxDD*100).toFixed(1)+'%';
+  document.getElementById('ddSub').textContent = 'OOS';
+  
+  const stability = Math.min(10, Math.max(1, Math.round(wfe * 6 + avgOOSSharpe * 2)));
+  document.getElementById('stabVal').textContent = stability;
+  
+  document.getElementById('dashGrid').style.display = 'grid';
+  
+  // comparison
+  const staticIS = 8 + Math.random()*12;
+  const staticOOS = -3 + Math.random()*6;
+  document.getElementById('staticIS').textContent = staticIS.toFixed(1)+'%';
+  document.getElementById('staticOOS').textContent = staticOOS.toFixed(1)+'%';
+  document.getElementById('wfIS').textContent = totalIS.toFixed(1)+'%';
+  document.getElementById('wfOOS').textContent = totalOOS.toFixed(1)+'%';
+  
+  const wfaWinner = totalOOS > staticOOS ? '✅ WFA' : '❌ Empate Estático';
+  document.getElementById('wfaWinner').textContent = wfaWinner;
+  document.getElementById('comparisonWrap').style.display = 'block';
+  
+  // gauge
+  drawGauge(wfe, stability);
+  
+  // code
+  document.getElementById('codeContent').textContent = 
+`//+------------------------------------------------------------------+
+// Walk-Forward Analysis - Resultados
+//+------------------------------------------------------------------+
+// Configuración:
+// In-Sample: ${document.getElementById('isMonths').value} meses
+// Out-of-Sample: ${document.getElementById('oosMonths').value} meses
+// Step: ${document.getElementById('stepMonths').value} meses
+// Ventanas: ${results.length}
+//
+// Resultados:
+// WFE: ${(wfe*100).toFixed(1)}%
+// OOS Sharpe Promedio: ${avgOOSSharpe.toFixed(2)}
+// Estabilidad: ${stability}/10
+//
+// Implementación:
+// Usa TesterOptimization() en un bucle para
+// recorrer ventanas temporalmente:
+// for(int w=0; w<numWindows; w++) {
+//    SetTesterDateRange(startDate[w], endDate[w]);
+//    OptimizationStart();
+//    ForwardTest();
+// }`;
+  
+  document.getElementById('codePanel').style.display = 'block';
+  document.getElementById('runBtn').disabled = false;
+  
+  if(!completed){
+    completed = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').innerHTML = '📋 Walk-Forward Analysis completado! WFE: '+(wfe*100).toFixed(1)+'% - Insignia desbloqueada.';
+    saveProgress();
+  } else {
+    document.getElementById('feedbackMsg').innerHTML = '✅ WFA completado. WFE: '+(wfe*100).toFixed(1)+'% | Estabilidad: '+stability+'/10';
+  }
+}
+
+function drawGauge(wfe, stability){
+  const gauge = document.getElementById('gaugeSvg');
+  const score = Math.min(100, Math.max(0, (wfe * 50 + stability * 5)));
+  const angle = -180 + (score/100)*180;
+  const rad = (angle * Math.PI)/180;
+  const cx = 100, cy = 95, r = 70;
+  const ex = cx + r * Math.sin(rad);
+  const ey = cy - r * Math.cos(rad);
+  
+  const largeArc = score > 50 ? 1 : 0;
+  
+  const defs = '<defs><linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">'+
+    '<stop offset="0%" stop-color="#ff1744"/>'+
+    '<stop offset="50%" stop-color="#ffcc00"/>'+
+    '<stop offset="100%" stop-color="#00c853"/>'+
+    '</linearGradient></defs>';
+  
+  const bgArc = '<path d="M 30 95 A 70 70 0 1 1 170 95" fill="none" stroke="#1a2a4a" stroke-width="12" stroke-linecap="round"/>';
+  const valArc = '<path d="M 30 95 A 70 70 0 '+largeArc+' 1 '+ex.toFixed(1)+' '+ey.toFixed(1)+'" fill="none" stroke="url(#gaugeGrad)" stroke-width="12" stroke-linecap="round"/>';
+  const needle = '<line x1="100" y1="95" x2="'+ex.toFixed(1)+'" y2="'+ey.toFixed(1)+'" stroke="#fff" stroke-width="2" stroke-linecap="round"/>';
+  const dot = '<circle cx="100" cy="95" r="5" fill="#fff"/>';
+  
+  gauge.innerHTML = defs + bgArc + valArc + needle + dot +
+    '<text x="100" y="40" text-anchor="middle" fill="#8899cc" font-size="10">The Truth Meter</text>'+
+    '<text x="25" y="107" fill="#ff1744" font-size="8">Overfitted</text>'+
+    '<text x="155" y="107" fill="#00c853" font-size="8">Robust</text>';
+  
+  const label = document.getElementById('gaugeLabel');
+  if(score > 70){
+    label.textContent = '🛡️ ROBUSTA';
+    label.className = 'gauge-label robust';
+  } else if(score > 40){
+    label.textContent = '⚠️ MODERADA';
+    label.className = 'gauge-label moderate';
+  } else {
+    label.textContent = '🚫 SOBREAJUSTADA';
+    label.className = 'gauge-label overfit';
+  }
+  document.getElementById('gaugeWrap').style.display = 'block';
+}
+
+document.getElementById('runBtn').addEventListener('click', ()=>{
+  drawTimeline();
+  runWFA();
+});
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  document.getElementById('dashGrid').style.display = 'none';
+  document.getElementById('comparisonWrap').style.display = 'none';
+  document.getElementById('gaugeWrap').style.display = 'none';
+  document.getElementById('codePanel').style.display = 'none';
+  document.getElementById('stepDots').innerHTML = '';
+  const canvas = document.getElementById('equityCanvas');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = '#0d1525';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  document.getElementById('feedbackMsg').innerHTML = '🔄 Panel reiniciado. Vuelve a configurar y ejecutar.';
+  drawTimeline();
+});
+document.getElementById('isMonths').addEventListener('change', drawTimeline);
+document.getElementById('oosMonths').addEventListener('change', drawTimeline);
+document.getElementById('stepMonths').addEventListener('change', drawTimeline);
+
+window.addEventListener('load', ()=>{
+  initProgress();
+  drawTimeline();
+});
+</script>
+</body>
+</html>

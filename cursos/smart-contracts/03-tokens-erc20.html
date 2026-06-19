@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tokens ERC-20 · Smart Contracts DeFi</title>
+  <meta property="og:title" content="Tokens ERC-20 · Smart Contracts DeFi">
+  <meta property="og:description" content="Implementación de tokens ERC-20 desde cero. Crea tu propio token siguiendo el estándar más usado en el ecosistema Ethereum.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Israel Romero Portfolio">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Tokens ERC-20 · Smart Contracts DeFi">
+  <meta name="twitter:description" content="Implementación de tokens ERC-20 desde cero. Crea tu propio token siguiendo el estándar más usado en el ecosistema Ethereum.">
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    :root {
+      --accent: #00ffc8;
+      --accent-dim: rgba(0, 255, 200, 0.15);
+      --accent-glow: rgba(0, 255, 200, 0.3);
+      --bg: #0b0d1a;
+      --surface: rgba(16, 20, 40, 0.85);
+      --surface-hover: rgba(20, 28, 58, 0.92);
+      --text: #e0e6f0;
+      --text-dim: #8892b0;
+      --radius: 16px;
+      --shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+      --border: 1px solid rgba(0, 255, 200, 0.18);
+      --font-mono: 'Press Start 2P', monospace;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+    a { color: var(--accent); text-decoration: none; transition: .3s; }
+    a:hover { filter: brightness(1.3); }
+
+    .container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+
+    /* Hero */
+    .hero {
+      text-align: center;
+      padding: 60px 24px 40px;
+      position: relative;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 120px; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    }
+    .hero-icon { font-size: 3rem; margin-bottom: 12px; display: block; }
+    .hero h1 {
+      font-family: var(--font-mono);
+      font-size: 1.6rem;
+      color: var(--accent);
+      text-shadow: 0 0 30px var(--accent-glow);
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+    }
+    .hero p { color: var(--text-dim); font-size: 1.05rem; max-width: 600px; margin: 0 auto; }
+
+    /* Cards */
+    .card {
+      background: var(--surface);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      margin-bottom: 28px;
+      box-shadow: var(--shadow);
+      transition: .3s;
+    }
+    .card:hover { border-color: rgba(0, 255, 200, 0.35); }
+    .card-title {
+      font-family: var(--font-mono);
+      font-size: .85rem;
+      color: var(--accent);
+      margin-bottom: 16px;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .card-title i { font-size: 1.1rem; }
+
+    /* Analogy */
+    .analogy-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 12px;
+    }
+    .analogy-item {
+      background: var(--accent-dim);
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+      font-size: .9rem;
+    }
+    .analogy-item i {
+      font-size: 1.5rem;
+      color: var(--accent);
+      display: block;
+      margin-bottom: 6px;
+    }
+    .analogy-item span { color: var(--accent); font-weight: 600; }
+
+    /* Form */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group.full { grid-column: 1 / -1; }
+    .form-group label {
+      font-size: .8rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-dim);
+    }
+    .form-group input {
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--text);
+      font-size: .95rem;
+      font-family: 'Inter', sans-serif;
+      transition: .3s;
+      outline: none;
+    }
+    .form-group input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 16px var(--accent-glow);
+    }
+    .form-group input::placeholder { color: var(--text-dim); opacity: .5; }
+
+    .btn-mint {
+      grid-column: 1 / -1;
+      background: linear-gradient(135deg, #00c896, var(--accent));
+      border: none;
+      border-radius: 10px;
+      padding: 14px;
+      color: #0b0d1a;
+      font-family: var(--font-mono);
+      font-size: .85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: .3s;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .btn-mint:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px var(--accent-glow);
+    }
+    .btn-mint:disabled {
+      opacity: .4;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* Token Card */
+    .token-card-display {
+      background: linear-gradient(135deg, rgba(0,255,200,0.08), rgba(0,0,0,0.3));
+      border: 2px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 24px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .token-card-display::before {
+      content: '';
+      position: absolute;
+      top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: conic-gradient(from 0deg, transparent, rgba(0,255,200,0.05), transparent, rgba(0,255,200,0.05), transparent);
+      animation: tokenSpin 8s linear infinite;
+    }
+    @keyframes tokenSpin { to { transform: rotate(360deg); } }
+    .token-card-content {
+      position: relative;
+      z-index: 1;
+    }
+    .token-name-big {
+      font-family: var(--font-mono);
+      font-size: 1.5rem;
+      color: var(--accent);
+      text-shadow: 0 0 20px var(--accent-glow);
+    }
+    .token-symbol-big {
+      color: var(--text-dim);
+      font-size: .9rem;
+      margin-bottom: 12px;
+    }
+    .token-stat {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+      margin: 12px 0;
+      font-size: .85rem;
+    }
+    .token-stat-item { text-align: center; }
+    .token-stat-item .label { color: var(--text-dim); font-size: .7rem; text-transform: uppercase; }
+    .token-stat-item .value { color: var(--text); font-weight: 600; font-family: var(--font-mono); font-size: .75rem; }
+    .token-address {
+      background: rgba(0,0,0,0.4);
+      border-radius: 6px;
+      padding: 8px 14px;
+      font-family: var(--font-mono);
+      font-size: .7rem;
+      color: var(--text-dim);
+      display: inline-block;
+      word-break: break-all;
+      margin-top: 8px;
+    }
+
+    /* Transfer */
+    .transfer-area {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .transfer-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .transfer-row input {
+      flex: 1;
+      min-width: 140px;
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--text);
+      font-size: .9rem;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: .3s;
+    }
+    .transfer-row input:focus { border-color: var(--accent); }
+    .transfer-row input::placeholder { color: var(--text-dim); opacity: .5; }
+    .btn-transfer {
+      background: transparent;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      padding: 10px 20px;
+      color: var(--accent);
+      font-family: var(--font-mono);
+      font-size: .7rem;
+      cursor: pointer;
+      transition: .3s;
+      white-space: nowrap;
+    }
+    .btn-transfer:hover {
+      background: var(--accent);
+      color: #0b0d1a;
+    }
+    .btn-transfer:disabled {
+      opacity: .3;
+      cursor: not-allowed;
+    }
+
+    /* Wallet */
+    .wallet-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .wallet-balance {
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      color: var(--accent);
+    }
+    .wallet-balance small {
+      font-size: .7rem;
+      color: var(--text-dim);
+      font-family: 'Inter', sans-serif;
+    }
+
+    .tx-log {
+      max-height: 180px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .tx-log::-webkit-scrollbar { width: 4px; }
+    .tx-log::-webkit-scrollbar-track { background: transparent; }
+    .tx-log::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; }
+    .tx-entry {
+      background: rgba(255,255,255,0.03);
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: .8rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .tx-entry .tx-type {
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: .65rem;
+      text-transform: uppercase;
+    }
+    .tx-entry .tx-type.mint { background: rgba(0,255,200,0.2); color: var(--accent); }
+    .tx-entry .tx-type.send { background: rgba(255,200,0,0.15); color: #ffc800; }
+    .tx-entry .tx-type.receive { background: rgba(0,150,255,0.15); color: #0096ff; }
+    .tx-entry .tx-type.stake { background: rgba(255,200,0,0.2); color: #ffc800; }
+    .tx-entry .tx-type.unstake { background: rgba(255,150,0,0.2); color: #ffaa00; }
+    .tx-entry .tx-addr { font-family: var(--font-mono); font-size: .65rem; color: var(--text-dim); }
+    .tx-entry .tx-amount { font-family: var(--font-mono); font-size: .7rem; color: var(--text); }
+
+    /* Badge */
+    .badge-earned {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #1a2a1a, #0d1f0d);
+      border: 1px solid var(--accent);
+      border-radius: 20px;
+      padding: 8px 18px;
+      font-family: var(--font-mono);
+      font-size: .65rem;
+      color: var(--accent);
+      animation: badgePulse 2s ease-in-out infinite;
+    }
+    @keyframes badgePulse { 0%, 100% { box-shadow: 0 0 8px var(--accent-glow); } 50% { box-shadow: 0 0 24px var(--accent-glow); } }
+    .badge-hidden { display: none; }
+
+    /* Concepts */
+    .concepts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+    }
+    .concept-item {
+      background: var(--accent-dim);
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+      transition: .3s;
+    }
+    .concept-item:hover { transform: translateY(-3px); }
+    .concept-item i { font-size: 1.6rem; color: var(--accent); display: block; margin-bottom: 8px; }
+    .concept-item h4 { font-size: .85rem; margin-bottom: 4px; }
+    .concept-item p { font-size: .75rem; color: var(--text-dim); line-height: 1.5; }
+
+    /* Nav */
+    .module-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin: 40px 0;
+      flex-wrap: wrap;
+    }
+    .module-nav a {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-size: .9rem;
+      font-weight: 500;
+      transition: .3s;
+      background: var(--surface);
+      border: var(--border);
+    }
+    .module-nav a:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px var(--accent-glow);
+    }
+    .module-nav .nav-center {
+      font-family: var(--font-mono);
+      font-size: .7rem;
+      color: var(--text-dim);
+    }
+
+    /* Reset badge button */
+    .btn-reset {
+      background: transparent;
+      border: 1px solid rgba(255,80,80,0.3);
+      border-radius: 6px;
+      padding: 6px 14px;
+      color: #ff5050;
+      font-size: .7rem;
+      cursor: pointer;
+      transition: .3s;
+      font-family: 'Inter', sans-serif;
+    }
+    .btn-reset:hover {
+      background: rgba(255,80,80,0.1);
+      border-color: #ff5050;
+    }
+
+    /* Staking */
+    .staking-area {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .staking-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .staking-row input {
+      flex: 1;
+      min-width: 120px;
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--text);
+      font-size: .9rem;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: .3s;
+    }
+    .staking-row input:focus { border-color: var(--accent); }
+    .staking-stats {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+    .staking-stat {
+      background: rgba(0,0,0,0.25);
+      border-radius: 10px;
+      padding: 12px 18px;
+      flex: 1;
+      min-width: 120px;
+      text-align: center;
+    }
+    .staking-stat .label {
+      font-size: .65rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-dim);
+      margin-bottom: 4px;
+    }
+    .staking-stat .value {
+      font-family: var(--font-mono);
+      font-size: 1rem;
+      color: #ffc800;
+    }
+    .staking-stat .value.green { color: var(--accent); }
+    .btn-stake {
+      background: linear-gradient(135deg, #c89600, #ffc800);
+      border: none;
+      border-radius: 8px;
+      padding: 10px 20px;
+      color: #1a1a00;
+      font-family: var(--font-mono);
+      font-size: .7rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: .3s;
+    }
+    .btn-stake:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(255,200,0,0.3); }
+    .btn-stake:disabled { opacity: .3; cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-unstake {
+      background: transparent;
+      border: 1px solid #ffc800;
+      border-radius: 8px;
+      padding: 10px 20px;
+      color: #ffc800;
+      font-family: var(--font-mono);
+      font-size: .7rem;
+      cursor: pointer;
+      transition: .3s;
+    }
+    .btn-unstake:hover { background: #ffc800; color: #1a1a00; }
+    .btn-unstake:disabled { opacity: .3; cursor: not-allowed; }
+    .rewards-active {
+      animation: rewardGlow 2s ease-in-out infinite;
+    }
+    @keyframes rewardGlow { 0%, 100% { box-shadow: 0 0 4px rgba(255,200,0,0.2); } 50% { box-shadow: 0 0 16px rgba(255,200,0,0.4); } }
+
+    .empty-state {
+      color: var(--text-dim);
+      text-align: center;
+      padding: 20px;
+      font-size: .9rem;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 40px 24px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      color: var(--text-dim);
+      font-size: .8rem;
+      margin-top: 40px;
+    }
+
+    @media (max-width: 600px) {
+      .hero h1 { font-size: 1.1rem; }
+      .analogy-grid { grid-template-columns: 1fr; }
+      .form-grid { grid-template-columns: 1fr; }
+      .token-stat { flex-direction: column; gap: 8px; }
+      .transfer-row { flex-direction: column; }
+      .staking-stats { flex-direction: column; }
+      .staking-row { flex-direction: column; }
+      .concepts-grid { grid-template-columns: 1fr 1fr; }
+      .module-nav { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="brand-return-nav">
+    <a href="../../index.html#cursos"><i class="fas fa-arrow-left"></i> Portfolio</a>
+    <a href="index.html"><i class="fas fa-layer-group"></i> Cursos</a>
+    <span class="brand-badge">Smart Contracts DeFi</span>
+  </nav>
+
+  <section class="hero">
+    <span class="hero-icon">🪙</span>
+    <h1>TOKENS ERC-20</h1>
+    <p>Crea tu propio token fungible en la blockchain. Define el nombre, símbolo y suministro como un verdadero desarrollador DeFi.</p>
+  </section>
+
+  <div class="container">
+
+    <!-- Analogía -->
+    <div class="card">
+      <div class="card-title"><i class="fas fa-lightbulb"></i> ANALOGÍA · Boletos de Concierto</div>
+      <p style="margin-bottom:14px; color:var(--text-dim); font-size:.9rem;">
+        Un token ERC-20 es como un boleto para un concierto: hay un número limitado, todos son idénticos,
+        puedes transferirlos a otra persona, y cualquiera puede verificar que son auténticos en la blockchain.
+      </p>
+      <div class="analogy-grid">
+        <div class="analogy-item"><i class="fas fa-hashtag"></i> <span>Suministro Limitado</span><br>Solo se imprimen X boletos</div>
+        <div class="analogy-item"><i class="fas fa-exchange-alt"></i> <span>Transferible</span><br>Puedes regalar o vender tu boleto</div>
+        <div class="analogy-item"><i class="fas fa-qrcode"></i> <span>Verificable</span><br>El contrato valida autenticidad</div>
+        <div class="analogy-item"><i class="fas fa-wallet"></i> <span>Saldo</span><br>Cada wallet tiene X boletos</div>
+      </div>
+    </div>
+
+    <!-- Creador de Token -->
+    <div class="card">
+      <div class="card-title"><i class="fas fa-flask"></i> TOKEN BUILDER</div>
+      <form id="tokenForm" class="form-grid">
+        <div class="form-group">
+          <label>Nombre del Token</label>
+          <input type="text" id="tokenName" placeholder="Ej: IsraelCoin" required>
+        </div>
+        <div class="form-group">
+          <label>Símbolo <span style="color:var(--text-dim);font-weight:400;">(máx 5)</span></label>
+          <input type="text" id="tokenSymbol" placeholder="Ej: ISR" maxlength="5" required>
+        </div>
+        <div class="form-group">
+          <label>Suministro Inicial</label>
+          <input type="number" id="tokenSupply" placeholder="Ej: 1000000" min="1" required>
+        </div>
+        <div class="form-group">
+          <label>Decimales</label>
+          <input type="number" id="tokenDecimals" value="18" min="0" max="18" required>
+        </div>
+        <button type="submit" class="btn-mint" id="mintBtn"><i class="fas fa-hammer"></i> ¡Mint!</button>
+      </form>
+    </div>
+
+    <!-- Token Card -->
+    <div class="card" id="tokenCardContainer" style="display:none;">
+      <div class="card-title"><i class="fas fa-coin"></i> TOKEN DESPLEGADO</div>
+      <div class="token-card-display">
+        <div class="token-card-content">
+          <div class="token-name-big" id="displayName">TOKEN</div>
+          <div class="token-symbol-big" id="displaySymbol">SYM</div>
+          <div class="token-stat">
+            <div class="token-stat-item"><div class="label">Supply Total</div><div class="value" id="displaySupply">0</div></div>
+            <div class="token-stat-item"><div class="label">Decimales</div><div class="value" id="displayDecimals">18</div></div>
+            <div class="token-stat-item"><div class="label">Bloque</div><div class="value" id="displayBlock">#0</div></div>
+          </div>
+          <div class="token-address" id="displayAddress">0x0000…0000</div>
+
+          <div class="transfer-area">
+            <p style="font-size:.8rem;color:var(--text-dim);margin-bottom:10px;"><i class="fas fa-paper-plane"></i> Simular Transferencia</p>
+            <div class="transfer-row">
+              <input type="text" id="transferTo" placeholder="0x… dirección destino">
+              <input type="number" id="transferAmount" placeholder="Cantidad" min="1" style="max-width:120px;">
+              <button class="btn-transfer" id="transferBtn"><i class="fas fa-arrow-right"></i> Enviar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Wallet -->
+    <div class="card">
+      <div class="card-title"><i class="fas fa-wallet"></i> WALLET</div>
+      <div class="wallet-header">
+        <div>
+          <span style="color:var(--text-dim);font-size:.8rem;">Tu Saldo</span>
+          <div class="wallet-balance" id="walletBalance">0 <small id="walletSymbol">tokens</small></div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <span id="badgeMinter" class="badge-hidden badge-earned"><i class="fas fa-certificate"></i> MINTER</span>
+          <button class="btn-reset" id="resetBtn"><i class="fas fa-trash-alt"></i> Reset</button>
+        </div>
+      </div>
+      <div style="margin-bottom:12px;">
+        <span style="color:var(--text-dim);font-size:.7rem;text-transform:uppercase;letter-spacing:1px;">Historial de Transacciones</span>
+      </div>
+      <div class="tx-log" id="txLog">
+        <div class="empty-state">Aún no hay transacciones. ¡Mint tu primer token!</div>
+      </div>
+    </div>
+
+    <!-- Staking -->
+    <div class="card" id="stakingCard" style="display:none;">
+      <div class="card-title"><i class="fas fa-piggy-bank"></i> STAKING · GANA RECOMPENSAS</div>
+      <p style="color:var(--text-dim);font-size:.85rem;margin-bottom:12px;">
+        Bloquea tus tokens para ganar recompensas. APY simulado: <strong style="color:#ffc800;">12%</strong>.
+        Las recompensas se acumulan cada 2 segundos (simulando bloques).
+      </p>
+      <div class="staking-stats">
+        <div class="staking-stat">
+          <div class="label">Tus Tokens Staked</div>
+          <div class="value" id="stakedDisplay">0</div>
+        </div>
+        <div class="staking-stat">
+          <div class="label">Recompensas</div>
+          <div class="value green" id="rewardsDisplay">0</div>
+        </div>
+        <div class="staking-stat">
+          <div class="label">APY</div>
+          <div class="value" style="color:#ffc800;">12%</div>
+        </div>
+      </div>
+      <div class="staking-row">
+        <input type="number" id="stakeAmount" placeholder="Cantidad a stakear" min="1">
+        <button class="btn-stake" id="stakeBtn"><i class="fas fa-lock"></i> Stake</button>
+        <button class="btn-unstake" id="unstakeBtn"><i class="fas fa-unlock"></i> Unstake Todo</button>
+      </div>
+    </div>
+
+    <!-- Conceptos -->
+    <div class="card">
+      <div class="card-title"><i class="fas fa-book"></i> CONCEPTOS CLAVE</div>
+      <div class="concepts-grid">
+        <div class="concept-item">
+          <i class="fas fa-file-code"></i>
+          <h4>ERC-20</h4>
+          <p>Estándar de tokens fungibles en Ethereum. Define 6 funciones obligatorias.</p>
+        </div>
+        <div class="concept-item">
+          <i class="fas fa-shield-alt"></i>
+          <h4>OpenZeppelin</h4>
+          <p>Librería de contratos auditados. Usa <code>ERC20.sol</code> de OZ para proyectos seguros.</p>
+        </div>
+        <div class="concept-item">
+          <i class="fas fa-sort-numeric-up-alt"></i>
+          <h4>Decimals</h4>
+          <p>Define la precisión del token. 18 decimals = 1 token = 10¹⁸ unidades.</p>
+        </div>
+        <div class="concept-item">
+          <i class="fas fa-handshake"></i>
+          <h4>Approve / TransferFrom</h4>
+          <p>Permite a un contrato gastar tokens en tu nombre. Base de los DEX.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navegación -->
+    <div class="module-nav">
+      <a href="02-fundamentos-solidity.html"><i class="fas fa-chevron-left"></i> Anterior</a>
+      <span class="nav-center">Módulo 3 de 9</span>
+      <a href="04-dex-amm.html">Siguiente <i class="fas fa-chevron-right"></i></a>
+    </div>
+
+    <div style="text-align:center;margin-bottom:20px;">
+      <a href="index.html" style="color:var(--text-dim);font-size:.85rem;"><i class="fas fa-th-large"></i> Volver al índice del curso</a>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p>Smart Contracts DeFi · Módulo 3 — Tokens ERC-20</p>
+    <p style="margin-top:4px;">&copy; 2026 Israel Romero · Hecho con <span style="color:var(--accent);">❤</span> y código descentralizado</p>
+  </footer>
+
+  <script src="../../assets/js/cookie-consent.js"></script>
+  <script>
+    (function() {
+      const STORAGE_KEY = 'sc_tokens3';
+
+      // DOM refs
+      const form = document.getElementById('tokenForm');
+      const nameInput = document.getElementById('tokenName');
+      const symbolInput = document.getElementById('tokenSymbol');
+      const supplyInput = document.getElementById('tokenSupply');
+      const decimalsInput = document.getElementById('tokenDecimals');
+      const mintBtn = document.getElementById('mintBtn');
+
+      const cardContainer = document.getElementById('tokenCardContainer');
+      const displayName = document.getElementById('displayName');
+      const displaySymbol = document.getElementById('displaySymbol');
+      const displaySupply = document.getElementById('displaySupply');
+      const displayDecimals = document.getElementById('displayDecimals');
+      const displayBlock = document.getElementById('displayBlock');
+      const displayAddress = document.getElementById('displayAddress');
+
+      const walletBalance = document.getElementById('walletBalance');
+      const walletSymbol = document.getElementById('walletSymbol');
+      const txLog = document.getElementById('txLog');
+      const badgeMinter = document.getElementById('badgeMinter');
+
+      const transferTo = document.getElementById('transferTo');
+      const transferAmount = document.getElementById('transferAmount');
+      const transferBtn = document.getElementById('transferBtn');
+      const resetBtn = document.getElementById('resetBtn');
+
+      // Staking refs
+      const stakingCard = document.getElementById('stakingCard');
+      const stakedDisplay = document.getElementById('stakedDisplay');
+      const rewardsDisplay = document.getElementById('rewardsDisplay');
+      const stakeAmount = document.getElementById('stakeAmount');
+      const stakeBtn = document.getElementById('stakeBtn');
+      const unstakeBtn = document.getElementById('unstakeBtn');
+      let rewardsTimer = null;
+
+      // State
+      let state = loadState();
+
+      function getDefaultState() {
+        return {
+          token: null,
+          balance: 0,
+          transactions: [],
+          staked: 0,
+          rewards: 0,
+          stakeActive: false
+        };
+      }
+
+      function loadState() {
+        try {
+          const saved = localStorage.getItem(STORAGE_KEY);
+          if (saved) {
+            const parsed = JSON.parse(saved);
+            if (parsed && typeof parsed === 'object') {
+              return parsed;
+            }
+          }
+        } catch (_) {}
+        return getDefaultState();
+      }
+
+      function saveState() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      }
+
+      function randomHex(length) {
+        const chars = '0123456789abcdef';
+        let result = '';
+        for (let i = 0; i < length; i++) {
+          result += chars[Math.floor(Math.random() * 16)];
+        }
+        return result;
+      }
+
+      function formatNumber(n) {
+        return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+      }
+
+      function render() {
+        const t = state.token;
+
+        if (t) {
+          cardContainer.style.display = 'block';
+          displayName.textContent = t.name;
+          displaySymbol.textContent = t.symbol;
+          displaySupply.textContent = formatNumber(t.supply);
+          displayDecimals.textContent = t.decimals;
+          displayBlock.textContent = '#' + t.block;
+          displayAddress.textContent = t.address;
+          walletSymbol.textContent = t.symbol;
+        } else {
+          cardContainer.style.display = 'none';
+          walletSymbol.textContent = 'tokens';
+        }
+
+        walletBalance.textContent = formatNumber(state.balance);
+
+        // Staking visibility
+        if (t) {
+          stakingCard.style.display = 'block';
+          stakedDisplay.textContent = formatNumber(state.staked);
+          rewardsDisplay.textContent = formatNumber(Math.floor(state.rewards));
+          stakeBtn.disabled = state.balance <= 0;
+          unstakeBtn.disabled = state.staked <= 0;
+        } else {
+          stakingCard.style.display = 'none';
+        }
+
+        if (state.balance > 0) {
+          badgeMinter.classList.remove('badge-hidden');
+        } else {
+          badgeMinter.classList.add('badge-hidden');
+        }
+
+        // TX log
+        txLog.innerHTML = '';
+        if (state.transactions.length === 0) {
+          txLog.innerHTML = '<div class="empty-state">Aún no hay transacciones. ¡Mint tu primer token!</div>';
+        } else {
+          state.transactions.slice().reverse().forEach(tx => {
+            const div = document.createElement('div');
+            div.className = 'tx-entry';
+
+            const typeSpan = document.createElement('span');
+            typeSpan.className = 'tx-type ' + tx.type;
+            typeSpan.textContent = tx.type === 'mint' ? 'Mint' : tx.type === 'send' ? 'Send' : tx.type === 'stake' ? 'Stake' : tx.type === 'unstake' ? 'Unstake' : 'Receive';
+
+            const addrSpan = document.createElement('span');
+            addrSpan.className = 'tx-addr';
+            addrSpan.textContent = tx.address || '';
+
+            const amountSpan = document.createElement('span');
+            amountSpan.className = 'tx-amount';
+            const prefix = tx.type === 'send' ? '- ' : tx.type === 'stake' ? '→ ' : tx.type === 'unstake' ? '← ' : '+ ';
+            amountSpan.textContent = prefix + formatNumber(tx.amount) + ' ' + (state.token ? state.token.symbol : '');
+
+            div.appendChild(typeSpan);
+            div.appendChild(addrSpan);
+            div.appendChild(amountSpan);
+            txLog.appendChild(div);
+          });
+        }
+
+        saveState();
+      }
+
+      function mintToken(name, symbol, supply, decimals) {
+        const block = Math.floor(Math.random() * 15000000) + 10000000;
+        const address = '0x' + randomHex(40);
+
+        state.token = {
+          name: name.trim(),
+          symbol: symbol.trim().toUpperCase(),
+          supply: Number(supply),
+          decimals: Number(decimals),
+          block: block,
+          address: address
+        };
+        state.balance = Number(supply);
+
+        state.transactions.push({
+          type: 'mint',
+          amount: Number(supply),
+          address: address,
+          timestamp: Date.now()
+        });
+
+        render();
+      }
+
+      function transferTokens(to, amount) {
+        if (!state.token) return;
+        const amt = Number(amount);
+        if (isNaN(amt) || amt <= 0) return;
+        if (amt > state.balance) return;
+        if (!to || to.trim() === '') return;
+
+        let addr = to.trim();
+        if (!addr.startsWith('0x')) {
+          addr = '0x' + addr;
+        }
+        if (addr.length < 10) {
+          addr = addr.substring(0, 42);
+        }
+
+        state.balance -= amt;
+
+        state.transactions.push({
+          type: 'send',
+          amount: amt,
+          address: addr.substring(0, 10) + '…' + addr.substring(addr.length - 4),
+          timestamp: Date.now()
+        });
+
+        render();
+      }
+
+      function startRewardsTimer() {
+        if (rewardsTimer) return;
+        rewardsTimer = setInterval(function() {
+          if (state.staked > 0 && state.stakeActive) {
+            const rewardRate = 0.12 / (365 * 24 * 60 * 30);
+            state.rewards += state.staked * rewardRate;
+            rewardsDisplay.textContent = formatNumber(Math.floor(state.rewards));
+            saveState();
+          }
+        }, 2000);
+      }
+
+      function stopRewardsTimer() {
+        if (rewardsTimer) {
+          clearInterval(rewardsTimer);
+          rewardsTimer = null;
+        }
+      }
+
+      function stakeTokens() {
+        if (!state.token) return;
+        const amt = parseInt(stakeAmount.value);
+        if (isNaN(amt) || amt <= 0) return;
+        if (amt > state.balance) return;
+
+        state.balance -= amt;
+        state.staked += amt;
+        if (!state.stakeActive) state.stakeActive = true;
+
+        state.transactions.push({
+          type: 'stake',
+          amount: amt,
+          address: 'Staking Pool',
+          timestamp: Date.now()
+        });
+
+        stakeAmount.value = '';
+        startRewardsTimer();
+        render();
+      }
+
+      function unstakeTokens() {
+        if (state.staked <= 0) return;
+        const total = state.staked + Math.floor(state.rewards);
+        state.balance += total;
+        state.staked = 0;
+        state.rewards = 0;
+        state.stakeActive = false;
+
+        state.transactions.push({
+          type: 'unstake',
+          amount: total,
+          address: 'Staking Pool',
+          timestamp: Date.now()
+        });
+
+        stopRewardsTimer();
+        render();
+      }
+
+      function resetAll() {
+        if (state.token && state.balance > 0) {
+          if (!confirm('¿Resetear todo? Perderás tu token y tu insignia.')) return;
+        }
+        stopRewardsTimer();
+        state = getDefaultState();
+        form.reset();
+        document.getElementById('tokenDecimals').value = 18;
+        render();
+      }
+
+      // Event listeners
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const name = nameInput.value.trim();
+        const symbol = symbolInput.value.trim();
+        const supply = supplyInput.value.trim();
+        const decimals = decimalsInput.value.trim();
+
+        if (!name || !symbol || !supply || decimals === '') return;
+        if (Number(supply) < 1) return;
+
+        mintToken(name, symbol, supply, decimals);
+        form.reset();
+        document.getElementById('tokenDecimals').value = 18;
+      });
+
+      transferBtn.addEventListener('click', function() {
+        if (!state.token) return;
+        const to = transferTo.value.trim();
+        const amount = transferAmount.value.trim();
+        if (!to || !amount) return;
+        transferTokens(to, amount);
+        transferTo.value = '';
+        transferAmount.value = '';
+      });
+
+      resetBtn.addEventListener('click', resetAll);
+
+      // Staking events
+      stakeBtn.addEventListener('click', stakeTokens);
+      unstakeBtn.addEventListener('click', unstakeTokens);
+      stakeAmount.addEventListener('keydown', function(e) { if (e.key === 'Enter') stakeTokens(); });
+
+      // Char limit hint on symbol
+      symbolInput.addEventListener('input', function() {
+        if (this.value.length >= 5) {
+          this.style.borderColor = '#ffc800';
+        } else {
+          this.style.borderColor = '';
+        }
+      });
+
+      // Resume rewards timer if staked
+      if (state.staked > 0 && state.stakeActive) startRewardsTimer();
+
+      // Initial render
+      render();
+    })();
+  </script>
+</body>
+</html>

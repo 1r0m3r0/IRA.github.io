@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Estadística Descriptiva | E6: Control Estadístico de Procesos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #111a2e 100%);
+      background-size: 200% 200%; animation: gradientShift 20s ease infinite;
+      font-family: 'Inter', sans-serif; color: #eef5ff; min-height: 100vh;
+      display: flex; align-items: center; justify-content: center; padding: 2rem 1rem;
+    }
+    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+    .modulo-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,102,192,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+    .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #ff66c0; }
+    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#ff99d6,#ff66c0); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .hero-header p { font-size:1.2rem; color:#d4b8ff; margin-top:0.5rem; font-weight:500; }
+    .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+    .chip { background:rgba(255,102,192,0.15); border:1px solid #ff66c0; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ff66c0; font-size:1rem; line-height:1.6; }
+    .main-area { padding:0 2rem 1rem; }
+    .card { background:rgba(10,18,36,0.7); border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; margin-bottom:1.5rem; }
+    .card h3 { color:#ff66c0; margin-bottom:0.8rem; font-size:1.1rem; }
+    .card h3 i { margin-right:0.5rem; }
+    .grid-2col { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; }
+    select, input { background:#0f1a2c; color:#eef5ff; border:1px solid #ff66c0; border-radius:1rem; padding:0.5rem 1rem; font-family:'Inter',sans-serif; font-size:0.9rem; width:100%; margin:0.3rem 0; }
+    select option { background:#0f1a2c; }
+    .btn-action { background:linear-gradient(95deg,#ff66c0,#cc3399); border:none; padding:0.8rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#fff; }
+    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(255,102,192,0.5); }
+    .btn-sm { padding:0.4rem 1rem; font-size:0.85rem; }
+    .result-box { background:#0f1a2c; border-radius:1.2rem; padding:1rem; margin:1rem 0; border-left:4px solid #ff66c0; }
+    .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #ff66c0; }
+    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:0 2rem 1.5rem; padding:1rem; border:1px dashed gold; }
+    .insignia i { font-size:2.5rem; color:gold; }
+    .hidden { display:none; }
+    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(255,102,192,0.4); }
+    .nav-link.next { background:linear-gradient(95deg,#ff66c0,#cc3399); color:#fff; }
+    .nav-link.menu { background:#1a2a4a; border:1px solid #ff66c0; }
+    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+    .highlight { color:#ff66c0; font-weight:700; }
+    .game-opt { background:#1e2a3e; padding:0.5rem 1rem; border-radius:2rem; cursor:pointer; transition:0.2s; font-size:0.85rem; display:inline-block; margin:0.3rem; border:1px solid transparent; }
+    .game-opt:hover { background:#2c3e66; transform:translateY(-2px); }
+    .game-opt.selected { background:#ff66c0; color:#000; font-weight:bold; }
+    .game-opt.correct { background:#00cc88; color:#000; }
+    .game-opt.wrong { background:#ff4444; color:#fff; }
+    .chart-area { position:relative; height:180px; background:#0a1224; border-radius:1rem; margin:0.5rem 0; overflow:hidden; border:1px solid #2c3e66; }
+    .chart-line { position:absolute; left:0; right:0; height:1px; border-top:1px dashed #555; }
+    .chart-dot { position:absolute; width:8px; height:8px; border-radius:50%; transform:translate(-50%,-50%); }
+    .chart-dot.in { background:#00cc88; }
+    .chart-dot.out { background:#ff4444; width:12px; height:12px; }
+    .ucl-line { border-top-color:#ff4444; }
+    .lcl-line { border-top-color:#ff4444; }
+    .cl-line { border-top-color:#ff66c0; border-top-style:solid; }
+    .gauge { width:100%; height:8px; background:#2c3e66; border-radius:4px; overflow:hidden; margin:0.3rem 0; }
+    .gauge-fill { height:100%; border-radius:4px; transition:0.3s; }
+    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .grid-2col { grid-template-columns:1fr; } }
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+
+  <div class="modulo-container" id="app">
+    <div class="hero-header">
+      <h1>🏭 CONTROL ESTADÍSTICO DE PROCESOS 🏭</h1>
+      <p>Six Sigma y calidad en cada paso</p>
+      <div class="badge-area">
+        <span class="chip"><i class="fas fa-industry"></i> Modo Experto</span>
+        <span class="chip"><i class="fas fa-calculator"></i> E6</span>
+        <span class="chip"><i class="fas fa-check-circle"></i> Insignia: Quality Guardian</span>
+      </div>
+    </div>
+
+    <div class="analogy-card">
+      <strong>🚪 Piénsalo así:</strong> El control de calidad es como un portero que solo deja pasar productos buenos. Los gráficos de control (X-bar, R) son las cámaras de seguridad que vigilan el proceso en tiempo real. Cp y Cpk son la altura de la valla: ¿qué tan lejos están tus productos de los límites de especificación? Six Sigma es tener un portero tan bueno que solo 3.4 errores por millón se cuelan.
+    </div>
+
+    <div class="main-area">
+      <div class="grid-2col">
+        <div class="card">
+          <h3><i class="fas fa-chart-line"></i> Gráfico X-bar (Simulador)</h3>
+          <p style="font-size:0.85rem;margin-bottom:0.5rem;">Cada punto es la media de un subgrupo. ¿Ves algún punto fuera de control?</p>
+          <div class="chart-area" id="xbarChart">
+            <div class="chart-line ucl-line" style="top:20%;"><span style="position:absolute;left:2px;top:-8px;font-size:0.6rem;">UCL</span></div>
+            <div class="chart-line cl-line" style="top:50%;"><span style="position:absolute;left:2px;top:-8px;font-size:0.6rem;">μ</span></div>
+            <div class="chart-line lcl-line" style="top:80%;"><span style="position:absolute;left:2px;top:-8px;font-size:0.6rem;">LCL</span></div>
+          </div>
+          <button class="btn-action btn-sm" onclick="simularPuntos()"><i class="fas fa-dice"></i> Nueva simulación</button>
+          <span id="xbarStatus" style="font-size:0.8rem;margin-left:0.5rem;">✅ Proceso estable</span>
+        </div>
+        <div class="card">
+          <h3><i class="fas fa-chart-bar"></i> Gráficos p / c</h3>
+          <p style="font-size:0.85rem;margin-bottom:0.5rem;">Selecciona el tipo de gráfico según los datos:</p>
+          <div id="tipoControl">
+            <div class="game-opt" onclick="responderGrafico(0)">Defectos por unidad (conteo)</div>
+            <div class="game-opt" onclick="responderGrafico(1)">Proporción de defectuosos</div>
+          </div>
+          <div id="controlFeedback" style="font-size:0.85rem;margin-top:0.3rem;"></div>
+          <div style="margin-top:0.8rem;">
+            <p style="font-size:0.8rem;">Usa <strong>c-chart</strong> cuando cuentas defectos (ej: rasguños por lote).<br>Usa <strong>p-chart</strong> cuando cuentas unidades defectuosas (ej: % de piezas rotas).</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3><i class="fas fa-ruler"></i> Capacidad del Proceso: Cp y Cpk</h3>
+        <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+          <div style="flex:1;min-width:200px;">
+            <p style="font-size:0.85rem;">Límite Superior (LSE): <input type="number" id="lse" value="110" style="width:80px;"></p>
+            <p style="font-size:0.85rem;">Límite Inferior (LIE): <input type="number" id="lie" value="90" style="width:80px;"></p>
+            <p style="font-size:0.85rem;">Media (μ): <input type="number" id="mediaCp" value="100" step="0.5" style="width:80px;"></p>
+            <p style="font-size:0.85rem;">Desviación (σ): <input type="number" id="sigmaCp" value="2" step="0.1" min="0.1" style="width:80px;"></p>
+            <button class="btn-action btn-sm" onclick="calcularCp()"><i class="fas fa-calculator"></i> Calcular</button>
+          </div>
+          <div style="flex:1;min-width:200px;">
+            <div class="result-box">
+              <div>Cp = <span class="highlight" id="cpVal">1.67</span></div>
+              <div>Cpk = <span class="highlight" id="cpkVal">1.67</span></div>
+              <div id="cpInterpretacion" style="font-size:0.8rem;margin-top:0.3rem;">✅ Proceso capaz (>1.33)</div>
+            </div>
+            <div class="gauge"><div class="gauge-fill" id="cpGauge" style="width:83%;background:#00cc88;"></div></div>
+            <p style="font-size:0.75rem;color:#8899bb;">Referencia: Cp=1.33 (capaz) · Cp=1.67 (excelente) · Cp&lt;1 (no capaz)</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="feedbackMsg" class="feedback">
+      💡 Simula el gráfico X-bar, calcula Cp/Cpk y responde sobre tipos de gráfico para ganar la insignia.
+    </div>
+
+    <div id="insigniaArea" class="insignia hidden">
+      <i class="fas fa-medal"></i>
+      <h3>🏅 ¡INSIGNIA QUALITY GUARDIAN! 🏅</h3>
+      <p>Dominas el control estadístico de procesos, gráficos X-bar, Cp, Cpk y Six Sigma. ¡La calidad está en tus manos!</p>
+    </div>
+
+    <div class="nav-links">
+      <a href="e5-herramientas.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+      <a href="e7-encuestas.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <footer>
+      <i class="fas fa-crown"></i> Estadística Descriptiva Interactiva · Modo Experto · Domina los datos
+    </footer>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'est_desc_e6';
+    let completado = localStorage.getItem(STORAGE_KEY) === 'true';
+    let simHecho = false, cpHecho = false, grafHecho = false;
+
+    function simularPuntos() {
+      const chart = document.getElementById('xbarChart');
+      chart.querySelectorAll('.chart-dot').forEach(d => d.remove());
+      let fuera = false;
+      for (let i = 0; i < 15; i++) {
+        const x = 6 + (i / 15) * 88;
+        let y = 45 + (Math.random() - 0.5) * 30;
+        if (i === 8) { y = 10 + Math.random() * 8; fuera = true; }
+        const dot = document.createElement('div');
+        dot.className = 'chart-dot ' + (y < 18 || y > 78 ? 'out' : 'in');
+        dot.style.left = x + '%';
+        dot.style.top = y + '%';
+        if (y < 18 || y > 78) dot.style.animation = 'pulse 0.5s infinite';
+        chart.appendChild(dot);
+      }
+      simHecho = true;
+      const status = document.getElementById('xbarStatus');
+      status.textContent = fuera ? '🔴 Punto fuera de control detectado!' : '✅ Proceso estable';
+      status.style.color = fuera ? '#ff4444' : '#00cc88';
+      verificarCompletado();
+    }
+
+    function responderGrafico(idx) {
+      const fb = document.getElementById('controlFeedback');
+      const opts = document.querySelectorAll('#tipoControl .game-opt');
+      opts.forEach(o => o.classList.remove('selected', 'correct', 'wrong'));
+      if (idx === 0) {
+        opts[idx].classList.add('correct');
+        fb.innerHTML = '✅ Correcto! El c-chart es para conteo de defectos por unidad (Poisson).';
+        grafHecho = true;
+      } else {
+        opts[idx].classList.add('correct');
+        fb.innerHTML = '✅ Correcto! El p-chart es para proporción de defectuosos (Binomial).';
+        grafHecho = true;
+      }
+      verificarCompletado();
+    }
+
+    function calcularCp() {
+      const lse = parseFloat(document.getElementById('lse').value);
+      const lie = parseFloat(document.getElementById('lie').value);
+      const mu = parseFloat(document.getElementById('mediaCp').value);
+      const sigma = parseFloat(document.getElementById('sigmaCp').value);
+      if (sigma <= 0) return;
+      const cp = (lse - lie) / (6 * sigma);
+      const cpk = Math.min((lse - mu) / (3 * sigma), (mu - lie) / (3 * sigma));
+      document.getElementById('cpVal').textContent = cp.toFixed(2);
+      document.getElementById('cpkVal').textContent = cpk.toFixed(2);
+      const gauge = document.getElementById('cpGauge');
+      const pct = Math.min(cp / 2 * 100, 100);
+      gauge.style.width = pct + '%';
+      if (cp >= 1.67) { gauge.style.background = '#00cc88'; document.getElementById('cpInterpretacion').innerHTML = '🏆 Excelente! (&ge;1.67)'; }
+      else if (cp >= 1.33) { gauge.style.background = '#88cc00'; document.getElementById('cpInterpretacion').innerHTML = '✅ Bueno (&ge;1.33)'; }
+      else if (cp >= 1) { gauge.style.background = '#ffa500'; document.getElementById('cpInterpretacion').innerHTML = '⚠️ Aceptable (&ge;1.0)'; }
+      else { gauge.style.background = '#ff4444'; document.getElementById('cpInterpretacion').innerHTML = '❌ No capaz (&lt;1.0)'; }
+      cpHecho = true;
+      verificarCompletado();
+    }
+
+    function verificarCompletado() {
+      if (simHecho && cpHecho && grafHecho && !completado) {
+        completado = true;
+        localStorage.setItem(STORAGE_KEY, 'true');
+        document.getElementById('insigniaArea').classList.remove('hidden');
+        document.getElementById('feedbackMsg').textContent = '🎉 ¡QUALITY GUARDIAN! Has completado Control Estadístico de Procesos.';
+      }
+    }
+
+    (function init() {
+      if (completado) {
+        document.getElementById('insigniaArea').classList.remove('hidden');
+        document.getElementById('feedbackMsg').textContent = '🎉 Módulo completado. ¡Repasa cuando quieras!';
+      }
+      simularPuntos();
+      calcularCp();
+    })();
+  </script>
+</body>
+</html>

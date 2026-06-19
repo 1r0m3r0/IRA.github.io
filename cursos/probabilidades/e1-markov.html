@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Probabilidades Interactiva | Cadenas de Markov</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #111a2e 100%); background-size: 200% 200%; animation: gradientShift 20s ease infinite; font-family: 'Inter', sans-serif; color: #eef5ff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; }
+    @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+    .m-container { max-width: 1300px; width: 100%; background: rgba(15,25,45,0.65); backdrop-filter: blur(12px); border-radius: 3rem; border: 1px solid rgba(255,102,192,0.25); box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden; }
+    .hero-header { background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%); padding: 2rem 2rem 1.5rem 2rem; text-align: center; border-bottom: 2px solid #ff66c0; }
+    .hero-header h1 { font-size: 2.6rem; font-weight: 800; background: linear-gradient(135deg, #FFF, #ff99d6, #ff66c0); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .hero-header p { font-size: 1.1rem; color: #f0c0e0; margin-top: 0.5rem; font-weight: 500; }
+    .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1.2rem; flex-wrap: wrap; }
+    .chip { background: rgba(255,102,192,0.15); border: 1px solid #ff66c0; padding: 0.4rem 1rem; border-radius: 40px; font-size: 0.8rem; font-weight: 600; }
+    .analogy-card { background: #1e2a3acc; margin: 1.5rem 2rem; padding: 1.2rem 1.8rem; border-radius: 2rem; border-left: 8px solid #ff66c0; font-size: 1rem; line-height: 1.6; }
+    .main-area { padding: 0 2rem 1rem 2rem; display: flex; flex-direction: column; gap: 1.5rem; }
+    .sim-box { background: #0f1a2c; border-radius: 2rem; padding: 1.5rem; border: 1px solid rgba(255,102,192,0.2); }
+    .sim-box h3 { color: #ff99d6; margin-bottom: 0.8rem; font-size: 1.2rem; }
+    .matrix-grid { display: grid; grid-template-columns: repeat(3, 80px); gap: 0.5rem; justify-content: center; margin: 1rem 0; }
+    .matrix-cell { background: #1a2a4a; border-radius: 0.8rem; padding: 0.6rem; text-align: center; font-weight: 600; font-size: 0.95rem; }
+    .matrix-cell input { width: 100%; background: transparent; border: none; color: #fff; text-align: center; font-weight: 600; font-size: 0.95rem; outline: none; }
+    .matrix-cell input:focus { border-bottom: 2px solid #ff66c0; }
+    .state-row { display: flex; gap: 1.5rem; align-items: center; justify-content: center; flex-wrap: wrap; }
+    .state-badge { background: rgba(255,102,192,0.2); border: 1px solid #ff66c0; border-radius: 2rem; padding: 0.4rem 1rem; font-size: 0.9rem; cursor: pointer; transition: 0.2s; }
+    .state-badge.active { background: #ff66c0; color: #000; font-weight: 700; box-shadow: 0 0 15px rgba(255,102,192,0.5); }
+    .state-badge:hover { transform: translateY(-2px); }
+    .step-display { display: flex; align-items: center; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .step-counter { font-family: 'Press Start 2P', monospace; font-size: 1.2rem; color: #ff99d6; }
+    .prob-bar { height: 12px; background: #1a2a4a; border-radius: 1rem; overflow: hidden; margin: 0.3rem 0; }
+    .prob-fill { height: 100%; background: linear-gradient(90deg, #ff66c0, #ff99d6); border-radius: 1rem; transition: width 0.5s ease; }
+    .prob-item { display: flex; align-items: center; gap: 0.8rem; font-size: 0.9rem; }
+    .prob-item .label { min-width: 60px; font-weight: 600; }
+    .btn-action { background: linear-gradient(95deg, #ff66c0, #ff3388); border: none; padding: 0.7rem 1.5rem; font-weight: bold; border-radius: 3rem; cursor: pointer; font-size: 0.95rem; color: #fff; transition: 0.2s; }
+    .btn-action:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(255,102,192,0.4); }
+    .btn-action:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-secondary-action { background: #2c3e66; border: none; padding: 0.6rem 1.2rem; font-weight: 600; border-radius: 3rem; cursor: pointer; font-size: 0.9rem; color: #eef5ff; transition: 0.2s; }
+    .btn-secondary-action:hover { transform: translateY(-2px); }
+    .feedback { background: #00000099; margin: 0 2rem 1.5rem 2rem; padding: 1rem; border-radius: 1.5rem; text-align: center; font-weight: 500; border-left: 4px solid #ff66c0; }
+    .insignia { text-align: center; background: #0c1b2f; border-radius: 2rem; margin: 0 2rem 1.5rem; padding: 1rem; border: 1px dashed gold; }
+    .insignia i { font-size: 2.5rem; color: gold; }
+    .hidden { display: none; }
+    .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
+    .nav-link { background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem; font-weight: 600; text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; }
+    .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(255,102,192,0.4); }
+    .nav-link.next { background: linear-gradient(95deg, #ff66c0, #ff3388); color: #fff; }
+    .nav-link.menu { background: #1a2a4a; border: 1px solid #ff66c0; }
+    footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .stat-card { background: #0f1a2c; border-radius: 1.2rem; padding: 1rem; border: 1px solid rgba(255,102,192,0.15); text-align: center; }
+    .stat-card .num { font-size: 1.8rem; font-weight: 800; color: #ff99d6; }
+    .stat-card .lbl { font-size: 0.8rem; color: #aac; }
+    .value-display { font-size: 1.4rem; font-weight: 700; color: #ff66c0; text-align: center; padding: 0.5rem; }
+    @media (max-width:800px) { .hero-header h1 { font-size: 1.9rem; } .stats-grid { grid-template-columns: 1fr; } }
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+<nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+<div class="m-container">
+  <div class="hero-header">
+    <h1>🔗 CADENAS DE MARKOV</h1>
+    <p>Modela sistemas que solo recuerdan el presente</p>
+    <div class="badge-area">
+      <span class="chip"><i class="fas fa-arrow-right"></i> Estados y transiciones</span>
+      <span class="chip"><i class="fas fa-calculator"></i> Matriz P</span>
+      <span class="chip"><i class="fas fa-infinity"></i> Distribución estacionaria</span>
+    </div>
+  </div>
+
+  <div class="analogy-card">
+    <strong>🐱 Piénsalo así:</strong> Las cadenas de Markov son como un gato que se mueve aleatoriamente entre habitaciones: solo importa dónde está ahora, no cómo llegó allí. Si está en la cocina, la probabilidad de ir al jardín es la misma sin importar si antes estuvo en el baño o en el salón.
+  </div>
+
+  <div class="main-area">
+    <div class="sim-box">
+      <h3><i class="fas fa-table"></i> Matriz de Transición P</h3>
+      <p style="font-size:0.9rem;color:#aac;margin-bottom:1rem;">Probabilidad de ir de estado i (fila) a estado j (columna). Cada fila suma 1.</p>
+      <div style="display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;align-items:center;">
+        <div>
+          <div class="matrix-grid">
+            <div class="matrix-cell" style="background:#2c3e66;font-size:0.8rem;">→ A</div>
+            <div class="matrix-cell" style="background:#2c3e66;font-size:0.8rem;">→ B</div>
+            <div class="matrix-cell" style="background:#2c3e66;font-size:0.8rem;">→ C</div>
+            <div class="matrix-cell" style="background:#2c3e66;font-size:0.8rem;">A</div>
+            <div class="matrix-cell"><input id="p00" type="number" step="0.1" min="0" max="1" value="0.7"></div>
+            <div class="matrix-cell"><input id="p01" type="number" step="0.1" min="0" max="1" value="0.2"></div>
+            <div class="matrix-cell" style="background:#2c3e66;font-size:0.8rem;">B</div>
+            <div class="matrix-cell"><input id="p10" type="number" step="0.1" min="0" max="1" value="0.3"></div>
+            <div class="matrix-cell"><input id="p11" type="number" step="0.1" min="0" max="1" value="0.4"></div>
+            <div class="matrix-cell" style="background:#2c3e66;font-size:0.8rem;">C</div>
+            <div class="matrix-cell"><input id="p20" type="number" step="0.1" min="0" max="1" value="0.1"></div>
+            <div class="matrix-cell"><input id="p21" type="number" step="0.1" min="0" max="1" value="0.6"></div>
+          </div>
+          <div style="text-align:center;margin-top:0.5rem;">
+            <button class="btn-action" onclick="updateP()">🔄 Actualizar P</button>
+          </div>
+        </div>
+        <div class="stat-card" style="min-width:200px;">
+          <div class="lbl">P^3 (prob. a 3 pasos)</div>
+          <div id="p3Display" class="value-display" style="font-size:1rem;">—</div>
+          <button class="btn-secondary-action" onclick="computeP3()">📊 Calcular P³</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="sim-box">
+      <h3><i class="fas fa-route"></i> Simular camino aleatorio</h3>
+      <p style="font-size:0.9rem;color:#aac;margin-bottom:0.5rem;">Haz clic en un estado inicial, luego avanza paso a paso.</p>
+      <div class="state-row" id="stateRow">
+        <div class="state-badge" data-state="0" onclick="setStart(0)">🌞 A: Soleado</div>
+        <div class="state-badge" data-state="1" onclick="setStart(1)">☁️ B: Nublado</div>
+        <div class="state-badge" data-state="2" onclick="setStart(2)">🌧️ C: Lluvioso</div>
+      </div>
+      <div class="step-display" style="margin-top:1rem;">
+        <span>Paso <span id="stepCount">0</span>:</span>
+        <span id="currentState" style="font-size:1.8rem;font-weight:700;color:#ff66c0;">🌞</span>
+        <button class="btn-action" id="stepBtn" onclick="nextStep()">⏭️ Siguiente paso</button>
+        <button class="btn-secondary-action" onclick="resetSim()">🔄 Reiniciar</button>
+      </div>
+      <div style="margin-top:1rem;">
+        <div class="prob-item"><span class="label">🌞 A:</span><div class="prob-bar" style="flex:1;"><div class="prob-fill" id="probA" style="width:100%"></div></div><span id="probAText">100%</span></div>
+        <div class="prob-item"><span class="label">☁️ B:</span><div class="prob-bar" style="flex:1;"><div class="prob-fill" id="probB" style="width:0%"></div></div><span id="probBText">0%</span></div>
+        <div class="prob-item"><span class="label">🌧️ C:</span><div class="prob-bar" style="flex:1;"><div class="prob-fill" id="probC" style="width:0%"></div></div><span id="probCText">0%</span></div>
+      </div>
+    </div>
+
+    <div class="sim-box">
+      <h3><i class="fas fa-chart-pie"></i> Distribución Estacionaria π</h3>
+      <p style="font-size:0.9rem;color:#aac;margin-bottom:0.5rem;">π · P = π: la distribución que no cambia con el tiempo.</p>
+      <div id="stationaryDisplay" class="stats-grid" style="margin-top:0.5rem;">
+        <div class="stat-card"><div class="lbl">π(A)</div><div class="num" id="piA">—</div></div>
+        <div class="stat-card"><div class="lbl">π(B)</div><div class="num" id="piB">—</div></div>
+        <div class="stat-card"><div class="lbl">π(C)</div><div class="num" id="piC">—</div></div>
+        <div class="stat-card"><div class="lbl">Suma</div><div class="num" id="piSum">—</div></div>
+      </div>
+      <div style="text-align:center;margin-top:0.5rem;">
+        <button class="btn-action" onclick="computeStationary()">🧮 Calcular π</button>
+      </div>
+    </div>
+
+    <div class="sim-box">
+      <h3><i class="fas fa-coins"></i> Gambler's Ruin</h3>
+      <p style="font-size:0.9rem;color:#aac;margin-bottom:0.5rem;">Un jugador con $<span id="gamblerStartDisplay">5</span> apuesta $1 cada ronda (p=0.5). ¿Probabilidad de ruina?</p>
+      <div style="display:flex;gap:1rem;align-items:center;justify-content:center;flex-wrap:wrap;">
+        <div><span style="font-size:0.85rem;">Fortuna inicial:</span><br><input id="gamblerInit" type="range" min="1" max="20" value="5" oninput="document.getElementById('gamblerStartDisplay').textContent=this.value"></div>
+        <div><span style="font-size:0.85rem;">p (ganar):</span><br><input id="gamblerP" type="range" min="0.1" max="0.9" step="0.05" value="0.5" oninput="document.getElementById('gamblerPDisplay').textContent=this.value"></div>
+        <div><span id="gamblerPDisplay" style="font-weight:700;color:#ff66c0;">0.50</span></div>
+      </div>
+      <div class="stats-grid" style="margin-top:0.8rem;">
+        <div class="stat-card"><div class="lbl">Prob. Ruina</div><div class="num" id="ruinProb">—</div></div>
+        <div class="stat-card"><div class="lbl">Prob. Ganar</div><div class="num" id="winProb">—</div></div>
+      </div>
+      <div style="text-align:center;margin-top:0.5rem;">
+        <button class="btn-action" onclick="computeRuin()">🎲 Calcular ruina</button>
+        <button class="btn-secondary-action" onclick="simulateRuin()">🎰 Simular 1000 juegos</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="feedbackMsg" class="feedback">💡 Selecciona un estado inicial y avanza paso a paso para ver cómo la cadena de Markov evoluciona.</div>
+
+  <div id="insigniaArea" class="insignia hidden">
+    <i class="fas fa-medal"></i>
+    <h3>🏅 ¡MAESTRO DE MARKOV! 🏅</h3>
+    <p>Dominas las cadenas de Markov, la matriz de transición y la distribución estacionaria.</p>
+  </div>
+
+  <div class="nav-links">
+    <a href="e8-temas-selectos.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+    <a href="e2-procesos-poisson.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Probabilidades Interactiva · Modo Experto · Domina la teoría</footer>
+</div>
+
+<script>
+const STORAGE_KEY = 'prob_e1';
+let P = [[0.7,0.2,0.1],[0.3,0.4,0.3],[0.1,0.6,0.3]];
+let currentState = 0;
+let step = 0;
+let path = [0];
+let transitionCount = [[0,0,0],[0,0,0],[0,0,0]];
+let completed = false;
+
+function updateP() {
+  const v00 = parseFloat(document.getElementById('p00').value) || 0;
+  const v01 = parseFloat(document.getElementById('p01').value) || 0;
+  const v10 = parseFloat(document.getElementById('p10').value) || 0;
+  const v11 = parseFloat(document.getElementById('p11').value) || 0;
+  const v20 = parseFloat(document.getElementById('p20').value) || 0;
+  const v21 = parseFloat(document.getElementById('p21').value) || 0;
+  P = [
+    [v00, v01, 1 - v00 - v01],
+    [v10, v11, 1 - v10 - v11],
+    [v20, v21, 1 - v20 - v21]
+  ];
+  normalizeP();
+  showFeedback('✅ Matriz P actualizada. Cada fila suma 1.');
+  computeStationary();
+}
+
+function normalizeP() {
+  for (let i = 0; i < 3; i++) {
+    let s = P[i][0] + P[i][1] + P[i][2];
+    if (s > 0) { P[i][0] /= s; P[i][1] /= s; P[i][2] /= s; }
+  }
+}
+
+function setStart(s) {
+  currentState = s;
+  step = 0;
+  path = [s];
+  transitionCount = [[0,0,0],[0,0,0],[0,0,0]];
+  document.querySelectorAll('.state-badge').forEach((el,i) => el.classList.toggle('active', i===s));
+  document.getElementById('stepCount').textContent = '0';
+  document.getElementById('currentState').textContent = ['🌞','☁️','🌧️'][s];
+  updateProbs();
+  showFeedback(`🎯 Estado inicial: ${['A: Soleado','B: Nublado','C: Lluvioso'][s]}. ¡Avanza pasos!`);
+}
+
+function nextStep() {
+  const r = Math.random();
+  let cumulative = 0;
+  for (let j = 0; j < 3; j++) {
+    cumulative += P[currentState][j];
+    if (r < cumulative) {
+      transitionCount[currentState][j]++;
+      currentState = j;
+      path.push(j);
+      step++;
+      document.getElementById('stepCount').textContent = step;
+      document.getElementById('currentState').textContent = ['🌞','☁️','🌧️'][j];
+      document.querySelectorAll('.state-badge').forEach((el,i) => el.classList.toggle('active', i===j));
+      updateProbs();
+      showFeedback(`🚶 Paso ${step}: ahora estamos en ${['A (Soleado)','B (Nublado)','C (Lluvioso)'][j]}.`);
+      checkCompletion();
+      return;
+    }
+  }
+}
+
+function updateProbs() {
+  const dist = getDistribution(step);
+  const total = dist.reduce((a,b) => a + b, 0) || 1;
+  const pA = (dist[0]/total*100).toFixed(1);
+  const pB = (dist[1]/total*100).toFixed(1);
+  const pC = (dist[2]/total*100).toFixed(1);
+  document.getElementById('probA').style.width = pA + '%';
+  document.getElementById('probAText').textContent = pA + '%';
+  document.getElementById('probB').style.width = pB + '%';
+  document.getElementById('probBText').textContent = pB + '%';
+  document.getElementById('probC').style.width = pC + '%';
+  document.getElementById('probCText').textContent = pC + '%';
+}
+
+function getDistribution(n) {
+  let dist = [0,0,0];
+  dist[currentState] = 1;
+  for (let k = 0; k < n; k++) {
+    let newDist = [0,0,0];
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) { newDist[j] += dist[i] * P[i][j]; }
+    }
+    dist = newDist;
+  }
+  return dist;
+}
+
+function resetSim() {
+  setStart(currentState);
+}
+
+function computeP3() {
+  function matMul(A, B) {
+    const r = A.length, c = B[0].length, n = A[0].length;
+    const res = Array.from({length: r}, () => Array(c).fill(0));
+    for (let i = 0; i < r; i++) for (let k = 0; k < n; k++) for (let j = 0; j < c; j++) res[i][j] += A[i][k] * B[k][j];
+    return res;
+  }
+  const P2 = matMul(P, P);
+  const P3 = matMul(P2, P);
+  let html = '';
+  for (let i = 0; i < 3; i++) {
+    const row = P3[i].map(v => (v*100).toFixed(1)+'%').join(' | ');
+    html += `${['A','B','C'][i]}: [ ${row} ]<br>`;
+  }
+  document.getElementById('p3Display').innerHTML = html;
+}
+
+function computeStationary() {
+  let pi = [1/3, 1/3, 1/3];
+  for (let iter = 0; iter < 100; iter++) {
+    let newPi = [0,0,0];
+    for (let j = 0; j < 3; j++) for (let i = 0; i < 3; i++) newPi[j] += pi[i] * P[i][j];
+    pi = newPi;
+  }
+  document.getElementById('piA').textContent = (pi[0]*100).toFixed(1) + '%';
+  document.getElementById('piB').textContent = (pi[1]*100).toFixed(1) + '%';
+  document.getElementById('piC').textContent = (pi[2]*100).toFixed(1) + '%';
+  document.getElementById('piSum').textContent = ((pi[0]+pi[1]+pi[2])*100).toFixed(1) + '%';
+  showFeedback(`📊 Distribución estacionaria: π = [${(pi[0]*100).toFixed(1)}%, ${(pi[1]*100).toFixed(1)}%, ${(pi[2]*100).toFixed(1)}%]`);
+}
+
+function computeRuin() {
+  const a = parseInt(document.getElementById('gamblerInit').value);
+  const p = parseFloat(document.getElementById('gamblerP').value);
+  const q = 1 - p;
+  const N = 20;
+  let probRuin;
+  if (Math.abs(p - q) < 0.001) {
+    probRuin = 1 - a / N;
+  } else {
+    const ratio = q / p;
+    probRuin = (Math.pow(ratio, a) - Math.pow(ratio, N)) / (1 - Math.pow(ratio, N));
+  }
+  document.getElementById('ruinProb').textContent = (probRuin * 100).toFixed(1) + '%';
+  document.getElementById('winProb').textContent = ((1 - probRuin) * 100).toFixed(1) + '%';
+  showFeedback(`🎲 Con $${a} y p=${p}, la probabilidad de ruina es ${(probRuin*100).toFixed(1)}%.`);
+}
+
+function simulateRuin() {
+  const a = parseInt(document.getElementById('gamblerInit').value);
+  const p = parseFloat(document.getElementById('gamblerP').value);
+  const N = 20;
+  let ruins = 0, wins = 0;
+  for (let sim = 0; sim < 1000; sim++) {
+    let fortune = a;
+    while (fortune > 0 && fortune < N) {
+      if (Math.random() < p) fortune++;
+      else fortune--;
+    }
+    if (fortune === 0) ruins++; else wins++;
+  }
+  document.getElementById('ruinProb').textContent = (ruins / 10).toFixed(1) + '%';
+  document.getElementById('winProb').textContent = (wins / 10).toFixed(1) + '%';
+  showFeedback(`🎰 Simulación: ${ruins} ruinas, ${wins} victorias en 1000 juegos.`);
+}
+
+function checkCompletion() {
+  if (!completed && step >= 5) {
+    completed = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    localStorage.setItem(STORAGE_KEY, 'true');
+    showFeedback('🎉 ¡LO LOGRASTE! Has completado 5+ pasos. Eres un Maestro de Markov.');
+  }
+}
+
+function showFeedback(msg) {
+  document.getElementById('feedbackMsg').innerHTML = msg;
+}
+
+function restoreProgress() {
+  if (localStorage.getItem(STORAGE_KEY) === 'true') {
+    completed = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    showFeedback('🏆 ¡Ya completaste este módulo! Puedes repasar los conceptos.');
+  }
+}
+
+setStart(0);
+restoreProgress();
+</script>
+<script src="../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

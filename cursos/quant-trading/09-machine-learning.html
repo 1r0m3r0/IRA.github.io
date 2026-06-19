@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Quant Trading | ML I: XGBoost & Modelos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:"Inter",sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+    .modulo-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,179,71,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+    .hero-header { background:linear-gradient(95deg,#0b1120 0%,#111a2e 100%); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #ffb347; }
+    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#ffce80,#ffb347); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ffb347; font-size:1rem; line-height:1.6; }
+    .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #ffb347; }
+    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:0 2rem 1.5rem; padding:1rem; border:1px dashed gold; }
+    .insignia i { font-size:2.5rem; color:gold; }
+    .hidden { display:none !important; }
+    .btn-action { background:linear-gradient(95deg,#f0a500,#ff6a00); border:none; padding:0.8rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; }
+    .btn-action:hover { transform:scale(1.04); box-shadow:0 0 15px rgba(255,179,71,0.3); }
+    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(0,224,255,0.4); }
+    .nav-link.next { background:linear-gradient(95deg,#f0a500,#ff6a00); color:#1e1a0c; }
+    .nav-link.menu { background:#1a2a4a; border:1px solid #3399ff; }
+    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+
+    .main-area { padding:1.5rem 2rem; display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; }
+    .panel { background:rgba(15,25,45,0.5); border-radius:1.5rem; padding:1.5rem; border:1px solid rgba(255,179,71,0.15); }
+    .panel h2 { font-size:1.2rem; margin-bottom:1rem; color:#ffce80; }
+    .slider-group { margin:0.8rem 0; }
+    .slider-group label { display:flex; justify-content:space-between; font-size:0.85rem; color:#aab8d6; }
+    .slider-group input[type=range] { width:100%; accent-color:#ffb347; }
+    .slider-group .val { color:#ffce80; font-weight:700; }
+    canvas { width:100%; border-radius:1rem; background:#0a1120; margin-top:0.5rem; }
+    .results-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.6rem; margin-top:1rem; }
+    .res-card { background:#0a1120; border-radius:0.8rem; padding:0.6rem; text-align:center; border:1px solid #1a2a4a; }
+    .res-card .val { font-size:1.3rem; font-weight:700; }
+    .res-card .lbl { font-size:0.7rem; color:#8899bb; text-transform:uppercase; }
+    .conf-matrix { display:grid; grid-template-columns:1fr 1fr; gap:0.3rem; margin-top:0.5rem; }
+    .conf-cell { background:#0a1120; border-radius:0.5rem; padding:0.5rem; text-align:center; font-size:0.85rem; border:1px solid #1a2a4a; }
+    .conf-cell .num { font-size:1.1rem; font-weight:700; }
+    .split-panel { display:flex; gap:0.5rem; margin-bottom:0.5rem; }
+    .split-panel > div { flex:1; padding:0.3rem; border-radius:0.5rem; text-align:center; font-size:0.75rem; }
+    @media(max-width:768px) {
+      .main-area { grid-template-columns:1fr; }
+      .hero-header h1 { font-size:1.8rem; }
+    }
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+  <div class="modulo-container">
+    <div class="hero-header">
+      <span style="display:inline-block;background:#ffb34722;padding:0.3rem 1rem;border-radius:2rem;font-size:0.8rem;letter-spacing:0.1em;margin-bottom:0.5rem;"><i class="fas fa-chart-line"></i> MÓDULO 9</span>
+      <h1><i class="fas fa-brain"></i> ML I: XGBoost & Modelos</h1>
+      <p style="color:#99aacd;margin-top:0.4rem;">Entrenamiento, overfitting y matriz de confusión</p>
+    </div>
+
+    <div class="analogy-card">
+      <i class="fas fa-lightbulb" style="color:#ffb347;margin-right:0.6rem;"></i>
+      <strong>Analogía:</strong> XGBoost es como un equipo de detectives que aprende de sus errores. Cada nuevo detective (árbol) se enfoca en los casos que los anteriores resolvieron mal, y entre todos llegan a la verdad. Pero si los entrenas demasiado en un solo caso, memorizan en vez de aprender.
+    </div>
+
+    <div class="main-area">
+      <div class="panel">
+        <h2><i class="fas fa-sliders-h"></i> Simulador de Entrenamiento</h2>
+        <div class="slider-group">
+          <label>Learning Rate <span id="lrVal" class="val">0.10</span></label>
+          <input type="range" id="learningRate" min="1" max="30" value="10" oninput="actualizar()">
+        </div>
+        <div class="slider-group">
+          <label>Max Depth <span id="depthVal" class="val">6</span></label>
+          <input type="range" id="maxDepth" min="2" max="12" value="6" oninput="actualizar()">
+        </div>
+        <div class="slider-group">
+          <label>N Estimators <span id="estVal" class="val">100</span></label>
+          <input type="range" id="nEst" min="10" max="500" value="100" step="10" oninput="actualizar()">
+        </div>
+
+        <div class="split-panel">
+          <div style="background:#0a1120;border:1px solid #4cd96444;"><span style="color:#4cd964;">Train</span> <span id="trainAcc" style="color:#fff;font-weight:700;">—</span></div>
+          <div style="background:#0a1120;border:1px solid #00e0ff44;"><span style="color:#00e0ff;">Test</span> <span id="testAcc" style="color:#fff;font-weight:700;">—</span></div>
+        </div>
+
+        <div style="display:flex;gap:0.8rem;margin-top:0.5rem;">
+          <button class="btn-action" onclick="entrenar()"><i class="fas fa-play"></i> Entrenar</button>
+          <button class="btn-action" style="background:#2c3e66;color:#eef5ff;" onclick="guardar()"><i class="fas fa-save"></i> Guardar</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2><i class="fas fa-chart-pie"></i> Resultados del Modelo</h2>
+        <canvas id="featureImportance" height="200"></canvas>
+        <div style="margin-top:0.8rem;">
+          <div style="color:#ffce80;font-size:0.85rem;margin-bottom:0.3rem;">Matriz de Confusión</div>
+          <div class="conf-matrix">
+            <div class="conf-cell"><div class="num" id="cmTP" style="color:#4cd964;">—</div><div>TP</div></div>
+            <div class="conf-cell"><div class="num" id="cmFP" style="color:#ff5050;">—</div><div>FP</div></div>
+            <div class="conf-cell"><div class="num" id="cmFN" style="color:#ff5050;">—</div><div>FN</div></div>
+            <div class="conf-cell"><div class="num" id="cmTN" style="color:#4cd964;">—</div><div>TN</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="feedbackMsg" class="feedback"><i class="fas fa-robot"></i> Ajusta hiperparámetros y presiona "Entrenar" para ver el rendimiento del modelo.</div>
+
+    <div id="insigniaArea" class="insignia hidden">
+      <i class="fas fa-medal"></i>
+      <h3 style="color:gold;margin:0.3rem 0;">¡Modelo Entrenado!</h3>
+      <p style="color:#ddd;">Has aprendido cómo los hiperparámetros afectan el rendimiento del modelo.</p>
+    </div>
+
+    <div class="nav-links">
+      <a href="08-feature-engineering.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
+      <a href="index.html" class="nav-link menu"><i class="fas fa-th"></i> Menú</a>
+      <a href="10-deep-learning.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+    </div>
+
+    <footer>&copy; 2026 Israel Romero &mdash; Quant Trading Course</footer>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "quant_trading_09";
+
+    function actualizar() {
+      document.getElementById("lrVal").textContent = (parseInt(document.getElementById("learningRate").value)/100).toFixed(2);
+      document.getElementById("depthVal").textContent = document.getElementById("maxDepth").value;
+      document.getElementById("estVal").textContent = document.getElementById("nEst").value;
+    }
+
+    function entrenar() {
+      const lr = parseInt(document.getElementById("learningRate").value)/100;
+      const depth = parseInt(document.getElementById("maxDepth").value);
+      const nEst = parseInt(document.getElementById("nEst").value);
+
+      const baseTest = 0.78 + lr*0.3 - depth*0.008 + Math.random()*0.04;
+      const baseTrain = baseTest + 0.05 + depth*0.012 + (nEst/1000);
+
+      const trainAcc = Math.min(0.995, Math.max(0.6, baseTrain));
+      const testAcc = Math.min(0.95, Math.max(0.5, baseTest - depth*0.005*(nEst/200)));
+
+      if(trainAcc - testAcc > 0.15) {
+        document.getElementById("feedbackMsg").innerHTML = '<i class="fas fa-exclamation-triangle" style="color:#ffb347;"></i> Atención: posible overfitting. Train vs Test gap: '+((trainAcc-testAcc)*100).toFixed(1)+'%. Reduce depth o n_estimators.';
+      } else {
+        document.getElementById("feedbackMsg").innerHTML = '<i class="fas fa-check-circle" style="color:#4cd964;"></i> Modelo entrenado. Test accuracy: '+(testAcc*100).toFixed(1)+'%. El gap train-test es aceptable.';
+      }
+
+      document.getElementById("trainAcc").textContent = (trainAcc*100).toFixed(1)+"%";
+      document.getElementById("testAcc").textContent = (testAcc*100).toFixed(1)+"%";
+      document.getElementById("trainAcc").style.color = trainAcc>0.85 ? "#4cd964" : "#ffb347";
+      document.getElementById("testAcc").style.color = testAcc>0.75 ? "#4cd964" : "#ffb347";
+
+      const n = 100;
+      const tp = Math.round(n * testAcc * 0.65);
+      const tn = Math.round(n * testAcc * 0.35);
+      const fp = Math.round(n * (1-testAcc) * 0.35);
+      const fn = Math.round(n * (1-testAcc) * 0.65);
+      document.getElementById("cmTP").textContent = tp;
+      document.getElementById("cmFP").textContent = fp;
+      document.getElementById("cmFN").textContent = fn;
+      document.getElementById("cmTN").textContent = tn;
+
+      const feats = [
+        {name:"RSI_14", imp:0.15+Math.random()*0.2},
+        {name:"SMA_20", imp:0.1+Math.random()*0.15},
+        {name:"MACD", imp:0.12+Math.random()*0.18},
+        {name:"BB_%B", imp:0.08+Math.random()*0.12},
+        {name:"ATR", imp:0.05+Math.random()*0.1},
+        {name:"Volumen", imp:0.04+Math.random()*0.08}
+      ];
+      feats.sort((a,b)=>b.imp-a.imp);
+      const maxImp = feats[0].imp;
+
+      const canvas = document.getElementById("featureImportance");
+      const ctx = canvas.getContext("2d");
+      const W = canvas.width = canvas.clientWidth;
+      const H = canvas.height = 200;
+      const pad = {l:75, r:15, t:10, b:25};
+      const gap = (H-pad.t-pad.b)/feats.length;
+      const barH = Math.min(22, gap*0.7);
+
+      ctx.clearRect(0,0,W,H);
+      feats.forEach((f,i) => {
+        const y = pad.t + i*gap + (gap-barH)/2;
+        const bw = (f.imp/maxImp)*(W-pad.l-pad.r);
+        const grad = ctx.createLinearGradient(pad.l,0,pad.l+bw,0);
+        grad.addColorStop(0,"#ffb347");
+        grad.addColorStop(1,"#ff8c00");
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.roundRect(pad.l, y, bw, barH, 3);
+        ctx.fill();
+        ctx.fillStyle = "#eef5ff";
+        ctx.font = "10px Inter";
+        ctx.textAlign = "right";
+        ctx.fillText(f.name, pad.l-5, y+barH/2+3.5);
+        ctx.fillStyle = "#aab8d6";
+        ctx.textAlign = "left";
+        ctx.fillText((f.imp*100).toFixed(0)+"%", pad.l+bw+4, y+barH/2+3.5);
+      });
+
+      document.getElementById("insigniaArea").classList.remove("hidden");
+      guardar();
+    }
+
+    if(!CanvasRenderingContext2D.prototype.roundRect) {
+      CanvasRenderingContext2D.prototype.roundRect = function(x,y,w,h,r) {
+        if(w<2*r) r=w/2; if(h<2*r) r=h/2;
+        this.moveTo(x+r,y); this.lineTo(x+w-r,y);
+        this.quadraticCurveTo(x+w,y,x+w,y+r);
+        this.lineTo(x+w,y+h-r);
+        this.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+        this.lineTo(x+r,y+h);
+        this.quadraticCurveTo(x,y+h,x,y+h-r);
+        this.lineTo(x,y+r);
+        this.quadraticCurveTo(x,y,x+r,y);
+        this.closePath(); return this;
+      };
+    }
+
+    function guardar() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        lr: document.getElementById("learningRate").value,
+        depth: document.getElementById("maxDepth").value,
+        nEst: document.getElementById("nEst").value
+      }));
+    }
+
+    function cargar() {
+      const s = localStorage.getItem(STORAGE_KEY);
+      if(s) {
+        try {
+          const d = JSON.parse(s);
+          if(d.lr) document.getElementById("learningRate").value = d.lr;
+          if(d.depth) document.getElementById("maxDepth").value = d.depth;
+          if(d.nEst) document.getElementById("nEst").value = d.nEst;
+        } catch(e){}
+      }
+      actualizar();
+      entrenar();
+    }
+    window.addEventListener("DOMContentLoaded", cargar);
+  </script>
+  <script src="../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

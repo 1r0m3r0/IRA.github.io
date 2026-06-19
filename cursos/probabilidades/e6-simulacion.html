@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Probabilidades Interactiva | Simulación Monte Carlo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%);background-size:200% 200%;animation:gradientShift 20s ease infinite;font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
+    @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+    .m-container{max-width:1300px;width:100%;background:rgba(15,25,45,0.65);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(255,102,192,0.25);box-shadow:0 25px 45px rgba(0,0,0,0.5);overflow:hidden}
+    .hero-header{background:linear-gradient(95deg,#0b1120 0%,#111a2e 100%);padding:2rem 2rem 1.5rem 2rem;text-align:center;border-bottom:2px solid #ff66c0}
+    .hero-header h1{font-size:2.6rem;font-weight:800;background:linear-gradient(135deg,#FFF,#ff99d6,#ff66c0);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .hero-header p{font-size:1.1rem;color:#f0c0e0;margin-top:0.5rem;font-weight:500}
+    .badge-area{display:flex;justify-content:center;gap:1rem;margin-top:1.2rem;flex-wrap:wrap}
+    .chip{background:rgba(255,102,192,0.15);border:1px solid #ff66c0;padding:0.4rem 1rem;border-radius:40px;font-size:0.8rem;font-weight:600}
+    .analogy-card{background:#1e2a3acc;margin:1.5rem 2rem;padding:1.2rem 1.8rem;border-radius:2rem;border-left:8px solid #ff66c0;font-size:1rem;line-height:1.6}
+    .main-area{padding:0 2rem 1rem 2rem;display:flex;flex-direction:column;gap:1.5rem}
+    .sim-box{background:#0f1a2c;border-radius:2rem;padding:1.5rem;border:1px solid rgba(255,102,192,0.2)}
+    .sim-box h3{color:#ff99d6;margin-bottom:0.8rem;font-size:1.2rem}
+    .sim-box p{font-size:0.9rem;color:#aac;margin-bottom:0.5rem}
+    .dartboard{position:relative;width:250px;height:250px;border-radius:50%;background:#0a0f1e;border:2px solid #ff66c0;overflow:hidden;margin:0 auto}
+    .dart{position:absolute;width:6px;height:6px;border-radius:50%;transition:all 0.3s}
+    .dart.in{background:#66ff99;box-shadow:0 0 6px #66ff99}
+    .dart.out{background:#ff6666;box-shadow:0 0 6px #ff6666}
+    .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:0.5rem;margin-top:0.5rem}
+    .stat-card{background:#0f1a2c;border-radius:1.2rem;padding:0.8rem;border:1px solid rgba(255,102,192,0.15);text-align:center}
+    .stat-card .num{font-size:1.6rem;font-weight:800;color:#ff99d6}
+    .stat-card .lbl{font-size:0.75rem;color:#aac}
+    .btn-action{background:linear-gradient(95deg,#ff66c0,#ff3388);border:none;padding:0.7rem 1.5rem;font-weight:bold;border-radius:3rem;cursor:pointer;font-size:0.95rem;color:#fff;transition:0.2s}
+    .btn-action:hover{transform:translateY(-2px);box-shadow:0 0 15px rgba(255,102,192,0.4)}
+    .btn-secondary-action{background:#2c3e66;border:none;padding:0.6rem 1.2rem;font-weight:600;border-radius:3rem;cursor:pointer;font-size:0.9rem;color:#eef5ff;transition:0.2s}
+    .btn-secondary-action:hover{transform:translateY(-2px)}
+    .sampling-vis{display:flex;gap:2px;align-items:flex-end;min-height:120px;background:#0a0f1e;border-radius:1rem;padding:0.5rem}
+    .samp-bar{width:20px;border-radius:3px 3px 0 0;background:linear-gradient(180deg,#ff66c0,#ff3388);transition:height 0.3s}
+    .slider-row{display:flex;gap:1.5rem;align-items:center;justify-content:center;flex-wrap:wrap}
+    .slider-group{display:flex;flex-direction:column;align-items:center;gap:0.3rem}
+    .slider-group label{font-size:0.85rem;color:#aac}
+    .feedback{background:#00000099;margin:0 2rem 1.5rem 2rem;padding:1rem;border-radius:1.5rem;text-align:center;font-weight:500;border-left:4px solid #ff66c0}
+    .insignia{text-align:center;background:#0c1b2f;border-radius:2rem;margin:0 2rem 1.5rem;padding:1rem;border:1px dashed gold}
+    .insignia i{font-size:2.5rem;color:gold}
+    .hidden{display:none}
+    .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.5rem 2rem}
+    .nav-link{background:#2c3e66;padding:0.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:0.5rem;transition:0.2s}
+    .nav-link:hover{transform:translateY(-2px);box-shadow:0 0 10px rgba(255,102,192,0.4)}
+    .nav-link.next{background:linear-gradient(95deg,#ff66c0,#ff3388);color:#fff}
+    .nav-link.menu{background:#1a2a4a;border:1px solid #ff66c0}
+    footer{text-align:center;padding:1.2rem;font-size:0.8rem;border-top:1px solid #2c3e66}
+    @media(max-width:800px){.hero-header h1{font-size:1.9rem}.dartboard{width:200px;height:200px}}
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+<nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+<div class="m-container">
+  <div class="hero-header">
+    <h1>🎯 SIMULACIÓN MONTE CARLO</h1>
+    <p>Estima lo imposible lanzando números aleatorios</p>
+    <div class="badge-area">
+      <span class="chip"><i class="fas fa-dice"></i> Uniformes U(0,1)</span>
+      <span class="chip"><i class="fas fa-circle"></i> Estimar π</span>
+      <span class="chip"><i class="fas fa-chart-area"></i> Integración MC</span>
+    </div>
+  </div>
+
+  <div class="analogy-card">
+    <strong>🪨 Piénsalo así:</strong> Monte Carlo es como estimar el área de un lago tirando piedras y viendo dónde caen. Si tiras 100 piedras en un cuadrado que contiene el lago, y 70 caen en el agua, estimas que el lago ocupa el 70% del cuadrado. ¡Más piedras = mejor estimación!
+  </div>
+
+  <div class="main-area">
+    <div class="sim-box">
+      <h3><i class="fas fa-circle"></i> Estimar π lanzando dardos</h3>
+      <p>Un cuadrado de lado 2 contiene un círculo de radio 1. π ≈ 4 · (dardos dentro / total dardos)</p>
+      <div class="slider-row">
+        <div class="slider-group">
+          <label>Dardos: <span id="dartCount">1000</span></label>
+          <input id="dartSlider" type="range" min="100" max="10000" step="100" value="1000" oninput="document.getElementById('dartCount').textContent=this.value">
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:0.5rem;">
+        <button class="btn-action" onclick="throwDarts()">🎯 ¡Lanzar dardos!</button>
+        <button class="btn-secondary-action" onclick="throwMoreDarts()">➕ Añadir 500</button>
+      </div>
+      <div class="dartboard" id="dartboard"></div>
+      <div class="stats-row" style="margin-top:0.5rem;">
+        <div class="stat-card"><div class="lbl">Dardos totales</div><div class="num" id="piTotal">0</div></div>
+        <div class="stat-card"><div class="lbl">Dentro del círculo</div><div class="num" id="piIn">0</div></div>
+        <div class="stat-card"><div class="lbl">π estimado</div><div class="num" id="piEst">—</div></div>
+        <div class="stat-card"><div class="lbl">Error</div><div class="num" id="piError">—</div></div>
+      </div>
+    </div>
+
+    <div class="sim-box">
+      <h3><i class="fas fa-chart-area"></i> Integración Monte Carlo</h3>
+      <p>Estima ∫₀¹ x² dx = 1/3 usando promedio de f(U) con U ~ Uniform(0,1)</p>
+      <div style="text-align:center;">
+        <button class="btn-action" onclick="mcIntegrate()">📊 Integrar f(x)=x²</button>
+        <button class="btn-secondary-action" onclick="mcIntegrateSin()">🌊 f(x)=sin(x)</button>
+      </div>
+      <div class="stats-row" style="margin-top:0.5rem;">
+        <div class="stat-card"><div class="lbl">Estimación MC</div><div class="num" id="mcEst">—</div></div>
+        <div class="stat-card"><div class="lbl">Valor exacto</div><div class="num" id="mcExact">—</div></div>
+        <div class="stat-card"><div class="lbl">Error</div><div class="num" id="mcError">—</div></div>
+        <div class="stat-card"><div class="lbl">Muestras</div><div class="num" id="mcN">0</div></div>
+      </div>
+    </div>
+
+    <div class="sim-box">
+      <h3><i class="fas fa-random"></i> Inverse CDF: Muestreo de cualquier distribución</h3>
+      <p>Genera x = F⁻¹(u) donde u ~ U(0,1). Aquí: exponencial(λ).</p>
+      <div class="slider-row">
+        <div class="slider-group">
+          <label>λ: <span id="icdfLambda">1.0</span></label>
+          <input id="icdfSlider" type="range" min="0.2" max="5" step="0.1" value="1" oninput="document.getElementById('icdfLambda').textContent=this.value">
+        </div>
+      </div>
+      <div style="text-align:center;">
+        <button class="btn-action" onclick="sampleExp()">🎲 Muestrear 1000</button>
+      </div>
+      <div id="sampleVis" class="sampling-vis" style="margin-top:0.5rem;"></div>
+    </div>
+
+    <div class="sim-box">
+      <h3><i class="fas fa-bolt"></i> Rejection Sampling</h3>
+      <p>Acepta/Rechaza: genera de una distribución fácil y filtra.</p>
+      <div style="text-align:center;">
+        <button class="btn-action" onclick="rejectionSample()">🔄 Aceptar/Rechazar</button>
+      </div>
+      <div id="rejectStats" class="stats-row" style="margin-top:0.5rem;">
+        <div class="stat-card"><div class="lbl">Aceptados</div><div class="num" id="rejAccepted">—</div></div>
+        <div class="stat-card"><div class="lbl">Rechazados</div><div class="num" id="rejRejected">—</div></div>
+        <div class="stat-card"><div class="lbl">Tasa aceptación</div><div class="num" id="rejRate">—</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="feedbackMsg" class="feedback">💡 Lanza dardos al cuadrado para estimar π. ¡Más dardos = mejor precisión!</div>
+
+  <div id="insigniaArea" class="insignia hidden">
+    <i class="fas fa-medal"></i>
+    <h3>🏅 ¡SIMULADOR MONTE CARLO! 🏅</h3>
+    <p>Dominas la simulación, muestreo por transformada inversa y aceptación-rechazo.</p>
+  </div>
+
+  <div class="nav-links">
+    <a href="e5-financiera.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+    <a href="e7-bayesiana.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Probabilidades Interactiva · Modo Experto · Domina la teoría</footer>
+</div>
+
+<script>
+const STORAGE_KEY = 'prob_e6';
+let darts = [];
+let completed = false;
+
+function throwDarts() {
+  const n = parseInt(document.getElementById('dartSlider').value);
+  darts = [];
+  const board = document.getElementById('dartboard');
+  board.innerHTML = '';
+  let inside = 0;
+  for (let i = 0; i < n; i++) {
+    const x = (Math.random() * 2 - 1);
+    const y = (Math.random() * 2 - 1);
+    const inCircle = x*x + y*y <= 1;
+    if (inCircle) inside++;
+    const dart = document.createElement('div');
+    dart.className = 'dart ' + (inCircle ? 'in' : 'out');
+    dart.style.left = ((x + 1) * 50) + '%';
+    dart.style.top = ((y + 1) * 50) + '%';
+    board.appendChild(dart);
+  }
+  const piEst = 4 * inside / n;
+  document.getElementById('piTotal').textContent = n;
+  document.getElementById('piIn').textContent = inside;
+  document.getElementById('piEst').textContent = piEst.toFixed(5);
+  document.getElementById('piError').textContent = (Math.abs(piEst - Math.PI) * 100 / Math.PI).toFixed(2) + '%';
+  showFeedback(`🎯 π ≈ ${piEst.toFixed(5)} (error: ${(Math.abs(piEst-Math.PI)*100/Math.PI).toFixed(2)}%). ${n >= 5000 ? '¡Excelente precisión!' : 'Prueba con más dardos para mejorar.'}`);
+  checkCompletion();
+}
+
+function throwMoreDarts() {
+  const board = document.getElementById('dartboard');
+  let inside = 0;
+  let n = 0;
+  for (let i = 0; i < 500; i++) {
+    const x = (Math.random() * 2 - 1);
+    const y = (Math.random() * 2 - 1);
+    const inCircle = x*x + y*y <= 1;
+    if (inCircle) inside++;
+    const dart = document.createElement('div');
+    dart.className = 'dart ' + (inCircle ? 'in' : 'out');
+    dart.style.left = ((x + 1) * 50) + '%';
+    dart.style.top = ((y + 1) * 50) + '%';
+    board.appendChild(dart);
+    n++;
+  }
+  const total = parseInt(document.getElementById('piTotal').textContent) + n;
+  const totalIn = parseInt(document.getElementById('piIn').textContent) + inside;
+  const piEst = 4 * totalIn / total;
+  document.getElementById('piTotal').textContent = total;
+  document.getElementById('piIn').textContent = totalIn;
+  document.getElementById('piEst').textContent = piEst.toFixed(5);
+  document.getElementById('piError').textContent = (Math.abs(piEst - Math.PI) * 100 / Math.PI).toFixed(2) + '%';
+  showFeedback(`🎯 +500 dardos. π ≈ ${piEst.toFixed(5)}.`);
+  checkCompletion();
+}
+
+function mcIntegrate() {
+  const n = 10000;
+  let sum = 0;
+  for (let i = 0; i < n; i++) {
+    const u = Math.random();
+    sum += u * u;
+  }
+  const est = sum / n;
+  document.getElementById('mcEst').textContent = est.toFixed(6);
+  document.getElementById('mcExact').textContent = (1/3).toFixed(6);
+  document.getElementById('mcError').textContent = (Math.abs(est - 1/3) * 100).toFixed(3) + '%';
+  document.getElementById('mcN').textContent = n;
+  showFeedback(`📊 ∫x² dx ≈ ${est.toFixed(6)} (exacto: ${(1/3).toFixed(6)}). Error: ${(Math.abs(est-1/3)*100).toFixed(3)}%.`);
+  checkCompletion();
+}
+
+function mcIntegrateSin() {
+  const n = 10000;
+  let sum = 0;
+  for (let i = 0; i < n; i++) {
+    const u = Math.random();
+    sum += Math.sin(u);
+  }
+  const est = sum / n;
+  const exact = 1 - Math.cos(1);
+  document.getElementById('mcEst').textContent = est.toFixed(6);
+  document.getElementById('mcExact').textContent = exact.toFixed(6);
+  document.getElementById('mcError').textContent = (Math.abs(est - exact) * 100 / exact).toFixed(3) + '%';
+  document.getElementById('mcN').textContent = n;
+  showFeedback(`🌊 ∫sin(x)dx ≈ ${est.toFixed(6)} (exacto: ${exact.toFixed(6)}).`);
+  checkCompletion();
+}
+
+function sampleExp() {
+  const lambda = parseFloat(document.getElementById('icdfSlider').value);
+  const n = 1000;
+  const samples = [];
+  for (let i = 0; i < n; i++) {
+    const u = Math.random();
+    const x = -Math.log(1 - u) / lambda;
+    samples.push(x);
+  }
+  const maxX = Math.max(...samples);
+  const bins = 20;
+  const binSize = maxX / bins || 0.1;
+  const histogram = Array(bins).fill(0);
+  samples.forEach(x => { const idx = Math.min(Math.floor(x / binSize), bins - 1); histogram[idx]++; });
+  const maxCount = Math.max(...histogram, 1);
+  const container = document.getElementById('sampleVis');
+  container.innerHTML = '';
+  histogram.forEach((count, i) => {
+    const bar = document.createElement('div');
+    bar.className = 'samp-bar';
+    bar.style.height = Math.max(4, (count / maxCount) * 100) + 'px';
+    bar.title = `x≈${((i+0.5)*binSize).toFixed(2)}: ${count}`;
+    container.appendChild(bar);
+  });
+  const theoreticalMean = 1 / lambda;
+  const empiricalMean = samples.reduce((a,b) => a+b, 0) / n;
+  showFeedback(`📊 Exp(λ=${lambda}): media empírica = ${empiricalMean.toFixed(3)} (teórica: ${theoreticalMean.toFixed(3)}). Inverse CDF funciona.`);
+  checkCompletion();
+}
+
+function rejectionSample() {
+  let accepted = 0, rejected = 0;
+  const target = x => 2 * x;
+  for (let i = 0; i < 5000; i++) {
+    const x = Math.random();
+    const y = Math.random() * 2;
+    if (y <= target(x)) accepted++;
+    else rejected++;
+  }
+  document.getElementById('rejAccepted').textContent = accepted;
+  document.getElementById('rejRejected').textContent = rejected;
+  document.getElementById('rejRate').textContent = (accepted / (accepted + rejected) * 100).toFixed(1) + '%';
+  const area = 1;
+  showFeedback(`🔄 Rejection sampling: ${accepted} aceptados, tasa ${(accepted/5000*100).toFixed(1)}%. f(x)=2x en [0,1].`);
+  checkCompletion();
+}
+
+function checkCompletion() {
+  if (!completed) {
+    completed = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    localStorage.setItem(STORAGE_KEY, 'true');
+  }
+}
+
+function showFeedback(msg) {
+  document.getElementById('feedbackMsg').innerHTML = msg;
+}
+
+function restoreProgress() {
+  if (localStorage.getItem(STORAGE_KEY) === 'true') {
+    completed = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    showFeedback('🏆 ¡Ya completaste este módulo! Repasa los conceptos.');
+  }
+}
+
+throwDarts();
+restoreProgress();
+</script>
+<script src="../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

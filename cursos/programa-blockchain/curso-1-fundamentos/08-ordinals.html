@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Curso 1 | Ordinals, Runes y Protocolos Bitcoin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 100%); font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+    .modulo-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(247,147,26,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+    .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #f7931a; }
+    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#fbbf6a,#f7931a); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .hero-header p { font-size:1.1rem; color:#fde8c8; margin-top:0.5rem; }
+    .badge-area { display:flex; justify-content:center; gap:1rem; margin:1.2rem 0 0; flex-wrap:wrap; }
+    .chip { background:rgba(247,147,26,0.15); border:1px solid #f7931a; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+    .progress-bar-top { background:#00000044; padding:0.6rem 2rem; text-align:center; font-size:0.85rem; border-bottom:1px solid #2c3e66; }
+    .progress-bar-top span { color:#fbbf6a; font-weight:600; }
+    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #f7931a; font-size:1rem; line-height:1.6; }
+    .main-area { padding:0 2rem 1.5rem; display:flex; flex-direction:column; gap:1.5rem; }
+    .demo-card { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; border:1px solid #f7931a; }
+    .demo-card h3 { color:#fbbf6a; margin-bottom:0.8rem; }
+    .demo-card p { font-size:0.85rem; color:#8899bb; margin-bottom:0.8rem; }
+    .ordinal-area { display:flex; flex-wrap:wrap; gap:1rem; }
+    .ordinal-form { flex:1; min-width:200px; }
+    .ordinal-form input, .ordinal-form textarea { width:100%; background:#0f1a2c; border:1px solid #2c3e66; border-radius:1rem; padding:0.6rem 1rem; color:#eef5ff; font-family:'Inter',sans-serif; font-size:0.9rem; margin:0.3rem 0; }
+    .ordinal-form textarea { min-height:60px; resize:vertical; }
+    .ordinal-result { flex:1; min-width:200px; background:#0f1a2c; border-radius:1rem; padding:1rem; }
+    .inscribed-satoshi { background:#1a2a1a; border:1px solid #22c55e; border-radius:0.8rem; padding:0.5rem; font-family:monospace; font-size:0.7rem; word-break:break-all; margin:0.5rem 0; }
+    .btn-action { background:linear-gradient(95deg,#fbbf6a,#f7931a); border:none; padding:0.7rem 1.5rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:0.95rem; transition:0.2s; color:#1e1a0c; margin-top:0.5rem; }
+    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(247,147,26,0.5); }
+    .btn-reset { background:#2c3e66; border:none; padding:0.7rem 1.5rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:0.95rem; color:#eef5ff; margin-top:0.5rem; margin-left:0.5rem; }
+    .quiz-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; border:1px solid #f7931a; }
+    .question { background:#0f1a2c; margin:0.8rem 0; padding:0.8rem; border-radius:1rem; }
+    .question p { font-weight:600; margin-bottom:0.4rem; font-size:0.9rem; }
+    .options { display:flex; flex-wrap:wrap; gap:0.6rem; }
+    .opt { background:#1e2a3e; padding:0.3rem 0.8rem; border-radius:2rem; cursor:pointer; transition:0.2s; font-size:0.85rem; }
+    .opt:hover { background:#2c3e66; }
+    .opt.selected { background:#f7931a; color:#000; font-weight:bold; }
+    .opt.correct { background:#22c55e; color:#000; }
+    .opt.wrong { background:#ef4444; color:#fff; }
+    .feedback { background:#00000099; margin:1.5rem 2rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #f7931a; }
+    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:1.5rem 2rem; padding:1rem; border:1px dashed gold; }
+    .insignia i { font-size:2.5rem; color:gold; }
+    .hidden { display:none; }
+    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; font-size:0.95rem; }
+    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(247,147,26,0.4); }
+    .nav-link.next { background:linear-gradient(95deg,#fbbf6a,#f7931a); color:#1e1a0c; }
+    .nav-link.menu { background:#1a2a4a; border:1px solid #3399ff; }
+    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
+  </style>
+  <link rel="stylesheet" href="../../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a><a href="../index.html">Programa Blockchain</a></nav>
+  <div class="modulo-container">
+    <div class="progress-bar-top"><i class="fas fa-cube"></i> Curso 1: Fundamentos de Blockchain y Bitcoin <span>| M&oacute;dulo 8 de 12</span></div>
+    <div class="hero-header">
+      <h1><i class="fas fa-scroll"></i> Ordinals, Runes y Protocolos Bitcoin</h1>
+      <p>Inscripciones, tokens y la nueva capa de aplicaciones en Bitcoin</p>
+      <div class="badge-area"><span class="chip"><i class="fas fa-hashtag"></i> Ordinals</span><span class="chip"><i class="fas fa-coins"></i> BRC-20 / Runes</span><span class="chip"><i class="fas fa-cube"></i> Inscriptions</span></div>
+    </div>
+    <div class="analogy-card"><i class="fas fa-coins" style="color:#f7931a;margin-right:0.5rem;"></i> <strong>Piensa en monedas antiguas grabadas:</strong> Inscribir datos en satoshis individuales es como grabar mensajes en monedas antiguas. Cada satoshi se vuelve &uacute;nico y reconocible. As&iacute; funcionan las inscripciones Ordinals: convierten cada satoshi en una pieza &uacute;nica.</div>
+    <div class="main-area">
+      <div class="demo-card">
+        <h3><i class="fas fa-scroll"></i> Inscribe un Satoshi (Simulador Ordinals)</h3>
+        <p>Selecciona un n&uacute;mero de satoshi y escribe el contenido de tu inscripci&oacute;n.</p>
+        <div class="ordinal-area">
+          <div class="ordinal-form">
+            <label style="font-size:0.85rem;">N&uacute;mero de satoshi:</label>
+            <input type="number" id="satoshiNum" value="123456789" min="1">
+            <label style="font-size:0.85rem;">Contenido de la inscripci&oacute;n:</label>
+            <textarea id="inscriptionText">Hola mundo desde Bitcoin!</textarea>
+            <button id="inscribeBtn" class="btn-action"><i class="fas fa-scroll"></i> Inscribir</button>
+            <button id="resetInscriptionsBtn" class="btn-reset"><i class="fas fa-sync-alt"></i> Limpiar</button>
+          </div>
+          <div class="ordinal-result">
+            <div style="font-size:0.85rem;color:#8899bb;">&Uacute;ltimas inscripciones:</div>
+            <div id="inscriptionsList">
+              <div style="color:#8899bb;font-size:0.8rem;padding:0.5rem;">A&uacute;n no hay inscripciones.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="demo-card">
+        <h3><i class="fas fa-info-circle"></i> Ordinals, BRC-20 y Runes: El Debate</h3>
+        <p style="font-size:0.85rem;color:#8899bb;">Las inscripciones Ordinals (2023) permiten incrustar datos arbitrarios en satoshis individuales, creando NFTs en Bitcoin. BRC-20 y Runes son est&aacute;ndares de tokens fungibles sobre Bitcoin.</p>
+        <p style="font-size:0.85rem;color:#8899bb;margin-top:0.5rem;"><strong style="color:#fbbf6a;">Impacto en 2026:</strong> El protocolo Ordinals ha aumentado la demanda de blockspace, elevando las comisiones y generando debate en la comunidad: &iquest;debe Bitcoin ser solo dinero o tambi&eacute;n una plataforma de aplicaciones? Los partidarios ven innovaci&oacute;n; los cr&iacute;ticos se&ntilde;alan la congesti&oacute;n.</p>
+      </div>
+      <div class="quiz-area">
+        <h3><i class="fas fa-question-circle"></i> Comprueba lo aprendido</h3>
+        <div id="quizContainer"></div>
+        <button id="submitQuizBtn" class="btn-action" disabled>Validar respuestas</button>
+        <div id="quizFeedback" style="margin-top:0.5rem;font-size:0.85rem;"></div>
+      </div>
+    </div>
+    <div id="feedbackMsg" class="feedback">Crea inscripciones, aprende sobre Ordinals y responde el quiz para ganar tu insignia.</div>
+    <div id="insigniaArea" class="insignia hidden"><i class="fas fa-medal"></i><h3>INSIGNIA: COLECCIONISTA DE SATOSHIS</h3><p>Entiendes Ordinals, inscripciones y los nuevos protocolos de Bitcoin.</p></div>
+    <div class="nav-links">
+      <a href="07-lightning.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
+      <a href="09-altcoins.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <footer><i class="fas fa-crown"></i> Curso 1: Fundamentos de Blockchain y Bitcoin &middot; Ordinals, Runes y Protocolos Bitcoin</footer>
+  </div>
+  <script>
+    const STORAGE_KEY = 'block_1_08';
+    var inscriptions = [];
+    function renderInscriptions() {
+      var list = document.getElementById('inscriptionsList');
+      if (inscriptions.length === 0) {
+        list.innerHTML = '<div style="color:#8899bb;font-size:0.8rem;padding:0.5rem;">A&uacute;n no hay inscripciones.</div>';
+        return;
+      }
+      var html = '';
+      inscriptions.slice().reverse().forEach(function(ins) {
+        html += '<div class="inscribed-satoshi">';
+        html += '<span style="color:#f7931a;">Sat #' + ins.satoshi + '</span><br>';
+        html += '<span style="color:#8899bb;">' + ins.content + '</span><br>';
+        html += '<span style="color:#555;">Hash: ' + ins.hash.substring(0, 20) + '...</span>';
+        html += '</div>';
+      });
+      list.innerHTML = html;
+      saveInscriptions();
+    }
+    function inscribe() {
+      var satoshi = document.getElementById('satoshiNum').value || Math.floor(Math.random() * 1000000000);
+      var content = document.getElementById('inscriptionText').value || 'Inscripci&oacute;n vac&iacute;a';
+      var hash = simpleHash(satoshi + content + Date.now());
+      inscriptions.push({ satoshi: satoshi, content: content, hash: hash });
+      renderInscriptions();
+      document.getElementById('feedbackMsg').innerHTML = 'Inscripci&oacute;n creada en satoshi #' + satoshi + ' con hash ' + hash.substring(0, 12) + '...';
+    }
+    function simpleHash(str) { var h=0; for(var i=0;i<str.length;i++){h=((h<<5)-h)+str.charCodeAt(i);h|=0;} return (h>>>0).toString(16); }
+    function resetInscriptions() {
+      inscriptions = [];
+      renderInscriptions();
+      localStorage.removeItem('block_1_08_inscriptions');
+      document.getElementById('feedbackMsg').innerHTML = 'Inscripciones limpiadas.';
+    }
+    function saveInscriptions() { try { localStorage.setItem('block_1_08_inscriptions', JSON.stringify(inscriptions)); } catch(e) {} }
+    function loadInscriptions() {
+      try { var r = localStorage.getItem('block_1_08_inscriptions'); if (r) { inscriptions = JSON.parse(r); renderInscriptions(); } } catch(e) {}
+    }
+    document.getElementById('inscribeBtn').addEventListener('click', inscribe);
+    document.getElementById('resetInscriptionsBtn').addEventListener('click', resetInscriptions);
+    loadInscriptions();
+    var quizQuestions = [
+      { text: "&iquest;Qu&eacute; te permite hacer el protocolo Ordinals?", options: ["Minar Bitcoin", "Inscribir datos arbitrarios en satoshis individuales", "Crear contratos inteligentes", "Hacer staking"], correct: 1 },
+      { text: "&iquest;Cu&aacute;l es la diferencia entre BRC-20 y Runes?", options: ["Son lo mismo", "BRC-20 se basa en Ordinals, Runes es un protocolo m&aacute;s eficiente de tokens fungibles en Bitcoin", "BRC-20 es para NFTs", "Runes solo funciona en Ethereum"], correct: 1 },
+      { text: "&iquest;Qu&eacute; debate han generado los Ordinals en la comunidad Bitcoin?", options: ["Ninguno, todos est&aacute;n de acuerdo", "Aumentan la demanda de blockspace y las comisiones, algunos lo ven como innovaci&oacute;n y otros como congesti&oacute;n", "Hacen Bitcoin m&aacute;s lento", "Eliminan la miner&iacute;a"], correct: 1 }
+    ];
+    var quizAnswers = new Array(quizQuestions.length).fill(null);
+    var quizCompleted = false;
+    function renderQuiz() {
+      var container = document.getElementById('quizContainer');
+      container.innerHTML = '';
+      quizQuestions.forEach(function(q, idx) {
+        var qDiv = document.createElement('div');
+        qDiv.classList.add('question');
+        qDiv.innerHTML = '<p>' + q.text + '</p><div class="options" id="hqopt-' + idx + '"></div>';
+        var optDiv = qDiv.querySelector('.options');
+        q.options.forEach(function(opt, oi) {
+          var o = document.createElement('span');
+          o.classList.add('opt');
+          o.textContent = opt;
+          o.addEventListener('click', function() {
+            if (quizCompleted) return;
+            var parent = this.parentElement;
+            Array.from(parent.children).forEach(function(c) { c.classList.remove('selected'); });
+            this.classList.add('selected');
+            quizAnswers[idx] = oi;
+            var all = quizAnswers.every(function(a) { return a !== null; });
+            document.getElementById('submitQuizBtn').disabled = !all;
+          });
+          optDiv.appendChild(o);
+        });
+        container.appendChild(qDiv);
+      });
+    }
+    function submitQuiz() {
+      if (quizCompleted) return;
+      var correct = 0;
+      quizQuestions.forEach(function(q, idx) { if (quizAnswers[idx] === q.correct) correct++; });
+      var fb = document.getElementById('quizFeedback');
+      if (correct >= 2) {
+        quizCompleted = true;
+        localStorage.setItem(STORAGE_KEY, 'true');
+        document.getElementById('insigniaArea').classList.remove('hidden');
+        document.getElementById('feedbackMsg').innerHTML = 'M&oacute;dulo completado.';
+        fb.innerHTML = '<span style="color:#22c55e;">Acertaste ' + correct + '/3.</span>';
+        quizQuestions.forEach(function(q, idx) {
+          var opts = document.querySelectorAll('#hqopt-' + idx + ' .opt');
+          opts.forEach(function(o, oi) {
+            o.style.pointerEvents = 'none';
+            if (oi === q.correct) o.classList.add('correct');
+            else if (oi === quizAnswers[idx] && oi !== q.correct) o.classList.add('wrong');
+          });
+        });
+        document.getElementById('submitQuizBtn').disabled = true;
+      } else {
+        fb.innerHTML = '<span style="color:#ef4444;">Acertaste ' + correct + '/3. Necesitas 2.</span>';
+      }
+    }
+    document.getElementById('submitQuizBtn').addEventListener('click', submitQuiz);
+    renderQuiz();
+    if (localStorage.getItem(STORAGE_KEY) === 'true') {
+      quizCompleted = true;
+      document.getElementById('insigniaArea').classList.remove('hidden');
+      document.getElementById('feedbackMsg').innerHTML = 'M&oacute;dulo completado';
+      document.getElementById('submitQuizBtn').disabled = true;
+      quizQuestions.forEach(function(q, idx) {
+        var opts = document.querySelectorAll('#hqopt-' + idx + ' .opt');
+        opts.forEach(function(o) { o.style.pointerEvents = 'none'; });
+      });
+    }
+  </script>
+  <script src="../../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

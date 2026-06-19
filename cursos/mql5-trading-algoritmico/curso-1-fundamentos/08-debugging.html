@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Fundamentos MQL5 | 🐛 Depuración y Logging</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:linear-gradient(135deg,#0a0f1e,#0c1222 50%,#111a2e); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+    .course-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(0,224,255,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+    .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #00e0ff; }
+    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#7af2ff,#00e0ff); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .hero-header p { font-size:1.1rem; color:#b9e2ff; margin-top:0.5rem; font-weight:500; }
+    .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+    .chip { background:rgba(0,224,255,0.15); border:1px solid #00e0ff; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+    .progress-section { padding:1.2rem 2rem; border-bottom:1px solid #1a2a4a; }
+    .progress-bar-outer { background:#1a2a4a; border-radius:20px; height:16px; overflow:hidden; }
+    .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#00e0ff,#0088ff); border-radius:20px; transition:width 0.5s ease; }
+    .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
+    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #00e0ff; font-size:1rem; line-height:1.6; }
+    .main-area { padding:1.5rem 2rem; }
+    .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#00e0ff; }
+    .puzzle-card { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.2rem; backdrop-filter:blur(8px); border:1px solid #3399ff; margin-bottom:1.2rem; }
+    .puzzle-card h3 { font-size:1.1rem; color:#ffcc44; margin-bottom:0.5rem; }
+    .code-block { background:#0a0e1a; border-radius:1rem; padding:0.8rem; font-family:'Fira Code',monospace; font-size:0.8rem; color:#aaccff; line-height:1.6; border:1px solid #2c3e66; overflow-x:auto; margin:0.5rem 0; }
+    .code-block .err { background:#5a1a1a; color:#ff6666; padding:0.1rem 0.3rem; border-radius:0.3rem; }
+    .puzzle-options { display:flex; flex-wrap:wrap; gap:0.5rem; margin:0.5rem 0; }
+    .puzzle-opt { background:#1e2a3e; padding:0.4rem 0.9rem; border-radius:2rem; cursor:pointer; font-size:0.85rem; transition:0.2s; }
+    .puzzle-opt:hover { background:#2c3e66; transform:translateY(-2px); }
+    .puzzle-opt.selected { background:#00e0ff; color:#000; font-weight:bold; box-shadow:0 0 8px cyan; }
+    .puzzle-opt.correct { background:#00cc88; color:#000; }
+    .puzzle-opt.wrong { background:#ff4455; color:#fff; }
+    .log-sim { background:#0a0010; border-radius:1rem; padding:0.8rem; font-family:'Fira Code',monospace; font-size:0.75rem; color:#88dd88; max-height:120px; overflow-y:auto; border:1px solid #334; margin:0.5rem 0; }
+    .log-line { padding:0.1rem 0; }
+    .log-line .ts { color:#668; } .log-line .lvl { color:#ffbb66; } .log-line .msg { color:#88dd88; }
+    .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #00e0ff; }
+    .btn-action { background:linear-gradient(95deg,#f0a500,#ff6a00); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin-top:0.5rem; }
+    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(240,165,0,0.5); }
+    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:1.5rem 0; padding:1rem; border:1px dashed gold; }
+    .insignia i { font-size:2.5rem; color:gold; }
+    .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
+    .hidden { display:none; }
+    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(0,224,255,0.4); }
+    .nav-link.next { background:linear-gradient(95deg,#f0a500,#ff6a00); color:#1e1a0c; }
+    .nav-link.menu { background:#1a2a4a; border:1px solid #3399ff; }
+    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+    @media (max-width:800px) { .hero-header h1{font-size:1.9rem} }
+  </style>
+  <link rel="stylesheet" href="../../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a></nav>
+  <div class="course-container" id="app">
+    <div class="hero-header">
+      <h1>🐛 Depuración y Logging</h1>
+      <p>Encuentra errores como un detective del código</p>
+      <div class="badge-area">
+        <span class="chip"><i class="fas fa-bug"></i> Debug</span>
+        <span class="chip"><i class="fas fa-print"></i> Print/Comment/Alert</span>
+        <span class="chip"><i class="fas fa-puzzle-piece"></i> Puzzle</span>
+      </div>
+    </div>
+    <div class="progress-section">
+      <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+      <span class="progress-text" id="progressText">Módulo 8 de 12</span>
+    </div>
+    <div class="analogy-card">
+      <strong>💡 Piénsalo así:</strong> Depurar es como ser detective. El código te da pistas (Print, Comment, Alert) y tú debes encontrar al culpable (el bug). El depurador de MetaEditor es tu lupa: permite pausar la ejecución, inspeccionar variables y avanzar paso a paso.
+    </div>
+    <div class="main-area">
+      <div class="section-title"><i class="fas fa-bug"></i> Encuentra el error en cada fragmento</div>
+
+      <div id="puzzlesContainer"></div>
+      <div id="logSimulator" class="puzzle-card">
+        <h3><i class="fas fa-terminal"></i> Simulador de Log</h3>
+        <p style="font-size:0.85rem;color:#8899bb;margin-bottom:0.5rem;">Haz clic para ejecutar y ver el output en el panel de log.</p>
+        <button class="btn-action" onclick="simulateLog()">▶️ Ejecutar código</button>
+        <div class="log-sim" id="logOutput">
+          <div class="log-line"><span class="ts">[--:--:--]</span> <span class="lvl">INFO</span> <span class="msg">Log vacío. Ejecuta el código.</span></div>
+        </div>
+      </div>
+
+      <button id="checkAllBtn" class="btn-action">✅ Verificar todo</button>
+      <div id="insigniaArea" class="insignia hidden">
+        <i class="fas fa-medal"></i>
+        <h3>🏅 Cazador de Bugs 🏅</h3>
+        <p>Has demostrado ser un excelente detective de código. ¡Los bugs te temen!</p>
+      </div>
+    </div>
+
+    <div id="feedbackMsg" class="feedback">💡 Selecciona el error en cada fragmento de código.</div>
+
+    <div class="nav-links">
+      <a href="07-arrays-matrices.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+      <a href="09-archivos.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <footer><i class="fas fa-robot"></i> MQL5 & Trading Algorítmico · Programa. Automatiza. Gana.</footer>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'mql5_1_08';
+    const PROGRESS_KEY = 'mql5_1_progress';
+    let completed = false;
+    let userAnswers = {};
+
+    const puzzles = [
+      {
+        code: 'double x = 10.5;<br><span class="err">int y = "texto";</span>',
+        options: ['x debe ser int', '"texto" no se asigna a int', 'Falta ;', 'No hay error'],
+        correct: 1
+      },
+      {
+        code: 'for(int i=0; i<10; i++) {<br>&nbsp;&nbsp;Print(i);<br>}<br><span class="err">Print("Fin"); }</span>',
+        options: ['Falta { de cierre', 'i debe ser double', 'Print necesita #include', 'No hay error'],
+        correct: 0
+      },
+      {
+        code: 'void OnTick() {<br>&nbsp;&nbsp;double precios[];<br>&nbsp;&nbsp;<span class="err">precios[0] = 1.2345;</span><br>}',
+        options: ['Array no dimensionado', 'Tipo incorrecto', 'Falta return', 'No hay error'],
+        correct: 0
+      },
+      {
+        code: 'int suma(int a, int b) {<br>&nbsp;&nbsp;return a + b;<br>}<br><span class="err">double r = suma(5, 3.14);</span>',
+        options: ['La función debe ser double', '3.14 es double, no int', 'Falta MathSum', 'No hay error'],
+        correct: 1
+      }
+    ];
+
+    function saveProgress() {
+      let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+      if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
+      localStorage.setItem(STORAGE_KEY, 'true');
+    }
+
+    function updateProgress() {
+      let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+      document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
+      document.getElementById('progressText').textContent = 'M\u00f3dulo '+(p.length || 1)+' de 12';
+    }
+
+    function renderPuzzles() {
+      const container = document.getElementById('puzzlesContainer');
+      container.innerHTML = '';
+      puzzles.forEach((p, idx) => {
+        const card = document.createElement('div');
+        card.classList.add('puzzle-card');
+        card.innerHTML = '<h3>🧩 Puzzle ' + (idx+1) + '</h3><div class="code-block">' + p.code + '</div><div class="puzzle-options" id="popt-' + idx + '">' +
+          p.options.map((o, oi) => '<span class="puzzle-opt" data-p="' + idx + '" data-o="' + oi + '">' + o + '</span>').join('') +
+        '</div>';
+        container.appendChild(card);
+      });
+      container.querySelectorAll('.puzzle-opt').forEach(opt => {
+        opt.addEventListener('click', function() {
+          if (completed) return;
+          const pIdx = this.dataset.p;
+          document.querySelectorAll('#popt-' + pIdx + ' .puzzle-opt').forEach(o => o.classList.remove('selected'));
+          this.classList.add('selected');
+          userAnswers[pIdx] = parseInt(this.dataset.o);
+        });
+      });
+    }
+
+    function checkAll() {
+      if (completed) return;
+      const total = puzzles.length;
+      if (Object.keys(userAnswers).length < total) { document.getElementById('feedbackMsg').textContent = '⚠️ Responde todos los puzzles primero.'; return; }
+      let correct = 0;
+      puzzles.forEach((p, idx) => {
+        const opts = document.querySelectorAll('#popt-' + idx + ' .puzzle-opt');
+        opts.forEach((o, oi) => {
+          o.classList.remove('selected');
+          if (oi === p.correct) o.classList.add('correct');
+          else if (oi === userAnswers[idx]) o.classList.add('wrong');
+        });
+        if (userAnswers[idx] === p.correct) correct++;
+      });
+      if (correct === total) {
+        completed = true; document.getElementById('insigniaArea').classList.remove('hidden');
+        document.getElementById('feedbackMsg').textContent = '🎉 ¡Todos los bugs encontrados! Eres un cazador de bugs experto.';
+        saveProgress(); updateProgress();
+      } else {
+        document.getElementById('feedbackMsg').textContent = '❌ ' + correct + '/' + total + ' correctos. Revisa las opciones en rojo.';
+      }
+    }
+
+    window.simulateLog = function() {
+      const log = document.getElementById('logOutput');
+      const now = new Date();
+      const ts = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0') + ':' + String(now.getSeconds()).padStart(2,'0');
+      const msgs = [
+        'Inicializando indicador...',
+        'CopyBuffer éxito: 100 velas obtenidas',
+        'Precio actual: 1.23456',
+        'Señal COMPRA detectada',
+        'Enviando orden... OK (Ticket #12345)'
+      ];
+      const msg = msgs[Math.floor(Math.random() * msgs.length)];
+      log.innerHTML += '<div class="log-line"><span class="ts">[' + ts + ']</span> <span class="lvl">INFO</span> <span class="msg">' + msg + '</span></div>';
+      log.scrollTop = log.scrollHeight;
+    };
+
+    function restoreProgress() {
+      const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+      if (p.includes(STORAGE_KEY)) {
+        completed = true; document.getElementById('insigniaArea').classList.remove('hidden');
+        document.getElementById('feedbackMsg').textContent = '🏆 Ya completaste este módulo.';
+        document.querySelectorAll('.puzzle-opt').forEach(o => o.style.pointerEvents = 'none');
+        document.querySelectorAll('#puzzlesContainer .puzzle-opt').forEach((o, idx) => {
+          const pIdx = parseInt(o.dataset.p);
+          const correct = puzzles[pIdx].correct;
+          if (parseInt(o.dataset.o) === correct) o.classList.add('correct');
+        });
+      }
+    }
+
+    renderPuzzles();
+    document.getElementById('checkAllBtn').addEventListener('click', checkAll);
+    updateProgress(); restoreProgress();
+  </script>
+  <script src="../../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

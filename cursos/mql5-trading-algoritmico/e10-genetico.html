@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>MQL5 | Optimización Genética</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../assets/css/theme.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%);background-size:200% 200%;animation:gradientShift 20s ease infinite;font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
+@keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.modulo-container{max-width:1400px;width:100%;background:rgba(15,25,45,0.65);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(255,102,192,0.25);box-shadow:0 25px 45px rgba(0,0,0,0.5);overflow:hidden}
+.hero-header{background:linear-gradient(95deg,#0b1120 0%,#111a2e 100%);padding:2rem 2rem 1.5rem 2rem;text-align:center;border-bottom:2px solid #ff66c0}
+.hero-header h1{font-size:2.6rem;font-weight:800;background:linear-gradient(135deg,#FFF,#ff99d6,#ff66c0);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-header p{color:#bcc9f0;margin-top:.5rem;font-size:1.1rem}
+.badge-area{display:flex;justify-content:center;gap:1rem;margin-top:1.2rem;flex-wrap:wrap}
+.chip{background:rgba(255,102,192,0.15);border:1px solid #ff66c0;padding:0.4rem 1rem;border-radius:40px;font-size:0.8rem;font-weight:600;color:#ddd}
+.analogy-card{background:#1e2a3acc;margin:1.5rem 2rem;padding:1.2rem 1.8rem;border-radius:2rem;border-left:8px solid #ff66c0;font-size:1rem;line-height:1.6}
+.progress-section{margin:1rem 2rem 0}
+.progress-bar-outer{background:#1a2a4a;border-radius:20px;height:20px;overflow:hidden}
+.progress-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,#ff66c0,#fff);border-radius:20px;transition:width 0.5s ease}
+.progress-text{text-align:center;font-size:0.85rem;color:#8899cc;margin-bottom:.5rem}
+.main-area{padding:1rem 2rem}
+.ga-grid{display:grid;grid-template-columns:320px 1fr;gap:1.5rem;margin-bottom:1.5rem}
+@media(max-width:900px){.ga-grid{grid-template-columns:1fr}}
+.control-panel{background:#0a1020;border-radius:2rem;padding:1.5rem;border:1px solid #2a3a5a}
+.control-panel h3{font-size:1rem;color:#ff66c0;margin-bottom:.8rem}
+.btn-action{background:linear-gradient(95deg,#ff66c0,#d4408a);border:none;padding:0.8rem 1.8rem;font-weight:bold;border-radius:3rem;cursor:pointer;font-size:1rem;transition:0.2s;color:#fff;font-family:'Inter',sans-serif;width:100%;margin-bottom:.5rem}
+.btn-action:hover{transform:translateY(-2px);box-shadow:0 0 15px rgba(255,102,192,0.5)}
+.btn-action:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-action.small{padding:.5rem 1rem;font-size:.85rem;width:auto}
+.result-panel{background:#0a1020;border-radius:2rem;padding:1.5rem;border:1px solid #2a3a5a;min-height:500px}
+.gen-counter{font-size:2rem;font-weight:800;color:#ff66c0;text-align:center;padding:.5rem;background:#0d1525;border-radius:1rem;border:1px solid #2a3a5a;margin-bottom:1rem}
+.pop-table{width:100%;border-collapse:collapse;font-size:.75rem;margin-bottom:1rem}
+.pop-table th{background:#1a2a4a;padding:.4rem .3rem;text-align:center;color:#8899cc;font-weight:600;font-size:.65rem;text-transform:uppercase}
+.pop-table td{padding:.35rem .3rem;text-align:center;border-bottom:1px solid #1a2a4a;font-size:.72rem}
+.pop-table tr:hover{background:#ffffff08}
+.pop-table .parent-row{background:#ff66c022;border-left:3px solid #ff66c0}
+.pop-table .best-fit{color:#aaff00;font-weight:700}
+.fitness-cell{font-weight:600}
+.fitness-cell.high{color:#aaff00}
+.fitness-cell.med{color:#ffcc00}
+.fitness-cell.low{color:#ff6644}
+.chart-wrap{background:#0d1525;border-radius:1rem;padding:.5rem;margin-bottom:1rem;border:1px solid #2a3a5a}
+#fitnessChart{width:100%;height:150px;border-radius:.5rem}
+.heatmap-wrap{background:#0d1525;border-radius:1rem;padding:1rem;margin-bottom:1rem;border:1px solid #2a3a5a}
+.heatmap-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:2px;margin-top:.5rem}
+.heatmap-cell{aspect-ratio:1;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:.5rem;color:#fff;font-weight:600}
+.convergence-bar{display:flex;align-items:center;gap:.8rem;padding:.5rem;background:#0d1525;border-radius:.8rem;margin-bottom:1rem;border:1px solid #2a3a5a}
+.convergence-fill-wrap{flex:1;height:20px;background:#1a2a4a;border-radius:10px;overflow:hidden}
+.convergence-fill{height:100%;width:100%;background:linear-gradient(90deg,#ff6644,#ffcc00,#aaff00);border-radius:10px;transition:width .5s}
+.code-panel{background:#0d1525;border-radius:1rem;padding:1rem;margin-top:1rem;border:1px solid #3a4a6a;max-height:200px;overflow-y:auto}
+.code-panel pre{font-family:'Courier New',monospace;font-size:.75rem;color:#aabbdd;white-space:pre-wrap;line-height:1.5}
+.overfit-trap{background:#ff660022;border:1px solid #ff6600;border-radius:1rem;padding:.8rem;font-size:.85rem;display:none;margin-bottom:1rem}
+.overfit-trap.show{display:block}
+.manual-breed{display:flex;gap:.5rem;align-items:center;margin-top:.5rem;flex-wrap:wrap}
+.manual-breed select{background:#1a2a4a;color:#eef5ff;border:1px solid #ff66c0;border-radius:.8rem;padding:.4rem;font-family:'Inter',sans-serif;font-size:.8rem}
+.feedback{background:#00000099;margin:0 2rem 1.5rem 2rem;padding:1rem;border-radius:1.5rem;text-align:center;font-weight:500;border-left:4px solid #ff66c0;min-height:3rem}
+.insignia{text-align:center;background:#0c1b2f;border-radius:2rem;margin:0 2rem 1.5rem;padding:1rem;border:2px dashed gold}
+.insignia i{font-size:2.5rem;color:gold}
+.insignia h3{color:gold;margin:.5rem 0}
+.hidden{display:none!important}
+.nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.5rem 2rem}
+.nav-link{background:#2c3e66;padding:0.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:0.5rem;transition:0.2s}
+.nav-link:hover{transform:translateY(-2px);box-shadow:0 0 10px rgba(255,102,192,0.4)}
+.nav-link.next{background:linear-gradient(95deg,#f0a500,#ff6a00);color:#1e1a0c}
+.nav-link.menu{background:#1a2a4a;border:1px solid #3399ff}
+.nav-link.prev{background:#1a2a4a;border:1px solid #666}
+footer{text-align:center;padding:1.2rem;font-size:0.8rem;border-top:1px solid #2c3e66;color:#8899cc}
+@media(max-width:800px){
+  .hero-header h1{font-size:1.9rem}
+  .analogy-card{margin:1rem}
+  .feedback{margin:0 1rem 1rem}
+  .main-area{padding:1rem}
+  .pop-table{font-size:.65rem}
+  .pop-table td,.pop-table th{padding:.25rem .15rem}
+}
+</style>
+</head>
+<body>
+<div class="modulo-container">
+  <nav class="brand-return-nav">
+    <a href="../../index.html">&larr; Portfolio</a>
+    <a href="../../cursos/index.html">Cursos</a>
+  </nav>
+
+  <div class="hero-header">
+    <h1>🧬 Optimización Genética de Estrategias</h1>
+    <p>"Evolución darwiniana aplicada a tus parámetros de trading"</p>
+    <div class="badge-area">
+      <span class="chip"><i class="fas fa-dna"></i> Algoritmos Genéticos</span>
+      <span class="chip"><i class="fas fa-chart-line"></i> Fitness</span>
+      <span class="chip"><i class="fas fa-evolution"></i> Evolución</span>
+    </div>
+  </div>
+
+  <div class="progress-section">
+    <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+    <div class="progress-text" id="progressText">Módulo E10 de 26</div>
+  </div>
+
+  <div class="analogy-card">
+    <strong>🧬 Piénsalo así:</strong> La optimización genética es como la selección natural: tienes muchas "criaturas" (combinaciones de parámetros), las que sobreviven (mejor fitness) se reproducen (cruzan sus genes), y tras varias generaciones obtienes especímenes superiores.
+  </div>
+
+  <div class="main-area">
+    <div class="ga-grid">
+      <div class="control-panel">
+        <h3><i class="fas fa-sliders-h"></i> Controles</h3>
+        <button class="btn-action" id="nextGenBtn"><i class="fas fa-forward"></i> Siguiente Generación</button>
+        <button class="btn-action small" id="resetBtn" style="width:100%"><i class="fas fa-redo"></i> Reiniciar Población</button>
+        <div style="margin-top:1rem">
+          <h3><i class="fas fa-dna"></i> Cruce Manual</h3>
+          <div class="manual-breed">
+            <select id="parent1Select" style="flex:1"></select>
+            <select id="parent2Select" style="flex:1"></select>
+            <button class="btn-action small" id="breedBtn"><i class="fas fa-heart"></i> Cruzar</button>
+          </div>
+        </div>
+        <div style="margin-top:1rem">
+          <h3><i class="fas fa-tachometer-alt"></i> Fitness</h3>
+          <select id="fitnessSelect" style="width:100%;padding:.6rem;background:#1a2a4a;color:#eef5ff;border:1px solid #ff66c0;border-radius:.8rem;font-family:'Inter',sans-serif;font-size:.85rem">
+            <option value="sharpe">Sharpe Ratio</option>
+            <option value="profit">Profit Factor</option>
+            <option value="custom">Custom Score</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="result-panel">
+        <div class="gen-counter">Generación <span id="genDisplay">1</span></div>
+        <div style="display:grid;grid-template-columns:2fr 1fr;gap:1rem">
+          <div class="chart-wrap">
+            <canvas id="fitnessChart" width="600" height="150"></canvas>
+          </div>
+          <div class="convergence-bar">
+            <span style="font-size:.8rem;color:#8899cc;min-width:60px">Convergencia</span>
+            <div class="convergence-fill-wrap"><div class="convergence-fill" id="convFill" style="width:100%"></div></div>
+            <span id="convPct" style="font-size:.8rem;font-weight:700;color:#ff66c0;min-width:35px">100%</span>
+          </div>
+        </div>
+        <div class="heatmap-wrap" id="heatmapWrap">
+          <div style="display:flex;justify-content:space-between;font-size:.8rem">
+            <span style="color:#bcc9f0"><i class="fas fa-th"></i> Mapa de Calor: Fast MA × Slow MA</span>
+            <span style="color:#8899cc">Verde = mejor fitness</span>
+          </div>
+          <div class="heatmap-grid" id="heatmapGrid"></div>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="pop-table" id="popTable">
+            <thead><tr><th>#</th><th>Fast MA</th><th>Slow MA</th><th>SL</th><th>TP</th><th>Risk%</th><th>Fitness</th><th></th></tr></thead>
+            <tbody id="popBody"></tbody>
+          </table>
+        </div>
+        <div class="overfit-trap" id="overfitTrap">
+          <strong><i class="fas fa-exclamation-triangle"></i> ¡TRAMPA DEL SOBREAJUSTE!</strong><br>
+          Llevas <span id="genCount">0</span> generaciones sin mejora significativa. El algoritmo está memorizando ruido. En forward test el rendimiento caerá. Reduce generaciones o aumenta el tamaño de población.
+        </div>
+        <div class="code-panel" id="codePanel">
+          <pre id="codeContent">// MQL5 Genetic Optimization code will appear here</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="feedbackMsg" class="feedback">💡 Presiona "Siguiente Generación" para iniciar la evolución de parámetros. Cada generación selecciona los mejores padres, cruza sus genes y muta.</div>
+
+  <div id="insigniaArea" class="insignia hidden">
+    <i class="fas fa-medal"></i>
+    <h3>🏅 Ingeniero Genético 🏅</h3>
+    <p>¡Has dominado la optimización genética! Evolución, cruce, mutación y convergencia no tienen secretos para ti. 🚀</p>
+  </div>
+
+  <div class="nav-links">
+    <a href="e9-machine-learning.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+    <a href="e11-walk-forward.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> MQL5 Trading Algorítmico · Domina el arte del trading automatizado</footer>
+</div>
+<script>
+const STORAGE_KEY = 'mql5_e10';
+const POP_SIZE = 20;
+const PARAM_NAMES = ['Fast MA','Slow MA','SL','TP','Risk%'];
+let population = [];
+let generation = 1;
+let bestFitnessHistory = [];
+let avgFitnessHistory = [];
+let stagnantGens = 0;
+let completed = false;
+const MAX_GENS = 30;
+
+function randomParams(){
+  return {
+    fastMA: Math.floor(Math.random()*40+5),
+    slowMA: Math.floor(Math.random()*100+50),
+    sl: Math.floor(Math.random()*200+10),
+    tp: Math.floor(Math.random()*400+20),
+    risk: parseFloat((Math.random()*4+1).toFixed(1))
+  };
+}
+
+function calcFitness(params, mode){
+  const spread = params.slowMA - params.fastMA;
+  if(spread <= 0) return 0.001;
+  const base = spread/100 * (params.tp/params.sl) * (1/params.risk) * (5 + Math.random()*5);
+  const noise = (Math.random()-0.5)*0.3*base;
+  let val = base + noise;
+  if(mode === 'sharpe') val = val * (0.8 + Math.random()*0.4);
+  else if(mode === 'profit') val = val * (1.2 + Math.random()*0.6);
+  else val = val * (1 + Math.random()*0.5);
+  return Math.max(0.001, val);
+}
+
+function initPopulation(){
+  population = [];
+  const mode = document.getElementById('fitnessSelect').value;
+  for(let i=0;i<POP_SIZE;i++){
+    const p = randomParams();
+    p.fitness = calcFitness(p, mode);
+    population.push(p);
+  }
+  generation = 1;
+  bestFitnessHistory = [];
+  avgFitnessHistory = [];
+  stagnantGens = 0;
+  completed = false;
+  document.getElementById('overfitTrap').classList.remove('show');
+  render();
+}
+
+function evolve(){
+  const mode = document.getElementById('fitnessSelect').value;
+  const sorted = [...population].sort((a,b)=>b.fitness - a.fitness);
+  const parents = sorted.slice(0, 5);
+  const newPop = [];
+  
+  newPop.push({...parents[0]});
+  newPop.push({...parents[1]});
+  
+  while(newPop.length < POP_SIZE){
+    const p1 = parents[Math.floor(Math.random()*parents.length)];
+    const p2 = parents[Math.floor(Math.random()*parents.length)];
+    const child = crossover(p1, p2);
+    mutate(child);
+    child.fitness = calcFitness(child, mode);
+    newPop.push(child);
+  }
+  
+  population = newPop;
+  generation++;
+  
+  const best = Math.max(...population.map(p=>p.fitness));
+  const avg = population.reduce((s,p)=>s+p.fitness,0)/POP_SIZE;
+  bestFitnessHistory.push(best);
+  avgFitnessHistory.push(avg);
+  
+  if(bestFitnessHistory.length >= 3){
+    const last3 = bestFitnessHistory.slice(-3);
+    if(Math.abs(last3[2]-last3[0])/last3[0] < 0.02) stagnantGens++;
+    else stagnantGens = 0;
+  }
+  
+  if(stagnantGens >= 5) document.getElementById('overfitTrap').classList.add('show');
+  document.getElementById('genCount').textContent = stagnantGens;
+  
+  if(generation >= MAX_GENS){
+    document.getElementById('nextGenBtn').disabled = true;
+    document.getElementById('feedbackMsg').innerHTML = '🧬 Simulación completa tras '+generation+' generaciones. El mejor fitness es '+best.toFixed(2);
+  }
+  
+  render();
+  updateChart();
+  updateHeatmap();
+  updateCode();
+  
+  if(!completed && generation >= 5){
+    completed = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    saveProgress();
+  }
+}
+
+function crossover(p1, p2){
+  return {
+    fastMA: Math.random()>0.5 ? p1.fastMA : p2.fastMA,
+    slowMA: Math.random()>0.5 ? p1.slowMA : p2.slowMA,
+    sl: Math.random()>0.5 ? p1.sl : p2.sl,
+    tp: Math.random()>0.5 ? p1.tp : p2.tp,
+    risk: Math.random()>0.5 ? p1.risk : p2.risk,
+    fitness: 0
+  };
+}
+
+function mutate(indiv){
+  if(Math.random() < 0.3){
+    indiv.fastMA = Math.max(2, Math.min(200, indiv.fastMA + Math.floor((Math.random()-0.5)*10)));
+  }
+  if(Math.random() < 0.3){
+    indiv.slowMA = Math.max(indiv.fastMA+5, Math.min(300, indiv.slowMA + Math.floor((Math.random()-0.5)*15)));
+  }
+  if(Math.random() < 0.2){
+    indiv.sl = Math.max(5, Math.min(500, indiv.sl + Math.floor((Math.random()-0.5)*30)));
+  }
+  if(Math.random() < 0.2){
+    indiv.tp = Math.max(5, Math.min(1000, indiv.tp + Math.floor((Math.random()-0.5)*50)));
+  }
+  if(Math.random() < 0.15){
+    indiv.risk = Math.max(0.1, Math.min(10, indiv.risk + (Math.random()-0.5)*1));
+    indiv.risk = parseFloat(indiv.risk.toFixed(1));
+  }
+}
+
+function render(){
+  const body = document.getElementById('popBody');
+  const sorted = [...population].sort((a,b)=>b.fitness - a.fitness);
+  const bestFitness = sorted[0].fitness;
+  body.innerHTML = sorted.map((p,i)=>{
+    const isParent = i < 5;
+    const fitClass = p.fitness === bestFitness ? 'best-fit' : 
+      p.fitness > bestFitness*0.7 ? 'high' : p.fitness > bestFitness*0.4 ? 'med' : 'low';
+    return '<tr class="'+(isParent?'parent-row':'')+'">'+
+      '<td>'+(i+1)+(isParent?' 👑':'')+'</td>'+
+      '<td>'+p.fastMA+'</td>'+
+      '<td>'+p.slowMA+'</td>'+
+      '<td>'+p.sl+'</td>'+
+      '<td>'+p.tp+'</td>'+
+      '<td>'+p.risk.toFixed(1)+'%</td>'+
+      '<td class="fitness-cell '+fitClass+'">'+p.fitness.toFixed(2)+'</td>'+
+      '<td>'+(isParent?'<span style="color:#ff66c0;font-size:.7rem">PADRE</span>':'')+'</td>'+
+    '</tr>';
+  }).join('');
+  document.getElementById('genDisplay').textContent = generation;
+  
+  const p1sel = document.getElementById('parent1Select');
+  const p2sel = document.getElementById('parent2Select');
+  p1sel.innerHTML = sorted.map((p,i)=>'<option value="'+i+'">#'+(i+1)+' Fit:'+p.fitness.toFixed(2)+'</option>').join('');
+  p2sel.innerHTML = sorted.map((p,i)=>'<option value="'+i+'">#'+(i+1)+' Fit:'+p.fitness.toFixed(2)+'</option>').join('');
+}
+
+function updateChart(){
+  const canvas = document.getElementById('fitnessChart');
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle = '#0d1525';
+  ctx.fillRect(0,0,w,h);
+  if(bestFitnessHistory.length < 1) return;
+  const pad = 10;
+  const allVals = [...bestFitnessHistory, ...avgFitnessHistory];
+  const maxV = Math.max(...allVals)*1.1;
+  const minV = Math.min(...allVals)*0.9;
+  const range = maxV-minV||1;
+  const plotH = h-pad*2;
+  
+  function drawLine(data, color){
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    data.forEach((v,i)=>{
+      const x = i/(data.length-1||1)*(w-pad*2)+pad;
+      const y = pad + (maxV-v)/range*plotH;
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    });
+    ctx.stroke();
+  }
+  if(avgFitnessHistory.length) drawLine(avgFitnessHistory, 'rgba(255,102,192,0.4)');
+  drawLine(bestFitnessHistory, '#ff66c0');
+  
+  ctx.fillStyle = '#8899cc';
+  ctx.font = '9px Inter';
+  ctx.fillText('Max: '+(bestFitnessHistory[bestFitnessHistory.length-1]||0).toFixed(2), w-100, pad+10);
+  const avg = avgFitnessHistory.length ? avgFitnessHistory[avgFitnessHistory.length-1] : 0;
+  ctx.fillText('Avg: '+avg.toFixed(2), w-100, pad+22);
+  // legend
+  ctx.fillStyle = '#ff66c0';
+  ctx.fillRect(pad, h-pad-8, 12, 4);
+  ctx.fillStyle = 'rgba(255,102,192,0.4)';
+  ctx.fillRect(pad+16, h-pad-8, 12, 4);
+  ctx.fillStyle = '#8899cc';
+  ctx.font = '7px Inter';
+  ctx.fillText('Máx', pad+2, h-pad-11);
+  ctx.fillText('Prom', pad+18, h-pad-11);
+  
+  // convergence
+  const conv = bestFitnessHistory.length >= 10 ? 
+    Math.max(5, 100 - (stagnantGens * 15)) : 100;
+  document.getElementById('convFill').style.width = conv+'%';
+  document.getElementById('convPct').textContent = conv+'%';
+}
+
+function updateHeatmap(){
+  const grid = document.getElementById('heatmapGrid');
+  grid.innerHTML = '';
+  const fastRange = [5, 200];
+  const slowRange = [50, 300];
+  const cells = [];
+  for(let i=0;i<10;i++){
+    for(let j=0;j<10;j++){
+      const fast = fastRange[0] + (fastRange[1]-fastRange[0])*i/9;
+      const slow = slowRange[0] + (slowRange[1]-slowRange[0])*j/9;
+      const match = population.filter(p => 
+        Math.abs(p.fastMA - fast) < 20 && Math.abs(p.slowMA - slow) < 30
+      );
+      const avgFit = match.length ? match.reduce((s,p)=>s+p.fitness,0)/match.length : 0;
+      const bestFit = Math.max(...population.map(p=>p.fitness));
+      const intensity = bestFit > 0 ? avgFit/bestFit : 0;
+      const r = Math.round(20 + intensity * 80);
+      const g = Math.round(150 + intensity * 105);
+      const b = Math.round(50 + (1-intensity) * 50);
+      cells.push('<div class="heatmap-cell" style="background:rgb('+r+','+g+','+b+')" title="Fast:'+fast.toFixed(0)+' Slow:'+slow.toFixed(0)+' Fit:'+avgFit.toFixed(2)+'"></div>');
+    }
+  }
+  grid.innerHTML = cells.join('');
+}
+
+function updateCode(){
+  const sorted = [...population].sort((a,b)=>b.fitness - a.fitness);
+  const best = sorted[0];
+  document.getElementById('codeContent').textContent = 
+`//+------------------------------------------------------------------+
+// MQL5 Optimización Genética - Generación ${generation}
+//+------------------------------------------------------------------+
+sinput int    FastMA     = ${best.fastMA};           // Media Rápida
+sinput int    SlowMA     = ${best.slowMA};           // Media Lenta
+sinput int    StopLoss   = ${best.sl};               // Stop Loss (pips)
+sinput int    TakeProfit = ${best.tp};               // Take Profit (pips)
+sinput double RiskPerT   = ${best.risk.toFixed(1)};  // Riesgo %
+
+// Mejor Fitness: ${best.fitness.toFixed(2)}
+// Población: ${POP_SIZE} individuos
+// Generaciones ejecutadas: ${generation}
+
+// En el Strategy Tester:
+// 1. Abre MT5 → Strategy Tester
+// 2. Selecciona "Genetic Optimization"
+// 3. Define rangos para cada parámetro
+// 4. Ejecuta y analiza el reporte de optimización`;
+}
+
+function manualBreed(){
+  const p1idx = parseInt(document.getElementById('parent1Select').value);
+  const p2idx = parseInt(document.getElementById('parent2Select').value);
+  const sorted = [...population].sort((a,b)=>b.fitness - a.fitness);
+  const p1 = sorted[p1idx];
+  const p2 = sorted[p2idx];
+  const child = crossover(p1, p2);
+  mutate(child);
+  const mode = document.getElementById('fitnessSelect').value;
+  child.fitness = calcFitness(child, mode);
+  
+  const worstIdx = 0;
+  let worstVal = Infinity;
+  population.forEach((p,i)=>{
+    if(p.fitness < worstVal){ worstVal = p.fitness; worstIdx = i; }
+  });
+  population[worstIdx] = child;
+  render();
+  updateChart();
+  updateHeatmap();
+  document.getElementById('feedbackMsg').innerHTML = '🧬 Cruce manual completado. Nuevo individuo generado con fitness: '+child.fitness.toFixed(2);
+}
+
+document.getElementById('nextGenBtn').addEventListener('click', evolve);
+document.getElementById('resetBtn').addEventListener('click', initPopulation);
+document.getElementById('breedBtn').addEventListener('click', manualBreed);
+document.getElementById('fitnessSelect').addEventListener('change', initPopulation);
+
+function initProgress(){
+  const p = JSON.parse(localStorage.getItem('mql5_progress')) || [];
+  const pf = document.getElementById('progressFill');
+  const pt = document.getElementById('progressText');
+  if(pf) pf.style.width = Math.round((p.length/26)*100)+'%';
+  if(pt) pt.textContent = p.length+' de 26 módulos';
+  if(p.includes(STORAGE_KEY)){
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    completed = true;
+  }
+}
+
+function saveProgress(){
+  let p = JSON.parse(localStorage.getItem('mql5_progress')) || [];
+  if(!p.includes(STORAGE_KEY)){p.push(STORAGE_KEY);localStorage.setItem('mql5_progress',JSON.stringify(p));}
+  const pf = document.getElementById('progressFill');
+  const pt = document.getElementById('progressText');
+  if(pf) pf.style.width = Math.round((p.length/26)*100)+'%';
+  if(pt) pt.textContent = p.length+' de 26 módulos';
+}
+
+window.addEventListener('load', ()=>{
+  initProgress();
+  initPopulation();
+  updateChart();
+  updateHeatmap();
+  updateCode();
+});
+</script>
+</body>
+</html>

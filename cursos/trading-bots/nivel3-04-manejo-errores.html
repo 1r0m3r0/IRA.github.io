@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bot Trader | Error Handling y Reconexión</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700;14..32,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    body{background:linear-gradient(145deg,#1a0500,#2a0800);font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:2rem 1rem}
+    .container{max-width:1300px;width:100%;background:rgba(28,6,0,.88);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(255,100,50,.22);box-shadow:0 25px 55px rgba(0,0,0,.65);overflow:hidden}
+    .hero{background:linear-gradient(95deg,#140400,#200600);padding:1.8rem 2rem;text-align:center;border-bottom:2px solid #ff6432}
+    .hero h1{font-size:1.9rem;font-weight:800;background:linear-gradient(135deg,#ffd0c0,#ff9966,#ff6432);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .hero p{margin-top:.5rem;font-size:.95rem;color:#aa5533}
+    .chips{display:flex;justify-content:center;gap:.6rem;flex-wrap:wrap;margin-top:.7rem}
+    .chip{background:rgba(255,100,50,.1);border:1px solid rgba(255,100,50,.3);color:#aa5533;font-size:.72rem;padding:.25rem .8rem;border-radius:2rem}
+    .week-badge{display:inline-block;background:rgba(255,100,50,.15);border:1px solid #ff6432;color:#ff6432;font-size:.75rem;font-weight:700;padding:.3rem 1rem;border-radius:2rem;margin-top:.5rem}
+    .analogy{background:#1c0600cc;margin:1.4rem 2rem;padding:1.1rem 1.7rem;border-radius:2rem;border-left:7px solid #ff6432;font-size:.9rem;line-height:1.65}
+    .analogy strong{color:#ff9966}
+    .lab{display:flex;flex-wrap:wrap;gap:1.4rem;padding:0 1.8rem 1.5rem}
+    .left{flex:0 0 280px;display:flex;flex-direction:column;gap:.9rem}
+    .right{flex:1;min-width:300px;display:flex;flex-direction:column;gap:.9rem}
+    .panel{background:#1c0600dd;border-radius:1.8rem;padding:1.2rem 1.3rem;border:1px solid rgba(255,100,50,.15)}
+    .panel h3{font-size:.88rem;font-weight:700;color:#ff9966;margin-bottom:.7rem;display:flex;align-items:center;gap:.4rem}
+    pre{background:#0c0200;border-radius:1rem;padding:1rem;font-family:'JetBrains Mono',monospace;font-size:.73rem;line-height:1.7;overflow-x:auto;color:#ffd0c0;border:1px solid rgba(255,100,50,.12)}
+    .kw{color:#ff6432}.fn{color:#ff9966}.cm{color:#884433}.str{color:#80eeaa}.num{color:#ffd070}.exc{color:#ff3311}
+
+    /* Error cards */
+    .error-scenarios{display:flex;flex-direction:column;gap:.5rem}
+    .err-card{background:#140400;border-radius:1.2rem;border:1px solid rgba(255,100,50,.2);overflow:hidden;cursor:pointer;transition:.2s}
+    .err-card:hover{border-color:#ff6432}
+    .err-card.active{border-color:#ff6432;box-shadow:0 0 12px rgba(255,100,50,.2)}
+    .err-head{display:flex;align-items:center;gap:.6rem;padding:.65rem .9rem}
+    .err-icon{font-size:1.1rem;width:28px;text-align:center}
+    .err-name{font-size:.82rem;font-weight:700;color:#ff9966;flex:1}
+    .err-freq{font-size:.65rem;color:#884433;background:rgba(255,100,50,.1);padding:.15rem .5rem;border-radius:1rem}
+
+    /* Simulation */
+    .sim-container{position:relative}
+    .bot-status{display:flex;align-items:center;gap:.7rem;padding:.7rem 1rem;border-radius:1.2rem;background:#100300;border:1px solid rgba(255,100,50,.15);margin-bottom:.6rem}
+    .status-dot{width:12px;height:12px;border-radius:50%;background:#00ff88;box-shadow:0 0 8px #00ff88}
+    .status-dot.error{background:#ff3311;box-shadow:0 0 8px #ff3311;animation:pulse .5s infinite alternate}
+    .status-dot.warning{background:#ff9944;box-shadow:0 0 8px #ff9944}
+    .status-dot.retry{background:#ffd700;box-shadow:0 0 8px #ffd700;animation:pulse .8s infinite alternate}
+    @keyframes pulse{to{opacity:.3}}
+    .status-text{font-size:.82rem;font-weight:600}
+    .status-sub{font-size:.7rem;color:#884433;margin-top:.1rem}
+
+    .sim-log{background:#080200;border-radius:1rem;padding:.8rem;font-family:'JetBrains Mono',monospace;font-size:.7rem;max-height:220px;overflow-y:auto;border:1px solid rgba(255,100,50,.1)}
+    .sim-log p{padding:.1rem 0;border-bottom:1px solid rgba(255,100,50,.05);line-height:1.5}
+    .log-ok{color:#00ff88}.log-err{color:#ff3311}.log-warn{color:#ff9944}.log-info{color:#ff9966}
+
+    .btn-row{display:flex;gap:.5rem;flex-wrap:wrap}
+    .btn{background:linear-gradient(95deg,#ff6432,#cc3311);border:none;padding:.65rem 1.2rem;font-weight:700;border-radius:2rem;cursor:pointer;color:#fff;font-size:.82rem;transition:.2s;display:flex;align-items:center;gap:.4rem}
+    .btn:hover{transform:translateY(-2px);box-shadow:0 0 15px rgba(255,100,50,.3)}
+    .btn.secondary{background:#2a1000}
+    .btn.green{background:linear-gradient(95deg,#00cc55,#008833)}
+
+    .retry-vis{padding:.5rem 0}
+    .retry-step{display:flex;align-items:center;gap:.5rem;padding:.3rem 0;font-size:.75rem}
+    .retry-step .rs-n{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;flex-shrink:0}
+    .retry-step .rs-t{color:#884433}
+    .retry-step.done .rs-n{background:#00ff8833;color:#00ff88;border:1px solid #00ff88}
+    .retry-step.active .rs-n{background:#ffd70033;color:#ffd700;border:1px solid #ffd700;animation:pulse .6s infinite alternate}
+    .retry-step.pending .rs-n{background:#2a1000;color:#884433;border:1px solid rgba(255,100,50,.2)}
+    .retry-step.fail .rs-n{background:#ff331133;color:#ff3311;border:1px solid #ff3311}
+
+    canvas{border-radius:1rem;display:block}
+    .feedback{background:#00000088;margin:0 1.8rem 1rem;padding:.85rem 1.2rem;border-radius:1.5rem;text-align:center;border-left:4px solid #ff6432;font-size:.88rem;line-height:1.55}
+    .insignia{text-align:center;background:#1c0600;border-radius:2rem;margin:0 1.8rem 1.5rem;padding:1rem;border:1px dashed gold}
+    .insignia i{font-size:2.4rem;color:gold}
+    .hidden{display:none}
+    .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.4rem 2rem}
+    .nav-link{background:#1a0800;padding:.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:.5rem;font-size:.88rem;transition:.2s}
+    .nav-link:hover{transform:translateY(-2px)}
+    .nav-link.next{background:linear-gradient(95deg,#f0a500,#ff6a00);color:#1e1a0c}
+    footer{text-align:center;padding:1rem;font-size:.72rem;border-top:1px solid #1c0600;color:#884433}
+    @media(max-width:860px){.hero h1{font-size:1.4rem}.left{flex:1;min-width:100%}}
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+<nav class="brand-return-nav">
+  <a href="../../index.html">&larr; Portfolio</a>
+  <a href="../../cursos/index.html">Cursos</a>
+</nav>
+<div class="container">
+  <div class="hero">
+    <h1>🚨 ERROR HANDLING: El Arte de No Morir en Producción</h1>
+    <p>Los errores no se evitan — se anticipan. Un bot robusto falla elegantemente y se recupera solo</p>
+    <div class="week-badge"><i class="fas fa-calendar-week"></i> Semanas 3-4: Exchange Connections</div>
+    <div class="chips">
+      <span class="chip">Exponential backoff</span>
+      <span class="chip">Circuit breaker</span>
+      <span class="chip">Dead letter queue</span>
+      <span class="chip">Health checks</span>
+    </div>
+  </div>
+
+  <div class="analogy">
+    <strong>✈️ Piénsalo así:</strong> Los pilotos no cancelan el vuelo cuando hay turbulencia — tienen protocolos para cada escenario. Tu bot necesita lo mismo: si la API del exchange cae → esperar y reintentar con <strong>exponential backoff</strong>. Si hay 10 errores seguidos → activar <strong>circuit breaker</strong> y pausar. Si una orden no llega → verificar con query separada. Un bot que explota al primer error perderá dinero real; uno robusto sobrevive semanas sin supervisión.
+    <div style="margin-top:.5rem;font-size:.78rem;color:#884433"><strong>📚 Fuentes:</strong> Nygard, M. (2018) — <em>"Release It! Design and Deploy Production-Ready Software"</em>. / tenacity library: tenacity.readthedocs.io</div>
+  </div>
+
+  <div class="lab">
+    <div class="left">
+      <div class="panel">
+        <h3><i class="fas fa-exclamation-triangle"></i> Escenarios de Error</h3>
+        <div class="error-scenarios" id="errorScenarios">
+          <div class="err-card active" onclick="selectError(this,'timeout')">
+            <div class="err-head"><span class="err-icon">⏱️</span><span class="err-name">API Timeout</span><span class="err-freq">Frecuente</span></div>
+          </div>
+          <div class="err-card" onclick="selectError(this,'ratelimit')">
+            <div class="err-head"><span class="err-icon">🚦</span><span class="err-name">Rate Limit (429)</span><span class="err-freq">Muy frecuente</span></div>
+          </div>
+          <div class="err-card" onclick="selectError(this,'network')">
+            <div class="err-head"><span class="err-icon">📡</span><span class="err-name">Network Drop</span><span class="err-freq">Ocasional</span></div>
+          </div>
+          <div class="err-card" onclick="selectError(this,'insufficient')">
+            <div class="err-head"><span class="err-icon">💸</span><span class="err-name">Insufficient Funds</span><span class="err-freq">Raro</span></div>
+          </div>
+          <div class="err-card" onclick="selectError(this,'exchange')">
+            <div class="err-head"><span class="err-icon">💥</span><span class="err-name">Exchange Down</span><span class="err-freq">Raro</span></div>
+          </div>
+          <div class="err-card" onclick="selectError(this,'partial')">
+            <div class="err-head"><span class="err-icon">🔀</span><span class="err-name">Partial Fill</span><span class="err-freq">Moderado</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="right">
+      <div class="panel">
+        <h3><i class="fas fa-robot"></i> Simulador de Bot en Producción</h3>
+        <div class="bot-status">
+          <div class="status-dot" id="statusDot"></div>
+          <div>
+            <div class="status-text" id="statusText">Bot corriendo — esperando señal</div>
+            <div class="status-sub" id="statusSub">Uptime: 0s · Errores: 0 · Retries: 0</div>
+          </div>
+        </div>
+        <div class="btn-row" style="margin-bottom:.7rem">
+          <button class="btn" onclick="triggerError()"><i class="fas fa-bolt"></i> Disparar Error</button>
+          <button class="btn green" onclick="resetBot()"><i class="fas fa-redo"></i> Reiniciar Bot</button>
+        </div>
+        <div style="font-size:.8rem;color:#ff9966;margin-bottom:.4rem;font-weight:600">Estrategia de Retry (Exponential Backoff)</div>
+        <div class="retry-vis" id="retryVis"></div>
+        <div class="sim-log" id="simLog">
+          <p class="log-info">🤖 Bot iniciado. Esperando primer ciclo...</p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3><i class="fas fa-code"></i> Código de Manejo — <span id="errorName">API Timeout</span></h3>
+        <pre id="codeBox"></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="feedback" id="feedbackMsg">
+    🚨 Selecciona un escenario de error y presiona <strong>Disparar Error</strong> para ver cómo el bot responde con retry automático y circuit breaker.
+  </div>
+
+  <div class="insignia hidden" id="insigniaArea">
+    <i class="fas fa-shield-alt"></i>
+    <h3 style="margin:.4rem 0;color:#ffd700">🏅 ¡INSIGNIA RESILIENCE ENGINEER!</h3>
+    <p style="font-size:.85rem;color:#ff9966">Has simulado 5+ tipos de error. ¡Tu bot no muere ante el primer obstáculo!</p>
+  </div>
+
+  <div class="nav-links">
+    <a href="nivel3-03-base-datos.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Menú</a>
+    <a href="nivel3-05-patrones-chartistas.html" class="nav-link next">Patrones Chartistas <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Bot Trader Adventure · Semana 3-4 · Nygard (2018) "Release It!" · tenacity</footer>
+</div>
+
+<script>
+const STORAGE_KEY = 'tbot_err2';
+let currentError = 'timeout', errorsTriggered = new Set();
+let uptime = 0, totalErrors = 0, totalRetries = 0, uptimeTimer;
+let circuitOpen = false, circuitCount = 0;
+
+const ERROR_CODES = {
+  timeout: {
+    name: 'API Timeout',
+    desc: 'El exchange no responde en el tiempo límite',
+    retries: [1,2,4,8],
+    fatal: false,
+    code: `<span class="kw">from</span> tenacity <span class="kw">import</span> retry, stop_after_attempt, wait_exponential\n<span class="kw">import</span> ccxt\n\n<span class="cls">@retry</span>(\n    stop=<span class="fn">stop_after_attempt</span>(<span class="num">4</span>),\n    wait=<span class="fn">wait_exponential</span>(multiplier=<span class="num">1</span>, min=<span class="num">1</span>, max=<span class="num">16</span>),\n    reraise=<span class="kw">True</span>\n)\n<span class="kw">def</span> <span class="fn">fetch_ohlcv_safe</span>(exchange, symbol, tf):\n    <span class="kw">try</span>:\n        <span class="kw">return</span> exchange.<span class="fn">fetch_ohlcv</span>(symbol, tf)\n    <span class="kw">except</span> ccxt.RequestTimeout <span class="kw">as</span> e:\n        <span class="fn">logger.warning</span>(f<span class="str">"Timeout #{attempt}: {e}. Retry en {wait}s"</span>)\n        <span class="kw">raise</span>\n    <span class="kw">except</span> ccxt.NetworkError <span class="kw">as</span> e:\n        <span class="fn">logger.error</span>(f<span class="str">"Network error: {e}"</span>)\n        <span class="kw">raise</span>`
+  },
+  ratelimit: {
+    name: 'Rate Limit (429)',
+    desc: 'Demasiadas peticiones por segundo al exchange',
+    retries: [5,10,30],
+    fatal: false,
+    code: `<span class="kw">except</span> ccxt.RateLimitExceeded <span class="kw">as</span> e:\n    <span class="cm"># Binance permite 1200 pesos/min</span>\n    <span class="cm"># NUNCA hagas burst de requests</span>\n    retry_after = <span class="fn">int</span>(e.headers.get(<span class="str">'Retry-After'</span>, <span class="num">30</span>))\n    <span class="fn">logger.warning</span>(f<span class="str">"Rate limit hit. Waiting {retry_after}s"</span>)\n    <span class="fn">time.sleep</span>(retry_after)\n\n<span class="cm"># Mejor: usar enableRateLimit en ccxt</span>\nexchange = ccxt.<span class="fn">binance</span>({\n    <span class="str">'enableRateLimit'</span>: <span class="kw">True</span>,  <span class="cm"># auto-throttle</span>\n    <span class="str">'rateLimit'</span>: <span class="num">50</span>  <span class="cm"># ms entre requests</span>\n})`
+  },
+  network: {
+    name: 'Network Drop',
+    desc: 'Conexión a internet perdida durante una orden',
+    retries: [2,4,8,16,32],
+    fatal: false,
+    code: `<span class="kw">class</span> <span class="cls">CircuitBreaker</span>:\n    <span class="kw">def</span> <span class="fn">__init__</span>(self, threshold=<span class="num">5</span>, timeout=<span class="num">60</span>):\n        self.failures = <span class="num">0</span>\n        self.threshold = threshold\n        self.state = <span class="str">'CLOSED'</span>\n    \n    <span class="kw">def</span> <span class="fn">call</span>(self, fn, *args):\n        <span class="kw">if</span> self.state == <span class="str">'OPEN'</span>:\n            <span class="kw">raise</span> <span class="exc">Exception</span>(<span class="str">"Circuit OPEN — pausando operaciones"</span>)\n        <span class="kw">try</span>:\n            result = <span class="fn">fn</span>(*args)\n            self.failures = <span class="num">0</span>  <span class="cm"># reset on success</span>\n            <span class="kw">return</span> result\n        <span class="kw">except</span> <span class="exc">Exception</span>:\n            self.failures += <span class="num">1</span>\n            <span class="kw">if</span> self.failures >= self.threshold:\n                self.state = <span class="str">'OPEN'</span>\n            <span class="kw">raise</span>`
+  },
+  insufficient: {
+    name: 'Insufficient Funds',
+    desc: 'Saldo insuficiente para la orden — no retry',
+    retries: [],
+    fatal: false,
+    code: `<span class="kw">except</span> ccxt.InsufficientFunds <span class="kw">as</span> e:\n    <span class="cm"># NO hacer retry — el problema no se resuelve esperando</span>\n    <span class="fn">logger.critical</span>(f<span class="str">"FONDOS INSUFICIENTES: {e}"</span>)\n    <span class="cm"># Cancelar órdenes abiertas</span>\n    exchange.<span class="fn">cancel_all_orders</span>(symbol)\n    <span class="cm"># Notificar al trader</span>\n    <span class="fn">send_telegram</span>(<span class="str">f"⚠️ Bot pausado: {e}"</span>)\n    <span class="cm"># Pausar el bot hasta reposición manual</span>\n    bot_state[<span class="str">'active'</span>] = <span class="kw">False</span>\n    <span class="kw">raise</span>`
+  },
+  exchange: {
+    name: 'Exchange Down',
+    desc: 'Exchange caído — activar circuit breaker',
+    retries: [30,60,120,300],
+    fatal: false,
+    code: `<span class="kw">except</span> (ccxt.ExchangeNotAvailable,\n        ccxt.ExchangeError) <span class="kw">as</span> e:\n    <span class="fn">logger.error</span>(f<span class="str">"Exchange error: {e}"</span>)\n    <span class="cm"># Esperar tiempos más largos</span>\n    <span class="fn">send_alert</span>(<span class="str">f"🚨 Exchange down: {str(e)[:100]}"</span>)\n    \n    <span class="cm"># Verificar en exchange status page</span>\n    status = requests.<span class="fn">get</span>(\n        <span class="str">'https://www.binancezh.com/api/v3/ping'</span>).status_code\n    <span class="kw">if</span> status != <span class="num">200</span>:\n        <span class="fn">time.sleep</span>(<span class="num">300</span>)  <span class="cm"># 5 min antes de retry</span>`
+  },
+  partial: {
+    name: 'Partial Fill',
+    desc: 'Orden ejecutada parcialmente — verificar y manejar',
+    retries: [],
+    fatal: false,
+    code: `<span class="cm"># Verificar estado de orden tras envío</span>\norder = exchange.<span class="fn">create_order</span>(symbol, <span class="str">'limit'</span>, <span class="str">'buy'</span>, qty, price)\norder_id = order[<span class="str">'id'</span>]\n\n<span class="cm"># Poll hasta completar o timeout</span>\nfor _ <span class="kw">in</span> <span class="fn">range</span>(<span class="num">30</span>):\n    order = exchange.<span class="fn">fetch_order</span>(order_id, symbol)\n    <span class="kw">if</span> order[<span class="str">'status'</span>] == <span class="str">'closed'</span>: <span class="kw">break</span>\n    <span class="kw">if</span> order[<span class="str">'filled'</span>] > <span class="num">0</span>:\n        <span class="fn">logger.info</span>(f<span class="str">"Partial: {order['filled']}/{order['amount']}"</span>)\n    <span class="fn">time.sleep</span>(<span class="num">2</span>)\n<span class="kw">else</span>:\n    exchange.<span class="fn">cancel_order</span>(order_id, symbol)`
+  }
+};
+
+function selectError(el, type) {
+  document.querySelectorAll('.err-card').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  currentError = type;
+  document.getElementById('errorName').textContent = ERROR_CODES[type].name;
+  document.getElementById('codeBox').innerHTML = ERROR_CODES[type].code;
+  renderRetrySteps(ERROR_CODES[type].retries, -1);
+}
+
+function renderRetrySteps(delays, activeIdx) {
+  const vis = document.getElementById('retryVis');
+  if (!delays.length) {
+    vis.innerHTML = '<div style="color:#ff6432;font-size:.78rem">⚡ Este error no permite retry — acción inmediata requerida</div>';
+    return;
+  }
+  vis.innerHTML = delays.map((d,i)=>`
+    <div class="retry-step ${i<activeIdx?'done':i===activeIdx?'active':'pending'}">
+      <div class="rs-n">${i+1}</div>
+      <div class="rs-t">Wait ${d}s → retry #${i+1} ${i<activeIdx?'✅':i===activeIdx?'⏳...':''}</div>
+    </div>`).join('') + `<div class="retry-step ${activeIdx>=delays.length?'fail':'pending'}">
+      <div class="rs-n">✕</div><div class="rs-t">Circuit Breaker: pausar 60s</div></div>`;
+}
+
+let retryInterval;
+function triggerError() {
+  const err = ERROR_CODES[currentError];
+  errorsTriggered.add(currentError);
+  totalErrors++;
+  circuitCount++;
+
+  const dot = document.getElementById('statusDot');
+  dot.className = 'status-dot error';
+  document.getElementById('statusText').textContent = `❌ ${err.name}`;
+  document.getElementById('statusSub').textContent = err.desc;
+
+  appendLog(`❌ ERROR: ${err.name} — ${err.desc}`, 'log-err');
+  document.getElementById('codeBox').innerHTML = err.code;
+  document.getElementById('errorName').textContent = err.name;
+
+  if (!err.retries.length) {
+    appendLog('⚡ No retry — acción correctiva inmediata', 'log-warn');
+    appendLog('📱 Telegram alert enviado al trader', 'log-warn');
+    setTimeout(()=>{ dot.className='status-dot warning'; document.getElementById('statusText').textContent='⚠️ Bot pausado — acción manual requerida'; },800);
+    document.getElementById('feedbackMsg').innerHTML = `⚡ <strong>${err.name}</strong>: Este error no se resuelve con retry. Se requiere intervención manual.`;
+    renderRetrySteps([], -1);
+    checkCompletion();
+    return;
+  }
+
+  if (circuitCount >= 5) {
+    circuitOpen = true;
+    appendLog('🔴 CIRCUIT BREAKER ABIERTO — demasiados fallos', 'log-err');
+    appendLog('⏳ Cooldown 60s antes de reanudar', 'log-warn');
+    dot.className = 'status-dot error';
+    document.getElementById('statusText').textContent = '🔴 Circuit Breaker ABIERTO';
+  }
+
+  let step = 0;
+  renderRetrySteps(err.retries, 0);
+  clearInterval(retryInterval);
+  retryInterval = setInterval(()=>{
+    if (step < err.retries.length) {
+      totalRetries++;
+      appendLog(`🔄 Retry #${step+1} — esperando ${err.retries[step]}s...`, 'log-warn');
+      step++;
+      renderRetrySteps(err.retries, step);
+    } else {
+      clearInterval(retryInterval);
+      if (Math.random() > .35) {
+        appendLog('✅ Reconectado exitosamente', 'log-ok');
+        dot.className = 'status-dot';
+        document.getElementById('statusText').textContent = '✅ Bot recuperado — reanudando operación';
+        circuitCount = Math.max(0, circuitCount-1);
+        renderRetrySteps(err.retries, err.retries.length+1);
+      } else {
+        appendLog('🔴 Todos los retries fallaron — activando circuit breaker', 'log-err');
+        dot.className = 'status-dot error';
+        document.getElementById('statusText').textContent = '🔴 Circuit Breaker — esperando 60s';
+        renderRetrySteps(err.retries, err.retries.length+2);
+        setTimeout(()=>{
+          appendLog('🟡 Circuit breaker half-open — probando reconexión', 'log-warn');
+          dot.className = 'status-dot retry';
+        }, 3000);
+      }
+    }
+    updateStats();
+  }, 800);
+
+  document.getElementById('feedbackMsg').innerHTML = `🔄 Simulando <strong>${err.name}</strong>: ${err.retries.length} intentos con backoff exponencial (${err.retries.join('s → ')}s).`;
+  checkCompletion();
+}
+
+function resetBot() {
+  clearInterval(retryInterval);
+  circuitCount = 0; circuitOpen = false;
+  const dot = document.getElementById('statusDot');
+  dot.className = 'status-dot';
+  document.getElementById('statusText').textContent = 'Bot corriendo — esperando señal';
+  document.getElementById('statusSub').textContent = `Uptime: ${uptime}s · Errores: ${totalErrors} · Retries: ${totalRetries}`;
+  appendLog('🔁 Bot reiniciado manualmente', 'log-info');
+  renderRetrySteps(ERROR_CODES[currentError].retries, -1);
+}
+
+function appendLog(msg, cls) {
+  const l = document.getElementById('simLog');
+  const p = document.createElement('p');
+  p.className = cls;
+  p.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+  l.prepend(p);
+}
+
+function updateStats() {
+  document.getElementById('statusSub').textContent = `Uptime: ${uptime}s · Errores: ${totalErrors} · Retries: ${totalRetries}`;
+}
+
+uptimeTimer = setInterval(()=>{ uptime++; updateStats(); }, 1000);
+
+function checkCompletion() {
+  if (errorsTriggered.size >= 4 && !localStorage.getItem(STORAGE_KEY)) {
+    localStorage.setItem(STORAGE_KEY, 'true');
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').innerHTML += '<br><strong style="color:#ff9966">🎓 ¡Insignia Resilience Engineer desbloqueada!</strong>';
+  }
+}
+
+// Init
+selectError(document.querySelector('.err-card'), 'timeout');
+if (localStorage.getItem(STORAGE_KEY)) document.getElementById('insigniaArea').classList.remove('hidden');
+</script>
+</body>
+</html>

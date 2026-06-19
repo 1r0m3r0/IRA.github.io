@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Est. Descriptiva | ⏱️ Series de Tiempo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:linear-gradient(135deg,#0a0f1e,#0c1222 50%,#111a2e); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+    .course-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(0,224,255,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+    .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #00e0ff; }
+    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#7af2ff,#00e0ff); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .hero-header p { font-size:1.1rem; color:#b9e2ff; margin-top:0.5rem; font-weight:500; }
+    .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+    .chip { background:rgba(0,224,255,0.15); border:1px solid #00e0ff; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+    .progress-section { padding:1.2rem 2rem; border-bottom:1px solid #1a2a4a; }
+    .progress-bar-outer { background:#1a2a4a; border-radius:20px; height:16px; overflow:hidden; }
+    .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#00e0ff,#0088ff); border-radius:20px; transition:width 0.5s ease; }
+    .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
+    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #00e0ff; font-size:1rem; line-height:1.6; }
+    .main-area { padding:1.5rem 2rem; }
+    .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#00e0ff; }
+    .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
+    .info-panel { background:rgba(10,20,40,0.7); border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
+    .info-panel h3 { color:#7af2ff; font-size:1rem; margin-bottom:0.5rem; }
+    .info-panel p { font-size:0.85rem; color:#b9ccee; line-height:1.6; }
+    .sim-area { background:rgba(0,10,25,0.5); border-radius:2rem; padding:1.5rem; margin-bottom:1.5rem; border:1px solid #2c3e66; }
+    .sim-area h3 { color:#00e0ff; margin-bottom:1rem; }
+    .ts-canvas { display:block; margin:0 auto; background:#0a0f1e; border-radius:1rem; border:1px solid #2c3e66; }
+    .ts-controls { display:flex; gap:0.8rem; justify-content:center; flex-wrap:wrap; margin:1rem 0; }
+    .ts-btn { background:#1e2a3e; border:1px solid #2c3e66; padding:0.4rem 1rem; border-radius:2rem; cursor:pointer; color:#b9ccee; font-size:0.8rem; transition:0.2s; }
+    .ts-btn:hover { border-color:#00e0ff; }
+    .ts-btn.active { background:#00e0ff; color:#000; font-weight:bold; border-color:#00e0ff; }
+    .quiz-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #3399ff; margin-bottom:1.5rem; }
+    .quiz-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#00e0ff; }
+    .question { background:#0f1a2c; margin:0.8rem 0; padding:0.8rem 1rem; border-radius:1.2rem; }
+    .question p { font-weight:600; margin-bottom:0.5rem; font-size:0.95rem; }
+    .options { display:flex; flex-wrap:wrap; gap:0.6rem; }
+    .opt { background:#1e2a3e; padding:0.3rem 0.9rem; border-radius:2rem; cursor:pointer; transition:0.2s; font-size:0.85rem; }
+    .opt:hover { background:#2c3e66; transform:translateY(-2px); }
+    .opt.selected { background:#00e0ff; color:#000; font-weight:bold; box-shadow:0 0 8px cyan; }
+    .opt.correct { background:#00cc88; color:#000; }
+    .opt.wrong { background:#ff4455; color:#fff; }
+    .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #00e0ff; }
+    .btn-action { background:linear-gradient(95deg,#f0a500,#ff6a00); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin-top:1rem; }
+    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(240,165,0,0.5); }
+    .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
+    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin-top:1.5rem; padding:1rem; border:1px dashed gold; }
+    .insignia i { font-size:2.5rem; color:gold; }
+    .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
+    .hidden { display:none; }
+    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(0,224,255,0.4); }
+    .nav-link.next { background:linear-gradient(95deg,#f0a500,#ff6a00); color:#1e1a0c; }
+    .nav-link.menu { background:#1a2a4a; border:1px solid #3399ff; }
+    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .info-grid { grid-template-columns:1fr; } }
+  </style>
+  <link rel="stylesheet" href="../../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a><a href="../index.html">Programa Estadística</a></nav>
+  <div class="course-container" id="app">
+    <div class="hero-header">
+      <h1>⏱️ Series de Tiempo</h1>
+      <p>Datos que viajan en el tiempo: tendencias, ciclos y estacionalidad</p>
+      <div class="badge-area">
+        <span class="chip"><i class="fas fa-chart-line"></i> Tendencia</span>
+        <span class="chip"><i class="fas fa-wave-sine"></i> Estacionalidad</span>
+        <span class="chip"><i class="fas fa-random"></i> Ciclo</span>
+        <span class="chip"><i class="fas fa-smooth"></i> Suavizado</span>
+      </div>
+    </div>
+    <div class="progress-section">
+      <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+      <span class="progress-text" id="progressText">Módulo 9 de 12</span>
+    </div>
+    <div class="analogy-card">
+      <strong>💡 Piénsalo así:</strong> Una serie de tiempo es como el diario personal de una variable. Cada día anotas lo que pasó: el precio del café, la temperatura, tus pasos. Al leerlo, ves patrones: en diciembre siempre hace más frío (estacionalidad), con los años vas caminando más (tendencia), y algunos días son raros (ruido).
+    </div>
+    <div class="main-area">
+      <div class="section-title"><i class="fas fa-info-circle"></i> Componentes de una Serie</div>
+      <div class="info-grid">
+        <div class="info-panel">
+          <h3><i class="fas fa-chart-line"></i> Tendencia (T)</h3>
+          <p>Movimiento de largo plazo. Crecimiento, decrecimiento o estabilidad. Se identifica con medias móviles o regresión.</p>
+        </div>
+        <div class="info-panel">
+          <h3><i class="fas fa-wave-sine"></i> Estacionalidad (S)</h3>
+          <p>Patrón que se repite en períodos fijos (días, meses, trimestres). Ej: ventas en Navidad, consumo de electricidad en verano.</p>
+        </div>
+        <div class="info-panel">
+          <h3><i class="fas fa-sync-alt"></i> Ciclo (C)</h3>
+          <p>Fluctuaciones no periódicas asociadas a ciclos económicos. Más largos que la estacionalidad y de duración variable.</p>
+        </div>
+        <div class="info-panel">
+          <h3><i class="fas fa-wave-square"></i> Ruido (ε)</h3>
+          <p>Componente aleatorio o irregular. Todo lo que no se explica por T, S, ni C. Ideal: ruido blanco.</p>
+        </div>
+      </div>
+
+      <div class="section-title"><i class="fas fa-hand-pointer"></i> Simulador de Series</div>
+      <div class="sim-area">
+        <h3><i class="fas fa-chart-line"></i> Explora los componentes de una serie temporal</h3>
+        <div class="ts-controls">
+          <button class="ts-btn active" data-ts="original">Original</button>
+          <button class="ts-btn" data-ts="trend">Tendencia</button>
+          <button class="ts-btn" data-ts="smooth">Suavizado</button>
+        </div>
+        <canvas id="tsCanvas" class="ts-canvas" width="600" height="280"></canvas>
+        <p id="tsCaption" style="text-align:center;font-size:0.8rem;color:#8899cc;margin-top:0.5rem;">Datos mensuales de ventas simulados (24 meses)</p>
+      </div>
+
+      <div class="quiz-area">
+        <div class="quiz-title"><i class="fas fa-question-circle"></i> Mini Quiz: Series de Tiempo</div>
+        <div id="quizContainer"></div>
+        <button id="submitQuizBtn" class="btn-action">✅ Verificar respuestas</button>
+        <div id="insigniaArea" class="insignia hidden">
+          <i class="fas fa-medal"></i>
+          <h3>⏱️ Viajero Temporal ⏱️</h3>
+          <p>Entiendes los componentes de las series de tiempo y cómo suavizarlas. ¡Excelente!</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre series de tiempo.</div>
+
+    <div class="nav-links">
+      <a href="08-correlacion-regresion.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+      <a href="10-numeros-indice.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <footer><i class="fas fa-chart-bar"></i> Curso 2: Estadística Descriptiva · Módulo 9 de 12</footer>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'prog_est_2_09';
+    const PROGRESS_KEY = 'prog_est_2_progress';
+    const questions = [
+      { text: "¿Cuál es el componente que muestra la dirección a largo plazo de una serie?", options: ["Estacionalidad", "Tendencia", "Ciclo", "Ruido"], correct: 1 },
+      { text: "¿Qué técnica se usa para eliminar el ruido y ver la tendencia?", options: ["Regresión lineal", "Media móvil", "Correlación", "Desviación estándar"], correct: 1 },
+      { text: "La estacionalidad se caracteriza por:", options: ["Ser impredecible", "Tener períodos fijos", "Ser de larga duración", "No tener patrón"], correct: 1 },
+      { text: "¿Qué diferencia un ciclo de la estacionalidad?", options: ["El ciclo es más corto", "El ciclo no tiene período fijo", "El ciclo es aleatorio", "Son lo mismo"], correct: 1 },
+      { text: "El componente irregular o aleatorio también se llama:", options: ["Tendencia", "Señal", "Ruido blanco", "Ciclo"], correct: 2 }
+    ];
+    let userAnswers = new Array(questions.length).fill(null);
+    let quizCompleted = false;
+    const tsData = [52,48,55,60,58,65,62,68,72,70,75,80,78,74,82,88,85,92,88,95,100,98,105,110];
+
+    function saveProgress() {
+      let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+      if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
+      localStorage.setItem(STORAGE_KEY, 'true');
+    }
+
+    function updateProgress() {
+      let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+      document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
+      document.getElementById('progressText').textContent = 'M\u00f3dulo '+(p.length || 1)+' de 12';
+    }
+
+    const canvas = document.getElementById('tsCanvas');
+    const ctx = canvas.getContext('2d');
+
+    function drawTimeSeries(mode) {
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      const pad = {t:15,b:30,l:45,r:15};
+      const pw = canvas.width-pad.l-pad.r;
+      const ph = canvas.height-pad.t-pad.b;
+      const n = tsData.length;
+      const min = Math.min(...tsData)*0.9;
+      const max = Math.max(...tsData)*1.1;
+
+      function scaleX(i) { return pad.l + (i/(n-1))*pw; }
+      function scaleY(v) { return pad.t + ph - ((v-min)/(max-min))*ph; }
+
+      ctx.strokeStyle = '#2c3e66'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(pad.l,pad.t); ctx.lineTo(pad.l,pad.t+ph); ctx.lineTo(pad.l+pw,pad.t+ph); ctx.stroke();
+
+      let values = tsData;
+      let color = '#00e0ff';
+      let label = 'Original';
+
+      if (mode === 'trend') {
+        const mx = (n-1)/2; const my = tsData.reduce((s,v)=>s+v,0)/n;
+        let num=0, den=0;
+        tsData.forEach((v,i) => { num+=(i-mx)*(v-my); den+=(i-mx)**2; });
+        const b1 = den?num/den:0; const b0 = my-b1*mx;
+        values = tsData.map((v,i) => b0+b1*i);
+        color = '#ff6a00';
+        label = 'Tendencia lineal';
+      } else if (mode === 'smooth') {
+        const window = 3;
+        values = tsData.map((v,i) => {
+          let sum=0, count=0;
+          for(let j=-window; j<=window; j++) { const k=i+j; if(k>=0&&k<n){sum+=tsData[k];count++;} }
+          return sum/count;
+        });
+        color = '#00ff88';
+        label = 'Media móvil (ventana 3)';
+      }
+
+      ctx.strokeStyle = color; ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      values.forEach((v,i) => {
+        const x = scaleX(i); const y = scaleY(v);
+        i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+      });
+      ctx.stroke();
+
+      if (mode !== 'smooth') {
+        ctx.fillStyle = color; ctx.globalAlpha = 0.6;
+        values.forEach((v,i) => {
+          ctx.beginPath(); ctx.arc(scaleX(i),scaleY(v),3,0,Math.PI*2); ctx.fill();
+        });
+        ctx.globalAlpha = 1;
+      }
+
+      ctx.fillStyle = '#8899cc'; ctx.font = '10px Inter'; ctx.textAlign = 'center';
+      ctx.fillText('Mes',pad.l+pw/2,pad.t+ph+18);
+      ctx.save(); ctx.translate(20,pad.t+ph/2); ctx.rotate(-Math.PI/2); ctx.fillText('Valor',0,0); ctx.restore();
+      document.getElementById('tsCaption').textContent = label + ' — Datos mensuales simulados (24 meses)';
+    }
+
+    document.querySelectorAll('.ts-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.ts-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        drawTimeSeries(this.dataset.ts);
+      });
+    });
+    drawTimeSeries('original');
+
+    function renderQuestions() {
+      const container = document.getElementById('quizContainer');
+      container.innerHTML = '';
+      questions.forEach((q, idx) => {
+        const qDiv = document.createElement('div'); qDiv.classList.add('question');
+        qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
+        const optsDiv = qDiv.querySelector('.options');
+        q.options.forEach((opt, optIdx) => {
+          const span = document.createElement('div'); span.classList.add('opt');
+          span.textContent = opt; span.dataset.qIdx = idx; span.dataset.optIdx = optIdx;
+          span.addEventListener('click', function() {
+            if (quizCompleted) return;
+            this.parentElement.querySelectorAll('.opt').forEach(c => c.classList.remove('selected'));
+            this.classList.add('selected'); userAnswers[idx] = optIdx; updateBtnState();
+          });
+          optsDiv.appendChild(span);
+        });
+        container.appendChild(qDiv);
+      });
+    }
+
+    function updateBtnState() {
+      document.getElementById('submitQuizBtn').disabled = userAnswers.some(a => a === null) || quizCompleted;
+    }
+
+    function handleSubmit() {
+      if (quizCompleted) return;
+      if (userAnswers.some(a => a === null)) { document.getElementById('feedbackMsg').textContent = '⚠️ Responde todas las preguntas primero.'; return; }
+      let correct = 0;
+      questions.forEach((q, i) => { if (userAnswers[i] === q.correct) correct++; });
+      const total = questions.length; const passed = correct >= Math.ceil(total * 0.6);
+      document.querySelectorAll('.question').forEach((qDiv, idx) => {
+        const opts = qDiv.querySelectorAll('.opt');
+        opts.forEach((o, oi) => {
+          o.classList.remove('selected');
+          if (oi === questions[idx].correct) o.classList.add('correct');
+          else if (oi === userAnswers[idx]) o.classList.add('wrong');
+        });
+      });
+      if (passed) {
+        quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+        document.getElementById('insigniaArea').classList.remove('hidden');
+        document.getElementById('feedbackMsg').textContent = '🎉 ¡Excelente! Dominas las series de tiempo.';
+        saveProgress(); updateProgress();
+      } else {
+        document.getElementById('feedbackMsg').textContent = '❌ ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. ¡Reintenta!';
+      }
+    }
+
+    function restoreProgress() {
+      const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+      if (p.includes(STORAGE_KEY)) {
+        quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+        document.getElementById('insigniaArea').classList.remove('hidden');
+        document.getElementById('feedbackMsg').textContent = '🏆 Ya completaste este módulo.';
+        document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
+      }
+    }
+
+    document.getElementById('submitQuizBtn').addEventListener('click', handleSubmit);
+    renderQuestions(); updateBtnState(); restoreProgress(); updateProgress();
+  </script>
+  <script src="../../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Probabilidades Interactiva | Temas Selectos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%);background-size:200% 200%;animation:gradientShift 20s ease infinite;font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
+    @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+    .t-container{max-width:1300px;width:100%;background:rgba(15,25,45,0.65);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(255,102,192,0.25);box-shadow:0 25px 45px rgba(0,0,0,0.5);overflow:hidden}
+    .hero-header{background:linear-gradient(95deg,#0b1120 0%,#111a2e 100%);padding:2rem 2rem 1.5rem 2rem;text-align:center;border-bottom:2px solid #ff66c0}
+    .hero-header h1{font-size:2.6rem;font-weight:800;background:linear-gradient(135deg,#FFF,#ff99d6,#ff66c0);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .hero-header p{font-size:1.1rem;color:#f0c0e0;margin-top:0.5rem;font-weight:500}
+    .badge-area{display:flex;justify-content:center;gap:1rem;margin-top:1.2rem;flex-wrap:wrap}
+    .chip{background:rgba(255,102,192,0.15);border:1px solid #ff66c0;padding:0.4rem 1rem;border-radius:40px;font-size:0.8rem;font-weight:600}
+    .analogy-card{background:#1e2a3acc;margin:1.5rem 2rem;padding:1.2rem 1.8rem;border-radius:2rem;border-left:8px solid #ff66c0;font-size:1rem;line-height:1.6}
+    .main-area{padding:0 2rem 1rem 2rem;display:flex;flex-direction:column;gap:1.5rem}
+    .sim-box{background:#0f1a2c;border-radius:2rem;padding:1.5rem;border:1px solid rgba(255,102,192,0.2)}
+    .sim-box h3{color:#ff99d6;margin-bottom:0.8rem;font-size:1.2rem}
+    .sim-box p{font-size:0.9rem;color:#aac;margin-bottom:0.5rem}
+    .grid-vis{display:grid;gap:2px;justify-content:center;margin:0 auto}
+    .grid-cell{width:20px;height:20px;border-radius:3px;transition:background 0.3s}
+    .grid-cell.open{background:#1a2a4a;border:1px solid #2c3e66}
+    .grid-cell.occupied{background:#ff66c0;border:1px solid #ff99d6;box-shadow:0 0 4px rgba(255,102,192,0.5)}
+    .grid-cell.cluster{background:#66ff99;border:1px solid #99ffbb;box-shadow:0 0 4px rgba(102,255,153,0.5)}
+    .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:0.5rem;margin-top:0.5rem}
+    .stat-card{background:#0f1a2c;border-radius:1.2rem;padding:0.8rem;border:1px solid rgba(255,102,192,0.15);text-align:center}
+    .stat-card .num{font-size:1.6rem;font-weight:800;color:#ff99d6}
+    .stat-card .lbl{font-size:0.75rem;color:#aac}
+    .btn-action{background:linear-gradient(95deg,#ff66c0,#ff3388);border:none;padding:0.7rem 1.5rem;font-weight:bold;border-radius:3rem;cursor:pointer;font-size:0.95rem;color:#fff;transition:0.2s}
+    .btn-action:hover{transform:translateY(-2px);box-shadow:0 0 15px rgba(255,102,192,0.4)}
+    .btn-secondary-action{background:#2c3e66;border:none;padding:0.6rem 1.2rem;font-weight:600;border-radius:3rem;cursor:pointer;font-size:0.9rem;color:#eef5ff;transition:0.2s}
+    .btn-secondary-action:hover{transform:translateY(-2px)}
+    .slider-row{display:flex;gap:1.5rem;align-items:center;justify-content:center;flex-wrap:wrap}
+    .slider-group{display:flex;flex-direction:column;align-items:center;gap:0.3rem}
+    .slider-group label{font-size:0.85rem;color:#aac}
+    .feedback{background:#00000099;margin:0 2rem 1.5rem 2rem;padding:1rem;border-radius:1.5rem;text-align:center;font-weight:500;border-left:4px solid #ff66c0}
+    .insignia{text-align:center;background:#0c1b2f;border-radius:2rem;margin:0 2rem 1.5rem;padding:1rem;border:1px dashed gold}
+    .insignia i{font-size:2.5rem;color:gold}
+    .hidden{display:none}
+    .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.5rem 2rem}
+    .nav-link{background:#2c3e66;padding:0.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:0.5rem;transition:0.2s}
+    .nav-link:hover{transform:translateY(-2px);box-shadow:0 0 10px rgba(255,102,192,0.4)}
+    .nav-link.next{background:linear-gradient(95deg,#ff66c0,#ff3388);color:#fff}
+    .nav-link.menu{background:#1a2a4a;border:1px solid #ff66c0}
+    footer{text-align:center;padding:1.2rem;font-size:0.8rem;border-top:1px solid #2c3e66}
+    .clickable{display:flex;gap:1rem;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:0.5rem}
+    .clickable .opt{background:#2c3e66;border:1px solid rgba(255,102,192,0.3);padding:0.4rem 1rem;border-radius:2rem;cursor:pointer;font-weight:600;transition:0.2s}
+    .clickable .opt:hover{border-color:#ff66c0}
+    .clickable .opt.active{background:#ff66c0;color:#000}
+    @media(max-width:800px){.hero-header h1{font-size:1.9rem}.grid-cell{width:14px;height:14px}}
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+<nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+<div class="t-container">
+  <div class="hero-header">
+    <h1>🌟 TEMAS SELECTOS</h1>
+    <p>Fronteras de la probabilidad: percolación, ramificación, grafos y ML</p>
+    <div class="badge-area">
+      <span class="chip"><i class="fas fa-grid"></i> Percolación</span>
+      <span class="chip"><i class="fas fa-tree"></i> Galton-Watson</span>
+      <span class="chip"><i class="fas fa-share-alt"></i> Grafos aleatorios</span>
+      <span class="chip"><i class="fas fa-robot"></i> VC dimension</span>
+    </div>
+  </div>
+
+  <div class="analogy-card">
+    <strong>🗺️ Piénsalo así:</strong> Las fronteras de la probabilidad son como un continente por explorar. La percolación es como un café filtrándose: ¿el agua logra atravesar? Los procesos de ramificación son como genealogías: ¿una familia se extingue o crece sin límite? ¡Bienvenido a la última frontera!
+  </div>
+
+  <div class="main-area">
+    <div class="sim-box">
+      <h3><i class="fas fa-grid"></i> Percolación en una red cuadrada</h3>
+      <p>Cada celda está abierta con probabilidad p. ¿Existe un camino de extremo a extremo?</p>
+      <div class="slider-row">
+        <div class="slider-group">
+          <label>p: <span id="percP">0.6</span></label>
+          <input id="percSlider" type="range" min="0.1" max="0.95" step="0.05" value="0.6" oninput="document.getElementById('percP').textContent=this.value">
+        </div>
+        <div class="slider-group">
+          <label>Tamaño: <span id="percSize">10</span>x10</label>
+          <input id="percSizeSlider" type="range" min="5" max="20" step="1" value="10" oninput="document.getElementById('percSize').textContent=this.value">
+        </div>
+      </div>
+      <div style="text-align:center;">
+        <button class="btn-action" onclick="runPercolation()">🌊 Percolar</button>
+        <button class="btn-secondary-action" onclick="runMultiplePerc()">📊 p crítico (200 sims)</button>
+      </div>
+      <div id="percVis" style="display:flex;justify-content:center;margin-top:0.5rem;"></div>
+      <div class="stats-row">
+        <div class="stat-card"><div class="lbl">¿Percola?</div><div class="num" id="percResult">—</div></div>
+        <div class="stat-card"><div class="lbl">Fracción ocupada</div><div class="num" id="percFrac">—</div></div>
+        <div class="stat-card"><div class="lbl">Cluster más grande</div><div class="num" id="percCluster">—</div></div>
+      </div>
+    </div>
+
+    <div class="sim-box">
+      <h3><i class="fas fa-tree"></i> Proceso de Galton-Watson (Ramificación)</h3>
+      <p>Cada individuo tiene Z hijos, donde Z ~ Poisson(λ). ¿La población se extingue?</p>
+      <div class="slider-row">
+        <div class="slider-group">
+          <label>λ (media de hijos): <span id="gwLambda">1.0</span></label>
+          <input id="gwSlider" type="range" min="0.2" max="3" step="0.1" value="1" oninput="document.getElementById('gwLambda').textContent=this.value">
+        </div>
+      </div>
+      <div style="text-align:center;">
+        <button class="btn-action" onclick="runGaltonWatson()">🌳 Simular</button>
+        <button class="btn-secondary-action" onclick="runMultipleGW()">📊 Prob. extinción</button>
+      </div>
+      <div class="stats-row" style="margin-top:0.5rem;">
+        <div class="stat-card"><div class="lbl">Generaciones</div><div class="num" id="gwGen">—</div></div>
+        <div class="stat-card"><div class="lbl">Población total</div><div class="num" id="gwPop">—</div></div>
+        <div class="stat-card"><div class="lbl">¿Extinción?</div><div class="num" id="gwExtinct">—</div></div>
+        <div class="stat-card"><div class="lbl">Prob. extinción (500 sims)</div><div class="num" id="gwPE">—</div></div>
+      </div>
+    </div>
+
+    <div class="sim-box">
+      <h3><i class="fas fa-share-alt"></i> Grafos Aleatorios: Erdős-Rényi G(n,p)</h3>
+      <p>n nodos, cada arista existe con prob. p. ¿Hay componente gigante?</p>
+      <div class="slider-row">
+        <div class="slider-group">
+          <label>n: <span id="erN">30</span></label>
+          <input id="erNSlider" type="range" min="10" max="60" step="5" value="30" oninput="document.getElementById('erN').textContent=this.value">
+        </div>
+        <div class="slider-group">
+          <label>p: <span id="erP">0.08</span></label>
+          <input id="erPSlider" type="range" min="0.01" max="0.3" step="0.01" value="0.08" oninput="document.getElementById('erP').textContent=this.value">
+        </div>
+      </div>
+      <div style="text-align:center;">
+        <button class="btn-action" onclick="runER()">🔗 Generar grafo</button>
+      </div>
+      <div class="stats-row" style="margin-top:0.5rem;">
+        <div class="stat-card"><div class="lbl">Aristas</div><div class="num" id="erEdges">—</div></div>
+        <div class="stat-card"><div class="lbl">Componente gigante</div><div class="num" id="erGiant">—</div></div>
+        <div class="stat-card"><div class="lbl">Grado promedio</div><div class="num" id="erDeg">—</div></div>
+        <div class="stat-card"><div class="lbl">np crítico = 1</div><div class="num" id="erCrit">—</div></div>
+      </div>
+    </div>
+
+    <div class="sim-box">
+      <h3><i class="fas fa-robot"></i> Probabilidad en Machine Learning: VC Dimension</h3>
+      <p>¿Cuántos puntos puede romper un clasificador lineal en 2D? ¡Hasta 3!</p>
+      <div id="vcVis" style="text-align:center;">
+        <div style="display:flex;gap:0.8rem;justify-content:center;flex-wrap:wrap;margin-bottom:0.5rem;">
+          <div class="clickable">
+            <span class="opt active" onclick="setVCPoints(2)">2 puntos</span>
+            <span class="opt" onclick="setVCPoints(3)">3 puntos</span>
+            <span class="opt" onclick="setVCPoints(4)">4 puntos</span>
+          </div>
+        </div>
+        <div style="font-size:1.2rem;color:#ff99d6;font-weight:700;">VC dimension = 3</div>
+        <p style="font-size:0.85rem;color:#aac;margin-top:0.3rem;">Un clasificador lineal en 2D puede romper (separar) cualquier configuración de hasta 3 puntos, pero no 4.</p>
+      </div>
+      <div class="stat-card" style="margin-top:0.5rem;">
+        <div class="lbl">PAC Learning: muestras necesarias</div>
+        <div class="num" id="pacSamples" style="font-size:1rem;">m ≥ (1/ε)[ln(VC) + ln(1/δ)]</div>
+      </div>
+      <div style="text-align:center;margin-top:0.5rem;">
+        <button class="btn-action" onclick="calcPACSamples()">📐 Calcular PAC</button>
+      </div>
+      <div class="stats-row" style="margin-top:0.5rem;">
+        <div class="stat-card"><div class="lbl">ε (error)</div><div class="num" style="font-size:1rem;"><input id="pacEpsilon" type="number" value="0.1" step="0.05" min="0.01" max="0.5" style="width:60px;background:#1a2a4a;border:none;color:#ff99d6;font-weight:700;text-align:center;"></div></div>
+        <div class="stat-card"><div class="lbl">δ (confianza)</div><div class="num" style="font-size:1rem;"><input id="pacDelta" type="number" value="0.05" step="0.01" min="0.01" max="0.5" style="width:60px;background:#1a2a4a;border:none;color:#ff99d6;font-weight:700;text-align:center;"></div></div>
+        <div class="stat-card"><div class="lbl">m mínimo</div><div class="num" id="pacM" style="font-size:1.2rem;">—</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="feedbackMsg" class="feedback">💡 Explora la percolación cambiando p. ¿Encuentras la transición de fase cerca de p ≈ 0.593?</div>
+
+  <div id="insigniaArea" class="insignia hidden">
+    <i class="fas fa-medal"></i>
+    <h3>🏅 ¡EXPLORADOR DE FRONTERAS! 🏅</h3>
+    <p>Has completado el viaje por las fronteras de la probabilidad. ¡Eres un verdadero experto!</p>
+  </div>
+
+  <div class="nav-links">
+    <a href="e7-bayesiana.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+    <a href="e1-markov.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Probabilidades Interactiva · Modo Experto · Domina la teoría</footer>
+</div>
+
+<script>
+const STORAGE_KEY = 'prob_e8';
+let completed = false;
+
+function runPercolation() {
+  const p = parseFloat(document.getElementById('percSlider').value);
+  const n = parseInt(document.getElementById('percSizeSlider').value);
+  const grid = Array.from({length: n}, () => Array(n).fill(0));
+  for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) grid[i][j] = Math.random() < p ? 1 : 0;
+  const visited = Array.from({length: n}, () => Array(n).fill(false));
+  const dirs = [[-1,0],[1,0],[0,-1],[0,1]];
+  function dfs(i, j, cluster) {
+    if (i < 0 || i >= n || j < 0 || j >= n || visited[i][j] || grid[i][j] === 0) return;
+    visited[i][j] = true;
+    cluster.push([i,j]);
+    dirs.forEach(d => dfs(i + d[0], j + d[1], cluster));
+  }
+  const clusters = [];
+  for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
+    if (!visited[i][j] && grid[i][j] === 1) {
+      const cluster = [];
+      dfs(i, j, cluster);
+      clusters.push(cluster);
+    }
+  }
+  const maxCluster = clusters.reduce((max, c) => c.length > max.length ? c : max, []);
+  const topReach = Array(n).fill(false);
+  const botReach = Array(n).fill(false);
+  maxCluster.forEach(([i,j]) => { if (i === 0) topReach[j] = true; if (i === n-1) botReach[j] = true; });
+  const percolates = topReach.some((v, j) => v && botReach[j]);
+  const visited2 = Array.from({length: n}, () => Array(n).fill(false));
+  function bfs(startI, startJ) {
+    const q = [[startI, startJ]];
+    visited2[startI][startJ] = true;
+    let reached = false;
+    while (q.length > 0) {
+      const [ci, cj] = q.shift();
+      if (ci === n-1) reached = true;
+      dirs.forEach(([di, dj]) => {
+        const ni = ci + di, nj = cj + dj;
+        if (ni >= 0 && ni < n && nj >= 0 && nj < n && !visited2[ni][nj] && grid[ni][nj] === 1) {
+          visited2[ni][nj] = true;
+          q.push([ni, nj]);
+        }
+      });
+    }
+    return reached;
+  }
+  let doesPercolate = false;
+  for (let j = 0; j < n; j++) { if (grid[0][j] === 1 && bfs(0, j)) { doesPercolate = true; break; } }
+  document.getElementById('percResult').textContent = doesPercolate ? '✅ Sí' : '❌ No';
+  const total = n * n;
+  const occupied = grid.flat().filter(v => v === 1).length;
+  document.getElementById('percFrac').textContent = (occupied / total * 100).toFixed(1) + '%';
+  document.getElementById('percCluster').textContent = maxCluster.length + ' celdas';
+  renderGrid(grid, maxCluster);
+  showFeedback(`🌊 Percolación ${doesPercolate ? 'SÍ' : 'NO'} con p=${p}. ${doesPercolate ? '¡El agua fluye!' : 'No hay camino de extremo a extremo.'}`);
+  checkCompletion();
+}
+
+function renderGrid(grid, maxCluster) {
+  const n = grid.length;
+  const container = document.getElementById('percVis');
+  container.innerHTML = '';
+  const wrapper = document.createElement('div');
+  wrapper.style.display = 'grid';
+  wrapper.style.gridTemplateColumns = `repeat(${n}, 20px)`;
+  wrapper.style.gap = '2px';
+  const clusterSet = new Set(maxCluster.map(([i,j]) => `${i},${j}`));
+  for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
+    const cell = document.createElement('div');
+    cell.className = 'grid-cell';
+    if (grid[i][j] === 1) {
+      if (clusterSet.has(`${i},${j}`)) cell.className = 'grid-cell cluster';
+      else cell.className = 'grid-cell occupied';
+    } else {
+      cell.className = 'grid-cell open';
+    }
+    wrapper.appendChild(cell);
+  }
+  container.appendChild(wrapper);
+}
+
+function runMultiplePerc() {
+  const n = 10;
+  const trials = 200;
+  const ps = [];
+  for (let t = 0; t < trials; t++) {
+    const p = 0.5 + (t / trials) * 0.3;
+    let percs = 0;
+    for (let sim = 0; sim < 50; sim++) {
+      const grid = Array.from({length: n}, () => Array(n).fill(0));
+      for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) grid[i][j] = Math.random() < p ? 1 : 0;
+      const visited = Array.from({length: n}, () => Array(n).fill(false));
+      function bfs(sj) {
+        const q = [[0, sj]];
+        visited[0][sj] = true;
+        while (q.length > 0) {
+          const [ci, cj] = q.shift();
+          if (ci === n-1) return true;
+          [[-1,0],[1,0],[0,-1],[0,1]].forEach(([di, dj]) => {
+            const ni = ci + di, nj = cj + dj;
+            if (ni >= 0 && ni < n && nj >= 0 && nj < n && !visited[ni][nj] && grid[ni][nj] === 1) {
+              visited[ni][nj] = true; q.push([ni, nj]);
+            }
+          });
+        }
+        return false;
+      }
+      for (let j = 0; j < n; j++) { if (grid[0][j] === 1 && bfs(j)) { percs++; break; } }
+    }
+    ps.push({p, rate: percs / 50});
+  }
+  const threshold = ps.find(p => p.rate >= 0.5);
+  showFeedback(`📊 La transición de fase ocurre cerca de p ≈ ${threshold ? threshold.p.toFixed(2) : '0.593'}. ¡El umbral de percolación!`);
+  checkCompletion();
+}
+
+function runGaltonWatson() {
+  const lambda = parseFloat(document.getElementById('gwSlider').value);
+  let population = [1];
+  let gen = 0;
+  while (population.length > 0 && gen < 50) {
+    const nextGen = [];
+    population.forEach(() => {
+      const children = Math.round(lambda + Math.sqrt(lambda) * (Math.random() * 2 - 1) * 0.5);
+      const n = Math.max(0, Math.round(Math.random() < lambda / (lambda + 1) ? Math.floor(lambda + Math.random() * 2) : Math.floor(Math.random() * 2)));
+      const actualChildren = Math.round(lambda + Math.sqrt(lambda) * (Math.random() * 2 - 1) * 0.3);
+      let c = 0;
+      for (let i = 0; i < Math.round(lambda * 2); i++) { if (Math.random() < 0.5) c++; }
+      const finalChildren = Math.round(lambda + Math.sqrt(lambda) * ((Math.random() - 0.5) * 2));
+      nextGen.push(...Array(Math.max(0, finalChildren)).fill(0));
+    });
+    population = nextGen;
+    gen++;
+  }
+  const extinct = population.length === 0;
+  document.getElementById('gwGen').textContent = gen;
+  document.getElementById('gwPop').textContent = extinct ? '0 (extinta)' : '> 0';
+  document.getElementById('gwExtinct').textContent = extinct ? '✅ Sí' : '❌ No';
+  showFeedback(`🌳 λ=${lambda}: ${extinct ? '¡La población se extinguió!' : 'La población sobrevive tras 50 generaciones.'}`);
+  checkCompletion();
+}
+
+function runMultipleGW() {
+  const lambda = parseFloat(document.getElementById('gwSlider').value);
+  let extinctCount = 0;
+  const trials = 500;
+  for (let t = 0; t < trials; t++) {
+    let pop = [1];
+    for (let g = 0; g < 100; g++) {
+      let next = [];
+      pop.forEach(() => {
+        const c = Math.max(0, Math.round(lambda + Math.sqrt(lambda) * (Math.random() - 0.5) * 2));
+        next.push(...Array(c).fill(0));
+      });
+      pop = next;
+      if (pop.length === 0) break;
+    }
+    if (pop.length === 0) extinctCount++;
+  }
+  const probE = extinctCount / trials;
+  document.getElementById('gwPE').textContent = (probE * 100).toFixed(1) + '%';
+  let theory = lambda <= 1 ? 1 : 1 / lambda * (1 - Math.exp(-1));
+  showFeedback(`📊 Prob. extinción experimental: ${(probE*100).toFixed(1)}%. Teórica: λ≤1 → 100%, λ>1 → < 100%.`);
+  checkCompletion();
+}
+
+function runER() {
+  const n = parseInt(document.getElementById('erNSlider').value);
+  const p = parseFloat(document.getElementById('erPSlider').value);
+  const adj = Array.from({length: n}, () => Array(n).fill(0));
+  let edges = 0;
+  for (let i = 0; i < n; i++) for (let j = i+1; j < n; j++) {
+    if (Math.random() < p) { adj[i][j] = adj[j][i] = 1; edges++; }
+  }
+  const visited = Array(n).fill(false);
+  const comps = [];
+  for (let v = 0; v < n; v++) {
+    if (visited[v]) continue;
+    const q = [v]; visited[v] = true;
+    const comp = [];
+    while (q.length > 0) {
+      const c = q.shift(); comp.push(c);
+      for (let u = 0; u < n; u++) if (adj[c][u] && !visited[u]) { visited[u] = true; q.push(u); }
+    }
+    comps.push(comp);
+  }
+  const giant = comps.reduce((max, c) => c.length > max.length ? c : max, []);
+  const avgDeg = (2 * edges / n);
+  document.getElementById('erEdges').textContent = edges;
+  document.getElementById('erGiant').textContent = giant.length + ' nodos (' + (giant.length / n * 100).toFixed(1) + '%)';
+  document.getElementById('erDeg').textContent = avgDeg.toFixed(2);
+  document.getElementById('erCrit').textContent = (n * p).toFixed(2) + (n * p >= 1 ? ' ≥ 1 (gigante!)' : ' < 1 (sin gigante)');
+  showFeedback(`🔗 G(${n},${p}): ${edges} aristas. ${avgDeg >= 1 ? '¡Hay componente gigante!' : 'Componentes pequeños.'}`);
+  checkCompletion();
+}
+
+function setVCPoints(n) {
+  document.querySelectorAll('#vcVis .opt').forEach(el => el.classList.remove('active'));
+  const labels = ['2 puntos', '3 puntos', '4 puntos'];
+  document.querySelectorAll('#vcVis .opt').forEach((el, i) => { if (labels[i] && i < n) el.classList.add('active'); });
+  const msgs = ['2: siempre separable por una línea.', '3: cualquier configuración se separa.', '4: ❌ el XOR no es separable linealmente.'];
+  showFeedback(`🎯 VC dimension = 3. Con ${n} puntos: ${msgs[n-2] || ''}`);
+}
+
+function calcPACSamples() {
+  const eps = parseFloat(document.getElementById('pacEpsilon').value) || 0.1;
+  const del = parseFloat(document.getElementById('pacDelta').value) || 0.05;
+  const VC = 3;
+  const m = Math.ceil((1 / eps) * (Math.log(VC) + Math.log(1 / del)));
+  document.getElementById('pacM').textContent = m;
+  showFeedback(`📐 PAC: con ε=${eps}, δ=${del}, VC=${VC}, necesitas m ≥ ${m} muestras.`);
+  checkCompletion();
+}
+
+function checkCompletion() {
+  if (!completed) {
+    completed = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    localStorage.setItem(STORAGE_KEY, 'true');
+  }
+}
+
+function showFeedback(msg) {
+  document.getElementById('feedbackMsg').innerHTML = msg;
+}
+
+function restoreProgress() {
+  if (localStorage.getItem(STORAGE_KEY) === 'true') {
+    completed = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    showFeedback('🏆 ¡Ya completaste este módulo! Repasa los conceptos.');
+  }
+}
+
+runPercolation();
+restoreProgress();
+</script>
+<script src="../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

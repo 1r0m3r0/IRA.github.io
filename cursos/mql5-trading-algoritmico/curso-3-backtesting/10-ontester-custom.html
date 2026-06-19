@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Curso 3 | OnTester y Custom Criteria</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../../assets/css/theme.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%);background-size:200% 200%;animation:gradientShift 20s ease infinite;font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
+@keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.modulo-container{max-width:1300px;width:100%;background:rgba(15,25,45,0.65);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(255,100,220,0.25);box-shadow:0 25px 45px rgba(0,0,0,0.5);overflow:hidden}
+.hero-header{background:linear-gradient(95deg,#0b1120 0%,#111a2e 100%);padding:2rem 2rem 1.5rem 2rem;text-align:center;border-bottom:2px solid #ff64dc}
+.hero-header h1{font-size:2.6rem;font-weight:800;background:linear-gradient(135deg,#FFF,#ff99e6,#ff64dc);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-header p{color:#f0ccee;margin-top:.5rem;font-size:1.1rem}
+.badge-area{display:flex;justify-content:center;gap:1rem;margin-top:1.2rem;flex-wrap:wrap}
+.chip{background:rgba(255,100,220,0.15);border:1px solid #ff64dc;padding:0.4rem 1rem;border-radius:40px;font-size:0.8rem;font-weight:600;color:#ddd}
+.analogy-card{background:#1e2a3acc;margin:1.5rem 2rem;padding:1.2rem 1.8rem;border-radius:2rem;border-left:8px solid #ff64dc;font-size:1rem;line-height:1.6}
+.progress-section{margin:1rem 2rem 0}
+.progress-bar-outer{background:#1a2a4a;border-radius:20px;height:20px;overflow:hidden}
+.progress-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,#ff64dc,#fff);border-radius:20px;transition:width 0.5s ease}
+.progress-text{text-align:center;font-size:0.85rem;color:#8899cc;margin-bottom:.5rem}
+.main-area{padding:1rem 2rem}
+.ont-panel{background:#0a1020;border-radius:2rem;padding:1.5rem;border:1px solid #2a3a5a;margin-bottom:1.5rem}
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.form-group{margin-bottom:.8rem}
+.form-group label{display:block;font-size:.8rem;color:#8899cc;margin-bottom:.3rem}
+.form-group input,.form-group select{width:100%;padding:.6rem;background:#1a2a4a;border:1px solid #3a4a6a;border-radius:.8rem;color:#eef5ff;font-family:'Inter',sans-serif;font-size:.85rem;transition:.2s}
+.form-group input:focus,.form-group select:focus{border-color:#ff64dc;outline:none}
+.btn-action{background:linear-gradient(95deg,#ff64dc,#ff30c0);border:none;padding:0.8rem 1.8rem;font-weight:bold;border-radius:3rem;cursor:pointer;font-size:1rem;transition:0.2s;color:#fff;font-family:'Inter',sans-serif}
+.btn-action:hover{transform:translateY(-2px);box-shadow:0 0 15px rgba(255,100,220,0.5)}
+.btn-action:disabled{opacity:.5;cursor:not-allowed}
+.code-box{background:#0a0a12;border-radius:1.2rem;padding:1rem;font-family:'Courier New',monospace;font-size:.78rem;color:#aaccff;line-height:1.6;overflow-x:auto;border:1px solid #2a3a5a;margin-bottom:1rem}
+.code-box .keyword{color:#66aaff}
+.code-box .string{color:#8f8}
+.code-box .comment{color:#888}
+.code-box .number{color:#f80}
+.code-box .func{color:#ff99e6}
+.criteria-pills{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem}
+.criteria-pill{background:#1a2a4a;padding:.4rem .8rem;border-radius:2rem;font-size:.75rem;cursor:pointer;transition:.2s;border:1px solid transparent}
+.criteria-pill.active{border-color:#ff64dc;background:rgba(255,100,220,0.15);color:#ff64dc}
+.criteria-pill:hover{border-color:#ff64dc}
+.builder-area{background:#0d1525;border-radius:1rem;padding:1rem;margin-bottom:1rem}
+.weight-row{display:flex;align-items:center;gap:.6rem;margin:.5rem 0}
+.weight-row label{min-width:120px;font-size:.8rem;color:#8899cc}
+.weight-row input[type="range"]{flex:1;-webkit-appearance:none;background:#2a3a5a;height:6px;border-radius:3px;outline:none}
+.weight-row input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#ff64dc;cursor:pointer}
+.weight-row .weight-val{min-width:40px;text-align:right;font-weight:600;color:#ff64dc}
+.result-card{background:#0d1525;border-radius:1rem;padding:1rem;text-align:center;border:1px solid #2a3a5a;margin-top:1rem}
+.result-card .score{font-size:2.5rem;font-weight:800}
+.result-card .score.gold{color:#ffd700}
+.result-card .score.green{color:#00c853}
+.rank-table{width:100%;border-collapse:collapse;font-size:.78rem;margin-top:1rem}
+.rank-table th{background:#1a2a4a;padding:.5rem;text-align:left;color:#8899cc;border-bottom:2px solid #3a4a6a}
+.rank-table td{padding:.5rem;border-bottom:1px solid #2a3a5a}
+.rank-table .best{background:rgba(0,200,83,0.1)}
+.feedback{background:#00000099;margin:0 2rem 1.5rem 2rem;padding:1rem;border-radius:1.5rem;text-align:center;font-weight:500;border-left:4px solid #ff64dc;min-height:3rem}
+.insignia{text-align:center;background:#0c1b2f;border-radius:2rem;margin:0 2rem 1.5rem;padding:1rem;border:2px dashed gold}
+.insignia i{font-size:2.5rem;color:gold}
+.insignia h3{color:gold;margin:.5rem 0}
+.hidden{display:none!important}
+.nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.5rem 2rem}
+.nav-link{background:#2c3e66;padding:0.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:0.5rem;transition:0.2s}
+.nav-link:hover{transform:translateY(-2px);box-shadow:0 0 10px rgba(255,100,220,0.4)}
+.nav-link.next{background:linear-gradient(95deg,#f0a500,#ff6a00);color:#1e1a0c}
+.nav-link.menu{background:#1a2a4a;border:1px solid #ff64dc}
+.nav-link.prev{background:#1a2a4a;border:1px solid #666}
+footer{text-align:center;padding:1.2rem;font-size:0.8rem;border-top:1px solid #2c3e66;color:#8899cc}
+@media(max-width:900px){.settings-grid{grid-template-columns:1fr}.hero-header h1{font-size:1.9rem}.analogy-card{margin:1rem}.feedback{margin:0 1rem 1rem}.main-area{padding:1rem}}
+</style>
+</head>
+<body>
+<nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a><a href="../index.html">Programa MQL5</a></nav>
+<div class="modulo-container">
+  <div class="hero-header">
+    <h1>⚙️ OnTester y Custom Criteria</h1>
+    <p>"Crea tu propio criterio de optimización más allá del Profit Factor"</p>
+    <div class="badge-area">
+      <span class="chip"><i class="fas fa-code"></i> OnTester</span>
+      <span class="chip"><i class="fas fa-sliders"></i> Pesos</span>
+      <span class="chip"><i class="fas fa-trophy"></i> Ranking</span>
+    </div>
+  </div>
+
+  <div class="progress-section">
+    <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+    <div class="progress-text" id="progressText">Módulo 10 de 12</div>
+  </div>
+
+  <div class="analogy-card">
+    <strong>🏆 Piénsalo así:</strong> El Profit Factor es como juzgar un atleta solo por su velocidad. Pero un buen atleta necesita velocidad + resistencia + técnica + salud mental. OnTester te permite crear tu propio "juez" que mira múltiples métricas a la vez. Así encuentras estrategias que son buenas en todo, no solo en una cosa.
+  </div>
+
+  <div class="main-area">
+    <div class="ont-panel">
+      <h3 style="color:#bcc9f0;margin-bottom:1rem"><i class="fas fa-code"></i> Código MQL5 — OnTester</h3>
+      <div class="code-box">
+        <span class="comment">//+------------------------------------------------------------------+</span><br>
+        <span class="comment">//| Custom Optimization Criterion                                   |</span><br>
+        <span class="comment">//+------------------------------------------------------------------+</span><br>
+        <span class="keyword">double</span> <span class="func">OnTester</span>()<br>
+        {<br>
+        &nbsp;&nbsp;<span class="comment">// Get standard metrics</span><br>
+        &nbsp;&nbsp;<span class="keyword">double</span> pf        = <span class="func">TesterStatistics</span>(STAT_PROFIT_FACTOR);<br>
+        &nbsp;&nbsp;<span class="keyword">double</span> sharpe    = <span class="func">TesterStatistics</span>(STAT_SHARPE_RATIO);<br>
+        &nbsp;&nbsp;<span class="keyword">double</span> dd        = <span class="func">TesterStatistics</span>(STAT_EQUITY_DD);<br>
+        &nbsp;&nbsp;<span class="keyword">double</span> recovery  = <span class="func">TesterStatistics</span>(STAT_RECOVERY_FACTOR);<br>
+        &nbsp;&nbsp;<span class="keyword">double</span> trades    = <span class="func">TesterStatistics</span>(STAT_TRADES);<br><br>
+        &nbsp;&nbsp;<span class="comment">// Custom weighted score</span><br>
+        &nbsp;&nbsp;<span class="keyword">double</span> score = pf * W_PF + sharpe * W_SHARPE<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ (<span class="number">1</span> - dd/<span class="number">100</span>) * W_DD<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ recovery * W_RECOVERY;<br><br>
+        &nbsp;&nbsp;<span class="keyword">return</span> score;<br>
+        }<br>
+      </div>
+    </div>
+
+    <div class="ont-panel">
+      <h3 style="color:#bcc9f0;margin-bottom:1rem"><i class="fas fa-sliders"></i> Constructor de Criterio Custom</h3>
+      <div class="criteria-pills">
+        <span class="criteria-pill active" onclick="setCriterion('custom',this)">🎯 Custom Score</span>
+        <span class="criteria-pill" onclick="setCriterion('sharpe',this)">📈 Sharpe Ratio</span>
+        <span class="criteria-pill" onclick="setCriterion('recovery',this)">🔄 Recovery Factor</span>
+        <span class="criteria-pill" onclick="setCriterion('calmar',this)">📊 Calmar Ratio</span>
+      </div>
+
+      <div class="builder-area" id="weightBuilder">
+        <p style="font-size:.8rem;color:#8899cc;margin-bottom:.8rem">Ajusta los pesos de cada métrica para crear tu criterio personalizado:</p>
+        <div class="weight-row"><label>Profit Factor</label><input type="range" min="0" max="100" value="30" class="weightSlider" data-metric="pf"><span class="weight-val" id="wPf">30</span></div>
+        <div class="weight-row"><label>Sharpe Ratio</label><input type="range" min="0" max="100" value="25" class="weightSlider" data-metric="sharpe"><span class="weight-val" id="wSharpe">25</span></div>
+        <div class="weight-row"><label>Max Drawdown (invertido)</label><input type="range" min="0" max="100" value="20" class="weightSlider" data-metric="dd"><span class="weight-val" id="wDd">20</span></div>
+        <div class="weight-row"><label>Recovery Factor</label><input type="range" min="0" max="100" value="15" class="weightSlider" data-metric="recovery"><span class="weight-val" id="wRecovery">15</span></div>
+        <div class="weight-row"><label>Nº Trades (consistencia)</label><input type="range" min="0" max="100" value="10" class="weightSlider" data-metric="trades"><span class="weight-val" id="wTrades">10</span></div>
+      </div>
+
+      <button class="btn-action" id="evalBtn"><i class="fas fa-flask"></i> Evaluar Estrategias</button>
+    </div>
+
+    <div id="evalResults" class="ont-panel" style="display:none">
+      <div class="result-card">
+        <div style="font-size:.8rem;color:#8899cc">Mejor Estrategia — Custom Score</div>
+        <div class="score gold" id="bestScore">0.00</div>
+        <div style="font-size:.85rem;color:#bcc9f0" id="bestParams">Fast: 10, Slow: 30</div>
+      </div>
+
+      <div style="max-height:250px;overflow-y:auto;margin-top:1rem">
+        <table class="rank-table"><thead><tr><th>#</th><th>Fast MA</th><th>Slow MA</th><th>Profit Factor</th><th>Sharpe</th><th>DD</th><th>Recovery</th><th>Custom Score</th></tr></thead><tbody id="rankBody"></tbody></table>
+      </div>
+    </div>
+  </div>
+
+  <div id="feedbackMsg" class="feedback">💡 Ajusta los pesos de cada métrica para crear tu criterio de optimización personalizado, luego evalúa.</div>
+
+  <div id="insigniaArea" class="insignia hidden">
+    <i class="fas fa-medal"></i>
+    <h3>🏅 Custom Criterion Creator 🏅</h3>
+    <p>¡Creas tus propios criterios de optimización! Eso es pensar como un verdadero cuant. ⚙️</p>
+  </div>
+
+  <div class="nav-links">
+    <a href="09-anti-overfitting.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+    <a href="11-forward-test.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-flask"></i> Curso 3: Backtesting y Validación Cuantitativa</footer>
+</div>
+
+<script>
+const STORAGE_KEY = 'mql5_3_10';
+let completed = false;
+let evalDone = false;
+
+function initProgress(){
+  const p = JSON.parse(localStorage.getItem('mql5_3_progress')) || [];
+  const pf = document.getElementById('progressFill');
+  const pt = document.getElementById('progressText');
+  if(pf) pf.style.width = Math.round((p.length/12)*100)+'%';
+  if(pt) pt.textContent = p.length+' de 12 módulos';
+  if(p.includes(STORAGE_KEY)){
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    completed = true;
+  }
+}
+
+function saveProgress(){
+  let p = JSON.parse(localStorage.getItem('mql5_3_progress')) || [];
+  if(!p.includes(STORAGE_KEY)){p.push(STORAGE_KEY);localStorage.setItem('mql5_3_progress',JSON.stringify(p));}
+  const pf = document.getElementById('progressFill');
+  const pt = document.getElementById('progressText');
+  if(pf) pf.style.width = Math.round((p.length/12)*100)+'%';
+  if(pt) pt.textContent = p.length+' de 12 módulos';
+}
+
+// Weight sliders
+document.querySelectorAll('.weightSlider').forEach(slider => {
+  slider.addEventListener('input', function(){
+    const id = 'w' + this.dataset.metric.charAt(0).toUpperCase() + this.dataset.metric.slice(1);
+    document.getElementById(id).textContent = this.value;
+  });
+});
+
+function setCriterion(name, el){
+  document.querySelectorAll('.criteria-pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  const presets = {
+    sharpe: {pf:10, sharpe:50, dd:15, recovery:15, trades:10},
+    recovery: {pf:20, sharpe:15, dd:20, recovery:40, trades:5},
+    calmar: {pf:15, sharpe:20, dd:35, recovery:25, trades:5},
+    custom: {pf:30, sharpe:25, dd:20, recovery:15, trades:10}
+  };
+  const w = presets[name] || presets.custom;
+  document.querySelectorAll('.weightSlider').forEach(s => {
+    const key = s.dataset.metric;
+    s.value = w[key];
+    const id = 'w' + key.charAt(0).toUpperCase() + key.slice(1);
+    document.getElementById(id).textContent = w[key];
+  });
+  if(name !== 'custom'){
+    document.getElementById('feedbackMsg').innerHTML = '📋 Criterio "'+name+'" cargado. Puedes ajustar los pesos manualmente.';
+  }
+}
+
+function simulateStrategy(fast, slow){
+  const numTrades = 20 + Math.floor(Math.random()*20);
+  let balance = 10000, peak = 10000, maxDD = 0;
+  let win=0, lose=0, tProfit=0, tLoss=0, price=1.1, fMA=1.095, sMA=1.09;
+  let inPos=false, entryPrice=0;
+  for(let i=0;i<numTrades;i++){
+    price += (Math.random()-0.48)*0.01;
+    if(price<1.05)price=1.05;
+    if(price>1.15)price=1.15;
+    fMA=fMA*0.8+price*0.2;
+    sMA=sMA*0.92+price*0.08;
+    if(fMA>sMA&&!inPos){inPos=true;entryPrice=price;}
+    if(fMA<sMA&&inPos){
+      inPos=false;
+      const pl=(price-entryPrice)/0.0001*1+(Math.random()-0.5)*15*(Math.random()<0.55?1:-0.6);
+      balance+=pl;
+      if(pl>0){win++;tProfit+=pl;}else{lose++;tLoss+=Math.abs(pl);}
+      if(balance>peak)peak=balance;
+      const dd=(peak-balance)/peak*100;
+      if(dd>maxDD)maxDD=dd;
+    }
+  }
+  const total=win+lose;
+  const pf=tLoss>0?tProfit/tLoss:tProfit>0?999:0;
+  const wr=total>0?win/total*100:0;
+  const returns=total>0?(balance-10000)/10000*100:0;
+  const sharpe = pf>0?(wr/100)*Math.sqrt(252)/Math.max(1,maxDD/10):0;
+  const recovery=maxDD>0?((balance-10000)/10000*100)/maxDD:0;
+  return {pf, sharpe, dd:maxDD, recovery, trades:total, wr, balance};
+}
+
+document.getElementById('evalBtn').addEventListener('click', function(){
+  const weights = {};
+  document.querySelectorAll('.weightSlider').forEach(s => {
+    const key = s.dataset.metric;
+    weights[key] = parseFloat(s.value) || 0;
+  });
+  const totalW = Object.values(weights).reduce((a,b)=>a+b,0) || 1;
+
+  const results = [];
+  for(let f=5;f<=30;f+=5){
+    for(let s=20;s<=60;s+=5){
+      if(s<=f) continue;
+      const r = simulateStrategy(f, s);
+      const customScore = (
+        (r.pf/5) * weights.pf +
+        (r.sharpe/2) * weights.sharpe +
+        (1-r.dd/50) * (weights.dd/5) +
+        (r.recovery/5) * weights.recovery +
+        (r.trades/50) * weights.trades
+      ) / (totalW/5);
+      results.push({fast:f, slow:s, pf:r.pf, sharpe:r.sharpe, dd:r.dd, recovery:r.recovery, trades:r.trades, score:customScore});
+    }
+  }
+
+  results.sort((a,b)=>b.score-a.score);
+
+  document.getElementById('bestScore').textContent = results[0].score.toFixed(2);
+  document.getElementById('bestParams').textContent = 'Fast: '+results[0].fast+', Slow: '+results[0].slow;
+
+  const tbody = document.getElementById('rankBody');
+  tbody.innerHTML = results.slice(0,20).map((r,i)=>{
+    const cls=i===0?' class="best"':'';
+    return '<tr'+cls+'><td>'+(i+1)+'</td><td>'+r.fast+'</td><td>'+r.slow+'</td><td>'+r.pf.toFixed(2)+'</td><td>'+r.sharpe.toFixed(2)+'</td><td>'+r.dd.toFixed(1)+'%</td><td>'+r.recovery.toFixed(2)+'</td><td style="color:#ff64dc;font-weight:600">'+r.score.toFixed(2)+'</td></tr>';
+  }).join('');
+  document.getElementById('evalResults').style.display = 'block';
+  evalDone = true;
+
+  document.getElementById('feedbackMsg').innerHTML = '✅ Evaluación completada: '+results.length+' estrategias rankeadas. Mejor score: '+results[0].score.toFixed(2)+' (Fast='+results[0].fast+', Slow='+results[0].slow+')';
+  if(!completed){
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').innerHTML = '🎉 ¡Criterio custom dominado! Sabes crear tu propio ranking de optimización. ¡Insignia desbloqueada!';
+    saveProgress();
+    completed = true;
+  }
+});
+
+window.addEventListener('load', initProgress);
+</script>
+<script src="../../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>ML para Trading | Regresión Lineal y Logística</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #111a2e 100%);
+      background-size: 200% 200%; animation: gradientShift 20s ease infinite;
+      font-family: 'Inter', sans-serif; color: #eef5ff; min-height: 100vh;
+      display: flex; align-items: center; justify-content: center; padding: 2rem 1rem;
+    }
+    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+    .curso4-container {
+      max-width: 1300px; width: 100%;
+      background: rgba(15, 25, 45, 0.65); backdrop-filter: blur(12px);
+      border-radius: 3rem; border: 1px solid rgba(43,158,255,0.25);
+      box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden;
+    }
+    .hero-header { background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%); padding: 2rem 2rem 1.5rem; text-align: center; border-bottom: 2px solid #2b9eff; }
+    .hero-header h1 { font-size: 2.6rem; font-weight: 800; background: linear-gradient(135deg, #FFF, #80c8ff, #2b9eff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .hero-header p { font-size: 1.1rem; color: #b9e2ff; margin-top: 0.3rem; }
+    .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
+    .chip { background: rgba(43,158,255,0.15); border: 1px solid #2b9eff; padding: 0.3rem 1rem; border-radius: 40px; font-size: 0.8rem; font-weight: 600; }
+    .analogy-card { background: #1e2a3acc; margin: 1.5rem 2rem; padding: 1.2rem 1.8rem; border-radius: 2rem; border-left: 8px solid #2b9eff; font-size: 1rem; line-height: 1.6; }
+    .main-area { padding: 0.5rem 2rem; }
+    .sim-canvas { background: #0a0f1e; border-radius: 1.5rem; padding: 1rem; margin-bottom: 1rem; }
+    .sim-canvas canvas { display: block; margin: 0 auto; width: 100%; max-width: 600px; height: 300px; background: #0a0f1e; border-radius: 1rem; border: 1px solid #2c3e66; }
+    .controls { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; align-items: center; }
+    .controls label { display: flex; align-items: center; gap: 0.5rem; }
+    .controls input[type=range] { width: 120px; }
+    .controls .val { font-family: monospace; min-width: 40px; display: inline-block; }
+    .feedback { background: #00000099; margin: 1.5rem 2rem; padding: 1rem; border-radius: 1.5rem; text-align: center; font-weight: 500; border-left: 4px solid #2b9eff; }
+    .insignia { text-align: center; background: #0c1b2f; border-radius: 2rem; margin: 0 2rem 1.5rem; padding: 1rem; border: 1px dashed gold; }
+    .insignia i { font-size: 2.5rem; color: gold; }
+    .hidden { display: none; }
+    .btn-action { background: linear-gradient(95deg, #f0a500, #ff6a00); border: none; padding: 0.8rem 1.8rem; font-weight: bold; border-radius: 3rem; cursor: pointer; font-size: 1rem; transition: 0.2s; color: #1e1a0c; }
+    .btn-action:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(240,165,0,0.5); }
+    .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
+    .nav-link { background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem; font-weight: 600; text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; }
+    .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(43,158,255,0.4); }
+    .nav-link.next { background: linear-gradient(95deg, #f0a500, #ff6a00); color: #1e1a0c; }
+    .nav-link.menu { background: #1a2a4a; border: 1px solid #3399ff; }
+    footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
+    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
+  </style>
+  <link rel="stylesheet" href="../../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../../../index.html">&larr; Portfolio</a><a href="../../../../cursos/index.html">Cursos</a></nav>
+
+  <div class="curso4-container">
+    <div class="hero-header">
+      <h1>📐 Regresión Lineal y Logística</h1>
+      <p>Predecir precio y dirección del mercado</p>
+      <div class="badge-area">
+        <span class="chip"><i class="fas fa-chart-line"></i> Regresión</span>
+        <span class="chip"><i class="fas fa-arrows-alt"></i> Simulación</span>
+      </div>
+    </div>
+    <div class="analogy-card"><strong>📐 Piénsalo así:</strong> La regresión lineal es como dibujar la línea que mejor atraviesa una nube de puntos. La logística es como trazar la frontera que separa dos territorios. Una predice cuánto, la otra predice qué lado.</div>
+    <div class="main-area">
+      <div class="sim-canvas">
+        <p style="margin-bottom:0.5rem"><strong>📈 Regresión Lineal:</strong> Precio vs Volumen</p>
+        <canvas id="regCanvas" width="600" height="300"></canvas>
+        <div class="controls">
+          <label>Pendiente: <input type="range" id="slope" min="-5" max="5" step="0.1" value="1.5"> <span id="slopeVal" class="val">1.5</span></label>
+          <label>Intercepto: <input type="range" id="intercept" min="-50" max="50" step="1" value="5"> <span id="interceptVal" class="val">5</span></label>
+          <span>R²: <span id="rsqDisplay" class="val">0.00</span></span>
+        </div>
+      </div>
+      <div class="sim-canvas">
+        <p style="margin-bottom:0.5rem"><strong>🎯 Regresión Logística:</strong> Límite de decisión (2 features)</p>
+        <canvas id="logCanvas" width="600" height="300"></canvas>
+        <div class="controls">
+          <label>Límite X: <input type="range" id="boundary" min="0" max="100" step="1" value="50"> <span id="boundaryVal" class="val">50</span></label>
+          <span>Accuracy: <span id="accDisplay" class="val">0%</span></span>
+        </div>
+      </div>
+      <div style="text-align:center;margin:0.5rem 0"><button id="completeBtn" class="btn-action"><i class="fas fa-check"></i> Completar módulo</button></div>
+    </div>
+    <div id="feedbackMsg" class="feedback">💡 Ajusta la línea de regresión y el límite logístico. Luego haz clic en "Completar módulo".</div>
+    <div id="insigniaArea" class="insignia hidden">
+      <i class="fas fa-medal"></i>
+      <h3>🏅 REGRESOR EXPERTO 🏅</h3>
+      <p>Has dominado los fundamentos de regresión lineal y logística para trading. ¡Excelente!</p>
+    </div>
+    <div class="nav-links">
+      <a href="03-preprocesamiento.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+      <a href="05-random-forest-boosting.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <footer><i class="fas fa-crown"></i> ML para Trading · Trading Algorítmico con Python</footer>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'py_trade_4_04';
+    const regData = [];
+    for (let i=0; i<30; i++) { regData.push({ x: Math.random()*100, y: 2 + 1.5*Math.random()*100 + (Math.random()-0.5)*30 }); }
+    const logData = [];
+    for (let i=0; i<40; i++) { logData.push({ x: Math.random()*100, y: Math.random()*100, cls: Math.random()>0.5?1:0 }); }
+
+    function drawReg() {
+      const c = document.getElementById('regCanvas');
+      const ctx = c.getContext('2d');
+      ctx.clearRect(0,0,c.width,c.height);
+      const slope = parseFloat(document.getElementById('slope').value);
+      const intercept = parseFloat(document.getElementById('intercept').value);
+      document.getElementById('slopeVal').textContent = slope.toFixed(1);
+      document.getElementById('interceptVal').textContent = intercept.toFixed(0);
+
+      regData.forEach(d => {
+        const px = d.x/100*c.width;
+        const py = c.height - (d.y/150*c.height);
+        ctx.beginPath(); ctx.arc(px, py, 4, 0, Math.PI*2);
+        ctx.fillStyle = '#2b9eff'; ctx.fill();
+      });
+
+      ctx.strokeStyle = '#ff6a00'; ctx.lineWidth = 2;
+      ctx.beginPath();
+      const x1 = 0, y1 = c.height - ((slope*x1 + intercept)/150*c.height);
+      const x2 = c.width, y2 = c.height - ((slope*100 + intercept)/150*c.height);
+      ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+
+      const ss_res = regData.reduce((a,d) => { const pred = slope*d.x + intercept; return a + (d.y-pred)**2; },0);
+      const mean_y = regData.reduce((a,d)=>a+d.y,0)/regData.length;
+      const ss_tot = regData.reduce((a,d)=>a+(d.y-mean_y)**2,0);
+      const rsq = 1 - ss_res/ss_tot;
+      document.getElementById('rsqDisplay').textContent = rsq.toFixed(4);
+    }
+
+    function drawLog() {
+      const c = document.getElementById('logCanvas');
+      const ctx = c.getContext('2d');
+      ctx.clearRect(0,0,c.width,c.height);
+      const boundary = parseFloat(document.getElementById('boundary').value);
+      document.getElementById('boundaryVal').textContent = boundary;
+
+      let correct = 0;
+      logData.forEach(d => {
+        const px = d.x/100*c.width;
+        const py = c.height - (d.y/100*c.height);
+        const pred = d.x > boundary ? 1 : 0;
+        if (pred === d.cls) correct++;
+        ctx.beginPath(); ctx.arc(px, py, 5, 0, Math.PI*2);
+        ctx.fillStyle = d.cls === 1 ? '#00ffc8' : '#ff5050';
+        ctx.fill();
+        ctx.strokeStyle = pred === d.cls ? '#fff' : '#ff0'; ctx.lineWidth = 1; ctx.stroke();
+      });
+
+      ctx.strokeStyle = '#ff0'; ctx.lineWidth = 2; ctx.setLineDash([5,5]);
+      const bx = boundary/100*c.width;
+      ctx.beginPath(); ctx.moveTo(bx,0); ctx.lineTo(bx,c.height); ctx.stroke();
+      ctx.setLineDash([]);
+
+      const acc = (correct/logData.length*100).toFixed(0);
+      document.getElementById('accDisplay').textContent = acc + '%';
+    }
+
+    document.getElementById('slope').addEventListener('input', drawReg);
+    document.getElementById('intercept').addEventListener('input', drawReg);
+    document.getElementById('boundary').addEventListener('input', drawLog);
+    drawReg(); drawLog();
+
+    document.getElementById('completeBtn').addEventListener('click', () => {
+      localStorage.setItem(STORAGE_KEY, 'true');
+      document.getElementById('insigniaArea').classList.remove('hidden');
+      document.getElementById('feedbackMsg').innerHTML = '🎉 <strong>¡Módulo completado!</strong>';
+      document.getElementById('completeBtn').disabled = true;
+    });
+  </script>
+</body>
+</html>
+

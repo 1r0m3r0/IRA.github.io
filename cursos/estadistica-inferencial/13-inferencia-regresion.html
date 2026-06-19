@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Estadística Inferencial | Inferencia en Regresión Lineal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{background:linear-gradient(135deg,#0a0f1e,#0c1222,#111a2e);background-size:200% 200%;animation:gradientShift 20s ease infinite;font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem;}
+    @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+    .modulo-container{max-width:1300px;width:100%;background:rgba(15,25,45,0.65);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(255,80,80,0.25);box-shadow:0 25px 45px rgba(0,0,0,0.5);overflow:hidden;}
+    .hero-header{background:linear-gradient(95deg,#0b1120,#111a2e);padding:2rem 2rem 1.5rem;text-align:center;border-bottom:2px solid #ff5050;}
+    .hero-header h1{font-size:2.6rem;font-weight:800;background:linear-gradient(135deg,#FFF,#ff8a80,#ff5050);-webkit-background-clip:text;background-clip:text;color:transparent;}
+    .hero-header p{font-size:1.1rem;color:#ffcdd2;margin-top:0.5rem;}
+    .badge-area{display:flex;justify-content:center;gap:1rem;margin-top:1.2rem;flex-wrap:wrap;}
+    .chip{background:rgba(255,80,80,0.15);border:1px solid #ff5050;padding:0.4rem 1rem;border-radius:40px;font-size:0.8rem;font-weight:600;}
+    .analogy-card{background:#1e2a3acc;margin:1.5rem 2rem;padding:1.2rem 1.8rem;border-radius:2rem;border-left:8px solid #ff5050;font-size:1rem;line-height:1.6;}
+    .main-area{padding:0 2rem 1rem;}
+    .panel-grid{display:flex;flex-wrap:wrap;gap:1.5rem;margin-bottom:1.5rem;}
+    .panel-card{flex:1;min-width:200px;background:#0f1a2be0;border-radius:1.5rem;padding:1.2rem;border:1px solid #334;text-align:center;}
+    .panel-card h3{color:#ff8a80;margin-bottom:0.5rem;}
+    .panel-card select,.panel-card input{background:#001e2f;border:1px solid #ff5050;padding:0.5rem;border-radius:1rem;color:#fff;width:100%;margin:0.3rem 0;font-family:'Inter',sans-serif;}
+    .panel-card button{background:linear-gradient(95deg,#ff5050,#d32f2f);border:none;padding:0.6rem 1.2rem;border-radius:2rem;font-weight:700;cursor:pointer;color:#fff;margin:0.3rem;transition:0.2s;}
+    .panel-card button:hover{transform:translateY(-2px);box-shadow:0 0 15px rgba(255,80,80,0.5);}
+    .chart-area{background:#0a1520;border-radius:1.5rem;padding:1rem;margin:1rem 0;text-align:center;}
+    .chart-area canvas{width:100%;max-width:700px;height:300px;background:#0a1520;border-radius:1rem;margin:0 auto;display:block;}
+    .results-area{background:#00000066;border-radius:1.5rem;padding:1.2rem;margin:1rem 0;}
+    .results-area table{width:100%;border-collapse:collapse;font-size:0.85rem;}
+    .results-area th,.results-area td{padding:0.5rem;text-align:center;border:1px solid #334;}
+    .results-area th{background:#0a1a2a;color:#ff8a80;}
+    .feedback{background:#00000099;margin:0 2rem 1.5rem;padding:1rem;border-radius:1.5rem;text-align:center;font-weight:500;border-left:4px solid #ff5050;}
+    .insignia{text-align:center;background:#0c1b2f;border-radius:2rem;margin:0 2rem 1.5rem;padding:1rem;border:1px dashed gold;}
+    .insignia i{font-size:2.5rem;color:gold;}
+    .hidden{display:none;}
+    .btn-action{background:linear-gradient(95deg,#f0a500,#ff6a00);border:none;padding:0.8rem 1.8rem;font-weight:700;border-radius:3rem;cursor:pointer;font-size:1rem;transition:0.2s;color:#1e1a0c;}
+    .btn-action:hover{transform:translateY(-2px);box-shadow:0 0 15px rgba(240,165,0,0.5);}
+    .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.5rem 2rem;}
+    .nav-link{background:#2c3e66;padding:0.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:0.5rem;transition:0.2s;}
+    .nav-link:hover{transform:translateY(-2px);box-shadow:0 0 10px rgba(0,224,255,0.4);}
+    .nav-link.next{background:linear-gradient(95deg,#f0a500,#ff6a00);color:#1e1a0c;}
+    .nav-link.menu{background:#1a2a4a;border:1px solid #3399ff;}
+    footer{text-align:center;padding:1.2rem;font-size:0.8rem;border-top:1px solid #2c3e66;}
+    @media(max-width:800px){.hero-header h1{font-size:1.9rem;}}
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+  <div class="modulo-container">
+    <div class="hero-header">
+      <h1><i class="fas fa-chart-line"></i> Inferencia en Regresión Lineal</h1>
+      <p>¿La pendiente es real o es ruido? Cuantifica la confianza en tu modelo</p>
+      <div class="badge-area">
+        <span class="chip"><i class="fas fa-ruler"></i> Pendiente β₁</span>
+        <span class="chip"><i class="fas fa-arrows-left-right"></i> Intervalo de confianza</span>
+        <span class="chip"><i class="fas fa-clipboard-check"></i> F-test</span>
+      </div>
+    </div>
+    <div class="analogy-card">
+      <strong><i class="fas fa-microscope"></i> Piénsalo así:</strong> Inferir en regresión es como calibrar un instrumento: no solo queremos la línea de tendencia, sino saber qué tan precisa es. ¿El estimado de la pendiente β₁ es confiable o podría ser casualidad? Los intervalos de confianza y pruebas de hipótesis nos dan esa certeza.
+    </div>
+    <div class="main-area">
+      <div class="panel-grid">
+        <div class="panel-card">
+          <h3><i class="fas fa-dice-d6"></i> Puntos</h3>
+          <select id="numPoints"><option value="10">10 puntos</option><option value="20" selected>20 puntos</option><option value="50">50 puntos</option></select>
+        </div>
+        <div class="panel-card">
+          <h3><i class="fas fa-chart-line"></i> Pendiente β₁</h3>
+          <input type="range" id="trueSlope" min="-5" max="5" value="2" step="0.2">
+          <span id="trueSlopeVal">2.0</span>
+        </div>
+        <div class="panel-card">
+          <h3><i class="fas fa-shuffle"></i> Ruido σ</h3>
+          <input type="range" id="noiseLevel" min="0.5" max="8" value="3" step="0.5">
+          <span id="noiseLevelVal">3</span>
+        </div>
+        <div class="panel-card">
+          <h3><i class="fas fa-crosshairs"></i> X: new</h3>
+          <input type="number" id="newX" value="15" step="0.5" min="0" max="30">
+        </div>
+      </div>
+      <div style="text-align:center;margin-bottom:1rem;">
+        <button class="btn-action" id="runBtn"><i class="fas fa-play"></i> Ajustar regresión</button>
+        <button class="btn-action" style="background:#2c3e66;color:#fff;" id="newDataBtn"><i class="fas fa-dice"></i> Nuevos datos aleatorios</button>
+      </div>
+      <div class="chart-area">
+        <canvas id="regChart" width="700" height="300"></canvas>
+        <div style="display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;margin-top:0.5rem;font-size:0.75rem;">
+          <span><i class="fas fa-circle" style="color:#ff8a80;"></i> Datos</span>
+          <span><i class="fas fa-minus" style="color:#4fc3f7;"></i> Recta ajustada</span>
+          <span><i class="fas fa-minus" style="color:#ffd740;border:2px dashed #ffd740;"></i> IC media</span>
+          <span><i class="fas fa-minus" style="color:#ff6b6b;border:2px dashed #ff6b6b;"></i> IC predicción</span>
+        </div>
+      </div>
+      <div class="results-area" id="resultsArea">
+        <table id="coeffTable">
+          <thead><tr><th>Coeficiente</th><th>Estimado</th><th>Error Est.</th><th>t</th><th>p-valor</th><th>IC 95%</th></tr></thead>
+          <tbody id="coeffBody"></tbody>
+        </table>
+        <div style="display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;margin-top:1rem;">
+          <div style="background:#0f1a2be0;border-radius:1rem;padding:0.6rem 1.2rem;text-align:center;">
+            <span style="font-size:0.7rem;color:#aaa;">R²</span><br>
+            <span id="rSquared" style="font-size:1.4rem;font-weight:700;color:#4fc3f7;">-</span>
+          </div>
+          <div style="background:#0f1a2be0;border-radius:1rem;padding:0.6rem 1.2rem;text-align:center;">
+            <span style="font-size:0.7rem;color:#aaa;">F (modelo)</span><br>
+            <span id="fStat" style="font-size:1.4rem;font-weight:700;color:#ff8a80;">-</span>
+          </div>
+          <div style="background:#0f1a2be0;border-radius:1rem;padding:0.6rem 1.2rem;text-align:center;">
+            <span style="font-size:0.7rem;color:#aaa;">p-valor (F)</span><br>
+            <span id="fPval" style="font-size:1.4rem;font-weight:700;color:#ffd740;">-</span>
+          </div>
+          <div style="background:#0f1a2be0;border-radius:1rem;padding:0.6rem 1.2rem;text-align:center;">
+            <span style="font-size:0.7rem;color:#aaa;">Predicción (x=new)</span><br>
+            <span id="prediction" style="font-size:1.4rem;font-weight:700;color:#69f0ae;">-</span>
+          </div>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;justify-content:center;margin-top:0.8rem;">
+          <div id="residNormality" class="stat-badge" style="padding:0.3rem 1rem;border-radius:1rem;font-size:0.75rem;background:#1a1a1a;border:1px solid #555;">Normalidad: ?</div>
+          <div id="residHomosced" class="stat-badge" style="padding:0.3rem 1rem;border-radius:1rem;font-size:0.75rem;background:#1a1a1a;border:1px solid #555;">Homocedasticidad: ?</div>
+        </div>
+      </div>
+    </div>
+    <div id="feedbackMsg" class="feedback"><i class="fas fa-comment-dots"></i> Ajusta la pendiente y el ruido, luego haz clic en "Ajustar regresión" para ver los resultados de inferencia.</div>
+    <div id="insigniaArea" class="insignia hidden">
+      <i class="fas fa-medal"></i>
+      <h3><i class="fas fa-certificate"></i> Detective de Regresión</h3>
+      <p>¡Sabes interpretar los intervalos de confianza y las pruebas de hipótesis en regresión!</p>
+    </div>
+    <div class="nav-links">
+      <a href="12-anova-medidas-repetidas.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+      <a href="14-regresion-logistica.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <footer><i class="fas fa-crown"></i> Estadística Inferencial Interactiva · Inferencia en regresión</footer>
+  </div>
+  <script>
+    const STORAGE_KEY='est_inf_lvl13';
+    let completed=false;
+    function save(){localStorage.setItem(STORAGE_KEY,'1');completed=true;}
+    function load(){if(localStorage.getItem(STORAGE_KEY)==='1'){completed=true;document.getElementById('insigniaArea').classList.remove('hidden');}}
+    load();
+    const nPts=document.getElementById('numPoints'),slope=document.getElementById('trueSlope'),noise=document.getElementById('noiseLevel'),sVal=document.getElementById('trueSlopeVal'),nVal=document.getElementById('noiseLevelVal'),newX=document.getElementById('newX'),runBtn=document.getElementById('runBtn'),newBtn=document.getElementById('newDataBtn'),feed=document.getElementById('feedbackMsg'),ins=document.getElementById('insigniaArea'),canvas=document.getElementById('regChart'),ctx=canvas.getContext('2d'),coeffBody=document.getElementById('coeffBody'),rSquared=document.getElementById('rSquared'),fStat=document.getElementById('fStat'),fPval=document.getElementById('fPval'),prediction=document.getElementById('prediction'),residNorm=document.getElementById('residNormality'),residHomo=document.getElementById('residHomosced');
+    slope.addEventListener('input',()=>sVal.textContent=slope.value);
+    noise.addEventListener('input',()=>nVal.textContent=noise.value);
+    let currentData=null;
+    function generateData(N,beta1,sigma){
+      let x=[],y=[];
+      for(let i=0;i<N;i++){let xi=1+Math.random()*28;xi=Math.round(xi*10)/10;let yi=20+beta1*xi+(Math.random()-0.5)*sigma*2;x.push(xi);y.push(yi);}
+      return {x,y};
+    }
+    function ols(x,y){
+      const n=x.length;
+      let mx=x.reduce((a,b)=>a+b,0)/n,my=y.reduce((a,b)=>a+b,0)/n;
+      let num=0,den=0;
+      for(let i=0;i<n;i++){num+=(x[i]-mx)*(y[i]-my);den+=(x[i]-mx)**2;}
+      const b1=num/den,b0=my-b1*mx;
+      let res=[],sse=0;
+      for(let i=0;i<n;i++){let r=y[i]-(b0+b1*x[i]);res.push(r);sse+=r**2;}
+      const mse=sse/(n-2),seB1=Math.sqrt(mse/den),seB0=Math.sqrt(mse*(1/n+mx*mx/den));
+      const tB1=b1/seB1,tB0=b0/seB0;
+      function pval(t,df){t=Math.abs(t);let x=df/(df+t*t);function lgamma(z){if(z<0.5)return Math.PI/Math.sin(Math.PI*z)-lgamma(1-z);z-=1;const g=7,c=[0.99999999999980993,676.5203681218851,-1259.1392167224028,771.32342877765313,-176.61502916214059,12.507343278686905,-0.13857109526572012,9.9843695780195716e-6,1.5056327351493116e-7];let x=c[0];for(let i=1;i<g+2;i++)x+=c[i]/(z+i);const t=z+g+0.5;return 0.5*Math.log(2*Math.PI)+Math.log(x)-t+z*Math.log(t);}
+        function betacf(x,a,b){const MAX=100,EPS=3e-12;let qab=a+b,qap=a+1,qam=a-1;let c=1,d=1-qab*x/qap;if(Math.abs(d)<1e-30)d=1e-30;d=1/d;let h=d;for(let m=1;m<=MAX;m++){let m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<1e-30)d=1e-30;c=1+aa/c;if(Math.abs(c)<1e-30)c=1e-30;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<1e-30)d=1e-30;c=1+aa/c;if(Math.abs(c)<1e-30)c=1e-30;d=1/d;let del=d*c;h*=del;if(Math.abs(del-1)<EPS)break;}return h;}
+        function betainc(x,a,b){if(x<0||x>1)return 0;if(x===0||x===1)return x;let bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));if(x<(a+1)/(a+b+2))return bt*betacf(x,a,b)/a;return 1-bt*betacf(1-x,b,a)/b;}
+        return 2*(1-betainc(x,df/2,0.5));
+      }
+      const pB1=pval(tB1,n-2),pB0=pval(tB0,n-2);
+      const ciB1=b1-seB1*tcrit(n-2,0.975),ciB1u=b1+seB1*tcrit(n-2,0.975);
+      const ciB0=b0-seB0*tcrit(n-2,0.975),ciB0u=b0+seB0*tcrit(n-2,0.975);
+      const sst=y.reduce((s,vi)=>s+(vi-my)**2,0);
+      const r2=1-sse/sst;
+      const fVal=(sst-sse)/mse;
+      function pf(f,df1,df2){if(f<=0)return 1;function lgamma(z){if(z<0.5)return Math.PI/Math.sin(Math.PI*z)-lgamma(1-z);z-=1;const g=7,c=[0.99999999999980993,676.5203681218851,-1259.1392167224028,771.32342877765313,-176.61502916214059,12.507343278686905,-0.13857109526572012,9.9843695780195716e-6,1.5056327351493116e-7];let x=c[0];for(let i=1;i<g+2;i++)x+=c[i]/(z+i);const t=z+g+0.5;return 0.5*Math.log(2*Math.PI)+Math.log(x)-t+z*Math.log(t);}
+        function betacf(x,a,b){const MAX=100,EPS=3e-12;let qab=a+b,qap=a+1,qam=a-1;let c=1,d=1-qab*x/qap;if(Math.abs(d)<1e-30)d=1e-30;d=1/d;let h=d;for(let m=1;m<=MAX;m++){let m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<1e-30)d=1e-30;c=1+aa/c;if(Math.abs(c)<1e-30)c=1e-30;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<1e-30)d=1e-30;c=1+aa/c;if(Math.abs(c)<1e-30)c=1e-30;d=1/d;let del=d*c;h*=del;if(Math.abs(del-1)<EPS)break;}return h;}
+        function betainc(x,a,b){if(x<0||x>1)return 0;if(x===0||x===1)return x;let bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));if(x<(a+1)/(a+b+2))return bt*betacf(x,a,b)/a;return 1-bt*betacf(1-x,b,a)/b;}
+        return 1-betainc(df2/(df2+df1*f),df2/2,df1/2);
+      }
+      const pF=pf(fVal,1,n-2);
+      const x0=parseFloat(newX.value);
+      const yHat=b0+b1*x0;
+      const sePred=Math.sqrt(mse*(1+1/n+(x0-mx)**2/den));
+      const ciPredL=yHat-sePred*tcrit(n-2,0.975),ciPredU=yHat+sePred*tcrit(n-2,0.975);
+      const seMean=Math.sqrt(mse*(1/n+(x0-mx)**2/den));
+      const ciMeanL=yHat-seMean*tcrit(n-2,0.975),ciMeanU=yHat+seMean*tcrit(n-2,0.975);
+      let shapiroP=shapiroWilk(res);
+      let bpP=bpTest(res,x);
+      return {b0,b1,seB0,seB1,tB0,tB1,pB0,pB1,ciB0,ciB0u,ciB1,ciB1u,r2,fVal,pF,mse,mx,den,x0,yHat,sePred,ciPredL,ciPredU,seMean,ciMeanL,ciMeanU,res,shapiroP,bpP,x,y,n};
+    }
+    function tcrit(df,p){
+      if(df>100)return 1.96;
+      function lgamma(z){if(z<0.5)return Math.PI/Math.sin(Math.PI*z)-lgamma(1-z);z-=1;const g=7,c=[0.99999999999980993,676.5203681218851,-1259.1392167224028,771.32342877765313,-176.61502916214059,12.507343278686905,-0.13857109526572012,9.9843695780195716e-6,1.5056327351493116e-7];let x=c[0];for(let i=1;i<g+2;i++)x+=c[i]/(z+i);const t=z+g+0.5;return 0.5*Math.log(2*Math.PI)+Math.log(x)-t+z*Math.log(t);}
+      function betainc(x,a,b){if(x<0||x>1)return 0;if(x===0||x===1)return x;function betacf(x,a,b){const MAX=100,EPS=3e-12;let qab=a+b,qap=a+1,qam=a-1;let c=1,d=1-qab*x/qap;if(Math.abs(d)<1e-30)d=1e-30;d=1/d;let h=d;for(let m=1;m<=MAX;m++){let m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<1e-30)d=1e-30;c=1+aa/c;if(Math.abs(c)<1e-30)c=1e-30;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<1e-30)d=1e-30;c=1+aa/c;if(Math.abs(c)<1e-30)c=1e-30;d=1/d;let del=d*c;h*=del;if(Math.abs(del-1)<EPS)break;}return h;}
+        let bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));if(x<(a+1)/(a+b+2))return bt*betacf(x,a,b)/a;return 1-bt*betacf(1-x,b,a)/b;}
+      let lo=0,hi=5,mid;
+      while(hi-lo>1e-6){mid=(lo+hi)/2;let p=2*(1-betainc(df/(df+mid*mid),df/2,0.5));if(p<p)lo=mid;else hi=mid;}
+      return lo;
+    }
+    function shapiroWilk(x){
+      const n=x.length;
+      if(n<3||n>5000)return 0.5;
+      let s=0;x.forEach(v=>s+=v);const m=s/n;
+      let ss=0;x.forEach(v=>ss+=(v-m)**2);
+      if(ss===0)return 1;
+      const sorted=[...x].sort((a,b)=>a-b);
+      let w=0;
+      for(let i=0;i<Math.floor(n/2);i++){
+        let a=i+1;
+        if(n<=3){w=0.7071;}else{
+          let phi=3.1415926535;
+          let m_i=-(Math.log(Math.sin((a-0.375)/(n+0.25)*phi))-Math.log(Math.sin((n-a+0.625)/(n+0.25)*phi)))/2;
+          w+=m_i*(sorted[n-1-i]-sorted[i]);
+        }
+      }
+      if(n<=3)w=0.7071;
+      else{w=w*w/ss;}
+      return w>0.05?0.5:0.05;
+    }
+    function bpTest(res,x){
+      const n=res.length;
+      let r2=res.map(v=>v*v);
+      let my=r2.reduce((a,b)=>a+b,0)/n;
+      let num=0,den=0;
+      for(let i=0;i<n;i++){num+=(x[i]-x.reduce((a,b)=>a+b,0)/n)*(r2[i]-my);den+=(x[i]-x.reduce((a,b)=>a+b,0)/n)**2;}
+      const b1=num/den;
+      const lm=2;const R2=b1*b1*den/(r2.reduce((a,b)=>a+(b-my)**2,0));
+      const chi=R2*n;
+      return chi<3.84?0.5:0.05;
+    }
+    function drawChart(r){
+      const pad={t:30,b:40,l:50,r:30},w=canvas.width,h=canvas.height;
+      const plotW=w-pad.l-pad.r,plotH=h-pad.t-pad.b;
+      let xMin=Math.min(...r.x),xMax=Math.max(...r.x),yMin=Math.min(...r.y),yMax=Math.max(...r.y);
+      const xRange=xMax-xMin||1,yRange=yMax-yMin||1;
+      xMin-=xRange*0.1;xMax+=xRange*0.1;yMin-=yRange*0.15;yMax+=yRange*0.15;
+      const xR=xMax-xMin,yR=yMax-yMin;
+      function sx(v){return pad.l+(v-xMin)/xR*plotW;}
+      function sy(v){return pad.t+plotH-(v-yMin)/yR*plotH;}
+      ctx.clearRect(0,0,w,h);
+      for(let i=0;i<=5;i++){let y=yMin+i/5*yR;ctx.strokeStyle='#1a2a4a';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pad.l,sy(y));ctx.lineTo(w-pad.r,sy(y));ctx.stroke();ctx.fillStyle='#446';ctx.font='10px Inter';ctx.fillText(y.toFixed(0),5,sy(y)+3);}
+      ctx.strokeStyle='#ff8a80';ctx.lineWidth=2;
+      r.x.forEach((xi,i)=>{ctx.beginPath();ctx.arc(sx(xi),sy(r.y[i]),3,0,2*Math.PI);ctx.fillStyle='#ff8a80';ctx.fill();});
+      ctx.strokeStyle='#4fc3f7';ctx.lineWidth=2.5;
+      ctx.beginPath();
+      ctx.moveTo(sx(xMin),sy(r.b0+r.b1*xMin));
+      ctx.lineTo(sx(xMax),sy(r.b0+r.b1*xMax));
+      ctx.stroke();
+      const xVals=[];for(let i=0;i<=50;i++){xVals.push(xMin+i/50*xR);}
+      ctx.setLineDash([5,5]);
+      xVals.forEach((xi,i)=>{
+        const yHat=r.b0+r.b1*xi;
+        const seM=Math.sqrt(r.mse*(1/r.n+(xi-r.mx)*(xi-r.mx)/r.den));
+        const ciL=yHat-seM*tcrit(r.n-2,0.975),ciU=yHat+seM*tcrit(r.n-2,0.975);
+        if(i===0){ctx.strokeStyle='#ffd740';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(sx(xi),sy(ciL));}else{ctx.lineTo(sx(xi),sy(ciL));}
+        if(i===xVals.length-1)ctx.stroke();
+      });
+      xVals.forEach((xi,i)=>{
+        const yHat=r.b0+r.b1*xi;
+        const seP=Math.sqrt(r.mse*(1+1/r.n+(xi-r.mx)*(xi-r.mx)/r.den));
+        const piL=yHat-seP*tcrit(r.n-2,0.975),piU=yHat+seP*tcrit(r.n-2,0.975);
+        if(i===0){ctx.strokeStyle='#ff6b6b';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(sx(xi),sy(piL));}else{ctx.lineTo(sx(xi),sy(piL));}
+        if(i===xVals.length-1)ctx.stroke();
+      });
+      ctx.setLineDash([]);
+      ctx.fillStyle='#ffd740';ctx.font='11px Inter';ctx.fillText('μ(x₀)=['+r.ciMeanL.toFixed(1)+','+r.ciMeanU.toFixed(1)+']',pad.l+10,20);
+      ctx.fillStyle='#ff6b6b';ctx.font='11px Inter';ctx.fillText('y₀=['+r.ciPredL.toFixed(1)+','+r.ciPredU.toFixed(1)+']',pad.l+10,38);
+      ctx.fillStyle='#ff8a80';ctx.beginPath();ctx.arc(sx(r.x0),sy(r.yHat),5,0,2*Math.PI);ctx.fill();
+      ctx.fillStyle='#fff';ctx.font='10px Inter';ctx.fillText('x₀',sx(r.x0)-5,sy(r.yHat)-8);
+    }
+    function run(){
+      const N=parseInt(nPts.value),b1=parseFloat(slope.value),sig=parseFloat(noise.value);
+      if(!currentData||currentData.N!==N||currentData.b1!==b1||currentData.sig!==sig)currentData=generateData(N,b1,sig);
+      const r=ols(currentData.x,currentData.y);
+      coeffBody.innerHTML=`<tr><td>β₀ (intercepto)</td><td>${r.b0.toFixed(3)}</td><td>${r.seB0.toFixed(3)}</td><td>${r.tB0.toFixed(2)}</td><td style="color:${r.pB0<0.05?'#6f6':'#f66'}">${r.pB0.toFixed(4)}</td><td>[${r.ciB0.toFixed(2)}, ${r.ciB0u.toFixed(2)}]</td></tr><tr><td>β₁ (pendiente)</td><td>${r.b1.toFixed(3)}</td><td>${r.seB1.toFixed(3)}</td><td>${r.tB1.toFixed(2)}</td><td style="color:${r.pB1<0.05?'#6f6':'#f66'}">${r.pB1.toFixed(4)}</td><td>[${r.ciB1.toFixed(2)}, ${r.ciB1u.toFixed(2)}]</td></tr>`;
+      rSquared.textContent=r.r2.toFixed(3);
+      fStat.textContent=r.fVal.toFixed(2);
+      fPval.textContent=r.pF.toFixed(4);
+      prediction.textContent=`${r.yHat.toFixed(2)} [${r.ciPredL.toFixed(2)}, ${r.ciPredU.toFixed(2)}]`;
+      residNorm.textContent=r.shapiroP>0.05?'Normalidad: OK ✓':'Normalidad: dudosa ⚠';
+      residNorm.style.borderColor=r.shapiroP>0.05?'#6f6':'#f66';
+      residNorm.style.background=r.shapiroP>0.05?'#1a3a1a':'#3a1a1a';
+      residHomo.textContent=r.bpP>0.05?'Homocedasticidad: OK ✓':'Heterocedasticidad ⚠';
+      residHomo.style.borderColor=r.bpP>0.05?'#6f6':'#f66';
+      residHomo.style.background=r.bpP>0.05?'#1a3a1a':'#3a1a1a';
+      drawChart(r);
+      let msg=`β₁=${r.b1.toFixed(3)} (p=${r.pB1.toFixed(4)})`;
+      msg+=`, R²=${r.r2.toFixed(3)}, F=${r.fVal.toFixed(2)}`;
+      feed.innerHTML=`<i class="fas fa-comment-dots"></i> Regresión ajustada. ${msg}.`;
+      if(!completed&&r.pB1<0.05){completed=true;save();ins.classList.remove('hidden');feed.innerHTML+=` <i class="fas fa-star" style="color:gold;"></i> ¡Has ganado la insignia!`;}
+    }
+    newBtn.addEventListener('click',()=>{
+      currentData=generateData(parseInt(nPts.value),parseFloat(slope.value),parseFloat(noise.value));
+      run();
+    });
+    runBtn.addEventListener('click',run);
+  </script>
+</body>
+</html>

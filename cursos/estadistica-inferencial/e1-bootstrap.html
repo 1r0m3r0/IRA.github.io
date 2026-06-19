@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Estadística Inferencial | Bootstrap y Remuestreo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%);background-size:200% 200%;animation:gradientShift 20s ease infinite;font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
+    @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+    .container{max-width:1300px;width:100%;background:rgba(15,25,45,0.65);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(255,102,192,0.25);box-shadow:0 25px 45px rgba(0,0,0,0.5);overflow:hidden}
+    .hero-header{background:linear-gradient(95deg,#0b1120 0%,#111a2e 100%);padding:2rem 2rem 1.5rem;text-align:center;border-bottom:2px solid #ff66c0}
+    .hero-header h1{font-size:2.6rem;font-weight:800;background:linear-gradient(135deg,#FFF,#ff99dd,#ff66c0);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .hero-header p{font-size:1.1rem;color:#ffb3e6;margin-top:0.5rem;font-weight:500}
+    .badge-area{display:flex;justify-content:center;gap:1rem;margin-top:1.2rem;flex-wrap:wrap}
+    .chip{background:rgba(255,102,192,0.15);border:1px solid #ff66c0;padding:0.4rem 1rem;border-radius:40px;font-size:0.8rem;font-weight:600}
+    .analogy-card{background:#1e2a3acc;margin:1.5rem 2rem;padding:1.2rem 1.8rem;border-radius:2rem;border-left:8px solid #ff66c0;font-size:1rem;line-height:1.6}
+    .main-area{padding:0 2rem 1rem;display:flex;flex-direction:column;gap:1.5rem}
+    .data-panel{background:#0f1a2be0;border-radius:2rem;padding:1.5rem;border:1px solid rgba(255,102,192,0.2)}
+    .data-panel h3{font-size:1.2rem;margin-bottom:0.8rem;color:#ff99dd}
+    .data-values{display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1rem}
+    .data-value{background:#1a2a4a;padding:0.5rem 0.8rem;border-radius:0.8rem;font-weight:700;font-size:0.95rem;font-family:monospace;border:1px solid rgba(255,102,192,0.3)}
+    .controls{display:flex;flex-wrap:wrap;gap:1rem;align-items:center;justify-content:center}
+    .btn-action{background:linear-gradient(95deg,#ff66c0,#ff3388);border:none;padding:0.8rem 1.8rem;font-weight:700;border-radius:3rem;cursor:pointer;font-size:1rem;transition:0.2s;color:#1e1a0c;font-family:'Inter',sans-serif}
+    .btn-action:hover{transform:translateY(-2px);box-shadow:0 0 15px rgba(255,102,192,0.5)}
+    .btn-action:disabled{opacity:0.4;cursor:not-allowed;transform:none;box-shadow:none}
+    .btn-secondary{background:#2c3e66;color:#eef5ff;border:none;padding:0.6rem 1.4rem;font-weight:600;border-radius:3rem;cursor:pointer;font-size:0.9rem;transition:0.2s;font-family:'Inter',sans-serif}
+    .btn-secondary:hover{transform:translateY(-2px);box-shadow:0 0 10px rgba(255,102,192,0.3)}
+    .results-grid{display:flex;flex-wrap:wrap;gap:1.5rem}
+    .result-card{flex:1;min-width:220px;background:#0f1a2be0;border-radius:1.5rem;padding:1.2rem;border:1px solid rgba(255,102,192,0.15);text-align:center}
+    .result-card .stat-value{font-size:1.8rem;font-weight:800;color:#ff99dd;font-family:monospace}
+    .result-card .stat-label{font-size:0.8rem;color:#b9c8e6;margin-top:0.3rem}
+    .histogram{display:flex;align-items:flex-end;gap:2px;height:120px;padding:0.5rem 0;margin-top:0.5rem}
+    .hist-bar{flex:1;background:linear-gradient(to top,#ff66c0,#ff99dd);border-radius:2px 2px 0 0;min-width:3px;transition:height 0.3s;position:relative}
+    .comparison-table{width:100%;border-collapse:collapse;margin-top:1rem}
+    .comparison-table td,.comparison-table th{padding:0.6rem;text-align:center;border-bottom:1px solid rgba(255,102,192,0.15)}
+    .comparison-table th{color:#ff99dd;font-size:0.85rem}
+    .comparison-table td{font-family:monospace;font-size:0.95rem}
+    .feedback{background:#00000099;margin:0 2rem 1.5rem;padding:1rem;border-radius:1.5rem;text-align:center;font-weight:500;border-left:4px solid #ff66c0}
+    .insignia{text-align:center;background:#0c1b2f;border-radius:2rem;margin:0 2rem 1.5rem;padding:1rem;border:1px dashed gold}
+    .insignia i{font-size:2.5rem;color:gold}
+    .hidden{display:none}
+    .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.5rem 2rem}
+    .nav-link{background:#2c3e66;padding:0.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:0.5rem;transition:0.2s}
+    .nav-link:hover{transform:translateY(-2px);box-shadow:0 0 10px rgba(255,102,192,0.4)}
+    .nav-link.next{background:linear-gradient(95deg,#ff66c0,#ff3388);color:#1e1a0c}
+    .nav-link.menu{background:#1a2a4a;border:1px solid #ff66c0}
+    footer{text-align:center;padding:1.2rem;font-size:0.8rem;border-top:1px solid #2c3e66}
+    @media(max-width:800px){.hero-header h1{font-size:1.9rem}}
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+  <div class="container">
+    <div class="hero-header">
+      <h1>🔁 Bootstrap y Remuestreo 🔁</h1>
+      <p>Cuando no tienes más datos, ¡reutiliza los que tienes!</p>
+      <div class="badge-area">
+        <span class="chip"><i class="fas fa-dice"></i> Remuestreo</span>
+        <span class="chip"><i class="fas fa-chart-bar"></i> IC Bootstrap</span>
+        <span class="chip"><i class="fas fa-crosshairs"></i> Jackknife</span>
+      </div>
+    </div>
+    <div class="analogy-card">
+      <strong>🧬 Piénsalo así:</strong> El bootstrap es como un clonador estadístico: haces muchas copias de tus datos (con reemplazo) para ver qué tan estables son tus estimaciones. Si tus 10 amigos te dan una opinión, puedes "replicarlos" 1000 veces para simular qué pasaría si tuvieras 1000 amigos.
+    </div>
+    <div class="main-area">
+      <div class="data-panel">
+        <h3><i class="fas fa-table"></i> Datos originales (n=12)</h3>
+        <div class="data-values" id="originalData"></div>
+        <div class="controls">
+          <button class="btn-action" id="bootstrapBtn"><i class="fas fa-dice"></i> Generar muestra bootstrap</button>
+          <button class="btn-action" id="autoBtn"><i class="fas fa-fast-forward"></i> Generar 500 muestras</button>
+          <button class="btn-secondary" id="resetBtn"><i class="fas fa-redo"></i> Reiniciar</button>
+          <label style="color:#b9c8e6;font-size:0.85rem;display:flex;align-items:center;gap:0.4rem">
+            <i class="fas fa-cog"></i> Estadístico:
+            <select id="statSelect" style="background:#1a2a4a;color:#eef5ff;border:1px solid #ff66c0;border-radius:0.5rem;padding:0.3rem;font-family:'Inter',sans-serif">
+              <option value="mean">Media</option>
+              <option value="median">Mediana</option>
+            </select>
+          </label>
+        </div>
+        <div id="sampleDisplay" style="margin-top:0.8rem;font-size:0.9rem;color:#b9c8e6;min-height:1.5rem"></div>
+      </div>
+      <div class="results-grid">
+        <div class="result-card">
+          <div class="stat-value" id="bootMean">—</div>
+          <div class="stat-label">Media bootstrap (500 muestras)</div>
+        </div>
+        <div class="result-card">
+          <div class="stat-value" id="bootSE">—</div>
+          <div class="stat-label">Error estándar bootstrap</div>
+        </div>
+        <div class="result-card">
+          <div class="stat-value" id="bootCI">—</div>
+          <div class="stat-label">IC 95% Bootstrap</div>
+        </div>
+        <div class="result-card">
+          <div class="stat-value" id="tradCI">—</div>
+          <div class="stat-label">IC 95% Tradicional (t-student)</div>
+        </div>
+      </div>
+      <div class="data-panel">
+        <h3><i class="fas fa-chart-bar"></i> Distribución bootstrap <span style="font-weight:400;font-size:0.85rem;color:#b9c8e6">(medias de 500 remuestras)</span></h3>
+        <div class="histogram" id="histogram"></div>
+        <div style="display:flex;justify-content:space-between;font-size:0.75rem;color:#8899bb;padding:0 0.3rem">
+          <span id="histMinLabel"></span>
+          <span id="histMaxLabel"></span>
+        </div>
+      </div>
+      <div class="data-panel">
+        <h3><i class="fas fa-crosshairs"></i> Jackknife (dejar-uno-fuera)</h3>
+        <table class="comparison-table">
+          <tr><th>Estadístico</th><th>Media original</th><th>Media jackknife</th><th>Sesgo estimado</th></tr>
+          <tr><td>Media</td><td id="jkOrigMean">—</td><td id="jkMean">—</td><td id="jkBias">—</td></tr>
+        </table>
+      </div>
+    </div>
+    <div id="feedbackMsg" class="feedback">
+      💡 Presiona "Generar muestra bootstrap" para comenzar. Luego lanza 500 muestras para ver el IC formarse.
+    </div>
+    <div id="insigniaArea" class="insignia hidden">
+      <i class="fas fa-medal"></i>
+      <h3>🏅 Remuestreador Experto 🏅</h3>
+      <p>¡Has dominado el bootstrap! Sabes que con remuestreo puedes estimar cualquier estadístico sin asumir distribución.</p>
+    </div>
+    <div class="nav-links">
+      <a href="e8-causalidad.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+      <a href="e2-no-parametricas.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <footer><i class="fas fa-crown"></i> Estadística Inferencial Interactiva · Modo Experto</footer>
+  </div>
+  <script>
+    (function(){
+      const STORAGE_KEY='est_inf_e1';
+      const rawData=[23,27,19,31,25,22,29,24,26,28,21,30];
+      let bootstrapMeans=[];
+      let completed=false;
+
+      const origDataEl=document.getElementById('originalData');
+      rawData.forEach(v=>{
+        const el=document.createElement('span');
+        el.className='data-value';
+        el.textContent=v;
+        origDataEl.appendChild(el);
+      });
+
+      const statSelect=document.getElementById('statSelect');
+      const bootstrapBtn=document.getElementById('bootstrapBtn');
+      const autoBtn=document.getElementById('autoBtn');
+      const resetBtn=document.getElementById('resetBtn');
+      const sampleDisplay=document.getElementById('sampleDisplay');
+      const bootMeanEl=document.getElementById('bootMean');
+      const bootSEEl=document.getElementById('bootSE');
+      const bootCIEl=document.getElementById('bootCI');
+      const tradCIEl=document.getElementById('tradCI');
+      const histogramEl=document.getElementById('histogram');
+      const histMinLabel=document.getElementById('histMinLabel');
+      const histMaxLabel=document.getElementById('histMaxLabel');
+      const feedbackEl=document.getElementById('feedbackMsg');
+      const insigniaEl=document.getElementById('insigniaArea');
+      const jkOrigMeanEl=document.getElementById('jkOrigMean');
+      const jkMeanEl=document.getElementById('jkMean');
+      const jkBiasEl=document.getElementById('jkBias');
+
+      function calcStat(data){
+        const fn=statSelect.value;
+        const sorted=[...data].sort((a,b)=>a-b);
+        if(fn==='median'){
+          const mid=Math.floor(sorted.length/2);
+          return sorted.length%2===0?(sorted[mid-1]+sorted[mid])/2:sorted[mid];
+        }
+        return data.reduce((a,b)=>a+b,0)/data.length;
+      }
+
+      function bootstrapSample(){return rawData.map(()=>rawData[Math.floor(Math.random()*rawData.length)]);}
+
+      function jackknife(data){
+        const n=data.length;
+        const jkMeans=[];
+        for(let i=0;i<n;i++){
+          const subset=data.filter((_,idx)=>idx!==i);
+          jkMeans.push(calcStat(subset));
+        }
+        const jkMean=jkMeans.reduce((a,b)=>a+b,0)/n;
+        const origMean=calcStat(data);
+        const bias=(n-1)*(jkMean-origMean);
+        return{jkMean,bias,origMean};
+      }
+
+      function updateHistogram(){
+        if(bootstrapMeans.length<2){
+          histogramEl.innerHTML='<div style="color:#8899bb;padding:1rem;text-align:center">Genera al menos 2 muestras bootstrap para ver la distribución</div>';
+          histMinLabel.textContent='';
+          histMaxLabel.textContent='';
+          return;
+        }
+        const min=Math.min(...bootstrapMeans);
+        const max=Math.max(...bootstrapMeans);
+        const range=max-min||1;
+        const numBars=30;
+        const binWidth=range/numBars;
+        const bins=new Array(numBars).fill(0);
+        bootstrapMeans.forEach(m=>{
+          const idx=Math.min(Math.floor((m-min)/binWidth),numBars-1);
+          bins[idx]++;
+        });
+        const maxCount=Math.max(...bins);
+        histogramEl.innerHTML='';
+        bins.forEach((count,i)=>{
+          const bar=document.createElement('div');
+          bar.className='hist-bar';
+          const pct=maxCount>0?(count/maxCount)*100:0;
+          bar.style.height=Math.max(3,pct)+'%';
+          bar.title=`${(min+i*binWidth).toFixed(2)}-${(min+(i+1)*binWidth).toFixed(2)}: ${count}`;
+          histogramEl.appendChild(bar);
+        });
+        histMinLabel.textContent=min.toFixed(2);
+        histMaxLabel.textContent=max.toFixed(2);
+      }
+
+      function updateStats(){
+        if(bootstrapMeans.length<2){
+          bootMeanEl.textContent='—';
+          bootSEEl.textContent='—';
+          bootCIEl.textContent='—';
+          tradCIEl.textContent='—';
+          return;
+        }
+        const n=bootstrapMeans.length;
+        const bootMean=bootstrapMeans.reduce((a,b)=>a+b,0)/n;
+        const bootVar=bootstrapMeans.reduce((s,m)=>s+(m-bootMean)**2,0)/(n-1);
+        const bootSE=Math.sqrt(bootVar);
+        const sortedBMs=[...bootstrapMeans].sort((a,b)=>a-b);
+        const lowerIdx=Math.round(n*0.025);
+        const upperIdx=Math.round(n*0.975)-1;
+        const bootCI_L=sortedBMs[Math.max(0,lowerIdx)];
+        const bootCI_U=sortedBMs[Math.min(n-1,upperIdx)];
+        bootMeanEl.textContent=bootMean.toFixed(3);
+        bootSEEl.textContent=bootSE.toFixed(3);
+        bootCIEl.textContent=`[${bootCI_L.toFixed(3)}, ${bootCI_U.toFixed(3)}]`;
+
+        const origMean=calcStat(rawData);
+        const nOrig=rawData.length;
+        const origVar=rawData.reduce((s,m)=>s+(m-origMean)**2,0)/(nOrig-1);
+        const seTrad=Math.sqrt(origVar/nOrig);
+        const tVal=2.201;
+        tradCIEl.textContent=`[${(origMean-tVal*seTrad).toFixed(3)}, ${(origMean+tVal*seTrad).toFixed(3)}]`;
+
+        const jk=jackknife(rawData);
+        jkOrigMeanEl.textContent=jk.origMean.toFixed(3);
+        jkMeanEl.textContent=jk.jkMean.toFixed(3);
+        jkBiasEl.textContent=jk.bias.toFixed(4);
+
+        if(bootstrapMeans.length>=500&&!completed){
+          completed=true;
+          localStorage.setItem(STORAGE_KEY,'completed');
+          insigniaEl.classList.remove('hidden');
+          feedbackEl.innerHTML='🎉 ¡Excelente, investigador! Has generado 500 muestras bootstrap y construido tu IC. Comprueba cómo se compara con el IC tradicional.';
+        }
+      }
+
+      function addBootstrapSample(){
+        const sample=bootstrapSample();
+        const stat=calcStat(sample);
+        bootstrapMeans.push(stat);
+        sampleDisplay.textContent=`Muestra #${bootstrapMeans.length}: [${sample.join(', ')}] → ${statSelect.value}=${stat.toFixed(3)}`;
+        updateHistogram();
+        updateStats();
+      }
+
+      function runAuto(){
+        const start=bootstrapMeans.length;
+        const target=Math.min(start+500,500);
+        const step=()=>{
+          if(bootstrapMeans.length<target){
+            addBootstrapSample();
+            setTimeout(step,5);
+          }
+        };
+        step();
+      }
+
+      function resetAll(){
+        bootstrapMeans=[];
+        completed=false;
+        localStorage.removeItem(STORAGE_KEY);
+        sampleDisplay.textContent='';
+        bootMeanEl.textContent='—';
+        bootSEEl.textContent='—';
+        bootCIEl.textContent='—';
+        tradCIEl.textContent='—';
+        jkOrigMeanEl.textContent='—';
+        jkMeanEl.textContent='—';
+        jkBiasEl.textContent='—';
+        histogramEl.innerHTML='<div style="color:#8899bb;padding:1rem;text-align:center">Genera al menos 2 muestras bootstrap para ver la distribución</div>';
+        histMinLabel.textContent='';
+        histMaxLabel.textContent='';
+        const jk=jackknife(rawData);
+        jkOrigMeanEl.textContent=jk.origMean.toFixed(3);
+        jkMeanEl.textContent=jk.jkMean.toFixed(3);
+        jkBiasEl.textContent=jk.bias.toFixed(4);
+        insigniaEl.classList.add('hidden');
+        feedbackEl.innerHTML='💡 Presiona "Generar muestra bootstrap" para comenzar. Luego lanza 500 muestras para ver el IC formarse.';
+      }
+
+      statSelect.addEventListener('change',resetAll);
+      bootstrapBtn.addEventListener('click',addBootstrapSample);
+      autoBtn.addEventListener('click',runAuto);
+      resetBtn.addEventListener('click',resetAll);
+
+      if(localStorage.getItem(STORAGE_KEY)==='completed'){
+        completed=true;
+        for(let i=0;i<500;i++)addBootstrapSample();
+        insigniaEl.classList.remove('hidden');
+        feedbackEl.innerHTML='🎉 ¡Bienvenido de vuelta, remuestreador! Ya completaste este módulo.';
+      }else{
+        const jk=jackknife(rawData);
+        jkOrigMeanEl.textContent=jk.origMean.toFixed(3);
+        jkMeanEl.textContent=jk.jkMean.toFixed(3);
+        jkBiasEl.textContent=jk.bias.toFixed(4);
+      }
+    })();
+  </script>
+</body>
+</html>

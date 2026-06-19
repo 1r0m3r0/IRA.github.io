@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>MQL5 | Tu Primer EA</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../assets/css/theme.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%);background-size:200% 200%;animation:gradientShift 20s ease infinite;font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
+@keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.modulo-container{max-width:1300px;width:100%;background:rgba(15,25,45,0.65);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(0,255,200,0.25);box-shadow:0 25px 45px rgba(0,0,0,0.5);overflow:hidden}
+.hero-header{background:linear-gradient(95deg,#0b1120 0%,#111a2e 100%);padding:2rem 2rem 1.5rem 2rem;text-align:center;border-bottom:2px solid #00ffc8}
+.hero-header h1{font-size:2.6rem;font-weight:800;background:linear-gradient(135deg,#FFF,#66ffdd,#00ffc8);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-header p{color:#bcc9f0;margin-top:.5rem;font-size:1.1rem}
+.badge-area{display:flex;justify-content:center;gap:1rem;margin-top:1.2rem;flex-wrap:wrap}
+.chip{background:rgba(0,255,200,0.15);border:1px solid #00ffc8;padding:0.4rem 1rem;border-radius:40px;font-size:0.8rem;font-weight:600;color:#ddd}
+.analogy-card{background:#1e2a3acc;margin:1.5rem 2rem;padding:1.2rem 1.8rem;border-radius:2rem;border-left:8px solid #00ffc8;font-size:1rem;line-height:1.6}
+.progress-section{margin:1rem 2rem 0}
+.progress-bar-outer{background:#1a2a4a;border-radius:20px;height:20px;overflow:hidden}
+.progress-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,#00ffc8,#fff);border-radius:20px;transition:width 0.5s ease}
+.progress-text{text-align:center;font-size:0.85rem;color:#8899cc;margin-bottom:.5rem}
+.main-area{padding:1rem 2rem}
+.code-builder{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem}
+.code-area{background:#0a1020;border-radius:2rem;padding:1.5rem;border:1px solid #2a3a5a;overflow:hidden}
+.pool-area{background:#0a1020;border-radius:2rem;padding:1.5rem;border:1px solid #2a3a5a}
+.code-skeleton{background:#0d1525;border-radius:1rem;padding:1rem;font-family:'Courier New',monospace;font-size:.78rem;line-height:1.7;overflow-x:auto;border:1px solid #2a3a5a;max-height:500px;overflow-y:auto}
+.code-line{display:flex;align-items:center;gap:.5rem;padding:1px 0}
+.line-num{color:#444;width:2rem;text-align:right;user-select:none;font-size:.7rem}
+.code-slot{display:inline-block;background:#1a2a4a;border:2px dashed #00ffc8;border-radius:.4rem;padding:0 .4rem;min-width:3rem;min-height:1.5rem;cursor:pointer;transition:.2s;color:#00ffc8;font-family:'Courier New',monospace;font-size:.78rem}
+.code-slot.filled{border-style:solid;background:#0a3a2a;border-color:#00ffc8;color:#00ffc8;cursor:default}
+.code-slot.drag-over{border-color:#fff;background:#2a4a3a}
+.code-block{background:#1e2e4e;border:1px solid #3a5a7a;padding:.6rem .8rem;border-radius:.8rem;cursor:grab;font-family:'Courier New',monospace;font-size:.78rem;color:#eef5ff;margin-bottom:.5rem;transition:.2s}
+.code-block:hover{background:#2e3e5e;border-color:#00ffc8;transform:translateX(4px)}
+.code-block:active{cursor:grabbing}
+.code-block.placed{opacity:.4;pointer-events:none;text-decoration:line-through}
+.code-block .keyword{color:#ff79c6}
+.code-block .type{color:#8be9fd}
+.code-block .func{color:#50fa7b}
+.code-block .str{color:#f1fa8c}
+.code-block .num{color:#bd93f9}
+.slot-label{color:#00ffc8;font-size:.7rem;margin-right:.3rem}
+.btn-group{display:flex;gap:.8rem;margin-top:1rem;flex-wrap:wrap}
+.btn-action{background:linear-gradient(95deg,#00ffc8,#00cc99);border:none;padding:0.8rem 1.8rem;font-weight:bold;border-radius:3rem;cursor:pointer;font-size:1rem;transition:0.2s;color:#0a1a1a;font-family:'Inter',sans-serif}
+.btn-action:hover{transform:translateY(-2px);box-shadow:0 0 15px rgba(0,255,200,0.5)}
+.btn-action:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-secondary{background:#2c3e66;border:none;padding:.6rem 1.2rem;border-radius:2rem;cursor:pointer;color:#eef5ff;font-family:'Inter',sans-serif;font-size:.85rem;transition:.2s}
+.btn-secondary:hover{background:#3a4e76}
+.btn-secondary:disabled{opacity:.5;cursor:not-allowed}
+.simulation-area{background:#0a1020;border-radius:2rem;padding:1.5rem;border:1px solid #2a3a5a;margin-bottom:1.5rem}
+.chart-visual{background:#0d1525;border-radius:1rem;padding:1rem;margin-bottom:1rem;border:1px solid #2a3a5a}
+.chart-visual canvas{width:100%;height:150px;border-radius:.5rem}
+.trade-log{max-height:200px;overflow-y:auto;background:#0d1525;border-radius:1rem;padding:.8rem;font-size:.78rem;border:1px solid #3a4a6a;margin-top:1rem}
+.trade-log .entry{padding:.25rem 0;border-bottom:1px solid #1a2a4a;display:flex;gap:.5rem}
+.trade-log .entry:last-child{border-bottom:none}
+.trade-log .buy{color:#00c853}
+.trade-log .sell{color:#ff1744}
+.trade-log .info{color:#8899cc}
+.compile-output{background:#0d1525;border-radius:.8rem;padding:.8rem;margin-top:1rem;font-family:'Courier New',monospace;font-size:.75rem;border:1px solid #3a4a6a;max-height:120px;overflow-y:auto}
+.compile-output .success{color:#00c853}
+.compile-output .error{color:#ff1744}
+.compile-output .warn{color:#ffd700}
+.feedback{background:#00000099;margin:0 2rem 1.5rem 2rem;padding:1rem;border-radius:1.5rem;text-align:center;font-weight:500;border-left:4px solid #00ffc8;min-height:3rem}
+.insignia{text-align:center;background:#0c1b2f;border-radius:2rem;margin:0 2rem 1.5rem;padding:1rem;border:2px dashed gold}
+.insignia i{font-size:2.5rem;color:gold}
+.insignia h3{color:gold;margin:.5rem 0}
+.hidden{display:none!important}
+.nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.5rem 2rem}
+.nav-link{background:#2c3e66;padding:0.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:0.5rem;transition:0.2s}
+.nav-link:hover{transform:translateY(-2px);box-shadow:0 0 10px rgba(0,255,200,0.4)}
+.nav-link.next{background:linear-gradient(95deg,#f0a500,#ff6a00);color:#1e1a0c}
+.nav-link.menu{background:#1a2a4a;border:1px solid #3399ff}
+.nav-link.prev{background:#1a2a4a;border:1px solid #666}
+footer{text-align:center;padding:1.2rem;font-size:0.8rem;border-top:1px solid #2c3e66;color:#8899cc}
+@media(max-width:900px){
+  .code-builder{grid-template-columns:1fr}
+  .hero-header h1{font-size:1.9rem}
+  .analogy-card{margin:1rem}
+  .feedback{margin:0 1rem 1rem}
+  .main-area{padding:1rem}
+}
+</style>
+</head>
+<body>
+<div class="modulo-container">
+  <nav class="brand-return-nav">
+    <a href="../../index.html">&larr; Portfolio</a>
+    <a href="../../cursos/index.html">Cursos</a>
+  </nav>
+
+  <div class="hero-header">
+    <h1>🤖 Tu Primer EA: Moving Average Crossover</h1>
+    <p>"De cero a tu primer robot de trading en un solo módulo"</p>
+    <div class="badge-area">
+      <span class="chip"><i class="fas fa-code"></i> Código en Vivo</span>
+      <span class="chip"><i class="fas fa-arrows-up-down"></i> Drag & Drop</span>
+      <span class="chip"><i class="fas fa-play"></i> Simulación</span>
+    </div>
+  </div>
+
+  <div class="progress-section">
+    <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+    <div class="progress-text" id="progressText">Módulo 11 de 26</div>
+  </div>
+
+  <div class="analogy-card">
+    <strong>🐕 Piénsalo así:</strong> Un Expert Advisor es como un perro guardián entrenado: tú le enseñas las reglas (si pasa A, haz B) y él vigila el mercado 24/7 sin quejarse, sin dormirse, sin emociones. Solo ejecuta lo que programaste.
+  </div>
+
+  <div class="main-area">
+    <div class="code-builder">
+      <div class="code-area">
+        <h3 style="margin-bottom:.8rem;color:#bcc9f0"><i class="fas fa-file-code"></i> Constructor del EA</h3>
+        <p style="color:#8899cc;font-size:.8rem;margin-bottom:.8rem">Arrastra los bloques de código a los espacios marcados con <span style="color:#00ffc8">???</span></p>
+        <div class="code-skeleton" id="codeSkeleton">
+          <div class="code-line"><span class="line-num">1</span><span style="color:#666">//+------------------------------------------------------------------+</span></div>
+          <div class="code-line"><span class="line-num">2</span><span style="color:#666">//| MA_Crossover_EA.mq5</span></div>
+          <div class="code-line"><span class="line-num">3</span><span style="color:#666">//| Moving Average Crossover Robot</span></div>
+          <div class="code-line"><span class="line-num">4</span><span style="color:#666">//+------------------------------------------------------------------+</span></div>
+          <div class="code-line"><span class="line-num">5</span><span class="slot-label">S1</span><span class="code-slot" id="slot1" data-slot="1">???</span></div>
+          <div class="code-line"><span class="line-num">6</span><span style="color:#666">//+------------------------------------------------------------------+</span></div>
+          <div class="code-line"><span class="line-num">7</span><span style="color:#f8f8f2">int </span><span style="color:#50fa7b">maFastHandle</span>, maSlowHandle;</div>
+          <div class="code-line"><span class="line-num">8</span><span class="slot-label">S2</span><span class="code-slot" id="slot2" data-slot="2">???</span></div>
+          <div class="code-line"><span class="line-num">9</span><span style="color:#f8f8f2">  maFastHandle = </span><span style="color:#50fa7b">iMA</span><span style="color:#f8f8f2">(_Symbol,_Period,maFastPeriod,0,MODE_SMA,PRICE_CLOSE);</span></div>
+          <div class="code-line"><span class="line-num">10</span><span style="color:#f8f8f2">  maSlowHandle = </span><span style="color:#50fa7b">iMA</span><span style="color:#f8f8f2">(_Symbol,_Period,maSlowPeriod,0,MODE_SMA,PRICE_CLOSE);</span></div>
+          <div class="code-line"><span class="line-num">11</span><span style="color:#f8f8f2">  if(maFastHandle==INVALID_HANDLE || maSlowHandle==INVALID_HANDLE) return(INIT_FAILED);</span></div>
+          <div class="code-line"><span class="line-num">12</span><span style="color:#f8f8f2">  return(INIT_SUCCEEDED);</span></div>
+          <div class="code-line"><span class="line-num">13</span><span style="color:#f8f8f2">}</span></div>
+          <div class="code-line"><span class="line-num">14</span><span style="color:#f8f8f2">void </span><span style="color:#50fa7b">OnDeinit</span><span style="color:#f8f8f2">(const int reason) { }</span></div>
+          <div class="code-line"><span class="line-num">15</span><span style="color:#f8f8f2">void </span><span style="color:#50fa7b">OnTick</span><span style="color:#f8f8f2">()</span></div>
+          <div class="code-line"><span class="line-num">16</span><span style="color:#f8f8f2">{</span></div>
+          <div class="code-line"><span class="line-num">17</span><span class="slot-label">S3</span><span class="code-slot" id="slot3" data-slot="3">???</span></div>
+          <div class="code-line"><span class="line-num">18</span><span class="slot-label">S4</span><span class="code-slot" id="slot4" data-slot="4">???</span></div>
+          <div class="code-line"><span class="line-num">19</span><span class="slot-label">S5</span><span class="code-slot" id="slot5" data-slot="5">???</span></div>
+          <div class="code-line"><span class="line-num">20</span><span class="slot-label">S6</span><span class="code-slot" id="slot6" data-slot="6">???</span></div>
+          <div class="code-line"><span class="line-num">21</span><span style="color:#f8f8f2">}</span></div>
+        </div>
+      </div>
+
+      <div class="pool-area">
+        <h3 style="margin-bottom:.8rem;color:#bcc9f0"><i class="fas fa-cubes"></i> Bloques de Código</h3>
+        <p style="color:#8899cc;font-size:.8rem;margin-bottom:.8rem">Arrastra cada bloque al slot correcto</p>
+        <div id="blockPool">
+          <div class="code-block" draggable="true" data-block="1"><span class="keyword">input</span> <span class="type">int</span> maFastPeriod = <span class="num">10</span>; <span style="color:#666">// Rápida</span><br><span class="keyword">input</span> <span class="type">int</span> maSlowPeriod = <span class="num">30</span>; <span style="color:#666">// Lenta</span><br><span class="keyword">input</span> <span class="type">double</span> lotSize = <span class="num">0.1</span>;</div>
+          <div class="code-block" draggable="true" data-block="2"><span class="type">int</span> <span class="func">OnInit</span>()<span style="color:#f8f8f2"> {</span></div>
+          <div class="code-block" draggable="true" data-block="3"><span class="type">double</span> fastMA[], slowMA[];<br><span class="func">CopyBuffer</span>(maFastHandle,<span class="num">0</span>,<span class="num">0</span>,<span class="num">3</span>,fastMA);<br><span class="func">CopyBuffer</span>(maSlowHandle,<span class="num">0</span>,<span class="num">0</span>,<span class="num">3</span>,slowMA);<br><span class="type">double</span> ask = <span class="func">SymbolInfoDouble</span>(_Symbol,SYMBOL_ASK);<br><span class="type">double</span> bid = <span class="func">SymbolInfoDouble</span>(_Symbol,SYMBOL_BID);</div>
+          <div class="code-block" draggable="true" data-block="4"><span class="keyword">if</span>(fastMA[<span class="num">1</span>] > slowMA[<span class="num">1</span>] && fastMA[<span class="num">2</span>] <= slowMA[<span class="num">2</span>] && !<span class="func">PositionSelect</span>(_Symbol))</div>
+          <div class="code-block" draggable="true" data-block="5"><span class="keyword">else if</span>(fastMA[<span class="num">1</span>] < slowMA[<span class="num">1</span>] && fastMA[<span class="num">2</span>] >= slowMA[<span class="num">2</span>] && <span class="func">PositionSelect</span>(_Symbol))</div>
+          <div class="code-block" draggable="true" data-block="6"><span style="color:#f8f8f2">{</span><br>  <span class="func">PositionClose</span>(_Symbol); <span style="color:#666">// Salir</span><br>  <span class="func">OrderSend</span>(_Symbol,OP_BUY,lotSize,ask,<span class="num">0</span>,<span class="num">0</span>,<span class="num">0</span>); <span style="color:#666">// Entrar</span><br><span style="color:#f8f8f2">}</span></div>
+        </div>
+        <div style="margin-top:1rem">
+          <button class="btn-action" id="compileBtn" disabled><i class="fas fa-check-circle"></i> Compilar EA</button>
+          <button class="btn-secondary" id="resetBtn"><i class="fas fa-undo"></i> Reiniciar</button>
+        </div>
+        <div class="compile-output" id="compileOutput" style="margin-top:.8rem">
+          <div style="color:#666">⏳ Esperando que completes los slots...</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="simulation-area" id="simArea" style="display:none">
+      <h3 style="margin-bottom:.8rem;color:#bcc9f0"><i class="fas fa-play"></i> Simulación en Vivo</h3>
+      <div class="chart-visual">
+        <canvas id="simChart" width="900" height="150"></canvas>
+      </div>
+      <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:.5rem">
+        <span style="font-size:.85rem">Fast MA: <strong id="simFast" style="color:#ffcc00">—</strong></span>
+        <span style="font-size:.85rem">Slow MA: <strong id="simSlow" style="color:#ff66cc">—</strong></span>
+        <span style="font-size:.85rem">Señal: <strong id="simSignal" style="color:#00ffc8">—</strong></span>
+        <span style="font-size:.85rem">Trades: <strong id="simTrades" style="color:#ffd700">0</strong></span>
+      </div>
+      <div class="trade-log" id="simTradeLog">
+        <div class="entry info">🔄 Simulación lista. Presiona "Iniciar Simulación".</div>
+      </div>
+      <button class="btn-action" id="runSimBtn" style="margin-top:.8rem"><i class="fas fa-forward"></i> Iniciar Simulación (50 ticks)</button>
+    </div>
+  </div>
+
+  <div id="feedbackMsg" class="feedback">💡 Arrastra cada bloque de código al espacio correcto en el constructor, luego compila y ejecuta la simulación.</div>
+
+  <div id="insigniaArea" class="insignia hidden">
+    <i class="fas fa-medal"></i>
+    <h3>🏅 Creador de EAs 🏅</h3>
+    <p>¡Has construido tu primer Expert Advisor en MQL5! El crossover de medias móviles ya no tiene secretos para ti. 🚀</p>
+  </div>
+
+  <div class="nav-links">
+    <a href="10-api-trading.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+    <a href="12-backtesting.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+
+  <footer><i class="fas fa-crown"></i> MQL5 Trading Algorítmico · Domina el arte del trading automatizado</footer>
+</div>
+<script>
+const STORAGE_KEY = 'mql5_11';
+const SLOT_ANSWERS = {1:'1',2:'2',3:'3',4:'4',5:'5',6:'6'};
+let filledSlots = {};
+let slotContents = {};
+let compiled = false;
+let completed = false;
+let simRunning = false;
+
+function initProgress(){
+  const p = JSON.parse(localStorage.getItem('mql5_progress')) || [];
+  const pf = document.getElementById('progressFill');
+  const pt = document.getElementById('progressText');
+  if(pf) pf.style.width = Math.round((p.length/26)*100)+'%';
+  if(pt) pt.textContent = p.length+' de 26 módulos';
+  if(p.includes(STORAGE_KEY)){
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    completed = true;
+    compiled = true;
+    document.getElementById('simArea').style.display = 'block';
+  }
+}
+
+function saveProgress(){
+  let p = JSON.parse(localStorage.getItem('mql5_progress')) || [];
+  if(!p.includes(STORAGE_KEY)){p.push(STORAGE_KEY);localStorage.setItem('mql5_progress',JSON.stringify(p));}
+  const pf = document.getElementById('progressFill');
+  const pt = document.getElementById('progressText');
+  if(pf) pf.style.width = Math.round((p.length/26)*100)+'%';
+  if(pt) pt.textContent = p.length+' de 26 módulos';
+}
+
+const blocks = document.querySelectorAll('.code-block');
+blocks.forEach(block => {
+  block.addEventListener('dragstart', e => {
+    e.dataTransfer.setData('text/plain', block.dataset.block);
+    block.classList.add('dragging');
+  });
+  block.addEventListener('dragend', e => {
+    block.classList.remove('dragging');
+  });
+});
+
+const slots = document.querySelectorAll('.code-slot');
+slots.forEach(slot => {
+  slot.addEventListener('dragover', e => {
+    e.preventDefault();
+    if(!slot.classList.contains('filled')) slot.classList.add('drag-over');
+  });
+  slot.addEventListener('dragleave', e => {
+    slot.classList.remove('drag-over');
+  });
+  slot.addEventListener('drop', e => {
+    e.preventDefault();
+    slot.classList.remove('drag-over');
+    if(slot.classList.contains('filled')) return;
+    const blockId = e.dataTransfer.getData('text/plain');
+    const slotId = slot.dataset.slot;
+    if(blockId === slotId){
+      const block = document.querySelector(`.code-block[data-block="${blockId}"]`);
+      block.classList.add('placed');
+      slot.textContent = '✔️ Completado';
+      slot.classList.add('filled');
+      filledSlots[slotId] = true;
+      slotContents[slotId] = block.innerHTML;
+      checkAllFilled();
+    } else {
+      document.getElementById('feedbackMsg').innerHTML = '❌ Ese bloque no va aquí. Slot S'+slotId+' espera los parámetros input (S1), OnInit (S2), datos (S3), compra (S4), venta (S5), o ejecución (S6).';
+    }
+  });
+});
+
+function checkAllFilled(){
+  const all = Object.keys(filledSlots).length;
+  document.getElementById('feedbackMsg').innerHTML = all+' de 6 slots completados' + (all===6?' 🎉 ¡Todos listos! Ahora presiona Compilar.':'');
+  document.getElementById('compileBtn').disabled = all !== 6;
+}
+
+document.getElementById('resetBtn').addEventListener('click',()=>{
+  filledSlots = {};
+  slotContents = {};
+  compiled = false;
+  document.getElementById('simArea').style.display = 'none';
+  document.getElementById('compileOutput').innerHTML = '<div style="color:#666">⏳ Esperando que completes los slots...</div>';
+  document.querySelectorAll('.code-slot').forEach(s=>{
+    s.textContent = '???';
+    s.classList.remove('filled');
+  });
+  document.querySelectorAll('.code-block').forEach(b=>b.classList.remove('placed'));
+  document.getElementById('compileBtn').disabled = true;
+  document.getElementById('feedbackMsg').innerHTML = '💡 Slots reiniciados. Arrastra los bloques nuevamente.';
+});
+
+document.getElementById('compileBtn').addEventListener('click',()=>{
+  const output = document.getElementById('compileOutput');
+  let html = '';
+  const delay = (ms)=>new Promise(r=>setTimeout(r,ms));
+  const steps = [
+    {msg:'🔍 Verificando sintaxis...',cls:'info',time:500},
+    {msg:'📦 Resolviendo referencias a iMA(), CopyBuffer()...',cls:'info',time:600},
+    {msg:'⚡ Comprobando tipos de datos...',cls:'info',time:400},
+    {msg:'✅ Compilación exitosa — 0 errores, 0 warnings',cls:'success',time:200}
+  ];
+  let i=0;
+  function showStep(){
+    if(i>=steps.length){
+      compiled = true;
+      document.getElementById('simArea').style.display = 'block';
+      document.getElementById('feedbackMsg').innerHTML = '✅ ¡EA compilado con éxito! Ahora ejecuta la simulación.';
+      return;
+    }
+    const s = steps[i];
+    output.innerHTML += '<div class="'+s.cls+'">'+s.msg+'</div>';
+    i++;
+    setTimeout(showStep, s.time);
+  }
+  output.innerHTML = '';
+  setTimeout(showStep, 100);
+});
+
+document.getElementById('runSimBtn').addEventListener('click',()=>{
+  if(simRunning) return;
+  simRunning = true;
+  const btn = document.getElementById('runSimBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Simulando...';
+  const log = document.getElementById('simTradeLog');
+  log.innerHTML = '';
+  let price = 1.1000;
+  let fastMA = 1.0950;
+  let slowMA = 1.0900;
+  let tradeCount = 0;
+  let tick = 0;
+  const fastData = [], slowData = [], priceData = [];
+  const canvas = document.getElementById('simChart');
+  const ctx = canvas.getContext('2d');
+  let inPosition = false;
+
+  function drawSimChart(){
+    const w = canvas.width, h = canvas.height;
+    ctx.clearRect(0,0,w,h);
+    if(priceData.length<2) return;
+    const all = [...priceData,...fastData,...slowData];
+    const min = Math.min(...all), max = Math.max(...all);
+    const range = max-min||1;
+    const pad = 5, ch = h-pad*2;
+    ctx.lineWidth = 1.5;
+    // Price
+    ctx.strokeStyle = '#3399ff';
+    ctx.beginPath();
+    priceData.forEach((v,i)=>{const x=i/(priceData.length-1)*(w-pad*2)+pad;const y=pad+(max-v)/range*ch;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
+    ctx.stroke();
+    // Fast MA
+    if(fastData.length>1){
+      ctx.strokeStyle = '#ffcc00';
+      ctx.setLineDash([3,3]);
+      ctx.beginPath();
+      fastData.forEach((v,i)=>{const x=i/(fastData.length-1)*(w-pad*2)+pad;const y=pad+(max-v)/range*ch;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+    // Slow MA
+    if(slowData.length>1){
+      ctx.strokeStyle = '#ff66cc';
+      ctx.setLineDash([5,3]);
+      ctx.beginPath();
+      slowData.forEach((v,i)=>{const x=i/(slowData.length-1)*(w-pad*2)+pad;const y=pad+(max-v)/range*ch;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+  }
+
+  function doTick(){
+    if(tick>=50){
+      simRunning = false;
+      btn.disabled = false;
+      btn.textContent = 'Iniciar Simulación (50 ticks)';
+      document.getElementById('feedbackMsg').innerHTML = '✅ Simulación completada: '+tradeCount+' trades ejecutados. ¡EA funcionando!';
+      checkCompletion();
+      return;
+    }
+    tick++;
+    price += (Math.random()-0.48)*0.005;
+    if(price<1.07) price=1.07;
+    if(price>1.13) price=1.13;
+    fastMA = fastMA*0.85 + price*0.15;
+    slowMA = slowMA*0.93 + price*0.07;
+    priceData.push(price);
+    fastData.push(fastMA);
+    slowData.push(slowMA);
+    if(priceData.length>60){priceData.shift();fastData.shift();slowData.shift();}
+
+    document.getElementById('simFast').textContent = fastMA.toFixed(5);
+    document.getElementById('simSlow').textContent = slowMA.toFixed(5);
+
+    // Crossover logic
+    const crossBuy = fastData.length>=3 && fastData[fastData.length-2] > slowData[slowData.length-2] &&
+      (fastData.length<3 || (fastData[fastData.length-3] <= slowData[slowData.length-3]));
+    const crossSell = fastData.length>=3 && fastData[fastData.length-2] < slowData[slowData.length-2] &&
+      (fastData.length<3 || (fastData[fastData.length-3] >= slowData[slowData.length-3]));
+
+    if(crossBuy && !inPosition){
+      inPosition = true;
+      tradeCount++;
+      log.innerHTML += '<div class="entry buy">🟢 Tick '+tick+': <strong>COMPRA</strong> @ '+price.toFixed(5)+' — Fast MA cruzó arriba</div>';
+      document.getElementById('simSignal').textContent = '🟢 BUY';
+    } else if(crossSell && inPosition){
+      inPosition = false;
+      tradeCount++;
+      log.innerHTML += '<div class="entry sell">🔴 Tick '+tick+': <strong>VENTA</strong> @ '+price.toFixed(5)+' — Fast MA cruzó abajo</div>';
+      document.getElementById('simSignal').textContent = '🔴 SELL';
+    }
+    document.getElementById('simTrades').textContent = tradeCount;
+    drawSimChart();
+    log.scrollTop = log.scrollHeight;
+    setTimeout(doTick, 120);
+  }
+
+  setTimeout(doTick, 300);
+});
+
+function checkCompletion(){
+  if(!completed && compiled){
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').innerHTML = '🎉 ¡FELICIDADES, PROGRAMADOR! Has construido, compilado y ejecutado tu primer EA en MQL5. ¡Insignia desbloqueada!';
+    saveProgress();
+    completed = true;
+  }
+}
+
+window.addEventListener('load',initProgress);
+</script>
+</body>
+</html>

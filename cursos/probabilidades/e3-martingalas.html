@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Probabilidades Interactiva | Martingalas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+    .m-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,102,192,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+    .hero-header { background:linear-gradient(95deg,#0b1120 0%,#111a2e 100%); padding:2rem 2rem 1.5rem 2rem; text-align:center; border-bottom:2px solid #ff66c0; }
+    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#ff99d6,#ff66c0); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .hero-header p { font-size:1.1rem; color:#f0c0e0; margin-top:0.5rem; font-weight:500; }
+    .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+    .chip { background:rgba(255,102,192,0.15); border:1px solid #ff66c0; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ff66c0; font-size:1rem; line-height:1.6; }
+    .main-area { padding:0 2rem 1rem 2rem; display:flex; flex-direction:column; gap:1.5rem; }
+    .sim-box { background:#0f1a2c; border-radius:2rem; padding:1.5rem; border:1px solid rgba(255,102,192,0.2); }
+    .sim-box h3 { color:#ff99d6; margin-bottom:0.8rem; font-size:1.2rem; }
+    .walk-chart { display:flex; gap:2px; align-items:flex-end; min-height:180px; background:#0a0f1e; border-radius:1rem; padding:0.5rem; flex-wrap:wrap; }
+    .walk-bar { width:14px; border-radius:2px; transition:height 0.2s; position:relative; }
+    .walk-bar.up { background:linear-gradient(180deg,#66ff99,#33cc66); }
+    .walk-bar.down { background:linear-gradient(180deg,#ff6666,#cc3333); }
+    .stats-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:0.5rem; margin-top:0.5rem; }
+    .stat-card { background:#0f1a2c; border-radius:1.2rem; padding:0.8rem; border:1px solid rgba(255,102,192,0.15); text-align:center; }
+    .stat-card .num { font-size:1.6rem; font-weight:800; color:#ff99d6; }
+    .stat-card .lbl { font-size:0.75rem; color:#aac; }
+    .btn-action { background:linear-gradient(95deg,#ff66c0,#ff3388); border:none; padding:0.7rem 1.5rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:0.95rem; color:#fff; transition:0.2s; }
+    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(255,102,192,0.4); }
+    .btn-secondary-action { background:#2c3e66; border:none; padding:0.6rem 1.2rem; font-weight:600; border-radius:3rem; cursor:pointer; font-size:0.9rem; color:#eef5ff; transition:0.2s; }
+    .btn-secondary-action:hover { transform:translateY(-2px); }
+    .value-display { font-size:1.4rem; font-weight:700; color:#ff66c0; text-align:center; padding:0.3rem; }
+    .opt-row { display:flex; gap:1rem; align-items:center; justify-content:center; flex-wrap:wrap; }
+    .opt-btn { background:#2c3e66; border:1px solid rgba(255,102,192,0.3); padding:0.5rem 1.2rem; border-radius:2rem; cursor:pointer; font-weight:600; transition:0.2s; font-size:0.9rem; }
+    .opt-btn:hover { border-color:#ff66c0; }
+    .opt-btn.active { background:#ff66c0; color:#000; }
+    .feedback { background:#00000099; margin:0 2rem 1.5rem 2rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #ff66c0; }
+    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:0 2rem 1.5rem; padding:1rem; border:1px dashed gold; }
+    .insignia i { font-size:2.5rem; color:gold; }
+    .hidden { display:none; }
+    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(255,102,192,0.4); }
+    .nav-link.next { background:linear-gradient(95deg,#ff66c0,#ff3388); color:#fff; }
+    .nav-link.menu { background:#1a2a4a; border:1px solid #ff66c0; }
+    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .walk-bar { width:10px; } }
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+<nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+<div class="m-container">
+  <div class="hero-header">
+    <h1>🎲 MARTINGALAS</h1>
+    <p>El juego justo donde el futuro esperado es tu presente</p>
+    <div class="badge-area">
+      <span class="chip"><i class="fas fa-arrow-up"></i> E[Xₙ₊₁|ℱₙ]=Xₙ</span>
+      <span class="chip"><i class="fas fa-random"></i> Caminata aleatoria</span>
+      <span class="chip"><i class="fas fa-stop"></i> Optional Stopping</span>
+    </div>
+  </div>
+
+  <div class="analogy-card">
+    <strong>⚖️ Piénsalo así:</strong> Una martingala es un juego justo: tu fortuna esperada futura es tu fortuna actual. Si tienes $100 hoy, después de una apuesta justa sigues esperando tener $100. No hay ventaja — es como lanzar una moneda donde el resultado esperado es siempre neutro.
+  </div>
+
+  <div class="main-area">
+    <div class="sim-box">
+      <h3><i class="fas fa-chart-line"></i> Caminata Aleatoria Simétrica</h3>
+      <p style="font-size:0.9rem;color:#aac;margin-bottom:0.5rem;">X₀ = 0, cada paso +1 o -1 con p = 0.5. Martingala: E[Xₙ₊₁|X₀...Xₙ] = Xₙ</p>
+      <div style="text-align:center;margin-bottom:0.5rem;">
+        <button class="btn-action" onclick="addStep()">👣 Un paso</button>
+        <button class="btn-action" onclick="addSteps(10)">🏃 10 pasos</button>
+        <button class="btn-secondary-action" onclick="resetWalk()">🔄 Reiniciar</button>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card"><div class="lbl">Pasos (n)</div><div class="num" id="walkN">0</div></div>
+        <div class="stat-card"><div class="lbl">Xₙ (posición)</div><div class="num" id="walkX">0</div></div>
+        <div class="stat-card"><div class="lbl">E[Xₙ] = X₀</div><div class="num" id="walkE">0</div></div>
+        <div class="stat-card"><div class="lbl">|Xₙ| promedio</div><div class="num" id="walkAbs">0</div></div>
+      </div>
+      <div id="walkChart" class="walk-chart" style="margin-top:0.5rem;"></div>
+    </div>
+
+    <div class="sim-box">
+      <h3><i class="fas fa-stopwatch"></i> Optional Stopping Theorem</h3>
+      <p style="font-size:0.9rem;color:#aac;margin-bottom:0.5rem;">Si paras cuando Xₙ = +3 o Xₙ = -3, ¿E[X_τ] = 0? La martingala se mantiene.</p>
+      <div style="text-align:center;">
+        <button class="btn-action" onclick="simulateStopping()">🎯 Simular hasta ±3</button>
+        <button class="btn-secondary-action" onclick="simulateStoppingBatch()">📊 500 simulaciones</button>
+      </div>
+      <div class="stats-row" style="margin-top:0.5rem;">
+        <div class="stat-card"><div class="lbl">τ (tiempo de paro)</div><div class="num" id="stopTau">—</div></div>
+        <div class="stat-card"><div class="lbl">X_τ final</div><div class="num" id="stopX">—</div></div>
+        <div class="stat-card"><div class="lbl">E[X_τ] (500 sims)</div><div class="num" id="stopE">—</div></div>
+        <div class="stat-card"><div class="lbl">P(ganar)</div><div class="num" id="stopP">—</div></div>
+      </div>
+    </div>
+
+    <div class="sim-box">
+      <h3><i class="fas fa-coins"></i> Martingala en Gambler's Ruin</h3>
+      <p style="font-size:0.9rem;color:#aac;margin-bottom:0.5rem;">Apuesta $1 en cada lanzamiento (p=0.5). La fortuna es una martingala hasta que llegas a 0 o N.</p>
+      <div class="opt-row">
+        <span>Fortuna inicial:</span>
+        <input id="ruinStart" type="range" min="2" max="18" value="10" style="width:120px;" oninput="document.getElementById('ruinStartV').textContent=this.value">
+        <span id="ruinStartV">10</span>
+      </div>
+      <div style="text-align:center;margin-top:0.5rem;">
+        <button class="btn-action" onclick="runRuinSim()">🎲 Simular una partida</button>
+      </div>
+      <div class="stats-row" style="margin-top:0.5rem;">
+        <div class="stat-card"><div class="lbl">Resultado</div><div class="num" id="ruinResult">—</div></div>
+        <div class="stat-card"><div class="lbl">Duración</div><div class="num" id="ruinDuration">—</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="feedbackMsg" class="feedback">💡 La caminata simétrica es una martingala: E[Xₙ₊₁|ℱₙ] = Xₙ. ¡Agrega pasos y compruébalo!</div>
+
+  <div id="insigniaArea" class="insignia hidden">
+    <i class="fas fa-medal"></i>
+    <h3>🏅 ¡MAGO DE LAS MARTINGALAS! 🏅</h3>
+    <p>Comprendes el juego justo, la caminata aleatoria y el teorema de paro opcional.</p>
+  </div>
+
+  <div class="nav-links">
+    <a href="e2-procesos-poisson.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+    <a href="e4-informacion.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Probabilidades Interactiva · Modo Experto · Domina la teoría</footer>
+</div>
+
+<script>
+const STORAGE_KEY = 'prob_e3';
+let walk = [0];
+let completed = false;
+
+function renderWalk() {
+  const container = document.getElementById('walkChart');
+  container.innerHTML = '';
+  const maxVal = Math.max(...walk.map(Math.abs), 1);
+  const offset = maxVal;
+  walk.forEach((v, i) => {
+    const bar = document.createElement('div');
+    bar.className = 'walk-bar ' + (i === 0 ? 'up' : (walk[i] > walk[i-1] ? 'up' : 'down'));
+    const h = ((v + offset) / (offset * 2 + 1)) * 160 + 4;
+    bar.style.height = h + 'px';
+    bar.title = `n=${i}: X=${v}`;
+    container.appendChild(bar);
+  });
+  const n = walk.length - 1;
+  document.getElementById('walkN').textContent = n;
+  document.getElementById('walkX').textContent = walk[n];
+  document.getElementById('walkE').textContent = '0';
+  const absAvg = walk.reduce((s,v) => s + Math.abs(v), 0) / walk.length;
+  document.getElementById('walkAbs').textContent = absAvg.toFixed(1);
+}
+
+function addStep() {
+  const last = walk[walk.length - 1];
+  const step = Math.random() < 0.5 ? 1 : -1;
+  walk.push(last + step);
+  renderWalk();
+  checkCompletion();
+}
+
+function addSteps(n) {
+  for (let i = 0; i < n; i++) addStep();
+}
+
+function resetWalk() {
+  walk = [0];
+  renderWalk();
+}
+
+function simulateStopping() {
+  let x = 0, steps = 0;
+  while (Math.abs(x) < 3) {
+    x += Math.random() < 0.5 ? 1 : -1;
+    steps++;
+  }
+  document.getElementById('stopTau').textContent = steps;
+  document.getElementById('stopX').textContent = x;
+  if (x === 3) showFeedback('🎯 ¡Llegaste a +3! La martingala se detuvo en ganancia.');
+  else showFeedback('🎯 ¡Llegaste a -3! Pérdida, pero la martingala se mantiene justa.');
+  checkCompletion();
+}
+
+function simulateStoppingBatch() {
+  let sumX = 0, wins = 0;
+  for (let sim = 0; sim < 500; sim++) {
+    let x = 0;
+    while (Math.abs(x) < 3) { x += Math.random() < 0.5 ? 1 : -1; }
+    sumX += x;
+    if (x === 3) wins++;
+  }
+  document.getElementById('stopTau').textContent = '—';
+  document.getElementById('stopX').textContent = '—';
+  document.getElementById('stopE').textContent = (sumX / 500).toFixed(3);
+  document.getElementById('stopP').textContent = (wins / 5).toFixed(1) + '%';
+  showFeedback(`📊 E[X_τ] ≈ ${(sumX/500).toFixed(3)} (debería ser 0). P(ganar) = ${(wins/5).toFixed(1)}%.`);
+}
+
+function runRuinSim() {
+  const a = parseInt(document.getElementById('ruinStart').value);
+  const N = 20;
+  let fortune = a, steps = 0;
+  const path = [fortune];
+  while (fortune > 0 && fortune < N) {
+    fortune += Math.random() < 0.5 ? 1 : -1;
+    path.push(fortune);
+    steps++;
+  }
+  document.getElementById('ruinResult').textContent = fortune >= N ? '💰 Ganó' : '💸 Ruina';
+  document.getElementById('ruinDuration').textContent = steps + ' pasos';
+  walk = path;
+  renderWalk();
+  showFeedback(`🎲 Partida terminó en ${fortune >= N ? 'VICTORIA' : 'RUINA'} tras ${steps} pasos.`);
+  checkCompletion();
+}
+
+function checkCompletion() {
+  if (!completed && walk.length > 10) {
+    completed = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    localStorage.setItem(STORAGE_KEY, 'true');
+    showFeedback('🎉 ¡LO LOGRASTE! Has explorado las martingalas a fondo.');
+  }
+}
+
+function showFeedback(msg) {
+  document.getElementById('feedbackMsg').innerHTML = msg;
+}
+
+function restoreProgress() {
+  if (localStorage.getItem(STORAGE_KEY) === 'true') {
+    completed = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    showFeedback('🏆 ¡Ya completaste este módulo! Repasa los conceptos.');
+  }
+}
+
+renderWalk();
+restoreProgress();
+</script>
+<script src="../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

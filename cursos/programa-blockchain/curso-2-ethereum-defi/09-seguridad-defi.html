@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Seguridad DeFi: Exploits, Flash Loans | Curso 2</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 100%); font-family: 'Inter', sans-serif; color: #eef5ff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; }
+    .course-container { max-width: 1300px; width: 100%; background: rgba(15,25,45,0.65); backdrop-filter: blur(12px); border-radius: 3rem; border: 1px solid rgba(255,80,80,0.25); box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden; }
+    .hero-header { background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%); padding: 2rem 2rem 1.5rem; text-align: center; border-bottom: 2px solid #ff5050; }
+    .hero-header h1 { font-size: 2.6rem; font-weight: 800; background: linear-gradient(135deg, #FFF, #ff8080, #ff5050); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .hero-header p { font-size: 1.1rem; color: #b9e2ff; margin-top: 0.5rem; }
+    .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1.2rem; flex-wrap: wrap; }
+    .chip { background: rgba(255,80,80,0.15); border: 1px solid #ff5050; padding: 0.4rem 1rem; border-radius: 40px; font-size: 0.8rem; font-weight: 600; }
+    .analogy-card { background: #1e2a3acc; margin: 1.5rem 2rem; padding: 1.2rem 1.8rem; border-radius: 2rem; border-left: 8px solid #ff5050; font-size: 1rem; line-height: 1.6; }
+    .main-area { padding: 1rem 2rem 2rem; }
+    .sim-box { background: rgba(0,10,25,0.7); border-radius: 2rem; padding: 1.5rem; border: 1px solid #ff5050; text-align: center; margin-bottom: 1.5rem; }
+    .sim-box h3 { margin-bottom: 1rem; color: #ff8080; }
+    .exploit-steps { display: flex; flex-direction: column; gap: 0.8rem; margin: 1rem 0; text-align: left; }
+    .step-card { background: #0f1a2c; border-radius: 1rem; padding: 1rem; border-left: 4px solid #ff5050; display: flex; align-items: center; gap: 1rem; }
+    .step-card .step-num { font-size: 1.5rem; font-weight: 800; color: #ff5050; min-width: 30px; }
+    .step-card p { font-size: 0.9rem; color: #b9e2ff; }
+    .step-card.done { border-left-color: #22c55e; opacity: 0.7; }
+    .step-card.done .step-num { color: #22c55e; }
+    .btn-action { background: linear-gradient(95deg, #ff5050, #cc3333); border: none; padding: 0.8rem 1.8rem; font-weight: bold; border-radius: 3rem; margin: 0.5rem; cursor: pointer; font-size: 1rem; transition: 0.2s; color: #fff; }
+    .btn-action:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(255,80,80,0.5); }
+    .btn-action:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-action.blue { background: linear-gradient(95deg, #627eea, #8099f0); }
+    .exploit-result { background: #1a0a0a; border-radius: 1.5rem; padding: 1.5rem; margin: 1rem 0; border: 1px solid #ff5050; }
+    .exploit-result .big-loss { font-size: 2.5rem; font-weight: 800; color: #ff5050; }
+    .feedback { background: #00000099; margin: 1rem 0; padding: 1rem; border-radius: 1.5rem; text-align: center; font-weight: 500; border-left: 4px solid #ff5050; }
+    .quiz-block { background: rgba(0,10,25,0.5); border-radius: 2rem; padding: 1.5rem; margin-top: 1.5rem; border: 1px solid #ff5050; }
+    .quiz-block h3 { color: #ff8080; margin-bottom: 1rem; }
+    .quiz-q { margin: 1rem 0; padding: 1rem; background: #0f1a2c; border-radius: 1rem; }
+    .quiz-q p { font-weight: 600; margin-bottom: 0.5rem; }
+    .quiz-q .opt { display: inline-block; background: #1e2a3e; padding: 0.4rem 1rem; border-radius: 2rem; margin: 0.2rem; cursor: pointer; transition: 0.2s; font-size: 0.9rem; }
+    .quiz-q .opt:hover { background: #2c3e66; }
+    .quiz-q .opt.selected { background: #ff5050; color: #fff; }
+    .insignia { text-align: center; background: #0c1b2f; border-radius: 2rem; margin: 1rem 0; padding: 1rem; border: 1px dashed gold; }
+    .insignia i { font-size: 2.5rem; color: gold; }
+    .hidden { display: none; }
+    .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
+    .nav-link { background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem; font-weight: 600; text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; }
+    .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(255,80,80,0.4); }
+    .nav-link.next { background: linear-gradient(95deg, #627eea, #8099f0); color: #fff; }
+    .nav-link.menu { background: #1a2a4a; border: 1px solid #627eea; }
+    footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
+    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
+  </style>
+  <link rel="stylesheet" href="../../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a><a href="../index.html">Programa Blockchain</a></nav>
+
+<div class="course-container">
+  <div class="hero-header">
+    <h1> SEGURIDAD DeFi: EXPLOITS Y FLASH LOANS</h1>
+    <p>&iquest;C&oacute;mo se atacan los protocolos descentralizados y c&oacute;mo protegerse?</p>
+    <div class="badge-area">
+      <span class="chip"><i class="fas fa-bolt"></i> Flash Loans</span>
+      <span class="chip"><i class="fas fa-bug"></i> Exploits</span>
+      <span class="chip"><i class="fas fa-shield-alt"></i> Auditor&iacute;a</span>
+    </div>
+  </div>
+
+  <div class="analogy-card">
+    <strong> Piénsalo as&iacute;:</strong> Un flash loan es como pedir prestado un diamante por un segundo para examinarlo y devolverlo &mdash; si encuentras una grieta, puedes aprovecharte antes de devolverlo. Los atacantes usan esta t&eacute;cnica para explotar vulnerabilidades en los protocolos.
+  </div>
+
+  <div class="main-area">
+    <div class="sim-box">
+      <h3><i class="fas fa-skull"></i> Simulador de Ataque Flash Loan</h3>
+      <p>Observa paso a paso c&oacute;mo un atacante ejecuta un flash loan exploit simplificado.</p>
+
+      <div class="exploit-steps" id="stepContainer">
+        <div class="step-card" id="step1"><span class="step-num">1</span><p>Pedir flash loan de 10,000 ETH (sin colateral, se devuelve en la misma transacci&oacute;n)</p></div>
+        <div class="step-card" id="step2"><span class="step-num">2</span><p>Depositar los 10,000 ETH en el protocolo como colateral</p></div>
+        <div class="step-card" id="step3"><span class="step-num">3</span><p>Pedir prestado 8,000,000 USDC contra el colateral inflado</p></div>
+        <div class="step-card" id="step4"><span class="step-num">4</span><p>Manipular el oracle de precio para que el colateral valga m&aacute;s</p></div>
+        <div class="step-card" id="step5"><span class="step-num">5</span><p>Drenar fondos del protocolo y devolver el flash loan</p></div>
+      </div>
+
+      <button class="btn-action" id="runExploitBtn"> Ejecutar Exploit</button>
+      <button class="btn-action blue" id="resetExploitBtn"> Reiniciar Simulaci&oacute;n</button>
+
+      <div class="exploit-result" id="exploitResult">
+        <p>Fondos drenados: <span class="big-loss" id="drainedAmount">$0</span></p>
+        <p id="exploitDetail">Haz clic en "Ejecutar Exploit" para ver el ataque en acci&oacute;n.</p>
+      </div>
+
+      <div class="feedback" id="securityFeedback">Conceptos clave: los flash loans no son el problema, sino las vulnerabilidades en el c&oacute;digo que permiten manipular precios o estados.</div>
+    </div>
+
+    <div class="quiz-block">
+      <h3> Cuestionario Express</h3>
+      <div id="quizQs"></div>
+      <button class="btn-action" id="submitQuiz"> Validar respuestas</button>
+      <div id="quizFeedback" class="feedback" style="margin-top:1rem;"></div>
+    </div>
+
+    <div id="insigniaArea" class="insignia hidden">
+      <i class="fas fa-medal"></i>
+      <h3> INSIGNIA DE AUDITOR DeFi </h3>
+      <p>&iexcl;Entiendes c&oacute;mo funcionan los exploits y c&oacute;mo proteger los protocolos!</p>
+    </div>
+  </div>
+
+  <div class="nav-links">
+    <a href="08-defi-2026.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
+    <a href="10-daos.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer>
+    <i class="fas fa-crown"></i> Programa Blockchain &middot; Curso 2 &middot; M&oacute;dulo 9
+  </footer>
+</div>
+
+<script>
+  const STORAGE_KEY = 'block_2_09';
+  let exploitRunning = false;
+  let exploitDone = false;
+  let intervalId = null;
+  let currentStep = 0;
+  let quizAnswers = [null, null, null];
+  let quizCompleted = false;
+
+  function resetExploit() {
+    if (intervalId) { clearInterval(intervalId); intervalId = null; }
+    currentStep = 0;
+    exploitRunning = false;
+    exploitDone = false;
+    for (var i = 1; i <= 5; i++) {
+      document.getElementById('step' + i).classList.remove('done');
+    }
+    document.getElementById('drainedAmount').textContent = '$0';
+    document.getElementById('exploitDetail').textContent = 'Haz clic en "Ejecutar Exploit" para ver el ataque en acci&oacute;n.';
+    document.getElementById('runExploitBtn').disabled = false;
+    document.getElementById('securityFeedback').innerHTML = ' Simulaci&oacute;n reiniciada. Los flash loans permiten pedir prestado sin colateral si devuelves en la misma transacci&oacute;n.';
+  }
+
+  function runExploit() {
+    if (exploitRunning || exploitDone) return;
+    exploitRunning = true;
+    document.getElementById('runExploitBtn').disabled = true;
+    document.getElementById('securityFeedback').innerHTML = ' Ejecutando ataque flash loan...';
+
+    var drainedTotal = 0;
+    currentStep = 0;
+
+    intervalId = setInterval(function() {
+      currentStep++;
+      if (currentStep <= 5) {
+        document.getElementById('step' + currentStep).classList.add('done');
+        if (currentStep === 1) {
+          drainedTotal += 0;
+        } else if (currentStep === 2) {
+          drainedTotal += 0;
+        } else if (currentStep === 3) {
+          drainedTotal += 2000000;
+        } else if (currentStep === 4) {
+          drainedTotal += 3000000;
+        } else if (currentStep === 5) {
+          drainedTotal += 5000000;
+        }
+        document.getElementById('drainedAmount').textContent = '$' + drainedTotal.toLocaleString();
+        document.getElementById('exploitDetail').textContent = 'Paso ' + currentStep + '/5 completado. Fondos drenados hasta ahora: $' + drainedTotal.toLocaleString();
+      }
+
+      if (currentStep >= 5) {
+        clearInterval(intervalId);
+        intervalId = null;
+        exploitRunning = false;
+        exploitDone = true;
+        document.getElementById('exploitDetail').innerHTML = ' Ataque completado. Se drenaron $10M del protocolo. El flash loan se devolvi&oacute; y el atacante huy&oacute; con las ganancias.';
+        document.getElementById('securityFeedback').innerHTML = ' Este exploit fue posible por un oracle de precio manipulable. Las auditor&iacute;as y seguros (Nexus Mutual) ayudan a mitigar estos riesgos. Contexto 2026: exploits en Drift y Kelp causaron ~$10B en salidas de Aave.';
+      }
+    }, 1200);
+  }
+
+  function init() {
+    document.getElementById('runExploitBtn').addEventListener('click', runExploit);
+    document.getElementById('resetExploitBtn').addEventListener('click', resetExploit);
+
+    renderQuiz();
+    document.getElementById('submitQuiz').addEventListener('click', checkQuiz);
+
+    var saved = localStorage.getItem(STORAGE_KEY);
+    if (saved === 'true') {
+      quizCompleted = true;
+      document.getElementById('insigniaArea').classList.remove('hidden');
+    }
+  }
+
+  var quizData = [
+    { q: "&iquest;Qu&eacute; es un flash loan?", opts: ["Un pr&eacute;stamo r&aacute;pido con inter&eacute;s alto", "Un pr&eacute;stamo sin colateral que debe devolverse en la misma transacci&oacute;n", "Un pr&eacute;stamo garantizado por NFTs", "Un tipo de seguro"], correct: 1 },
+    { q: "&iquest;Por qu&eacute; son peligrosos los flash loans?", opts: ["Porque tienen intereses alt&iacute;simos", "Porque permiten explotar vulnerabilidades con capital masivo sin riesgo", "Porque no se pueden devolver", "Porque son ilegales"], correct: 1 },
+    { q: "&iquest;Qu&eacute; ayuda a proteger los protocolos DeFi?", opts: ["No usar smart contracts", "Auditor&iacute;as, seguros y oracles resistentes a manipulaci&oacute;n", "Tener un CEO", "Usar solo Bitcoin"], correct: 1 }
+  ];
+
+  function renderQuiz() {
+    var container = document.getElementById('quizQs');
+    container.innerHTML = '';
+    quizData.forEach(function(q, idx) {
+      var div = document.createElement('div');
+      div.className = 'quiz-q';
+      div.innerHTML = '<p>' + q.q + '</p><div class="opts" id="qopts-' + idx + '"></div>';
+      var optsDiv = div.querySelector('.opts');
+      q.opts.forEach(function(opt, oi) {
+        var span = document.createElement('span');
+        span.className = 'opt';
+        span.textContent = opt;
+        span.dataset.qi = idx;
+        span.dataset.oi = oi;
+        span.addEventListener('click', function() {
+          if (quizCompleted) return;
+          var parent = span.parentElement;
+          Array.from(parent.children).forEach(function(c) { c.classList.remove('selected'); });
+          span.classList.add('selected');
+          quizAnswers[idx] = oi;
+        });
+        optsDiv.appendChild(span);
+      });
+      container.appendChild(div);
+    });
+  }
+
+  function checkQuiz() {
+    if (quizCompleted) { document.getElementById('quizFeedback').innerHTML = ' Ya completaste este cuestionario.'; return; }
+    var allAnswered = quizAnswers.every(function(a) { return a !== null; });
+    if (!allAnswered) { document.getElementById('quizFeedback').innerHTML = ' Responde todas las preguntas primero.'; return; }
+    var correct = 0;
+    for (var i = 0; i < quizData.length; i++) { if (quizAnswers[i] === quizData[i].correct) correct++; }
+    if (correct >= 2) {
+      quizCompleted = true;
+      document.getElementById('quizFeedback').innerHTML = ' &iexcl;Correcto! ' + correct + '/' + quizData.length + '. &iexcl;Dominas la seguridad DeFi!';
+      document.getElementById('insigniaArea').classList.remove('hidden');
+      localStorage.setItem(STORAGE_KEY, 'true');
+    } else {
+      document.getElementById('quizFeedback').innerHTML = ' Obtuviste ' + correct + '/' + quizData.length + '. Repasa los conceptos e int&eacute;ntalo de nuevo.';
+    }
+  }
+
+  init();
+</script>
+<script src="../../../assets/js/cookie-consent.js"></script></body>
+</html>

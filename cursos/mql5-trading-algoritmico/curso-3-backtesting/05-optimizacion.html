@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Curso 3 | Optimización de Parámetros</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../../assets/css/theme.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%);background-size:200% 200%;animation:gradientShift 20s ease infinite;font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
+@keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.modulo-container{max-width:1300px;width:100%;background:rgba(15,25,45,0.65);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(255,100,220,0.25);box-shadow:0 25px 45px rgba(0,0,0,0.5);overflow:hidden}
+.hero-header{background:linear-gradient(95deg,#0b1120 0%,#111a2e 100%);padding:2rem 2rem 1.5rem 2rem;text-align:center;border-bottom:2px solid #ff64dc}
+.hero-header h1{font-size:2.6rem;font-weight:800;background:linear-gradient(135deg,#FFF,#ff99e6,#ff64dc);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-header p{color:#f0ccee;margin-top:.5rem;font-size:1.1rem}
+.badge-area{display:flex;justify-content:center;gap:1rem;margin-top:1.2rem;flex-wrap:wrap}
+.chip{background:rgba(255,100,220,0.15);border:1px solid #ff64dc;padding:0.4rem 1rem;border-radius:40px;font-size:0.8rem;font-weight:600;color:#ddd}
+.analogy-card{background:#1e2a3acc;margin:1.5rem 2rem;padding:1.2rem 1.8rem;border-radius:2rem;border-left:8px solid #ff64dc;font-size:1rem;line-height:1.6}
+.progress-section{margin:1rem 2rem 0}
+.progress-bar-outer{background:#1a2a4a;border-radius:20px;height:20px;overflow:hidden}
+.progress-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,#ff64dc,#fff);border-radius:20px;transition:width 0.5s ease}
+.progress-text{text-align:center;font-size:0.85rem;color:#8899cc;margin-bottom:.5rem}
+.main-area{padding:1rem 2rem}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-bottom:1.5rem}
+.compare-card{background:#0a1020;border-radius:2rem;padding:1.5rem;border:1px solid #2a3a5a;transition:.2s}
+.compare-card h3{margin-bottom:.8rem}
+.compare-card ul{list-style:none}
+.compare-card ul li{margin:.4rem 0;padding:.4rem 0;border-bottom:1px solid #1a2a4a;font-size:.85rem}
+.compare-card ul li i{width:1.5rem}
+.opt-panel{background:#0a1020;border-radius:2rem;padding:1.5rem;border:1px solid #2a3a5a;margin-bottom:1.5rem}
+.settings-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem}
+.form-group{margin-bottom:.8rem}
+.form-group label{display:block;font-size:.8rem;color:#8899cc;margin-bottom:.3rem}
+.form-group input,.form-group select{width:100%;padding:.6rem;background:#1a2a4a;border:1px solid #3a4a6a;border-radius:.8rem;color:#eef5ff;font-family:'Inter',sans-serif;font-size:.85rem;transition:.2s}
+.form-group input:focus,.form-group select:focus{border-color:#ff64dc;outline:none}
+.btn-action{background:linear-gradient(95deg,#ff64dc,#ff30c0);border:none;padding:0.8rem 1.8rem;font-weight:bold;border-radius:3rem;cursor:pointer;font-size:1rem;transition:0.2s;color:#fff;font-family:'Inter',sans-serif}
+.btn-action:hover{transform:translateY(-2px);box-shadow:0 0 15px rgba(255,100,220,0.5)}
+.btn-action:disabled{opacity:.5;cursor:not-allowed}
+.btn-opt{background:#2c3e66;border:none;padding:.6rem 1.2rem;border-radius:2rem;cursor:pointer;color:#eef5ff;font-family:'Inter',sans-serif;font-size:.85rem;transition:.2s;margin-right:.5rem}
+.btn-opt:hover{background:#3a4e76}
+.btn-opt.active{background:rgba(255,100,220,0.2);border:1px solid #ff64dc;color:#ff64dc}
+.opt-table{width:100%;border-collapse:collapse;font-size:.78rem;margin-top:1rem}
+.opt-table th{background:#1a2a4a;padding:.5rem;text-align:left;color:#8899cc;border-bottom:2px solid #3a4a6a}
+.opt-table td{padding:.5rem;border-bottom:1px solid #2a3a5a}
+.opt-table .best{background:rgba(0,200,83,0.1)}
+.heatmap-canvas-wrap{background:#0d1525;border-radius:1rem;padding:1rem;margin:1rem 0}
+.heatmap-canvas-wrap canvas{width:100%;height:200px;border-radius:.5rem}
+.sim-progress{width:100%;background:#1a2a4a;border-radius:10px;height:24px;overflow:hidden;margin:1rem 0;position:relative}
+.sim-progress-fill{height:100%;width:0%;background:linear-gradient(90deg,#ff64dc,#fff);border-radius:10px;transition:width .15s}
+.sim-progress-label{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;font-size:.75rem;color:#fff;font-weight:600}
+.feedback{background:#00000099;margin:0 2rem 1.5rem 2rem;padding:1rem;border-radius:1.5rem;text-align:center;font-weight:500;border-left:4px solid #ff64dc;min-height:3rem}
+.insignia{text-align:center;background:#0c1b2f;border-radius:2rem;margin:0 2rem 1.5rem;padding:1rem;border:2px dashed gold}
+.insignia i{font-size:2.5rem;color:gold}
+.insignia h3{color:gold;margin:.5rem 0}
+.hidden{display:none!important}
+.nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.5rem 2rem}
+.nav-link{background:#2c3e66;padding:0.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:0.5rem;transition:0.2s}
+.nav-link:hover{transform:translateY(-2px);box-shadow:0 0 10px rgba(255,100,220,0.4)}
+.nav-link.next{background:linear-gradient(95deg,#f0a500,#ff6a00);color:#1e1a0c}
+.nav-link.menu{background:#1a2a4a;border:1px solid #ff64dc}
+.nav-link.prev{background:#1a2a4a;border:1px solid #666}
+footer{text-align:center;padding:1.2rem;font-size:0.8rem;border-top:1px solid #2c3e66;color:#8899cc}
+@media(max-width:900px){.compare-grid{grid-template-columns:1fr}.settings-grid{grid-template-columns:1fr}.hero-header h1{font-size:1.9rem}.analogy-card{margin:1rem}.feedback{margin:0 1rem 1rem}.main-area{padding:1rem}}
+</style>
+</head>
+<body>
+<nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a><a href="../index.html">Programa MQL5</a></nav>
+<div class="modulo-container">
+  <div class="hero-header">
+    <h1>🔬 Optimización de Parámetros</h1>
+    <p>"Encontrar la aguja en el pajar de parámetros: el arte de la optimización"</p>
+    <div class="badge-area">
+      <span class="chip"><i class="fas fa-th"></i> Grid</span>
+      <span class="chip"><i class="fas fa-dna"></i> Genético</span>
+      <span class="chip"><i class="fas fa-fire"></i> Heatmap</span>
+    </div>
+  </div>
+
+  <div class="progress-section">
+    <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+    <div class="progress-text" id="progressText">Módulo 5 de 12</div>
+  </div>
+
+  <div class="analogy-card">
+    <strong>🔍 Piénsalo así:</strong> Optimizar parámetros es como buscar la combinación de una caja fuerte. Grid prueba cada combinación una por una (seguro pero lento). Genético aprende de intentos anteriores y se acerca inteligentemente (rápido pero puede perderse). El truco: usa grid para pocos parámetros, genético para muchos.
+  </div>
+
+  <div class="main-area">
+    <div class="compare-grid">
+      <div class="compare-card" style="border-color:#ff64dc">
+        <h3 style="color:#ff64dc"><i class="fas fa-th"></i> Grid (Completa)</h3>
+        <ul>
+          <li><i class="fas fa-check-circle" style="color:#00c853"></i> Prueba TODAS las combinaciones</li>
+          <li><i class="fas fa-check-circle" style="color:#00c853"></i> Garantiza encontrar el óptimo global</li>
+          <li><i class="fas fa-check-circle" style="color:#00c853"></i> Ideal para 1-3 parámetros</li>
+          <li><i class="fas fa-times-circle" style="color:#ff1744"></i> Tiempo exponencial con más parámetros</li>
+          <li><i class="fas fa-times-circle" style="color:#ff1744"></i> 10 parámetros × 10 valores = 10B combinaciones</li>
+        </ul>
+      </div>
+      <div class="compare-card" style="border-color:#00e0ff">
+        <h3 style="color:#00e0ff"><i class="fas fa-dna"></i> Genético</h3>
+        <ul>
+          <li><i class="fas fa-check-circle" style="color:#00c853"></i> Usa selección natural para converger rápido</li>
+          <li><i class="fas fa-check-circle" style="color:#00c853"></i> 10-100x más rápido que Grid</li>
+          <li><i class="fas fa-check-circle" style="color:#00c853"></i> Ideal para 5+ parámetros</li>
+          <li><i class="fas fa-times-circle" style="color:#ff1744"></i> Puede converger a óptimo local</li>
+          <li><i class="fas fa-times-circle" style="color:#ff1744"></i> No garantiza encontrar el mejor</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="opt-panel">
+      <h3 style="color:#bcc9f0;margin-bottom:1rem"><i class="fas fa-microchip"></i> Simulador de Optimización</h3>
+      <div style="margin-bottom:1rem">
+        <button class="btn-opt active" id="modeGridBtn" onclick="setOptMode('grid')"><i class="fas fa-th"></i> Grid</button>
+        <button class="btn-opt" id="modeGeneticBtn" onclick="setOptMode('genetic')"><i class="fas fa-dna"></i> Genético</button>
+      </div>
+      <div class="settings-grid">
+        <div class="form-group"><label>Fast MA — Desde</label><input type="number" id="optFastFrom" value="5" min="2" max="50"></div>
+        <div class="form-group"><label>Fast MA — Hasta</label><input type="number" id="optFastTo" value="25" min="2" max="50"></div>
+        <div class="form-group"><label>Fast MA — Paso</label><input type="number" id="optFastStep" value="5" min="1" max="20"></div>
+        <div class="form-group"><label>Slow MA — Desde</label><input type="number" id="optSlowFrom" value="20" min="5" max="100"></div>
+        <div class="form-group"><label>Slow MA — Hasta</label><input type="number" id="optSlowTo" value="60" min="5" max="100"></div>
+        <div class="form-group"><label>Slow MA — Paso</label><input type="number" id="optSlowStep" value="10" min="5" max="30"></div>
+      </div>
+      <button class="btn-action" id="optBtn"><i class="fas fa-flask"></i> Iniciar Optimización</button>
+      <div class="sim-progress" id="optProgress" style="display:none">
+        <div class="sim-progress-fill" id="optProgressFill"></div>
+        <div class="sim-progress-label" id="optProgressLabel">0%</div>
+      </div>
+    </div>
+
+    <div id="optResults" class="opt-panel" style="display:none">
+      <h4 style="color:#bcc9f0;margin-bottom:.5rem"><i class="fas fa-table"></i> Resultados de Optimización</h4>
+      <p style="color:#8899cc;font-size:.8rem;margin-bottom:.5rem">Ordenado por Profit Factor. <span style="color:#00c853">Verde</span> = mejor resultado.</p>
+      <div class="heatmap-canvas-wrap">
+        <canvas id="heatmapCanvas" width="900" height="200"></canvas>
+      </div>
+      <div style="max-height:250px;overflow-y:auto">
+        <table class="opt-table"><thead><tr><th>Fast MA</th><th>Slow MA</th><th>Trades</th><th>Win Rate</th><th>Profit Factor</th><th>Drawdown</th></tr></thead><tbody id="optBody"></tbody></table>
+      </div>
+    </div>
+  </div>
+
+  <div id="feedbackMsg" class="feedback">💡 Configura los rangos de parámetros y elige Grid o Genético para optimizar.</div>
+
+  <div id="insigniaArea" class="insignia hidden">
+    <i class="fas fa-medal"></i>
+    <h3>🏅 Optimizer 🏅</h3>
+    <p>¡Sabes optimizar parámetros como un verdadero cuant! Grid y genético no tienen secretos para ti. 🔬</p>
+  </div>
+
+  <div class="nav-links">
+    <a href="04-analisis-resultados.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+    <a href="06-algoritmos-geneticos.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-flask"></i> Curso 3: Backtesting y Validación Cuantitativa</footer>
+</div>
+
+<script>
+const STORAGE_KEY = 'mql5_3_05';
+let completed = false;
+let optDone = false;
+let optMode = 'grid';
+
+function initProgress(){
+  const p = JSON.parse(localStorage.getItem('mql5_3_progress')) || [];
+  const pf = document.getElementById('progressFill');
+  const pt = document.getElementById('progressText');
+  if(pf) pf.style.width = Math.round((p.length/12)*100)+'%';
+  if(pt) pt.textContent = p.length+' de 12 módulos';
+  if(p.includes(STORAGE_KEY)){
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    completed = true;
+  }
+}
+
+function saveProgress(){
+  let p = JSON.parse(localStorage.getItem('mql5_3_progress')) || [];
+  if(!p.includes(STORAGE_KEY)){p.push(STORAGE_KEY);localStorage.setItem('mql5_3_progress',JSON.stringify(p));}
+  const pf = document.getElementById('progressFill');
+  const pt = document.getElementById('progressText');
+  if(pf) pf.style.width = Math.round((p.length/12)*100)+'%';
+  if(pt) pt.textContent = p.length+' de 12 módulos';
+}
+
+function setOptMode(mode){
+  optMode = mode;
+  document.getElementById('modeGridBtn').className = 'btn-opt'+(mode==='grid'?' active':'');
+  document.getElementById('modeGeneticBtn').className = 'btn-opt'+(mode==='genetic'?' active':'');
+}
+
+function simulateBacktest(fast, slow, deposit){
+  const numTrades = 20 + Math.floor(Math.random()*15);
+  let balance = deposit;
+  let peak = deposit;
+  let maxDD = 0, winning = 0, losing = 0, totalProfit = 0, totalLoss = 0;
+  let price = 1.1000, fastMA = 1.0950, slowMA = 1.0900;
+  let inPos = false, entryPrice = 0;
+
+  for(let i=0;i<numTrades;i++){
+    price += (Math.random()-0.48)*0.01;
+    if(price<1.05) price=1.05;
+    if(price>1.15) price=1.15;
+    fastMA = fastMA*0.8 + price*0.2;
+    slowMA = slowMA*0.92 + price*0.08;
+    const crossBuy = fastMA>slowMA && !inPos;
+    const crossSell = fastMA<slowMA && inPos;
+    if(crossBuy){inPos=true;entryPrice=price;}
+    if(crossSell && inPos){
+      inPos=false;
+      const pl = (price-entryPrice)/0.0001 * 0.1 * 10 + (Math.random()-0.5)*20 * (Math.random()<0.6?1:-0.5);
+      balance+=pl;
+      if(pl>0){winning++;totalProfit+=pl;}else{losing++;totalLoss+=Math.abs(pl);}
+      if(balance>peak) peak=balance;
+      const dd=(peak-balance)/peak*100;
+      if(dd>maxDD) maxDD=dd;
+    }
+  }
+  const total = winning+losing;
+  const winRate = total>0?winning/total*100:0;
+  const profitFactor = totalLoss>0?totalProfit/totalLoss:totalProfit>0?999:0;
+  return {totalTrades:total, winRate, profitFactor:profitFactor, maxDD};
+}
+
+document.getElementById('optBtn').addEventListener('click', function(){
+  const fastFrom = parseInt(document.getElementById('optFastFrom').value)||5;
+  const fastTo = parseInt(document.getElementById('optFastTo').value)||25;
+  const fastStep = parseInt(document.getElementById('optFastStep').value)||5;
+  const slowFrom = parseInt(document.getElementById('optSlowFrom').value)||20;
+  const slowTo = parseInt(document.getElementById('optSlowTo').value)||60;
+  const slowStep = parseInt(document.getElementById('optSlowStep').value)||10;
+  const deposit = 10000;
+
+  const progressBar = document.getElementById('optProgress');
+  const fill = document.getElementById('optProgressFill');
+  const label = document.getElementById('optProgressLabel');
+  progressBar.style.display = 'block';
+  fill.style.width = '0%'; label.textContent = '0%';
+
+  const results = [];
+  let done = 0;
+  const fastVals = [];
+  const slowVals = [];
+  for(let f=fastFrom;f<=fastTo;f+=fastStep) fastVals.push(f);
+  for(let s=slowFrom;s<=slowTo;s+=slowStep) slowVals.push(s);
+  const totalCombos = fastVals.length * slowVals.length;
+
+  // Simulate with animation
+  function runNext(){
+    const batchSize = Math.max(1, Math.floor(totalCombos / 20));
+    for(let b=0;b<batchSize && done<totalCombos;b++){
+      const fi = Math.floor(done / slowVals.length);
+      const si = done % slowVals.length;
+      const f = fastVals[fi];
+      const s = slowVals[si];
+      if(s > f){
+        const r = simulateBacktest(f, s, deposit);
+        results.push({fast:f, slow:s, trades:r.totalTrades, winRate:r.winRate, pf:r.profitFactor, dd:r.maxDD});
+        if(optMode==='genetic' && Math.random()<0.4){
+          // Genetic skips some
+          done++;
+          continue;
+        }
+      } else if(optMode==='grid'){
+        results.push({fast:f, slow:s, trades:0, winRate:0, pf:0, dd:0});
+      }
+      done++;
+    }
+    const pct = Math.min(100, Math.round(done/totalCombos*100));
+    fill.style.width = pct+'%';
+    label.textContent = pct+'%';
+
+    if(done >= totalCombos){
+      results.sort((a,b)=>b.pf-a.pf);
+      displayResults(results);
+      progressBar.style.display = 'none';
+      return;
+    }
+    setTimeout(runNext, 30);
+  }
+  runNext();
+});
+
+function displayResults(results){
+  const optBody = document.getElementById('optBody');
+  optBody.innerHTML = results.map((r,i)=>{
+    const cls = i===0?' class="best"':'';
+    return '<tr'+cls+'><td>'+r.fast+'</td><td>'+r.slow+'</td><td>'+r.trades+'</td><td>'+r.winRate.toFixed(1)+'%</td><td style="color:'+(r.pf>1.5?'#00c853':r.pf>1?'#ffd700':'#ff1744')+'">'+r.pf.toFixed(2)+'</td><td>'+r.dd.toFixed(2)+'%</td></tr>';
+  }).join('');
+  document.getElementById('optResults').style.display = 'block';
+
+  // Draw heatmap
+  const canvas = document.getElementById('heatmapCanvas');
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle = '#0d1525';
+  ctx.fillRect(0,0,w,h);
+
+  const maxPF = Math.max(...results.map(r=>r.pf), 0.01);
+  const pad = 30;
+  const cols = [...new Set(results.map(r=>r.fast))].sort((a,b)=>a-b);
+  const rows = [...new Set(results.map(r=>r.slow))].sort((a,b)=>a-b);
+  const cw = (w-pad*2)/cols.length;
+  const rh = (h-pad*2)/rows.length;
+
+  results.forEach(r=>{
+    const ci = cols.indexOf(r.fast);
+    const ri = rows.indexOf(r.slow);
+    if(ci<0||ri<0) return;
+    const intensity = r.pf / maxPF;
+    const hue = 300 - intensity * 150;
+    ctx.fillStyle = 'hsla('+hue+', 80%, '+(30+intensity*30)+'%, 0.8)';
+    ctx.fillRect(pad+ci*cw, pad+ri*rh, cw, rh);
+    if(r.pf>0){
+      ctx.fillStyle = '#fff';
+      ctx.font = '10px Inter';
+      ctx.textAlign = 'center';
+      ctx.fillText(r.pf.toFixed(1), pad+ci*cw+cw/2, pad+ri*rh+rh/2+3);
+    }
+  });
+  ctx.fillStyle = '#8899cc';
+  ctx.font = '11px Inter';
+  ctx.fillText('Profit Factor Heatmap (más verde = mejor)', pad+5, 15);
+
+  if(results.length>0){
+    document.getElementById('feedbackMsg').innerHTML = '✅ Optimización ('+optMode+') completada: '+results.length+' combinaciones. Mejor: Fast='+results[0].fast+', Slow='+results[0].slow+' (PF: '+results[0].pf.toFixed(2)+')';
+  }
+  optDone = true;
+  if(!completed){
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').innerHTML = '🎉 ¡Optimización dominada! Grid y genético ya son tuyos. ¡Insignia desbloqueada!';
+    saveProgress();
+    completed = true;
+  }
+}
+
+window.addEventListener('load', initProgress);
+</script>
+<script src="../../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

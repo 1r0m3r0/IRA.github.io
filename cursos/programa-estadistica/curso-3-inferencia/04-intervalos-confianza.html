@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Curso 3 | 🎯 Intervalos de Confianza</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:linear-gradient(135deg,#0a0f1e,#0c1222 50%,#111a2e); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+    .course-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(0,255,200,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+    .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #00ffc8; }
+    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#7affd8,#00ffc8); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .hero-header p { font-size:1.1rem; color:#b9ffe5; margin-top:0.5rem; font-weight:500; }
+    .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+    .chip { background:rgba(0,255,200,0.15); border:1px solid #00ffc8; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+    .progress-section { padding:1.2rem 2rem; border-bottom:1px solid #1a2a4a; }
+    .progress-bar-outer { background:#1a2a4a; border-radius:20px; height:16px; overflow:hidden; }
+    .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#00ffc8,#00bb88); border-radius:20px; transition:width 0.5s ease; }
+    .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
+    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #00ffc8; font-size:1rem; line-height:1.6; }
+    .main-area { padding:1.5rem 2rem; }
+    .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#00ffc8; }
+    .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
+    .info-panel { background:rgba(10,20,40,0.7); border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
+    .info-panel h3 { color:#7affd8; font-size:1rem; margin-bottom:0.5rem; }
+    .info-panel p { font-size:0.85rem; color:#b9ccee; line-height:1.6; }
+    .sim-area { background:rgba(0,10,25,0.6); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #00ffc8; margin-bottom:1.5rem; }
+    .quiz-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #3399ff; margin-bottom:1.5rem; }
+    .quiz-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#00ffc8; }
+    .question { background:#0f1a2c; margin:0.8rem 0; padding:0.8rem 1rem; border-radius:1.2rem; }
+    .question p { font-weight:600; margin-bottom:0.5rem; font-size:0.95rem; }
+    .options { display:flex; flex-wrap:wrap; gap:0.6rem; }
+    .opt { background:#1e2a3e; padding:0.3rem 0.9rem; border-radius:2rem; cursor:pointer; transition:0.2s; font-size:0.85rem; }
+    .opt:hover { background:#2c3e66; transform:translateY(-2px); }
+    .opt.selected { background:#00ffc8; color:#000; font-weight:bold; box-shadow:0 0 8px #00ffc8; }
+    .opt.correct { background:#00cc88; color:#000; }
+    .opt.wrong { background:#ff4455; color:#fff; }
+    .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #00ffc8; }
+    .btn-action { background:linear-gradient(95deg,#f0a500,#ff6a00); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin-top:1rem; }
+    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(240,165,0,0.5); }
+    .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
+    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin-top:1.5rem; padding:1rem; border:1px dashed gold; }
+    .insignia i { font-size:2.5rem; color:gold; }
+    .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
+    .hidden { display:none; }
+    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(0,255,200,0.4); }
+    .nav-link.next { background:linear-gradient(95deg,#f0a500,#ff6a00); color:#1e1a0c; }
+    .nav-link.menu { background:#1a2a4a; border:1px solid #00ffc8; }
+    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .info-grid { grid-template-columns:1fr; } }
+  </style>
+  <link rel="stylesheet" href="../../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a><a href="../index.html">Programa Estadística</a></nav>
+  <div class="course-container" id="app">
+    <div class="hero-header">
+      <h1>🎯 Intervalos de Confianza</h1>
+      <p>El rango de lo plausible</p>
+      <div class="badge-area">
+        <span class="chip"><i class="fas fa-arrows-alt-h"></i> IC para media</span>
+        <span class="chip"><i class="fas fa-percent"></i> IC para proporción</span>
+        <span class="chip"><i class="fas fa-sigma"></i> IC para varianza</span>
+      </div>
+    </div>
+    <div class="progress-section">
+      <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+      <span class="progress-text" id="progressText">Módulo 4 de 12</span>
+    </div>
+    <div class="analogy-card">
+      <strong>💡 Piénsalo así:</strong> Un intervalo de confianza es como lanzar una red de pesca en lugar de una flecha. En lugar de dar un único valor, das un rango donde confías que está el parámetro. Un IC al 95% significa que si repitieras el estudio 100 veces, 95 de los intervalos contendrían el verdadero valor.
+    </div>
+    <div class="main-area">
+      <div class="section-title"><i class="fas fa-arrows-alt-h"></i> Tipos de Intervalos</div>
+      <div class="info-grid">
+        <div class="info-panel">
+          <h3>📐 IC para la Media (σ conocido)</h3>
+          <p>IC = x̄ ± z<sub>α/2</sub> · σ/√n. Usa la distribución normal. Requiere conocer σ o n ≥ 30. Ejemplo: si x̄=70, σ=10, n=25, el IC al 95% es 70 ± 1.96·10/5 = (66.08, 73.92).</p>
+        </div>
+        <div class="info-panel">
+          <h3>📐 IC para la Media (σ desconocido)</h3>
+          <p>IC = x̄ ± t<sub>α/2, n-1</sub> · s/√n. Usa la distribución t de Student con n-1 grados de libertad. Es el caso más común en la práctica. El intervalo es más ancho que con σ conocido.</p>
+        </div>
+        <div class="info-panel">
+          <h3>📊 IC para una Proporción</h3>
+          <p>IC = p̂ ± z<sub>α/2</sub> · √(p̂(1-p̂)/n). Válido si np̂ ≥ 10 y n(1-p̂) ≥ 10. Método de Wilson: más preciso para n pequeñas. Ejemplo: 60/100 encuestados, IC 95% = 0.6 ± 0.096.</p>
+        </div>
+        <div class="info-panel">
+          <h3>📊 IC para la Varianza</h3>
+          <p>IC = ((n-1)s²/χ²<sub>α/2</sub>, (n-1)s²/χ²<sub>1-α/2</sub>). Usa la distribución chi-cuadrado con n-1 gl. Es asimétrico. Útil para control de calidad y análisis de precisión.</p>
+        </div>
+      </div>
+
+      <div class="sim-area">
+        <div class="section-title"><i class="fas fa-play-circle"></i> Simulación: Intervalos de Confianza</div>
+        <p style="color:#b9ccee; font-size:0.9rem; margin-bottom:1rem;">
+          Generamos 50 muestras de una población normal(μ=100, σ=15). Cada línea representa un IC al 95% para la media. Observa cuántos intervalos contienen al verdadero μ (≈95%).
+        </p>
+        <div style="display:flex; flex-wrap:wrap; gap:0.8rem; align-items:center; margin-bottom:1rem;">
+          <label style="color:#7affd8;">n:
+            <select id="sampleSize" style="background:#1e2a3e; color:#eef5ff; border:1px solid #00ffc8; border-radius:8px; padding:0.3rem 0.6rem; margin-left:0.4rem;">
+              <option value="10">10</option><option value="30" selected>30</option><option value="100">100</option>
+            </select>
+          </label>
+          <button id="simulateBtn" class="btn-action" style="background:linear-gradient(95deg,#00ffc8,#00aa88); color:#000; padding:0.5rem 1.2rem; font-size:0.9rem;"><i class="fas fa-play"></i> Generar 50 ICs</button>
+        </div>
+        <div style="background:#0f1a2c; border-radius:1.2rem; padding:1rem;">
+          <div style="display:flex; gap:2rem; flex-wrap:wrap; margin-bottom:0.8rem;">
+            <div><span style="color:#7affd8;">IC que contienen μ: </span><span id="containCount" style="color:#eef5ff; font-weight:700;">—</span></div>
+            <div><span style="color:#7affd8;">Porcentaje: </span><span id="containPct" style="color:#eef5ff; font-weight:700;">—</span></div>
+            <div><span style="color:#7affd8;">IC promedio: </span><span id="avgIC" style="color:#eef5ff; font-weight:700;">—</span></div>
+          </div>
+          <div id="icDisplay" style="background:#0a1220; border-radius:1rem; padding:0.5rem; min-height:150px; font-size:0.7rem; font-family:monospace;">
+            <span style="color:#8899cc;">Haz clic para generar...</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="quiz-area">
+        <div class="quiz-title"><i class="fas fa-question-circle"></i> Quiz: Intervalos de Confianza</div>
+        <div id="quizContainer"></div>
+        <button id="submitQuizBtn" class="btn-action">✅ Verificar respuestas</button>
+        <div id="insigniaArea" class="insignia hidden">
+          <i class="fas fa-medal"></i>
+          <h3>🏅 Intervalista 🏅</h3>
+          <p>Has dominado la construcción e interpretación de intervalos de confianza.</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre intervalos de confianza.</div>
+
+    <div class="nav-links">
+      <a href="03-estimacion-puntual.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+      <a href="05-hipotesis-una-muestra.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <footer><i class="fas fa-square-root-alt"></i> Curso 3: Inferencia Estadística · Módulo 4 de 12</footer>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'prog_est_3_04';
+    const PROGRESS_KEY = 'prog_est_3_progress';
+    const questions = [
+      { text: "¿Qué significa un IC al 95%?", options: ["El 95% de los datos están en el intervalo", "Hay 95% de probabilidad de que el parámetro esté en el intervalo (en la interpretación frecuentista)", "En 95 de 100 muestras similares, el IC contendrá al parámetro", "El intervalo cubre el 95% de la población"], correct: 2 },
+      { text: "¿Qué distribución se usa para un IC de la media con σ desconocido?", options: ["Normal", "t de Student", "Chi-cuadrado", "F"], correct: 1 },
+      { text: "Si aumentamos el nivel de confianza de 95% a 99%, el intervalo:", options: ["Se reduce", "Se ensancha", "No cambia", "Se vuelve negativo"], correct: 1 },
+      { text: "¿Cuál es el margen de error para un IC de proporción al 95%?", options: ["1.96·√(p̂(1-p̂)/n)", "1.64·√(p̂(1-p̂)/n)", "2.58·√(p̂(1-p̂)/n)", "t·s/√n"], correct: 0 },
+      { text: "¿Qué distribución se usa para el IC de la varianza?", options: ["Normal", "t de Student", "Chi-cuadrado", "F"], correct: 2 },
+      { text: "Si n aumenta, el ancho del IC:", options: ["Aumenta", "Disminuye", "No cambia", "Depende del nivel de confianza"], correct: 1 }
+    ];
+    let userAnswers = new Array(questions.length).fill(null);
+    let quizCompleted = false;
+
+    function saveProgress() {
+      let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+      if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
+      localStorage.setItem(STORAGE_KEY, 'true');
+    }
+
+    function updateProgress() {
+      let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+      document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
+      document.getElementById('progressText').textContent = 'M\u00f3dulo '+(p.length || 1)+' de 12';
+    }
+
+    function renderQuestions() {
+      const container = document.getElementById('quizContainer');
+      container.innerHTML = '';
+      questions.forEach((q, idx) => {
+        const qDiv = document.createElement('div'); qDiv.classList.add('question');
+        qDiv.innerHTML = '<p>'+(idx+1)+'. '+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
+        const optsDiv = qDiv.querySelector('.options');
+        q.options.forEach((opt, optIdx) => {
+          const span = document.createElement('div'); span.classList.add('opt');
+          span.textContent = opt; span.dataset.qIdx = idx; span.dataset.optIdx = optIdx;
+          span.addEventListener('click', function() {
+            if (quizCompleted) return;
+            this.parentElement.querySelectorAll('.opt').forEach(c => c.classList.remove('selected'));
+            this.classList.add('selected'); userAnswers[idx] = optIdx; updateBtnState();
+          });
+          optsDiv.appendChild(span);
+        });
+        container.appendChild(qDiv);
+      });
+    }
+
+    function updateBtnState() {
+      document.getElementById('submitQuizBtn').disabled = userAnswers.some(a => a === null) || quizCompleted;
+    }
+
+    function handleSubmit() {
+      if (quizCompleted) return;
+      if (userAnswers.some(a => a === null)) { document.getElementById('feedbackMsg').textContent = '⚠️ Responde todas las preguntas primero.'; return; }
+      let correct = 0;
+      questions.forEach((q, i) => { if (userAnswers[i] === q.correct) correct++; });
+      const total = questions.length; const passed = correct >= Math.ceil(total * 0.6);
+      document.querySelectorAll('.question').forEach((qDiv, idx) => {
+        const opts = qDiv.querySelectorAll('.opt');
+        opts.forEach((o, oi) => {
+          o.classList.remove('selected');
+          if (oi === questions[idx].correct) o.classList.add('correct');
+          else if (oi === userAnswers[idx]) o.classList.add('wrong');
+        });
+      });
+      if (passed) {
+        quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+        document.getElementById('insigniaArea').classList.remove('hidden');
+        document.getElementById('feedbackMsg').textContent = '🎉 ¡Excelente! Puntaje: '+correct+'/'+total;
+        saveProgress(); updateProgress();
+      } else {
+        document.getElementById('feedbackMsg').textContent = '❌ ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. ¡Reintenta!';
+      }
+    }
+
+    function restoreProgress() {
+      const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+      if (p.includes(STORAGE_KEY)) {
+        quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+        document.getElementById('insigniaArea').classList.remove('hidden');
+        document.getElementById('feedbackMsg').textContent = '🏆 Ya completaste este módulo.';
+        document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
+      }
+    }
+
+    function normalRandom(mean, std) {
+      let u = 0, v = 0;
+      while (u === 0) u = Math.random();
+      while (v === 0) v = Math.random();
+      return mean + std * Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+    }
+
+    document.getElementById('simulateBtn').addEventListener('click', function() {
+      const n = parseInt(document.getElementById('sampleSize').value);
+      const numICs = 50;
+      const mu = 100, sigma = 15;
+      let contain = 0;
+      let html = '';
+      for (let i = 0; i < numICs; i++) {
+        const sample = [];
+        for (let j = 0; j < n; j++) sample.push(normalRandom(mu, sigma));
+        const xbar = sample.reduce((a,b) => a+b, 0) / n;
+        const s = Math.sqrt(sample.reduce((a,b) => a + (b-xbar)*(b-xbar), 0) / (n-1));
+        const se = s / Math.sqrt(n);
+        const tVal = 1.96 + 2.0/(n-1); // approx t0.025,n-1
+        const lo = xbar - tVal * se;
+        const hi = xbar + tVal * se;
+        const contains = lo <= mu && hi >= mu;
+        if (contains) contain++;
+        const color = contains ? '#00cc88' : '#ff4455';
+        html += '<div style="color:'+color+';">' + (i+1).toString().padStart(2,' ') + ' [' + lo.toFixed(2) + ', ' + hi.toFixed(2) + '] ' + (contains ? '✓' : '✗') + '</div>';
+      }
+      document.getElementById('containCount').textContent = contain + '/50';
+      document.getElementById('containPct').textContent = (contain/50*100).toFixed(1) + '%';
+      document.getElementById('avgIC').textContent = 'n='+n;
+      document.getElementById('icDisplay').innerHTML = '<div style="display:grid; grid-template-columns:repeat(5,1fr); gap:2px;">'+html+'</div>';
+    });
+
+    document.getElementById('submitQuizBtn').addEventListener('click', handleSubmit);
+    renderQuestions(); updateBtnState(); restoreProgress(); updateProgress();
+  </script>
+  <script src="../../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

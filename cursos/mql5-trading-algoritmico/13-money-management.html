@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>MQL5 & Trading Algorítmico | Gestión de Riesgo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      background: linear-gradient(135deg, #1a0808 0%, #1f0a0a 30%, #0f0505 100%);
+      background-size:200% 200%;
+      animation: gradientShift 20s ease infinite;
+      font-family:'Inter',sans-serif; color:#ffe6e6;
+      min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem;
+    }
+    @keyframes gradientShift {
+      0%{background-position:0% 50%}
+      50%{background-position:100% 50%}
+      100%{background-position:0% 50%}
+    }
+    .container {
+      max-width:1300px; width:100%;
+      background:rgba(30,12,12,0.85); backdrop-filter:blur(12px);
+      border-radius:3rem; border:1px solid #ff5050;
+      box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden;
+    }
+    .hero {
+      background:linear-gradient(95deg,#2a0f0f,#3a1212);
+      padding:1.5rem 2rem; text-align:center; border-bottom:3px solid #ff5050;
+    }
+    .hero h1 {
+      font-size:2rem; font-weight:800;
+      background:linear-gradient(135deg,#ffaaaa,#ff5050);
+      -webkit-background-clip:text; background-clip:text; color:transparent;
+    }
+    .hero p { margin-top:0.5rem; font-size:1rem; color:#ffcccc; }
+    .content { padding:1.5rem 2rem; }
+    .card {
+      background:rgba(25,10,10,0.9); border-radius:2rem; padding:1.5rem;
+      border:1px solid #ff505066; margin-bottom:1.5rem;
+    }
+    .card h2 { color:#ff8080; margin-bottom:1rem; font-size:1.3rem; }
+    .card h3 { color:#ffaa66; margin:1rem 0 0.5rem; font-size:1.1rem; }
+    .form-group { margin-bottom:0.8rem; }
+    .form-group label { display:block; font-size:0.85rem; color:#ffbbbb; margin-bottom:0.3rem; }
+    .form-group input,.form-group select {
+      width:100%; padding:0.6rem; border-radius:1rem; border:1px solid #ff505066;
+      background:#1a0808; color:#ffe6e6; font-size:0.95rem;
+    }
+    .btn {
+      background:linear-gradient(95deg,#ff5050,#cc3333); border:none;
+      padding:0.7rem 2rem; border-radius:3rem; font-weight:600; font-size:1rem;
+      cursor:pointer; color:#fff; transition:0.2s;
+    }
+    .btn:hover { transform:scale(1.02); box-shadow:0 0 20px #ff505066; }
+    .btn-secondary { background:linear-gradient(95deg,#555,#333); }
+    .btn-secondary:hover { box-shadow:0 0 20px #55555566; }
+    .result-box {
+      background:#1a0a0a; border-radius:1.5rem; padding:1rem;
+      border:1px solid #ff505044; margin-top:1rem;
+    }
+    .result-box .value { font-size:1.5rem; font-weight:700; color:#ff8888; }
+    .result-box .label { font-size:0.8rem; color:#ffaaaa; }
+    .result-row { display:flex; justify-content:space-between; padding:0.5rem 0; border-bottom:1px solid #ff505022; }
+    .formula-breakdown { font-size:0.85rem; color:#ffcccc; background:#0f0505; border-radius:1rem; padding:0.8rem; margin-top:0.5rem; }
+    table { width:100%; border-collapse:collapse; margin-top:0.8rem; }
+    th,td { padding:0.5rem; text-align:center; border-bottom:1px solid #ff505022; font-size:0.85rem; }
+    th { color:#ffaa66; }
+    td { color:#ffdddd; }
+    .analogy-box {
+      background:linear-gradient(135deg,#2a1212,#1a0808);
+      border-left:4px solid #ff5050; border-radius:1.5rem;
+      padding:1.2rem; margin-bottom:1.5rem; font-style:italic; color:#ffcccc;
+    }
+    .analogy-box i { color:#ff5050; margin-right:0.5rem; }
+    .radio-group { display:flex; flex-wrap:wrap; gap:0.5rem; margin:0.5rem 0; }
+    .radio-group label {
+      padding:0.5rem 1rem; border-radius:2rem; border:1px solid #ff505066;
+      cursor:pointer; font-size:0.85rem; transition:0.2s;
+    }
+    .radio-group input[type="radio"] { display:none; }
+    .radio-group input[type="radio"]:checked + label { background:#ff5050; color:#fff; border-color:#ff5050; }
+    .trail-visual { position:relative; height:200px; background:#0f0505; border-radius:1.5rem; margin:1rem 0; overflow:hidden; }
+    .trail-price { position:absolute; left:10%; width:80%; height:4px; background:#00e0ff; transition:top 0.3s; }
+    .trail-sl { position:absolute; left:10%; width:80%; height:4px; background:#ff5050; transition:top 0.3s; border:1px dashed #ff5050; }
+    .trail-label { position:absolute; font-size:0.7rem; }
+    .badge { font-size:0.85rem; }
+    .scenario-card { background:#1a0a0a; border-radius:1.2rem; padding:1rem; margin-bottom:1rem; border:1px solid #ff505033; }
+    .scenario-card p { font-size:0.9rem; margin-bottom:0.5rem; }
+    .scenario-card input { width:120px; padding:0.4rem; border-radius:0.8rem; border:1px solid #ff505066; background:#0f0505; color:#fff; margin-right:0.5rem; }
+    .scenario-feedback { font-size:0.85rem; margin-top:0.3rem; }
+    .correct { color:#66ff88; } .incorrect { color:#ff5050; }
+    .insignia {
+      text-align:center; padding:1.5rem; border:2px dashed gold;
+      border-radius:2rem; margin:1.5rem 0; font-size:1.2rem; display:none;
+    }
+    .insignia.show { display:block; animation:glowPulse 2s ease infinite; }
+    @keyframes glowPulse {
+      0%,100%{box-shadow:0 0 20px rgba(255,215,0,0.3)}
+      50%{box-shadow:0 0 40px rgba(255,215,0,0.6)}
+    }
+    .progress-section {
+      display:flex; align-items:center; gap:1rem; padding:0.5rem 2rem;
+    }
+    .progress-bar-outer {
+      flex:1; height:8px; background:#1a1a1a; border-radius:1rem; overflow:hidden;
+    }
+    .progress-bar-fill {
+      height:100%; width:0%; background:linear-gradient(90deg,#ff5050,#cc3333);
+      border-radius:1rem; transition:width 0.5s;
+    }
+    .progress-text { font-size:0.8rem; color:#ffaaaa; white-space:nowrap; }
+    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+    .nav-link {
+      background:#3a1a1a; border:none; padding:0.7rem 1.5rem; border-radius:3rem;
+      font-weight:600; cursor:pointer; text-decoration:none; color:#eef5ff;
+      display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; font-size:0.95rem;
+    }
+    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px #ff505066; }
+    .nav-link.menu { background:#1a1a2a; border:1px solid #ff5050; }
+    footer { text-align:center; padding:0.8rem; font-size:0.7rem; border-top:1px solid #ff505044; }
+    .section-tabs { display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:1rem; }
+    .section-tab {
+      padding:0.5rem 1rem; border-radius:2rem; border:1px solid #ff505066;
+      cursor:pointer; font-size:0.8rem; transition:0.2s; background:transparent; color:#ffaaaa;
+    }
+    .section-tab.active { background:#ff5050; color:#fff; border-color:#ff5050; }
+    .section-content { display:none; }
+    .section-content.active { display:block; }
+    .kelly-formula { font-family:monospace; font-size:0.9rem; color:#ffcc88; }
+    @media(max-width:600px) {
+      .hero h1{font-size:1.4rem}
+      .content{padding:1rem}
+      .nav-links{gap:0.5rem}
+      .nav-link{font-size:0.8rem;padding:0.5rem 1rem}
+    }
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+<nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+
+<div class="container">
+  <div class="hero">
+    <h1><i class="fas fa-shield-alt"></i> Gestión de Riesgo y Money Management</h1>
+    <p>"La regla de oro: no pierdas lo que no puedes recuperar"</p>
+  </div>
+
+  <div class="progress-section">
+    <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+    <span class="progress-text" id="progressText">Módulo 13 de 26</span>
+  </div>
+
+  <div class="content">
+    <div class="analogy-box">
+      <i class="fas fa-quote-left fa-2x"></i> La gestión de riesgo es como un cinturón de seguridad: no evita el accidente, pero te mantiene vivo para seguir manejando. La diferencia entre un trader profesional y un apostador es cómo maneja el riesgo.
+    </div>
+
+    <div class="section-tabs">
+      <div class="section-tab active" data-section="calculator"><i class="fas fa-calculator"></i> Calculadora</div>
+      <div class="section-tab" data-section="methods"><i class="fas fa-layer-group"></i> Métodos</div>
+      <div class="section-tab" data-section="trailing"><i class="fas fa-chart-line"></i> Trailing Stop</div>
+      <div class="section-tab" data-section="scenarios"><i class="fas fa-question-circle"></i> Escenarios</div>
+    </div>
+
+    <div id="section-calculator" class="section-content active">
+      <div class="card">
+        <h2><i class="fas fa-calculator"></i> Calculadora de Riesgo</h2>
+        <div class="form-group">
+          <label>Account Balance ($)</label>
+          <input type="number" id="balance" value="10000" min="100" step="100">
+        </div>
+        <div class="form-group">
+          <label>Risk (%)</label>
+          <input type="number" id="riskPercent" value="1" min="0.1" max="5" step="0.1">
+        </div>
+        <div class="form-group">
+          <label>Stop Loss (pips)</label>
+          <input type="number" id="slPips" value="30" min="1" step="1">
+        </div>
+        <div class="form-group">
+          <label>Currency Pair</label>
+          <select id="currencyPair">
+            <option value="10">EUR/USD (pip $10)</option>
+            <option value="10">GBP/USD (pip $10)</option>
+            <option value="9.09">USD/JPY (pip ~$9.09)</option>
+            <option value="10">USD/CHF (pip $10)</option>
+            <option value="10">XAU/USD (pip $10)</option>
+            <option value="10">AUD/USD (pip $10)</option>
+          </select>
+        </div>
+        <button class="btn" id="calcRiskBtn"><i class="fas fa-sync-alt"></i> Calculate</button>
+
+        <div id="riskResults" class="result-box" style="display:none;">
+          <div class="result-row"><span class="label">Position Size (lots)</span><span class="value" id="posSize">0.00</span></div>
+          <div class="result-row"><span class="label">Dollar Amount at Risk</span><span class="value" id="dollarRisk">$0.00</span></div>
+          <div class="result-row"><span class="label">Pip Value</span><span class="value" id="pipValue">$0.00</span></div>
+          <div class="result-row"><span class="label">Position Size (units)</span><span class="value" id="posUnits">0</span></div>
+          <div class="formula-breakdown" id="formulaBreakdown"></div>
+          <h3 style="margin-top:1rem;">Risk/Reward Table</h3>
+          <table>
+            <thead><tr><th>TP (pips)</th><th>R:R Ratio</th><th>Profit ($)</th><th>Profit (%)</th></tr></thead>
+            <tbody id="rrTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="section-methods" class="section-content">
+      <div class="card">
+        <h2><i class="fas fa-layer-group"></i> Choose Money Management Method</h2>
+        <div class="radio-group" id="mmMethods">
+          <input type="radio" name="mmMethod" id="mmFixedLot" value="fixedLot" checked><label for="mmFixedLot">Fixed Lot</label>
+          <input type="radio" name="mmMethod" id="mmFixedFraction" value="fixedFraction"><label for="mmFixedFraction">Fixed Fraction</label>
+          <input type="radio" name="mmMethod" id="mmKelly" value="kelly"><label for="mmKelly">Kelly Criterion</label>
+          <input type="radio" name="mmMethod" id="mmMartingale" value="martingale"><label for="mmMartingale">Martingale</label>
+          <input type="radio" name="mmMethod" id="mmAntiMartingale" value="antiMartingale"><label for="mmAntiMartingale">Anti-Martingale</label>
+        </div>
+        <div id="mmResult" class="result-box" style="margin-top:1rem;">
+          <p id="mmDescription">Fixed Lot: Trading with a constant lot size regardless of account balance.</p>
+          <div id="mmCalc">
+            <div class="form-group"><label>Lot Size</label><input type="number" id="mmFixedLotSize" value="0.1" min="0.01" step="0.01"></div>
+            <div class="form-group"><label>Account Balance ($)</label><input type="number" id="mmBalance" value="10000" min="100" step="100"></div>
+            <button class="btn btn-secondary" id="mmCalcBtn"><i class="fas fa-calculator"></i> Calculate</button>
+            <div id="mmCalcResult" style="margin-top:0.8rem;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="section-trailing" class="section-content">
+      <div class="card">
+        <h2><i class="fas fa-chart-line"></i> Interactive Trailing Stop Simulator</h2>
+        <div class="form-group"><label>Trail Distance (pips)</label><input type="number" id="trailDistance" value="20" min="5" step="5"></div>
+        <button class="btn" id="startTrailBtn"><i class="fas fa-play"></i> Start Trail</button>
+        <button class="btn btn-secondary" id="stopTrailBtn" style="display:none;"><i class="fas fa-stop"></i> Stop</button>
+        <div class="trail-visual" id="trailVisual">
+          <div style="position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;padding:0.3rem 0.5rem;font-size:0.7rem;color:#666;">
+            <span>Price</span><span>SL</span>
+          </div>
+          <div class="trail-price" id="trailPriceLine" style="top:30px;"></div>
+          <div class="trail-sl" id="trailSLLine" style="top:70px;"></div>
+          <div class="trail-label" id="trailPriceLabel" style="top:26px;left:5%;color:#00e0ff;">Price: 1.10000</div>
+          <div class="trail-label" id="trailSLLabel" style="top:66px;left:5%;color:#ff5050;">SL: 1.09800</div>
+        </div>
+        <div id="trailStatus" style="text-align:center;font-size:0.85rem;color:#ffaaaa;"></div>
+      </div>
+    </div>
+
+    <div id="section-scenarios" class="section-content">
+      <div class="card">
+        <h2><i class="fas fa-question-circle"></i> Risk Scenarios</h2>
+        <p style="font-size:0.85rem;color:#ffaaaa;margin-bottom:1rem;">Solve each scenario. Enter your answer (lot size).</p>
+        <div id="scenariosContainer"></div>
+        <div id="scenarioScore" class="result-box" style="display:none;">
+          <span class="value" id="scenarioScoreValue">0/5</span>
+          <span class="label"> scenarios correct</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="insignia" id="insignia">
+      🏅 Gestor de Riesgo 🏅<br>
+      <span style="font-size:0.9rem;">Has demostrado dominio en gestión de riesgo y money management</span>
+    </div>
+  </div>
+
+  <div class="nav-links">
+    <a href="12-backtesting.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+    <a href="14-certificado.html" class="nav-link next"><i class="fas fa-arrow-right"></i> Siguiente</a>
+  </div>
+  <footer><i class="fas fa-shield-alt"></i> Gestiona tu riesgo, protege tu capital, vive para operar otro día</footer>
+</div>
+
+<script>
+  const STORAGE_KEY = 'mql5_13';
+  const PROGRESS_KEY = 'mql5_progress';
+
+  function updateProgress() {
+    const progress = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+    const total = 26;
+    const done = progress.length;
+    const pct = Math.min(100, Math.round((done / total) * 100));
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressText').textContent = `Módulo 13 de ${total}`;
+  }
+  updateProgress();
+
+  function saveProgress() {
+    let progress = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+    if (!progress.includes(STORAGE_KEY)) {
+      progress.push(STORAGE_KEY);
+      localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress));
+    }
+    localStorage.setItem(STORAGE_KEY, 'true');
+    updateProgress();
+    checkInsignia();
+  }
+
+  function checkInsignia() {
+    const ins = document.getElementById('insignia');
+    const scenariosCorrect = parseInt(document.getElementById('scenarioScoreValue').textContent.split('/')[0]) || 0;
+    if (scenariosCorrect >= 5) {
+      ins.classList.add('show');
+      saveProgress();
+    }
+  }
+
+  function getPipValue(pairValue) {
+    return parseFloat(pairValue);
+  }
+
+  function calculateRisk() {
+    const balance = parseFloat(document.getElementById('balance').value) || 10000;
+    const riskPct = parseFloat(document.getElementById('riskPercent').value) || 1;
+    const slPips = parseFloat(document.getElementById('slPips').value) || 30;
+    const pairSelect = document.getElementById('currencyPair');
+    const pipVal = getPipValue(pairSelect.value);
+
+    const riskAmount = balance * (riskPct / 100);
+    const posSize = riskAmount / (slPips * pipVal);
+    const posSizeRounded = Math.round(posSize / 0.01) * 0.01;
+    const units = posSizeRounded * 100000;
+
+    document.getElementById('posSize').textContent = posSizeRounded.toFixed(2);
+    document.getElementById('dollarRisk').textContent = '$' + riskAmount.toFixed(2);
+    document.getElementById('pipValue').textContent = '$' + (pipVal * posSizeRounded).toFixed(2);
+    document.getElementById('posUnits').textContent = Math.round(units);
+
+    const formula = `Position Size = (Account × Risk%) / (SL_pips × PipValue)<br>`;
+    document.getElementById('formulaBreakdown').innerHTML = formula +
+      `= ($${balance.toFixed(2)} × ${riskPct}%) / (${slPips} × $${pipVal.toFixed(2)})<br>` +
+      `= $${riskAmount.toFixed(2)} / $${(slPips * pipVal).toFixed(2)}<br>` +
+      `= ${posSizeRounded.toFixed(2)} lots`;
+
+    const tbody = document.getElementById('rrTableBody');
+    tbody.innerHTML = '';
+    const ratios = [0.5, 1, 1.5, 2, 2.5, 3];
+    ratios.forEach(r => {
+      const tpPips = slPips * r;
+      const profit = tpPips * pipVal * posSizeRounded;
+      const profitPct = (profit / balance) * 100;
+      tbody.innerHTML += `<tr><td>${tpPips.toFixed(0)}</td><td>1:${r.toFixed(1)}</td><td>$${profit.toFixed(2)}</td><td>${profitPct.toFixed(2)}%</td></tr>`;
+    });
+
+    document.getElementById('riskResults').style.display = 'block';
+  }
+
+  // MM methods
+  const mmDescriptions = {
+    fixedLot: 'Fixed Lot: Trading with a constant lot size regardless of account balance. Simple but ignores account growth/decline.',
+    fixedFraction: 'Fixed Fraction: Risk a fixed percentage of your account on each trade. Position size adjusts as account grows or shrinks.',
+    kelly: 'Kelly Criterion: Optimal position sizing based on win rate and risk/reward ratio. Maximizes geometric growth.',
+    martingale: 'Martingale: Double position size after each loss until a win recovers all losses. High risk of ruin.',
+    antiMartingale: 'Anti-Martingale: Increase position size after wins, decrease after losses. Capitalizes on winning streaks.'
+  };
+
+  document.querySelectorAll('input[name="mmMethod"]').forEach(r => {
+    r.addEventListener('change', function() {
+      document.getElementById('mmDescription').textContent = mmDescriptions[this.value];
+      let html = '';
+      if (this.value === 'fixedLot') {
+        html = `<div class="form-group"><label>Lot Size</label><input type="number" id="mmFixedLotSize" value="0.1" min="0.01" step="0.01"></div>
+                <div class="form-group"><label>Account Balance ($)</label><input type="number" id="mmBalance" value="10000" min="100" step="100"></div>`;
+      } else if (this.value === 'fixedFraction') {
+        html = `<div class="form-group"><label>Risk % per Trade</label><input type="number" id="mmRiskPct" value="2" min="0.1" max="10" step="0.1"></div>
+                <div class="form-group"><label>Account Balance ($)</label><input type="number" id="mmBalance" value="10000" min="100" step="100"></div>
+                <div class="form-group"><label>Stop Loss (pips)</label><input type="number" id="mmSL" value="30" min="1" step="1"></div>
+                <div class="form-group"><label>Pip Value ($)</label><input type="number" id="mmPipVal" value="10" min="0.01" step="0.01"></div>`;
+      } else if (this.value === 'kelly') {
+        html = `<div class="form-group"><label>Win Rate (W) — as decimal (e.g. 0.6 for 60%)</label><input type="number" id="mmKellyW" value="0.6" min="0.01" max="0.99" step="0.01"></div>
+                <div class="form-group"><label>Risk/Reward Ratio (R)</label><input type="number" id="mmKellyR" value="2" min="0.1" step="0.1"></div>
+                <div class="form-group"><label>Account Balance ($)</label><input type="number" id="mmBalance" value="10000" min="100" step="100"></div>
+                <p class="kelly-formula">Kelly % = W - (1-W)/R</p>`;
+      } else if (this.value === 'martingale') {
+        html = `<div class="form-group"><label>Initial Lot Size</label><input type="number" id="mmMartingaleBase" value="0.01" min="0.01" step="0.01"></div>
+                <div class="form-group"><label>Consecutive Losses</label><input type="number" id="mmMartingaleLosses" value="3" min="1" max="10" step="1"></div>
+                <div class="form-group"><label>Account Balance ($)</label><input type="number" id="mmBalance" value="10000" min="100" step="100"></div>`;
+      } else if (this.value === 'antiMartingale') {
+        html = `<div class="form-group"><label>Base Lot Size</label><input type="number" id="mmAntiBase" value="0.01" min="0.01" step="0.01"></div>
+                <div class="form-group"><label>Consecutive Wins</label><input type="number" id="mmAntiWins" value="3" min="1" max="10" step="1"></div>
+                <div class="form-group"><label>Account Balance ($)</label><input type="number" id="mmBalance" value="10000" min="100" step="100"></div>`;
+      }
+      html += `<button class="btn btn-secondary" id="mmCalcBtn" style="margin-top:0.5rem;"><i class="fas fa-calculator"></i> Calculate</button>
+               <div id="mmCalcResult" style="margin-top:0.8rem;"></div>`;
+      document.getElementById('mmCalc').innerHTML = html;
+      document.getElementById('mmCalcBtn').addEventListener('click', calculateMM);
+    });
+  });
+
+  function calculateMM() {
+    const method = document.querySelector('input[name="mmMethod"]:checked').value;
+    const balance = parseFloat(document.getElementById('mmBalance').value) || 10000;
+    const resultDiv = document.getElementById('mmCalcResult');
+
+    if (method === 'fixedLot') {
+      const lot = parseFloat(document.getElementById('mmFixedLotSize').value) || 0.1;
+      resultDiv.innerHTML = `<div class="result-row"><span class="label">Lot Size</span><span class="value">${lot.toFixed(2)}</span></div>
+        <div class="result-row"><span class="label">Units</span><span class="value">${(lot * 100000).toLocaleString()}</span></div>
+        <div class="result-row"><span class="label">% of Account per pip</span><span class="value">${((lot * 10 / balance) * 100).toFixed(4)}%</span></div>`;
+    } else if (method === 'fixedFraction') {
+      const riskPct = parseFloat(document.getElementById('mmRiskPct').value) || 2;
+      const sl = parseFloat(document.getElementById('mmSL').value) || 30;
+      const pv = parseFloat(document.getElementById('mmPipVal').value) || 10;
+      const riskAmt = balance * (riskPct / 100);
+      const lot = Math.round(riskAmt / (sl * pv) / 0.01) * 0.01;
+      resultDiv.innerHTML = `<div class="result-row"><span class="label">Risk Amount</span><span class="value">$${riskAmt.toFixed(2)}</span></div>
+        <div class="result-row"><span class="label">Position Size</span><span class="value">${lot.toFixed(2)} lots</span></div>
+        <div class="result-row"><span class="label">Max Loss if SL hit</span><span class="value">$${(lot * sl * pv).toFixed(2)}</span></div>`;
+    } else if (method === 'kelly') {
+      const W = parseFloat(document.getElementById('mmKellyW').value) || 0.6;
+      const R = parseFloat(document.getElementById('mmKellyR').value) || 2;
+      const kellyPct = W - (1 - W) / R;
+      const kellySafe = Math.max(0, kellyPct);
+      resultDiv.innerHTML = `<div class="result-row"><span class="label">Kelly %</span><span class="value">${(kellyPct * 100).toFixed(2)}%</span></div>
+        <div class="result-row"><span class="label">Kelly Fraction of Account</span><span class="value">$${(balance * kellySafe).toFixed(2)}</span></div>
+        <div class="formula-breakdown">Kelly % = ${W.toFixed(2)} - (1 - ${W.toFixed(2)})/${R.toFixed(2)} = ${(kellyPct * 100).toFixed(2)}%</div>
+        <p style="font-size:0.8rem;color:#ffaa66;margin-top:0.5rem;">⚠️ Many traders use fractional Kelly (25-50%) to reduce risk.</p>`;
+    } else if (method === 'martingale') {
+      const base = parseFloat(document.getElementById('mmMartingaleBase').value) || 0.01;
+      const losses = parseInt(document.getElementById('mmMartingaleLosses').value) || 1;
+      const nextLot = base * Math.pow(2, losses);
+      const totalRisk = base * (Math.pow(2, losses + 1) - 1) * 30 * 10;
+      resultDiv.innerHTML = `<div class="result-row"><span class="label">Next Lot Size</span><span class="value">${nextLot.toFixed(2)}</span></div>
+        <div class="result-row"><span class="label">Sequence</span><span class="value">${Array.from({length: losses + 1}, (_, i) => (base * Math.pow(2, i)).toFixed(2)).join(' → ')}</span></div>
+        <div class="formula-breakdown" style="color:#ff6666;">⚠️ Martingale can lead to rapid account depletion. Not recommended for forex.</div>`;
+    } else if (method === 'antiMartingale') {
+      const base = parseFloat(document.getElementById('mmAntiBase').value) || 0.01;
+      const wins = parseInt(document.getElementById('mmAntiWins').value) || 1;
+      const nextLot = base * Math.pow(2, wins);
+      resultDiv.innerHTML = `<div class="result-row"><span class="label">Next Lot Size</span><span class="value">${nextLot.toFixed(2)}</span></div>
+        <div class="result-row"><span class="label">Sequence</span><span class="value">${Array.from({length: wins + 1}, (_, i) => (base * Math.pow(2, i)).toFixed(2)).join(' → ')}</span></div>
+        <div class="formula-breakdown">Increases after wins, decreases after losses. Capitalizes on streaks while protecting capital.</div>`;
+    }
+  }
+
+  // Trailing stop
+  let trailInterval = null;
+  let trailPrice = 1.1000;
+  let trailBaseSL = 1.0980;
+  let trailHighestPrice = 1.1000;
+
+  document.getElementById('startTrailBtn').addEventListener('click', function() {
+    const dist = parseFloat(document.getElementById('trailDistance').value) || 20;
+    trailPrice = 1.1000;
+    trailBaseSL = trailPrice - (dist * 0.0001);
+    trailHighestPrice = trailPrice;
+    document.getElementById('startTrailBtn').style.display = 'none';
+    document.getElementById('stopTrailBtn').style.display = 'inline-block';
+    document.getElementById('trailStatus').textContent = '🟢 Trailing active...';
+
+    if (trailInterval) clearInterval(trailInterval);
+    trailInterval = setInterval(() => {
+      const move = (Math.random() - 0.48) * 0.0020;
+      trailPrice += move;
+      if (trailPrice > trailHighestPrice) {
+        trailHighestPrice = trailPrice;
+        trailBaseSL = trailPrice - (dist * 0.0001);
+      }
+      const pricePx = 160 - ((trailPrice - 1.0800) / 0.0400) * 150;
+      const slPx = 160 - ((trailBaseSL - 1.0800) / 0.0400) * 150;
+      document.getElementById('trailPriceLine').style.top = Math.max(5, Math.min(155, pricePx)) + 'px';
+      document.getElementById('trailSLLine').style.top = Math.max(5, Math.min(155, slPx)) + 'px';
+      document.getElementById('trailPriceLabel').textContent = 'Price: ' + trailPrice.toFixed(5);
+      document.getElementById('trailSLLabel').textContent = 'SL: ' + trailBaseSL.toFixed(5);
+      if (trailPrice <= trailBaseSL) {
+        document.getElementById('trailStatus').textContent = '🔴 Stop Loss hit at ' + trailPrice.toFixed(5);
+        clearInterval(trailInterval);
+        trailInterval = null;
+        document.getElementById('startTrailBtn').style.display = 'inline-block';
+        document.getElementById('stopTrailBtn').style.display = 'none';
+      }
+    }, 400);
+  });
+
+  document.getElementById('stopTrailBtn').addEventListener('click', function() {
+    if (trailInterval) {
+      clearInterval(trailInterval);
+      trailInterval = null;
+    }
+    document.getElementById('trailStatus').textContent = '⏹️ Trailing stopped';
+    document.getElementById('startTrailBtn').style.display = 'inline-block';
+    document.getElementById('stopTrailBtn').style.display = 'none';
+  });
+
+  // Scenarios
+  const scenarios = [
+    {
+      q: 'You have $5,000, risk 2% per trade with 30 pip SL on EUR/USD (pip value $10). What is the maximum lot size?',
+      answer: 0.33,
+      tolerance: 0.02
+    },
+    {
+      q: 'You have $10,000, risk 1% with 50 pip SL on GBP/USD (pip value $10). What is the maximum lot size?',
+      answer: 0.20,
+      tolerance: 0.02
+    },
+    {
+      q: 'You have $2,000, risk 3% with 20 pip SL on USD/JPY (pip value ~$9.09). What is the maximum lot size?',
+      answer: 0.33,
+      tolerance: 0.02
+    },
+    {
+      q: 'You have $25,000, risk 0.5% with 40 pip SL on EUR/USD. What is the maximum lot size?',
+      answer: 0.31,
+      tolerance: 0.02
+    },
+    {
+      q: 'You have $50,000, risk 1.5% with 25 pip SL on XAU/USD (pip value $10). What is the maximum lot size?',
+      answer: 3.00,
+      tolerance: 0.02
+    }
+  ];
+
+  let scenarioCorrect = [false, false, false, false, false];
+
+  function renderScenarios() {
+    const container = document.getElementById('scenariosContainer');
+    container.innerHTML = '';
+    scenarios.forEach((s, i) => {
+      const div = document.createElement('div');
+      div.className = 'scenario-card';
+      div.innerHTML = `<p><strong>Scenario ${i+1}:</strong> ${s.q}</p>
+        <div style="display:flex;align-items:center;flex-wrap:wrap;gap:0.5rem;">
+          <input type="number" step="0.01" id="scenarioInput${i}" placeholder="e.g. 0.33">
+          <button class="btn btn-secondary" data-scenario="${i}" style="padding:0.4rem 1rem;font-size:0.85rem;">Check</button>
+          <span class="scenario-feedback" id="scenarioFeedback${i}"></span>
+        </div>`;
+      container.appendChild(div);
+    });
+    container.querySelectorAll('[data-scenario]').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const idx = parseInt(this.dataset.scenario);
+        const input = document.getElementById('scenarioInput' + idx);
+        const val = parseFloat(input.value);
+        const feedback = document.getElementById('scenarioFeedback' + idx);
+        if (isNaN(val)) {
+          feedback.innerHTML = '<span class="incorrect">Enter a number</span>';
+          return;
+        }
+        const diff = Math.abs(val - scenarios[idx].answer);
+        if (diff <= scenarios[idx].tolerance) {
+          feedback.innerHTML = '<span class="correct">✅ Correct!</span>';
+          scenarioCorrect[idx] = true;
+        } else {
+          feedback.innerHTML = `<span class="incorrect">❌ Incorrect. Expected ~${scenarios[idx].answer.toFixed(2)} lots</span>`;
+          scenarioCorrect[idx] = false;
+        }
+        updateScenarioScore();
+      });
+    });
+  }
+
+  function updateScenarioScore() {
+    const correct = scenarioCorrect.filter(Boolean).length;
+    document.getElementById('scenarioScoreValue').textContent = `${correct}/${scenarios.length}`;
+    document.getElementById('scenarioScore').style.display = 'block';
+    checkInsignia();
+  }
+
+  // Tab switching
+  document.querySelectorAll('.section-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.section-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.section-content').forEach(s => s.classList.remove('active'));
+      this.classList.add('active');
+      document.getElementById('section-' + this.dataset.section).classList.add('active');
+    });
+  });
+
+  // Init
+  document.getElementById('calcRiskBtn').addEventListener('click', calculateRisk);
+  calculateRisk();
+  renderScenarios();
+
+  // Init MM calculation
+  document.getElementById('mmCalcBtn')?.addEventListener('click', calculateMM);
+  calculateMM();
+</script>
+<script src="../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

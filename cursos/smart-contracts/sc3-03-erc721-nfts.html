@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ERC-721 NFTs | Smart Contracts DeFi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700;14..32,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    body{background:linear-gradient(145deg,#0a0018,#14002a);font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:2rem 1rem}
+    .container{max-width:1300px;width:100%;background:rgba(10,0,24,.88);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(180,80,255,.22);box-shadow:0 25px 55px rgba(0,0,0,.65);overflow:hidden}
+    .hero{background:linear-gradient(95deg,#0a0018,#14002a);padding:1.8rem 2rem;text-align:center;border-bottom:2px solid #b450ff}
+    .hero h1{font-size:1.9rem;font-weight:800;background:linear-gradient(135deg,#f0ccff,#cc88ff,#b450ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .hero p{margin-top:.5rem;font-size:.95rem;color:#6a3388}
+    .chips{display:flex;justify-content:center;gap:.6rem;flex-wrap:wrap;margin-top:.7rem}
+    .chip{background:rgba(180,80,255,.1);border:1px solid rgba(180,80,255,.3);color:#6a3388;font-size:.72rem;padding:.25rem .8rem;border-radius:2rem}
+    .week-badge{display:inline-block;background:rgba(180,80,255,.15);border:1px solid #b450ff;color:#b450ff;font-size:.75rem;font-weight:700;padding:.3rem 1rem;border-radius:2rem;margin-top:.5rem}
+    .analogy{background:#0a0018cc;margin:1.4rem 2rem;padding:1.1rem 1.7rem;border-radius:2rem;border-left:7px solid #b450ff;font-size:.9rem;line-height:1.65}
+    .analogy strong{color:#cc88ff}
+    .lab{display:flex;flex-wrap:wrap;gap:1.4rem;padding:0 1.8rem 1.5rem}
+    .left{flex:0 0 280px;display:flex;flex-direction:column;gap:.9rem}
+    .right{flex:1;min-width:300px;display:flex;flex-direction:column;gap:.9rem}
+    .panel{background:#0e0022dd;border-radius:1.8rem;padding:1.2rem 1.3rem;border:1px solid rgba(180,80,255,.15)}
+    .panel h3{font-size:.88rem;font-weight:700;color:#cc88ff;margin-bottom:.7rem}
+    label{font-size:.72rem;color:#4a2266;text-transform:uppercase;letter-spacing:.06rem;display:block;margin-bottom:.3rem;margin-top:.5rem}
+    select,input[type=text]{width:100%;background:#0a0018;border:1px solid rgba(180,80,255,.2);color:#eef5ff;padding:.45rem .7rem;border-radius:.75rem;font-size:.82rem;font-family:'Inter',sans-serif}
+    .btn{background:linear-gradient(95deg,#b450ff,#7a00cc);border:none;padding:.65rem 1.3rem;font-weight:700;border-radius:2rem;cursor:pointer;color:#fff;font-size:.85rem;transition:.2s;width:100%;margin-top:.4rem;display:flex;align-items:center;justify-content:center;gap:.5rem}
+    .btn:hover{transform:translateY(-2px);box-shadow:0 0 18px rgba(180,80,255,.4)}
+    pre{background:#050010;border-radius:1rem;padding:.9rem 1rem;font-family:'JetBrains Mono',monospace;font-size:.72rem;line-height:1.75;overflow-x:auto;color:#f0ccff;border:1px solid rgba(180,80,255,.12);white-space:pre}
+    .kw{color:#ff79c6}.fn{color:#50fa7b}.str{color:#f1fa8c}.num{color:#bd93f9}.cm{color:#6272a4;font-style:italic}.cls{color:#8be9fd}
+    canvas{border-radius:1rem;display:block;cursor:pointer}
+    .nft-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:.5rem;margin:.5rem 0}
+    .nft-card{background:#0e0022;border:1px solid rgba(180,80,255,.2);border-radius:1rem;padding:.4rem;text-align:center;cursor:pointer;transition:.15s}
+    .nft-card:hover{border-color:#b450ff;transform:scale(1.05)}
+    .nft-card.selected{border-color:#b450ff;box-shadow:0 0 12px rgba(180,80,255,.4)}
+    .nft-id{font-size:.65rem;color:#6a3388;margin-top:.2rem}
+    .nft-owner{font-size:.55rem;color:#4a2266;margin-top:.1rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .json-box{background:#050010;border-radius:1rem;padding:.7rem;font-family:monospace;font-size:.68rem;line-height:1.7;border:1px solid rgba(180,80,255,.15);max-height:200px;overflow-y:auto;color:#f0ccff}
+    .meta-key{color:#cc88ff}.meta-val{color:#f1fa8c}.meta-str{color:#50fa7b}
+    .feedback{background:#00000088;margin:0 1.8rem 1rem;padding:.85rem 1.2rem;border-radius:1.5rem;text-align:center;border-left:4px solid #b450ff;font-size:.88rem;line-height:1.55}
+    .insignia{text-align:center;background:#0a0018;border-radius:2rem;margin:0 1.8rem 1.5rem;padding:1rem;border:1px dashed gold}
+    .insignia i{font-size:2.4rem;color:gold}
+    .hidden{display:none}
+    .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.4rem 2rem}
+    .nav-link{background:#0e0022;padding:.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:.5rem;font-size:.88rem;transition:.2s}
+    .nav-link:hover{transform:translateY(-2px)}
+    .nav-link.next{background:linear-gradient(95deg,#f0a500,#ff6a00);color:#1e1a0c}
+    footer{text-align:center;padding:1rem;font-size:.72rem;border-top:1px solid #0a0018;color:#4a2266}
+    @media(max-width:860px){.hero h1{font-size:1.4rem}.left{flex:1;min-width:100%}}
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+<nav class="brand-return-nav">
+  <a href="../../index.html">&larr; Portfolio</a>
+  <a href="../../cursos/index.html">Cursos</a>
+</nav>
+<div class="container">
+  <div class="hero">
+    <h1>🎨 ERC-721: Crea tu Propio NFT</h1>
+    <p>Non-Fungible Tokens — cada token es único, como un certificado de propiedad digital</p>
+    <div class="week-badge"><i class="fas fa-calendar-week"></i> Semanas 3-4: Tokens y Standards</div>
+    <div class="chips">
+      <span class="chip">ERC-721</span>
+      <span class="chip">NFT Metadata</span>
+      <span class="chip">tokenURI</span>
+      <span class="chip">OpenZeppelin</span>
+    </div>
+  </div>
+
+  <div class="analogy">
+    <strong>🎨 Piénsalo así:</strong> ERC-20 son billetes de banco — todos los de $1 son idénticos e intercambiables. ERC-721 son como <strong>escrituras de propiedad</strong> — cada una identifica una propiedad específica e irrepetible. El token #1 y el token #2 son distintos aunque estén en el mismo contrato. La magia está en el <strong>tokenURI</strong>: un JSON con imagen, atributos y rareza que convierte un número en un arte digital único. OpenSea, Blur y todos los marketplaces leen este estándar.
+    <div style="margin-top:.5rem;font-size:.78rem;color:#4a2266"><strong>📚 Refs:</strong> EIP-721 (Dieter Shirley, 2018) — eips.ethereum.org/EIPS/eip-721 · OpenZeppelin ERC721 Docs</div>
+  </div>
+
+  <div class="lab">
+    <div class="left">
+      <div class="panel">
+        <h3><i class="fas fa-paint-brush"></i> Mint NFT Interactivo</h3>
+        <label>Nombre de la colección</label>
+        <input type="text" id="collName" value="CryptoArt" placeholder="Ej: PixelPunks">
+        <label>Símbolo</label>
+        <input type="text" id="collSymbol" value="CART" maxlength="6">
+        <label>Rareza del trait</label>
+        <select id="rarity">
+          <option value="common">Common (70%)</option>
+          <option value="rare">Rare (20%)</option>
+          <option value="epic">Epic (8%)</option>
+          <option value="legendary">Legendary (2%)</option>
+        </select>
+        <label>Paleta de colores</label>
+        <select id="palette">
+          <option value="neon">Neon Punk</option>
+          <option value="retro">Retro Wave</option>
+          <option value="cosmic">Cosmic</option>
+          <option value="forest">Forest</option>
+        </select>
+        <button class="btn" onclick="mintNFT()"><i class="fas fa-plus"></i> Mint NFT</button>
+        <button class="btn" style="background:#0e0022;border:1px solid rgba(180,80,255,.3);color:#cc88ff;margin-top:.3rem" onclick="clearAll()"><i class="fas fa-trash"></i> Reset Collection</button>
+        <div style="margin-top:.6rem;font-size:.72rem;color:#4a2266" id="gasEstimate">Gas estimado: ~65,000</div>
+      </div>
+    </div>
+
+    <div class="right">
+      <div class="panel">
+        <h3><i class="fas fa-images"></i> Colección <span id="collNameDisplay">CryptoArt</span> — <span id="totalMinted">0</span> NFTs</h3>
+        <canvas id="nftCanvas" width="200" height="200" style="display:none"></canvas>
+        <div class="nft-grid" id="nftGrid">
+          <div style="color:#4a2266;font-size:.78rem;grid-column:1/-1;text-align:center;padding:1rem">Mint tu primer NFT para comenzar la colección</div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3><i class="fas fa-code"></i> tokenURI Metadata (EIP-721)</h3>
+        <div class="json-box" id="metadataBox">
+          <span style="color:#4a2266">// Selecciona un NFT de la colección para ver su metadata</span>
+        </div>
+      </div>
+      <div class="panel">
+        <h3><i class="fas fa-file-code"></i> Solidity — Contrato ERC-721</h3>
+        <pre><span class="cm">// SPDX-License-Identifier: MIT</span>
+<span class="kw">pragma solidity</span> ^<span class="num">0.8.20</span>;
+<span class="kw">import</span> <span class="str">"@openzeppelin/contracts/token/ERC721/ERC721.sol"</span>;
+<span class="kw">import</span> <span class="str">"@openzeppelin/contracts/access/Ownable.sol"</span>;
+<span class="kw">import</span> <span class="str">"@openzeppelin/contracts/utils/Base64.sol"</span>;
+
+<span class="kw">contract</span> <span class="cls">CryptoArt</span> <span class="kw">is</span> <span class="cls">ERC721</span>, <span class="cls">Ownable</span> {
+    <span class="cls">uint256</span> <span class="kw">private</span> _tokenId;
+
+    <span class="kw">struct</span> <span class="cls">NFTData</span> {
+        <span class="cls">string</span> rarity;
+        <span class="cls">string</span> palette;
+        <span class="cls">uint256</span> power;
+    }
+    <span class="kw">mapping</span>(<span class="cls">uint256</span> => <span class="cls">NFTData</span>) <span class="kw">public</span> nftData;
+
+    <span class="kw">constructor</span>() <span class="fn">ERC721</span>(<span class="str">"CryptoArt"</span>, <span class="str">"CART"</span>) <span class="fn">Ownable</span>(<span class="fn">msg.sender</span>) {}
+
+    <span class="kw">function</span> <span class="fn">safeMint</span>(<span class="cls">address</span> to) <span class="kw">external</span> <span class="kw">onlyOwner</span> {
+        <span class="cls">uint256</span> id = ++_tokenId;
+        nftData[id] = <span class="cls">NFTData</span>(<span class="str">"Rare"</span>, <span class="str">"Neon"</span>, <span class="num">85</span>);
+        <span class="fn">_safeMint</span>(to, id);
+    }
+
+    <span class="kw">function</span> <span class="fn">tokenURI</span>(<span class="cls">uint256</span> id) <span class="kw">public view override</span>
+        <span class="kw">returns</span> (<span class="cls">string memory</span>) {
+        <span class="kw">return</span> <span class="fn">string</span>.<span class="fn">concat</span>(<span class="str">"data:application/json;base64,"</span>,
+            <span class="cls">Base64</span>.<span class="fn">encode</span>(<span class="fn">abi.encodePacked</span>(
+                <span class="str">'{"name":"CryptoArt #'</span>, <span class="fn">Strings.toString</span>(id),
+                <span class="str">'","attributes":[{"trait_type":"Rarity","value":"'</span>,
+                nftData[id].rarity, <span class="str">'"}]}'</span>
+            ))
+        );
+    }
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="feedback" id="feedbackMsg">
+    🎨 Mint tu primer NFT y observa cómo se genera el metadata JSON. Cada NFT tiene atributos únicos on-chain.
+  </div>
+
+  <div class="insignia hidden" id="insigniaArea">
+    <i class="fas fa-palette"></i>
+    <h3 style="margin:.4rem 0;color:#ffd700">🏅 ¡INSIGNIA NFT CREATOR!</h3>
+    <p style="font-size:.85rem;color:#cc88ff">Minteaste tu primera colección NFT. ¡El ERC-721 es el estándar detrás de todo el arte digital en blockchain!</p>
+  </div>
+
+  <div class="nav-links">
+    <a href="sc3-02-hardhat-foundry.html" class="nav-link"><i class="fas fa-arrow-left"></i> Testing</a>
+    <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Menú</a>
+    <a href="sc3-04-erc1155-vaults.html" class="nav-link next">ERC-1155 & Vaults <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Smart Contracts DeFi · Semana 3-4 · ERC-721 · EIP-721 (Dieter Shirley, 2018)</footer>
+</div>
+
+<script>
+const STORAGE_KEY='sc3_nft';
+const PALETTES={
+  neon:['#ff00ff','#00ffff','#ff0088','#8800ff','#00ff88'],
+  retro:['#ff6b35','#f7931e','#ffce47','#d4ef00','#7ed321'],
+  cosmic:['#6c3483','#1a5276','#117a65','#1e8449','#d4ac0d'],
+  forest:['#1b4f1e','#2e7d32','#4caf50','#a5d6a7','#e8f5e9']
+};
+const RARITIES={common:{label:'Common',power:[10,40],mult:1},rare:{label:'Rare',power:[41,70],mult:2},epic:{label:'Epic',power:[71,90],mult:3},legendary:{label:'Legendary',power:[91,99],mult:5}};
+let nfts=[];
+let mintCount=0;
+
+function randInt(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
+
+function drawNFTOnCanvas(canvas,nft){
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+  const pal=PALETTES[nft.palette];
+  ctx.fillStyle='#050010';ctx.fillRect(0,0,W,H);
+  for(let i=0;i<8;i++){
+    ctx.beginPath();
+    const x=randInt(20,W-20),y=randInt(20,H-20);
+    const r=randInt(10,40);
+    const grad=ctx.createRadialGradient(x,y,0,x,y,r);
+    grad.addColorStop(0,pal[i%pal.length]+'bb');
+    grad.addColorStop(1,'transparent');
+    ctx.arc(x,y,r,0,Math.PI*2);
+    ctx.fillStyle=grad;ctx.fill();
+  }
+  ctx.strokeStyle='#ffffff22';ctx.lineWidth=1;
+  for(let i=0;i<4;i++){
+    ctx.beginPath();
+    ctx.moveTo(randInt(0,W),randInt(0,H));
+    ctx.bezierCurveTo(randInt(0,W),randInt(0,H),randInt(0,W),randInt(0,H),randInt(0,W),randInt(0,H));
+    ctx.strokeStyle=pal[i%pal.length]+'66';ctx.stroke();
+  }
+  ctx.fillStyle='#ffffff';ctx.font='bold 12px Inter';ctx.textAlign='center';
+  ctx.fillText('#'+nft.id,W/2,H-10);
+  const rarColors={common:'#888',rare:'#64dc00',epic:'#b450ff',legendary:'#ffd700'};
+  ctx.fillStyle=rarColors[nft.rarity]||'#888';
+  ctx.font='9px Inter';ctx.fillText(RARITIES[nft.rarity].label,W/2,H-24);
+}
+
+function mintNFT(){
+  const name=document.getElementById('collName').value||'CryptoArt';
+  const symbol=document.getElementById('collSymbol').value||'CART';
+  const rarity=document.getElementById('rarity').value;
+  const palette=document.getElementById('palette').value;
+  const rData=RARITIES[rarity];
+  const power=randInt(rData.power[0],rData.power[1]);
+  const nft={id:nfts.length+1,name,symbol,rarity,palette,power,owner:'0x'+Math.random().toString(16).slice(2,10)+'...'};
+  nfts.push(nft);
+  mintCount++;
+  document.getElementById('collNameDisplay').textContent=name;
+  document.getElementById('totalMinted').textContent=nfts.length;
+  document.getElementById('gasEstimate').textContent=`Gas estimado: ~${(65000+Math.random()*5000).toFixed(0)} (~$${(0.065*20*2600/1e9*65000).toFixed(3)})`;
+  renderGrid();
+  selectNFT(nft);
+  document.getElementById('feedbackMsg').innerHTML=`🎨 <strong>NFT #${nft.id} minteado</strong> — ${rData.label} · Power: ${power} · Paleta: ${palette}. El <code>tokenURI</code> devuelve un JSON codificado en base64 con todos los atributos.`;
+  if(mintCount>=3&&!localStorage.getItem(STORAGE_KEY)){localStorage.setItem(STORAGE_KEY,'true');document.getElementById('insigniaArea').classList.remove('hidden');}
+}
+
+function renderGrid(){
+  const grid=document.getElementById('nftGrid');
+  grid.innerHTML='';
+  nfts.forEach(nft=>{
+    const tc=document.createElement('canvas');tc.width=80;tc.height=80;
+    tc.style.cssText='border-radius:.6rem;display:block;cursor:pointer';
+    const rngBackup=Math.random;
+    Math.random=(()=>{let s=nft.id*137.508;return()=>{s=Math.sin(s)*10000;return s-Math.floor(s);}})();
+    drawNFTOnCanvas(tc,nft);
+    Math.random=rngBackup;
+    const div=document.createElement('div');
+    div.className='nft-card';
+    div.appendChild(tc);
+    div.innerHTML+=`<div class="nft-id">#${nft.id}</div><div class="nft-owner">${nft.owner}</div>`;
+    div.onclick=()=>{document.querySelectorAll('.nft-card').forEach(c=>c.classList.remove('selected'));div.classList.add('selected');selectNFT(nft);};
+    grid.appendChild(div);
+  });
+}
+
+function selectNFT(nft){
+  const rarColors={common:'#888888',rare:'#64dc00',epic:'#b450ff',legendary:'#ffd700'};
+  const meta={name:`${nft.name} #${nft.id}`,description:`${nft.name} NFT Collection — ${RARITIES[nft.rarity].label} token`,image:`ipfs://QmXXXXX/images/${nft.id}.png`,attributes:[{trait_type:'Rarity',value:RARITIES[nft.rarity].label},{trait_type:'Power',value:nft.power,display_type:'number'},{trait_type:'Palette',value:nft.palette},{trait_type:'Rarity Color',value:rarColors[nft.rarity]}]};
+  const box=document.getElementById('metadataBox');
+  box.innerHTML=`<span class="meta-key">{"name"</span>: <span class="meta-str">"${meta.name}"</span>,\n<span class="meta-key"> "description"</span>: <span class="meta-str">"${meta.description}"</span>,\n<span class="meta-key"> "image"</span>: <span class="meta-str">"${meta.image}"</span>,\n<span class="meta-key"> "attributes"</span>: [\n${meta.attributes.map(a=>`  { <span class="meta-key">"trait_type"</span>: <span class="meta-str">"${a.trait_type}"</span>, <span class="meta-key">"value"</span>: <span class="meta-val">${typeof a.value==='string'?'"'+a.value+'"':a.value}</span> }`).join(',\n')}\n]}`;
+}
+
+function clearAll(){nfts=[];mintCount=0;document.getElementById('nftGrid').innerHTML='<div style="color:#4a2266;font-size:.78rem;grid-column:1/-1;text-align:center;padding:1rem">Colección vacía</div>';document.getElementById('totalMinted').textContent='0';document.getElementById('metadataBox').innerHTML='<span style="color:#4a2266">// Selecciona un NFT para ver su metadata</span>';}
+
+if(localStorage.getItem(STORAGE_KEY))document.getElementById('insigniaArea').classList.remove('hidden');
+</script>
+</body>
+</html>

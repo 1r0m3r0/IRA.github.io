@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Curso 3 | Modos de Backtesting</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../../assets/css/theme.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%);background-size:200% 200%;animation:gradientShift 20s ease infinite;font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
+@keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.modulo-container{max-width:1300px;width:100%;background:rgba(15,25,45,0.65);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(255,100,220,0.25);box-shadow:0 25px 45px rgba(0,0,0,0.5);overflow:hidden}
+.hero-header{background:linear-gradient(95deg,#0b1120 0%,#111a2e 100%);padding:2rem 2rem 1.5rem 2rem;text-align:center;border-bottom:2px solid #ff64dc}
+.hero-header h1{font-size:2.6rem;font-weight:800;background:linear-gradient(135deg,#FFF,#ff99e6,#ff64dc);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-header p{color:#f0ccee;margin-top:.5rem;font-size:1.1rem}
+.badge-area{display:flex;justify-content:center;gap:1rem;margin-top:1.2rem;flex-wrap:wrap}
+.chip{background:rgba(255,100,220,0.15);border:1px solid #ff64dc;padding:0.4rem 1rem;border-radius:40px;font-size:0.8rem;font-weight:600;color:#ddd}
+.analogy-card{background:#1e2a3acc;margin:1.5rem 2rem;padding:1.2rem 1.8rem;border-radius:2rem;border-left:8px solid #ff64dc;font-size:1rem;line-height:1.6}
+.progress-section{margin:1rem 2rem 0}
+.progress-bar-outer{background:#1a2a4a;border-radius:20px;height:20px;overflow:hidden}
+.progress-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,#ff64dc,#fff);border-radius:20px;transition:width 0.5s ease}
+.progress-text{text-align:center;font-size:0.85rem;color:#8899cc;margin-bottom:.5rem}
+.main-area{padding:1rem 2rem}
+.mode-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin-bottom:1.5rem}
+.mode-card{background:#0d1525;border-radius:1.5rem;padding:1.2rem;border:1px solid #2a3a5a;cursor:pointer;transition:0.2s}
+.mode-card:hover{border-color:#ff64dc;transform:translateY(-3px)}
+.mode-card.selected{border-color:#ff64dc;box-shadow:0 0 15px rgba(255,100,220,0.3)}
+.mode-card h3{font-size:1rem;margin-bottom:.4rem;color:#ff99e6}
+.mode-card .icon{font-size:2rem;margin-bottom:.5rem}
+.mode-card .badge{display:inline-block;background:rgba(255,100,220,0.15);padding:.2rem .6rem;border-radius:1rem;font-size:.7rem;color:#ff99e6;margin-right:.3rem}
+.mode-detail{background:#0a1020;border-radius:2rem;padding:1.5rem;border:1px solid #2a3a5a;margin-bottom:1.5rem;display:none}
+.mode-detail.active{display:block}
+.mode-detail h4{color:#ff64dc;margin-bottom:.8rem}
+.mode-detail ul{list-style:none;padding:0}
+.mode-detail ul li{margin:.4rem 0;padding:.4rem 0;border-bottom:1px solid #1a2a4a;font-size:.9rem}
+.mode-detail ul li i{width:1.5rem;color:#ff64dc}
+.comparison-table{width:100%;border-collapse:collapse;font-size:.8rem;margin:1rem 0}
+.comparison-table th{background:#1a2a4a;padding:.6rem;text-align:left;color:#8899cc;border-bottom:2px solid #3a4a6a}
+.comparison-table td{padding:.6rem;border-bottom:1px solid #2a3a5a}
+.comparison-table .best{color:#00c853;font-weight:600}
+.comparison-table .mid{color:#ffd700}
+.comparison-table .worst{color:#ff1744}
+.sim-panel{background:#0a1020;border-radius:2rem;padding:1.5rem;border:1px solid #2a3a5a;margin-bottom:1.5rem}
+.sim-controls{display:flex;gap:1rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem}
+.sim-controls select,.sim-controls input{background:#1a2a4a;border:1px solid #3a4a6a;padding:.6rem;border-radius:1rem;color:#eef5ff;font-family:'Inter',sans-serif}
+.sim-canvas-wrap{background:#0d1525;border-radius:1rem;padding:1rem;margin-bottom:1rem}
+.sim-canvas-wrap canvas{width:100%;height:180px;border-radius:.5rem}
+.metrics-compare{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:1rem}
+.metric-card{background:#0d1525;border-radius:1rem;padding:.8rem;text-align:center;border:1px solid #2a3a5a}
+.metric-card .val{font-size:1.3rem;font-weight:700;color:#ff64dc}
+.metric-card .lbl{font-size:.7rem;color:#8899cc}
+.btn-action{background:linear-gradient(95deg,#ff64dc,#ff30c0);border:none;padding:0.8rem 1.8rem;font-weight:bold;border-radius:3rem;cursor:pointer;font-size:1rem;transition:0.2s;color:#fff;font-family:'Inter',sans-serif}
+.btn-action:hover{transform:translateY(-2px);box-shadow:0 0 15px rgba(255,100,220,0.5)}
+.feedback{background:#00000099;margin:0 2rem 1.5rem 2rem;padding:1rem;border-radius:1.5rem;text-align:center;font-weight:500;border-left:4px solid #ff64dc;min-height:3rem}
+.insignia{text-align:center;background:#0c1b2f;border-radius:2rem;margin:0 2rem 1.5rem;padding:1rem;border:2px dashed gold}
+.insignia i{font-size:2.5rem;color:gold}
+.insignia h3{color:gold;margin:.5rem 0}
+.hidden{display:none!important}
+.nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.5rem 2rem}
+.nav-link{background:#2c3e66;padding:0.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:0.5rem;transition:0.2s}
+.nav-link:hover{transform:translateY(-2px);box-shadow:0 0 10px rgba(255,100,220,0.4)}
+.nav-link.next{background:linear-gradient(95deg,#f0a500,#ff6a00);color:#1e1a0c}
+.nav-link.menu{background:#1a2a4a;border:1px solid #ff64dc}
+.nav-link.prev{background:#1a2a4a;border:1px solid #666}
+footer{text-align:center;padding:1.2rem;font-size:0.8rem;border-top:1px solid #2c3e66;color:#8899cc}
+@media(max-width:900px){.mode-grid{grid-template-columns:1fr}.metrics-compare{grid-template-columns:1fr}.hero-header h1{font-size:1.9rem}.analogy-card{margin:1rem}.feedback{margin:0 1rem 1rem}.main-area{padding:1rem}}
+</style>
+</head>
+<body>
+<nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a><a href="../index.html">Programa MQL5</a></nav>
+<div class="modulo-container">
+  <div class="hero-header">
+    <h1>🎯 Modos de Backtesting</h1>
+    <p>"Cada modo de simulación tiene un precio: velocidad vs precisión"</p>
+    <div class="badge-area">
+      <span class="chip"><i class="fas fa-bolt"></i> Every Tick</span>
+      <span class="chip"><i class="fas fa-dot-circle"></i> Control Points</span>
+      <span class="chip"><i class="fas fa-chart-bar"></i> OHLC</span>
+    </div>
+  </div>
+
+  <div class="progress-section">
+    <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+    <div class="progress-text" id="progressText">Módulo 2 de 12</div>
+  </div>
+
+  <div class="analogy-card">
+    <strong>🎬 Piénsalo así:</strong> Elegir un modo de backtesting es como ver una película. Every Tick es verla fotograma a fotograma (preciso pero lento). Control Points es ver solo las escenas clave (buen balance). OHLC es leer el resumen de Wikipedia (rápido pero te pierdes los detalles). El truco es saber cuándo usar cada uno.
+  </div>
+
+  <div class="main-area">
+    <div class="mode-grid">
+      <div class="mode-card" data-mode="everytick" onclick="selectMode('everytick')">
+        <div class="icon">⚡</div>
+        <h3>Every Tick</h3>
+        <p style="font-size:.85rem;color:#8899cc">Simula cada tick real del mercado. Precisión máxima.</p>
+        <div style="margin-top:.5rem"><span class="badge"><i class="fas fa-tachometer-alt"></i> Lento</span><span class="badge"><i class="fas fa-bullseye"></i> Exacto</span></div>
+      </div>
+      <div class="mode-card" data-mode="controlpoints" onclick="selectMode('controlpoints')">
+        <div class="icon">🔵</div>
+        <h3>Control Points</h3>
+        <p style="font-size:.85rem;color:#8899cc">Solo ticks en cambios de precio. Buen balance.</p>
+        <div style="margin-top:.5rem"><span class="badge"><i class="fas fa-balance-scale"></i> Balance</span><span class="badge"><i class="fas fa-clock"></i> Rápido</span></div>
+      </div>
+      <div class="mode-card" data-mode="ohlc" onclick="selectMode('ohlc')">
+        <div class="icon">📊</div>
+        <h3>OHLC (M1)</h3>
+        <p style="font-size:.85rem;color:#8899cc">Solo OHLC de M1. Máxima velocidad.</p>
+        <div style="margin-top:.5rem"><span class="badge"><i class="fas fa-rocket"></i> Veloz</span><span class="badge"><i class="fas fa-exclamation-triangle"></i> Aproximado</span></div>
+      </div>
+    </div>
+
+    <div id="detail-everytick" class="mode-detail active">
+      <h4><i class="fas fa-bolt"></i> Every Tick — Precisión Quirúrgica</h4>
+      <ul>
+        <li><i class="fas fa-check-circle" style="color:#00c853"></i> Simula CADA tick real del historial</li>
+        <li><i class="fas fa-check-circle" style="color:#00c853"></i> Ideal para EAs que operan en M1 o scalping</li>
+        <li><i class="fas fa-check-circle" style="color:#00c853"></i> Detecta slippage realista y relleno de órdenes</li>
+        <li><i class="fas fa-times-circle" style="color:#ff1744"></i> 10-50x más lento que OHLC</li>
+        <li><i class="fas fa-times-circle" style="color:#ff1744"></i> Requiere datos de ticks reales (archivos .bin)</li>
+      </ul>
+    </div>
+    <div id="detail-controlpoints" class="mode-detail">
+      <h4><i class="fas fa-dot-circle"></i> Control Points — El Balance Perfecto</h4>
+      <ul>
+        <li><i class="fas fa-check-circle" style="color:#00c853"></i> Genera ticks solo cuando el precio cambia</li>
+        <li><i class="fas fa-check-circle" style="color:#00c853"></i> 2-5x más rápido que Every Tick</li>
+        <li><i class="fas fa-check-circle" style="color:#00c853"></i> Suficiente para EAs en H1+</li>
+        <li><i class="fas fa-times-circle" style="color:#ff1744"></i> Menos preciso para órdenes limit y stop</li>
+        <li><i class="fas fa-check-circle" style="color:#00c853"></i> 99% de precisión vs modo real para timeframes altos</li>
+      </ul>
+    </div>
+    <div id="detail-ohlc" class="mode-detail">
+      <h4><i class="fas fa-chart-bar"></i> OHLC (M1) — Velocidad Máxima</h4>
+      <ul>
+        <li><i class="fas fa-check-circle" style="color:#00c853"></i> Solo usa Open, High, Low, Close de cada M1</li>
+        <li><i class="fas fa-check-circle" style="color:#00c853"></i> 50-100x más rápido que Every Tick</li>
+        <li><i class="fas fa-check-circle" style="color:#00c853"></i> Ideal para optimizaciones masivas</li>
+        <li><i class="fas fa-times-circle" style="color:#ff1744"></i> No detecta stops intra-barra</li>
+        <li><i class="fas fa-times-circle" style="color:#ff1744"></i> Sobreestima el profit en estrategias de tendencia</li>
+      </ul>
+    </div>
+
+    <div class="sim-panel">
+      <h3 style="color:#bcc9f0;margin-bottom:1rem"><i class="fas fa-flask"></i> Simulador Comparativo</h3>
+      <div class="sim-controls">
+        <div><label style="font-size:.8rem;color:#8899cc">Estrategia</label><select id="strategySel"><option value="trend">Tendencia (MA Cross)</option><option value="scalp">Scalping</option><option value="grid">Grid</option></select></div>
+        <div><label style="font-size:.8rem;color:#8899cc">Modo</label><select id="modeSel"><option value="everytick">Every Tick</option><option value="controlpoints">Control Points</option><option value="ohlc">OHLC M1</option></select></div>
+        <button class="btn-action" id="simBtn"><i class="fas fa-play"></i> Simular</button>
+      </div>
+      <div class="sim-canvas-wrap">
+        <canvas id="simCanvas" width="900" height="180"></canvas>
+      </div>
+      <div class="metrics-compare" id="simMetrics">
+        <div class="metric-card"><div class="lbl">Tiempo</div><div class="val" id="mTime">—</div></div>
+        <div class="metric-card"><div class="lbl">Trades</div><div class="val" id="mTrades">—</div></div>
+        <div class="metric-card"><div class="lbl">Profit</div><div class="val" id="mProfit">—</div></div>
+      </div>
+    </div>
+
+    <div class="sim-panel">
+      <h3 style="color:#bcc9f0;margin-bottom:1rem"><i class="fas fa-table"></i> Tabla Comparativa</h3>
+      <table class="comparison-table">
+        <tr><th>Característica</th><th>Every Tick</th><th>Control Points</th><th>OHLC M1</th></tr>
+        <tr><td>Precisión</td><td class="best">★★★★★</td><td class="mid">★★★★☆</td><td class="worst">★★☆☆☆</td></tr>
+        <tr><td>Velocidad</td><td class="worst">★★☆☆☆</td><td class="mid">★★★★☆</td><td class="best">★★★★★</td></tr>
+        <tr><td>Stop Loss intra-barra</td><td class="best">✅ Exacto</td><td class="mid">⚠️ Parcial</td><td class="worst">❌ No detecta</td></tr>
+        <tr><td>Órdenes Limit/Stop</td><td class="best">✅ Realista</td><td class="mid">⚠️ Aprox</td><td class="worst">❌ Ignora</td></tr>
+        <tr><td>Slippage</td><td class="best">✅ Simula</td><td class="mid">⚠️ Parcial</td><td class="worst">❌ No simula</td></tr>
+        <tr><td>Uso recomendado</td><td>Scalping, M1-M5</td><td>H1-H4, optimización</td><td>D1+, optimización masiva</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div id="feedbackMsg" class="feedback">💡 Selecciona un modo de simulación haciendo clic en las tarjetas, luego prueba el simulador comparativo.</div>
+
+  <div id="insigniaArea" class="insignia hidden">
+    <i class="fas fa-medal"></i>
+    <h3>🏅 Mode Selector 🏅</h3>
+    <p>¡Dominas los modos de backtesting! Sabes exactamente cuándo usar cada modo. 🚀</p>
+  </div>
+
+  <div class="nav-links">
+    <a href="01-portal.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+    <a href="03-spread-slippage.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-flask"></i> Curso 3: Backtesting y Validación Cuantitativa</footer>
+</div>
+
+<script>
+const STORAGE_KEY = 'mql5_3_02';
+let completed = false;
+let modeSelected = false;
+let simDone = false;
+
+function initProgress(){
+  const p = JSON.parse(localStorage.getItem('mql5_3_progress')) || [];
+  const pf = document.getElementById('progressFill');
+  const pt = document.getElementById('progressText');
+  if(pf) pf.style.width = Math.round((p.length/12)*100)+'%';
+  if(pt) pt.textContent = p.length+' de 12 módulos';
+  if(p.includes(STORAGE_KEY)){
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    completed = true;
+  }
+}
+
+function saveProgress(){
+  let p = JSON.parse(localStorage.getItem('mql5_3_progress')) || [];
+  if(!p.includes(STORAGE_KEY)){p.push(STORAGE_KEY);localStorage.setItem('mql5_3_progress',JSON.stringify(p));}
+  const pf = document.getElementById('progressFill');
+  const pt = document.getElementById('progressText');
+  if(pf) pf.style.width = Math.round((p.length/12)*100)+'%';
+  if(pt) pt.textContent = p.length+' de 12 módulos';
+}
+
+function selectMode(mode){
+  document.querySelectorAll('.mode-card').forEach(c=>c.classList.remove('selected'));
+  document.querySelectorAll('.mode-detail').forEach(d=>d.classList.remove('active'));
+  document.querySelector('.mode-card[data-mode="'+mode+'"]').classList.add('selected');
+  document.getElementById('detail-'+mode).classList.add('active');
+  document.getElementById('modeSel').value = mode;
+  modeSelected = true;
+  checkCompletion();
+  document.getElementById('feedbackMsg').innerHTML = '📖 Explorando modo: <strong>'+mode+'</strong>';
+}
+
+function simulateMode(){
+  const mode = document.getElementById('modeSel').value;
+  const strategy = document.getElementById('strategySel').value;
+  const canvas = document.getElementById('simCanvas');
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+  ctx.clearRect(0,0,w,h);
+
+  const timeMultipliers = {everytick:1, controlpoints:3, ohlc:8};
+  const profitMultipliers = {everytick:1, controlpoints:0.97, ohlc:1.15};
+  const tradesCount = strategy === 'scalp' ? 85 + Math.floor(Math.random()*30) : strategy === 'grid' ? 40 + Math.floor(Math.random()*20) : 25 + Math.floor(Math.random()*15);
+
+  const simulatedTime = (tradesCount / timeMultipliers[mode]).toFixed(1);
+  const profitFactor = profitMultipliers[mode] * (1.2 + Math.random()*0.8);
+  const finalTrades = Math.round(tradesCount * (mode === 'ohlc' ? 0.85 : 1));
+
+  document.getElementById('mTime').textContent = simulatedTime + 's';
+  document.getElementById('mTrades').textContent = finalTrades;
+  document.getElementById('mProfit').textContent = profitFactor.toFixed(2);
+
+  // Draw
+  ctx.fillStyle = '#0d1525';
+  ctx.fillRect(0,0,w,h);
+
+  const pts = 35;
+  const values = [];
+  let v = 10000;
+  const vol = mode === 'everytick' ? 0.015 : mode === 'controlpoints' ? 0.012 : 0.02;
+  for(let i=0;i<pts;i++){
+    v += (Math.random()-0.47)*v*vol;
+    values.push(v);
+  }
+  const min = Math.min(...values), max = Math.max(...values);
+  const range = max-min||1;
+  const pad = 10, ch = h-pad*2;
+
+  const grad = ctx.createLinearGradient(0,0,0,h);
+  grad.addColorStop(0,'rgba(255,100,220,0.15)');
+  grad.addColorStop(1,'rgba(255,100,220,0.01)');
+  ctx.beginPath();
+  values.forEach((v,i)=>{const x=i/(pts-1)*(w-pad*2)+pad;const y=pad+(max-v)/range*ch;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
+  ctx.lineTo(w-pad, h-pad); ctx.lineTo(pad, h-pad); ctx.closePath();
+  ctx.fillStyle = grad; ctx.fill();
+  ctx.strokeStyle = '#ff64dc'; ctx.lineWidth = 2;
+  ctx.beginPath();
+  values.forEach((v,i)=>{const x=i/(pts-1)*(w-pad*2)+pad;const y=pad+(max-v)/range*ch;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
+  ctx.stroke();
+  ctx.fillStyle = '#8899cc';
+  ctx.font = '11px Inter';
+  ctx.fillText('Modo: '+mode+' | Estrategia: '+strategy, pad+5, pad+15);
+  ctx.fillText('$'+values[values.length-1].toFixed(0), w-100, pad+15);
+
+  simDone = true;
+  checkCompletion();
+  document.getElementById('feedbackMsg').innerHTML = '✅ Simulación completada en modo <strong>'+mode+'</strong> con estrategia '+strategy+'. '+finalTrades+' trades ejecutados.';
+}
+
+function checkCompletion(){
+  if(!completed && modeSelected && simDone){
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').innerHTML = '🎉 ¡Modos dominados! Sabes elegir el modo correcto para cada estrategia. ¡Insignia desbloqueada!';
+    saveProgress();
+    completed = true;
+  }
+}
+
+document.getElementById('simBtn').addEventListener('click', simulateMode);
+window.addEventListener('load', initProgress);
+</script>
+<script src="../../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

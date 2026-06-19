@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MQL5 · Eventos: OnInit / OnTick / OnDeinit</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    :root {
+      --bg: #0a0f1e; --bg2: #0c1222; --bg3: #111a2e;
+      --glass: rgba(15,25,45,0.65); --border: rgba(255,255,255,0.06);
+      --text: #e0e6f0; --text2: #8899cc; --accent: #ff5050;
+      --accent-dim: rgba(255,80,80,0.15); --font: 'Inter', sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: var(--font); background: linear-gradient(135deg,var(--bg),var(--bg2),var(--bg3));
+      background-size: 400% 400%; animation: gradShift 20s ease infinite;
+      color: var(--text); min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; padding: 1rem;
+    }
+    @keyframes gradShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+    .brand-return-nav {
+      width: 100%; max-width: 900px; display: flex; gap: 1rem; padding: 0.75rem 1rem;
+      background: rgba(15,25,45,0.5); backdrop-filter: blur(10px); border-radius: 60px;
+      margin-bottom: 1.5rem; border: 1px solid var(--border);
+    }
+    .brand-return-nav a { color: var(--text2); text-decoration: none; font-size: 0.85rem; font-weight: 500; padding: 0.4rem 1rem; border-radius: 60px; transition: all 0.3s; }
+    .brand-return-nav a:hover { background: var(--accent-dim); color: var(--accent); }
+    .course-container {
+      width: 100%; max-width: 900px; background: var(--glass); backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px); border-radius: 3rem; padding: 2.5rem 2.8rem;
+      border: 1px solid var(--border); box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+    }
+    @media(max-width:600px){ .course-container{ padding:1.5rem 1.2rem; border-radius:2rem; } }
+    .hero-header { text-align: center; margin-bottom: 1.8rem; }
+    .hero-header h1 {
+      font-size: 2.4rem; font-weight: 800; background: linear-gradient(135deg,var(--accent),#fff);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      margin-bottom: 0.4rem;
+    }
+    .hero-header p { color: var(--text2); font-size: 1.05rem; font-weight: 400; }
+    .badge-area { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; margin-top: 0.8rem; }
+    .badge { background: var(--accent-dim); color: var(--accent); padding: 0.3rem 1rem; border-radius: 60px; font-size: 0.75rem; font-weight: 600; border: 1px solid rgba(255,80,80,0.2); }
+    .progress-section { margin: 1.2rem 0; }
+    .progress-bar-outer { background: #1a2a4a; border-radius: 20px; height: 20px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg,var(--accent),#fff); border-radius: 20px; transition: width 0.5s ease; }
+    .progress-text { text-align: center; font-size: 0.85rem; color: #8899cc; margin-top: 0.3rem; }
+    .analogy-card { background: rgba(255,255,255,0.03); border-left: 8px solid var(--accent); border-radius: 1.5rem; padding: 1.5rem 1.8rem; margin-bottom: 2rem; }
+    .analogy-card .icon { font-size: 1.8rem; margin-bottom: 0.3rem; }
+    .analogy-card p { font-size: 0.95rem; line-height: 1.6; color: #c8d0e0; }
+    #mainArea { margin-bottom: 1.5rem; }
+    .chart-container { background: rgba(0,0,0,0.3); border-radius: 16px; padding: 0.5rem; margin-bottom: 1rem; position: relative; border: 1px solid var(--border); }
+    .chart-container canvas { width: 100%; height: 200px; display: block; border-radius: 12px; }
+    .ea-controls { display: flex; flex-wrap: wrap; gap: 0.6rem; justify-content: center; margin-bottom: 1rem; }
+    .ea-btn {
+      padding: 0.6rem 1.4rem; border-radius: 60px; border: 2px solid var(--border); background: transparent;
+      color: var(--text); font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.3s;
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+    .ea-btn:hover { transform: translateY(-2px); }
+    .ea-btn.start { border-color: #00c864; color: #00c864; }
+    .ea-btn.start:hover { background: rgba(0,200,100,0.15); }
+    .ea-btn.stop { border-color: #ff5050; color: #ff5050; }
+    .ea-btn.stop:hover { background: rgba(255,80,80,0.15); }
+    .ea-btn.tick { border-color: #2b9eff; color: #2b9eff; }
+    .ea-btn.tick:hover { background: rgba(43,158,255,0.15); }
+    .ea-btn.timer { border-color: #ffd700; color: #ffd700; }
+    .ea-btn.timer:hover { background: rgba(255,215,0,0.15); }
+    .ea-btn.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+    .ea-btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
+    .console-log {
+      background: rgba(0,0,0,0.5); border-radius: 12px; padding: 1rem; height: 220px; overflow-y: auto;
+      font-family: 'Courier New', monospace; font-size: 0.78rem; line-height: 1.5;
+      border: 1px solid var(--border); margin-bottom: 1rem;
+    }
+    .console-log::-webkit-scrollbar { width: 4px; }
+    .console-log::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; }
+    .console-log .log-entry { padding: 2px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
+    .console-log .log-time { color: var(--text2); }
+    .console-log .log-init { color: #2b9eff; }
+    .console-log .log-tick { color: #00c864; }
+    .console-log .log-deinit { color: #ff5050; }
+    .console-log .log-timer { color: #ffd700; }
+    .status-indicator {
+      display: flex; align-items: center; gap: 0.5rem; justify-content: center; margin-bottom: 0.8rem;
+      padding: 0.5rem; border-radius: 12px; background: rgba(0,0,0,0.2);
+    }
+    .status-dot {
+      width: 10px; height: 10px; border-radius: 50%; display: inline-block;
+    }
+    .status-dot.stopped { background: #ff5050; }
+    .status-dot.running { background: #00c864; animation: pulse 1s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    #feedbackMsg { text-align: center; padding: 0.8rem; border-radius: 16px; font-weight: 500; margin: 1rem 0; min-height: 3rem; display: flex; align-items: center; justify-content: center; }
+    #feedbackMsg.success { background: rgba(0,200,100,0.12); color: #00c864; }
+    #feedbackMsg.error { background: rgba(255,80,80,0.12); color: #ff5050; }
+    #feedbackMsg.info { background: rgba(43,158,255,0.12); color: #2b9eff; }
+    #insigniaArea { display: none; text-align: center; padding: 1.5rem; border: 2px dashed var(--accent); border-radius: 2rem; margin: 1.2rem 0; background: var(--accent-dim); }
+    #insigniaArea.show { display: block; }
+    #insigniaArea .insignia-text { font-size: 1.6rem; font-weight: 800; color: var(--accent); }
+    .nav-links { display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; gap: 0.5rem; }
+    .nav-links a { color: var(--text2); text-decoration: none; font-size: 0.85rem; font-weight: 500; padding: 0.5rem 1.2rem; border-radius: 60px; border: 1px solid var(--border); transition: all 0.3s; display: flex; align-items: center; gap: 0.4rem; }
+    .nav-links a:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+    .nav-links a.menu-link { background: var(--accent); color: #0a0f1e; border-color: var(--accent); font-weight: 700; }
+    .nav-links a.menu-link:hover { box-shadow: 0 0 20px rgba(255,80,80,0.3); }
+    footer { text-align: center; margin-top: 1.5rem; color: var(--text2); font-size: 0.75rem; opacity: 0.6; }
+  </style>
+</head>
+<body>
+  <nav class="brand-return-nav">
+    <a href="../../index.html"><i class="fas fa-arrow-left"></i> Portfolio</a>
+    <a href="../../cursos/index.html"><i class="fas fa-graduation-cap"></i> Cursos</a>
+  </nav>
+  <div class="course-container">
+    <header class="hero-header">
+      <h1>⚡ Eventos: OnInit / OnTick / OnDeinit</h1>
+      <p>El corazón palpitante de todo Expert Advisor</p>
+      <div class="badge-area">
+        <span class="badge"><i class="fas fa-bolt"></i> Eventos</span>
+        <span class="badge"><i class="fas fa-play-circle"></i> OnInit</span>
+        <span class="badge"><i class="fas fa-chart-line"></i> OnTick</span>
+        <span class="badge"><i class="fas fa-power-off"></i> OnDeinit</span>
+      </div>
+    </header>
+
+    <div class="progress-section">
+      <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+      <div class="progress-text" id="progressText">Cargando…</div>
+    </div>
+
+    <div class="analogy-card">
+      <div class="icon">💡</div>
+      <p><strong>Piénsalo así:</strong> Los eventos en MQL5 son como el sistema nervioso humano: cada vez que algo sucede (un tick nuevo = un estímulo), el cuerpo (EA) reacciona automáticamente. OnInit es el nacimiento, OnTick es cada latido, OnDeinit es el último suspiro.</p>
+    </div>
+
+    <div id="mainArea">
+      <div class="status-indicator">
+        <span class="status-dot stopped" id="statusDot"></span>
+        <span id="statusText" style="font-size:0.9rem;font-weight:600;color:var(--text2);">EA DETENIDO</span>
+      </div>
+
+      <div class="chart-container">
+        <canvas id="priceChart" width="800" height="200"></canvas>
+      </div>
+
+      <div class="ea-controls">
+        <button class="ea-btn start" id="btnInit"><i class="fas fa-play"></i> Start EA</button>
+        <button class="ea-btn tick" id="btnTick" disabled><i class="fas fa-arrow-up"></i> Send Tick</button>
+        <button class="ea-btn timer" id="btnTimer" disabled><i class="fas fa-clock"></i> Set Timer</button>
+        <button class="ea-btn stop" id="btnDeinit" disabled><i class="fas fa-stop"></i> Stop EA</button>
+      </div>
+
+      <div class="console-log" id="consoleLog">
+        <div class="log-entry"><span class="log-time">[--:--:--]</span> <span style="color:var(--text2)">Esperando instrucciones…</span></div>
+      </div>
+    </div>
+
+    <div id="feedbackMsg"></div>
+
+    <div id="insigniaArea">
+      <div style="font-size:3rem;margin-bottom:0.5rem;">🏅</div>
+      <div class="insignia-text">¡Controlador de Eventos!</div>
+      <p style="color:var(--text2);margin-top:0.3rem;">Has dominado el ciclo de vida de un EA en MQL5.</p>
+    </div>
+
+    <div class="nav-links">
+      <a href="06-poo-clases.html"><i class="fas fa-chevron-left"></i> Anterior</a>
+      <a href="index.html" class="menu-link"><i class="fas fa-th"></i> Menú</a>
+      <a href="08-datos-mercado.html">Siguiente <i class="fas fa-chevron-right"></i></a>
+    </div>
+
+    <footer>MQL5 · Curso de Trading Algorítmico</footer>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'mql5_07';
+    const ACCENT = '#ff5050';
+
+    const canvas = document.getElementById('priceChart');
+    const ctx = canvas.getContext('2d');
+    let priceData = [];
+    let currentPrice = 1.1000;
+    let eaRunning = false;
+    let tickInterval = null;
+    let timerInterval = null;
+    let timerCount = 0;
+    let chartAnimFrame = null;
+    let moduleCompleted = false;
+    let startTime = null;
+
+    function resizeCanvas() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      canvas.width = rect.width - 10;
+      canvas.height = 200;
+    }
+
+    function drawChart() {
+      const w = canvas.width, h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+
+      const padding = { top: 20, bottom: 20, left: 30, right: 10 };
+      const chartW = w - padding.left - padding.right;
+      const chartH = h - padding.top - padding.bottom;
+
+      if (priceData.length < 2) {
+        ctx.fillStyle = '#444';
+        ctx.font = '14px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Esperando ticks...', w/2, h/2);
+        return;
+      }
+
+      const minP = Math.min(...priceData);
+      const maxP = Math.max(...priceData);
+      const range = maxP - minP || 0.001;
+
+      ctx.beginPath();
+      ctx.strokeStyle = ACCENT;
+      ctx.lineWidth = 2;
+      ctx.shadowColor = ACCENT;
+      ctx.shadowBlur = 6;
+
+      for (let i = 0; i < priceData.length; i++) {
+        const x = padding.left + (i / (priceData.length - 1)) * chartW;
+        const y = padding.top + chartH - ((priceData[i] - minP) / range) * chartH;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+
+      const lastPrice = priceData[priceData.length - 1];
+      ctx.fillStyle = ACCENT;
+      ctx.font = 'bold 13px Inter, sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText(lastPrice.toFixed(5), w - padding.right, padding.top + 16);
+
+      ctx.fillStyle = '#8899cc';
+      ctx.font = '11px Inter, sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText(`Bid: ${(lastPrice - 0.0002).toFixed(5)}  Ask: ${(lastPrice + 0.0002).toFixed(5)}`, w - padding.right, h - padding.bottom + 14);
+    }
+
+    function generateTick() {
+      const change = (Math.random() - 0.48) * 0.0010;
+      currentPrice += change;
+      if (currentPrice < 1.0500) currentPrice = 1.0500;
+      if (currentPrice > 1.1500) currentPrice = 1.1500;
+      priceData.push(currentPrice);
+      if (priceData.length > 80) priceData.shift();
+      drawChart();
+      return currentPrice;
+    }
+
+    function getTimestamp() {
+      const d = new Date();
+      return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')}`;
+    }
+
+    function addLog(message, className) {
+      const log = document.getElementById('consoleLog');
+      const entry = document.createElement('div');
+      entry.className = 'log-entry';
+      entry.innerHTML = `<span class="log-time">[${getTimestamp()}]</span> <span class="${className}">${message}</span>`;
+      log.appendChild(entry);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    function updateStatus(running) {
+      const dot = document.getElementById('statusDot');
+      const text = document.getElementById('statusText');
+      dot.className = 'status-dot ' + (running ? 'running' : 'stopped');
+      text.textContent = running ? 'EA EJECUTÁNDOSE' : 'EA DETENIDO';
+      text.style.color = running ? '#00c864' : 'var(--text2)';
+    }
+
+    function doInit() {
+      if (eaRunning) return;
+      eaRunning = true;
+      startTime = Date.now();
+      updateStatus(true);
+      priceData = [];
+      currentPrice = 1.1000;
+
+      document.getElementById('btnInit').disabled = true;
+      document.getElementById('btnTick').disabled = false;
+      document.getElementById('btnTimer').disabled = false;
+      document.getElementById('btnDeinit').disabled = false;
+
+      addLog('[OnInit] Inicializando Expert Advisor…', 'log-init');
+      addLog('[OnInit] Magic number: 12345 | Símbolo: EURUSD', 'log-init');
+      addLog('[OnInit] Timeframe: H1 | Spread actual: 12', 'log-init');
+      addLog('[OnInit] ✅ EA listo para operar.', 'log-init');
+
+      generateTick();
+      addLog(`[OnTick] Tick inicial. Bid: ${currentPrice.toFixed(5)}`, 'log-tick');
+
+      showFeedback('✅ EA iniciado correctamente. Los ticks automáticos están corriendo.', 'success');
+
+      if (tickInterval) clearInterval(tickInterval);
+      tickInterval = setInterval(() => {
+        if (!eaRunning) return;
+        const price = generateTick();
+        const spread = Math.floor(Math.random() * 10) + 5;
+        const hasPosition = Math.random() > 0.7;
+        addLog(`[OnTick] Price: ${price.toFixed(5)} | Spread: ${spread} | Posición: ${hasPosition ? 'ABIERTA' : 'NINGUNA'}`, 'log-tick');
+      }, 1500 + Math.random() * 2000);
+    }
+
+    function doTick() {
+      if (!eaRunning) {
+        showFeedback('⚠️ Inicia el EA primero con "Start EA".', 'error');
+        return;
+      }
+      const price = generateTick();
+      const signals = ['COMPRA', 'VENTA', 'NINGUNA'];
+      const signal = signals[Math.floor(Math.random() * 3)];
+      const ma50 = price + (Math.random() - 0.5) * 0.002;
+      const ma200 = price + (Math.random() - 0.5) * 0.004;
+      addLog(`[OnTick] Bid: ${price.toFixed(5)} | Ask: ${(price+0.0002).toFixed(5)} | Señal: ${signal}`, 'log-tick');
+      addLog(`[OnTick] MA50: ${ma50.toFixed(5)} | MA200: ${ma200.toFixed(5)}`, 'log-tick');
+      if (signal !== 'NINGUNA') {
+        addLog(`[OnTick] ⚡ Señal de ${signal} detectada!`, 'log-tick');
+      }
+      showFeedback(`🔄 Tick manual enviado. Precio: ${price.toFixed(5)}`, 'info');
+    }
+
+    function doTimer() {
+      if (!eaRunning) {
+        showFeedback('⚠️ Inicia el EA primero.', 'error');
+        return;
+      }
+      timerCount++;
+      if (!timerInterval) {
+        timerInterval = setInterval(() => {
+          if (!eaRunning) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            return;
+          }
+          timerCount++;
+          addLog(`[OnTimer] Timer #${timerCount} disparado. Intervalo: 3 segundos`, 'log-timer');
+          addLog(`[OnTimer] Equity: ${(10000 + Math.random()*200).toFixed(2)} | Balance: 10000.00`, 'log-timer');
+        }, 3000);
+        document.getElementById('btnTimer').classList.add('active');
+        addLog('[OnTimer] ⏱ Timer configurado: cada 3 segundos', 'log-timer');
+        showFeedback('⏱ Timer activado. Se dispara cada 3 segundos.', 'info');
+      } else {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        document.getElementById('btnTimer').classList.remove('active');
+        addLog('[OnTimer] ⏱ Timer desactivado.', 'log-timer');
+        showFeedback('⏱ Timer desactivado.', 'info');
+      }
+    }
+
+    function doDeinit() {
+      if (!eaRunning) return;
+      eaRunning = false;
+      updateStatus(false);
+
+      if (tickInterval) { clearInterval(tickInterval); tickInterval = null; }
+      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+      document.getElementById('btnTimer').classList.remove('active');
+
+      document.getElementById('btnInit').disabled = false;
+      document.getElementById('btnTick').disabled = true;
+      document.getElementById('btnTimer').disabled = true;
+      document.getElementById('btnDeinit').disabled = true;
+
+      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      const reasons = ['REASON_REMOVE', 'REASON_PARAMETERS', 'REASON_RECOMPILE', 'REASON_CLOSE'];
+      const reason = reasons[Math.floor(Math.random() * reasons.length)];
+
+      addLog(`[OnDeinit] Cerrando EA... Motivo: ${reason}`, 'log-deinit');
+      addLog(`[OnDeinit] Órdenes abiertas cerradas: ${Math.floor(Math.random()*3)}`, 'log-deinit');
+      addLog(`[OnDeinit] Tiempo activo: ${elapsed} segundos | Ticks procesados: ${priceData.length}`, 'log-deinit');
+      addLog('[OnDeinit] ✅ EA finalizado correctamente.', 'log-deinit');
+
+      showFeedback('🛑 EA detenido. Usa "Start EA" para reiniciar.', 'info');
+
+      if (!moduleCompleted && priceData.length > 10) {
+        setTimeout(() => completeModule(), 800);
+      }
+    }
+
+    function completeModule() {
+      if (moduleCompleted) return;
+      moduleCompleted = true;
+      document.getElementById('feedbackMsg').textContent = '';
+      document.getElementById('feedbackMsg').className = '';
+      document.getElementById('insigniaArea').classList.add('show');
+      updateProgress();
+    }
+
+    function updateProgress() {
+      let p = JSON.parse(localStorage.getItem('mql5_progress')) || [];
+      if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem('mql5_progress', JSON.stringify(p)); }
+      const progressFill = document.getElementById('progressFill');
+      const progressText = document.getElementById('progressText');
+      if (progressFill) progressFill.style.width = Math.round((p.length/26)*100)+'%';
+      if (progressText) progressText.textContent = `${STORAGE_KEY} — ${p.length} de 26 módulos`;
+    }
+
+    function showFeedback(msg, type) {
+      const el = document.getElementById('feedbackMsg');
+      el.textContent = msg;
+      el.className = type || 'info';
+    }
+
+    function initSimulator() {
+      resizeCanvas();
+      drawChart();
+
+      document.getElementById('btnInit').addEventListener('click', doInit);
+      document.getElementById('btnTick').addEventListener('click', doTick);
+      document.getElementById('btnTimer').addEventListener('click', doTimer);
+      document.getElementById('btnDeinit').addEventListener('click', doDeinit);
+
+      window.addEventListener('resize', () => { resizeCanvas(); drawChart(); });
+    }
+
+    document.addEventListener('DOMContentLoaded', initSimulator);
+    if (document.readyState !== 'loading') initSimulator();
+
+    updateProgress();
+  </script>
+</body>
+</html>

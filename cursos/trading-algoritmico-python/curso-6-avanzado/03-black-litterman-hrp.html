@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Avanzado | Black-Litterman y HRP</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #111a2e 100%);
+      background-size: 200% 200%; animation: gradientShift 20s ease infinite;
+      font-family: 'Inter', sans-serif; color: #eef5ff; min-height: 100vh;
+      display: flex; align-items: center; justify-content: center; padding: 2rem 1rem;
+    }
+    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+    .curso6-container {
+      max-width: 1300px; width: 100%;
+      background: rgba(15, 25, 45, 0.65); backdrop-filter: blur(12px);
+      border-radius: 3rem; border: 1px solid rgba(156,100,255,0.25);
+      box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden;
+    }
+    .hero-header { background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%); padding: 2rem 2rem 1.5rem; text-align: center; border-bottom: 2px solid #9c64ff; }
+    .hero-header h1 { font-size: 2.6rem; font-weight: 800; background: linear-gradient(135deg, #FFF, #9c64ff, #6633cc); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .hero-header p { font-size: 1.1rem; color: #b9e2ff; margin-top: 0.3rem; }
+    .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
+    .chip { background: rgba(156,100,255,0.15); border: 1px solid #9c64ff; padding: 0.3rem 1rem; border-radius: 40px; font-size: 0.8rem; font-weight: 600; }
+    .analogy-card { background: #1e2a3acc; margin: 1.5rem 2rem; padding: 1.2rem 1.8rem; border-radius: 2rem; border-left: 8px solid #9c64ff; font-size: 1rem; line-height: 1.6; }
+    .main-area { padding: 0.5rem 2rem; }
+    .bl-section { background: #1a2640cc; border-radius: 1.5rem; padding: 1.2rem; margin-bottom: 1rem; border: 1px solid rgba(156,100,255,0.12); }
+    .bl-section h4 { color: #9c64ff; margin-bottom: 0.5rem; }
+    .form-row { display: flex; gap: 1rem; align-items: center; margin: 0.5rem 0; flex-wrap: wrap; }
+    .form-row label { min-width: 120px; }
+    .form-row input, .form-row select { padding: 0.5rem; border-radius: 0.8rem; border: 1px solid #2c3e66; background: #0f1a30; color: #eef5ff; flex: 1; }
+    .comparison-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+    .comp-card { background: #0f1a30cc; border-radius: 1.2rem; padding: 1rem; text-align: center; border: 1px solid rgba(156,100,255,0.2); }
+    .comp-card .title { font-weight: 600; color: #9c64ff; }
+    .comp-table { width: 100%; border-collapse: collapse; margin: 0.5rem 0; }
+    .comp-table th, .comp-table td { padding: 0.4rem; text-align: center; border-bottom: 1px solid #2c3e66; font-size: 0.85rem; }
+    .feedback { background: #00000099; margin: 1.5rem 2rem; padding: 1rem; border-radius: 1.5rem; text-align: center; font-weight: 500; border-left: 4px solid #9c64ff; }
+    .insignia { text-align: center; background: #0c1b2f; border-radius: 2rem; margin: 0 2rem 1.5rem; padding: 1rem; border: 1px dashed gold; }
+    .insignia i { font-size: 2.5rem; color: gold; }
+    .hidden { display: none; }
+    .btn-action { background: linear-gradient(95deg, #9c64ff, #6633cc); border: none; padding: 0.8rem 1.8rem; font-weight: bold; border-radius: 3rem; cursor: pointer; font-size: 1rem; transition: 0.2s; color: #fff; }
+    .btn-action:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(156,100,255,0.5); }
+    .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
+    .nav-link { background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem; font-weight: 600; text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; }
+    .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(156,100,255,0.4); }
+    .nav-link.next { background: linear-gradient(95deg, #9c64ff, #6633cc); color: #fff; }
+    .nav-link.menu { background: #1a2a4a; border: 1px solid #3399ff; }
+    footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
+    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .comparison-grid { grid-template-columns: 1fr; } }
+  </style>
+  <link rel="stylesheet" href="../../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../../../index.html">&larr; Portfolio</a><a href="../../../../cursos/index.html">Cursos</a></nav>
+
+  <div class="curso6-container">
+    <div class="hero-header">
+      <h1>🔮 BLACK-LITTERMAN Y HRP</h1>
+      <p>Optimización robusta con Hierarchical Risk Parity</p>
+      <div class="badge-area">
+        <span class="chip"><i class="fas fa-eye"></i> Views subjetivas</span>
+        <span class="chip"><i class="fas fa-sitemap"></i> Clustering</span>
+      </div>
+    </div>
+    <div class="analogy-card"><strong>🔮 Piénsalo así:</strong> Black-Litterman es como un chef que combina su receta secreta (opiniones personales) con la receta estándar del libro de cocina (equilibrio de mercado). HRP es como organizar una fiesta: agrupa a los invitados (activos) por afinidad y reparte la comida (capital) equitativamente entre grupos.</div>
+    <div class="main-area">
+      <div class="bl-section">
+        <h4><i class="fas fa-sliders-h"></i> Black-Litterman: Tus vistas del mercado</h4>
+        <div class="form-row"><label>BTC view:</label><select id="btcView"><option value="10">+10% alcista</option><option value="5">+5% ligeramente alcista</option><option value="0" selected>Neutral</option><option value="-5">-5% ligeramente bajista</option><option value="-10">-10% bajista</option></select></div>
+        <div class="form-row"><label>ETH view:</label><select id="ethView"><option value="10">+10% alcista</option><option value="5">+5% ligeramente alcista</option><option value="0" selected>Neutral</option><option value="-5">-5% ligeramente bajista</option><option value="-10">-10% bajista</option></select></div>
+        <div class="form-row"><label>Confianza:</label><select id="confidence"><option value="0.3">Baja (30%)</option><option value="0.5" selected>Media (50%)</option><option value="0.8">Alta (80%)</option></select></div>
+        <div style="text-align:center;margin-top:0.8rem;">
+          <button id="calcBL" class="btn-action"><i class="fas fa-crystal-ball"></i> Calcular BL</button>
+        </div>
+      </div>
+      <div class="comparison-grid">
+        <div class="comp-card">
+          <div class="title"><i class="fas fa-scale-balanced"></i> Black-Litterman</div>
+          <table class="comp-table" id="blTable">
+            <thead><tr><th>Activo</th><th>Peso</th></tr></thead>
+            <tbody><tr><td>BTC</td><td id="blBtc">—</td></tr><tr><td>ETH</td><td id="blEth">—</td></tr><tr><td>AAPL</td><td id="blAapl">—</td></tr><tr><td>SPY</td><td id="blSpy">—</td></tr></tbody>
+          </table>
+          <p style="margin-top:0.5rem;font-size:0.85rem;">Sharpe: <span id="blSharpe">—</span></p>
+        </div>
+        <div class="comp-card">
+          <div class="title"><i class="fas fa-chart-bar"></i> MPT Tradicional</div>
+          <table class="comp-table" id="mptTable">
+            <thead><tr><th>Activo</th><th>Peso</th></tr></thead>
+            <tbody><tr><td>BTC</td><td id="mptBtc">—</td></tr><tr><td>ETH</td><td id="mptEth">—</td></tr><tr><td>AAPL</td><td id="mptAapl">—</td></tr><tr><td>SPY</td><td id="mptSpy">—</td></tr></tbody>
+          </table>
+          <p style="margin-top:0.5rem;font-size:0.85rem;">Sharpe: <span id="mptSharpe">—</span></p>
+        </div>
+      </div>
+      <div class="bl-section">
+        <h4><i class="fas fa-sitemap"></i> Hierarchical Risk Parity</h4>
+        <p style="font-size:0.9rem;color:#b9e2ff;">Clusters: [BTC, ETH] 🡒 Cripto · [AAPL, SPY] 🡒 Acciones. Asignación por inverso de varianza intra-cluster y ponderación entre clusters.</p>
+        <table class="comp-table" style="width:60%;margin:0.5rem auto;">
+          <thead><tr><th>Activo</th><th>HRP Peso</th></tr></thead>
+          <tbody><tr><td>BTC</td><td id="hrpBtc">—</td></tr><tr><td>ETH</td><td id="hrpEth">—</td></tr><tr><td>AAPL</td><td id="hrpAapl">—</td></tr><tr><td>SPY</td><td id="hrpSpy">—</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+    <div id="feedbackMsg" class="feedback">💡 Selecciona tus views de mercado y nivel de confianza. BL combinará tu opinión con el equilibrio del mercado.</div>
+    <div id="insigniaArea" class="insignia hidden">
+      <i class="fas fa-medal"></i>
+      <h3>🏅 ARQUITECTO DE PORTAFOLIOS 🏅</h3>
+      <p>¡Dominate Black-Litterman y HRP! Ahora sabes combinar opiniones subjetivas con modelos cuantitativos.</p>
+    </div>
+    <div class="nav-links">
+      <a href="02-mpt-frontera.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+      <a href="04-var-cvar.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <footer><i class="fas fa-crown"></i> Trading Cuantitativo Avanzado · Trading Algorítmico con Python</footer>
+  </div>
+
+  <script>
+    const STORAGE_KEY = '03';
+    localStorage.setItem(STORAGE_KEY, 'true');
+
+    const marketWeights = [0.25, 0.25, 0.25, 0.25];
+    const assets = [
+      { ret: 0.12, vol: 0.35, name: 'BTC' },
+      { ret: 0.10, vol: 0.30, name: 'ETH' },
+      { ret: 0.08, vol: 0.18, name: 'AAPL' },
+      { ret: 0.07, vol: 0.15, name: 'SPY' }
+    ];
+    const corr = [
+      [1.0, 0.7, 0.3, 0.25],
+      [0.7, 1.0, 0.35, 0.3],
+      [0.3, 0.35, 1.0, 0.8],
+      [0.25, 0.3, 0.8, 1.0]
+    ];
+
+    function calcBL() {
+      const btcV = parseFloat(document.getElementById('btcView').value) / 100;
+      const ethV = parseFloat(document.getElementById('ethView').value) / 100;
+      const tau = parseFloat(document.getElementById('confidence').value);
+
+      const views = [btcV, ethV, 0, 0];
+      const blWeights = marketWeights.map((mw, i) => {
+        const adj = mw + tau * views[i] * 0.5;
+        return Math.max(0, Math.min(1, adj));
+      });
+      const sum = blWeights.reduce((a, b) => a + b, 0);
+      const normBL = blWeights.map(w => w / sum);
+
+      document.getElementById('blBtc').textContent = (normBL[0] * 100).toFixed(1) + '%';
+      document.getElementById('blEth').textContent = (normBL[1] * 100).toFixed(1) + '%';
+      document.getElementById('blAapl').textContent = (normBL[2] * 100).toFixed(1) + '%';
+      document.getElementById('blSpy').textContent = (normBL[3] * 100).toFixed(1) + '%';
+
+      let blRet = 0, blVol = 0;
+      for (let i = 0; i < 4; i++) blRet += normBL[i] * assets[i].ret;
+      for (let i = 0; i < 4; i++)
+        for (let j = 0; j < 4; j++)
+          blVol += normBL[i] * normBL[j] * assets[i].vol * assets[j].vol * corr[i][j];
+      blVol = Math.sqrt(blVol);
+      const blSharpe = blVol > 0 ? (blRet - 0.02) / blVol : 0;
+      document.getElementById('blSharpe').textContent = blSharpe.toFixed(2);
+
+      let bestS = -999, bestW = null;
+      for (let a = 0; a <= 100; a+=5)
+        for (let b = 0; b <= 100-a; b+=5)
+          for (let c = 0; c <= 100-a-b; c+=5) {
+            const d = 100 - a - b - c;
+            if (d < 0) continue;
+            const w = [a/100, b/100, c/100, d/100];
+            let r = 0, v = 0;
+            for (let i = 0; i < 4; i++) r += w[i] * assets[i].ret;
+            for (let i = 0; i < 4; i++)
+              for (let j = 0; j < 4; j++)
+                v += w[i] * w[j] * assets[i].vol * assets[j].vol * corr[i][j];
+            v = Math.sqrt(v);
+            const s = v > 0 ? (r - 0.02) / v : 0;
+            if (s > bestS) { bestS = s; bestW = w; }
+          }
+
+      if (bestW) {
+        document.getElementById('mptBtc').textContent = (bestW[0]*100).toFixed(0)+'%';
+        document.getElementById('mptEth').textContent = (bestW[1]*100).toFixed(0)+'%';
+        document.getElementById('mptAapl').textContent = (bestW[2]*100).toFixed(0)+'%';
+        document.getElementById('mptSpy').textContent = (bestW[3]*100).toFixed(0)+'%';
+        document.getElementById('mptSharpe').textContent = bestS.toFixed(2);
+      }
+
+      const hrpW = [0.25, 0.25, 0.25, 0.25];
+      document.getElementById('hrpBtc').textContent = (hrpW[0]*100).toFixed(0)+'%';
+      document.getElementById('hrpEth').textContent = (hrpW[1]*100).toFixed(0)+'%';
+      document.getElementById('hrpAapl').textContent = (hrpW[2]*100).toFixed(0)+'%';
+      document.getElementById('hrpSpy').textContent = (hrpW[3]*100).toFixed(0)+'%';
+
+      document.getElementById('feedbackMsg').innerHTML = '✅ BL combinado con ' + (tau*100) + '% de confianza. ¡Compara con MPT y HRP!';
+      document.getElementById('insigniaArea').classList.remove('hidden');
+      localStorage.setItem(STORAGE_KEY + '_badge', 'true');
+    }
+
+    document.getElementById('calcBL').addEventListener('click', calcBL);
+  </script>
+</body>
+</html>
+

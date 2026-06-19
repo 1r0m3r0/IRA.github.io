@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Macroeconomía Interactiva | Inflación y Curva de Phillips</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #1a0e1a 100%);
+      background-size: 200% 200%;
+      animation: gradientShift 20s ease infinite;
+      font-family: 'Inter', sans-serif;
+      color: #eef5ff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .phillips-container {
+      max-width: 1300px; width: 100%;
+      background: rgba(15, 25, 45, 0.65);
+      backdrop-filter: blur(12px);
+      border-radius: 3rem;
+      border: 1px solid rgba(255, 100, 220, 0.25);
+      box-shadow: 0 25px 45px rgba(0,0,0,0.5);
+      overflow: hidden;
+    }
+    .hero-header {
+      background: linear-gradient(95deg, #0b1120 0%, #1a0e1a 100%);
+      padding: 2rem 2rem 1.5rem 2rem;
+      text-align: center;
+      border-bottom: 2px solid #ff64dc;
+    }
+    .hero-header h1 {
+      font-size: 2.6rem; font-weight: 800;
+      background: linear-gradient(135deg, #FFF, #ffa0e8, #ff64dc);
+      -webkit-background-clip: text;
+      background-clip: text; color: transparent;
+    }
+    .hero-header p { font-size: 1.2rem; color: #ffb8ee; margin-top: 0.5rem; font-weight: 500; }
+    .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1.2rem; flex-wrap: wrap; }
+    .chip {
+      background: rgba(255,100,220,0.15);
+      border: 1px solid #ff64dc; padding: 0.4rem 1rem;
+      border-radius: 40px; font-size: 0.8rem; font-weight: 600;
+    }
+    .analogy-card {
+      background: #1e2a3acc; margin: 1.5rem 2rem; padding: 1.2rem 1.8rem;
+      border-radius: 2rem; border-left: 8px solid #ff64dc;
+      font-size: 1rem; line-height: 1.6;
+    }
+    .main-area {
+      display: flex; flex-wrap: wrap; gap: 2rem;
+      padding: 0.5rem 2rem 1rem 2rem;
+    }
+    .canvas-area { flex: 1.6; min-width: 300px; }
+    .canvas-area canvas {
+      width: 100%; height: auto; aspect-ratio: 4/3;
+      background: #0a0f1e; border-radius: 2rem;
+      border: 1px solid #ff64dc44; display: block;
+    }
+    .controls-area {
+      flex: 1.2; min-width: 240px;
+      background: rgba(0,10,25,0.7); border-radius: 2rem;
+      padding: 1.5rem; border: 1px solid #ff64dc44;
+    }
+    .controls-area h3 { color: #ffa0e8; margin-bottom: 0.8rem; font-size: 1.1rem; }
+    .slider-group { margin-bottom: 1rem; }
+    .slider-group label { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.3rem; }
+    .slider-group label span { color: #ffa0e8; font-weight: 700; font-family: monospace; }
+    .slider-group input[type=range] { width: 100%; accent-color: #ff64dc; }
+    .btn-action {
+      background: linear-gradient(95deg, #ff64dc, #cc33aa); border: none;
+      padding: 0.6rem 1.4rem; font-weight: bold; border-radius: 3rem;
+      cursor: pointer; font-size: 0.9rem; transition: 0.2s; color: #fff;
+      margin: 0.3rem;
+    }
+    .btn-action:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(255,100,220,0.5); }
+    .phillips-stats {
+      background: #00000066; border-radius: 1.5rem; padding: 0.8rem;
+      margin-top: 0.8rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem;
+    }
+    .phillips-stats .stat { text-align: center; }
+    .phillips-stats .stat .val { font-size: 1.3rem; font-weight: 700; color: #ffa0e8; font-family: monospace; }
+    .phillips-stats .stat .lbl { font-size: 0.65rem; color: #aabbdd; }
+    .cpi-table { font-size: 0.8rem; width: 100%; margin: 0.5rem 0; border-collapse: collapse; }
+    .cpi-table th, .cpi-table td { padding: 0.3rem; text-align: center; border-bottom: 1px solid #2c3e66; }
+    .cpi-table th { color: #ffa0e8; }
+    .cpi-table input {
+      background: #1a2a3e; border: 1px solid #ff64dc44; border-radius: 0.5rem;
+      padding: 0.2rem; color: #eef5ff; width: 60px; font-family: monospace; text-align: center;
+    }
+    .feedback {
+      background: #00000099; margin: 0 2rem 1.5rem 2rem; padding: 1rem;
+      border-radius: 1.5rem; text-align: center; font-weight: 500;
+      border-left: 4px solid #ff64dc;
+    }
+    .insignia {
+      text-align: center; background: #0c1b2f;
+      border-radius: 2rem; margin: 0 2rem 1.5rem; padding: 1rem;
+      border: 1px dashed gold;
+    }
+    .insignia i { font-size: 2.5rem; color: gold; }
+    .hidden { display: none; }
+    .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
+    .nav-link {
+      background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem;
+      font-weight: 600; text-decoration: none; color: #eef5ff;
+      display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s;
+    }
+    .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(255,100,220,0.4); }
+    .nav-link.next { background: linear-gradient(95deg, #f0a500, #ff6a00); color: #1e1a0c; }
+    .nav-link.menu { background: #1a2a4a; border: 1px solid #ff64dc; }
+    footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
+    @media (max-width: 800px) {
+      .hero-header h1 { font-size: 1.9rem; }
+      .main-area { flex-direction: column; }
+    }
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+
+  <div class="phillips-container">
+    <div class="hero-header">
+      <h1>📊 Inflación y Curva de Phillips 📊</h1>
+      <p>El dilema entre inflación y desempleo</p>
+      <div class="badge-area">
+        <span class="chip"><i class="fas fa-shopping-cart"></i> IPC</span>
+        <span class="chip"><i class="fas fa-chart-line"></i> Curva de Phillips</span>
+        <span class="chip"><i class="fas fa-balance-scale"></i> Trade-off</span>
+      </div>
+    </div>
+
+    <div class="analogy-card">
+      <strong>🫖 Piénsalo así:</strong> La inflación es como una olla a presión: demasiada presión (demanda) y los precios se disparan. La Curva de Phillips muestra la relación inversa entre inflación y desempleo: cuando la economía está muy caliente (bajo desempleo), los precios suben; cuando hay mucho desempleo, la inflación baja. Pero si la gente espera inflación, la curva se desplaza... como ajustar la válvula de la olla.
+    </div>
+
+    <div class="main-area">
+      <div class="canvas-area">
+        <canvas id="phillipsCanvas" width="600" height="450"></canvas>
+      </div>
+      <div class="controls-area">
+        <h3><i class="fas fa-sliders-h"></i> Curva de Phillips</h3>
+        <div class="slider-group">
+          <label>Inflación esperada <span id="expInfVal">2.0</span></label>
+          <input type="range" id="expInfSlider" min="0" max="10" value="2" step="0.5">
+        </div>
+        <div class="slider-group">
+          <label>Desempleo actual <span id="unempVal">6.0</span></label>
+          <input type="range" id="unempSlider" min="2" max="15" value="6" step="0.1">
+        </div>
+        <button id="calcPhillipsBtn" class="btn-action"><i class="fas fa-chart-line"></i> Calcular inflación</button>
+
+        <h3 style="margin-top:1rem;"><i class="fas fa-calculator"></i> Canasta IPC</h3>
+        <table class="cpi-table">
+          <tr><th>Bien</th><th>Peso %</th><th>Precio t₀</th><th>Precio t₁</th></tr>
+          <tr><td>Alimentos</td><td><input type="number" id="cpiFoodW" value="35" min="0" max="100"></td><td><input type="number" id="cpiFood0" value="100" min="1"></td><td><input type="number" id="cpiFood1" value="108" min="1"></td></tr>
+          <tr><td>Vivienda</td><td><input type="number" id="cpiHousW" value="25" min="0" max="100"></td><td><input type="number" id="cpiHous0" value="100" min="1"></td><td><input type="number" id="cpiHous1" value="105" min="1"></td></tr>
+          <tr><td>Transporte</td><td><input type="number" id="cpiTranW" value="15" min="0" max="100"></td><td><input type="number" id="cpiTran0" value="100" min="1"></td><td><input type="number" id="cpiTran1" value="112" min="1"></td></tr>
+          <tr><td>Salud</td><td><input type="number" id="cpiHealW" value="10" min="0" max="100"></td><td><input type="number" id="cpiHeal0" value="100" min="1"></td><td><input type="number" id="cpiHeal1" value="103" min="1"></td></tr>
+          <tr><td>Educación</td><td><input type="number" id="cpiEducW" value="15" min="0" max="100"></td><td><input type="number" id="cpiEduc0" value="100" min="1"></td><td><input type="number" id="cpiEduc1" value="110" min="1"></td></tr>
+        </table>
+        <button id="calcCpiBtn" class="btn-action"><i class="fas fa-percent"></i> Calcular inflación IPC</button>
+
+        <div class="phillips-stats">
+          <div class="stat"><div class="val" id="inflationRate">2.00</div><div class="lbl">Inflación actual %</div></div>
+          <div class="stat"><div class="val" id="sacrificeRatio">0.0</div><div class="lbl">Sacrifice ratio</div></div>
+          <div class="stat"><div class="val" id="naturalRate">5.0</div><div class="lbl">Tasa natural %</div></div>
+          <div class="stat"><div class="val" id="cpiResult">—</div><div class="lbl">Inflación IPC %</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="feedbackMsg" class="feedback">
+      💡 Ajusta la inflación esperada y el desempleo para ver la Curva de Phillips. Calcula el IPC con la calculadora.
+    </div>
+
+    <div id="insigniaArea" class="insignia hidden">
+      <i class="fas fa-medal"></i>
+      <h3>🏅 ¡CAZADOR DE INFLACIÓN! 🏅</h3>
+      <p>Has dominado la Curva de Phillips, calculado el IPC y entendido el trade-off inflación-desempleo. ¡Brillante!</p>
+    </div>
+
+    <div class="nav-links">
+      <a href="07-oferta-agregada.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+      <a href="09-crecimiento-solow.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <footer>
+      <i class="fas fa-crown"></i> Macroeconomía Interactiva · Inflación: el enemigo silencioso del poder adquisitivo
+    </footer>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'macro_lvl8';
+    const canvas = document.getElementById('phillipsCanvas');
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    const pad = { left: 60, right: 30, top: 30, bottom: 40 };
+
+    const expInfSlider = document.getElementById('expInfSlider');
+    const unempSlider = document.getElementById('unempSlider');
+    const expInfVal = document.getElementById('expInfVal');
+    const unempVal = document.getElementById('unempVal');
+    const inflationRate = document.getElementById('inflationRate');
+    const sacrificeRatio = document.getElementById('sacrificeRatio');
+    const naturalRate = document.getElementById('naturalRate');
+    const cpiResult = document.getElementById('cpiResult');
+    const feedbackMsg = document.getElementById('feedbackMsg');
+
+    let calculated = false;
+
+    function drawGraph() {
+      const expInf = parseFloat(expInfSlider.value);
+      const currUnemp = parseFloat(unempSlider.value);
+
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = '#0a0f1e';
+      ctx.fillRect(0, 0, W, H);
+
+      const chartW = W - pad.left - pad.right;
+      const chartH = H - pad.top - pad.bottom;
+      const uMax = 16;
+      const piMax = 16;
+
+      function toX(u) { return pad.left + (u / uMax) * chartW; }
+      function toYp(pi) { return pad.top + chartH - (pi / piMax) * chartH; }
+
+      ctx.strokeStyle = '#1a2a4a';
+      ctx.lineWidth = 0.5;
+      for (let i = 0; i <= 4; i++) {
+        const x = pad.left + (i / 4) * chartW;
+        ctx.beginPath(); ctx.moveTo(x, pad.top); ctx.lineTo(x, pad.top + chartH); ctx.stroke();
+        const y = pad.top + (i / 4) * chartH;
+        ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(pad.left + chartW, y); ctx.stroke();
+      }
+
+      ctx.fillStyle = '#8899bb';
+      ctx.font = '12px Inter';
+      ctx.textAlign = 'center';
+      for (let i = 0; i <= 4; i++) {
+        ctx.fillText((i / 4) * uMax, pad.left + (i / 4) * chartW, H - 10);
+      }
+      ctx.textAlign = 'right';
+      for (let i = 0; i <= 4; i++) {
+        ctx.fillText((i / 4) * piMax, pad.left - 8, toYp((i / 4) * piMax) + 4);
+      }
+      ctx.fillStyle = '#8899bb';
+      ctx.font = '13px Inter';
+      ctx.textAlign = 'center';
+      ctx.fillText('Desempleo (%)', pad.left + chartW / 2, H - 2);
+      ctx.save();
+      ctx.translate(12, pad.top + chartH / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillText('Inflación π (%)', 0, 0);
+      ctx.restore();
+
+      const un = 5;
+      naturalRate.textContent = un.toFixed(1);
+
+      // Long-run Phillips (vertical at natural rate)
+      ctx.setLineDash([4, 4]);
+      ctx.strokeStyle = '#ffd700';
+      ctx.lineWidth = 2;
+      const lrX = toX(un);
+      ctx.beginPath(); ctx.moveTo(lrX, pad.top); ctx.lineTo(lrX, pad.top + chartH); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#ffd700';
+      ctx.font = 'bold 11px Inter';
+      ctx.textAlign = 'center';
+      ctx.fillText('LRPC', lrX, pad.top + 15);
+
+      // Short-run Phillips curves (one per expected inflation)
+      const phillipsPoints = [];
+      for (let u = 1; u <= 14; u += 0.5) {
+        const pi = expInf - 1.5 * (u - un);
+        phillipsPoints.push({ x: toX(u), y: toYp(Math.max(pi, -2)) });
+      }
+      if (phillipsPoints.length > 1) {
+        ctx.beginPath();
+        ctx.moveTo(phillipsPoints[0].x, phillipsPoints[0].y);
+        for (let i = 1; i < phillipsPoints.length; i++) ctx.lineTo(phillipsPoints[i].x, phillipsPoints[i].y);
+        ctx.strokeStyle = '#ff64dc';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        ctx.fillStyle = '#ff64dc';
+        ctx.font = 'bold 12px Inter';
+        ctx.textAlign = 'left';
+        ctx.fillText('SRPC (πᵉ=' + expInf.toFixed(1) + '%)', phillipsPoints[5].x + 5, phillipsPoints[5].y - 8);
+      }
+
+      // Current point
+      const currPi = expInf - 1.5 * (currUnemp - un);
+      const cX = toX(currUnemp);
+      const cY = toYp(Math.max(currPi, -2));
+      ctx.beginPath();
+      ctx.arc(cX, cY, 8, 0, 2 * Math.PI);
+      ctx.fillStyle = '#ff4444';
+      ctx.fill();
+      ctx.strokeStyle = '#ff4444';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      ctx.fillStyle = '#ff4444';
+      ctx.font = 'bold 12px Inter';
+      ctx.textAlign = 'left';
+      ctx.fillText('Economía', cX + 10, cY - 5);
+
+      inflationRate.textContent = currPi.toFixed(2);
+
+      if (currUnemp > un) {
+        const sr = (currPi - expInf) / (currUnemp - un);
+        sacrificeRatio.textContent = Math.abs(sr).toFixed(2);
+      } else {
+        sacrificeRatio.textContent = '0.00';
+      }
+
+      if (calculated) {
+        const ins = document.getElementById('insigniaArea');
+        if (ins.classList.contains('hidden')) {
+          ins.classList.remove('hidden');
+          localStorage.setItem(STORAGE_KEY, 'true');
+        }
+      }
+    }
+
+    function updateFeedback(msg) {
+      feedbackMsg.innerHTML = msg;
+    }
+
+    expInfSlider.addEventListener('input', () => {
+      expInfVal.textContent = expInfSlider.value;
+      drawGraph();
+    });
+    unempSlider.addEventListener('input', () => {
+      unempVal.textContent = unempSlider.value;
+      drawGraph();
+    });
+
+    document.getElementById('calcPhillipsBtn').addEventListener('click', () => {
+      calculated = true;
+      drawGraph();
+      const currPi = parseFloat(inflationRate.textContent);
+      updateFeedback(`📈 Con desempleo al ${unempSlider.value}% e inflación esperada al ${expInfSlider.value}%, la inflación efectiva es ${currPi.toFixed(1)}%. ${currPi > 5 ? '⚠️ Inflación alta!' : currPi < 0 ? '❄️ Deflación!' : '✅ Inflación moderada.'}`);
+    });
+
+    document.getElementById('calcCpiBtn').addEventListener('click', () => {
+      const w1 = parseFloat(document.getElementById('cpiFoodW').value) || 0;
+      const w2 = parseFloat(document.getElementById('cpiHousW').value) || 0;
+      const w3 = parseFloat(document.getElementById('cpiTranW').value) || 0;
+      const w4 = parseFloat(document.getElementById('cpiHealW').value) || 0;
+      const w5 = parseFloat(document.getElementById('cpiEducW').value) || 0;
+      const totalW = w1 + w2 + w3 + w4 + w5;
+      if (totalW === 0) { updateFeedback('⚠️ Los pesos de la canasta no pueden sumar cero.'); return; }
+
+      const p01 = parseFloat(document.getElementById('cpiFood0').value) || 100;
+      const p11 = parseFloat(document.getElementById('cpiFood1').value) || 100;
+      const p02 = parseFloat(document.getElementById('cpiHous0').value) || 100;
+      const p12 = parseFloat(document.getElementById('cpiHous1').value) || 100;
+      const p03 = parseFloat(document.getElementById('cpiTran0').value) || 100;
+      const p13 = parseFloat(document.getElementById('cpiTran1').value) || 100;
+      const p04 = parseFloat(document.getElementById('cpiHeal0').value) || 100;
+      const p14 = parseFloat(document.getElementById('cpiHeal1').value) || 100;
+      const p05 = parseFloat(document.getElementById('cpiEduc0').value) || 100;
+      const p15 = parseFloat(document.getElementById('cpiEduc1').value) || 100;
+
+      const cost0 = (w1/totalW)*p01 + (w2/totalW)*p02 + (w3/totalW)*p03 + (w4/totalW)*p04 + (w5/totalW)*p05;
+      const cost1 = (w1/totalW)*p11 + (w2/totalW)*p12 + (w3/totalW)*p13 + (w4/totalW)*p14 + (w5/totalW)*p15;
+      const inf = ((cost1 - cost0) / cost0) * 100;
+
+      cpiResult.textContent = inf.toFixed(2);
+      calculated = true;
+      updateFeedback(`📊 Inflación IPC: ${inf.toFixed(2)}%. Costo canasta t₀: ${cost0.toFixed(1)} → t₁: ${cost1.toFixed(1)}.`);
+      const ins = document.getElementById('insigniaArea');
+      if (ins.classList.contains('hidden')) {
+        ins.classList.remove('hidden');
+        localStorage.setItem(STORAGE_KEY, 'true');
+      }
+    });
+
+    if (localStorage.getItem(STORAGE_KEY) === 'true') {
+      document.getElementById('insigniaArea').classList.remove('hidden');
+    }
+
+    drawGraph();
+  </script>
+  <script src="../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

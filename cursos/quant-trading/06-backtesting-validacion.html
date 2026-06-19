@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Quant Trading | Backtesting II: Validación</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:"Inter",sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+    .modulo-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,215,0,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+    .hero-header { background:linear-gradient(95deg,#0b1120 0%,#111a2e 100%); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #ffd700; }
+    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#ffe44d,#ffd700); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ffd700; font-size:1rem; line-height:1.6; }
+    .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #ffd700; }
+    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:0 2rem 1.5rem; padding:1rem; border:1px dashed gold; }
+    .insignia i { font-size:2.5rem; color:gold; }
+    .hidden { display:none !important; }
+    .btn-action { background:linear-gradient(95deg,#f0a500,#ff6a00); border:none; padding:0.8rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; }
+    .btn-action:hover { transform:scale(1.04); box-shadow:0 0 15px rgba(255,215,0,0.3); }
+    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(0,224,255,0.4); }
+    .nav-link.next { background:linear-gradient(95deg,#f0a500,#ff6a00); color:#1e1a0c; }
+    .nav-link.menu { background:#1a2a4a; border:1px solid #3399ff; }
+    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+
+    .main-area { padding:1.5rem 2rem; display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; }
+    .panel { background:rgba(15,25,45,0.5); border-radius:1.5rem; padding:1.5rem; border:1px solid rgba(255,215,0,0.15); }
+    .panel h2 { font-size:1.2rem; margin-bottom:1rem; color:#ffe44d; }
+    .slider-group { margin:1rem 0; }
+    .slider-group label { display:block; margin-bottom:0.3rem; font-size:0.85rem; color:#aab8d6; }
+    .slider-group input[type=range] { width:100%; accent-color:#ffd700; }
+    .slider-group .val { color:#ffd700; font-weight:700; }
+    canvas { width:100%; max-height:320px; border-radius:1rem; background:#0a1120; margin-top:0.5rem; }
+    .stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.6rem; margin-top:1rem; }
+    .stat-card { background:#0a1120; border-radius:0.8rem; padding:0.6rem; text-align:center; border:1px solid #1a2a4a; }
+    .stat-card .val { font-size:1.2rem; font-weight:700; color:#ffe44d; }
+    .stat-card .lbl { font-size:0.7rem; color:#8899bb; text-transform:uppercase; }
+    @media(max-width:768px) {
+      .main-area { grid-template-columns:1fr; }
+      .hero-header h1 { font-size:1.8rem; }
+    }
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+  <div class="modulo-container">
+    <div class="hero-header">
+      <span style="display:inline-block;background:#ffd70022;padding:0.3rem 1rem;border-radius:2rem;font-size:0.8rem;letter-spacing:0.1em;margin-bottom:0.5rem;"><i class="fas fa-chart-line"></i> MÓDULO 6</span>
+      <h1><i class="fas fa-check-double"></i> Backtesting II: Validación</h1>
+      <p style="color:#99aacd;margin-top:0.4rem;">Walk-Forward Analysis y curvas de equidad</p>
+    </div>
+
+    <div class="analogy-card">
+      <i class="fas fa-lightbulb" style="color:#ffd700;margin-right:0.6rem;"></i>
+      <strong>Analogía:</strong> El Walk-Forward es como probar un auto nuevo en diferentes terrenos (ciudad, carretera, montaña) antes de comprarlo. No basta con que funcione en un solo tramo; necesitas ver si se adapta a condiciones cambiantes sin estrellarse.
+    </div>
+
+    <div class="main-area">
+      <div class="panel">
+        <h2><i class="fas fa-sliders-h"></i> Walk-Forward Simulator</h2>
+        <p style="font-size:0.85rem;color:#aab8d6;margin-bottom:1rem;">Arrastra el slider para dividir los datos en in-sample (optimización) y out-of-sample (validación).</p>
+        <div class="slider-group">
+          <label>In-Sample: <span id="isPercent" class="val">70</span>% | Out-of-Sample: <span id="oosPercent" class="val">30</span>%</label>
+          <input type="range" id="splitSlider" min="50" max="90" value="70" oninput="actualizarSplit()">
+        </div>
+        <canvas id="walkChart" height="300"></canvas>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="val" id="isReturn">+18.4%</div><div class="lbl">Retorno In-Sample</div></div>
+          <div class="stat-card"><div class="val" id="oosReturn">+12.7%</div><div class="lbl">Retorno Out-of-Sample</div></div>
+          <div class="stat-card"><div class="val" id="isSharpe">1.84</div><div class="lbl">Sharpe In-Sample</div></div>
+          <div class="stat-card"><div class="val" id="oosSharpe">1.21</div><div class="lbl">Sharpe Out-of-Sample</div></div>
+        </div>
+        <div style="margin-top:1rem;display:flex;gap:0.8rem;">
+          <button class="btn-action" onclick="simular()"><i class="fas fa-play"></i> Simular</button>
+          <button class="btn-action" style="background:#2c3e66;color:#eef5ff;" onclick="guardar()"><i class="fas fa-save"></i> Guardar</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2><i class="fas fa-brain"></i> ¿Qué es Walk-Forward?</h2>
+        <p style="font-size:0.9rem;line-height:1.7;color:#c8d6f0;">Walk-Forward Analysis (WFA) es la técnica más rigurosa para validar estrategias de trading. Consiste en:</p>
+        <ul style="list-style:none;padding:0;margin-top:0.8rem;">
+          <li style="padding:0.5rem 0;border-bottom:1px solid #1a2a4a;"><strong style="color:#ffd700;">1.</strong> Dividir datos históricos en ventanas de optimización (in-sample) y prueba (out-of-sample).</li>
+          <li style="padding:0.5rem 0;border-bottom:1px solid #1a2a4a;"><strong style="color:#ffd700;">2.</strong> Optimizar parámetros solo con datos in-sample.</li>
+          <li style="padding:0.5rem 0;border-bottom:1px solid #1a2a4a;"><strong style="color:#ffd700;">3.</strong> Validar la estrategia optimizada en out-of-sample sin reoptimizar.</li>
+          <li style="padding:0.5rem 0;border-bottom:1px solid #1a2a4a;"><strong style="color:#ffd700;">4.</strong> Repetir deslizando la ventana hacia adelante (walk forward).</li>
+          <li style="padding:0.5rem 0;"><strong style="color:#ffd700;">5.</strong> Si el out-of-sample mantiene rendimiento, la estrategia es robusta.</li>
+        </ul>
+        <div style="margin-top:1rem;padding:1rem;background:#ffd7000a;border-radius:1rem;border:1px dashed #ffd70044;">
+          <p style="font-size:0.8rem;color:#aab8d6;"><i class="fas fa-exclamation-triangle" style="color:#ffd700;"></i> La diferencia entre IS y OOS no debe superar el 30-40%. Si el IS brilla y el OOS se desploma, estás sobreoptimizando (overfitting).</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="feedbackMsg" class="feedback"><i class="fas fa-robot"></i> Ajusta el split y presiona "Simular" para ver el Walk-Forward en acción.</div>
+
+    <div id="insigniaArea" class="insignia hidden">
+      <i class="fas fa-medal"></i>
+      <h3 style="color:gold;margin:0.3rem 0;">¡Validación Completada!</h3>
+      <p style="color:#ddd;">Has aprendido a diferenciar in-sample de out-of-sample.</p>
+    </div>
+
+    <div class="nav-links">
+      <a href="05-backtesting-metricas.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
+      <a href="index.html" class="nav-link menu"><i class="fas fa-th"></i> Menú</a>
+      <a href="07-estrategias-clasicas.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+    </div>
+
+    <footer>&copy; 2026 Israel Romero &mdash; Quant Trading Course</footer>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "quant_trading_06";
+    let simulatedData = null;
+
+    function generarSerie(precioInicial, pasos, drift, vol) {
+      const p = [precioInicial];
+      for(let i=1;i<=pasos;i++) {
+        const ret = drift + vol*(Math.random()-0.5)*2;
+        p.push(p[i-1]*(1+ret/100));
+      }
+      return p;
+    }
+
+    function actualizarSplit() {
+      const s = parseInt(document.getElementById("splitSlider").value);
+      document.getElementById("isPercent").textContent = s;
+      document.getElementById("oosPercent").textContent = 100-s;
+      if(simulatedData) dibujar(simulatedData.is, simulatedData.oos, s);
+    }
+
+    function dibujar(isData, oosData, splitPct) {
+      const canvas = document.getElementById("walkChart");
+      const ctx = canvas.getContext("2d");
+      const W = canvas.width = canvas.clientWidth;
+      const H = canvas.height = 300;
+
+      const all = isData.concat(oosData);
+      const mn = Math.min(...all), mx = Math.max(...all);
+      const range = mx-mn || 1;
+      const pad = 25;
+
+      ctx.clearRect(0,0,W,H);
+
+      const splitX = pad + (W-2*pad)*(splitPct/100);
+
+      ctx.strokeStyle = "#ffd70044";
+      ctx.setLineDash([5,5]);
+      ctx.beginPath();
+      ctx.moveTo(splitX, 10);
+      ctx.lineTo(splitX, H-10);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = "#ffd70066";
+      ctx.font = "10px Inter";
+      ctx.textAlign = "center";
+      ctx.fillText("IN-SAMPLE", splitX/2+pad/2, H-2);
+      ctx.fillText("OUT-OF-SAMPLE", (splitX+W-pad)/2, H-2);
+
+      const dib = (data, color) => {
+        ctx.beginPath();
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2.5;
+        for(let i=0;i<data.length;i++) {
+          const x = pad + (i/data.length)*(W-2*pad);
+          const y = pad + (1-(data[i]-mn)/range)*(H-2*pad);
+          i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+        }
+        ctx.stroke();
+      };
+      dib(isData, "#ffd700");
+      dib(oosData, "#ff8c00");
+    }
+
+    function simular() {
+      const splitPct = parseInt(document.getElementById("splitSlider").value);
+      const totalPts = 120;
+      const isPts = Math.floor(totalPts*splitPct/100);
+      const oosPts = totalPts - isPts;
+
+      const drift = 0.08 + (Math.random()-0.5)*0.1;
+      const vol = 0.6 + Math.random()*0.4;
+      const full = generarSerie(100, totalPts, drift, vol);
+
+      const isData = full.slice(0, isPts+1);
+      const oosData = full.slice(isPts);
+
+      simulatedData = {is:isData, oos:oosData};
+
+      const isRet = ((isData[isData.length-1]-isData[0])/isData[0]*100);
+      const oosRet = ((oosData[oosData.length-1]-oosData[0])/oosData[0]*100);
+      const isSharpe = (drift/vol)*Math.sqrt(252);
+      const oosFactor = 0.5+Math.random()*0.4;
+      const oosSharpe = isSharpe*oosFactor;
+
+      document.getElementById("isReturn").textContent = (isRet>=0?"+":"")+isRet.toFixed(1)+"%";
+      document.getElementById("oosReturn").textContent = (oosRet>=0?"+":"")+oosRet.toFixed(1)+"%";
+      document.getElementById("isSharpe").textContent = isSharpe.toFixed(2);
+      document.getElementById("oosSharpe").textContent = oosSharpe.toFixed(2);
+
+      document.getElementById("isReturn").style.color = isRet>0 ? "#4cd964" : "#ff5050";
+      document.getElementById("oosReturn").style.color = oosRet>0 ? "#4cd964" : "#ff5050";
+
+      dibujar(isData, oosData, splitPct);
+
+      const diff = Math.abs(isSharpe - oosSharpe)/isSharpe;
+      let msg = "";
+      if(diff<0.2) msg = "Validación excelente. La estrategia es robusta y consistente.";
+      else if(diff<0.4) msg = "Validación aceptable. Hay leve degradación, pero la estrategia se mantiene.";
+      else msg = "Posible sobreoptimización. La estrategia funciona mucho mejor in-sample que out-of-sample.";
+      document.getElementById("feedbackMsg").innerHTML = '<i class="fas fa-'+(diff<0.4?'check-circle" style="color:#4cd964"':'exclamation-triangle" style="color:#ffd700"')+'></i> '+msg;
+      document.getElementById("insigniaArea").classList.remove("hidden");
+      guardar();
+    }
+
+    function guardar() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({split:document.getElementById("splitSlider").value}));
+    }
+
+    function cargar() {
+      const s = localStorage.getItem(STORAGE_KEY);
+      if(s) {
+        try {
+          const d = JSON.parse(s);
+          if(d.split) document.getElementById("splitSlider").value = d.split;
+        } catch(e){}
+      }
+      actualizarSplit();
+      simular();
+    }
+    window.addEventListener("DOMContentLoaded", cargar);
+    window.addEventListener("resize", ()=>{
+      if(simulatedData) dibujar(simulatedData.is, simulatedData.oos, parseInt(document.getElementById("splitSlider").value));
+    });
+  </script>
+  <script src="../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

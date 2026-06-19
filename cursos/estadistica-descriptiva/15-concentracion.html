@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Estadística Descriptiva | Concentración y Desigualdad</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+    body {
+      background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #111a2e 100%);
+      background-size: 200% 200%;
+      animation: gradientShift 20s ease infinite;
+      font-family: 'Inter', sans-serif;
+      color: #eef5ff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+    .modulo-container {
+      max-width: 1300px; width: 100%;
+      background: rgba(15,25,45,0.65); backdrop-filter: blur(12px);
+      border-radius: 3rem; border: 1px solid rgba(156,100,255,0.25);
+      box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden;
+    }
+    .hero-header {
+      background: linear-gradient(95deg,#0b1120,#111a2e); padding: 2rem 2rem 1.5rem;
+      text-align: center; border-bottom: 2px solid #9c64ff;
+    }
+    .hero-header h1 {
+      font-size: 2.6rem; font-weight: 800;
+      background: linear-gradient(135deg,#FFF,#c9a0ff,#9c64ff);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .hero-header p { color: #d4b3ff; margin-top: 0.5rem; font-weight: 500; }
+    .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1.2rem; flex-wrap: wrap; }
+    .chip {
+      background: rgba(156,100,255,0.15); border: 1px solid #9c64ff;
+      padding: 0.4rem 1rem; border-radius: 40px; font-size: 0.8rem; font-weight: 600;
+    }
+    .analogy-card {
+      background: #1e2a3acc; margin: 1.5rem 2rem; padding: 1.2rem 1.8rem;
+      border-radius: 2rem; border-left: 8px solid #9c64ff; font-size: 1rem; line-height: 1.6;
+    }
+    .main-area { padding: 0 2rem 1.5rem; display: flex; flex-wrap: wrap; gap: 1.5rem; }
+    .plot-section { flex: 2; min-width: 320px; }
+    .ctrl-section { flex: 1; min-width: 280px; }
+    .canvas-wrap {
+      background: #0a0f1e; border-radius: 2rem; padding: 1rem;
+      border: 1px solid #9c64ff44; text-align: center;
+    }
+    .canvas-wrap canvas { width: 100%; height: auto; max-width: 480px; aspect-ratio: 1/1; border-radius: 1rem; }
+    .ctrl-panel {
+      background: #0f1a2ccc; border-radius: 2rem; padding: 1.2rem;
+      border: 1px solid #9c64ff33;
+    }
+    .ctrl-panel h3 { color: #9c64ff; margin-bottom: 0.8rem; font-size: 1.1rem; }
+    .quintile-row { display: flex; align-items: center; gap: 0.5rem; margin: 0.5rem 0; }
+    .quintile-row label { width: 80px; font-size: 0.85rem; color: #d4b3ff; }
+    .quintile-row input[type="range"] { flex: 1; accent-color: #9c64ff; }
+    .quintile-row .val { font-family: monospace; color: #c9a0ff; width: 50px; text-align: right; font-size: 0.9rem; }
+    .stat-row { display: flex; justify-content: space-between; padding: 0.4rem 0; border-bottom: 1px solid #ffffff0a; font-size: 0.9rem; }
+    .stat-row .val { font-family: monospace; font-weight: 700; color: #c9a0ff; }
+    .btn-row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.8rem; }
+    .btn-sm {
+      background: #1a2a4a; border: 1px solid #9c64ff66; color: #eef5ff;
+      padding: 0.4rem 0.8rem; border-radius: 2rem; font-size: 0.75rem; cursor: pointer; font-weight: 600; transition: 0.2s;
+    }
+    .btn-sm:hover { background: #9c64ff33; transform: translateY(-1px); }
+    .btn-sm.primary { background: linear-gradient(95deg,#9c64ff,#6a1b9a); border-color: #9c64ff; }
+    .compare-section { margin-top: 1rem; }
+    .feedback {
+      background: #00000099; margin: 0 2rem 1.5rem; padding: 1rem; border-radius: 1.5rem;
+      text-align: center; font-weight: 500; border-left: 4px solid #9c64ff;
+    }
+    .insignia {
+      text-align: center; background: #0c1b2f; border-radius: 2rem;
+      margin: 0 2rem 1.5rem; padding: 1rem; border: 1px dashed gold;
+    }
+    .insignia i { font-size: 2.5rem; color: gold; }
+    .hidden { display: none; }
+    .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
+    .nav-link {
+      background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem; font-weight: 600;
+      text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s;
+    }
+    .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(156,100,255,0.4); }
+    .nav-link.next { background: linear-gradient(95deg,#f0a500,#ff6a00); color: #1e1a0c; }
+    .nav-link.menu { background: #1a2a4a; border: 1px solid #3399ff; }
+    footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
+    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+<nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+
+<div class="modulo-container">
+  <div class="hero-header">
+    <h1>⚖️ CONCENTRACIÓN Y DESIGUALDAD ⚖️</h1>
+    <p>Visualiza la distribución del ingreso con la Curva de Lorenz y el Coeficiente de Gini</p>
+    <div class="badge-area">
+      <span class="chip"><i class="fas fa-chart-line"></i> Curva de Lorenz</span>
+      <span class="chip"><i class="fas fa-percentage"></i> Gini</span>
+      <span class="chip"><i class="fas fa-globe"></i> Comparativo</span>
+    </div>
+  </div>
+
+  <div class="analogy-card">
+    <strong>🪞 Piénsalo así:</strong> La curva de Lorenz es como un espejo de la desigualdad. Si todos ganaran exactamente lo mismo, la curva sería una línea diagonal perfecta. Cuanto más se separa de esa diagonal, más desigual es la distribución. El coeficiente de Gini es un número entre 0 (igualdad perfecta) y 1 (desigualdad total — una sola persona tiene todo).
+  </div>
+
+  <div class="main-area">
+    <div class="plot-section">
+      <div class="canvas-wrap">
+        <canvas id="lorenzCanvas" width="480" height="480"></canvas>
+        <p style="font-size:0.75rem;color:#8899bb;margin-top:0.3rem;">Diagonal = igualdad perfecta. Curva violeta = distribución actual. Curva naranja = comparación.</p>
+      </div>
+    </div>
+    <div class="ctrl-section">
+      <div class="ctrl-panel">
+        <h3><i class="fas fa-sliders-h"></i> Distribución por quintiles</h3>
+        <p style="font-size:0.7rem;color:#8899bb;margin-bottom:0.5rem;">Ajusta el ingreso de cada quintil (20% de la población)</p>
+        <div id="quintileSliders"></div>
+        <div class="stat-row" style="border-top:1px solid #9c64ff44;margin-top:0.4rem;padding-top:0.5rem;">
+          <span><i class="fas fa-chart-pie"></i> Gini</span>
+          <span class="val" id="giniVal">—</span>
+        </div>
+        <div class="stat-row">
+          <span><i class="fas fa-users"></i> Ingreso total</span>
+          <span class="val" id="totalIncome">—</span>
+        </div>
+        <div class="stat-row">
+          <span><i class="fas fa-percent"></i> Q5 / Q1</span>
+          <span class="val" id="q5q1Val">—</span>
+        </div>
+        <div class="btn-row">
+          <button class="btn-sm primary" id="equalBtn"><i class="fas fa-equals"></i> Igualdad</button>
+          <button class="btn-sm" id="unequalBtn"><i class="fas fa-chart-bar"></i> Desigualdad alta</button>
+          <button class="btn-sm" id="moderateBtn"><i class="fas fa-balance-scale"></i> Moderado</button>
+        </div>
+      </div>
+      <div class="ctrl-panel compare-section" style="margin-top:1rem;">
+        <h3><i class="fas fa-globe-americas"></i> Comparar países</h3>
+        <div class="btn-row">
+          <button class="btn-sm" id="swedenBtn"><i class="fas fa-flag"></i> Suecia</button>
+          <button class="btn-sm" id="usaBtn"><i class="fas fa-flag"></i> USA</button>
+          <button class="btn-sm" id="brazilBtn"><i class="fas fa-flag"></i> Brasil</button>
+          <button class="btn-sm" id="saBtn"><i class="fas fa-flag"></i> Sudáfrica</button>
+        </div>
+        <div id="compareGini" style="margin-top:0.4rem;font-size:0.8rem;min-height:1.5rem;color:#c9a0ff;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="feedbackMsg" class="feedback">
+    💡 Mueve los sliders para ajustar el ingreso de cada quintil (20% de la población). Observa cómo la curva de Lorenz se deforma y el Gini cambia. Compara con distribuciones de distintos países.
+  </div>
+
+  <div id="insigniaArea" class="insignia hidden">
+    <i class="fas fa-medal"></i>
+    <h3>🏅 ANALISTA DE DESIGUALDAD 🏅</h3>
+    <p>¡Comprendes la Curva de Lorenz y el Coeficiente de Gini! Has explorado cómo se distribuye el ingreso y comparado distintos escenarios de desigualdad.</p>
+  </div>
+
+  <div class="nav-links">
+    <a href="14-numeros-indice.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+    <a href="16-certificado.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Estadística Descriptiva Interactiva · Nivel 15: Concentración y Desigualdad</footer>
+</div>
+
+<script>
+const STORAGE_KEY = 'est_desc_lvl15';
+
+const canvas = document.getElementById('lorenzCanvas');
+const ctx = canvas.getContext('2d');
+const W = 480, H = 480;
+const PAD = 50;
+
+let quintiles = [20, 20, 20, 20, 20];
+let compareQuintiles = null;
+let compareLabel = '';
+let interacted = false;
+
+function computeLorenz(q) {
+  const sorted = [...q].sort((a,b)=>a-b);
+  const total = sorted.reduce((s,v)=>s+v,0);
+  if (total === 0) return { cumPob: [], cumIng: [] };
+  const cumPob = [];
+  const cumIng = [];
+  let sum = 0;
+  for (let i = 0; i < sorted.length; i++) {
+    sum += sorted[i];
+    cumPob.push((i+1) / sorted.length);
+    cumIng.push(sum / total);
+  }
+  return { cumPob, cumIng, total };
+}
+
+function computeGini(q) {
+  const l = computeLorenz(q);
+  if (l.cumPob.length === 0) return 0;
+  let area = 0;
+  let prevPob = 0, prevIng = 0;
+  for (let i = 0; i < l.cumPob.length; i++) {
+    const pob = l.cumPob[i];
+    const ing = l.cumIng[i];
+    area += (pob - prevPob) * (ing + prevIng) / 2;
+    prevPob = pob;
+    prevIng = ing;
+  }
+  return 1 - 2 * area;
+}
+
+function renderSliders() {
+  const container = document.getElementById('quintileSliders');
+  container.innerHTML = '';
+  const labels = ['Q1 (más pobre)', 'Q2', 'Q3', 'Q4', 'Q5 (más rico)'];
+  labels.forEach((label, i) => {
+    const div = document.createElement('div');
+    div.className = 'quintile-row';
+    div.innerHTML = `<label>${label}</label>
+      <input type="range" min="1" max="100" value="${quintiles[i]}" data-idx="${i}">
+      <span class="val" id="qVal${i}">${quintiles[i]}</span>`;
+    container.appendChild(div);
+    const slider = div.querySelector('input');
+    slider.addEventListener('input', function() {
+      quintiles[parseInt(this.dataset.idx)] = parseInt(this.value);
+      document.getElementById('qVal' + this.dataset.idx).textContent = this.value;
+      interacted = true;
+      draw();
+      updateStats();
+      checkCompletion();
+    });
+  });
+}
+
+function updateStats() {
+  const gini = computeGini(quintiles);
+  const total = quintiles.reduce((a,b)=>a+b,0);
+  const ratio = quintiles[4] / Math.max(quintiles[0], 1);
+  document.getElementById('giniVal').textContent = gini.toFixed(4);
+  document.getElementById('totalIncome').textContent = total;
+  document.getElementById('q5q1Val').textContent = ratio.toFixed(1) + 'x';
+}
+
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+
+  // Grid
+  ctx.strokeStyle = '#9c64ff22';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 10; i++) {
+    const pos = PAD + i/10 * (W - 2*PAD);
+    ctx.beginPath(); ctx.moveTo(pos, PAD); ctx.lineTo(pos, H - PAD); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(PAD, pos); ctx.lineTo(W - PAD, pos); ctx.stroke();
+  }
+
+  // Diagonal (igualdad perfecta)
+  ctx.strokeStyle = '#ffffff44';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([6, 4]);
+  ctx.beginPath(); ctx.moveTo(PAD, H-PAD); ctx.lineTo(W-PAD, PAD); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Axis labels
+  ctx.fillStyle = '#8899bb';
+  ctx.font = '11px monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText('% población', W/2, H - 8);
+  ctx.save();
+  ctx.translate(12, H/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.fillText('% ingreso acumulado', 0, 0);
+  ctx.restore();
+
+  // Corner labels
+  ctx.fillStyle = '#6666';
+  ctx.font = '10px monospace';
+  ctx.textAlign = 'right';
+  ctx.fillText('100%', W-PAD, PAD+12);
+  ctx.textAlign = 'left';
+  ctx.fillText('0%', PAD, H-PAD+15);
+
+  // Draw Lorenz curve
+  function drawCurve(q, color, label) {
+    const l = computeLorenz(q);
+    if (l.cumPob.length === 0) return;
+    const points = [{ pob: 0, ing: 0 }];
+    for (let i = 0; i < l.cumPob.length; i++) {
+      points.push({ pob: l.cumPob[i], ing: l.cumIng[i] });
+    }
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    points.forEach((p, i) => {
+      const x = PAD + p.pob * (W - 2*PAD);
+      const y = H - PAD - p.ing * (H - 2*PAD);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+
+    // Fill
+    ctx.fillStyle = color.replace('cc', '11').replace('dd', '15');
+    ctx.beginPath();
+    points.forEach((p, i) => {
+      const x = PAD + p.pob * (W - 2*PAD);
+      const y = H - PAD - p.ing * (H - 2*PAD);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.lineTo(W-PAD, H-PAD);
+    ctx.lineTo(PAD, H-PAD);
+    ctx.closePath();
+    ctx.fill();
+
+    if (label) {
+      ctx.fillStyle = color;
+      ctx.font = 'bold 12px monospace';
+      ctx.textAlign = 'left';
+      const last = points[points.length-1];
+      const lx = PAD + last.pob * (W - 2*PAD);
+      const ly = H - PAD - last.ing * (H - 2*PAD);
+      ctx.fillText(label, lx + 5, ly - 5);
+    }
+  }
+
+  drawCurve(quintiles, '#9c64ffcc', 'Tu distribución');
+
+  if (compareQuintiles) {
+    drawCurve(compareQuintiles, '#ff8a00cc', compareLabel);
+    const compareGini = computeGini(compareQuintiles);
+    const myGini = computeGini(quintiles);
+    document.getElementById('compareGini').innerHTML = `${compareLabel}: Gini = ${compareGini.toFixed(4)} | Tu Gini: ${myGini.toFixed(4)}`;
+  }
+}
+
+function setCompare(q, label) {
+  compareQuintiles = q;
+  compareLabel = label;
+  draw();
+}
+
+function checkCompletion() {
+  if (interacted) {
+    insigniaArea.classList.remove('hidden');
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ completed: true })); } catch(e) {}
+    document.getElementById('feedbackMsg').innerHTML = '🎉 ¡Excelente! Has explorado la Curva de Lorenz y el coeficiente de Gini. Has ganado la insignia <strong>Analista de Desigualdad</strong>. ¡Puedes pasar al certificado final!';
+  }
+}
+
+document.getElementById('equalBtn').addEventListener('click', () => {
+  quintiles = [20, 20, 20, 20, 20];
+  renderSliders(); draw(); updateStats();
+  compareQuintiles = null;
+  document.getElementById('compareGini').innerHTML = '';
+  document.getElementById('feedbackMsg').innerHTML = '✅ Distribución <strong>perfectamente igualitaria</strong>. La curva coincide con la diagonal. Gini = 0.';
+});
+
+document.getElementById('unequalBtn').addEventListener('click', () => {
+  quintiles = [2, 5, 10, 18, 65];
+  renderSliders(); draw(); updateStats();
+  document.getElementById('feedbackMsg').innerHTML = '⚠️ Distribución con <strong>alta desigualdad</strong>. El 20% más rico concentra la mayor parte del ingreso.';
+});
+
+document.getElementById('moderateBtn').addEventListener('click', () => {
+  quintiles = [8, 12, 18, 25, 37];
+  renderSliders(); draw(); updateStats();
+  document.getElementById('feedbackMsg').innerHTML = '⚖️ Distribución <strong>moderada</strong>. Similar a países europeos con clase media amplia.';
+});
+
+document.getElementById('swedenBtn').addEventListener('click', () => {
+  setCompare([10, 14, 20, 24, 32], 'Suecia (Gini ~0.25)');
+  document.getElementById('feedbackMsg').innerHTML = '🇸🇪 <strong>Suecia</strong>: distribución relativamente igualitaria con fuerte clase media.';
+});
+
+document.getElementById('usaBtn').addEventListener('click', () => {
+  setCompare([5, 10, 16, 24, 45], 'USA (Gini ~0.41)');
+  document.getElementById('feedbackMsg').innerHTML = '🇺🇸 <strong>Estados Unidos</strong>: desigualdad moderada-alta. El 20% más rico concentra casi la mitad del ingreso.';
+});
+
+document.getElementById('brazilBtn').addEventListener('click', () => {
+  setCompare([3, 6, 11, 20, 60], 'Brasil (Gini ~0.53)');
+  document.getElementById('feedbackMsg').innerHTML = '🇧🇷 <strong>Brasil</strong>: alta desigualdad. El 20% más rico tiene 20 veces el ingreso del 20% más pobre.';
+});
+
+document.getElementById('saBtn').addEventListener('click', () => {
+  setCompare([2, 4, 8, 16, 70], 'Sudáfrica (Gini ~0.63)');
+  document.getElementById('feedbackMsg').innerHTML = '🇿🇦 <strong>Sudáfrica</strong>: uno de los Gini más altos del mundo. Desigualdad extrema.';
+});
+
+// Init
+renderSliders();
+draw();
+updateStats();
+
+(function load() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) { const d = JSON.parse(saved); if (d.completed) { insigniaArea.classList.remove('hidden'); interacted = true; } }
+  } catch(e) {}
+})();
+</script>
+</body>
+</html>

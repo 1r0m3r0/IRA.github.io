@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>MQL5 & Trading Algorítmico | 🧮 Matrices y Vectores</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #111a2e 100%);
+      background-size: 200% 200%;
+      animation: gradientShift 20s ease infinite;
+      font-family: 'Inter', sans-serif;
+      color: #eef5ff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .modulo-container {
+      max-width: 1300px; width: 100%;
+      background: rgba(15,25,45,0.65);
+      backdrop-filter: blur(12px);
+      border-radius: 3rem;
+      border: 1px solid rgba(255,102,192,0.25);
+      box-shadow: 0 25px 45px rgba(0,0,0,0.5);
+      overflow: hidden;
+    }
+    .hero-header {
+      background: linear-gradient(95deg,#0b1120,#111a2e);
+      padding: 2rem 2rem 1.5rem;
+      text-align: center;
+      border-bottom: 2px solid #ff66c0;
+    }
+    .hero-header h1 {
+      font-size: 2.6rem; font-weight: 800;
+      background: linear-gradient(135deg,#FFF,#ffb0d8,#ff66c0);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .hero-header p { font-size: 1.1rem; color: #ffccdd; margin-top: 0.5rem; font-weight: 500; }
+    .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1.2rem; flex-wrap: wrap; }
+    .chip {
+      background: rgba(255,102,192,0.15);
+      border: 1px solid #ff66c0;
+      padding: 0.4rem 1rem;
+      border-radius: 40px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .progress-section { padding: 1.2rem 2rem; border-bottom: 1px solid #1a2a4a; }
+    .progress-bar-outer { background: #1a2a4a; border-radius: 20px; height: 16px; overflow: hidden; }
+    .progress-bar-fill {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg,#ff66c0,#ff3090);
+      border-radius: 20px; transition: width 0.5s ease;
+    }
+    .progress-text { display: block; text-align: center; margin-top: 0.3rem; font-size: 0.8rem; color: #8899cc; }
+    .analogy-card {
+      background: #1e2a3acc; margin: 1.5rem 2rem; padding: 1.2rem 1.8rem;
+      border-radius: 2rem; border-left: 8px solid #ff66c0;
+      font-size: 1rem; line-height: 1.6;
+    }
+    .main-area { padding: 1.5rem 2rem; }
+    .section-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 1rem; color: #ff66c0; }
+    .matrix-workspace { display: flex; flex-wrap: wrap; gap: 2rem; margin-bottom: 2rem; }
+    .matrix-panel { flex: 1; min-width: 280px; background: #0d1830; border-radius: 1.5rem; padding: 1.2rem; border: 1px solid #ff66c055; }
+    .matrix-panel h3 { color: #ff66c0; margin-bottom: 0.8rem; font-size: 1rem; }
+    .matrix-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 0.4rem; margin-bottom: 0.8rem; }
+    .matrix-grid input {
+      width: 100%; padding: 0.4rem; background: #0b1120; border: 1px solid #2a3d5a;
+      border-radius: 0.5rem; color: #eef5ff; text-align: center; font-size: 0.7rem;
+    }
+    .matrix-grid input:focus { border-color: #ff66c0; outline: none; box-shadow: 0 0 8px rgba(255,102,192,0.4); }
+    .ops-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0; }
+    .btn-op {
+      background: #1a2a4a; border: 1px solid #ff66c0; padding: 0.5rem 1rem; border-radius: 2rem;
+      color: #eef5ff; font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 0.8rem;
+    }
+    .btn-op:hover { background: #ff66c0; color: #0b1120; transform: translateY(-2px); }
+    .result-matrix { background: #0b1120; border-radius: 1rem; padding: 1rem; margin-top: 0.5rem; border: 1px solid #ff66c055; min-height: 60px; }
+    .result-grid { display: grid; gap: 0.3rem; margin-top: 0.5rem; }
+    .result-grid .cell { background: #0f1a2c; padding: 0.3rem; text-align: center; border-radius: 0.3rem; font-size: 0.65rem; color: #00ff88; }
+    .cell.filled { animation: cellPop 0.3s ease; }
+    @keyframes cellPop { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+    .trading-app { background: #0d1830; border-radius: 1.5rem; padding: 1.2rem; margin: 1.5rem 0; border: 1px solid #ff66c055; }
+    .trading-app h3 { color: #ff66c0; margin-bottom: 1rem; }
+    .trading-app input { background: #0b1120; border: 1px solid #2a3d5a; border-radius: 0.5rem; padding: 0.4rem; color: #eef5ff; width: 80px; }
+    .formula-box { background: #0b1120; border-radius: 1rem; padding: 1rem; margin: 0.5rem 0; font-size: 0.8rem; color: #ff66c0; }
+    .speed-challenge { background: #0d1830; border-radius: 1.5rem; padding: 1.2rem; margin: 1.5rem 0; border: 1px solid gold; }
+    .speed-challenge h3 { color: gold; margin-bottom: 1rem; }
+    .speed-q { background: #0b1120; border-radius: 1rem; padding: 1rem; margin: 0.5rem 0; }
+    .speed-q p { font-weight: 600; color: #ffccdd; }
+    .speed-opts { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
+    .speed-opt { background: #1a2a4a; border: 1px solid #2a3d5a; padding: 0.4rem 0.8rem; border-radius: 2rem; cursor: pointer; font-size: 0.8rem; transition: 0.2s; }
+    .speed-opt:hover { border-color: gold; }
+    .speed-opt.selected { background: gold; color: #0b1120; border-color: gold; font-weight: bold; }
+    .speed-opt.correct { background: #00cc88; color: #0b1120; border-color: #00cc88; }
+    .speed-opt.wrong { background: #ff4455; color: #fff; border-color: #ff4455; }
+    .speed-score { font-size: 1.5rem; font-weight: 800; text-align: center; margin-top: 1rem; }
+    .code-panel { background: #0b1120; border-radius: 1rem; padding: 1rem; margin: 1rem 0; border: 1px solid #ff66c055; }
+    .code-panel pre { font-family: 'Courier New', monospace; font-size: 0.8rem; color: #00ff88; white-space: pre-wrap; }
+    .code-panel .type { color: #66ccff; }
+    .code-panel .comment { color: #667799; }
+    .feedback { background: #00000099; margin: 0 2rem 1.5rem; padding: 1rem; border-radius: 1.5rem; text-align: center; font-weight: 500; border-left: 4px solid #ff66c0; }
+    .btn-action { background: linear-gradient(95deg,#f0a500,#ff6a00); border: none; padding: 0.6rem 1.4rem; font-weight: bold; border-radius: 3rem; cursor: pointer; font-size: 0.9rem; transition: 0.2s; color: #1e1a0c; }
+    .btn-action:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(240,165,0,0.5); }
+    .btn-action:disabled { opacity: 0.5; cursor: not-allowed; }
+    .insignia { text-align: center; background: #0c1b2f; border-radius: 2rem; margin: 0 2rem 1.5rem; padding: 1rem; border: 1px dashed gold; }
+    .insignia i { font-size: 2.5rem; color: gold; }
+    .insignia h3 { font-size: 1.3rem; color: #ffd700; margin: 0.5rem 0; }
+    .hidden { display: none; }
+    .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
+    .nav-link { background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem; font-weight: 600; text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; }
+    .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(255,102,192,0.4); }
+    .nav-link.next { background: linear-gradient(95deg,#f0a500,#ff6a00); color: #1e1a0c; }
+    .nav-link.menu { background: #1a2a4a; border: 1px solid #3399ff; }
+    footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
+    .tab-bar { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+    .tab-btn { background: #0b1120; border: 1px solid #2a3d5a; padding: 0.5rem 1rem; border-radius: 2rem; cursor: pointer; font-size: 0.8rem; color: #8899cc; transition: 0.2s; }
+    .tab-btn.active { background: #ff66c0; color: #0b1120; border-color: #ff66c0; font-weight: 600; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    @media (max-width: 800px) { .hero-header h1 { font-size: 1.9rem; } .matrix-workspace { flex-direction: column; } }
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+<nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+<div class="modulo-container" id="app">
+  <div class="hero-header">
+    <h1>🧮 Matrices y Vectores en MQL5</h1>
+    <p>Matemáticas de alto rendimiento para traders cuantitativos</p>
+    <div class="badge-area">
+      <span class="chip"><i class="fas fa-th"></i> Matrix Class</span>
+      <span class="chip"><i class="fas fa-calculator"></i> Operaciones</span>
+      <span class="chip"><i class="fas fa-rocket"></i> Vector Engine</span>
+    </div>
+  </div>
+  <div class="progress-section">
+    <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+    <span class="progress-text" id="progressText">Módulo 0 de 26</span>
+  </div>
+  <div class="analogy-card">
+    <strong>💡 Piénsalo así:</strong> Una matriz es como una hoja de cálculo: filas y columnas de números. Multiplicar matrices es como combinar dos recetas para obtener una nueva. MQL5 tiene un motor matricial built-in que hace cálculos a velocidad blister.
+  </div>
+  <div class="main-area">
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="sandbox">🧪 Matrix Sandbox</button>
+      <button class="tab-btn" data-tab="trading">📊 Trading App</button>
+      <button class="tab-btn" data-tab="speed">⚡ Speed Challenge</button>
+      <button class="tab-btn" data-tab="code">📟 Código MQL5</button>
+    </div>
+    <div id="tab-sandbox" class="tab-content active">
+      <div class="section-title"><i class="fas fa-pencil-alt"></i> Matrix Sandbox</div>
+      <p style="color:#b9e2ff;margin-bottom:1rem;">Ingresa valores en las matrices A y B (3x3), luego elige una operación.</p>
+      <div class="matrix-workspace">
+        <div class="matrix-panel">
+          <h3><i class="fas fa-font"></i> Matriz A</h3>
+          <div class="matrix-grid" id="matrixA"></div>
+          <button class="btn-op" onclick="randomFill('A')">🎲 Aleatorio</button>
+          <button class="btn-op" onclick="resetMatrix('A')">🔄 Reset</button>
+        </div>
+        <div class="matrix-panel">
+          <h3><i class="fas fa-font"></i> Matriz B</h3>
+          <div class="matrix-grid" id="matrixB"></div>
+          <button class="btn-op" onclick="randomFill('B')">🎲 Aleatorio</button>
+          <button class="btn-op" onclick="resetMatrix('B')">🔄 Reset</button>
+        </div>
+        <div class="matrix-panel" style="flex:1.5">
+          <h3><i class="fas fa-equals"></i> Resultado</h3>
+          <div class="ops-row">
+            <button class="btn-op" onclick="computeOp('add')">➕ Sumar</button>
+            <button class="btn-op" onclick="computeOp('sub')">➖ Restar</button>
+            <button class="btn-op" onclick="computeOp('elemul')">✖️ Elem-Wise</button>
+            <button class="btn-op" onclick="computeOp('dot')">🔗 Dot Product</button>
+            <button class="btn-op" onclick="computeOp('transposeA')">🔄 Transponer A</button>
+            <button class="btn-op" onclick="computeOp('inverseA')">🔢 Inversa A</button>
+            <button class="btn-op" onclick="computeOp('detA')">📐 Det(A)</button>
+          </div>
+          <div class="result-matrix" id="resultMatrix">
+            <p style="color:#667799;font-size:0.85rem;">Presiona un botón para ver el resultado</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="tab-trading" class="tab-content">
+      <div class="section-title"><i class="fas fa-chart-line"></i> Trading Application</div>
+      <div class="trading-app">
+        <h3><i class="fas fa-briefcase"></i> Varianza de Portafolio: w^T · Σ · w</h3>
+        <p style="color:#b9e2ff;font-size:0.9rem;margin-bottom:0.8rem;">Ingresa los pesos de 3 activos (deben sumar 1):</p>
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.8rem;">
+          <label>w1: <input type="number" id="w1" value="0.4" step="0.1" min="0" max="1"></label>
+          <label>w2: <input type="number" id="w2" value="0.35" step="0.1" min="0" max="1"></label>
+          <label>w3: <input type="number" id="w3" value="0.25" step="0.1" min="0" max="1"></label>
+          <button class="btn-op" onclick="calcPortfolioVar()">Calcular Varianza</button>
+        </div>
+        <div class="formula-box" id="portfolioResult">Presiona "Calcular Varianza" para ver el resultado</div>
+        <p style="color:#667799;font-size:0.75rem;margin-top:0.5rem;">Portfolio Variance = w₁²σ₁² + w₂²σ₂² + w₃²σ₃² + 2w₁w₂Cov₁₂ + 2w₁w₃Cov₁₃ + 2w₂w₃Cov₂₃</p>
+      </div>
+      <div class="trading-app">
+        <h3><i class="fas fa-chart-bar"></i> Regresión Lineal: y = Xβ</h3>
+        <p style="color:#b9e2ff;font-size:0.9rem;margin-bottom:0.8rem;">β = (XᵀX)⁻¹Xᵀy — Mínimos cuadrados con matrices</p>
+        <button class="btn-op" onclick="calcRegression()">📈 Calcular Regresión</button>
+        <div class="formula-box" id="regressionResult">Presiona para calcular β usando matrices</div>
+      </div>
+    </div>
+    <div id="tab-speed" class="tab-content">
+      <div class="section-title"><i class="fas fa-bolt"></i> Matrix Speed Challenge</div>
+      <p style="color:#b9e2ff;margin-bottom:1rem;">Identifica la operación matricial basada en la descripción visual.</p>
+      <div class="speed-challenge" id="speedArea"></div>
+      <button class="btn-action" id="checkSpeedBtn" onclick="checkSpeed()">✅ Verificar Speed Challenge</button>
+      <div id="speedResult" class="speed-score hidden"></div>
+    </div>
+    <div id="tab-code" class="tab-content">
+      <div class="section-title"><i class="fas fa-code"></i> Código MQL5: Matrix Class</div>
+      <div class="code-panel" id="codePanel">
+        <pre>// Selecciona una operación en el Sandbox para ver el código MQL5 correspondiente</pre>
+      </div>
+      <p style="color:#667799;font-size:0.75rem;margin-top:0.5rem;">MQL5 usa <span style="color:#ff66c0;">matrix&lt;double&gt;</span> y <span style="color:#66ccff;">vector&lt;double&gt;</span> desde build 2680+</p>
+    </div>
+    <div id="insigniaArea" class="insignia hidden">
+      <i class="fas fa-medal"></i>
+      <h3>🏅 Operador de Matrices 🏅</h3>
+      <p>Has dominado las operaciones matriciales en MQL5. ¡El álgebra lineal no tiene secretos para ti!</p>
+    </div>
+  </div>
+  <div id="feedbackMsg" class="feedback">💡 Explora las matrices usando el Sandbox primero, luego prueba las aplicaciones de trading.</div>
+  <div class="nav-links">
+    <a href="e4-objetos-graficos.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+    <a href="e6-algebra-lineal.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-robot"></i> MQL5 &amp; Trading Algorítmico · Programa. Automatiza. Gana.</footer>
+</div>
+<script>
+const STORAGE_KEY='mql5_e5';
+function updateProgress(){let p=JSON.parse(localStorage.getItem('mql5_progress'))||[];if(!p.includes(STORAGE_KEY)){p.push(STORAGE_KEY);localStorage.setItem('mql5_progress',JSON.stringify(p))}const idx=p.length;document.getElementById('progressFill').style.width=Math.round((idx/26)*100)+'%';document.getElementById('progressText').textContent='Módulo '+idx+' de 26'}
+let matA=[[1,2,3],[4,5,6],[7,8,9]],matB=[[9,8,7],[6,5,4],[3,2,1]],speedScore=0;
+function renderMatrix(id,data){const c=document.getElementById(id);c.innerHTML='';for(let r=0;r<3;r++)for(let t=0;t<3;t++){const i=document.createElement('input');i.type='number';i.value=data[r][t];i.dataset.r=r;i.dataset.c=t;i.dataset.mat=id==='matrixA'?'A':'B';i.addEventListener('input',function(){const m=this.dataset.mat==='A'?matA:matB;m[parseInt(this.dataset.r)][parseInt(this.dataset.c)]=parseFloat(this.value)||0});c.appendChild(i)}}
+function randomFill(id){const m=id==='A'?matA:matB;for(let r=0;r<3;r++)for(let c=0;c<3;c++)m[r][c]=Math.floor(Math.random()*20)-10+Math.round(Math.random()*100)/100;renderMatrix('matrix'+id,m);document.getElementById('feedbackMsg').textContent='🎲 Matriz '+id+' aleatoria.'}
+function resetMatrix(id){const m=id==='A'?matA:matB;for(let r=0;r<3;r++)for(let c=0;c<3;c++)m[r][c]=id==='A'?(r*3+c+1):(9-(r*3+c));renderMatrix('matrix'+id,m);document.getElementById('feedbackMsg').textContent='🔄 Matriz '+id+' reiniciada.'}
+function matHTML(m){if(typeof m==='number')return '<div style="font-family:monospace;font-size:1rem;color:#ff66c0;padding:1rem;text-align:center;">= '+m.toFixed(4)+'</div>';if(!m||!m.length)return '<p style="color:#ff4455;">Error</p>';let h='<div class="result-grid" style="grid-template-columns: repeat('+m[0].length+',1fr);">';for(let r=0;r<m.length;r++)for(let c=0;c<m[0].length;c++)h+='<div class="cell filled">'+(typeof m[r][c]==='number'?m[r][c].toFixed(2):m[r][c])+'</div>';return h+'</div>';}
+function computeOp(op){try{let r;let c='';const cp=document.getElementById('codePanel');switch(op){case'add':r=matA.map((a,i)=>a.map((v,j)=>v+matB[i][j]));c=`matrix<double> A={{${matA[0].join(',')}},{${matA[1].join(',')}},{${matA[2].join(',')}}};\nmatrix<double> B={{${matB[0].join(',')}},{${matB[1].join(',')}},{${matB[2].join(',')}}};\nmatrix<double> C=A+B;\nPrint("Suma=",C);`;document.getElementById('feedbackMsg').textContent='➕ Suma elemento a elemento.';break;
+case'sub':r=matA.map((a,i)=>a.map((v,j)=>v-matB[i][j]));c=`matrix<double> A={{${matA[0].join(',')}},{${matA[1].join(',')}},{${matA[2].join(',')}}};\nmatrix<double> B={{${matB[0].join(',')}},{${matB[1].join(',')}},{${matB[2].join(',')}}};\nmatrix<double> C=A-B;\nPrint("Resta=",C);`;document.getElementById('feedbackMsg').textContent='➖ Resta elemento a elemento.';break;
+case'elemul':r=matA.map((a,i)=>a.map((v,j)=>v*matB[i][j]));c=`matrix<double> A={{${matA[0].join(',')}},{${matA[1].join(',')}},{${matA[2].join(',')}}};\nmatrix<double> B={{${matB[0].join(',')}},{${matB[1].join(',')}},{${matB[2].join(',')}}};\nmatrix<double> C=A.MatMul(B);\nPrint("Producto=",C);`;document.getElementById('feedbackMsg').textContent='✖️ Multiplicación Hadamard (elemento a elemento).';break;
+case'dot':r=multiplyMatrices(matA,matB);c=`matrix<double> A={{${matA[0].join(',')}},{${matA[1].join(',')}},{${matA[2].join(',')}}};\nmatrix<double> B={{${matB[0].join(',')}},{${matB[1].join(',')}},{${matB[2].join(',')}}};\nmatrix<double> C=A.MatMul(B);\nPrint("Dot=",C);`;document.getElementById('feedbackMsg').textContent='🔗 Dot Product: filas×columnas. Esencial en regresión.';break;
+case'transposeA':r=transposeMatrix(matA);c=`matrix<double> A={{${matA[0].join(',')}},{${matA[1].join(',')}},{${matA[2].join(',')}}};\nmatrix<double> AT=A.Transpose();\nPrint("Transpuesta=",AT);`;document.getElementById('feedbackMsg').textContent='🔄 Transpuesta: filas↔columnas.';break;
+case'inverseA':r=inverseMatrix(matA);c=`matrix<double> A={{${matA[0].join(',')}},{${matA[1].join(',')}},{${matA[2].join(',')}}};\nmatrix<double> Ainv=A.Inv();\nPrint("Inversa=",Ainv);`;document.getElementById('feedbackMsg').textContent='🔢 Inversa: A×A⁻¹=I.';break;
+case'detA':r=determinant(matA);c=`matrix<double> A={{${matA[0].join(',')}},{${matA[1].join(',')}},{${matA[2].join(',')}}};\ndouble d=A.Det();\nPrint("Det=",d);`;document.getElementById('feedbackMsg').textContent='📐 Determinante: si es 0, no hay inversa.';break}
+if(r!==undefined)document.getElementById('resultMatrix').innerHTML=matHTML(r);if(c)cp.innerHTML='<pre>'+c.replace(/(matrix|vector|double|int|void|bool|string|Print)/g,'<span class="type">$1</span>').replace(/(\/\/.*)/g,'<span class="comment">$1</span>')+'</pre>'}catch(e){document.getElementById('feedbackMsg').textContent='❌ '+e.message}}
+function multiplyMatrices(A,B){const r=A.length,c=B[0].length,n=A[0].length;const C=Array.from({length:r},()=>Array(c).fill(0));for(let i=0;i<r;i++)for(let j=0;j<c;j++)for(let k=0;k<n;k++)C[i][j]+=A[i][k]*B[k][j];return C}
+function transposeMatrix(m){return m[0].map((_,i)=>m.map(r=>r[i]))}
+function determinant(m){const a=m[0][0],b=m[0][1],c=m[0][2],d=m[1][0],e=m[1][1],f=m[1][2],g=m[2][0],h=m[2][1],i=m[2][2];return a*(e*i-f*h)-b*(d*i-f*g)+c*(d*h-e*g)}
+function inverseMatrix(m){const det=determinant(m);if(Math.abs(det)<1e-10)throw new Error('Det=0, no inversa.');const a=m[0][0],b=m[0][1],c=m[0][2],d=m[1][0],e=m[1][1],f=m[1][2],g=m[2][0],h=m[2][1],i=m[2][2];return[[(e*i-f*h)/det,(c*h-b*i)/det,(b*f-c*e)/det],[(f*g-d*i)/det,(a*i-c*g)/det,(c*d-a*f)/det],[(d*h-e*g)/det,(b*g-a*h)/det,(a*e-b*d)/det]]}
+function calcPortfolioVar(){const w=[parseFloat(document.getElementById('w1').value)||0,parseFloat(document.getElementById('w2').value)||0,parseFloat(document.getElementById('w3').value)||0];const t=w.reduce((a,b)=>a+b,0);if(Math.abs(t-1)>0.01){document.getElementById('portfolioResult').innerHTML='⚠️ Pesos deben sumar 1. Actual: '+t.toFixed(2);return}const cov=[[0.04,0.012,0.008],[0.012,0.09,0.015],[0.008,0.015,0.0625]];let v=0;for(let i=0;i<3;i++)for(let j=0;j<3;j++)v+=w[i]*w[j]*cov[i][j];const vol=Math.sqrt(v);document.getElementById('portfolioResult').innerHTML='📊 Varianza = '+v.toFixed(6)+' | Volatilidad = '+vol.toFixed(4)+' ('+(vol*100).toFixed(2)+'%)';document.getElementById('feedbackMsg').textContent='📊 Varianza calculada.';const cp=document.getElementById('codePanel');cp.innerHTML='<pre><span class="comment">// Covariance matrix Σ</span>\n<span class="type">matrix</span>&lt;<span class="type">double</span>&gt; cov={{0.04,0.012,0.008},{0.012,0.09,0.015},{0.008,0.015,0.0625}};\n<span class="type">vector</span>&lt;<span class="type">double</span>&gt; w={'+w.join(',')+'};\n<span class="type">double</span> var=w.Dot(cov.MatMul(w));\n<span class="type">double</span> vol=MathSqrt(var);\n<span class="type">Print</span>("Varianza=",var,"Vol=",vol);</pre>'}
+function calcRegression(){const X=[[1,2,3,4,5,6,7,8,9,10]],y=[2.1,3.8,6.2,7.9,10.1,12.3,13.8,16.2,18.1,19.9];const n=X[0].length;const Xt=[[1,1,1,1,1,1,1,1,1,1],X[0]];const XtX=[[0,0],[0,0]];for(let i=0;i<2;i++)for(let j=0;j<2;j++)for(let k=0;k<n;k++)XtX[i][j]+=Xt[i][k]*Xt[j][k];const det=XtX[0][0]*XtX[1][1]-XtX[0][1]*XtX[1][0];const XtXinv=[[XtX[1][1]/det,-XtX[0][1]/det],[-XtX[1][0]/det,XtX[0][0]/det]];const Xty=[0,0];for(let i=0;i<2;i++)for(let k=0;k<n;k++)Xty[i]+=Xt[i][k]*y[k];const beta=[XtXinv[0][0]*Xty[0]+XtXinv[0][1]*Xty[1],XtXinv[1][0]*Xty[0]+XtXinv[1][1]*Xty[1]];const yPred=X[0].map(x=>beta[0]+beta[1]*x);const yMean=y.reduce((a,b)=>a+b,0)/n;const ssRes=y.reduce((s,yi,i)=>s+(yi-yPred[i])**2,0);const ssTot=y.reduce((s,yi)=>s+(yi-yMean)**2,0);const r2=1-ssRes/ssTot;document.getElementById('regressionResult').innerHTML='β₀='+beta[0].toFixed(4)+'<br>β₁='+beta[1].toFixed(4)+'<br>R²='+r2.toFixed(6)+'<br>y='+beta[0].toFixed(2)+'+'+beta[1].toFixed(2)+'·x';document.getElementById('feedbackMsg').textContent='📈 Regresión calculada.';const cp=document.getElementById('codePanel');cp.innerHTML='<pre><span class="comment">// β = (XᵀX)⁻¹Xᵀy</span>\n<span class="type">matrix</span>&lt;<span class="type">double</span>&gt; X={{1,'+X[0].join(',')+'}};\n<span class="type">vector</span>&lt;<span class="type">double</span>&gt; y={'+y.join(',')+'};\n<span class="type">matrix</span>&lt;<span class="type">double</span>&gt; Xt=X.Transpose();\n<span class="type">matrix</span>&lt;<span class="type">double</span>&gt; beta=(Xt.MatMul(X)).Inv().MatMul(Xt.MatMul(y));\n<span class="type">Print</span>("Beta=",beta);</pre>'}
+const speedQ=[{desc:'Suma de matrices elemento a elemento',answer:'Suma'},{desc:'Producto filas×columnas: Σ Aik·Bkj',answer:'Dot Product'},{desc:'Intercambiar filas por columnas',answer:'Transpuesta'},{desc:'Escalar a(ei−fh)−b(di−fg)+c(dh−eg)',answer:'Determinante'},{desc:'A×?=I para resolver sistemas',answer:'Inversa'}];let speedAnswers=new Array(speedQ.length).fill(null);let speedDone=false;
+function initSpeed(){const a=document.getElementById('speedArea');a.innerHTML='';speedQ.forEach((q,idx)=>{const d=document.createElement('div');d.classList.add('speed-q');d.innerHTML='<p><strong>'+(idx+1)+'.</strong> '+q.desc+'</p>';const o=document.createElement('div');o.classList.add('speed-opts');['Suma','Resta','Dot Product','Transpuesta','Determinante','Inversa','Element-wise'].forEach(v=>{const s=document.createElement('span');s.classList.add('speed-opt');s.textContent=v;s.dataset.qIdx=idx;s.addEventListener('click',function(){if(speedDone)return;Array.from(this.parentElement.children).forEach(c=>c.classList.remove('selected'));this.classList.add('selected');speedAnswers[idx]=v});o.appendChild(s)});d.appendChild(o);a.appendChild(d)})}
+function checkSpeed(){if(speedDone)return;if(speedAnswers.some(a=>a===null)){document.getElementById('feedbackMsg').textContent='⚠️ Responde todas.';return}let correct=0;speedQ.forEach((q,idx)=>{if(speedAnswers[idx]===q.answer)correct++});speedScore=correct;const r=document.getElementById('speedResult');r.classList.remove('hidden');r.innerHTML='Puntaje: '+correct+' / '+speedQ.length+(correct>=4?' 🎉 ¡Excelente!':correct>=3?' 👍 Bien!':' 💪 Sigue');if(correct>=4){speedDone=true;document.getElementById('insigniaArea').classList.remove('hidden');document.getElementById('checkSpeedBtn').disabled=true;updateProgress();document.getElementById('feedbackMsg').textContent='🏆 ¡Módulo completado! Eres Operador de Matrices.'}}
+document.querySelectorAll('.tab-btn').forEach(btn=>{btn.addEventListener('click',function(){document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));this.classList.add('active');document.getElementById('tab-'+this.dataset.tab).classList.add('active')})});
+renderMatrix('matrixA',matA);renderMatrix('matrixB',matB);initSpeed();
+(function(){const p=JSON.parse(localStorage.getItem('mql5_progress'))||[];if(p.includes(STORAGE_KEY)){document.getElementById('insigniaArea').classList.remove('hidden');speedDone=true;document.getElementById('checkSpeedBtn').disabled=true;document.getElementById('feedbackMsg').textContent='🏆 Ya completaste este módulo.'}})();
+updateProgress();
+</script>
+<script src="../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

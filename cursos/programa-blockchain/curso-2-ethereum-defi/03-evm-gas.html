@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>EVM, Gas y Transacciones | Curso 2</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 100%); font-family: 'Inter', sans-serif; color: #eef5ff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; }
+    .course-container { max-width: 1300px; width: 100%; background: rgba(15,25,45,0.65); backdrop-filter: blur(12px); border-radius: 3rem; border: 1px solid rgba(98,126,234,0.25); box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden; }
+    .hero-header { background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%); padding: 2rem 2rem 1.5rem; text-align: center; border-bottom: 2px solid #627eea; }
+    .hero-header h1 { font-size: 2.6rem; font-weight: 800; background: linear-gradient(135deg, #FFF, #8099f0, #627eea); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .hero-header p { font-size: 1.1rem; color: #b9e2ff; margin-top: 0.5rem; }
+    .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1.2rem; flex-wrap: wrap; }
+    .chip { background: rgba(98,126,234,0.15); border: 1px solid #627eea; padding: 0.4rem 1rem; border-radius: 40px; font-size: 0.8rem; font-weight: 600; }
+    .analogy-card { background: #1e2a3acc; margin: 1.5rem 2rem; padding: 1.2rem 1.8rem; border-radius: 2rem; border-left: 8px solid #627eea; font-size: 1rem; line-height: 1.6; }
+    .main-area { padding: 1rem 2rem 2rem; }
+    .sim-box { background: rgba(0,10,25,0.7); border-radius: 2rem; padding: 1.5rem; border: 1px solid #627eea; text-align: center; margin-bottom: 1.5rem; }
+    .sim-box h3 { margin-bottom: 1rem; color: #8099f0; }
+    .gas-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1rem 0; }
+    .gas-card { background: #0f1a2c; border-radius: 1rem; padding: 1rem; border: 1px solid #2c3e66; cursor: pointer; transition: 0.2s; }
+    .gas-card:hover { border-color: #627eea; transform: translateY(-2px); }
+    .gas-card.selected { border-color: #627eea; background: #1a2a4a; box-shadow: 0 0 10px rgba(98,126,234,0.3); }
+    .gas-card h4 { font-size: 1rem; color: #eef5ff; }
+    .gas-card p { font-size: 0.85rem; color: #8899bb; }
+    .btn-action { background: linear-gradient(95deg, #627eea, #8099f0); border: none; padding: 0.8rem 1.8rem; font-weight: bold; border-radius: 3rem; margin: 0.5rem; cursor: pointer; font-size: 1rem; transition: 0.2s; color: #fff; }
+    .btn-action:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(98,126,234,0.5); }
+    .btn-action:disabled { opacity: 0.5; cursor: not-allowed; }
+    .result-box { background: #0f1a2c; border-radius: 2rem; padding: 1.5rem; margin-top: 1rem; border: 1px solid #627eea; }
+    .result-box .big { font-size: 2rem; font-weight: 800; color: #627eea; }
+    .feedback { background: #00000099; margin: 1rem 0; padding: 1rem; border-radius: 1.5rem; text-align: center; font-weight: 500; border-left: 4px solid #627eea; }
+    .quiz-block { background: rgba(0,10,25,0.5); border-radius: 2rem; padding: 1.5rem; margin-top: 1.5rem; border: 1px solid #627eea; }
+    .quiz-block h3 { color: #8099f0; margin-bottom: 1rem; }
+    .quiz-q { margin: 1rem 0; padding: 1rem; background: #0f1a2c; border-radius: 1rem; }
+    .quiz-q p { font-weight: 600; margin-bottom: 0.5rem; }
+    .quiz-q .opt { display: inline-block; background: #1e2a3e; padding: 0.4rem 1rem; border-radius: 2rem; margin: 0.2rem; cursor: pointer; transition: 0.2s; font-size: 0.9rem; }
+    .quiz-q .opt:hover { background: #2c3e66; }
+    .quiz-q .opt.selected { background: #627eea; color: #fff; }
+    .insignia { text-align: center; background: #0c1b2f; border-radius: 2rem; margin: 1rem 0; padding: 1rem; border: 1px dashed gold; }
+    .insignia i { font-size: 2.5rem; color: gold; }
+    .hidden { display: none; }
+    .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
+    .nav-link { background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem; font-weight: 600; text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; }
+    .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(98,126,234,0.4); }
+    .nav-link.next { background: linear-gradient(95deg, #627eea, #8099f0); color: #fff; }
+    .nav-link.menu { background: #1a2a4a; border: 1px solid #627eea; }
+    footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
+    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
+  </style>
+  <link rel="stylesheet" href="../../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a><a href="../index.html">Programa Blockchain</a></nav>
+
+<div class="course-container">
+  <div class="hero-header">
+    <h1> EVM, GAS Y TRANSACCIONES</h1>
+    <p>La m&aacute;quina virtual de Ethereum y c&oacute;mo funciona el mercado de tarifas</p>
+    <div class="badge-area">
+      <span class="chip"><i class="fas fa-microchip"></i> EVM</span>
+      <span class="chip"><i class="fas fa-gas-pump"></i> EIP-1559</span>
+      <span class="chip"><i class="fas fa-fire"></i> Base Fee + Priority</span>
+    </div>
+  </div>
+
+  <div class="analogy-card">
+    <strong> Piénsalo as&iacute;:</strong> Cada operaci&oacute;n en Ethereum cuesta gas como un coche consume combustible &mdash; cuanto m&aacute;s compleja la operaci&oacute;n, m&aacute;s gas necesitas, y si la red est&aacute; congestionada, el precio del combustible sube.
+  </div>
+
+  <div class="main-area">
+    <div class="sim-box">
+      <h3><i class="fas fa-calculator"></i> Calculadora de Gas</h3>
+      <p>Selecciona una operaci&oacute;n para calcular su costo en gas y su equivalente en ETH/USD.</p>
+      <div class="gas-grid" id="opGrid">
+        <div class="gas-card" data-gas="21000" data-name="Transferencia ETH">
+          <h4> Transferencia ETH</h4>
+          <p>Gas: 21,000</p>
+        </div>
+        <div class="gas-card" data-gas="50000" data-name="Swap en Uniswap">
+          <h4> Swap en Uniswap</h4>
+          <p>Gas: ~50,000</p>
+        </div>
+        <div class="gas-card" data-gas="120000" data-name="Mint NFT">
+          <h4> Mint NFT</h4>
+          <p>Gas: ~120,000</p>
+        </div>
+        <div class="gas-card" data-gas="350000" data-name="Desplegar Contrato">
+          <h4> Desplegar Contrato</h4>
+          <p>Gas: ~350,000</p>
+        </div>
+      </div>
+
+      <div class="result-box" id="resultBox">
+        <p>Gas utilizado: <span class="big" id="gasUsed">0</span></p>
+        <p>Costo en ETH: <span class="big" id="costEth">0.0000</span></p>
+        <p>Costo en USD: <span class="big" id="costUsd">$0.00</span></p>
+        <p style="font-size:0.85rem;color:#8899bb;margin-top:0.5rem;" id="eip1559Info">Base fee ~25 Gwei + Priority fee ~2 Gwei (EIP-1559)</p>
+      </div>
+
+      <div class="feedback" id="gasFeedback">Haz clic en una operaci&oacute;n para ver el desglose de gas</div>
+    </div>
+
+    <div class="quiz-block">
+      <h3> Cuestionario Express</h3>
+      <div id="quizQs"></div>
+      <button class="btn-action" id="submitQuiz"> Validar respuestas</button>
+      <div id="quizFeedback" class="feedback" style="margin-top:1rem;"></div>
+    </div>
+
+    <div id="insigniaArea" class="insignia hidden">
+      <i class="fas fa-medal"></i>
+      <h3> INSIGNIA DE INGENIERO EVM </h3>
+      <p>&iexcl;Entiendes c&oacute;mo funciona el gas y la m&aacute;quina virtual de Ethereum!</p>
+    </div>
+  </div>
+
+  <div class="nav-links">
+    <a href="02-ethereum-pos.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
+    <a href="04-tokens-erc.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer>
+    <i class="fas fa-crown"></i> Programa Blockchain &middot; Curso 2 &middot; M&oacute;dulo 3
+  </footer>
+</div>
+
+<script>
+  const STORAGE_KEY = 'block_2_03';
+  const ETH_PRICE = 3200;
+  const BASE_FEE_GWEI = 25;
+  const PRIORITY_FEE_GWEI = 2;
+
+  let selectedGas = 0;
+  let quizAnswers = [null, null, null];
+  let quizCompleted = false;
+
+  function init() {
+    var cards = document.querySelectorAll('.gas-card');
+    cards.forEach(function(card) {
+      card.addEventListener('click', function() {
+        cards.forEach(function(c) { c.classList.remove('selected'); });
+        card.classList.add('selected');
+        selectedGas = parseInt(card.dataset.gas);
+        updateGasCalc();
+      });
+    });
+
+    renderQuiz();
+    document.getElementById('submitQuiz').addEventListener('click', checkQuiz);
+
+    var saved = localStorage.getItem(STORAGE_KEY);
+    if (saved === 'true') {
+      quizCompleted = true;
+      document.getElementById('insigniaArea').classList.remove('hidden');
+    }
+  }
+
+  function updateGasCalc() {
+    var totalGwei = selectedGas * (BASE_FEE_GWEI + PRIORITY_FEE_GWEI);
+    var ethCost = totalGwei / 1e9;
+    var usdCost = ethCost * ETH_PRICE;
+    document.getElementById('gasUsed').textContent = selectedGas.toLocaleString();
+    document.getElementById('costEth').textContent = ethCost.toFixed(6);
+    document.getElementById('costUsd').textContent = '$' + usdCost.toFixed(2);
+    document.getElementById('gasFeedback').innerHTML = ' Operaci&oacute;n calculada con base fee ' + BASE_FEE_GWEI + ' Gwei + priority ' + PRIORITY_FEE_GWEI + ' Gwei. ETH quemado: ~' + (selectedGas * BASE_FEE_GWEI / 1e9).toFixed(6) + ' ETH.';
+  }
+
+  var quizData = [
+    { q: "&iquest;Qu&eacute; mide el gas en Ethereum?", opts: ["El precio del ETH", "La unidad de trabajo computacional", "El n&uacute;mero de transacciones", "La temperatura de la red"], correct: 1 },
+    { q: "&iquest;Qu&eacute; introdujo EIP-1559?", opts: ["Los NFTs", "Base fee + priority fee", "Proof of Stake", "Smart contracts"], correct: 1 },
+    { q: "&iquest;Qu&eacute; sucede con el base fee en EIP-1559?", opts: ["Se lo queda el minero", "Se quema (burn)", "Se congela en un contrato", "Se devuelve al usuario"], correct: 1 }
+  ];
+
+  function renderQuiz() {
+    var container = document.getElementById('quizQs');
+    container.innerHTML = '';
+    quizData.forEach(function(q, idx) {
+      var div = document.createElement('div');
+      div.className = 'quiz-q';
+      div.innerHTML = '<p>' + q.q + '</p><div class="opts" id="qopts-' + idx + '"></div>';
+      var optsDiv = div.querySelector('.opts');
+      q.opts.forEach(function(opt, oi) {
+        var span = document.createElement('span');
+        span.className = 'opt';
+        span.textContent = opt;
+        span.dataset.qi = idx;
+        span.dataset.oi = oi;
+        span.addEventListener('click', function() {
+          if (quizCompleted) return;
+          var parent = span.parentElement;
+          Array.from(parent.children).forEach(function(c) { c.classList.remove('selected'); });
+          span.classList.add('selected');
+          quizAnswers[idx] = oi;
+        });
+        optsDiv.appendChild(span);
+      });
+      container.appendChild(div);
+    });
+  }
+
+  function checkQuiz() {
+    if (quizCompleted) { document.getElementById('quizFeedback').innerHTML = ' Ya completaste este cuestionario.'; return; }
+    var allAnswered = quizAnswers.every(function(a) { return a !== null; });
+    if (!allAnswered) { document.getElementById('quizFeedback').innerHTML = ' Responde todas las preguntas primero.'; return; }
+    var correct = 0;
+    for (var i = 0; i < quizData.length; i++) { if (quizAnswers[i] === quizData[i].correct) correct++; }
+    if (correct >= 2) {
+      quizCompleted = true;
+      document.getElementById('quizFeedback').innerHTML = ' &iexcl;Correcto! ' + correct + '/' + quizData.length + '. &iexcl;Dominas el gas y la EVM!';
+      document.getElementById('insigniaArea').classList.remove('hidden');
+      localStorage.setItem(STORAGE_KEY, 'true');
+    } else {
+      document.getElementById('quizFeedback').innerHTML = ' Obtuviste ' + correct + '/' + quizData.length + '. Repasa los conceptos e int&eacute;ntalo de nuevo.';
+    }
+  }
+
+  init();
+</script>
+<script src="../../../assets/js/cookie-consent.js"></script></body>
+</html>

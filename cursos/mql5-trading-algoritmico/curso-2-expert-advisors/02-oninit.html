@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Curso 2 | OnInit: Configuración y Handles</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../../assets/css/theme.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%);background-size:200% 200%;animation:gradientShift 20s ease infinite;font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
+@keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.modulo-container{max-width:1300px;width:100%;background:rgba(15,25,45,0.65);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(0,255,200,0.25);box-shadow:0 25px 45px rgba(0,0,0,0.5);overflow:hidden}
+.hero-header{background:linear-gradient(95deg,#0b1120 0%,#111a2e 100%);padding:2rem 2rem 1.5rem;text-align:center;border-bottom:2px solid #00ffc8}
+.hero-header h1{font-size:2.6rem;font-weight:800;background:linear-gradient(135deg,#FFF,#66ffdd,#00ffc8);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-header p{color:#bcc9f0;margin-top:.5rem;font-size:1.1rem}
+.badge-area{display:flex;justify-content:center;gap:1rem;margin-top:1.2rem;flex-wrap:wrap}
+.chip{background:rgba(0,255,200,0.15);border:1px solid #00ffc8;padding:0.4rem 1rem;border-radius:40px;font-size:0.8rem;font-weight:600;color:#ddd}
+.analogy-card{background:#1e2a3acc;margin:1.5rem 2rem;padding:1.2rem 1.8rem;border-radius:2rem;border-left:8px solid #00ffc8;font-size:1rem;line-height:1.6}
+.progress-section{margin:1rem 2rem 0}
+.progress-bar-outer{background:#1a2a4a;border-radius:20px;height:20px;overflow:hidden}
+.progress-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,#00ffc8,#fff);border-radius:20px;transition:width 0.5s ease}
+.progress-text{text-align:center;font-size:0.85rem;color:#8899cc;margin-bottom:.5rem}
+.main-area{padding:1rem 2rem}
+.code-completion{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem}
+.code-area{background:#0a1020;border-radius:2rem;padding:1.5rem;border:1px solid #2a3a5a;overflow:hidden}
+.pool-area{background:#0a1020;border-radius:2rem;padding:1.5rem;border:1px solid #2a3a5a}
+.code-skeleton{background:#0d1525;border-radius:1rem;padding:1rem;font-family:'Courier New',monospace;font-size:.78rem;line-height:1.7;overflow-x:auto;border:1px solid #2a3a5a}
+.code-line{display:flex;align-items:center;gap:.5rem;padding:1px 0}
+.line-num{color:#444;width:2rem;text-align:right;user-select:none;font-size:.7rem}
+.code-slot{display:inline-block;background:#1a2a4a;border:2px dashed #00ffc8;border-radius:.4rem;padding:0 .4rem;min-width:3rem;min-height:1.5rem;cursor:pointer;transition:.2s;color:#00ffc8;font-family:'Courier New',monospace;font-size:.78rem}
+.code-slot.filled{border-style:solid;background:#0a3a2a;border-color:#00ffc8;color:#00ffc8;cursor:default}
+.code-slot.drag-over{border-color:#fff;background:#2a4a3a}
+.code-block{background:#1e2e4e;border:1px solid #3a5a7a;padding:.6rem .8rem;border-radius:.8rem;cursor:grab;font-family:'Courier New',monospace;font-size:.78rem;color:#eef5ff;margin-bottom:.5rem;transition:.2s}
+.code-block:hover{background:#2e3e5e;border-color:#00ffc8;transform:translateX(4px)}
+.code-block:active{cursor:grabbing}
+.code-block.placed{opacity:.4;pointer-events:none;text-decoration:line-through}
+.code-block .keyword{color:#ff79c6}
+.code-block .type{color:#8be9fd}
+.code-block .func{color:#50fa7b}
+.code-block .str{color:#f1fa8c}
+.code-block .num{color:#bd93f9}
+.slot-label{color:#00ffc8;font-size:.7rem;margin-right:.3rem}
+.btn-group{display:flex;gap:.8rem;margin-top:1rem;flex-wrap:wrap}
+.btn-action{background:linear-gradient(95deg,#00ffc8,#00cc99);border:none;padding:0.8rem 1.8rem;font-weight:bold;border-radius:3rem;cursor:pointer;font-size:1rem;transition:0.2s;color:#0a1a1a;font-family:'Inter',sans-serif}
+.btn-action:hover{transform:translateY(-2px);box-shadow:0 0 15px rgba(0,255,200,0.5)}
+.btn-action:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-secondary{background:#2c3e66;border:none;padding:.6rem 1.2rem;border-radius:2rem;cursor:pointer;color:#eef5ff;font-family:'Inter',sans-serif;font-size:.85rem;transition:.2s}
+.btn-secondary:hover{background:#3a4e76}
+.feedback{background:#00000099;margin:0 2rem 1.5rem;padding:1rem;border-radius:1.5rem;text-align:center;font-weight:500;border-left:4px solid #00ffc8;min-height:3rem}
+.insignia{text-align:center;background:#0c1b2f;border-radius:2rem;margin:0 2rem 1.5rem;padding:1rem;border:2px dashed gold}
+.insignia i{font-size:2.5rem;color:gold}
+.insignia h3{color:gold;margin:.5rem 0}
+.hidden{display:none!important}
+.result-box{background:#0d1525;border-radius:1rem;padding:1rem;margin-top:1rem;font-size:.8rem;border:1px solid #3a4a6a}
+.result-box .ok{color:#00ffc8}
+.result-box .fail{color:#ff4455}
+.nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.5rem 2rem}
+.nav-link{background:#2c3e66;padding:0.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:0.5rem;transition:0.2s}
+.nav-link:hover{transform:translateY(-2px);box-shadow:0 0 10px rgba(0,255,200,0.4)}
+.nav-link.next{background:linear-gradient(95deg,#00ffc8,#00cc99);color:#0a1a1a}
+.nav-link.menu{background:#1a2a4a;border:1px solid #00ffc8}
+.nav-link.prev{background:#1a2a4a;border:1px solid #666}
+footer{text-align:center;padding:1.2rem;font-size:0.8rem;border-top:1px solid #2c3e66;color:#8899cc}
+@media(max-width:900px){.code-completion{grid-template-columns:1fr}.hero-header h1{font-size:1.9rem}.analogy-card{margin:1rem}.feedback{margin:0 1rem 1rem}.main-area{padding:1rem}}
+</style>
+</head>
+<body>
+<div class="modulo-container">
+  <nav class="brand-return-nav">
+    <a href="../../../index.html">&larr; Portfolio</a>
+    <a href="../../../cursos/index.html">Cursos</a>
+    <a href="../index.html">Menú MQL5</a>
+  </nav>
+
+  <div class="hero-header">
+    <h1>⚙️ OnInit: Configuración y Handles</h1>
+    <p>"El constructor de tu EA — todo empieza aquí"</p>
+    <div class="badge-area">
+      <span class="chip"><i class="fas fa-cog"></i> OnInit()</span>
+      <span class="chip"><i class="fas fa-hand-pointer"></i> Handles</span>
+      <span class="chip"><i class="fas fa-arrows-up-down"></i> Drag & Drop</span>
+    </div>
+  </div>
+
+  <div class="progress-section">
+    <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+    <div class="progress-text" id="progressText">Módulo 2 de 12</div>
+  </div>
+
+  <div class="analogy-card">
+    <strong>💡 Piénsalo así:</strong> OnInit() es como abrir una tienda: pones los carteles (input parameters), conectas los sistemas de seguridad (handles de indicadores), verificas que todo funcione (validaciones) y finalmente abres las puertas (INIT_SUCCEEDED). Si algo falla en OnInit(), la tienda nunca abre.
+  </div>
+
+  <div class="main-area">
+    <div class="code-completion">
+      <div class="code-area">
+        <h3 style="margin-bottom:.8rem;color:#bcc9f0"><i class="fas fa-file-code"></i> Código OnInit</h3>
+        <p style="color:#8899cc;font-size:.8rem;margin-bottom:.8rem">Arrastra los bloques a los espacios marcados</p>
+        <div class="code-skeleton" id="codeSkeleton">
+          <div class="code-line"><span class="line-num">1</span><span style="color:#666">//+------------------------------------------------------------------+</span></div>
+          <div class="code-line"><span class="line-num">2</span><span style="color:#666">//| OnInit() — Configuración del EA                                 |</span></div>
+          <div class="code-line"><span class="line-num">3</span><span style="color:#666">//+------------------------------------------------------------------+</span></div>
+          <div class="code-line"><span class="line-num">4</span><span class="slot-label">S1</span><span class="code-slot" id="slot1" data-slot="1">???</span></div>
+          <div class="code-line"><span class="line-num">5</span><span style="color:#f8f8f2">{</span></div>
+          <div class="code-line"><span class="line-num">6</span><span class="slot-label">S2</span><span class="code-slot" id="slot2" data-slot="2">???</span></div>
+          <div class="code-line"><span class="line-num">7</span><span class="slot-label">S3</span><span class="code-slot" id="slot3" data-slot="3">???</span></div>
+          <div class="code-line"><span class="line-num">8</span><span style="color:#f8f8f2">  if(maHandle==INVALID_HANDLE) { Print("Error al crear indicador"); return(INIT_FAILED); }</span></div>
+          <div class="code-line"><span class="line-num">9</span><span class="slot-label">S4</span><span class="code-slot" id="slot4" data-slot="4">???</span></div>
+          <div class="code-line"><span class="line-num">10</span><span style="color:#f8f8f2">}</span></div>
+        </div>
+      </div>
+      <div class="pool-area">
+        <h3 style="margin-bottom:.8rem;color:#bcc9f0"><i class="fas fa-cubes"></i> Bloques de Código</h3>
+        <p style="color:#8899cc;font-size:.8rem;margin-bottom:.8rem">Arrastra cada bloque al slot correcto</p>
+        <div id="blockPool">
+          <div class="code-block" draggable="true" data-block="1"><span class="type">int</span> <span class="func">OnInit</span>()</div>
+          <div class="code-block" draggable="true" data-block="2"><span class="keyword">input</span> <span class="type">int</span> MAPeriod = <span class="num">20</span>;<br><span class="keyword">input</span> <span class="type">double</span> LotSize = <span class="num">0.1</span>;</div>
+          <div class="code-block" draggable="true" data-block="3"><span class="type">int</span> maHandle = <span class="func">iMA</span>(_Symbol,_Period,MAPeriod,<span class="num">0</span>,MODE_SMA,PRICE_CLOSE);</div>
+          <div class="code-block" draggable="true" data-block="4"><span style="color:#f8f8f2">  </span><span class="keyword">return</span>(INIT_SUCCEEDED);</div>
+        </div>
+        <div style="margin-top:1rem">
+          <button class="btn-action" id="verifyBtn" disabled><i class="fas fa-check-circle"></i> Verificar</button>
+          <button class="btn-secondary" id="resetBtn"><i class="fas fa-undo"></i> Reiniciar</button>
+        </div>
+        <div class="result-box" id="resultBox" style="margin-top:.8rem">
+          <span style="color:#666">⏳ Arrastra los 4 bloques para completar OnInit()</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="feedbackMsg" class="feedback">💡 Arrastra cada bloque de código al espacio correcto para construir OnInit().</div>
+
+  <div id="insigniaArea" class="insignia hidden">
+    <i class="fas fa-medal"></i>
+    <h3>🏅 Configurador de EAs 🏅</h3>
+    <p>¡Has dominado OnInit()! Sabes declarar inputs, crear handles y validar recursos como un profesional.</p>
+  </div>
+
+  <div class="nav-links">
+    <a href="01-portal.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+    <a href="03-ontick.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Curso 2 · Expert Advisors Profesionales</footer>
+</div>
+
+<script>
+const STORAGE_KEY = 'mql5_2_02';
+const PROGRESS_KEY = 'mql5_2_progress';
+const SLOT_ANSWERS = {1:'1',2:'2',3:'3',4:'4'};
+let filledSlots = {};
+let completed = false;
+
+function initProgress(){
+  const p = JSON.parse(localStorage.getItem(PROGRESS_KEY)) || [];
+  const pf = document.getElementById('progressFill');
+  const pt = document.getElementById('progressText');
+  if(pf) pf.style.width = Math.round((p.length/12)*100)+'%';
+  if(pt) pt.textContent = p.length+' de 12 módulos';
+  if(p.includes(STORAGE_KEY)){
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    completed = true;
+    document.querySelectorAll('.code-slot').forEach(s=>{s.textContent='✔️';s.classList.add('filled');});
+    document.querySelectorAll('.code-block').forEach(b=>b.classList.add('placed'));
+    document.getElementById('verifyBtn').disabled = true;
+  }
+}
+
+function saveProgress(){
+  let p = JSON.parse(localStorage.getItem(PROGRESS_KEY)) || [];
+  if(!p.includes(STORAGE_KEY)){p.push(STORAGE_KEY);localStorage.setItem(PROGRESS_KEY,JSON.stringify(p));}
+  const pf = document.getElementById('progressFill');
+  const pt = document.getElementById('progressText');
+  if(pf) pf.style.width = Math.round((p.length/12)*100)+'%';
+  if(pt) pt.textContent = p.length+' de 12 módulos';
+}
+
+document.querySelectorAll('.code-block').forEach(block => {
+  block.addEventListener('dragstart',e=>{
+    e.dataTransfer.setData('text/plain',block.dataset.block);
+    block.classList.add('dragging');
+  });
+  block.addEventListener('dragend',e=>{block.classList.remove('dragging');});
+});
+
+document.querySelectorAll('.code-slot').forEach(slot => {
+  slot.addEventListener('dragover',e=>{e.preventDefault();if(!slot.classList.contains('filled')) slot.classList.add('drag-over');});
+  slot.addEventListener('dragleave',e=>{slot.classList.remove('drag-over');});
+  slot.addEventListener('drop',e=>{
+    e.preventDefault();
+    slot.classList.remove('drag-over');
+    if(slot.classList.contains('filled')) return;
+    const blockId = e.dataTransfer.getData('text/plain');
+    const slotId = slot.dataset.slot;
+    if(blockId === slotId){
+      const block = document.querySelector(`.code-block[data-block="${blockId}"]`);
+      block.classList.add('placed');
+      slot.textContent = '✔️';
+      slot.classList.add('filled');
+      filledSlots[slotId] = true;
+      const all = Object.keys(filledSlots).length;
+      document.getElementById('feedbackMsg').innerHTML = all+' de 4 slots completados'+(all===4?' 🎉 ¡Ahora presiona Verificar!':'');
+      document.getElementById('verifyBtn').disabled = all !== 4;
+    } else {
+      document.getElementById('feedbackMsg').innerHTML = '❌ Ese bloque no va en el slot S'+slotId+'.';
+    }
+  });
+});
+
+document.getElementById('resetBtn').addEventListener('click',()=>{
+  filledSlots = {};
+  document.getElementById('resultBox').innerHTML = '<span style="color:#666">⏳ Arrastra los 4 bloques para completar OnInit()</span>';
+  document.querySelectorAll('.code-slot').forEach(s=>{s.textContent='???';s.classList.remove('filled');});
+  document.querySelectorAll('.code-block').forEach(b=>b.classList.remove('placed'));
+  document.getElementById('verifyBtn').disabled = true;
+  document.getElementById('feedbackMsg').innerHTML = '💡 Slots reiniciados. Arrastra los bloques nuevamente.';
+});
+
+document.getElementById('verifyBtn').addEventListener('click',()=>{
+  const box = document.getElementById('resultBox');
+  box.innerHTML = '<div class="ok">✅ ¡OnInit() completo y correcto!<br>✓ Inputs declarados<br>✓ Handle de iMA creado<br>✓ Validación INVALID_HANDLE<br>✓ INIT_SUCCEEDED retornado</div>';
+  document.getElementById('feedbackMsg').innerHTML = '🎉 ¡OnInit() configurado correctamente! Tu EA está listo para arrancar.';
+  if(!completed){
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    saveProgress();
+    completed = true;
+  }
+});
+
+window.addEventListener('load',initProgress);
+</script>
+<script src="../../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

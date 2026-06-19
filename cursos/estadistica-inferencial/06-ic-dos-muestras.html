@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Estadística Inferencial | IC II: Dos Muestras</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:linear-gradient(135deg,#0a0f1e,#0c1222 50%,#111a2e); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+    .modulo-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,80,80,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+    .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #ff5050; }
+    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#ffb0b0,#ff5050); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .hero-header p { color:#ffb0b0; margin-top:0.5rem; font-weight:500; }
+    .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+    .chip { background:rgba(255,80,80,0.15); border:1px solid #ff5050; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ff5050; font-size:1rem; line-height:1.6; }
+    .main-area { padding:0 2rem 1.5rem; display:flex; flex-wrap:wrap; gap:1.5rem; }
+    .controls-section { flex:1; min-width:320px; }
+    .vis-section { flex:1; min-width:320px; }
+    .control-card { background:#0f1a2ccc; border-radius:2rem; padding:1.2rem; border:1px solid #ff505033; margin-bottom:1rem; }
+    .control-card h3 { color:#ff5050; margin-bottom:0.8rem; font-size:1.1rem; }
+    .control-card label { display:block; font-size:0.85rem; margin:0.6rem 0 0.2rem; color:#ffb0b0; }
+    .control-card input, .control-card select { width:100%; padding:0.5rem 0.8rem; border-radius:1rem; background:#0a0f1e; border:1px solid #ff505044; color:#eef5ff; font-family:'Inter',sans-serif; font-size:0.9rem; }
+    .control-card input:focus, .control-card select:focus { outline:none; border-color:#ff5050; }
+    .result-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; }
+    .result-item { background:#0a0f1e; border-radius:1rem; padding:0.6rem; text-align:center; }
+    .result-item .label { font-size:0.75rem; color:#8899bb; }
+    .result-item .value { font-size:1.2rem; font-weight:700; color:#ff9090; font-family:monospace; }
+    .group-inputs { display:flex; gap:0.5rem; }
+    .group-inputs > div { flex:1; }
+    .btn-action { background:linear-gradient(95deg,#ff5050,#cc3333); border:none; padding:0.8rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#fff; margin-top:0.5rem; }
+    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(255,80,80,0.5); }
+    .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #ff5050; }
+    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:0 2rem 1.5rem; padding:1rem; border:1px dashed gold; }
+    .insignia i { font-size:2.5rem; color:gold; }
+    .hidden { display:none; }
+    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(255,80,80,0.4); }
+    .nav-link.next { background:linear-gradient(95deg,#f0a500,#ff6a00); color:#1e1a0c; }
+    .nav-link.menu { background:#1a2a4a; border:1px solid #3399ff; }
+    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .result-grid { grid-template-columns:1fr; } }
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+<nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+<div class="modulo-container">
+  <div class="hero-header">
+    <h1><i class="fas fa-layer-group"></i> IC II: Dos Muestras</h1>
+    <p>Intervalos de confianza para diferencias entre dos grupos</p>
+    <div class="badge-area">
+      <span class="chip"><i class="fas fa-apple-alt"></i> Independientes</span>
+      <span class="chip"><i class="fas fa-link"></i> Pareadas</span>
+      <span class="chip"><i class="fas fa-percentage"></i> Proporciones</span>
+      <span class="chip"><i class="fas fa-chart-pie"></i> Varianzas (F)</span>
+    </div>
+  </div>
+  <div class="analogy-card">
+    <i class="fas fa-lightbulb" style="color:#ff5050"></i>
+    <strong>Analogía:</strong> Comparar dos muestras es como pesar dos grupos de manzanas. Si el intervalo para la diferencia de pesos incluye el cero, no podemos afirmar que un grupo pese más que el otro. Si todo el intervalo está por encima de cero, las manzanas del grupo A son significativamente más pesadas. ¡Y si usas la escala incorrecta (varianzas desiguales), tu conclusión puede ser errónea!
+  </div>
+  <div class="main-area">
+    <div class="controls-section">
+      <div class="control-card">
+        <h3><i class="fas fa-cog"></i> Tipo de comparación</h3>
+        <label>Tipo de intervalo</label>
+        <select id="ciType">
+          <option value="indep-pool">Diferencia de medias (indep., varianzas iguales)</option>
+          <option value="indep-welch">Diferencia de medias (indep., Welch)</option>
+          <option value="paired">Diferencia de medias (pareadas)</option>
+          <option value="prop">Diferencia de proporciones</option>
+          <option value="var">Cociente de varianzas (F)</option>
+        </select>
+      </div>
+      <div class="control-card" id="meanInputs">
+        <h3><i class="fas fa-edit"></i> Datos del grupo</h3>
+        <div class="group-inputs">
+          <div><label>Grupo 1 — x̄₁</label><input type="number" id="m1" step="0.1" value="105"><label>s₁</label><input type="number" id="s1" step="0.1" value="15"><label>n₁</label><input type="number" id="n1" step="1" min="2" value="30"></div>
+          <div><label>Grupo 2 — x̄₂</label><input type="number" id="m2" step="0.1" value="100"><label>s₂</label><input type="number" id="s2" step="0.1" value="15"><label>n₂</label><input type="number" id="n2" step="1" min="2" value="30"></div>
+        </div>
+      </div>
+      <div class="control-card" id="propInputs" style="display:none">
+        <h3><i class="fas fa-percentage"></i> Proporciones</h3>
+        <div class="group-inputs">
+          <div><label>Grupo 1 — p̂₁</label><input type="number" id="p1" step="0.01" min="0" max="1" value="0.65"><label>n₁</label><input type="number" id="pn1" step="1" min="5" value="100"></div>
+          <div><label>Grupo 2 — p̂₂</label><input type="number" id="p2" step="0.01" min="0" max="1" value="0.55"><label>n₂</label><input type="number" id="pn2" step="1" min="5" value="100"></div>
+        </div>
+      </div>
+      <div class="control-card" id="varInputs" style="display:none">
+        <h3><i class="fas fa-chart-pie"></i> Varianzas</h3>
+        <div class="group-inputs">
+          <div><label>Grupo 1 — s₁²</label><input type="number" id="v1" step="0.1" min="0.1" value="25"><label>n₁</label><input type="number" id="vn1" step="1" min="3" value="30"></div>
+          <div><label>Grupo 2 — s₂²</label><input type="number" id="v2" step="0.1" min="0.1" value="25"><label>n₂</label><input type="number" id="vn2" step="1" min="3" value="30"></div>
+        </div>
+      </div>
+      <div class="control-card">
+        <h3><i class="fas fa-sliders-h"></i> Nivel de confianza</h3>
+        <select id="confLevel">
+          <option value="0.80">80%</option><option value="0.90">90%</option><option value="0.95" selected>95%</option><option value="0.99">99%</option>
+        </select>
+        <button class="btn-action" id="calcBtn"><i class="fas fa-calculator"></i> Calcular IC</button>
+      </div>
+    </div>
+    <div class="vis-section">
+      <div class="control-card">
+        <h3><i class="fas fa-chart-bar"></i> Visualización</h3>
+        <div style="background:#0a0f1e;border-radius:1.5rem;padding:1rem;min-height:200px;text-align:center;">
+          <canvas id="icCanvas" width="500" height="260" style="width:100%;height:auto;border-radius:1rem;"></canvas>
+        </div>
+      </div>
+      <div class="control-card">
+        <h3><i class="fas fa-list"></i> Resultados</h3>
+        <div class="result-grid">
+          <div class="result-item"><div class="label">Estimación puntual</div><div class="value" id="pointEst">—</div></div>
+          <div class="result-item"><div class="label">Error estándar</div><div class="value" id="seVal">—</div></div>
+          <div class="result-item"><div class="label">Límite inferior</div><div class="value" id="lowerVal">—</div></div>
+          <div class="result-item"><div class="label">Límite superior</div><div class="value" id="upperVal">—</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="feedbackMsg" class="feedback"><i class="fas fa-info-circle"></i> Selecciona el tipo de comparación, ingresa los datos y presiona "Calcular IC".</div>
+  <div id="insigniaArea" class="insignia hidden">
+    <i class="fas fa-medal"></i>
+    <h3><i class="fas fa-balance-scale"></i> COMPARADOR DE DOS CARAS</h3>
+    <p>Has aprendido a construir intervalos de confianza para comparar dos poblaciones. ¡Ya puedes decidir si dos grupos son diferentes con evidencia estadística!</p>
+  </div>
+  <div class="nav-links">
+    <a href="05-ic-una-muestra.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+    <a href="07-intro-hipotesis.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Estadística Inferencial Interactiva · Nivel 6: IC II — Dos Muestras</footer>
+</div>
+<script>
+const STORAGE_KEY='est_inf_lvl6';const canvas=document.getElementById('icCanvas');const ctx=canvas.getContext('2d');const W=500,H=260;
+function jStatNormalQuant(p){const a=[-3.969683028665376e1,2.209460984245205e2,-2.759285104469687e2,1.383577518672690e2,-3.066479806614716e1,2.506628277459239];const b=[-5.447609879822406e1,1.615858368580409e2,-1.556989798598866e2,6.680131188771972e1,-1.328068155288572e1];const c=[-7.784894002430293e-3,-3.223964580411365e-1,-2.400758277161838,-2.549732539343734,4.374664141464968,2.938163982698783];const d=[7.784695709041462e-3,3.224671290700398e-1,2.445134137142996,3.754408661907416];if(p<0.02425){const q=Math.sqrt(-2*Math.log(p));return(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);}if(p<0.97575){const q=p-0.5,r=q*q;return(((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q/(((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);}const q=Math.sqrt(-2*Math.log(1-p));return-(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);}
+function zCritical(alpha){return -jStatNormalQuant(alpha/2);}
+function tCritical(alpha,df){if(df>200)return zCritical(alpha);let a=0.5,b=5;for(let i=0;i<60;i++){const m=(a+b)/2,p=tProb(m,df);if(p>alpha/2)a=m;else b=m;}return(a+b)/2;}
+function tProb(x,df){return 1-incBeta(df/(df+x*x),df/2,0.5);}
+function lgamma(z){if(z<0.5)return Math.PI/Math.sin(Math.PI*z)-lgamma(1-z);z-=1;const g=7,c=[0.99999999999980993,676.5203681218851,-1259.1392167224028,771.32342877765313,-176.61502916214059,12.507343278686905,-0.13857109526572012,9.9843695780195716e-6,1.5056327351493116e-7];let x=c[0];for(let i=1;i<g+2;i++)x+=c[i]/(z+i);const t=z+g+0.5;return 0.5*Math.log(2*Math.PI)+(z+0.5)*Math.log(t)-t+Math.log(x);}
+function incBeta(x,a,b){if(x<0||x>1)return x<0?0:1;if(x===0||x===1)return x;const bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));if(x<(a+1)/(a+b+2))return bt*betaCF(x,a,b)/a;return 1-bt*betaCF(1-x,b,a)/b;}
+function betaCF(x,a,b){const MAX=200,EPS=3e-12;let qab=a+b,qap=a+1,qam=a-1;let c=1,d=1-qab*x/qap;if(Math.abs(d)<1e-30)d=1e-30;d=1/d;let h=d;for(let m=1;m<=MAX;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<1e-30)d=1e-30;c=1+aa/c;if(Math.abs(c)<1e-30)c=1e-30;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<1e-30)d=1e-30;c=1+aa/c;if(Math.abs(c)<1e-30)c=1e-30;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<EPS)break;}return h;}
+function fCritical(alpha,df1,df2){let lo=0.01,hi=10;for(let i=0;i<60;i++){const m=(lo+hi)/2,p=fCDF(m,df1,df2);if(p>1-alpha/2)hi=m;else lo=m;}return(lo+hi)/2;}
+function fCriticalLow(alpha,df1,df2){return 1/fCritical(alpha,df2,df1);}
+function fCDF(x,df1,df2){if(x<=0)return 0;const p=df1*x/(df1*x+df2);return 1-incBeta(p,df1/2,df2/2);}
+function computeCI(){const t=document.getElementById('ciType').value,cf=parseFloat(document.getElementById('confLevel').value),a=1-cf;
+  if(t==='indep-pool'){const m1=+document.getElementById('m1').value,s1=+document.getElementById('s1').value,n1=+document.getElementById('n1').value,m2=+document.getElementById('m2').value,s2=+document.getElementById('s2').value,n2=+document.getElementById('n2').value;if([m1,s1,n1,m2,s2,n2].some(isNaN)||n1<2||n2<2||s1<=0||s2<=0)return null;const df=n1+n2-2,sp2=((n1-1)*s1*s1+(n2-1)*s2*s2)/df,se=Math.sqrt(sp2*(1/n1+1/n2)),t2=tCritical(a,df),d=m1-m2;return{point:d,lower:d-t2*se,upper:d+t2*se,se};}
+  if(t==='indep-welch'){const m1=+document.getElementById('m1').value,s1=+document.getElementById('s1').value,n1=+document.getElementById('n1').value,m2=+document.getElementById('m2').value,s2=+document.getElementById('s2').value,n2=+document.getElementById('n2').value;if([m1,s1,n1,m2,s2,n2].some(isNaN)||n1<2||n2<2||s1<=0||s2<=0)return null;const se=Math.sqrt(s1*s1/n1+s2*s2/n2),num=Math.pow(s1*s1/n1+s2*s2/n2,2),den=Math.pow(s1*s1/n1,2)/(n1-1)+Math.pow(s2*s2/n2,2)/(n2-1),df=den>0?num/den:1,t2=tCritical(a,df),d=m1-m2;return{point:d,lower:d-t2*se,upper:d+t2*se,se};}
+  if(t==='paired'){const m1=+document.getElementById('m1').value,s1=+document.getElementById('s1').value,n1=+document.getElementById('n1').value,m2=+document.getElementById('m2').value,s2=+document.getElementById('s2').value,n2=+document.getElementById('n2').value;if([m1,s1,n1,m2,s2,n2].some(isNaN)||n1<2||s1<=0)return null;const n=Math.min(n1,n2),d=m1-m2,sd=Math.sqrt((s1*s1+s2*s2)/2),se=sd/Math.sqrt(n),t2=tCritical(a,n-1);return{point:d,lower:d-t2*se,upper:d+t2*se,se};}
+  if(t==='prop'){const p1=+document.getElementById('p1').value,n1=+document.getElementById('pn1').value,p2=+document.getElementById('p2').value,n2=+document.getElementById('pn2').value;if([p1,n1,p2,n2].some(isNaN)||n1<5||n2<5||p1<=0||p1>=1||p2<=0||p2>=1)return null;const d=p1-p2,se=Math.sqrt(p1*(1-p1)/n1+p2*(1-p2)/n2),z=zCritical(a);return{point:d,lower:d-z*se,upper:d+z*se,se};}
+  if(t==='var'){const v1=+document.getElementById('v1').value,n1=+document.getElementById('vn1').value,v2=+document.getElementById('v2').value,n2=+document.getElementById('vn2').value;if([v1,n1,v2,n2].some(isNaN)||n1<3||n2<3||v1<=0||v2<=0)return null;const r=v1/v2,df1=n1-1,df2=n2-1,fL=fCriticalLow(a,df1,df2),fU=fCritical(a,df1,df2);return{point:r,lower:r/fU,upper:r/fL,se:null};}
+  return null;}
+function drawResult(ci){if(!ci)return;ctx.clearRect(0,0,W,H);ctx.fillStyle='#0a0f1e';ctx.fillRect(0,0,W,H);
+  document.getElementById('pointEst').textContent=ci.point.toFixed(4);document.getElementById('seVal').textContent=ci.se!==null?ci.se.toFixed(4):'—';document.getElementById('lowerVal').textContent=ci.lower.toFixed(4);document.getElementById('upperVal').textContent=ci.upper.toFixed(4);
+  const m=40,pw=W-2*m,cx=W/2,rg=Math.max(Math.abs(ci.upper-ci.lower)*0.7,Math.abs(ci.point)*0.3+0.1),y=H/2;
+  function toX(v){return m+((v-(cx-rg))/(2*rg))*pw;}
+  const pL=Math.max(m,toX(ci.lower)),pR=Math.min(W-m,toX(ci.upper)),pP=toX(ci.point);
+  ctx.fillStyle='#ff505044';ctx.fillRect(pL,y-12,pR-pL,24);ctx.strokeStyle='#ff9090';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(pL,y);ctx.lineTo(pR,y);ctx.stroke();
+  ctx.fillStyle='#ff5050';ctx.beginPath();ctx.arc(pP,y,7,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(pP,y,3,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#ff505088';ctx.font='11px Inter';ctx.textAlign='center';ctx.fillText(ci.lower.toFixed(2),pL,y+30);ctx.fillText(ci.upper.toFixed(2),pR,y+30);
+  ctx.fillStyle='#ffd700';ctx.font='bold 13px Inter';ctx.fillText(ci.point.toFixed(2),pP,y-25);
+  ctx.fillStyle='#8899bb';ctx.font='10px Inter';ctx.fillText('0',toX(0),H-10);ctx.strokeStyle='#ffffff08';ctx.beginPath();ctx.moveTo(toX(0),m);ctx.lineTo(toX(0),H-m);ctx.stroke();
+  const tp=document.getElementById('ciType').value,names={'indep-pool':'IC μ₁−μ₂ (pooled)','indep-welch':'IC μ₁−μ₂ (Welch)','paired':'IC μ_d','prop':'IC p₁−p₂','var':'IC σ₁²/σ₂²'};
+  ctx.fillStyle='#8899bb';ctx.font='11px Inter';ctx.textAlign='center';ctx.fillText(names[tp]||'',cx,20);
+  const fb=document.getElementById('feedbackMsg');
+  if(tp==='var'){const c1=ci.lower<=1&&ci.upper>=1;fb.innerHTML='<i class="fas fa-check-circle" style="color:#ff5050"></i> Cociente de varianzas = '+ci.point.toFixed(4)+'. IC ['+ci.lower.toFixed(4)+', '+ci.upper.toFixed(4)+']. '+(c1?'El 1 SÍ está (varianzas posiblemente iguales).':'El 1 NO está (varianzas significativamente diferentes).');}
+  else{const c0=ci.lower<=0&&ci.upper>=0;fb.innerHTML='<i class="fas fa-check-circle" style="color:#ff5050"></i> Diferencia = '+ci.point.toFixed(4)+'. IC ['+ci.lower.toFixed(4)+', '+ci.upper.toFixed(4)+']. '+(c0?'El 0 SÍ está (no hay diferencia significativa).':'El 0 NO está (diferencia significativa).');}}
+function toggleInputs(){const t=document.getElementById('ciType').value;document.getElementById('meanInputs').style.display=['indep-pool','indep-welch','paired'].includes(t)?'block':'none';document.getElementById('propInputs').style.display=t==='prop'?'block':'none';document.getElementById('varInputs').style.display=t==='var'?'block':'none';}
+document.getElementById('ciType').addEventListener('change',toggleInputs);toggleInputs();
+document.getElementById('calcBtn').addEventListener('click',()=>{const ci=computeCI();if(!ci){document.getElementById('feedbackMsg').innerHTML='<i class="fas fa-exclamation-triangle" style="color:#ff6a6a"></i> Verifica los valores ingresados.';return;}drawResult(ci);const ins=document.getElementById('insigniaArea');ins.classList.remove('hidden');try{localStorage.setItem(STORAGE_KEY,'true');}catch(e){}});
+(function loadState(){try{if(localStorage.getItem(STORAGE_KEY)==='true')document.getElementById('insigniaArea').classList.remove('hidden');}catch(e){}})();
+</script>
+<script src="../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

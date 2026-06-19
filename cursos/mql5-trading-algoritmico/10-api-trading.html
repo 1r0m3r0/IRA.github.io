@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>MQL5 | API de Trading</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../assets/css/theme.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%);background-size:200% 200%;animation:gradientShift 20s ease infinite;font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
+@keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.modulo-container{max-width:1300px;width:100%;background:rgba(15,25,45,0.65);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(255,215,0,0.25);box-shadow:0 25px 45px rgba(0,0,0,0.5);overflow:hidden}
+.hero-header{background:linear-gradient(95deg,#0b1120 0%,#111a2e 100%);padding:2rem 2rem 1.5rem 2rem;text-align:center;border-bottom:2px solid #ffd700}
+.hero-header h1{font-size:2.6rem;font-weight:800;background:linear-gradient(135deg,#FFF,#ffe866,#ffd700);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-header p{color:#bcc9f0;margin-top:.5rem;font-size:1.1rem}
+.badge-area{display:flex;justify-content:center;gap:1rem;margin-top:1.2rem;flex-wrap:wrap}
+.chip{background:rgba(255,215,0,0.15);border:1px solid #ffd700;padding:0.4rem 1rem;border-radius:40px;font-size:0.8rem;font-weight:600;color:#ddd}
+.analogy-card{background:#1e2a3acc;margin:1.5rem 2rem;padding:1.2rem 1.8rem;border-radius:2rem;border-left:8px solid #ffd700;font-size:1rem;line-height:1.6}
+.progress-section{margin:1rem 2rem 0}
+.progress-bar-outer{background:#1a2a4a;border-radius:20px;height:20px;overflow:hidden}
+.progress-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,#ffd700,#fff);border-radius:20px;transition:width 0.5s ease}
+.progress-text{text-align:center;font-size:0.85rem;color:#8899cc;margin-bottom:.5rem}
+.main-area{padding:1rem 2rem}
+.dashboard{display:grid;grid-template-columns:2fr 1fr;gap:1.5rem;margin-bottom:2rem}
+.chart-panel{background:#0a1020;border-radius:2rem;padding:1.5rem;border:1px solid #2a3a5a}
+.order-panel{background:#0a1020;border-radius:2rem;padding:1.5rem;border:1px solid #2a3a5a}
+.order-panel h3{color:#bcc9f0;margin-bottom:1rem;border-bottom:1px solid #2a3a5a;padding-bottom:.5rem}
+.form-group{margin-bottom:.8rem}
+.form-group label{display:block;font-size:.8rem;color:#8899cc;margin-bottom:.3rem}
+.form-group input,.form-group select{width:100%;padding:.6rem;background:#1a2a4a;border:1px solid #3a4a6a;border-radius:.8rem;color:#eef5ff;font-family:'Inter',sans-serif;font-size:.85rem;transition:.2s}
+.form-group input:focus,.form-group select:focus{border-color:#ffd700;outline:none}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+.price-ticker{text-align:center;padding:1rem;background:#1a2a4a;border-radius:1rem;margin-bottom:1rem}
+.price-ticker .price{font-size:2.2rem;font-weight:800;color:#ffd700}
+.price-ticker .spread{font-size:.75rem;color:#8899cc}
+.request-view{background:#0d1525;border-radius:1rem;padding:1rem;margin-top:1rem;font-family:'Courier New',monospace;font-size:.75rem;border:1px solid #3a4a6a;overflow-x:auto}
+.request-view .key{color:#ffd700}
+.request-view .string{color:#66cc99}
+.request-view .number{color:#66ccff}
+.position-table{width:100%;border-collapse:collapse;font-size:.8rem;margin-top:1rem}
+.position-table th{background:#1a2a4a;padding:.5rem;text-align:left;color:#8899cc;border-bottom:2px solid #3a4a6a}
+.position-table td{padding:.5rem;border-bottom:1px solid #2a3a5a}
+.position-table .profit{color:#00c853}
+.position-table .loss{color:#ff1744}
+.btn-action{background:linear-gradient(95deg,#ffd700,#ffb300);border:none;padding:0.8rem 1.8rem;font-weight:bold;border-radius:3rem;cursor:pointer;font-size:1rem;transition:0.2s;color:#1e1a0c;font-family:'Inter',sans-serif}
+.btn-action:hover{transform:translateY(-2px);box-shadow:0 0 15px rgba(255,215,0,0.5)}
+.btn-action:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-secondary{background:#2c3e66;border:none;padding:.5rem 1rem;border-radius:2rem;cursor:pointer;color:#eef5ff;font-family:'Inter',sans-serif;font-size:.8rem;transition:.2s}
+.btn-secondary:hover{background:#3a4e76}
+.btn-danger{background:#ff174466;border:1px solid #ff1744;padding:.5rem 1rem;border-radius:2rem;cursor:pointer;color:#ff1744;font-family:'Inter',sans-serif;font-size:.8rem;transition:.2s}
+.btn-danger:hover{background:#ff174488}
+.trade-log{max-height:200px;overflow-y:auto;background:#0d1525;border-radius:1rem;padding:.8rem;margin-top:1rem;font-size:.78rem;border:1px solid #3a4a6a}
+.trade-log .log-entry{padding:.3rem 0;border-bottom:1px solid #1a2a4a}
+.trade-log .log-entry:last-child{border-bottom:none}
+.quiz-area{background:#0a1020;border-radius:2rem;padding:1.5rem;border:1px solid #2a3a5a;margin-top:1.5rem}
+.quiz-area .qtext{font-size:1rem;margin-bottom:.8rem;min-height:2rem}
+.quiz-options{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+.quiz-options button{background:#1a2a4a;border:1px solid #3a4a6a;padding:.7rem;border-radius:1rem;color:#eef5ff;cursor:pointer;font-family:'Inter',sans-serif;font-size:.85rem;transition:.2s}
+.quiz-options button:hover{background:#2a3a5a;border-color:#ffd700}
+.quiz-options button.correct{background:#00c85333;border-color:#00c853;color:#00c853}
+.quiz-options button.wrong{background:#ff174433;border-color:#ff1744;color:#ff1744}
+.quiz-options button:disabled{cursor:not-allowed;opacity:.7}
+.feedback{background:#00000099;margin:0 2rem 1.5rem 2rem;padding:1rem;border-radius:1.5rem;text-align:center;font-weight:500;border-left:4px solid #ffd700;min-height:3rem}
+.insignia{text-align:center;background:#0c1b2f;border-radius:2rem;margin:0 2rem 1.5rem;padding:1rem;border:2px dashed gold}
+.insignia i{font-size:2.5rem;color:gold}
+.insignia h3{color:gold;margin:.5rem 0}
+.hidden{display:none!important}
+.nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.5rem 2rem}
+.nav-link{background:#2c3e66;padding:0.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:0.5rem;transition:0.2s}
+.nav-link:hover{transform:translateY(-2px);box-shadow:0 0 10px rgba(255,215,0,0.4)}
+.nav-link.next{background:linear-gradient(95deg,#f0a500,#ff6a00);color:#1e1a0c}
+.nav-link.menu{background:#1a2a4a;border:1px solid #3399ff}
+.nav-link.prev{background:#1a2a4a;border:1px solid #666}
+footer{text-align:center;padding:1.2rem;font-size:0.8rem;border-top:1px solid #2c3e66;color:#8899cc}
+@media(max-width:900px){
+  .dashboard{grid-template-columns:1fr}
+  .form-row{grid-template-columns:1fr}
+  .quiz-options{grid-template-columns:1fr}
+  .hero-header h1{font-size:1.9rem}
+  .analogy-card{margin:1rem}
+  .feedback{margin:0 1rem 1rem}
+  .main-area{padding:1rem}
+}
+</style>
+</head>
+<body>
+<div class="modulo-container">
+  <nav class="brand-return-nav">
+    <a href="../../index.html">&larr; Portfolio</a>
+    <a href="../../cursos/index.html">Cursos</a>
+  </nav>
+
+  <div class="hero-header">
+    <h1>💹 API de Trading: Órdenes y Posiciones</h1>
+    <p>"El poder de comprar y vender con una línea de código"</p>
+    <div class="badge-area">
+      <span class="chip"><i class="fas fa-file-invoice"></i> MqlTradeRequest</span>
+      <span class="chip"><i class="fas fa-code"></i> CTrade Class</span>
+      <span class="chip"><i class="fas fa-robot"></i> OrderSend</span>
+    </div>
+  </div>
+
+  <div class="progress-section">
+    <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+    <div class="progress-text" id="progressText">Módulo 10 de 26</div>
+  </div>
+
+  <div class="analogy-card">
+    <strong>🧑‍💼 Piénsalo así:</strong> La API de trading es como tener un asistente personal que ejecuta tus órdenes al instante. Tú le dices "compra 0.1 lotes de EURUSD con SL 50 pips" y él lo hace. La estructura <strong>MqlTradeRequest</strong> es el formulario que llenas con los detalles, y <strong>MqlTradeResult</strong> es el recibo que confirma la operación.
+  </div>
+
+  <div class="main-area">
+    <div class="dashboard">
+      <div class="chart-panel">
+        <h3 style="margin-bottom:.8rem;color:#bcc9f0"><i class="fas fa-chart-simple"></i> Mercado en Vivo</h3>
+        <div class="price-ticker">
+          <div style="display:flex;justify-content:center;gap:2rem;align-items:center">
+            <span id="symbolDisplay" style="font-weight:600">EURUSD</span>
+            <span class="price" id="currentPrice">1.09234</span>
+            <span style="font-size:.8rem;color:#8899cc">Spread: <span id="spreadDisplay">1.2</span></span>
+          </div>
+          <canvas id="miniChart" width="500" height="120" style="width:100%;height:auto;margin-top:.5rem;border-radius:.5rem"></canvas>
+        </div>
+        <div id="requestDisplay" class="request-view">
+          <div style="color:#8899cc;margin-bottom:.5rem">MqlTradeRequest <span style="color:#ffd700">request</span> = {}; <span style="color:#666">// se llenará al enviar</span></div>
+          <div><span class="key">request.action</span> = <span class="string" id="reqAction">—</span>;</div>
+          <div><span class="key">request.symbol</span> = <span class="string" id="reqSymbol">—</span>;</div>
+          <div><span class="key">request.volume</span> = <span class="number" id="reqVolume">—</span>;</div>
+          <div><span class="key">request.type</span> = <span class="string" id="reqType">—</span>;</div>
+          <div><span class="key">request.price</span> = <span class="number" id="reqPrice">—</span>;</div>
+          <div><span class="key">request.sl</span> = <span class="number" id="reqSL">—</span>;</div>
+          <div><span class="key">request.tp</span> = <span class="number" id="reqTP">—</span>;</div>
+          <div><span class="key">request.comment</span> = <span class="string" id="reqComment">—</span>;</div>
+          <div><span class="key">request.magic</span> = <span class="number" id="reqMagic">—</span>;</div>
+          <div style="margin-top:.5rem;color:#8899cc">MqlTradeResult <span style="color:#ffd700">result</span> = {};</div>
+          <div><span class="key">result.retcode</span> = <span class="number" id="resRetcode">—</span>;</div>
+          <div><span class="key">result.deal</span> = <span class="number" id="resDeal">—</span>;</div>
+          <div><span class="key">result.order</span> = <span class="number" id="resOrder">—</span>;</div>
+          <div><span class="key">result.comment</span> = <span class="string" id="resComment">—</span>;</div>
+        </div>
+      </div>
+
+      <div class="order-panel">
+        <h3><i class="fas fa-pen"></i> Nueva Orden</h3>
+        <div class="form-group">
+          <label>Símbolo</label>
+          <select id="selSymbol"><option>EURUSD</option><option>GBPUSD</option><option>BTCUSD</option><option>XAUUSD</option></select>
+        </div>
+        <div class="form-group">
+          <label>Tipo de Orden</label>
+          <select id="selOrderType">
+            <option value="OP_BUY">Market Buy (Compra)</option>
+            <option value="OP_SELL">Market Sell (Venta)</option>
+            <option value="OP_BUYLIMIT">Buy Limit</option>
+            <option value="OP_SELLLIMIT">Sell Limit</option>
+            <option value="OP_BUYSTOP">Buy Stop</option>
+            <option value="OP_SELLSTOP">Sell Stop</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Volumen (lotes)</label><input type="number" id="inpVolume" value="0.1" min="0.01" max="10" step="0.01"></div>
+          <div class="form-group"><label>Magic Number</label><input type="number" id="inpMagic" value="1001"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Stop Loss (SL)</label><input type="number" id="inpSL" placeholder="Precio" step="0.00001"></div>
+          <div class="form-group"><label>Take Profit (TP)</label><input type="number" id="inpTP" placeholder="Precio" step="0.00001"></div>
+        </div>
+        <div class="form-group"><label>Comentario</label><input type="text" id="inpComment" value="EA MQL5 v1.0"></div>
+        <div style="display:flex;gap:.8rem;margin-top:.5rem">
+          <button class="btn-action" id="sendOrderBtn"><i class="fas fa-paper-plane"></i> Enviar Orden</button>
+          <button class="btn-secondary" id="clearFieldsBtn"><i class="fas fa-undo"></i> Limpiar</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem">
+      <div class="chart-panel" style="padding:1rem">
+        <h3 style="color:#bcc9f0;margin-bottom:.5rem;font-size:.9rem"><i class="fas fa-briefcase"></i> Posiciones Abiertas</h3>
+        <div id="positionsContainer">
+          <table class="position-table">
+            <thead><tr><th>Símbolo</th><th>Tipo</th><th>Vol</th><th>Precio</th><th>SL</th><th>TP</th><th>P&L</th><th>Acción</th></tr></thead>
+            <tbody id="positionsBody">
+              <tr><td colspan="8" style="text-align:center;color:#666;padding:1rem">Sin posiciones abiertas</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="chart-panel" style="padding:1rem">
+        <h3 style="color:#bcc9f0;margin-bottom:.5rem;font-size:.9rem"><i class="fas fa-clock-rotate-left"></i> Historial de Órdenes</h3>
+        <div class="trade-log" id="tradeLog">
+          <div class="log-entry" style="color:#666;text-align:center">Aún no has enviado órdenes</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="quiz-area" id="quizArea">
+      <h3 style="color:#bcc9f0;margin-bottom:.8rem"><i class="fas fa-question-circle"></i> Order Types Quiz</h3>
+      <p style="color:#8899cc;font-size:.85rem;margin-bottom:1rem">Lee el escenario y elige el tipo de orden correcto.</p>
+      <div class="qtext" id="quizQuestion">Cargando...</div>
+      <div class="quiz-options" id="quizOptions"></div>
+      <div style="margin-top:.8rem;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:.8rem;color:#8899cc">Aciertos: <strong id="quizScore" style="color:#ffd700">0</strong>/5</span>
+        <button class="btn-action" id="nextQuizBtn" disabled>Siguiente</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="feedbackMsg" class="feedback">💡 Completa el quiz de tipos de orden y envía al menos 3 órdenes para ganar tu insignia.</div>
+
+  <div id="insigniaArea" class="insignia hidden">
+    <i class="fas fa-medal"></i>
+    <h3>🏅 Trader Algorítmico 🏅</h3>
+    <p>¡Dominas la API de trading de MQL5! Compras, vendes, modificas y cierras posiciones como un verdadero algorítmico. 🚀</p>
+  </div>
+
+  <div class="nav-links">
+    <a href="09-indicadores.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+    <a href="11-primer-ea.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+
+  <footer><i class="fas fa-crown"></i> MQL5 Trading Algorítmico · Domina el arte del trading automatizado</footer>
+</div>
+<script>
+const STORAGE_KEY = 'mql5_10';
+const RETURN_CODES = {
+  10009:'TRADE_RETCODE_DONE — orden ejecutada',10010:'TRADE_RETCODE_REJECT — rechazada',10011:'TRADE_RETCODE_ERROR — error',
+  10012:'TRADE_RETCODE_TIMEOUT — timeout',10013:'TRADE_RETCODE_INVALID — inválida',10014:'TRADE_RETCODE_NO_MONEY — fondos insuficientes',
+  10015:'TRADE_RETCODE_PRICE_CHANGED — precio cambiado',10016:'TRADE_RETCODE_TOO_MANY — demasiados requests',
+  10004:'TRADE_RETCODE_NO_CONNECTION — sin conexión'
+};
+const RETURN_KEYS = Object.keys(RETURN_CODES);
+let price = 1.09234;
+let positions = [];
+let tradeCount = 0;
+let orderHistory = [];
+let quizScore = 0;
+let quizQ = 0;
+let quizUsed = [];
+let completed = false;
+
+const QUIZ_QUESTIONS = [
+  {text:'Quieres comprar EURUSD al precio actual de mercado. ¿Qué tipo de orden usas?',options:['OP_BUY','OP_BUYLIMIT','OP_BUYSTOP','OP_SELL'],correct:0},
+  {text:'El precio de BTCUSD es 45000. Quieres comprar SI sube a 46000 (por encima). ¿Qué orden usas?',options:['OP_BUYLIMIT','OP_BUYSTOP','OP_BUY','OP_SELLSTOP'],correct:1},
+  {text:'El precio de XAUUSD es 1950. Quieres vender SI baja a 1930 (por debajo). ¿Qué orden usas?',options:['OP_SELL','OP_SELLLIMIT','OP_SELLSTOP','OP_BUYSTOP'],correct:2},
+  {text:'El precio de GBPUSD es 1.2650. Quieres comprar SI baja a 1.2600 (más barato, por debajo). ¿Qué orden usas?',options:['OP_BUY','OP_BUYSTOP','OP_SELLLIMIT','OP_BUYLIMIT'],correct:3},
+  {text:'Quieres vender EURUSD inmediatamente al precio actual. ¿Qué tipo de orden usas?',options:['OP_BUY','OP_SELL','OP_SELLLIMIT','OP_SELLSTOP'],correct:1}
+];
+
+function initProgress(){
+  const p = JSON.parse(localStorage.getItem('mql5_progress')) || [];
+  const pf = document.getElementById('progressFill');
+  const pt = document.getElementById('progressText');
+  if(pf) pf.style.width = Math.round((p.length/26)*100)+'%';
+  if(pt) pt.textContent = p.length+' de 26 módulos';
+  if(p.includes(STORAGE_KEY)){
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    completed = true;
+  }
+}
+
+function saveProgress(){
+  let p = JSON.parse(localStorage.getItem('mql5_progress')) || [];
+  if(!p.includes(STORAGE_KEY)){p.push(STORAGE_KEY);localStorage.setItem('mql5_progress',JSON.stringify(p));}
+  const pf = document.getElementById('progressFill');
+  const pt = document.getElementById('progressText');
+  if(pf) pf.style.width = Math.round((p.length/26)*100)+'%';
+  if(pt) pt.textContent = p.length+' de 26 módulos';
+}
+
+function updatePrice(){
+  const change = (Math.random()-0.5)*0.002;
+  price += change;
+  if(price<1.08) price=1.08;
+  if(price>1.11) price=1.11;
+  document.getElementById('currentPrice').textContent = price.toFixed(5);
+  document.getElementById('spreadDisplay').textContent = (0.8+Math.random()*0.8).toFixed(1);
+  drawMiniChart();
+}
+let priceHistory = [];
+function drawMiniChart(){
+  const canvas = document.getElementById('miniChart');
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+  ctx.clearRect(0,0,w,h);
+  priceHistory.push(price);
+  if(priceHistory.length>60) priceHistory.shift();
+  const data = priceHistory;
+  if(data.length<2) return;
+  const min = Math.min(...data), max = Math.max(...data);
+  const range = max-min||1;
+  const pad = 5;
+  const chartH = h-pad*2;
+  ctx.strokeStyle = '#ffd700';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  data.forEach((v,i)=>{
+    const x = i/(data.length-1)*(w-pad*2)+pad;
+    const y = pad + (max-v)/range*chartH;
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+}
+updatePrice();
+setInterval(updatePrice,2000);
+
+function sendOrder(){
+  const symbol = document.getElementById('selSymbol').value;
+  const type = document.getElementById('selOrderType').value;
+  const vol = parseFloat(document.getElementById('inpVolume').value)||0.1;
+  const magic = parseInt(document.getElementById('inpMagic').value)||1001;
+  const sl = parseFloat(document.getElementById('inpSL').value)||0;
+  const tp = parseFloat(document.getElementById('inpTP').value)||0;
+  const comment = document.getElementById('inpComment').value||'EA MQL5';
+
+  document.getElementById('reqAction').textContent = 'TRADE_ACTION_DEAL';
+  document.getElementById('reqSymbol').textContent = symbol;
+  document.getElementById('reqVolume').textContent = vol.toFixed(2);
+  document.getElementById('reqType').textContent = type;
+  document.getElementById('reqPrice').textContent = price.toFixed(5);
+  document.getElementById('reqSL').textContent = sl>0?sl.toFixed(5):'0 (sin SL)';
+  document.getElementById('reqTP').textContent = tp>0?tp.toFixed(5):'0 (sin TP)';
+  document.getElementById('reqComment').textContent = '"'+comment+'"';
+  document.getElementById('reqMagic').textContent = magic;
+
+  const retcode = Math.random()>0.2?10009:[10014,10011,10013,10015][Math.floor(Math.random()*4)];
+  const deal = Math.floor(Math.random()*90000+10000);
+  const order = Math.floor(Math.random()*90000+10000);
+  document.getElementById('resRetcode').textContent = retcode;
+  document.getElementById('resDeal').textContent = deal;
+  document.getElementById('resOrder').textContent = order;
+  document.getElementById('resComment').textContent = '"'+RETURN_CODES[retcode].split('—')[0].trim()+'"';
+
+  if(retcode===10009){
+    tradeCount++;
+    const pos = {symbol, type, vol, price:price.toFixed(5), sl, tp, magic, pnl: (Math.random()*40-20).toFixed(2), ticket: order };
+    positions.push(pos);
+    orderHistory.push({time:new Date().toLocaleTimeString(), symbol, type, vol, price:price.toFixed(5), result:'✅ EJECUTADA'});
+    document.getElementById('feedbackMsg').innerHTML = '✅ Orden ejecutada correctamente. Deal #'+deal+' | Order #'+order;
+  } else {
+    orderHistory.push({time:new Date().toLocaleTimeString(), symbol, type, vol, price:price.toFixed(5), result:'❌ '+RETURN_CODES[retcode].split('—')[0].trim()});
+    document.getElementById('feedbackMsg').innerHTML = '❌ Orden rechazada: '+RETURN_CODES[retcode];
+  }
+  updatePositions();
+  updateLog();
+  checkCompletion();
+}
+
+function updatePositions(){
+  const tbody = document.getElementById('positionsBody');
+  if(positions.length===0){
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#666;padding:1rem">Sin posiciones abiertas</td></tr>';
+    return;
+  }
+  tbody.innerHTML = positions.map((p,i)=>{
+    const pnl = parseFloat(p.pnl);
+    return '<tr>'+
+      '<td>'+p.symbol+'</td>'+
+      '<td>'+(p.type==='OP_BUY'?'🟢 BUY':'🔴 SELL')+'</td>'+
+      '<td>'+p.vol.toFixed(2)+'</td>'+
+      '<td>'+p.price+'</td>'+
+      '<td>'+(p.sl||'—')+'</td>'+
+      '<td>'+(p.tp||'—')+'</td>'+
+      '<td class="'+(pnl>=0?'profit':'loss')+'">'+pnl.toFixed(2)+'</td>'+
+      '<td><button class="btn-danger" onclick="closePosition('+i+')" style="padding:0.2rem 0.6rem;font-size:.7rem">Cerrar</button></td>'+
+    '</tr>';
+  }).join('');
+}
+
+function closePosition(idx){
+  const p = positions[idx];
+  orderHistory.push({time:new Date().toLocaleTimeString(), symbol:p.symbol, type:'CLOSE', vol:p.vol, price:p.price, result:'🔒 CERRADA'});
+  positions.splice(idx,1);
+  updatePositions();
+  updateLog();
+  document.getElementById('feedbackMsg').innerHTML = '🔒 Posición cerrada manualmente.';
+  checkCompletion();
+}
+
+function updateLog(){
+  const log = document.getElementById('tradeLog');
+  if(orderHistory.length===0){
+    log.innerHTML = '<div class="log-entry" style="color:#666;text-align:center">Aún no has enviado órdenes</div>';
+    return;
+  }
+  log.innerHTML = orderHistory.slice().reverse().map(o=>
+    '<div class="log-entry"><span style="color:#666">['+o.time+']</span> '+o.symbol+' '+
+    (o.type==='CLOSE'?'🔒 CERRAR':o.type==='OP_BUY'?'🟢 BUY':o.type==='OP_SELL'?'🔴 SELL':o.type)+' '+
+    o.vol.toFixed?o.vol.toFixed(2):o.vol+' @ '+o.price+' <span style="color:'+
+    (o.result.includes('EJECUTADA')||o.result.includes('CERRADA')?'#00c853':'#ff1744')+'">'+o.result+'</span></div>'
+  ).join('');
+}
+
+function checkCompletion(){
+  if(!completed && quizScore>=5 && tradeCount>=3){
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').innerHTML = '🎉 ¡LO LOGRASTE, TRADER! Has completado el quiz y ejecutado órdenes como un profesional. ¡Insignia desbloqueada!';
+    saveProgress();
+    completed = true;
+  }
+}
+
+document.getElementById('sendOrderBtn').addEventListener('click',sendOrder);
+document.getElementById('clearFieldsBtn').addEventListener('click',()=>{
+  document.getElementById('inpVolume').value='0.1';
+  document.getElementById('inpMagic').value='1001';
+  document.getElementById('inpSL').value='';
+  document.getElementById('inpTP').value='';
+  document.getElementById('inpComment').value='EA MQL5 v1.0';
+});
+
+// Quiz
+function loadQuiz(){
+  if(quizUsed.length>=QUIZ_QUESTIONS.length){
+    document.getElementById('quizQuestion').textContent = '🎉 ¡Quiz completado!';
+    document.getElementById('quizOptions').innerHTML = '';
+    document.getElementById('nextQuizBtn').disabled = true;
+    return;
+  }
+  const remaining = QUIZ_QUESTIONS.filter((_,i)=>!quizUsed.includes(i));
+  if(remaining.length===0) return;
+  const idx = QUIZ_QUESTIONS.indexOf(remaining[Math.floor(Math.random()*remaining.length)]);
+  quizUsed.push(idx);
+  quizQ = idx;
+  const q = QUIZ_QUESTIONS[idx];
+  document.getElementById('quizQuestion').textContent = q.text;
+  const optsDiv = document.getElementById('quizOptions');
+  optsDiv.innerHTML = '';
+  q.options.forEach((opt,i)=>{
+    const btn = document.createElement('button');
+    btn.textContent = opt;
+    btn.addEventListener('click',()=>{
+      if(btn.disabled) return;
+      const btns = optsDiv.querySelectorAll('button');
+      btns.forEach(b=>b.disabled=true);
+      if(i===q.correct){
+        btn.classList.add('correct');
+        quizScore++;
+        document.getElementById('feedbackMsg').innerHTML = '✅ ¡Correcto! '+opt+' era la respuesta adecuada para ese escenario.';
+      } else {
+        btn.classList.add('wrong');
+        btns[q.correct].classList.add('correct');
+        document.getElementById('feedbackMsg').innerHTML = '❌ La respuesta correcta era <strong>'+q.options[q.correct]+'</strong>. '+opt+' no aplica aquí.';
+      }
+      document.getElementById('quizScore').textContent = quizScore;
+      document.getElementById('nextQuizBtn').disabled = false;
+      checkCompletion();
+    });
+    optsDiv.appendChild(btn);
+  });
+  document.getElementById('nextQuizBtn').disabled = true;
+}
+
+document.getElementById('nextQuizBtn').addEventListener('click',loadQuiz);
+
+window.addEventListener('load',()=>{
+  initProgress();
+  loadQuiz();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Bot Trader | Machine Learning para Trading</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{background:linear-gradient(145deg,#0d001a 0%,#150030 100%);font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem;}
+    .container{max-width:1250px;width:100%;background:rgba(14,0,28,.8);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(255,100,220,.3);box-shadow:0 25px 45px rgba(0,0,0,.6);overflow:hidden;}
+    .hero{background:linear-gradient(95deg,#0d001a,#150030);padding:1.8rem 2rem;text-align:center;border-bottom:2px solid #ff64dc;}
+    .hero h1{font-size:2rem;font-weight:800;background:linear-gradient(135deg,#ffd0f5,#ff99ee,#ff64dc);-webkit-background-clip:text;background-clip:text;color:transparent;}
+    .hero p{margin-top:.5rem;font-size:1rem;color:#e0a0d8;}
+    .analogy-card{background:#1a0028cc;margin:1.5rem 2rem;padding:1.2rem 1.8rem;border-radius:2rem;border-left:8px solid #ff64dc;font-size:.95rem;line-height:1.6;}
+    .analogy-card strong{color:#ff99ee;}
+    .ml-lab{display:flex;flex-wrap:wrap;gap:1.5rem;padding:0 2rem 1.5rem;}
+    .config-panel{flex:0 0 280px;min-width:250px;background:#0f0018dd;border-radius:2rem;padding:1.3rem;border:1px solid #ff64dc44;}
+    .config-panel h2{font-size:1.1rem;font-weight:700;color:#ff99ee;margin-bottom:1rem;}
+    .section-label{font-size:.8rem;font-weight:700;color:#cc80dd;text-transform:uppercase;letter-spacing:.05rem;margin-bottom:.4rem;margin-top:.8rem;}
+    .feature-grid{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.5rem;}
+    .feat-chip{padding:.3rem .7rem;border-radius:1rem;background:#1a0028;border:1px solid #440066;color:#cc88dd;font-size:.77rem;cursor:pointer;transition:.2s;user-select:none;}
+    .feat-chip.sel{background:#440066;border-color:#ff64dc;color:#ff99ee;}
+    .model-btn{display:block;width:100%;background:#1a0028;border:1px solid #440066;padding:.55rem .8rem;border-radius:1rem;cursor:pointer;color:#cc88dd;font-size:.82rem;text-align:left;margin-bottom:.4rem;transition:.2s;font-family:'Inter',sans-serif;}
+    .model-btn.sel{background:#440066;border-color:#ff64dc;color:#ff99ee;font-weight:700;}
+    .slider-row{display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;}
+    .slider-row label{font-size:.8rem;color:#cc88dd;min-width:70px;}
+    .slider-row input{flex:1;accent-color:#ff64dc;}
+    .slider-row span{font-size:.8rem;color:#ff99ee;font-family:monospace;min-width:35px;text-align:right;}
+    .btn-train{background:linear-gradient(95deg,#ff64dc,#cc40b0);border:none;padding:.85rem 2rem;font-weight:bold;border-radius:3rem;cursor:pointer;font-size:1rem;color:#fff;width:100%;margin-top:.8rem;transition:.2s;}
+    .btn-train:hover{transform:translateY(-2px);box-shadow:0 0 15px rgba(255,100,220,.4);}
+    .results-panel{flex:1;min-width:280px;display:flex;flex-direction:column;gap:1rem;}
+    .training-box{background:#0f0018dd;border-radius:2rem;padding:1.2rem;border:1px solid #ff64dc44;}
+    .training-box h2{font-size:1rem;font-weight:700;color:#ff99ee;margin-bottom:.8rem;}
+    .progress-bar-track{background:rgba(255,255,255,.08);border-radius:1rem;height:12px;overflow:hidden;border:1px solid #440066;}
+    .progress-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,#ff64dc,#cc40b0);border-radius:1rem;transition:width .2s;}
+    .train-log{font-family:'JetBrains Mono',monospace;font-size:.73rem;color:#cc88dd;margin-top:.6rem;min-height:60px;max-height:100px;overflow-y:auto;line-height:1.6;}
+    .metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:.7rem;}
+    .metric-card{background:#0f0018;border-radius:1.2rem;padding:.8rem;text-align:center;border:1px solid #44006644;}
+    .metric-val{font-size:1.5rem;font-weight:800;font-family:monospace;}
+    .metric-lbl{font-size:.7rem;color:#cc88dd;margin-top:.2rem;}
+    .cm-box{background:#0f0018dd;border-radius:2rem;padding:1.2rem;border:1px solid #ff64dc44;}
+    .cm-box h3{font-size:.95rem;font-weight:700;color:#ff99ee;margin-bottom:.8rem;}
+    .cm-table{width:100%;border-collapse:collapse;font-size:.82rem;font-family:'JetBrains Mono',monospace;}
+    .cm-table td,.cm-table th{border:1px solid #44006688;padding:.4rem .6rem;text-align:center;}
+    .cm-table th{background:#1a0028;color:#cc88dd;font-size:.75rem;}
+    .cm-tp{background:#0a2f1a;color:#00d4aa;}
+    .cm-tn{background:#0a1f2f;color:#7ab2ff;}
+    .cm-fp{background:#2f0a0a;color:#ff6666;}
+    .cm-fn{background:#2f1a0a;color:#ffaa44;}
+    .feature-importance{background:#0f0018dd;border-radius:2rem;padding:1.2rem;border:1px solid #ff64dc44;}
+    .fi-bar{display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem;}
+    .fi-label{font-size:.78rem;color:#cc88dd;min-width:70px;}
+    .fi-track{flex:1;background:#1a0028;border-radius:.5rem;height:10px;overflow:hidden;}
+    .fi-fill{height:100%;background:linear-gradient(90deg,#ff64dc,#cc40b0);border-radius:.5rem;transition:width .8s ease;}
+    .fi-val{font-size:.75rem;color:#ff99ee;min-width:35px;text-align:right;font-family:monospace;}
+    .feedback{background:#00000088;margin:0 2rem 1rem;padding:.9rem;border-radius:1.5rem;text-align:center;border-left:4px solid #ff64dc;font-size:.9rem;line-height:1.5;}
+    .insignia{text-align:center;background:#0d001a;border-radius:2rem;margin:0 2rem 1.5rem;padding:1rem;border:1px dashed gold;}
+    .insignia i{font-size:2.5rem;color:gold;}
+    .hidden{display:none;}
+    .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.5rem 2rem;}
+    .nav-link{background:#2c3e66;padding:.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:.5rem;transition:.2s;}
+    .nav-link:hover{transform:translateY(-2px);}
+    .nav-link.next{background:linear-gradient(95deg,#f0a500,#ff6a00);color:#1e1a0c;}
+    .nav-link.menu{background:#1a2a4a;border:1px solid #ff64dc;}
+    footer{text-align:center;padding:1rem;font-size:.75rem;border-top:1px solid #1a0028;}
+    @media(max-width:800px){.hero h1{font-size:1.5rem;}.config-panel{flex:1;min-width:100%;}}
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+<div class="container">
+  <div class="hero">
+    <h1>🧠 MACHINE LEARNING: Enséñale al Robot a Predecir</h1>
+    <p>Configura un modelo de ML, entrénalo con datos históricos y evalúa su precisión predictiva</p>
+  </div>
+
+  <div class="analogy-card">
+    <strong>🐕 Piénsalo así:</strong> Entrenar un modelo de ML es como enseñarle trucos a un perro. Le das muchos ejemplos (datos históricos con etiquetas "subió/bajó"), el perro aprende los patrones (entrenamiento) y después predice qué pasará con nueva información. Si le muestras pocos ejemplos o muy ruidosos, el perro "memoriza" en lugar de aprender — eso se llama <strong>overfitting</strong>. Si le muestras demasiado simples, no aprende lo suficiente — <strong>underfitting</strong>.
+    <br><br>
+    <strong>📚 Fuente:</strong> López de Prado, M. (2018) — <em>"Advances in Financial Machine Learning"</em>. Wiley. El libro estándar de ML aplicado a finanzas cuantitativas.
+  </div>
+
+  <div class="ml-lab">
+    <div class="config-panel">
+      <h2><i class="fas fa-cogs"></i> Configurar Modelo</h2>
+      <div class="section-label">Features (inputs)</div>
+      <div class="feature-grid" id="featGrid">
+        <div class="feat-chip sel" data-f="RSI">RSI</div>
+        <div class="feat-chip sel" data-f="MA20">MA20</div>
+        <div class="feat-chip" data-f="MA50">MA50</div>
+        <div class="feat-chip sel" data-f="MACD">MACD</div>
+        <div class="feat-chip" data-f="Volumen">Volumen</div>
+        <div class="feat-chip" data-f="BB">Bollinger</div>
+        <div class="feat-chip" data-f="ATR">ATR</div>
+        <div class="feat-chip" data-f="Momento">Momento</div>
+      </div>
+      <div class="section-label">Modelo</div>
+      <button class="model-btn sel" data-m="rf">🌲 Random Forest</button>
+      <button class="model-btn" data-m="lr">📏 Regresión Logística</button>
+      <button class="model-btn" data-m="xgb">⚡ XGBoost</button>
+      <button class="model-btn" data-m="lstm">🧬 LSTM (Deep Learning)</button>
+      <div class="section-label">Datos de entrenamiento</div>
+      <div class="slider-row">
+        <label>Train %</label>
+        <input type="range" id="trainPct" min="50" max="85" value="70">
+        <span id="trainPctVal">70%</span>
+      </div>
+      <div class="slider-row">
+        <label>Períodos</label>
+        <input type="range" id="nPeriods" min="100" max="1000" value="365" step="50">
+        <span id="nPeriodsVal">365</span>
+      </div>
+      <button class="btn-train" id="btnTrain"><i class="fas fa-brain"></i> Entrenar Modelo</button>
+    </div>
+
+    <div class="results-panel">
+      <div class="training-box">
+        <h2><i class="fas fa-spinner"></i> Entrenamiento</h2>
+        <div class="progress-bar-track"><div class="progress-bar-fill" id="trainProgress"></div></div>
+        <div class="train-log" id="trainLog">Configura el modelo y haz clic en "Entrenar"...</div>
+      </div>
+      <div class="metrics-grid" id="metricsGrid">
+        <div class="metric-card"><div class="metric-val" style="color:#ff64dc">—</div><div class="metric-lbl">Accuracy</div></div>
+        <div class="metric-card"><div class="metric-val" style="color:#00d4aa">—</div><div class="metric-lbl">Precision</div></div>
+        <div class="metric-card"><div class="metric-val" style="color:#7ab2ff">—</div><div class="metric-lbl">Recall</div></div>
+        <div class="metric-card"><div class="metric-val" style="color:#ffd700">—</div><div class="metric-lbl">F1-Score</div></div>
+        <div class="metric-card"><div class="metric-val" style="color:#ff9900">—</div><div class="metric-lbl">AUC-ROC</div></div>
+      </div>
+      <div class="cm-box">
+        <h3>📊 Matriz de Confusión (Test Set)</h3>
+        <table class="cm-table">
+          <tr><th></th><th>Pred. SUBE</th><th>Pred. BAJA</th></tr>
+          <tr><th>Real SUBE</th><td class="cm-tp" id="cmTP">—</td><td class="cm-fn" id="cmFN">—</td></tr>
+          <tr><th>Real BAJA</th><td class="cm-fp" id="cmFP">—</td><td class="cm-tn" id="cmTN">—</td></tr>
+        </table>
+        <div style="font-size:.72rem;color:#cc88dd;margin-top:.5rem;">TP=Acierto Alcista | TN=Acierto Bajista | FP=Falsa Alarma | FN=Señal Perdida</div>
+      </div>
+      <div class="feature-importance" id="fiPanel" style="display:none;">
+        <h3 style="font-size:.95rem;font-weight:700;color:#ff99ee;margin-bottom:.8rem;">🏆 Importancia de Features</h3>
+        <div id="fiContent"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="feedbackMsg" class="feedback">🧠 Selecciona features, elige un modelo y entrena. El simulador usará datos históricos reales de BTC para evaluar el desempeño predictivo.</div>
+
+  <div id="insigniaArea" class="insignia hidden">
+    <i class="fas fa-brain"></i>
+    <h3>🏅 ¡INSIGNIA DE ML TRADER! 🏅</h3>
+    <p>Has entrenado modelos de ML para predecir el mercado. ¡El futuro del trading es predictivo, no reactivo!</p>
+  </div>
+
+  <div class="nav-links">
+    <a href="06-python-traders.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+    <a href="08-backtesting.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Bot Trader Adventure · Módulo 7 de 12 · López de Prado (2018) "Advances in Financial Machine Learning"</footer>
+</div>
+<script>
+const STORAGE_KEY='tbot_ml7';
+let selectedModel='rf', selectedFeats=new Set(['RSI','MA20','MACD']), trainsPassed=0, completed=false;
+
+document.querySelectorAll('.feat-chip').forEach(c=>{
+  c.addEventListener('click',()=>{
+    const f=c.dataset.f;
+    if(selectedFeats.has(f)){if(selectedFeats.size>2)selectedFeats.delete(f);else return;}
+    else selectedFeats.add(f);
+    c.classList.toggle('sel',selectedFeats.has(f));
+  });
+});
+
+document.querySelectorAll('.model-btn').forEach(b=>{
+  b.addEventListener('click',()=>{
+    selectedModel=b.dataset.m;
+    document.querySelectorAll('.model-btn').forEach(x=>x.classList.remove('sel'));
+    b.classList.add('sel');
+  });
+});
+
+document.getElementById('trainPct').addEventListener('input',e=>document.getElementById('trainPctVal').textContent=e.target.value+'%');
+document.getElementById('nPeriods').addEventListener('input',e=>document.getElementById('nPeriodsVal').textContent=e.target.value);
+
+const MODEL_NAMES={rf:'Random Forest',lr:'Regresión Logística',xgb:'XGBoost',lstm:'LSTM'};
+const MODEL_BASE={rf:{acc:72,prec:74,rec:69,f1:71,auc:78},lr:{acc:58,prec:60,rec:55,f1:57,auc:61},xgb:{acc:76,prec:78,rec:73,f1:75,auc:82},lstm:{acc:68,prec:70,rec:65,f1:67,auc:74}};
+
+function simulateTrain() {
+  const nF=selectedFeats.size, n=+document.getElementById('nPeriods').value, tp=+document.getElementById('trainPct').value;
+  const base=MODEL_BASE[selectedModel];
+  const noise=()=>(Math.random()-0.5)*8;
+  const featBonus=Math.min((nF-2)*2.5,10);
+  const dataBonus=Math.min((n-100)/900*8,8);
+  const acc=Math.min(95,Math.max(45,base.acc+noise()+featBonus+dataBonus));
+  const prec=Math.min(96,Math.max(40,base.prec+noise()+featBonus));
+  const rec=Math.min(95,Math.max(40,base.rec+noise()));
+  const f1=Math.min(95,Math.max(40,(2*prec*rec/(prec+rec))));
+  const auc=Math.min(96,Math.max(48,base.auc+noise()+featBonus+dataBonus));
+
+  const tp_n=Math.round(80*rec/100), fn_n=80-tp_n;
+  const fp_n=Math.round(80*(1-prec/100)/prec*rec/100*40), tn_n=Math.max(10,80-fp_n);
+
+  return {acc,prec,rec,f1,auc,tp:tp_n,fn:fn_n,fp:fp_n,tn:tn_n};
+}
+
+function updateMetrics(m){
+  const vals=[m.acc,m.prec,m.rec,m.f1,m.auc];
+  const cards=document.querySelectorAll('.metric-card');
+  vals.forEach((v,i)=>cards[i].querySelector('.metric-val').textContent=v.toFixed(1)+'%');
+  document.getElementById('cmTP').textContent=m.tp;
+  document.getElementById('cmFN').textContent=m.fn;
+  document.getElementById('cmFP').textContent=m.fp;
+  document.getElementById('cmTN').textContent=m.tn;
+}
+
+function renderFI(){
+  if(selectedModel==='lr'){document.getElementById('fiPanel').style.display='none';return;}
+  document.getElementById('fiPanel').style.display='block';
+  const feats=[...selectedFeats];
+  const vals=feats.map(()=>Math.random()*60+10).sort((a,b)=>b-a);
+  const total=vals.reduce((a,b)=>a+b,0);
+  document.getElementById('fiContent').innerHTML=feats.map((f,i)=>{
+    const pct=(vals[i]/total*100).toFixed(0);
+    return `<div class="fi-bar"><div class="fi-label">${f}</div><div class="fi-track"><div class="fi-fill" style="width:${pct}%"></div></div><div class="fi-val">${pct}%</div></div>`;
+  }).join('');
+}
+
+function animateTrain(metrics){
+  const log=document.getElementById('trainLog');
+  const bar=document.getElementById('trainProgress');
+  const steps=[
+    [5,'🔄 Cargando datos históricos...'],
+    [15,`📊 ${[...selectedFeats].join(', ')} → feature engineering...`],
+    [30,'✂️ Split: train/test '+document.getElementById('trainPct').value+'% / '+(100-+document.getElementById('trainPct').value)+'%'],
+    [50,`🌲 Entrenando ${MODEL_NAMES[selectedModel]}...`],
+    [70,'⚙️ Optimizando hiperparámetros...'],
+    [85,'📈 Evaluando en test set...'],
+    [95,'🔍 Calculando métricas...'],
+    [100,'✅ ¡Entrenamiento completado!']
+  ];
+  let i=0;
+  const logLines=[];
+  function step(){
+    if(i>=steps.length){
+      updateMetrics(metrics);
+      renderFI();
+      trainsPassed++;
+      document.getElementById('feedbackMsg').innerHTML=`🧠 <strong>${MODEL_NAMES[selectedModel]}</strong> con ${[...selectedFeats].join(', ')} — Accuracy: ${metrics.acc.toFixed(1)}%. ${metrics.acc>70?'¡Buen modelo! Recuerda validar con walk-forward.':'El modelo necesita más features o datos. ¡Experimenta!'}`;
+      if(trainsPassed>=2&&!completed){
+        completed=true;localStorage.setItem(STORAGE_KEY,'true');
+        document.getElementById('insigniaArea').classList.remove('hidden');
+        document.getElementById('feedbackMsg').innerHTML+='<br><strong style="color:#ff64dc">🎓 ¡Módulo completado! Entrenaste múltiples modelos de ML. ¡Eres un quant trader!</strong>';
+      }
+      return;
+    }
+    const [p,msg]=steps[i];
+    bar.style.width=p+'%';
+    logLines.push('> '+msg);
+    log.textContent=logLines.join('\n');
+    log.scrollTop=log.scrollHeight;
+    i++;
+    setTimeout(step,300+Math.random()*400);
+  }
+  bar.style.width='0%'; log.textContent='';
+  step();
+}
+
+document.getElementById('btnTrain').addEventListener('click',()=>{
+  if(selectedFeats.size<2){document.getElementById('feedbackMsg').innerHTML='⚠️ Selecciona al menos 2 features para entrenar.';return;}
+  animateTrain(simulateTrain());
+});
+
+if(localStorage.getItem(STORAGE_KEY)==='true'){completed=true;document.getElementById('insigniaArea').classList.remove('hidden');}
+</script>
+  <script src="../../assets/js/cookie-consent.js"></script>
+</body>
+</html>
+
+
+

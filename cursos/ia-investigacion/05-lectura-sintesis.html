@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📖 Lectura y Síntesis de Artículos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root { --accent: #9c64ff; --accent-glow: rgba(156,100,255,0.3); }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #111a2e 100%);
+  background-attachment: fixed; color: #e0e4f0;
+  display: flex; flex-direction: column; align-items: center; padding: 1rem;
+}
+.brand-return-nav { width: 100%; max-width: 900px; display: flex; gap: 1rem; padding: 0.75rem 1rem; margin-bottom: 0.5rem; }
+.brand-return-nav a { color: #8899cc; text-decoration: none; font-size: 0.85rem; padding: 0.35rem 1rem; border-radius: 20px; background: rgba(15,25,45,0.5); border: 1px solid rgba(255,255,255,0.06); transition: all 0.3s; }
+.brand-return-nav a:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+.container { width: 100%; max-width: 900px; background: rgba(15,25,45,0.65); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-radius: 3rem; padding: 2.5rem 2rem; border: 1px solid rgba(255,255,255,0.06); box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+.hero { text-align: center; margin-bottom: 2rem; }
+.hero h1 { font-size: 2.4rem; font-weight: 800; background: linear-gradient(135deg, var(--accent), #d4a0ff, #fff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.2; }
+.hero .subtitle { font-size: 1.1rem; color: #8899cc; margin-top: 0.5rem; font-weight: 300; }
+.analogy-card { background: rgba(10,15,30,0.5); border-left: 8px solid var(--accent); border-radius: 1.5rem; padding: 1.5rem 1.8rem; margin: 1.5rem 0; font-size: 1rem; line-height: 1.6; color: #c8d0e8; }
+.analogy-card i { color: var(--accent); margin-right: 0.5rem; }
+.progress-section { margin: 1.5rem 0 0.5rem; }
+.progress-bar-outer { background: #1a2a4a; border-radius: 20px; height: 20px; overflow: hidden; margin: 1rem 2rem; }
+.progress-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent, #9c64ff), #fff); border-radius: 20px; transition: width 0.5s ease; }
+.progress-text { text-align: center; font-size: 0.85rem; color: #8899cc; margin-bottom: 1rem; }
+.insignia { display: none; text-align: center; padding: 1.2rem; margin: 1rem auto; max-width: 400px; border: 2px dashed #ffd700; border-radius: 2rem; background: rgba(255,215,0,0.05); color: #ffd700; font-size: 1.2rem; font-weight: 600; animation: insigniaPulse 2s infinite; }
+@keyframes insigniaPulse { 0%,100%{box-shadow:0 0 10px rgba(255,215,0,0.1)} 50%{box-shadow:0 0 30px rgba(255,215,0,0.3)} }
+.insignia.show { display: block; }
+.feedback { text-align: center; padding: 1rem; margin: 1rem 0; border-radius: 1rem; display: none; }
+.feedback.success { display: block; background: rgba(0,255,200,0.08); border: 1px solid rgba(0,255,200,0.2); color: #00ffc8; }
+.feedback.error { display: block; background: rgba(255,100,100,0.08); border: 1px solid rgba(255,100,100,0.2); color: #ff6464; }
+.nav-links { display: flex; justify-content: center; gap: 1rem; margin-top: 2rem; flex-wrap: wrap; }
+.nav-links a { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.7rem 1.8rem; border-radius: 30px; text-decoration: none; font-weight: 600; font-size: 0.95rem; transition: all 0.3s; }
+.nav-links .prev { background: rgba(255,255,255,0.06); color: #8899cc; border: 1px solid rgba(255,255,255,0.1); }
+.nav-links .prev:hover { background: rgba(255,255,255,0.12); }
+.nav-links .menu { background: rgba(156,100,255,0.15); color: var(--accent); border: 1px solid rgba(156,100,255,0.2); }
+.nav-links .menu:hover { background: rgba(156,100,255,0.25); }
+.nav-links .next { background: var(--accent); color: #fff; }
+.nav-links .next:hover { box-shadow: 0 0 25px var(--accent-glow); transform: translateY(-2px); }
+h2 { font-size: 1.5rem; margin: 1.5rem 0 1rem; color: #fff; }
+h2 i { color: var(--accent); margin-right: 0.5rem; }
+h3 { font-size: 1.2rem; margin: 1rem 0 0.8rem; color: #d0d8f0; }
+.tab-bar { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+.tab { padding: 0.6rem 1.4rem; border-radius: 30px; background: rgba(10,15,30,0.5); border: 1px solid rgba(255,255,255,0.08); cursor: pointer; transition: all 0.3s; font-size: 0.85rem; color: #8899cc; }
+.tab:hover { border-color: var(--accent); }
+.tab.active { background: rgba(156,100,255,0.15); border-color: var(--accent); color: var(--accent); }
+.panel { display: none; }
+.panel.show { display: block; }
+.paper-card { background: rgba(10,15,30,0.4); border-radius: 1rem; padding: 1rem; margin-bottom: 0.8rem; border-left: 4px solid var(--accent); }
+.paper-card .p-title { font-weight: 600; color: #fff; font-size: 0.95rem; }
+.paper-card .p-meta { font-size: 0.8rem; color: #8899cc; margin: 0.2rem 0 0.5rem; }
+.paper-card .p-summary { font-size: 0.85rem; color: #b0c0e0; }
+.comparison-table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.82rem; }
+.comparison-table th, .comparison-table td { padding: 0.6rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.06); }
+.comparison-table th { color: var(--accent); font-weight: 600; background: rgba(10,15,30,0.3); }
+.comparison-table td { color: #b0c0e0; }
+.chat-area { height: 300px; overflow-y: auto; background: rgba(10,15,30,0.3); border-radius: 1rem; padding: 1rem; margin: 0.5rem 0; display: flex; flex-direction: column; gap: 0.5rem; }
+.chat-msg { max-width: 80%; padding: 0.6rem 1rem; border-radius: 1rem; font-size: 0.85rem; line-height: 1.4; }
+.chat-msg.user { align-self: flex-end; background: rgba(156,100,255,0.2); border: 1px solid rgba(156,100,255,0.3); }
+.chat-msg.ai { align-self: flex-start; background: rgba(10,15,30,0.5); border: 1px solid rgba(255,255,255,0.06); }
+.chat-msg.ai .cite { color: var(--accent); font-size: 0.75rem; margin-top: 0.3rem; }
+.chat-input-area { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+.chat-input-area input { flex: 1; padding: 0.7rem 1rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(10,15,30,0.6); color: #fff; font-size: 0.9rem; outline: none; }
+.chat-input-area input:focus { border-color: var(--accent); }
+.chat-input-area button { padding: 0.7rem 1.5rem; border-radius: 12px; border: none; background: var(--accent); color: #fff; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.chat-input-area button:hover { box-shadow: 0 0 15px var(--accent-glow); }
+.challenge-card { background: rgba(10,15,30,0.4); border-radius: 1rem; padding: 1rem; margin: 0.8rem 0; border-left: 4px solid var(--accent); }
+.challenge-card select { width: 100%; padding: 0.5rem; border-radius: 8px; background: rgba(10,15,30,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.1); margin-top: 0.3rem; }
+.matrix-area { display: flex; flex-wrap: wrap; gap: 1rem; margin: 1rem 0; }
+.matrix-category { flex: 1; min-width: 200px; background: rgba(10,15,30,0.3); border-radius: 1rem; padding: 1rem; border: 1px dashed rgba(255,255,255,0.1); min-height: 120px; }
+.matrix-category h4 { color: var(--accent); font-size: 0.9rem; margin-bottom: 0.5rem; }
+.matrix-item { padding: 0.4rem 0.8rem; background: rgba(156,100,255,0.1); border: 1px solid rgba(156,100,255,0.2); border-radius: 0.6rem; font-size: 0.8rem; margin: 0.3rem 0; cursor: grab; user-select: none; }
+.matrix-item:hover { background: rgba(156,100,255,0.2); }
+.matrix-pool { background: rgba(10,15,30,0.4); border-radius: 1rem; padding: 1rem; margin: 0.5rem 0; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.btn-primary { display: inline-block; padding: 0.8rem 2rem; background: var(--accent); color: #fff; border: none; border-radius: 30px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+.btn-primary:hover { box-shadow: 0 0 25px var(--accent-glow); transform: translateY(-2px); }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+@media (max-width: 600px) { .container { padding: 1.5rem 1rem; border-radius: 2rem; } .hero h1 { font-size: 1.6rem; } .tab { padding: 0.4rem 1rem; font-size: 0.8rem; } .nav-links a { padding: 0.5rem 1.2rem; font-size: 0.85rem; } }
+</style>
+</head>
+<body>
+<div class="brand-return-nav">
+  <a href="../../index.html"><i class="fas fa-arrow-left"></i> Portfolio</a>
+  <a href="../index.html"><i class="fas fa-th"></i> Cursos</a>
+</div>
+<div class="container">
+  <div class="hero">
+    <h1>📖 Lectura y Síntesis de Artículos</h1>
+    <p class="subtitle">Lee 10 papers en el tiempo que antes leías 1</p>
+  </div>
+  <div class="progress-section">
+    <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+    <div class="progress-text" id="progressText">Módulo 5 de 25</div>
+  </div>
+  <div class="insignia" id="insignia">
+    <i class="fas fa-medal"></i> 🏅 Sintetizador de Literatura 🏅
+    <div style="font-size:0.8rem;margin-top:0.3rem;color:#aabbdd;">Módulo completado</div>
+  </div>
+  <div class="analogy-card">
+    <i class="fas fa-lightbulb"></i>
+    <strong>Analogía:</strong> NotebookLM es como tener un asistente de investigación que lee todos tus PDFs y recuerda exactamente qué dijo cada autor sobre cada tema. Tú haces preguntas, él responde con citas exactas.
+  </div>
+  <div class="feedback" id="feedback"></div>
+  <h2><i class="fas fa-robot"></i> NotebookLM Simulator</h2>
+  <p style="color:#8899cc;margin-bottom:1rem;">"Sube" papers, obtén resúmenes, haz preguntas y construye una síntesis.</p>
+  <div class="tab-bar">
+    <div class="tab active" data-tab="papers"><i class="fas fa-file-alt"></i> Papers</div>
+    <div class="tab" data-tab="chat"><i class="fas fa-comments"></i> Chat con IA</div>
+    <div class="tab" data-tab="challenge"><i class="fas fa-brain"></i> Desafío</div>
+    <div class="tab" data-tab="matrix"><i class="fas fa-th-large"></i> Matriz</div>
+  </div>
+  <div class="panel show" id="panel-papers">
+    <p style="color:#8899cc;margin-bottom:0.8rem;"><i class="fas fa-cloud-upload-alt"></i> 5 papers simulados cargados. La IA ha generado resúmenes y tabla comparativa.</p>
+    <div id="paperList"></div>
+    <h3 style="margin-top:1.5rem;">📊 Tabla Comparativa</h3>
+    <div style="overflow-x:auto;">
+      <table class="comparison-table">
+        <thead><tr><th>Paper</th><th>Método</th><th>Muestra</th><th>Resultado</th><th>Limitación</th></tr></thead>
+        <tbody>
+          <tr><td>Paper 1</td><td>CNN + LSTM</td><td>5,000 pacientes</td><td>AUC 0.94</td><td>Datos unicéntricos</td></tr>
+          <tr><td>Paper 2</td><td>BERT fine-tuning</td><td>10,000 registros</td><td>F1 0.91</td><td>Inglés solamente</td></tr>
+          <tr><td>Paper 3</td><td>Random Forest</td><td>1,200 muestras</td><td>Precisión 88%</td><td>Clases desbalanceadas</td></tr>
+          <tr><td>Paper 4</td><td>GPT-4 prompting</td><td>500 abstracts</td><td>95% concordancia</td><td>Costo computacional</td></tr>
+          <tr><td>Paper 5</td><td>Graph Neural Net</td><td>50,000 nodos</td><td>Recall 0.92</td><td>Escalabilidad</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <button class="btn-primary" onclick="completeSection('papers')"><i class="fas fa-check"></i> Revisé los papers</button>
+  </div>
+
+  <div class="panel" id="panel-chat">
+    <p style="color:#8899cc;margin-bottom:0.5rem;">Haz preguntas sobre los papers cargados. El asistente responde con citas simuladas.</p>
+    <div class="chat-area" id="chatArea">
+      <div class="chat-msg ai"><i class="fas fa-robot"></i> Hola! Soy tu asistente de investigación. He leído los 5 papers. Pregúntame sobre métodos, resultados o cualquier detalle.</div>
+    </div>
+    <div class="chat-input-area">
+      <input type="text" id="chatInput" placeholder="Ej: ¿Qué dice el Paper 3 sobre el método?" onkeydown="if(event.key==='Enter') sendChat()">
+      <button onclick="sendChat()"><i class="fas fa-paper-plane"></i></button>
+    </div>
+    <button class="btn-primary" style="margin-top:0.5rem;" onclick="completeSection('chat')"><i class="fas fa-check"></i> Hice preguntas clave</button>
+  </div>
+
+  <div class="panel" id="panel-challenge">
+    <h3>🧩 Desafío de Síntesis</h3>
+    <p style="color:#8899cc;margin-bottom:0.8rem;">Relaciona cada pregunta de investigación con el paper que mejor la responde.</p>
+    <div class="challenge-card">
+      <p><strong>Pregunta 1:</strong> ¿Qué técnica de deep learning es más efectiva para diagnóstico por imágenes?</p>
+      <select id="ch1"><option value="">Selecciona...</option><option value="p1">Paper 1: CNN + LSTM</option><option value="p2">Paper 2: BERT</option><option value="p3">Paper 3: Random Forest</option><option value="p4">Paper 4: GPT-4</option><option value="p5">Paper 5: Graph Neural Net</option></select>
+    </div>
+    <div class="challenge-card">
+      <p><strong>Pregunta 2:</strong> ¿Qué modelo de lenguaje ofrece mejor extracción de información semántica?</p>
+      <select id="ch2"><option value="">Selecciona...</option><option value="p1">Paper 1: CNN + LSTM</option><option value="p2">Paper 2: BERT</option><option value="p3">Paper 3: Random Forest</option><option value="p4">Paper 4: GPT-4</option><option value="p5">Paper 5: Graph Neural Net</option></select>
+    </div>
+    <div class="challenge-card">
+      <p><strong>Pregunta 3:</strong> ¿Qué método es mejor para datos tabulares con clases desbalanceadas?</p>
+      <select id="ch3"><option value="">Selecciona...</option><option value="p1">Paper 1: CNN + LSTM</option><option value="p2">Paper 2: BERT</option><option value="p3">Paper 3: Random Forest</option><option value="p4">Paper 4: GPT-4</option><option value="p5">Paper 5: Graph Neural Net</option></select>
+    </div>
+    <button class="btn-primary" onclick="checkChallenge()"><i class="fas fa-check"></i> Verificar respuestas</button>
+  </div>
+
+  <div class="panel" id="panel-matrix">
+    <h3>📋 Matriz de Síntesis</h3>
+    <p style="color:#8899cc;margin-bottom:0.8rem;">Arrastra los hallazgos a la categoría correspondiente (simulado con clics).</p>
+    <div class="matrix-pool" id="matrixPool">
+      <span class="matrix-item" data-cat="method">CNN alcanza AUC 0.94</span>
+      <span class="matrix-item" data-cat="method">BERT obtiene F1 0.91</span>
+      <span class="matrix-item" data-cat="result">Precisión del 88% en clasificación</span>
+      <span class="matrix-item" data-cat="result">95% concordancia con expertos</span>
+      <span class="matrix-item" data-cat="limitation">Datos limitados a un centro</span>
+      <span class="matrix-item" data-cat="limitation">Solo disponible en inglés</span>
+    </div>
+    <div class="matrix-area">
+      <div class="matrix-category" data-cat="method"><h4>🔬 Método</h4></div>
+      <div class="matrix-category" data-cat="result"><h4>📈 Resultado</h4></div>
+      <div class="matrix-category" data-cat="limitation"><h4>⚠️ Limitación</h4></div>
+    </div>
+    <button class="btn-primary" onclick="checkMatrix()"><i class="fas fa-check"></i> Completar matriz</button>
+  </div>
+
+  <div class="nav-links">
+    <a href="04-revision-sistematica.html" class="prev"><i class="fas fa-chevron-left"></i> Anterior</a>
+    <a href="../index.html" class="menu"><i class="fas fa-th"></i> Menú</a>
+    <a href="#" class="next" style="visibility:hidden;">Siguiente <i class="fas fa-chevron-right"></i></a>
+  </div>
+</div>
+<script>
+const STORAGE_KEY = 'ia_inv_05';
+const papers = [
+  { title: 'Deep Learning for Medical Image Diagnosis', authors: 'García-López et al.', year: 2024, journal: 'Nature Digital Medicine', summary: 'Propone una arquitectura CNN-LSTM híbrida para diagnóstico por imágenes médicas. Alcanza AUC de 0.94 en detección de patologías pulmonares. Datos de 5,000 pacientes de un solo centro hospitalario.' },
+  { title: 'BERT for Clinical Information Extraction', authors: 'Martínez & Wong', year: 2024, journal: 'JAMIA', summary: 'Aplica fine-tuning de BERT sobre 10,000 historiales clínicos. Obtiene F1-score de 0.91 en extracción de entidades médicas. Limitado a textos en inglés.' },
+  { title: 'Random Forest in Epidemiological Studies', authors: 'Patel et al.', year: 2023, journal: 'Epidemiology', summary: 'Evalúa Random Forest para predicción de factores de riesgo. Precisión del 88% pero con sesgo por clases desbalanceadas en la muestra de 1,200 pacientes.' },
+  { title: 'GPT-4 for Abstract Screening', authors: 'Chen et al.', year: 2024, journal: 'Research Synthesis Methods', summary: 'Utiliza GPT-4 para cribado de abstracts en revisiones sistemáticas. Logra 95% de concordancia con revisores humanos. Costo computacional elevado.' },
+  { title: 'Graph Neural Networks for Drug Repurposing', authors: 'Kim & Rodríguez', year: 2024, journal: 'Bioinformatics', summary: 'Red neuronal de grafos aplicada a reposicionamiento farmacológico. Recall de 0.92 sobre 50,000 nodos de interacciones. Problemas de escalabilidad con grafos muy grandes.' }
+];
+
+const chatResponses = {
+  'muestra': 'Según los papers analizados: Paper 1 usó 5,000 pacientes (CNN-LSTM), Paper 2 trabajó con 10,000 registros clínicos (BERT), Paper 3 analizó 1,200 muestras (Random Forest), Paper 4 evaluó 500 abstracts (GPT-4) y Paper 5 procesó 50,000 nodos (GNN). <div class="cite">📚 Fuentes: Papers 1-5</div>',
+  'método': 'Los métodos varían según el objetivo: Paper 1 usa CNN + LSTM para imágenes, Paper 2 emplea BERT para texto clínico, Paper 3 utiliza Random Forest para datos tabulares, Paper 4 aplica GPT-4 para cribado y Paper 5 usa Graph Neural Networks para redes de interacciones. <div class="cite">📚 Fuentes: Papers 1-5</div>',
+  'resultado': 'Paper 1: AUC 0.94, Paper 2: F1 0.91, Paper 3: Precisión 88%, Paper 4: 95% concordancia, Paper 5: Recall 0.92. <div class="cite">📚 Fuentes: Papers 1-5</div>',
+  'limitación': 'Principales limitaciones: Paper 1: datos unicéntricos, Paper 2: solo inglés, Paper 3: clases desbalanceadas, Paper 4: alto costo computacional, Paper 5: escalabilidad limitada. <div class="cite">📚 Fuentes: Papers 1-5</div>',
+  'default': 'Basado en los 5 papers cargados, puedo decirte que... El Paper 1 (CNN-LSTM) se centra en diagnóstico por imágenes con AUC 0.94. El Paper 2 (BERT) extrae información de historiales clínicos con F1 0.91. El Paper 3 (Random Forest) predice riesgos epidemiológicos. El Paper 4 (GPT-4) asiste en cribado de literatura. El Paper 5 (GNN) explora reposicionamiento farmacológico. <div class="cite">📚 Fuentes: Papers 1-5</div>'
+};
+
+let sectionsDone = { papers: false, chat: false, challenge: false, matrix: false };
+
+function updateProgress() {
+  let p = JSON.parse(localStorage.getItem('ia_inv_progress') || '[]');
+  if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem('ia_inv_progress', JSON.stringify(p)); }
+  const pf = document.getElementById('progressFill');
+  const pt = document.getElementById('progressText');
+  if(pf) pf.style.width = Math.round((p.length/25)*100)+'%';
+  if(pt) pt.textContent = p.length+' de 25 módulos';
+}
+
+function checkCompletion() {
+  let p = JSON.parse(localStorage.getItem('ia_inv_progress') || '[]');
+  if (p.includes(STORAGE_KEY)) {
+    document.getElementById('insignia').classList.add('show');
+  }
+}
+
+function showFeedback(msg, type) {
+  const fb = document.getElementById('feedback');
+  fb.textContent = msg;
+  fb.className = 'feedback ' + type;
+  fb.style.display = 'block';
+  setTimeout(() => { fb.style.display = 'none'; }, 4000);
+}
+
+// Tab switching
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('show'));
+    document.getElementById('panel-' + tab.dataset.tab).classList.add('show');
+  });
+});
+
+// Load papers
+function loadPapers() {
+  const list = document.getElementById('paperList');
+  list.innerHTML = '';
+  papers.forEach((p, i) => {
+    list.innerHTML += '<div class="paper-card"><div class="p-title">' + p.title + '</div><div class="p-meta">' + p.authors + ' · ' + p.year + ' · ' + p.journal + '</div><div class="p-summary">' + p.summary + '</div></div>';
+  });
+}
+
+// Chat
+function sendChat() {
+  const input = document.getElementById('chatInput');
+  const q = input.value.trim();
+  if (!q) return;
+  const area = document.getElementById('chatArea');
+  area.innerHTML += '<div class="chat-msg user">' + q + '</div>';
+
+  const qLower = q.toLowerCase();
+  let response = chatResponses['default'];
+  for (const key of Object.keys(chatResponses)) {
+    if (key !== 'default' && qLower.includes(key)) {
+      response = chatResponses[key];
+      break;
+    }
+  }
+  setTimeout(() => {
+    area.innerHTML += '<div class="chat-msg ai"><i class="fas fa-robot"></i> ' + response + '</div>';
+    area.scrollTop = area.scrollHeight;
+  }, 600);
+  input.value = '';
+  area.scrollTop = area.scrollHeight;
+}
+
+function completeSection(section) {
+  sectionsDone[section] = true;
+  showFeedback('✅ Sección "' + section + '" completada', 'success');
+  if (Object.values(sectionsDone).every(v => v === true)) {
+    document.getElementById('insignia').classList.add('show');
+    showFeedback('🏅 ¡Has completado todos los desafíos del módulo!', 'success');
+    updateProgress();
+  }
+}
+
+function checkChallenge() {
+  const answers = { ch1: 'p1', ch2: 'p2', ch3: 'p3' };
+  let correct = 0;
+  for (const [id, ans] of Object.entries(answers)) {
+    const sel = document.getElementById(id).value;
+    if (sel === ans) correct++;
+  }
+  if (correct === 3) {
+    showFeedback('✅ ¡Desafío superado! 3/3 respuestas correctas', 'success');
+    completeSection('challenge');
+  } else {
+    showFeedback('❌ ' + correct + '/3 correctas. Revisa los resúmenes de los papers.', 'error');
+  }
+}
+
+function checkMatrix() {
+  const cats = document.querySelectorAll('.matrix-category');
+  let totalItems = 0;
+  cats.forEach(cat => {
+    totalItems += cat.querySelectorAll('.matrix-item').length;
+  });
+  if (totalItems < 6) {
+    showFeedback('Arrastra todos los hallazgos a sus categorías (haz clic en un ítem y luego en la categoría)', 'error');
+    return;
+  }
+  completeSection('matrix');
+}
+
+// Matrix drag (click-based)
+document.querySelectorAll('.matrix-item').forEach(item => {
+  item.addEventListener('click', () => {
+    if (item.closest('.matrix-category')) return;
+    item.classList.toggle('selected');
+  });
+});
+document.querySelectorAll('.matrix-category').forEach(cat => {
+  cat.addEventListener('click', (e) => {
+    if (e.target.closest('.matrix-item')) return;
+    const selected = document.querySelector('#matrixPool .matrix-item.selected');
+    if (!selected) return;
+    const clone = selected.cloneNode(true);
+    clone.classList.remove('selected');
+    clone.style.cursor = 'pointer';
+    clone.addEventListener('dblclick', function() { this.remove(); });
+    cat.appendChild(clone);
+    selected.remove();
+  });
+});
+
+loadPapers();
+checkCompletion();
+</script>
+</body>
+</html>

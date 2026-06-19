@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Estadística Inferencial | ANOVA de Un Factor</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:linear-gradient(135deg,#0a0f1e,#0c1222 50%,#111a2e); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+    .modulo-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(43,158,255,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+    .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #2b9eff; }
+    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#a0d0ff,#2b9eff); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .hero-header p { color:#a0d0ff; margin-top:0.5rem; font-weight:500; }
+    .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+    .chip { background:rgba(43,158,255,0.15); border:1px solid #2b9eff; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #2b9eff; font-size:1rem; line-height:1.6; }
+    .main-area { padding:0 2rem 1.5rem; display:flex; flex-wrap:wrap; gap:1.5rem; }
+    .controls-section { flex:1; min-width:320px; }
+    .vis-section { flex:1.5; min-width:380px; }
+    .control-card { background:#0f1a2ccc; border-radius:2rem; padding:1.2rem; border:1px solid #2b9eff33; margin-bottom:1rem; }
+    .control-card h3 { color:#2b9eff; margin-bottom:0.8rem; font-size:1.1rem; }
+    .control-card label { display:block; font-size:0.85rem; margin:0.6rem 0 0.2rem; color:#a0d0ff; }
+    .control-card input, .control-card select { width:100%; padding:0.5rem 0.8rem; border-radius:1rem; background:#0a0f1e; border:1px solid #2b9eff44; color:#eef5ff; font-family:'Inter',sans-serif; font-size:0.9rem; }
+    .control-card input:focus, .control-card select:focus { outline:none; border-color:#2b9eff; }
+    .group-inputs { display:flex; flex-wrap:wrap; gap:0.5rem; }
+    .group-inputs > div { flex:1; min-width:120px; }
+    .group-inputs textarea { width:100%; padding:0.5rem; border-radius:1rem; background:#0a0f1e; border:1px solid #2b9eff44; color:#eef5ff; font-family:monospace; font-size:0.85rem; min-height:80px; resize:vertical; }
+    .table-wrap { overflow-x:auto; }
+    table.anova { width:100%; border-collapse:collapse; font-size:0.85rem; }
+    table.anova th { background:#0a1a2e; padding:0.4rem; text-align:center; border-bottom:2px solid #2b9eff; color:#7af2ff; }
+    table.anova td { padding:0.3rem 0.5rem; text-align:center; border-bottom:1px solid #ffffff0a; }
+    table.anova td.val { font-family:monospace; color:#a0d0ff; }
+    .btn-action { background:linear-gradient(95deg,#f0a500,#ff6a00); border:none; padding:0.8rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin-top:0.5rem; }
+    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(240,165,0,0.5); }
+    .btn-secondary { background:#2c3e66; border:none; padding:0.5rem 1rem; font-weight:600; border-radius:2rem; cursor:pointer; font-size:0.85rem; color:#eef5ff; }
+    .btn-secondary:hover { background:#3a5080; }
+    .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #2b9eff; }
+    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:0 2rem 1.5rem; padding:1rem; border:1px dashed gold; }
+    .insignia i { font-size:2.5rem; color:gold; }
+    .hidden { display:none; }
+    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(43,158,255,0.4); }
+    .nav-link.next { background:linear-gradient(95deg,#f0a500,#ff6a00); color:#1e1a0c; }
+    .nav-link.menu { background:#1a2a4a; border:1px solid #3399ff; }
+    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+<nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+<div class="modulo-container">
+  <div class="hero-header">
+    <h1><i class="fas fa-chart-pie"></i> ANOVA de Un Factor</h1>
+    <p>Compara 3+ grupos: suma de cuadrados, F, Tukey HSD y supuestos</p>
+    <div class="badge-area">
+      <span class="chip"><i class="fas fa-calculator"></i> SS_total/between/within</span>
+      <span class="chip"><i class="fas fa-f"></i> F-statistic</span>
+      <span class="chip"><i class="fas fa-layer-group"></i> Tukey HSD</span>
+      <span class="chip"><i class="fas fa-check-circle"></i> Supuestos</span>
+    </div>
+  </div>
+  <div class="analogy-card">
+    <i class="fas fa-lightbulb" style="color:#2b9eff"></i>
+    <strong>Analogía:</strong> ANOVA es como comparar varias recetas de pastel. La pregunta no es si un pastel es diferente de otro (como en la t de dos muestras), sino si al menos una receta produce un pastel diferente del resto. Si el ANOVA es significativo, sabemos que al menos una receta es diferente... pero no cuál. Ahí entra Tukey HSD: es como hacer catas por pares para descubrir qué receta ganó. Los supuestos (normalidad, homogeneidad) son como asegurarse de que todos horneen en las mismas condiciones.
+  </div>
+  <div class="main-area">
+    <div class="controls-section">
+      <div class="control-card">
+        <h3><i class="fas fa-edit"></i> Datos de los grupos</h3>
+        <p style="font-size:0.75rem;color:#8899bb;margin-bottom:0.5rem;">Ingresa números separados por comas o espacios. Cada grupo debe tener al menos 2 valores.</p>
+        <div class="group-inputs">
+          <div><label>Grupo 1</label><textarea id="g1">23, 25, 21, 27, 24, 22, 26</textarea></div>
+          <div><label>Grupo 2</label><textarea id="g2">30, 28, 32, 29, 31, 27, 33</textarea></div>
+          <div><label>Grupo 3</label><textarea id="g3">18, 20, 19, 22, 21, 17, 20</textarea></div>
+          <div><label>Grupo 4</label><textarea id="g4">26, 24, 28, 25, 27, 23, 29</textarea></div>
+        </div>
+        <div style="display:flex;gap:0.5rem;margin-top:0.5rem;flex-wrap:wrap;">
+          <button class="btn-secondary" id="addGroupBtn"><i class="fas fa-plus"></i> Añadir grupo</button>
+          <button class="btn-secondary" id="exampleBtn"><i class="fas fa-flask"></i> Cargar ejemplo</button>
+        </div>
+        <button class="btn-action" id="runAnovaBtn"><i class="fas fa-play"></i> Ejecutar ANOVA</button>
+      </div>
+      <div class="control-card">
+        <h3><i class="fas fa-table"></i> Tabla ANOVA</h3>
+        <div class="table-wrap">
+          <table class="anova">
+            <tr><th>Fuente</th><th>SC</th><th>gl</th><th>CM</th><th>F</th><th>p-valor</th></tr>
+            <tr><td>Entre grupos</td><td class="val" id="ssb">—</td><td class="val" id="dfb">—</td><td class="val" id="msb">—</td><td class="val" id="fval">—</td><td class="val" id="pvalAnova">—</td></tr>
+            <tr><td>Dentro grupos</td><td class="val" id="ssw">—</td><td class="val" id="dfw">—</td><td class="val" id="msw">—</td><td></td><td></td></tr>
+            <tr><td>Total</td><td class="val" id="sst">—</td><td class="val" id="dft">—</td><td></td><td></td><td></td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="control-card" id="tukeyCard">
+        <h3><i class="fas fa-layer-group"></i> Tukey HSD — Post-hoc</h3>
+        <div id="tukeyResults"><p style="font-size:0.85rem;color:#8899bb;">Ejecuta el ANOVA para ver las comparaciones post-hoc.</p></div>
+      </div>
+    </div>
+    <div class="vis-section">
+      <div class="control-card">
+        <h3><i class="fas fa-chart-bar"></i> Boxplot por grupos</h3>
+        <div style="background:#0a0f1e;border-radius:1.5rem;padding:0.5rem;text-align:center;">
+          <canvas id="boxCanvas" width="580" height="220" style="width:100%;height:auto;border-radius:1rem;"></canvas>
+        </div>
+      </div>
+      <div class="control-card">
+        <h3><i class="fas fa-check-double"></i> Supuestos</h3>
+        <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+          <div style="flex:1;min-width:200px;background:#0a0f1e;border-radius:1rem;padding:0.5rem;text-align:center;">
+            <p style="font-size:0.75rem;color:#8899bb;">QQ Plot (normalidad)</p>
+            <canvas id="qqCanvas" width="260" height="200" style="width:100%;height:auto;border-radius:0.5rem;"></canvas>
+          </div>
+          <div style="flex:1;min-width:200px;background:#0a0f1e;border-radius:1rem;padding:0.8rem;">
+            <p style="font-size:0.85rem;font-weight:600;margin-bottom:0.5rem;">Levene (homogeneidad)</p>
+            <div class="stat-row"><span>Estadístico W</span><span class="val" id="leveneStat">—</span></div>
+            <div class="stat-row"><span>p-valor</span><span class="val" id="levenePval">—</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="feedbackMsg" class="feedback"><i class="fas fa-info-circle"></i> Ingresa los datos numéricos de 3 o más grupos y haz clic en "Ejecutar ANOVA".</div>
+  <div id="insigniaArea" class="insignia hidden">
+    <i class="fas fa-medal"></i>
+    <h3><i class="fas fa-chart-pie"></i> ANALISTA DE VARIANZA</h3>
+    <p>Has dominado el ANOVA de un factor. Sabes descomponer la varianza, interpretar el estadístico F, aplicar Tukey HSD y verificar supuestos. ¡El análisis de varianza no tiene secretos para ti!</p>
+  </div>
+  <div class="nav-links">
+    <a href="09-ph-dos-muestras.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+    <a href="11-anova-dos-factores.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Estadística Inferencial Interactiva · Nivel 10: ANOVA de Un Factor</footer>
+</div>
+<script>
+const STORAGE_KEY='est_inf_lvl10';let groupCount=4;
+
+function parseGroups(){
+  const groups=[];let minN=Infinity;
+  for(let i=1;i<=groupCount;i++){
+    const el=document.getElementById('g'+i);if(!el)break;
+    const vals=el.value.split(/[,\s]+/).map(Number).filter(v=>!isNaN(v));
+    if(vals.length>0){groups.push(vals);if(vals.length<minN)minN=vals.length;}
+  }
+  return groups;
+}
+
+function addGroup(){
+  groupCount++;const area=document.querySelector('.group-inputs');
+  const div=document.createElement('div');const label=document.createElement('label');
+  label.textContent='Grupo '+groupCount;
+  const ta=document.createElement('textarea');ta.id='g'+groupCount;ta.placeholder='25, 28, 22...';
+  div.appendChild(label);div.appendChild(ta);area.appendChild(div);
+}
+
+function jStatNormalQuant(p){const a=[-3.969683028665376e1,2.209460984245205e2,-2.759285104469687e2,1.383577518672690e2,-3.066479806614716e1,2.506628277459239],b=[-5.447609879822406e1,1.615858368580409e2,-1.556989798598866e2,6.680131188771972e1,-1.328068155288572e1],c=[-7.784894002430293e-3,-3.223964580411365e-1,-2.400758277161838,-2.549732539343734,4.374664141464968,2.938163982698783],d=[7.784695709041462e-3,3.224671290700398e-1,2.445134137142996,3.754408661907416];if(p<0.02425){const q=Math.sqrt(-2*Math.log(p));return(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);}if(p<0.97575){const q=p-0.5,r=q*q;return(((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q/(((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);}const q=Math.sqrt(-2*Math.log(1-p));return-(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);}
+function lgamma(z){if(z<0.5)return Math.PI/Math.sin(Math.PI*z)-lgamma(1-z);z-=1;const g=7,c=[0.99999999999980993,676.5203681218851,-1259.1392167224028,771.32342877765313,-176.61502916214059,12.507343278686905,-0.13857109526572012,9.9843695780195716e-6,1.5056327351493116e-7];let x=c[0];for(let i=1;i<g+2;i++)x+=c[i]/(z+i);const t=z+g+0.5;return 0.5*Math.log(2*Math.PI)+(z+0.5)*Math.log(t)-t+Math.log(x);}
+function incBeta(x,a,b){if(x<0||x>1)return x<0?0:1;if(x===0||x===1)return x;const bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));if(x<(a+1)/(a+b+2))return bt*betaCF(x,a,b)/a;return 1-bt*betaCF(1-x,b,a)/b;}
+function betaCF(x,a,b){const MAX=200,EPS=3e-12;let qab=a+b,qap=a+1,qam=a-1;let c=1,d=1-qab*x/qap;if(Math.abs(d)<1e-30)d=1e-30;d=1/d;let h=d;for(let m=1;m<=MAX;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<1e-30)d=1e-30;c=1+aa/c;if(Math.abs(c)<1e-30)c=1e-30;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<1e-30)d=1e-30;c=1+aa/c;if(Math.abs(c)<1e-30)c=1e-30;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<EPS)break;}return h;}
+function fCDF(x,df1,df2){if(x<=0)return 0;const p=df1*x/(df1*x+df2);return 1-incBeta(p,df1/2,df2/2);}
+function fCritical(alpha,df1,df2){let lo=0.01,hi=20;for(let i=0;i<60;i++){const m=(lo+hi)/2;if(fCDF(m,df1,df2)>1-alpha)hi=m;else lo=m;}return(lo+hi)/2;}
+
+function runAnova(){
+  const groups=parseGroups();
+  if(groups.length<3){document.getElementById('feedbackMsg').innerHTML='<i class="fas fa-exclamation-triangle" style="color:#ff6a6a"></i> Se necesitan al menos 3 grupos.';return;}
+  if(groups.some(g=>g.length<2)){document.getElementById('feedbackMsg').innerHTML='<i class="fas fa-exclamation-triangle" style="color:#ff6a6a"></i> Cada grupo debe tener al menos 2 valores.';return;}
+  if(groups.some(g=>g.some(v=>isNaN(v)))){document.getElementById('feedbackMsg').innerHTML='<i class="fas fa-exclamation-triangle" style="color:#ff6a6a"></i> Todos los valores deben ser numéricos.';return;}
+
+  const all=groups.flat(),n=all.length,k=groups.length;
+  const grandMean=all.reduce((a,b)=>a+b,0)/n;
+  let ssb=0,ssw=0;
+  const means=groups.map(g=>{const m=g.reduce((a,b)=>a+b,0)/g.length;ssb+=g.length*(m-grandMean)**2;g.forEach(v=>ssw+=(v-m)**2);return m;});
+  const sst=ssb+ssw,dfb=k-1,dfw=n-k,dft=n-1,msb=ssb/dfb,msw=ssw/dfw;
+  const F=msb/msw;
+  const pval=1-fCDF(F,dfb,dfw);
+
+  document.getElementById('ssb').textContent=ssb.toFixed(4);
+  document.getElementById('dfb').textContent=dfb;
+  document.getElementById('msb').textContent=msb.toFixed(4);
+  document.getElementById('fval').textContent=F.toFixed(4);
+  document.getElementById('pvalAnova').textContent=pval.toFixed(6);
+  document.getElementById('ssw').textContent=ssw.toFixed(4);
+  document.getElementById('dfw').textContent=dfw;
+  document.getElementById('msw').textContent=msw.toFixed(4);
+  document.getElementById('sst').textContent=sst.toFixed(4);
+  document.getElementById('dft').textContent=dft;
+
+  const significant=pval<0.05;
+  const fb=document.getElementById('feedbackMsg');
+  fb.innerHTML='<i class="fas fa-check-circle" style="color:#2b9eff"></i> ANOVA: F('+dfb+','+dfw+') = '+F.toFixed(4)+', p = '+pval.toFixed(6)+'. '+(significant?'Diferencias significativas entre grupos (p < 0.05).':'No hay diferencias significativas (p ≥ 0.05).');
+
+  drawBoxplot(groups,means,grandMean);
+  drawQQ(groups);
+  leveneTest(groups);
+
+  const sortedMeans=means.map((m,i)=>({m,i})).sort((a,b)=>b.m-a.m);
+  if(significant&&k>=3){
+    const qCrit=fCritical(0.05,dfb,dfw)*Math.SQRT2;
+    let html='<table class="anova"><tr><th>Comparación</th><th>Diferencia</th><th>HSD</th><th>Significativo</th></tr>';
+    for(let i=0;i<k;i++)for(let j=i+1;j<k;j++){
+      const diff=Math.abs(means[i]-means[j]);
+      const hsd=qCrit*Math.sqrt(msw/2*(1/groups[i].length+1/groups[j].length));
+      const sig=diff>hsd;
+      html+='<tr><td>G'+(i+1)+' vs G'+(j+1)+'</td><td class="val">'+diff.toFixed(4)+'</td><td class="val">'+hsd.toFixed(4)+'</td><td style="color:'+(sig?'#00e676':'#ff5050')+'">'+(sig?'Sí ✓':'No')+'</td></tr>';
+    }
+    html+='</table>';
+    document.getElementById('tukeyResults').innerHTML=html;
+  } else {
+    document.getElementById('tukeyResults').innerHTML=significant?'<p style="font-size:0.85rem;color:#8899bb;">Solo 2 grupos; no aplica Tukey.</p>':'<p style="font-size:0.85rem;color:#8899bb;">ANOVA no significativo. No se realizan comparaciones post-hoc.</p>';
+  }
+
+  const ins=document.getElementById('insigniaArea');ins.classList.remove('hidden');
+  try{localStorage.setItem(STORAGE_KEY,'true');}catch(e){}
+}
+
+function drawBoxplot(groups,means,grandMean){
+  const canvas=document.getElementById('boxCanvas');
+  const ctx=canvas.getContext('2d');const W=580,H=220;
+  ctx.clearRect(0,0,W,H);ctx.fillStyle='#0a0f1e';ctx.fillRect(0,0,W,H);
+  const m=50,pw=W-2*m,ph=120,k=groups.length;
+  const all=groups.flat(),minV=Math.min(...all)-3,maxV=Math.max(...all)+3,rg=maxV-minV;
+  function toX(i){return m+(i+0.5)/k*pw;}
+  function toY(v){return m+70+ph-(v-minV)/rg*ph;}
+
+  ctx.strokeStyle='#ffffff08';ctx.lineWidth=1;
+  for(let i=0;i<=5;i++){const y=toY(minV+i/5*rg);ctx.beginPath();ctx.moveTo(m-5,y);ctx.lineTo(W-m+5,y);ctx.stroke();ctx.fillStyle='#8899bb';ctx.font='9px Inter';ctx.textAlign='right';ctx.fillText((minV+i/5*rg).toFixed(1),m-8,y+3);}
+
+  const colors=['#2b9eff','#ff6a6a','#00e676','#ffb347','#9c64ff','#00e0ff','#ff5050','#a0ffb0'];
+  groups.forEach((g,i)=>{
+    const sorted=[...g].sort((a,b)=>a-b),n=g.length;
+    const q1=sorted[Math.floor(n*0.25)],q3=sorted[Math.floor(n*0.75)],med=sorted[Math.floor(n*0.5)];
+    const iqr=q3-q1,lw=Math.max(minV,q1-1.5*iqr),uw=Math.min(maxV,q3+1.5*iqr);
+    const cx=toX(i),bw=Math.min(40,pw/k*0.5);
+    const col=colors[i%colors.length];
+    ctx.fillStyle=col+'4d';ctx.strokeStyle=col;ctx.lineWidth=2;
+    const y1=toY(lw),y2=toY(uw),yQ1=toY(q1),yQ3=toY(q3),yMed=toY(med);
+    ctx.fillRect(cx-bw/2,yQ3,bw,yQ1-yQ3);
+    ctx.strokeRect(cx-bw/2,yQ3,bw,yQ1-yQ3);
+    ctx.beginPath();ctx.moveTo(cx,y2);ctx.lineTo(cx,y1);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(cx-bw/3,y2);ctx.lineTo(cx+bw/3,y2);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(cx-bw/3,y1);ctx.lineTo(cx+bw/3,y1);ctx.stroke();
+    ctx.fillStyle=col;ctx.font='bold 10px Inter';ctx.textAlign='center';
+    ctx.fillText('G'+(i+1),cx,m+200);
+    ctx.fillRect(cx-bw/2,yMed-1.5,bw,3);
+    ctx.fillStyle='#fff';ctx.font='9px Inter';
+    ctx.fillText('n='+g.length,cx,m+185);
+  });
+  ctx.strokeStyle='#ffd700';ctx.lineWidth=1.5;ctx.setLineDash([4,4]);
+  const gy=toY(grandMean);ctx.beginPath();ctx.moveTo(m,gy);ctx.lineTo(W-m,gy);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle='#ffd700';ctx.font='9px Inter';ctx.textAlign='left';ctx.fillText('Media global = '+grandMean.toFixed(2),W-m-120,gy-5);
+}
+
+function drawQQ(groups){
+  const canvas=document.getElementById('qqCanvas');
+  const ctx=canvas.getContext('2d');const W=260,H=200;
+  ctx.clearRect(0,0,W,H);ctx.fillStyle='#0a0f1e';ctx.fillRect(0,0,W,H);
+  const res=[];groups.forEach(g=>{const m=g.reduce((a,b)=>a+b,0)/g.length;g.forEach(v=>res.push(v-m));});
+  res.sort((a,b)=>a-b);const n=res.length;
+  if(n<3)return;
+  const m=35,pw=W-2*m,ph=H-2*m;
+  const maxR=Math.max(Math.abs(res[0]),Math.abs(res[n-1]))+1;
+  function toX(v){return m+(v+maxR)/(2*maxR)*pw;}
+  function toY(v){return m+ph-(v+maxR)/(2*maxR)*ph;}
+
+  ctx.strokeStyle='#2b9eff';ctx.lineWidth=1;ctx.setLineDash([4,4]);
+  ctx.beginPath();ctx.moveTo(toX(-maxR),toY(-maxR));ctx.lineTo(toX(maxR),toY(maxR));ctx.stroke();ctx.setLineDash([]);
+
+  const cols=['#2b9eff','#ff6a6a','#00e676','#ffb347','#9c64ff'];
+  ctx.fillStyle='#2b9eff';
+  res.forEach((r,i)=>{
+    const pp=(i+0.5)/n;
+    const tq=jStatNormalQuant(pp);
+    const x=toX(tq),y=toY(r);
+    ctx.beginPath();ctx.arc(x,y,2.5,0,Math.PI*2);ctx.fill();
+  });
+  ctx.fillStyle='#8899bb';ctx.font='8px Inter';ctx.textAlign='center';
+  ctx.fillText('Cuantiles teóricos',W/2,H-5);
+}
+
+function leveneTest(groups){
+  const medians=groups.map(g=>{const s=[...g].sort((a,b)=>a-b);return s[Math.floor(s.length/2)];});
+  const zij=groups.map((g,i)=>g.map(v=>Math.abs(v-medians[i])));
+  const allZ=zij.flat(),n=allZ.length,k=groups.length;
+  const grandZ=allZ.reduce((a,b)=>a+b,0)/n;
+  let ssb=0,ssw=0;
+  zij.forEach((z,i)=>{const mz=z.reduce((a,b)=>a+b,0)/z.length;ssb+=z.length*(mz-grandZ)**2;z.forEach(v=>ssw+=(v-mz)**2);});
+  const dfb=k-1,dfw=n-k;
+  const Wstat=(ssb/dfb)/(ssw/dfw);
+  const pval=1-fCDF(Wstat,dfb,dfw);
+  document.getElementById('leveneStat').textContent=Wstat.toFixed(4);
+  document.getElementById('levenePval').textContent=pval.toFixed(6);
+}
+
+document.getElementById('addGroupBtn').addEventListener('click',addGroup);
+document.getElementById('exampleBtn').addEventListener('click',()=>{
+  document.getElementById('g1').value='23, 25, 21, 27, 24, 22, 26';
+  document.getElementById('g2').value='30, 28, 32, 29, 31, 27, 33';
+  document.getElementById('g3').value='18, 20, 19, 22, 21, 17, 20';
+  document.getElementById('g4').value='26, 24, 28, 25, 27, 23, 29';
+});
+document.getElementById('runAnovaBtn').addEventListener('click',runAnova);
+(function loadState(){try{if(localStorage.getItem(STORAGE_KEY)==='true')document.getElementById('insigniaArea').classList.remove('hidden');}catch(e){}})();
+setTimeout(runAnova,200);
+</script>
+<script src="../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Mercados y Análisis | Datos OHLCV y Tick</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #111a2e 100%);
+      background-size: 200% 200%; animation: gradientShift 20s ease infinite;
+      font-family: 'Inter', sans-serif; color: #eef5ff; min-height: 100vh;
+      display: flex; align-items: center; justify-content: center; padding: 2rem 1rem;
+    }
+    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+    .curso2-container {
+      max-width: 1300px; width: 100%;
+      background: rgba(15, 25, 45, 0.65); backdrop-filter: blur(12px);
+      border-radius: 3rem; border: 1px solid rgba(0,255,200,0.25);
+      box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden;
+    }
+    .hero-header {
+      background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%);
+      padding: 2rem 2rem 1.5rem; text-align: center;
+      border-bottom: 2px solid #00ffc8;
+    }
+    .hero-header h1 {
+      font-size: 2.6rem; font-weight: 800;
+      background: linear-gradient(135deg, #FFF, #a8ffe8, #00ffc8);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .hero-header p { font-size: 1.1rem; color: #a8ffe8; margin-top: 0.3rem; }
+    .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
+    .chip { background: rgba(0,255,200,0.15); border: 1px solid #00ffc8; padding: 0.3rem 1rem; border-radius: 40px; font-size: 0.8rem; font-weight: 600; }
+    .analogy-card { background: #1e2a3acc; margin: 1.5rem 2rem; padding: 1.2rem 1.8rem; border-radius: 2rem; border-left: 8px solid #00ffc8; font-size: 1rem; line-height: 1.6; }
+    .main-area { padding: 0.5rem 2rem; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin: 0.8rem 0; }
+    th { background: #00ffc822; padding: 0.5rem; text-align: center; border-bottom: 2px solid #00ffc8; }
+    td { padding: 0.4rem 0.5rem; text-align: center; border-bottom: 1px solid #ffffff0a; }
+    tr.dirty { background: #ff505022; }
+    tr.clean { background: #00ffc811; }
+    .task-area { display: flex; gap: 1rem; flex-wrap: wrap; margin: 1rem 0; }
+    .task-btn { background: #1e2a4a; border: 1px solid #00ffc844; padding: 0.6rem 1.2rem; border-radius: 2rem; cursor: pointer; font-weight: 600; color: #eef5ff; transition: 0.2s; }
+    .task-btn:hover { background: #00ffc822; }
+    .task-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .feedback { background: #00000099; margin: 1.5rem 2rem; padding: 1rem; border-radius: 1.5rem; text-align: center; font-weight: 500; border-left: 4px solid #00ffc8; }
+    .insignia { text-align: center; background: #0c1b2f; border-radius: 2rem; margin: 0 2rem 1.5rem; padding: 1rem; border: 1px dashed gold; }
+    .insignia i { font-size: 2.5rem; color: gold; }
+    .hidden { display: none; }
+    .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
+    .nav-link { background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem; font-weight: 600; text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; }
+    .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(0,255,200,0.4); }
+    .nav-link.next { background: linear-gradient(95deg, #f0a500, #ff6a00); color: #1e1a0c; }
+    .nav-link.menu { background: #1a2a4a; border: 1px solid #00ffc8; }
+    footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
+    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } table { font-size:0.7rem; } }
+  </style>
+  <link rel="stylesheet" href="../../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../../../index.html">&larr; Portfolio</a><a href="../../../../cursos/index.html">Cursos</a></nav>
+  <div class="curso2-container">
+    <div class="hero-header">
+      <h1>📥 DATOS OHLCV Y TICK</h1>
+      <p>Fuentes, limpieza, Parquet/HDF5 y almacenamiento eficiente</p>
+      <div class="badge-area">
+        <span class="chip"><i class="fas fa-table"></i> Limpieza</span>
+        <span class="chip"><i class="fas fa-filter"></i> Resample</span>
+      </div>
+    </div>
+    <div class="analogy-card"><strong>📥 Piénsalo así:</strong> Los datos OHLCV son como el resumen diario del clima: temperatura máxima, mínima, actual y precipitación. Los ticks son cada medición individual. Para trabajar con ellos, primero hay que "limpiar" los datos erróneos (NaN, negativos) y luego agruparlos (resample).</div>
+    <div class="main-area">
+      <p style="margin-bottom:0.5rem;font-weight:600;">📋 Datos CSV simulados (20 filas):</p>
+      <div id="tableContainer"><table id="dataTable"><thead><tr><th>#</th><th>Fecha</th><th>Open</th><th>High</th><th>Low</th><th>Close</th><th>Volume</th><th>Estado</th></tr></thead><tbody id="tableBody"></tbody></table></div>
+      <div class="task-area">
+        <button class="task-btn" id="task1" onclick="removeNaN()">🗑️ Paso 1: Eliminar NaN</button>
+        <button class="task-btn" id="task2" onclick="fixNegative()" disabled>🔧 Paso 2: Corregir precio negativo</button>
+        <button class="task-btn" id="task3" onclick="resampleData()" disabled>📊 Paso 3: Resample a semanal</button>
+        <button class="task-btn" id="resetBtn" onclick="resetData()">🔄 Reiniciar</button>
+      </div>
+    </div>
+    <div id="feedbackMsg" class="feedback">💡 Haz clic en "Paso 1" para eliminar la fila con NaN. Luego corrige el precio negativo y finalmente resamplea a semanal.</div>
+    <div id="insigniaArea" class="insignia hidden">
+      <i class="fas fa-medal"></i>
+      <h3>🏅 INGENIERO DE DATOS 🏅</h3>
+      <p>Sabes limpiar, corregir y transformar datos OHLCV como un verdadero data engineer. ¡Excelente!</p>
+    </div>
+    <div class="nav-links">
+      <a href="02-microestructura.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+      <a href="04-soportes-resistencias.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <footer><i class="fas fa-crown"></i> Mercados y Análisis Técnico · Trading Algorítmico con Python</footer>
+  </div>
+  <script>
+    const STORAGE_KEY = 'py_trade_2_03';
+    let rawData = [];
+    let displayData = [];
+    let step1done = false, step2done = false, step3done = false;
+
+    function initData() {
+      rawData = [];
+      const start = new Date('2024-01-01');
+      for(let i=0;i<20;i++) {
+        const d = new Date(start); d.setDate(d.getDate()+i);
+        const base = 100 + Math.sin(i*0.5)*5 + (i*0.3);
+        let o = base, h = base+Math.random()*2, l = base-Math.random()*2, c = base+(Math.random()-0.5)*1.5, v = Math.round(10000+Math.random()*50000);
+        if(i===7) { o=NaN; h=NaN; l=NaN; c=NaN; v=0; } // NaN row
+        if(i===12) { c = -Math.abs(c); } // negative close
+        rawData.push({date:d.toISOString().split('T')[0], open:o, high:h, low:l, close:c, volume:v, flag:'raw'});
+      }
+      displayData = rawData.map(r => ({...r}));
+      renderTable();
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('tableBody');
+      let html = '';
+      displayData.forEach((r,i) => {
+        const isNaNRow = isNaN(r.open) || isNaN(r.high) || isNaN(r.low) || isNaN(r.close);
+        const isNeg = r.close < 0;
+        const cls = isNaNRow ? 'dirty' : (isNeg ? 'dirty' : 'clean');
+        const status = isNaNRow ? '❌ NaN' : (isNeg ? '⚠️ Neg' : '✅ Ok');
+        html += '<tr class="'+cls+'"><td>'+(i+1)+'</td><td>'+r.date+'</td><td>'+(isNaN(r.open)?'---':r.open.toFixed(2))+'</td><td>'+(isNaN(r.high)?'---':r.high.toFixed(2))+'</td><td>'+(isNaN(r.low)?'---':r.low.toFixed(2))+'</td><td>'+(isNaN(r.close)?'---':r.close.toFixed(2))+'</td><td>'+(r.volume||'---')+'</td><td>'+status+'</td></tr>';
+      });
+      tbody.innerHTML = html;
+    }
+
+    function removeNaN() {
+      displayData = displayData.filter(r => !isNaN(r.open) && !isNaN(r.high) && !isNaN(r.low) && !isNaN(r.close));
+      renderTable();
+      step1done = true;
+      document.getElementById('task1').disabled = true;
+      document.getElementById('task2').disabled = false;
+      document.getElementById('feedbackMsg').innerHTML = '✅ Paso 1 completado: fila con NaN eliminada. Ahora corrige el precio negativo (Paso 2).';
+    }
+
+    function fixNegative() {
+      displayData = displayData.map(r => {
+        if(r.close < 0) { r.close = Math.abs(r.close); }
+        return r;
+      });
+      renderTable();
+      step2done = true;
+      document.getElementById('task2').disabled = true;
+      document.getElementById('task3').disabled = false;
+      document.getElementById('feedbackMsg').innerHTML = '✅ Paso 2 completado: precio negativo corregido a valor absoluto. Ahora resamplea a semanal (Paso 3).';
+    }
+
+    function resampleData() {
+      const weekly = [];
+      for(let i=0;i<displayData.length;i+=5) {
+        const chunk = displayData.slice(i, i+5);
+        if(chunk.length===0) continue;
+        weekly.push({
+          date: chunk[0].date + ' (sem)',
+          open: chunk[0].open,
+          high: Math.max(...chunk.map(r=>r.high)),
+          low: Math.min(...chunk.map(r=>r.low)),
+          close: chunk[chunk.length-1].close,
+          volume: chunk.reduce((s,r)=>s+r.volume,0),
+          flag:'weekly'
+        });
+      }
+      displayData = weekly;
+      renderTable();
+      step3done = true;
+      document.getElementById('task3').disabled = true;
+      document.getElementById('feedbackMsg').innerHTML = '✅ Paso 3 completado: datos resampleados a semanal. ¡Has completado todo el pipeline!';
+      localStorage.setItem(STORAGE_KEY, 'true');
+      document.getElementById('insigniaArea').classList.remove('hidden');
+    }
+
+    function resetData() {
+      displayData = rawData.map(r => ({...r}));
+      renderTable();
+      step1done=step2done=step3done=false;
+      document.getElementById('task1').disabled = false;
+      document.getElementById('task2').disabled = true;
+      document.getElementById('task3').disabled = true;
+      document.getElementById('feedbackMsg').innerHTML = '💡 Datos reiniciados. Haz clic en "Paso 1" para empezar.';
+    }
+
+    initData();
+  </script>
+</body>
+</html>

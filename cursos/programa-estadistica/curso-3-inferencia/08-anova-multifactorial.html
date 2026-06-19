@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Curso 3 | 📊 ANOVA Multifactorial</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:linear-gradient(135deg,#0a0f1e,#0c1222 50%,#111a2e); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+    .course-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(0,255,200,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+    .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #00ffc8; }
+    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#7affd8,#00ffc8); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .hero-header p { font-size:1.1rem; color:#b9ffe5; margin-top:0.5rem; font-weight:500; }
+    .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+    .chip { background:rgba(0,255,200,0.15); border:1px solid #00ffc8; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+    .progress-section { padding:1.2rem 2rem; border-bottom:1px solid #1a2a4a; }
+    .progress-bar-outer { background:#1a2a4a; border-radius:20px; height:16px; overflow:hidden; }
+    .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#00ffc8,#00bb88); border-radius:20px; transition:width 0.5s ease; }
+    .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
+    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #00ffc8; font-size:1rem; line-height:1.6; }
+    .main-area { padding:1.5rem 2rem; }
+    .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#00ffc8; }
+    .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
+    .info-panel { background:rgba(10,20,40,0.7); border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
+    .info-panel h3 { color:#7affd8; font-size:1rem; margin-bottom:0.5rem; }
+    .info-panel p { font-size:0.85rem; color:#b9ccee; line-height:1.6; }
+    .sim-area { background:rgba(0,10,25,0.6); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #00ffc8; margin-bottom:1.5rem; }
+    .quiz-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #3399ff; margin-bottom:1.5rem; }
+    .quiz-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#00ffc8; }
+    .question { background:#0f1a2c; margin:0.8rem 0; padding:0.8rem 1rem; border-radius:1.2rem; }
+    .question p { font-weight:600; margin-bottom:0.5rem; font-size:0.95rem; }
+    .options { display:flex; flex-wrap:wrap; gap:0.6rem; }
+    .opt { background:#1e2a3e; padding:0.3rem 0.9rem; border-radius:2rem; cursor:pointer; transition:0.2s; font-size:0.85rem; }
+    .opt:hover { background:#2c3e66; transform:translateY(-2px); }
+    .opt.selected { background:#00ffc8; color:#000; font-weight:bold; box-shadow:0 0 8px #00ffc8; }
+    .opt.correct { background:#00cc88; color:#000; }
+    .opt.wrong { background:#ff4455; color:#fff; }
+    .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #00ffc8; }
+    .btn-action { background:linear-gradient(95deg,#f0a500,#ff6a00); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin-top:1rem; }
+    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(240,165,0,0.5); }
+    .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
+    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin-top:1.5rem; padding:1rem; border:1px dashed gold; }
+    .insignia i { font-size:2.5rem; color:gold; }
+    .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
+    .hidden { display:none; }
+    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(0,255,200,0.4); }
+    .nav-link.next { background:linear-gradient(95deg,#f0a500,#ff6a00); color:#1e1a0c; }
+    .nav-link.menu { background:#1a2a4a; border:1px solid #00ffc8; }
+    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .info-grid { grid-template-columns:1fr; } }
+  </style>
+  <link rel="stylesheet" href="../../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a><a href="../index.html">Programa Estadística</a></nav>
+  <div class="course-container" id="app">
+    <div class="hero-header">
+      <h1>📊 ANOVA Multifactorial</h1>
+      <p>Múltiples factores y sus interacciones</p>
+      <div class="badge-area">
+        <span class="chip"><i class="fas fa-project-diagram"></i> Diseño factorial</span>
+        <span class="chip"><i class="fas fa-exchange-alt"></i> Interacciones</span>
+        <span class="chip"><i class="fas fa-redo-alt"></i> Medidas repetidas</span>
+      </div>
+    </div>
+    <div class="progress-section">
+      <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+      <span class="progress-text" id="progressText">Módulo 8 de 12</span>
+    </div>
+    <div class="analogy-card">
+      <strong>💡 Piénsalo así:</strong> El ANOVA multifactorial es como estudiar cómo el fertilizante Y la luz solar afectan el crecimiento de las plantas. No solo importa cada factor por separado, sino su interacción: quizás el fertilizante funciona mejor cuando hay mucha luz. La interacción es cuando el efecto de un factor depende del nivel de otro factor.
+    </div>
+    <div class="main-area">
+      <div class="section-title"><i class="fas fa-project-diagram"></i> Conceptos de ANOVA Multifactorial</div>
+      <div class="info-grid">
+        <div class="info-panel">
+          <h3>🔬 Diseño Factorial 2×2</h3>
+          <p>El diseño más simple: dos factores, cada uno con dos niveles (bajo/alto, presente/ausente). Evalúa efectos principales de A, efectos principales de B, y la interacción A×B. Requiere 4 grupos (combinaciones).</p>
+        </div>
+        <div class="info-panel">
+          <h3>⚡ Interacciones</h3>
+          <p>Hay interacción cuando el efecto de un factor depende del nivel del otro. Se representa gráficamente con líneas que se cruzan. Si las líneas son paralelas, no hay interacción. La interacción puede ser ordinal (sin cruce) o disordinal (con cruce).</p>
+        </div>
+        <div class="info-panel">
+          <h3>🔄 Medidas Repetidas</h3>
+          <p>Cuando los mismos sujetos son medidos en múltiples condiciones. Controla la variabilidad entre sujetos. El ANOVA de medidas repetidas descompone la varianza en: entre sujetos, dentro de sujetos (tiempo/condición) y error.</p>
+        </div>
+        <div class="info-panel">
+          <h3>📊 ANOVA Mixto</h3>
+          <p>Combina factores entre-sujetos (grupos independientes) y dentro-sujetos (medidas repetidas). Ejemplo: tratamiento (experimental vs control) × tiempo (pre, post, seguimiento). Muy común en investigación clínica y educativa.</p>
+        </div>
+      </div>
+
+      <div class="sim-area">
+        <div class="section-title"><i class="fas fa-play-circle"></i> Simulación: Interacción Factorial 2×2</div>
+        <p style="color:#b9ccee; font-size:0.9rem; margin-bottom:1rem;">
+          Ajusta los efectos de los factores A y B y su interacción. Observa cómo cambian las medias de los 4 grupos.
+        </p>
+        <div style="display:flex; flex-wrap:wrap; gap:0.8rem; align-items:center; margin-bottom:1rem;">
+          <label style="color:#7affd8;">Efecto A: <select id="effectA" style="background:#1e2a3e; color:#eef5ff; border:1px solid #00ffc8; border-radius:8px; padding:0.3rem;"><option value="0">0 (nulo)</option><option value="5" selected>5</option><option value="10">10</option></select></label>
+          <label style="color:#7affd8;">Efecto B: <select id="effectB" style="background:#1e2a3e; color:#eef5ff; border:1px solid #00ffc8; border-radius:8px; padding:0.3rem;"><option value="0">0 (nulo)</option><option value="5" selected>5</option><option value="10">10</option></select></label>
+          <label style="color:#7affd8;">Interacción: <select id="interaction" style="background:#1e2a3e; color:#eef5ff; border:1px solid #00ffc8; border-radius:8px; padding:0.3rem;"><option value="0">0 (nula)</option><option value="5" selected>5</option><option value="10">10</option></select></label>
+          <button id="simulateBtn" class="btn-action" style="background:linear-gradient(95deg,#00ffc8,#00aa88); color:#000; padding:0.5rem 1.2rem; font-size:0.9rem;"><i class="fas fa-play"></i> Simular factorial</button>
+        </div>
+        <div style="background:#0f1a2c; border-radius:1.2rem; padding:1rem;">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+            <div><span style="color:#7affd8;">A₁B₁ (n=15): </span><span id="a1b1">—</span></div>
+            <div><span style="color:#7affd8;">A₁B₂ (n=15): </span><span id="a1b2">—</span></div>
+            <div><span style="color:#7affd8;">A₂B₁ (n=15): </span><span id="a2b1">—</span></div>
+            <div><span style="color:#7affd8;">A₂B₂ (n=15): </span><span id="a2b2">—</span></div>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem; margin-top:0.8rem;">
+            <div><span style="color:#7affd8;">F_A: </span><span id="fA">—</span></div>
+            <div><span style="color:#7affd8;">F_B: </span><span id="fB">—</span></div>
+            <div><span style="color:#7affd8;">F_AB: </span><span id="fAB">—</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="quiz-area">
+        <div class="quiz-title"><i class="fas fa-question-circle"></i> Quiz: ANOVA Multifactorial</div>
+        <div id="quizContainer"></div>
+        <button id="submitQuizBtn" class="btn-action">✅ Verificar respuestas</button>
+        <div id="insigniaArea" class="insignia hidden">
+          <i class="fas fa-medal"></i>
+          <h3>🏅 Diseñador Factorial 🏅</h3>
+          <p>Has dominado el ANOVA multifactorial y las interacciones.</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre ANOVA multifactorial.</div>
+
+    <div class="nav-links">
+      <a href="07-anova-un-factor.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+      <a href="09-regresion-inferencial.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <footer><i class="fas fa-square-root-alt"></i> Curso 3: Inferencia Estadística · Módulo 8 de 12</footer>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'prog_est_3_08';
+    const PROGRESS_KEY = 'prog_est_3_progress';
+    const questions = [
+      { text: "En un diseño factorial 2×2, ¿cuántos grupos hay?", options: ["2", "3", "4", "8"], correct: 2 },
+      { text: "¿Cuándo hay interacción entre dos factores?", options: ["Cuando ambos son significativos", "Cuando el efecto de un factor depende del nivel del otro", "Cuando no hay efectos principales", "Siempre que hay dos factores"], correct: 1 },
+      { text: "¿Qué ventaja tiene el diseño de medidas repetidas?", options: ["Requiere más sujetos", "Controla la variabilidad entre sujetos", "Elimina la necesidad de aleatorización", "Solo funciona con 2 grupos"], correct: 1 },
+      { text: "¿Qué es un diseño mixto en ANOVA?", options: ["Factores fijos y aleatorios", "Entre-sujetos y dentro-sujetos combinados", "Variables numéricas y categóricas", "Datos paramétricos y no paramétricos"], correct: 1 },
+      { text: "Si las líneas en un gráfico de interacción son paralelas:", options: ["Hay interacción", "No hay interacción", "Solo el factor A es significativo", "El diseño no es válido"], correct: 1 },
+      { text: "¿Cuántos efectos se prueban en un ANOVA factorial 2×2?", options: ["1", "2", "3 (A, B, AB)", "4"], correct: 2 }
+    ];
+    let userAnswers = new Array(questions.length).fill(null);
+    let quizCompleted = false;
+
+    function saveProgress() {
+      let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+      if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
+      localStorage.setItem(STORAGE_KEY, 'true');
+    }
+
+    function updateProgress() {
+      let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+      document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
+      document.getElementById('progressText').textContent = 'M\u00f3dulo '+(p.length || 1)+' de 12';
+    }
+
+    function renderQuestions() {
+      const container = document.getElementById('quizContainer');
+      container.innerHTML = '';
+      questions.forEach((q, idx) => {
+        const qDiv = document.createElement('div'); qDiv.classList.add('question');
+        qDiv.innerHTML = '<p>'+(idx+1)+'. '+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
+        const optsDiv = qDiv.querySelector('.options');
+        q.options.forEach((opt, optIdx) => {
+          const span = document.createElement('div'); span.classList.add('opt');
+          span.textContent = opt; span.dataset.qIdx = idx; span.dataset.optIdx = optIdx;
+          span.addEventListener('click', function() {
+            if (quizCompleted) return;
+            this.parentElement.querySelectorAll('.opt').forEach(c => c.classList.remove('selected'));
+            this.classList.add('selected'); userAnswers[idx] = optIdx; updateBtnState();
+          });
+          optsDiv.appendChild(span);
+        });
+        container.appendChild(qDiv);
+      });
+    }
+
+    function updateBtnState() {
+      document.getElementById('submitQuizBtn').disabled = userAnswers.some(a => a === null) || quizCompleted;
+    }
+
+    function handleSubmit() {
+      if (quizCompleted) return;
+      if (userAnswers.some(a => a === null)) { document.getElementById('feedbackMsg').textContent = '⚠️ Responde todas las preguntas primero.'; return; }
+      let correct = 0;
+      questions.forEach((q, i) => { if (userAnswers[i] === q.correct) correct++; });
+      const total = questions.length; const passed = correct >= Math.ceil(total * 0.6);
+      document.querySelectorAll('.question').forEach((qDiv, idx) => {
+        const opts = qDiv.querySelectorAll('.opt');
+        opts.forEach((o, oi) => {
+          o.classList.remove('selected');
+          if (oi === questions[idx].correct) o.classList.add('correct');
+          else if (oi === userAnswers[idx]) o.classList.add('wrong');
+        });
+      });
+      if (passed) {
+        quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+        document.getElementById('insigniaArea').classList.remove('hidden');
+        document.getElementById('feedbackMsg').textContent = '🎉 ¡Excelente! Puntaje: '+correct+'/'+total;
+        saveProgress(); updateProgress();
+      } else {
+        document.getElementById('feedbackMsg').textContent = '❌ ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. ¡Reintenta!';
+      }
+    }
+
+    function restoreProgress() {
+      const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+      if (p.includes(STORAGE_KEY)) {
+        quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+        document.getElementById('insigniaArea').classList.remove('hidden');
+        document.getElementById('feedbackMsg').textContent = '🏆 Ya completaste este módulo.';
+        document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
+      }
+    }
+
+    function normalRandom(mean, std) {
+      let u = 0, v = 0;
+      while (u === 0) u = Math.random();
+      while (v === 0) v = Math.random();
+      return mean + std * Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+    }
+
+    document.getElementById('simulateBtn').addEventListener('click', function() {
+      const effectA = parseInt(document.getElementById('effectA').value);
+      const effectB = parseInt(document.getElementById('effectB').value);
+      const effectAB = parseInt(document.getElementById('interaction').value);
+      const n = 15, sigma = 15;
+      const base = 100;
+      const means = {};
+      const data = {};
+      const combos = [['A1','B1'],['A1','B2'],['A2','B1'],['A2','B2']];
+      combos.forEach(([a,b]) => {
+        const aEff = a === 'A2' ? effectA : 0;
+        const bEff = b === 'B2' ? effectB : 0;
+        const abEff = (a === 'A2' && b === 'B2') ? effectAB : 0;
+        const mu = base + aEff + bEff + abEff;
+        const grp = [];
+        for (let i = 0; i < n; i++) grp.push(normalRandom(mu, sigma));
+        const key = a+b;
+        data[key] = grp;
+        means[key] = grp.reduce((a,b)=>a+b,0)/n;
+      });
+      document.getElementById('a1b1').textContent = means.A1B1.toFixed(2);
+      document.getElementById('a1b2').textContent = means.A1B2.toFixed(2);
+      document.getElementById('a2b1').textContent = means.A2B1.toFixed(2);
+      document.getElementById('a2b2').textContent = means.A2B2.toFixed(2);
+      const allVals = Object.values(data).flat();
+      const grandMean = allVals.reduce((a,b)=>a+b,0)/allVals.length;
+      const a1vals = [...data.A1B1, ...data.A1B2];
+      const a2vals = [...data.A2B1, ...data.A2B2];
+      const b1vals = [...data.A1B1, ...data.A2B1];
+      const b2vals = [...data.A1B2, ...data.A2B2];
+      const m_a1 = a1vals.reduce((a,b)=>a+b,0)/a1vals.length;
+      const m_a2 = a2vals.reduce((a,b)=>a+b,0)/a2vals.length;
+      const m_b1 = b1vals.reduce((a,b)=>a+b,0)/b1vals.length;
+      const m_b2 = b2vals.reduce((a,b)=>a+b,0)/b2vals.length;
+      const ssA = 2*n * ((m_a1-grandMean)**2 + (m_a2-grandMean)**2);
+      const ssB = 2*n * ((m_b1-grandMean)**2 + (m_b2-grandMean)**2);
+      let ssAB = 0;
+      combos.forEach(([a,b]) => {
+        const key = a+b;
+        const aEff = a === 'A2' ? effectA : 0;
+        const bEff = b === 'B2' ? effectB : 0;
+        const expected = grandMean + (means[key] - grandMean);
+        ssAB += n * (means[key] - grandMean - (m_a1 - grandMean)*(a==='A1'?1:0) - (m_a2 - grandMean)*(a==='A2'?1:0) - (m_b1 - grandMean)*(b==='B1'?1:0) - (m_b2 - grandMean)*(b==='B2'?1:0))**2;
+      });
+      let ssE = 0;
+      combos.forEach(([a,b]) => {
+        const key = a+b;
+        data[key].forEach(v => ssE += (v - means[key])**2);
+      });
+      const dfA = 1, dfB = 1, dfAB = 1, dfE = 4*n - 4;
+      const fA = (ssA/dfA) / (ssE/dfE);
+      const fB = (ssB/dfB) / (ssE/dfE);
+      const fAB = (ssAB/dfAB) / (ssE/dfE);
+      document.getElementById('fA').textContent = fA.toFixed(3) + (fA > 4 ? ' (sig)' : ' (no sig)');
+      document.getElementById('fB').textContent = fB.toFixed(3) + (fB > 4 ? ' (sig)' : ' (no sig)');
+      document.getElementById('fAB').textContent = fAB.toFixed(3) + (fAB > 4 ? ' (sig)' : ' (no sig)');
+      document.getElementById('fA').style.color = fA > 4 ? '#00ff88' : '#ffaa00';
+      document.getElementById('fB').style.color = fB > 4 ? '#00ff88' : '#ffaa00';
+      document.getElementById('fAB').style.color = fAB > 4 ? '#00ff88' : '#ffaa00';
+    });
+
+    document.getElementById('submitQuizBtn').addEventListener('click', handleSubmit);
+    renderQuestions(); updateBtnState(); restoreProgress(); updateProgress();
+  </script>
+  <script src="../../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

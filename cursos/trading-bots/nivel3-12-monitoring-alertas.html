@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bot Trader | Monitoring y Alertas en Tiempo Real</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700;14..32,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    body{background:linear-gradient(145deg,#0a0818,#140a24);font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:2rem 1rem}
+    .container{max-width:1300px;width:100%;background:rgba(10,8,24,.9);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(160,80,255,.22);box-shadow:0 25px 55px rgba(0,0,0,.65);overflow:hidden}
+    .hero{background:linear-gradient(95deg,#0a0818,#150a24);padding:1.8rem 2rem;text-align:center;border-bottom:2px solid #a050ff}
+    .hero h1{font-size:1.9rem;font-weight:800;background:linear-gradient(135deg,#e8ccff,#bb88ff,#a050ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .hero p{margin-top:.5rem;font-size:.95rem;color:#443366}
+    .chips{display:flex;justify-content:center;gap:.6rem;flex-wrap:wrap;margin-top:.7rem}
+    .chip{background:rgba(160,80,255,.1);border:1px solid rgba(160,80,255,.3);color:#664488;font-size:.72rem;padding:.25rem .8rem;border-radius:2rem}
+    .week-badge{display:inline-block;background:rgba(160,80,255,.15);border:1px solid #a050ff;color:#a050ff;font-size:.75rem;font-weight:700;padding:.3rem 1rem;border-radius:2rem;margin-top:.5rem}
+    .analogy{background:#0a0818cc;margin:1.4rem 2rem;padding:1.1rem 1.7rem;border-radius:2rem;border-left:7px solid #a050ff;font-size:.9rem;line-height:1.65}
+    .analogy strong{color:#bb88ff}
+    .tabs{display:flex;gap:.4rem;padding:.8rem 2rem 0;flex-wrap:wrap}
+    .tab{background:#0f0820;border:1px solid rgba(160,80,255,.2);color:#443366;padding:.45rem 1.1rem;border-radius:2rem 2rem 0 0;cursor:pointer;font-size:.82rem;font-weight:600;transition:.15s}
+    .tab.active{background:#150a24;border-color:#a050ff;border-bottom:1px solid #150a24;color:#bb88ff}
+    .tab-content{display:none;padding:0 2rem 1.2rem}
+    .tab-content.active{display:block}
+    .panel{background:#0f0820cc;border-radius:1.8rem;padding:1.2rem 1.3rem;border:1px solid rgba(160,80,255,.15);margin-top:.8rem}
+    .panel h3{font-size:.88rem;font-weight:700;color:#bb88ff;margin-bottom:.7rem}
+    .two-col{display:flex;gap:1rem;flex-wrap:wrap}
+    .col{flex:1;min-width:260px}
+    pre{background:#060410;border-radius:1rem;padding:.9rem 1rem;font-family:'JetBrains Mono',monospace;font-size:.72rem;line-height:1.75;overflow-x:auto;color:#e8ccff;border:1px solid rgba(160,80,255,.12);white-space:pre}
+    .kw{color:#a050ff}.fn{color:#bb88ff}.cm{color:#443366}.str{color:#80eeaa}.num{color:#ffd070}.sym{color:#ff8c50}
+    .btn{background:linear-gradient(95deg,#a050ff,#7030cc);border:none;padding:.65rem 1.3rem;font-weight:700;border-radius:2rem;cursor:pointer;color:#fff;font-size:.85rem;transition:.2s;display:inline-flex;align-items:center;gap:.5rem}
+    .btn:hover{transform:translateY(-2px);box-shadow:0 0 18px rgba(160,80,255,.4)}
+    .metric-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:.5rem;margin:.6rem 0}
+    .m-card{background:#0f0820;border-radius:1rem;padding:.6rem .7rem;border:1px solid rgba(160,80,255,.15);text-align:center;position:relative;overflow:hidden}
+    .m-val{font-size:1.1rem;font-weight:800;font-family:monospace}
+    .m-lbl{font-size:.62rem;color:#443366;margin-top:.2rem}
+    .m-bar{position:absolute;bottom:0;left:0;height:2px;background:#a050ff;transition:.5s}
+    .alert-feed{display:flex;flex-direction:column;gap:.4rem;max-height:200px;overflow-y:auto}
+    .alert-item{background:#0f0820;border-radius:.8rem;padding:.5rem .8rem;font-size:.75rem;display:flex;align-items:center;gap:.5rem;border-left:3px solid transparent}
+    .alert-item.info{border-color:#a050ff}
+    .alert-item.warn{border-color:#ffc800}
+    .alert-item.error{border-color:#ff4040}
+    .alert-item.ok{border-color:#00dc64}
+    .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+    .dot.info{background:#a050ff}.dot.warn{background:#ffc800}.dot.error{background:#ff4040}.dot.ok{background:#00dc64}
+    .ts{color:#443366;font-size:.68rem;margin-left:auto}
+    canvas{border-radius:1rem;display:block}
+    .feedback{background:#00000088;margin:0 1.8rem 1rem;padding:.85rem 1.2rem;border-radius:1.5rem;text-align:center;border-left:4px solid #a050ff;font-size:.88rem;line-height:1.55}
+    .insignia{text-align:center;background:#0a0818;border-radius:2rem;margin:0 1.8rem 1.5rem;padding:1rem;border:1px dashed gold}
+    .insignia i{font-size:2.4rem;color:gold}
+    .hidden{display:none}
+    .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.4rem 2rem}
+    .nav-link{background:#0f0820;padding:.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:.5rem;font-size:.88rem;transition:.2s}
+    .nav-link:hover{transform:translateY(-2px)}
+    .nav-link.next{background:linear-gradient(95deg,#f0a500,#ff6a00);color:#1e1a0c}
+    footer{text-align:center;padding:1rem;font-size:.72rem;border-top:1px solid #0a0818;color:#443366}
+    @media(max-width:860px){.hero h1{font-size:1.4rem}.col{min-width:100%}}
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+<nav class="brand-return-nav">
+  <a href="../../index.html">&larr; Portfolio</a>
+  <a href="../../cursos/index.html">Cursos</a>
+</nav>
+<div class="container">
+  <div class="hero">
+    <h1>📡 MONITORING: Tu Bot Siempre Bajo Control</h1>
+    <p>Prometheus, Grafana y alertas por Telegram/Discord — visibilidad total 24/7</p>
+    <div class="week-badge"><i class="fas fa-calendar-week"></i> Semanas 11-12: Operaciones y Monitoreo</div>
+    <div class="chips">
+      <span class="chip">Prometheus metrics</span>
+      <span class="chip">Grafana dashboards</span>
+      <span class="chip">Telegram bot</span>
+      <span class="chip">Discord webhook</span>
+    </div>
+  </div>
+
+  <div class="analogy">
+    <strong>📡 Piénsalo así:</strong> Un bot de trading sin monitoring es como un avión sin instrumentos. El piloto podría estar volando bien… o en caída libre, y nunca lo sabría. <strong>Prometheus</strong> es la caja negra que registra todo (PNL, trades, latencia, errores) cada segundo. <strong>Grafana</strong> convierte esos datos en el tablero de instrumentos. <strong>Telegram/Discord</strong> es el copiloto que te llama cuando las alarmas suenan. El objetivo: que nunca descubras un problema revisando manualmente — el sistema te avisa.
+    <div style="margin-top:.5rem;font-size:.78rem;color:#443366"><strong>📚 Refs:</strong> Prometheus Docs — instrumenting Python apps · python-telegram-bot library · Grafana dashboards for trading</div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('dashboard')"><i class="fas fa-tachometer-alt"></i> Dashboard en Vivo</div>
+    <div class="tab" onclick="switchTab('prometheus')"><i class="fas fa-fire"></i> Prometheus</div>
+    <div class="tab" onclick="switchTab('alertas')"><i class="fas fa-bell"></i> Alertas Bot</div>
+    <div class="tab" onclick="switchTab('grafana')"><i class="fas fa-chart-area"></i> Grafana Config</div>
+  </div>
+
+  <!-- TAB: Live Dashboard -->
+  <div class="tab-content active" id="tab-dashboard">
+    <div class="panel">
+      <h3><i class="fas fa-signal"></i> Simulador de Dashboard en Tiempo Real</h3>
+      <div class="metric-grid" id="metricGrid"></div>
+      <canvas id="dashCanvas" style="width:100%;margin:.5rem 0"></canvas>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.5rem">
+        <button class="btn" onclick="startDash()" id="btnStart"><i class="fas fa-play"></i> Iniciar Stream</button>
+        <button class="btn" style="background:#0f0820;border:1px solid #a050ff;color:#a050ff" onclick="stopDash()"><i class="fas fa-stop"></i> Detener</button>
+        <button class="btn" style="background:linear-gradient(95deg,#ff4040,#cc2020)" onclick="triggerAnomaly()"><i class="fas fa-exclamation-triangle"></i> Simular Anomalía</button>
+      </div>
+    </div>
+    <div class="panel" style="margin-top:.8rem">
+      <h3><i class="fas fa-list-alt"></i> Feed de Alertas</h3>
+      <div class="alert-feed" id="alertFeed"></div>
+    </div>
+  </div>
+
+  <!-- TAB: Prometheus -->
+  <div class="tab-content" id="tab-prometheus">
+    <div class="panel">
+      <h3><i class="fas fa-fire"></i> Instrumentación Python con prometheus_client</h3>
+      <pre><span class="kw">from</span> prometheus_client <span class="kw">import</span> (
+    Counter, Gauge, Histogram, Summary,
+    start_http_server
+)
+<span class="kw">import</span> time
+
+<span class="cm"># === MÉTRICAS DEL BOT ===</span>
+
+<span class="cm"># Contadores (solo suben)</span>
+TRADES_TOTAL = <span class="fn">Counter</span>(
+    <span class="str">'bot_trades_total'</span>,
+    <span class="str">'Número total de trades'</span>,
+    [<span class="str">'symbol'</span>, <span class="str">'side'</span>, <span class="str">'strategy'</span>]
+)
+ERRORS_TOTAL = <span class="fn">Counter</span>(<span class="str">'bot_errors_total'</span>, <span class="str">'Errores acumulados'</span>, [<span class="str">'type'</span>])
+
+<span class="cm"># Gauges (suben y bajan)</span>
+PORTFOLIO_VALUE = <span class="fn">Gauge</span>(<span class="str">'bot_portfolio_value_usd'</span>, <span class="str">'Valor total del portfolio'</span>)
+OPEN_POSITIONS  = <span class="fn">Gauge</span>(<span class="str">'bot_open_positions'</span>, <span class="str">'Posiciones abiertas actualmente'</span>)
+DAILY_PNL       = <span class="fn">Gauge</span>(<span class="str">'bot_daily_pnl_pct'</span>, <span class="str">'PNL del día en %'</span>)
+LAST_PRICE      = <span class="fn">Gauge</span>(<span class="str">'bot_last_price'</span>, <span class="str">'Último precio'</span>, [<span class="str">'symbol'</span>])
+
+<span class="cm"># Histogramas (distribución de valores)</span>
+TRADE_DURATION = <span class="fn">Histogram</span>(
+    <span class="str">'bot_trade_duration_seconds'</span>,
+    <span class="str">'Duración de trades'</span>,
+    buckets=[<span class="num">60</span>, <span class="num">300</span>, <span class="num">900</span>, <span class="num">3600</span>, <span class="num">86400</span>]
+)
+API_LATENCY = <span class="fn">Histogram</span>(
+    <span class="str">'bot_api_latency_ms'</span>,
+    <span class="str">'Latencia de llamadas al exchange'</span>
+)
+
+<span class="cm"># === USO EN EL BOT ===</span>
+
+<span class="kw">def</span> <span class="fn">on_trade_executed</span>(symbol, side, pnl):
+    TRADES_TOTAL.<span class="fn">labels</span>(symbol=symbol, side=side, strategy=<span class="str">'rsi_mean'</span>).<span class="fn">inc</span>()
+    PORTFOLIO_VALUE.<span class="fn">set</span>(portfolio.total_value())
+    DAILY_PNL.<span class="fn">set</span>(pnl)
+
+<span class="kw">with</span> API_LATENCY.<span class="fn">time</span>():  <span class="cm"># Context manager para latencia</span>
+    response = exchange.<span class="fn">fetch_ticker</span>(<span class="str">'BTC/USDT'</span>)
+
+<span class="cm"># Exponer métricas en puerto 8080</span>
+<span class="fn">start_http_server</span>(<span class="num">8080</span>)
+<span class="cm"># Prometheus scrapeará http://bot:8080/metrics cada 15s</span></pre>
+    </div>
+    <div class="panel" style="margin-top:.8rem">
+      <h3>prometheus.yml — Configuración de Scraping</h3>
+      <pre><span class="kw">global</span>:
+  scrape_interval: <span class="num">15</span>s
+  evaluation_interval: <span class="num">15</span>s
+
+<span class="kw">scrape_configs</span>:
+  - job_name: <span class="str">'trading_bot'</span>
+    static_configs:
+      - targets: [<span class="str">'bot:8080'</span>]  <span class="cm"># nombre del servicio Docker</span>
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: <span class="str">'bot-prod-1'</span>
+
+  - job_name: <span class="str">'postgres'</span>
+    static_configs:
+      - targets: [<span class="str">'postgres_exporter:9187'</span>]
+
+<span class="kw">alerting</span>:
+  alertmanagers:
+    - static_configs:
+        - targets: [<span class="str">'alertmanager:9093'</span>]
+
+<span class="kw">rule_files</span>:
+  - <span class="str">'/etc/prometheus/alerts.yml'</span></pre>
+    </div>
+  </div>
+
+  <!-- TAB: Alertas -->
+  <div class="tab-content" id="tab-alertas">
+    <div class="panel">
+      <h3><i class="fab fa-telegram"></i> Bot de Telegram — Alertas Automáticas</h3>
+      <div class="two-col">
+        <div class="col">
+          <pre><span class="kw">import</span> asyncio
+<span class="kw">from</span> telegram <span class="kw">import</span> Bot
+<span class="kw">from</span> telegram.constants <span class="kw">import</span> ParseMode
+<span class="kw">import</span> os
+
+TELEGRAM_TOKEN  = os.<span class="fn">getenv</span>(<span class="str">"TELEGRAM_TOKEN"</span>)
+TELEGRAM_CHAT   = os.<span class="fn">getenv</span>(<span class="str">"TELEGRAM_CHAT_ID"</span>)
+bot = <span class="fn">Bot</span>(token=TELEGRAM_TOKEN)
+
+<span class="kw">async def</span> <span class="fn">send_alert</span>(msg: str, level=<span class="str">"INFO"</span>):
+    icons = {<span class="str">"INFO"</span>:<span class="str">"ℹ️"</span>, <span class="str">"WARN"</span>:<span class="str">"⚠️"</span>,
+             <span class="str">"ERROR"</span>:<span class="str">"🚨"</span>, <span class="str">"TRADE"</span>:<span class="str">"💹"</span>}
+    text = <span class="str">f"{icons.get(level,'•')} *[{level}]* {msg}"</span>
+    <span class="kw">await</span> bot.<span class="fn">send_message</span>(
+        chat_id=TELEGRAM_CHAT,
+        text=text,
+        parse_mode=ParseMode.MARKDOWN
+    )
+
+<span class="cm"># Alerta de trade ejecutado</span>
+<span class="kw">async def</span> <span class="fn">notify_trade</span>(side, symbol, price, pnl):
+    emoji = <span class="str">"🟢"</span> <span class="kw">if</span> pnl > <span class="num">0</span> <span class="kw">else</span> <span class="str">"🔴"</span>
+    msg = (
+        <span class="str">f"{emoji} *TRADE {side.upper()}*\n"</span>
+        <span class="str">f"Par: `{symbol}`\n"</span>
+        <span class="str">f"Precio: `{price:,.2f} USDT`\n"</span>
+        <span class="str">f"PNL: `{pnl:+.2f}%`"</span>
+    )
+    <span class="kw">await</span> <span class="fn">send_alert</span>(msg, level=<span class="str">"TRADE"</span>)
+
+<span class="cm"># Alerta de drawdown crítico</span>
+<span class="kw">async def</span> <span class="fn">check_drawdown</span>(current_dd):
+    <span class="kw">if</span> current_dd > <span class="num">0.05</span>:  <span class="cm"># 5% drawdown</span>
+        <span class="kw">await</span> <span class="fn">send_alert</span>(
+            <span class="str">f"Drawdown crítico: {current_dd:.1%}"</span>,
+            level=<span class="str">"WARN"</span>
+        )</pre>
+        </div>
+        <div class="col">
+          <pre><span class="cm"># Discord Webhook — alternativa</span>
+<span class="kw">import</span> requests
+
+DISCORD_WH = os.<span class="fn">getenv</span>(<span class="str">"DISCORD_WEBHOOK"</span>)
+
+<span class="kw">def</span> <span class="fn">discord_alert</span>(title, desc, color=<span class="num">0x00dc64</span>):
+    payload = {
+        <span class="str">"embeds"</span>: [{
+            <span class="str">"title"</span>: title,
+            <span class="str">"description"</span>: desc,
+            <span class="str">"color"</span>: color,
+            <span class="str">"footer"</span>: {
+                <span class="str">"text"</span>: <span class="str">f"TradingBot · {datetime.now():%Y-%m-%d %H:%M}"</span>
+            }
+        }]
+    }
+    <span class="fn">requests.post</span>(DISCORD_WH, json=payload)
+
+<span class="cm"># Uso:</span>
+<span class="fn">discord_alert</span>(
+    <span class="str">"💹 Trade Ejecutado"</span>,
+    <span class="str">f"BTC/USDT BUY @ $65,420\nPNL: +2.3%"</span>,
+    color=<span class="num">0x00dc64</span>  <span class="cm"># verde</span>
+)
+<span class="fn">discord_alert</span>(
+    <span class="str">"🚨 ERROR CRÍTICO"</span>,
+    <span class="str">"Exchange timeout - 3 reintentos fallidos"</span>,
+    color=<span class="num">0xff4040</span>  <span class="cm"># rojo</span>
+)
+
+<span class="cm"># prometheus alertmanager — alerts.yml</span>
+<span class="cm"># groups:</span>
+<span class="cm">#   - name: bot_alerts</span>
+<span class="cm">#     rules:</span>
+<span class="cm">#     - alert: HighDrawdown</span>
+<span class="cm">#       expr: bot_daily_pnl_pct < -0.05</span>
+<span class="cm">#       for: 1m</span>
+<span class="cm">#       labels: {severity: critical}</span></pre>
+          <div style="margin-top:.5rem">
+            <button class="btn" onclick="simTelegramMsg()"><i class="fab fa-telegram"></i> Simular mensaje Telegram</button>
+          </div>
+          <div id="telegramPreview" style="display:none;margin-top:.5rem;background:#0a1522;border-radius:1rem;padding:.7rem;border:1px solid rgba(0,180,255,.2);font-size:.78rem;font-family:monospace;line-height:1.6"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: Grafana -->
+  <div class="tab-content" id="tab-grafana">
+    <div class="panel">
+      <h3><i class="fas fa-chart-area"></i> Configuración de Grafana Dashboard</h3>
+      <div class="two-col">
+        <div class="col">
+          <pre><span class="cm"># grafana/datasources/prometheus.yml</span>
+<span class="kw">apiVersion</span>: 1
+<span class="kw">datasources</span>:
+  - name: Prometheus
+    type: prometheus
+    url: http://prometheus:9090
+    isDefault: <span class="kw">true</span>
+    access: proxy
+
+<span class="cm"># Queries PromQL para el dashboard</span>
+
+<span class="cm"># PNL acumulado (línea)</span>
+<span class="fn">sum</span>(bot_daily_pnl_pct)
+
+<span class="cm"># Trades por hora</span>
+<span class="fn">rate</span>(bot_trades_total[<span class="num">1h</span>]) * <span class="num">3600</span>
+
+<span class="cm"># Latencia P95 de la API</span>
+<span class="fn">histogram_quantile</span>(<span class="num">0.95</span>,
+  <span class="fn">rate</span>(bot_api_latency_ms_bucket[<span class="num">5m</span>]))
+
+<span class="cm"># Errores por tipo</span>
+<span class="fn">sum by</span>(type) (bot_errors_total)
+
+<span class="cm"># Uptime del bot</span>
+<span class="fn">up</span>{job=<span class="str">"trading_bot"</span>}</pre>
+        </div>
+        <div class="col">
+          <pre><span class="cm"># grafana/dashboards/bot.json (fragmento)</span>
+{
+  <span class="str">"panels"</span>: [
+    {
+      <span class="str">"title"</span>: <span class="str">"💰 Portfolio Value"</span>,
+      <span class="str">"type"</span>: <span class="str">"stat"</span>,
+      <span class="str">"targets"</span>: [{
+        <span class="str">"expr"</span>: <span class="str">"bot_portfolio_value_usd"</span>
+      }],
+      <span class="str">"fieldConfig"</span>: {
+        <span class="str">"defaults"</span>: {
+          <span class="str">"unit"</span>: <span class="str">"currencyUSD"</span>,
+          <span class="str">"thresholds"</span>: {
+            <span class="str">"steps"</span>: [
+              {<span class="str">"value"</span>: <span class="kw">null</span>, <span class="str">"color"</span>: <span class="str">"red"</span>},
+              {<span class="str">"value"</span>: <span class="num">9000</span>, <span class="str">"color"</span>: <span class="str">"yellow"</span>},
+              {<span class="str">"value"</span>: <span class="num">10000</span>, <span class="str">"color"</span>: <span class="str">"green"</span>}
+            ]
+          }
+        }
+      }
+    }
+  ]
+}</pre>
+          <div style="margin-top:.5rem;background:rgba(160,80,255,.08);border:1px solid rgba(160,80,255,.2);border-radius:.8rem;padding:.6rem;font-size:.72rem;color:#bb88ff">
+            <strong>💡 Tip:</strong> Importa el dashboard ID <strong>13659</strong> desde grafana.com — es el dashboard de Prometheus para Python apps más popular. Personalízalo con tus métricas de trading.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="feedback" id="feedbackMsg">
+    📡 Explora cada pestaña: inicia el stream en vivo, revisa el código de Prometheus y configura alertas.
+  </div>
+
+  <div class="insignia hidden" id="insigniaArea">
+    <i class="fas fa-satellite-dish"></i>
+    <h3 style="margin:.4rem 0;color:#ffd700">🏅 ¡INSIGNIA MISSION CONTROL!</h3>
+    <p style="font-size:.85rem;color:#bb88ff">Tu bot ahora tiene ojos. Prometheus + Grafana + alertas = visibilidad total 24/7.</p>
+  </div>
+
+  <div class="nav-links">
+    <a href="nivel3-11-docker-deploy.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Menú</a>
+    <a href="nivel3-13-bot-produccion.html" class="nav-link next">Bot Final <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Bot Trader Adventure · Semana 11-12 · Prometheus + Grafana + Telegram</footer>
+</div>
+
+<script>
+const STORAGE_KEY='tbot_mon';
+const visitedTabs=new Set(['dashboard']);
+let dashTimer=null, dashRunning=false;
+let equityData=[], errorCount=0, tradeCount=0, portfolio=10000;
+
+const ALERTS_TEMPLATES=[
+  {l:'ok',icon:'✅',msg:'Sistema iniciado correctamente'},
+  {l:'info',icon:'ℹ️',msg:'BTC/USDT: señal RSI oversold detectada'},
+  {l:'info',icon:'💹',msg:'TRADE BUY BTC/USDT @ $65,420 — qty: 0.154'},
+  {l:'ok',icon:'💰',msg:'TRADE cerrado +2.3% PNL — Streak: 3 wins'},
+  {l:'warn',icon:'⚠️',msg:'API Latencia alta: 1,240ms (umbral: 1,000ms)'},
+  {l:'warn',icon:'⚠️',msg:'Drawdown diario: -3.2% (límite: -5%)'},
+  {l:'info',icon:'📊',msg:'Portfolio actualizado: $10,230 USDT'},
+  {l:'error',icon:'🚨',msg:'Exchange timeout — iniciando retry #1'},
+  {l:'ok',icon:'🔄',msg:'Reconexión exitosa — bot operativo'},
+];
+
+function switchTab(tab){
+  document.querySelectorAll('.tab').forEach((t,i)=>{
+    const tabs=['dashboard','prometheus','alertas','grafana'];
+    t.classList.toggle('active',tabs[i]===tab);
+  });
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  visitedTabs.add(tab);
+  checkProgress();
+}
+
+const METRICS=[
+  {id:'mPort',label:'Portfolio',val:()=>'$'+portfolio.toFixed(0),pct:()=>(portfolio-10000)/100,col:v=>v>=0?'#00dc64':'#ff4040'},
+  {id:'mTrades',label:'Trades Hoy',val:()=>tradeCount,pct:()=>tradeCount/20,col:()=>'#a050ff'},
+  {id:'mWR',label:'Win Rate',val:()=>(65+Math.random()*5).toFixed(1)+'%',pct:()=>.65,col:()=>'#ffd070'},
+  {id:'mLatency',label:'API Latencia',val:()=>Math.round(80+Math.random()*40)+'ms',pct:()=>.3,col:()=>'#00b4ff'},
+  {id:'mErrors',label:'Errores',val:()=>errorCount,pct:()=>errorCount/10,col:v=>v>3?'#ff4040':'#443366'},
+  {id:'mPos',label:'Posiciones',val:()=>Math.round(Math.random()*2+1),pct:()=>.3,col:()=>'#bb88ff'},
+];
+
+function initMetrics(){
+  const grid=document.getElementById('metricGrid');
+  grid.innerHTML=METRICS.map(m=>`<div class="m-card" id="${m.id}">
+    <div class="m-val">${m.val()}</div>
+    <div class="m-lbl">${m.label}</div>
+    <div class="m-bar" style="width:30%"></div>
+  </div>`).join('');
+}
+
+function updateMetrics(){
+  METRICS.forEach(m=>{
+    const el=document.getElementById(m.id);if(!el)return;
+    const v=m.val();const p=m.pct();const c=m.col(parseFloat(v)||0);
+    el.querySelector('.m-val').textContent=v;
+    el.querySelector('.m-val').style.color=c;
+    el.querySelector('.m-bar').style.width=Math.min(100,p*100)+'%';
+    el.querySelector('.m-bar').style.background=c;
+  });
+}
+
+let canvW=0,canvH=140;
+function drawDashCanvas(){
+  const canvas=document.getElementById('dashCanvas');
+  const W=canvas.parentElement.clientWidth-26;
+  if(W!==canvW){canvas.width=W;canvH=140;canvas.height=canvH;canvW=W;}
+  const ctx=canvas.getContext('2d');
+  ctx.fillStyle='#060410';ctx.fillRect(0,0,W,canvH);
+  if(equityData.length<2)return;
+  const mn=Math.min(...equityData)-100,mx=Math.max(...equityData)+100;
+  const xS=i=>8+(i/(equityData.length-1))*(W-16);
+  const yS=v=>canvH-12-((v-mn)/(mx-mn))*(canvH-24);
+  ctx.strokeStyle='#443366';ctx.lineWidth=1;ctx.setLineDash([3,4]);
+  [mn+(mx-mn)*.25,mn+(mx-mn)*.5,mn+(mx-mn)*.75].forEach(l=>{ctx.beginPath();ctx.moveTo(0,yS(l));ctx.lineTo(W,yS(l));ctx.stroke();});
+  ctx.setLineDash([]);
+  const grad=ctx.createLinearGradient(0,0,0,canvH);
+  grad.addColorStop(0,'rgba(160,80,255,.4)');grad.addColorStop(1,'rgba(160,80,255,.02)');
+  ctx.beginPath();equityData.forEach((v,i)=>i===0?ctx.moveTo(xS(i),yS(v)):ctx.lineTo(xS(i),yS(v)));ctx.lineTo(xS(equityData.length-1),canvH);ctx.lineTo(xS(0),canvH);ctx.closePath();ctx.fillStyle=grad;ctx.fill();
+  ctx.beginPath();ctx.strokeStyle='#a050ff';ctx.lineWidth=2;equityData.forEach((v,i)=>i===0?ctx.moveTo(xS(i),yS(v)):ctx.lineTo(xS(i),yS(v)));ctx.stroke();
+  ctx.fillStyle='#a050ff';ctx.beginPath();ctx.arc(xS(equityData.length-1),yS(equityData[equityData.length-1]),4,0,Math.PI*2);ctx.fill();
+}
+
+function addAlert(a){
+  const feed=document.getElementById('alertFeed');
+  const el=document.createElement('div');
+  el.className=`alert-item ${a.l}`;
+  const now=new Date();
+  el.innerHTML=`<div class="dot ${a.l}"></div><span>${a.icon} ${a.msg}</span><span class="ts">${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}</span>`;
+  feed.prepend(el);
+  if(feed.children.length>12)feed.removeChild(feed.lastChild);
+}
+
+let alertIdx=0;
+function startDash(){
+  if(dashRunning)return;
+  dashRunning=true;
+  equityData=[portfolio];
+  addAlert({l:'ok',icon:'✅',msg:'Sistema de monitoring iniciado'});
+  dashTimer=setInterval(()=>{
+    const delta=(Math.random()-.44)*30;
+    portfolio+=delta;
+    equityData.push(portfolio);
+    if(equityData.length>80)equityData.shift();
+    if(Math.random()<.15){tradeCount++;addAlert({l:delta>0?'ok':'info',icon:delta>0?'💹':'📉',msg:`Trade ${delta>0?'BUY':'SELL'} BTC/USDT @ $${(64000+Math.random()*3000).toFixed(0)} | PNL: ${delta>0?'+':''}${(delta/100).toFixed(2)}%`});}
+    if(Math.random()<.05){errorCount++;addAlert({l:'warn',icon:'⚠️',msg:`API latencia alta: ${Math.round(800+Math.random()*600)}ms`});}
+    if(Math.random()<.015){addAlert({l:'error',icon:'🚨',msg:'Exchange rate limit — pausando 2s'});}
+    updateMetrics();drawDashCanvas();
+  },500);
+  visitedTabs.add('dashboard');checkProgress();
+  document.getElementById('feedbackMsg').innerHTML='📡 <strong>Stream activo.</strong> El dashboard se actualiza cada 500ms simulando métricas reales de un bot en producción.';
+}
+
+function stopDash(){clearInterval(dashTimer);dashRunning=false;}
+
+function triggerAnomaly(){
+  addAlert({l:'error',icon:'🚨',msg:'DRAWDOWN CRÍTICO: -6.2% en las últimas 2h — bot pausado automáticamente'});
+  portfolio*=0.94;
+  equityData.push(portfolio);
+  updateMetrics();drawDashCanvas();
+  document.getElementById('feedbackMsg').innerHTML='🚨 <strong>Anomalía simulada.</strong> En producción, este evento activaría un circuit breaker que pausa el bot y envía alerta por Telegram con toda la info del incidente.';
+}
+
+function simTelegramMsg(){
+  const msgs=[
+    '💹 *TRADE BUY*\nPar: `BTC/USDT`\nPrecio: `$65,420`\nQty: `0.154 BTC`\nPNL estimado: `+2.3%`',
+    '🚨 *DRAWDOWN CRÍTICO*\nActual: `-6.2%`\nLímite: `-5%`\n_Bot pausado automáticamente_',
+    '✅ *Sistema Online*\n`Bot v2.1.0` iniciado\nPortfolio: `$10,230 USDT`\nEstado: `OK`',
+    '⚠️ *API Rate Limit*\nExchange: `Binance`\nRetry en: `2s`\nIntento: `1/3`',
+  ];
+  const msg=msgs[Math.floor(Math.random()*msgs.length)];
+  const preview=document.getElementById('telegramPreview');
+  preview.style.display='block';
+  preview.innerHTML=`<div style="color:#443366;font-size:.65rem;margin-bottom:.3rem">📱 Mensaje Telegram recibido:</div><div style="color:#e8ccff">${msg.replace(/\*([^*]+)\*/g,'<strong>$1</strong>').replace(/`([^`]+)`/g,'<code style="background:#1a0f30;padding:.1rem .3rem;border-radius:.3rem">$1</code>').replace(/\n/g,'<br>')}</div>`;
+  visitedTabs.add('alertas');checkProgress();
+}
+
+function checkProgress(){
+  const count=visitedTabs.size;
+  if(count>=3&&!localStorage.getItem(STORAGE_KEY)){localStorage.setItem(STORAGE_KEY,'true');document.getElementById('insigniaArea').classList.remove('hidden');}
+}
+
+initMetrics();
+if(localStorage.getItem(STORAGE_KEY))document.getElementById('insigniaArea').classList.remove('hidden');
+</script>
+</body>
+</html>

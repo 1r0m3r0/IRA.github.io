@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bot Trader | Volume Analysis & OBV</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700;14..32,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    body{background:linear-gradient(145deg,#000a18,#001428);font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:2rem 1rem}
+    .container{max-width:1300px;width:100%;background:rgba(0,8,22,.88);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(0,150,255,.22);box-shadow:0 25px 55px rgba(0,0,0,.65);overflow:hidden}
+    .hero{background:linear-gradient(95deg,#000610,#000e1e);padding:1.8rem 2rem;text-align:center;border-bottom:2px solid #0096ff}
+    .hero h1{font-size:1.9rem;font-weight:800;background:linear-gradient(135deg,#c0e8ff,#66bbff,#0096ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .hero p{margin-top:.5rem;font-size:.95rem;color:#3377aa}
+    .chips{display:flex;justify-content:center;gap:.6rem;flex-wrap:wrap;margin-top:.7rem}
+    .chip{background:rgba(0,150,255,.1);border:1px solid rgba(0,150,255,.3);color:#3377aa;font-size:.72rem;padding:.25rem .8rem;border-radius:2rem}
+    .week-badge{display:inline-block;background:rgba(0,150,255,.15);border:1px solid #0096ff;color:#0096ff;font-size:.75rem;font-weight:700;padding:.3rem 1rem;border-radius:2rem;margin-top:.5rem}
+    .analogy{background:#00081ecc;margin:1.4rem 2rem;padding:1.1rem 1.7rem;border-radius:2rem;border-left:7px solid #0096ff;font-size:.9rem;line-height:1.65}
+    .analogy strong{color:#66bbff}
+    .lab{display:flex;flex-wrap:wrap;gap:1.4rem;padding:0 1.8rem 1.5rem}
+    .left{flex:0 0 270px;display:flex;flex-direction:column;gap:.9rem}
+    .right{flex:1;min-width:300px;display:flex;flex-direction:column;gap:.9rem}
+    .panel{background:#00081edd;border-radius:1.8rem;padding:1.2rem 1.3rem;border:1px solid rgba(0,150,255,.15)}
+    .panel h3{font-size:.88rem;font-weight:700;color:#66bbff;margin-bottom:.7rem}
+    label{font-size:.72rem;color:#225588;text-transform:uppercase;letter-spacing:.06rem;display:block;margin-bottom:.3rem;margin-top:.5rem}
+    select,input[type=number]{width:100%;background:#000610;border:1px solid rgba(0,150,255,.2);color:#eef5ff;padding:.45rem .7rem;border-radius:.75rem;font-size:.82rem;font-family:'Inter',sans-serif}
+    .slider-row{display:flex;align-items:center;gap:.4rem;margin:.25rem 0}
+    .slider-row label{min-width:90px;margin:0}
+    .slider-row input[type=range]{flex:1;accent-color:#0096ff}
+    .slider-row span{font-size:.75rem;color:#66bbff;font-family:'JetBrains Mono',monospace;min-width:36px;text-align:right}
+    .btn{background:linear-gradient(95deg,#0096ff,#0055cc);border:none;padding:.75rem 1.4rem;font-weight:700;border-radius:2rem;cursor:pointer;color:#fff;font-size:.88rem;width:100%;margin-top:.4rem;transition:.2s;display:flex;align-items:center;justify-content:center;gap:.5rem}
+    .btn:hover{transform:translateY(-2px);box-shadow:0 0 20px rgba(0,150,255,.4)}
+    canvas{border-radius:1rem;display:block}
+    pre{background:#000408;border-radius:1rem;padding:1rem;font-family:'JetBrains Mono',monospace;font-size:.73rem;line-height:1.7;overflow-x:auto;color:#c0e8ff;border:1px solid rgba(0,150,255,.12)}
+    .kw{color:#0096ff}.fn{color:#66bbff}.cm{color:#225566}.str{color:#80eeaa}.num{color:#ffd070}
+    .signal-box{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.6rem}
+    .sig{flex:1;min-width:100px;background:#000610;border-radius:1rem;padding:.6rem;text-align:center;border:1px solid rgba(0,150,255,.15)}
+    .sig .sv{font-size:1rem;font-weight:800;font-family:monospace}
+    .sig .sl{font-size:.62rem;color:#225588;margin-top:.15rem}
+    .divergence-row{display:flex;gap:.5rem;margin-top:.5rem}
+    .div-card{flex:1;background:#000610;border-radius:1rem;padding:.6rem .8rem;border:1px solid rgba(0,150,255,.12)}
+    .div-card .dt{font-size:.72rem;font-weight:700;margin-bottom:.2rem}
+    .div-card .dd{font-size:.68rem;color:#3377aa;line-height:1.4}
+    .feedback{background:#00000088;margin:0 1.8rem 1rem;padding:.85rem 1.2rem;border-radius:1.5rem;text-align:center;border-left:4px solid #0096ff;font-size:.88rem;line-height:1.55}
+    .insignia{text-align:center;background:#00081e;border-radius:2rem;margin:0 1.8rem 1.5rem;padding:1rem;border:1px dashed gold}
+    .insignia i{font-size:2.4rem;color:gold}
+    .hidden{display:none}
+    .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.4rem 2rem}
+    .nav-link{background:#000e22;padding:.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:.5rem;font-size:.88rem;transition:.2s}
+    .nav-link:hover{transform:translateY(-2px)}
+    .nav-link.next{background:linear-gradient(95deg,#f0a500,#ff6a00);color:#1e1a0c}
+    footer{text-align:center;padding:1rem;font-size:.72rem;border-top:1px solid #00081e;color:#225566}
+    @media(max-width:860px){.hero h1{font-size:1.4rem}.left{flex:1;min-width:100%}}
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+<nav class="brand-return-nav">
+  <a href="../../index.html">&larr; Portfolio</a>
+  <a href="../../cursos/index.html">Cursos</a>
+</nav>
+<div class="container">
+  <div class="hero">
+    <h1>📊 VOLUME ANALYSIS & OBV: El Dinero Inteligente Habla</h1>
+    <p>El precio miente, el volumen no. Sigue al dinero institucional con On-Balance Volume y análisis de flujo</p>
+    <div class="week-badge"><i class="fas fa-calendar-week"></i> Semanas 5-6: Análisis Técnico</div>
+    <div class="chips">
+      <span class="chip">On-Balance Volume</span>
+      <span class="chip">Volume Profile</span>
+      <span class="chip">VWAP</span>
+      <span class="chip">Divergencias precio/volumen</span>
+    </div>
+  </div>
+
+  <div class="analogy">
+    <strong>💧 Piénsalo así:</strong> El volumen es como el caudal de un río. Un precio subiendo con <strong>bajo volumen</strong> es como el río subiendo por una pequeña lluvia — no durará. Un precio subiendo con <strong>alto volumen</strong> es como el deshielo de los Andes — la fuerza real detrás del movimiento. El OBV (On-Balance Volume) suma el volumen de días alcistas y resta el de bajistas. Si el OBV sube pero el precio no, los institucionales están acumulando en silencio — señal alcista poderosa.
+    <div style="margin-top:.5rem;font-size:.78rem;color:#225566"><strong>📚 Fuentes:</strong> Granville, J. (1963) — <em>"Granville's New Key to Stock Market Profits"</em> (inventó OBV). / Elder, A. (2002) — <em>"Come Into My Trading Room"</em>. Wiley. / VWAP — Bloomberg Terminal estándar institucional.</div>
+  </div>
+
+  <div class="lab">
+    <div class="left">
+      <div class="panel">
+        <h3><i class="fas fa-sliders-h"></i> Configuración</h3>
+        <label>Activo</label>
+        <select id="asset" onchange="generate()">
+          <option value="btc">BTC/USDT (Alta volatilidad)</option>
+          <option value="eth">ETH/USDT</option>
+          <option value="spy">SPY (Baja volatilidad)</option>
+        </select>
+        <label>Período</label>
+        <select id="period" onchange="generate()">
+          <option value="60">60 días</option>
+          <option value="120" selected>120 días</option>
+          <option value="365">365 días</option>
+        </select>
+        <label>Indicador de volumen</label>
+        <select id="volInd" onchange="drawCharts()">
+          <option value="obv">OBV (On-Balance Volume)</option>
+          <option value="vwap">VWAP</option>
+          <option value="vp">Volume Profile</option>
+          <option value="mfi">Money Flow Index</option>
+        </select>
+        <div class="slider-row"><label>Umbral volumen</label><input type="range" id="volTh" min="1" max="3" value="1.5" step=".1"><span id="volThV">1.5x</span></div>
+        <button class="btn" onclick="generate()"><i class="fas fa-sync"></i> Regenerar</button>
+      </div>
+
+      <div class="panel">
+        <h3><i class="fas fa-signal"></i> Señales Detectadas</h3>
+        <div class="signal-box">
+          <div class="sig"><div class="sv" id="sObvTrend" style="color:#66bbff">—</div><div class="sl">Tendencia OBV</div></div>
+          <div class="sig"><div class="sv" id="sVwapPos" style="color:#ffd070">—</div><div class="sl">Pos. VWAP</div></div>
+          <div class="sig"><div class="sv" id="sMfi" style="color:#00ff88">—</div><div class="sl">MFI</div></div>
+          <div class="sig"><div class="sv" id="sHighVolDays">—</div><div class="sl">Días alto vol.</div></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3><i class="fas fa-exclamation-triangle"></i> Divergencias</h3>
+        <div class="divergence-row">
+          <div class="div-card"><div class="dt" style="color:#00ff88">🐂 Divergencia Alcista</div><div class="dd">Precio baja, OBV sube → institucionales comprando</div></div>
+          <div class="div-card"><div class="dt" style="color:#ff5566">🐻 Divergencia Bajista</div><div class="dd">Precio sube, OBV baja → distribución institucional</div></div>
+        </div>
+        <div style="margin-top:.5rem;font-size:.72rem;color:#225588;padding:.4rem .6rem;background:#000610;border-radius:.75rem" id="divDetected">Genera datos para ver divergencias detectadas.</div>
+      </div>
+    </div>
+
+    <div class="right">
+      <div class="panel">
+        <h3><i class="fas fa-chart-area"></i> Precio + Volumen</h3>
+        <canvas id="priceCanvas"></canvas>
+      </div>
+
+      <div class="panel">
+        <h3 id="indTitle"><i class="fas fa-chart-line"></i> OBV — On-Balance Volume</h3>
+        <canvas id="obvCanvas"></canvas>
+      </div>
+
+      <div class="panel">
+        <h3><i class="fas fa-code"></i> Python — pandas-ta</h3>
+        <pre id="codeBox"></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="feedback" id="feedbackMsg">
+    📊 El volumen confirma o niega movimientos de precio. Genera un dataset y observa las <strong>divergencias OBV vs precio</strong> — la señal más poderosa del análisis de volumen.
+  </div>
+
+  <div class="insignia hidden" id="insigniaArea">
+    <i class="fas fa-water"></i>
+    <h3 style="margin:.4rem 0;color:#ffd700">🏅 ¡INSIGNIA VOLUME ANALYST!</h3>
+    <p style="font-size:.85rem;color:#66bbff">Dominaste el volumen. Ahora ves lo que el dinero inteligente hace antes que el precio lo revele.</p>
+  </div>
+
+  <div class="nav-links">
+    <a href="nivel3-05-patrones-chartistas.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Menú</a>
+    <a href="nivel3-07-arbitraje-grid.html" class="nav-link next">Arbitraje & Grid <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Bot Trader Adventure · Semana 5-6 · Granville (1963) "New Key to Stock Market Profits" · Elder (2002)</footer>
+</div>
+
+<script>
+const STORAGE_KEY = 'tbot_vol';
+let data = [], obvData = [], vwapData = [], mfiData = [], genCount = 0;
+
+const CODES = {
+  obv:`<span class="kw">import</span> pandas_ta <span class="kw">as</span> ta\n\n<span class="cm"># OBV acumula volumen con dirección del precio</span>\ndf[<span class="str">'OBV'</span>] = ta.<span class="fn">obv</span>(df[<span class="str">'close'</span>], df[<span class="str">'volume'</span>])\n\n<span class="cm"># Señal: divergencia precio/OBV</span>\nprice_trend = <span class="fn">np.sign</span>(df[<span class="str">'close'</span>].<span class="fn">diff</span>(<span class="num">10</span>))\nobv_trend   = <span class="fn">np.sign</span>(df[<span class="str">'OBV'</span>].<span class="fn">diff</span>(<span class="num">10</span>))\nbullish_div = (price_trend < <span class="num">0</span>) & (obv_trend > <span class="num">0</span>)\nbearish_div = (price_trend > <span class="num">0</span>) & (obv_trend < <span class="num">0</span>)`,
+  vwap:`<span class="cm"># VWAP — Volume Weighted Average Price</span>\ndf[<span class="str">'vwap'</span>] = ta.<span class="fn">vwap</span>(df[<span class="str">'high'</span>], df[<span class="str">'low'</span>],\n                  df[<span class="str">'close'</span>], df[<span class="str">'volume'</span>])\n<span class="cm"># Institucionales: compran bajo VWAP, venden sobre</span>\ndf[<span class="str">'signal'</span>] = <span class="kw">None</span>\ndf.<span class="fn">loc</span>[df[<span class="str">'close'</span>] < df[<span class="str">'vwap'</span>] * <span class="num">0.995</span>, <span class="str">'signal'</span>] = <span class="str">'BUY'</span>\ndf.<span class="fn">loc</span>[df[<span class="str">'close'</span>] > df[<span class="str">'vwap'</span>] * <span class="num">1.005</span>, <span class="str">'signal'</span>] = <span class="str">'SELL'</span>`,
+  vp:`<span class="cm"># Volume Profile — precio con más volumen negociado</span>\nprice_bins = pd.<span class="fn">cut</span>(df[<span class="str">'close'</span>], bins=<span class="num">50</span>)\nvol_profile = df.<span class="fn">groupby</span>(price_bins)[<span class="str">'volume'</span>].<span class="fn">sum</span>()\npoc = vol_profile.<span class="fn">idxmax</span>().<span class="fn">mid</span>  <span class="cm"># Point of Control</span>\nvah = vol_profile.<span class="fn">sort_values</span>(ascending=<span class="kw">False</span>).<span class="fn">cumsum</span>()\nvah_level = vah[vah/<span class="fn">vah.max</span>() >= <span class="num">0.7</span>].<span class="fn">index</span>[-<span class="num">1</span>].<span class="fn">mid</span>  <span class="cm"># VAH</span>`,
+  mfi:`<span class="cm"># Money Flow Index — RSI del volumen</span>\ndf[<span class="str">'MFI'</span>] = ta.<span class="fn">mfi</span>(df[<span class="str">'high'</span>], df[<span class="str">'low'</span>],\n               df[<span class="str">'close'</span>], df[<span class="str">'volume'</span>], length=<span class="num">14</span>)\n<span class="cm"># Señales de sobrecompra/sobreventa</span>\ndf[<span class="str">'signal'</span>] = <span class="kw">None</span>\ndf.<span class="fn">loc</span>[df[<span class="str">'MFI'</span>] < <span class="num">20</span>, <span class="str">'signal'</span>] = <span class="str">'BUY'</span>   <span class="cm"># oversold</span>\ndf.<span class="fn">loc</span>[df[<span class="str">'MFI'</span>] > <span class="num">80</span>, <span class="str">'signal'</span>] = <span class="str">'SELL'</span>  <span class="cm"># overbought</span>`
+};
+
+function generate() {
+  const n = +document.getElementById('period').value;
+  const asset = document.getElementById('asset').value;
+  const vol = asset==='btc'?0.035:asset==='eth'?0.04:0.01;
+  const vscale = asset==='spy'?5e6:2e5;
+
+  data = [];
+  let price = asset==='btc'?40000:asset==='eth'?2500:450;
+  let obvAcc = 0;
+  vwapData = []; mfiData = [];
+  let cumTP_V=0, cumV=0;
+
+  for (let i=0;i<n;i++) {
+    const ret = (Math.random()-.49)*2*vol;
+    const prevPrice = price;
+    price *= (1+ret);
+    const high = price*(1+Math.random()*vol*.5), low=price*(1-Math.random()*vol*.5);
+    // OBV
+    const bullDay = price >= prevPrice;
+    const v = vscale*(0.3+Math.random()*2);
+    obvAcc += bullDay ? v : -v;
+    // VWAP
+    const tp = (high+low+price)/3;
+    cumTP_V += tp*v; cumV += v;
+    const vwap = cumTP_V/cumV;
+    // MFI (simplified)
+    const mfi = 50 + (Math.random()-.5)*60;
+    data.push({close:price,high,low,volume:v,obv:obvAcc,vwap,mfi,bull:bullDay});
+  }
+
+  genCount++;
+  drawCharts();
+
+  // Signals
+  const obvTrend = data[data.length-1].obv > data[Math.max(0,data.length-20)].obv;
+  const lastVwap = data[data.length-1].vwap;
+  const lastClose = data[data.length-1].close;
+  const lastMfi = data[data.length-1].mfi;
+  document.getElementById('sObvTrend').textContent = obvTrend?'↑ SUBIENDO':'↓ BAJANDO';
+  document.getElementById('sObvTrend').style.color = obvTrend?'#00ff88':'#ff5566';
+  document.getElementById('sVwapPos').textContent = lastClose>lastVwap?'SOBRE':'BAJO';
+  document.getElementById('sVwapPos').style.color = lastClose>lastVwap?'#00ff88':'#ff9944';
+  document.getElementById('sMfi').textContent = lastMfi.toFixed(0);
+  document.getElementById('sMfi').style.color = lastMfi>70?'#ff5566':lastMfi<30?'#00ff88':'#ffd070';
+  const highVolDays = data.filter((d,i)=>i>0&&d.volume>data.reduce((a,x)=>a+x.volume,0)/data.length*+document.getElementById('volTh').value).length;
+  document.getElementById('sHighVolDays').textContent = highVolDays;
+
+  // Divergence
+  const pLast = data[data.length-1].close, pMid = data[Math.floor(data.length*.6)].close;
+  const oLast = data[data.length-1].obv, oMid = data[Math.floor(data.length*.6)].obv;
+  let divText = 'Sin divergencia clara en este período.';
+  if (pLast < pMid && oLast > oMid) divText = '🐂 DIVERGENCIA ALCISTA detectada: precio bajó pero OBV sube → posible acumulación institucional.';
+  else if (pLast > pMid && oLast < oMid) divText = '🐻 DIVERGENCIA BAJISTA detectada: precio subió pero OBV baja → posible distribución.';
+  document.getElementById('divDetected').textContent = divText;
+  document.getElementById('feedbackMsg').innerHTML = `📊 Dataset generado: ${n} días. OBV tendencia: <strong>${obvTrend?'alcista':'bajista'}</strong>. ${divText.split(':')[0]}.`;
+  if (genCount >= 2 && !localStorage.getItem(STORAGE_KEY)) { localStorage.setItem(STORAGE_KEY,'true'); document.getElementById('insigniaArea').classList.remove('hidden'); }
+}
+
+function drawCharts() {
+  if (!data.length) return;
+  const ind = document.getElementById('volInd').value;
+  document.getElementById('codeBox').innerHTML = CODES[ind];
+  document.getElementById('indTitle').innerHTML = `<i class="fas fa-chart-line"></i> ${ind.toUpperCase()} — ${{'obv':'On-Balance Volume','vwap':'VWAP','vp':'Volume Profile','mfi':'Money Flow Index'}[ind]}`;
+
+  const W0 = document.getElementById('priceCanvas').parentElement.clientWidth - 30;
+
+  // Price + Volume
+  const pc = document.getElementById('priceCanvas');
+  pc.width=W0; pc.height=180;
+  const pctx=pc.getContext('2d');
+  pctx.fillStyle='#000610';pctx.fillRect(0,0,W0,180);
+  const n=data.length, closes=data.map(d=>d.close);
+  const mn=Math.min(...closes)*.99,mx=Math.max(...closes)*1.01;
+  const xS=i=>(i/(n-1))*(W0-16)+8;
+  const yS=v=>160-((v-mn)/(mx-mn))*148;
+
+  // VWAP overlay
+  if (ind==='vwap') {
+    pctx.beginPath();pctx.strokeStyle='#ffd070aa';pctx.lineWidth=1.2;pctx.setLineDash([4,3]);
+    data.forEach((d,i)=>i===0?pctx.moveTo(xS(i),yS(d.vwap)):pctx.lineTo(xS(i),yS(d.vwap)));
+    pctx.stroke();pctx.setLineDash([]);
+  }
+
+  // Volume bars
+  const vols=data.map(d=>d.volume),maxV=Math.max(...vols);
+  data.forEach((d,i)=>{
+    pctx.fillStyle=d.bull?'rgba(0,255,136,.55)':'rgba(255,85,102,.55)';
+    const bh=(d.volume/maxV)*38;
+    pctx.fillRect(xS(i)-1,178-bh,Math.max(1,(W0-16)/n-0.5),bh);
+  });
+
+  // Price line
+  pctx.beginPath();pctx.strokeStyle='#0096ff';pctx.lineWidth=1.5;
+  closes.forEach((v,i)=>i===0?pctx.moveTo(xS(i),yS(v)):pctx.lineTo(xS(i),yS(v)));
+  pctx.stroke();
+
+  // Indicator panel
+  const oc=document.getElementById('obvCanvas');
+  oc.width=W0; oc.height=130;
+  const octx=oc.getContext('2d');
+  octx.fillStyle='#000408';octx.fillRect(0,0,W0,130);
+
+  if (ind==='obv') {
+    const obvs=data.map(d=>d.obv);
+    const oMn=Math.min(...obvs),oMx=Math.max(...obvs);
+    const oY=v=>120-((v-oMn)/(oMx-oMn))*108;
+    const grad=octx.createLinearGradient(0,0,0,130);
+    grad.addColorStop(0,'rgba(0,150,255,.2)');grad.addColorStop(1,'transparent');
+    octx.beginPath();
+    obvs.forEach((v,i)=>i===0?octx.moveTo(xS(i),oY(v)):octx.lineTo(xS(i),oY(v)));
+    octx.lineTo(xS(n-1),130);octx.lineTo(xS(0),130);octx.closePath();
+    octx.fillStyle=grad;octx.fill();
+    octx.beginPath();octx.strokeStyle='#0096ff';octx.lineWidth=1.5;
+    obvs.forEach((v,i)=>i===0?octx.moveTo(xS(i),oY(v)):octx.lineTo(xS(i),oY(v)));
+    octx.stroke();
+    octx.fillStyle='#0096ff';octx.font='10px Inter';octx.textAlign='left';
+    octx.fillText('OBV: '+(obvs[n-1]/1e6).toFixed(1)+'M',8,14);
+  } else if (ind==='vwap') {
+    // Price - VWAP spread
+    const spreads=data.map(d=>(d.close-d.vwap)/d.vwap*100);
+    const sMn=Math.min(...spreads),sMx=Math.max(...spreads);
+    const sY=v=>115-((v-sMn)/(sMx-sMn))*100;
+    octx.strokeStyle='#ffffff22';octx.setLineDash([3,3]);octx.beginPath();
+    octx.moveTo(0,sY(0));octx.lineTo(W0,sY(0));octx.stroke();octx.setLineDash([]);
+    octx.beginPath();octx.lineWidth=1.5;
+    spreads.forEach((v,i)=>{
+      octx.strokeStyle=v>=0?'#00ff88':'#ff5566';
+      if(i>0){octx.beginPath();octx.moveTo(xS(i-1),sY(spreads[i-1]));octx.lineTo(xS(i),sY(v));octx.stroke();}
+    });
+    octx.fillStyle='#ffd070';octx.font='10px Inter';octx.textAlign='left';
+    octx.fillText('Precio vs VWAP (%)',8,14);
+  } else if (ind==='vp') {
+    // Volume profile bars (horizontal)
+    const bins=20;const mn2=Math.min(...closes),mx2=Math.max(...closes);
+    const binSize=(mx2-mn2)/bins;
+    const vp=new Array(bins).fill(0);
+    data.forEach(d=>{const b=Math.min(bins-1,Math.floor((d.close-mn2)/binSize));vp[b]+=d.volume;});
+    const maxVp=Math.max(...vp);
+    const bh=130/bins;
+    vp.forEach((v,i)=>{
+      const w=(v/maxVp)*(W0-20);
+      octx.fillStyle=i===vp.indexOf(maxVp)?'rgba(255,215,0,.7)':'rgba(0,150,255,.4)';
+      octx.fillRect(10,i*bh,w,bh-1);
+    });
+    octx.fillStyle='#ffd070';octx.font='10px Inter';octx.textAlign='left';
+    octx.fillText('⭐ POC (Point of Control)',10+((maxVp/maxVp)*(W0-20))+4,(vp.indexOf(maxVp)+.5)*bh+4);
+  } else if (ind==='mfi') {
+    const mfis=data.map(d=>d.mfi);
+    const mY=v=>120-(v/100)*108;
+    [80,50,20].forEach(l=>{
+      octx.strokeStyle=l===50?'#ffffff22':l===80?'#ff556633':'#00ff8833';
+      octx.setLineDash([3,3]);octx.beginPath();octx.moveTo(0,mY(l));octx.lineTo(W0,mY(l));octx.stroke();
+    });
+    octx.setLineDash([]);
+    octx.beginPath();octx.lineWidth=1.5;
+    mfis.forEach((v,i)=>{
+      octx.strokeStyle=v>70?'#ff5566':v<30?'#00ff88':'#0096ff';
+      if(i>0){octx.beginPath();octx.moveTo(xS(i-1),mY(mfis[i-1]));octx.lineTo(xS(i),mY(v));octx.stroke();}
+    });
+    octx.fillStyle='#0096ff';octx.font='10px Inter';octx.textAlign='left';
+    octx.fillText(`MFI(14): ${mfis[n-1].toFixed(0)}`,8,14);
+  }
+}
+
+document.getElementById('volTh').addEventListener('input',e=>document.getElementById('volThV').textContent=e.target.value+'x');
+generate();
+if (localStorage.getItem(STORAGE_KEY)) document.getElementById('insigniaArea').classList.remove('hidden');
+</script>
+</body>
+</html>

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Storage vs Memory vs Calldata | Smart Contracts DeFi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700;14..32,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    body{background:linear-gradient(145deg,#0a0800,#1a1200);font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:2rem 1rem}
+    .container{max-width:1300px;width:100%;background:rgba(18,14,0,.85);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(255,215,0,.22);box-shadow:0 25px 55px rgba(0,0,0,.65);overflow:hidden}
+    .hero{background:linear-gradient(95deg,#0a0800,#1a1200);padding:1.8rem 2rem;text-align:center;border-bottom:2px solid #ffd700}
+    .hero h1{font-size:1.9rem;font-weight:800;background:linear-gradient(135deg,#fff8cc,#ffe066,#ffd700);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .hero p{margin-top:.5rem;font-size:.95rem;color:#b8941c}
+    .chips{display:flex;justify-content:center;gap:.6rem;flex-wrap:wrap;margin-top:.7rem}
+    .chip{background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.3);color:#8a6a00;font-size:.72rem;padding:.25rem .8rem;border-radius:2rem}
+    .week-badge{display:inline-block;background:rgba(255,215,0,.15);border:1px solid #ffd700;color:#ffd700;font-size:.75rem;font-weight:700;padding:.3rem 1rem;border-radius:2rem;margin-top:.5rem}
+    .analogy{background:#110e00cc;margin:1.4rem 2rem;padding:1.1rem 1.7rem;border-radius:2rem;border-left:7px solid #ffd700;font-size:.9rem;line-height:1.65}
+    .analogy strong{color:#ffe066}
+    .lab{display:flex;flex-wrap:wrap;gap:1.4rem;padding:0 1.8rem 1.5rem}
+    .left{flex:0 0 260px;display:flex;flex-direction:column;gap:.9rem}
+    .right{flex:1;min-width:300px;display:flex;flex-direction:column;gap:.9rem}
+    .panel{background:#110e00dd;border-radius:1.8rem;padding:1.2rem 1.3rem;border:1px solid rgba(255,215,0,.15)}
+    .panel h3{font-size:.88rem;font-weight:700;color:#ffd700;margin-bottom:.7rem}
+    label{font-size:.72rem;color:#7a5a00;text-transform:uppercase;letter-spacing:.06rem;display:block;margin-bottom:.3rem;margin-top:.5rem}
+    select{width:100%;background:#0a0800;border:1px solid rgba(255,215,0,.2);color:#eef5ff;padding:.45rem .7rem;border-radius:.75rem;font-size:.82rem;font-family:'Inter',sans-serif}
+    .slider-row{display:flex;align-items:center;gap:.4rem;margin:.25rem 0}
+    .slider-row label{min-width:100px;margin:0}
+    .slider-row input[type=range]{flex:1;accent-color:#ffd700}
+    .slider-row span{font-size:.75rem;color:#ffd700;font-family:'JetBrains Mono',monospace;min-width:40px;text-align:right}
+    .btn{background:linear-gradient(95deg,#ffd700,#cc9900);border:none;padding:.65rem 1.3rem;font-weight:700;border-radius:2rem;cursor:pointer;color:#1a1000;font-size:.85rem;transition:.2s;width:100%;margin-top:.4rem}
+    .btn:hover{transform:translateY(-2px);box-shadow:0 0 18px rgba(255,215,0,.4)}
+    pre{background:#050300;border-radius:1rem;padding:.9rem 1rem;font-family:'JetBrains Mono',monospace;font-size:.72rem;line-height:1.75;overflow-x:auto;color:#fff8cc;border:1px solid rgba(255,215,0,.12);white-space:pre}
+    .kw{color:#ff79c6}.fn{color:#50fa7b}.str{color:#f1fa8c}.num{color:#bd93f9}.cm{color:#6272a4;font-style:italic}.cls{color:#8be9fd}
+    .gas-bar-wrap{margin:.4rem 0}
+    .gas-label{display:flex;justify-content:space-between;font-size:.72rem;margin-bottom:.15rem}
+    .gas-lbl-name{color:#ffe066}
+    .gas-lbl-cost{color:#ffd700;font-family:monospace}
+    .gas-bar{height:20px;border-radius:.4rem;transition:.5s;position:relative;min-width:6px}
+    .gas-bar.storage{background:linear-gradient(90deg,#ff5050,#ff8050)}
+    .gas-bar.memory{background:linear-gradient(90deg,#ffd700,#ffaa00)}
+    .gas-bar.calldata{background:linear-gradient(90deg,#50fa7b,#00dc64)}
+    .result-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin:.6rem 0}
+    .r-card{background:#110e00;border-radius:1rem;padding:.6rem;text-align:center;border:1px solid rgba(255,215,0,.15)}
+    .r-val{font-size:1rem;font-weight:800;font-family:monospace;color:#ffd700}
+    .r-lbl{font-size:.62rem;color:#7a5a00;margin-top:.15rem}
+    .tip-box{background:rgba(255,215,0,.06);border:1px solid rgba(255,215,0,.2);border-radius:1rem;padding:.7rem .9rem;font-size:.76rem;line-height:1.55;margin:.4rem 0}
+    .tip-box strong{color:#ffd700}
+    .feedback{background:#00000088;margin:0 1.8rem 1rem;padding:.85rem 1.2rem;border-radius:1.5rem;text-align:center;border-left:4px solid #ffd700;font-size:.88rem;line-height:1.55}
+    .insignia{text-align:center;background:#110e00;border-radius:2rem;margin:0 1.8rem 1.5rem;padding:1rem;border:1px dashed gold}
+    .insignia i{font-size:2.4rem;color:gold}
+    .hidden{display:none}
+    .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.4rem 2rem}
+    .nav-link{background:#110e00;padding:.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:.5rem;font-size:.88rem;transition:.2s}
+    .nav-link:hover{transform:translateY(-2px)}
+    .nav-link.next{background:linear-gradient(95deg,#f0a500,#ff6a00);color:#1e1a0c}
+    footer{text-align:center;padding:1rem;font-size:.72rem;border-top:1px solid #110e00;color:#7a5a00}
+    @media(max-width:860px){.hero h1{font-size:1.4rem}.left{flex:1;min-width:100%}}
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+<nav class="brand-return-nav">
+  <a href="../../index.html">&larr; Portfolio</a>
+  <a href="../../cursos/index.html">Cursos</a>
+</nav>
+<div class="container">
+  <div class="hero">
+    <h1>⛽ STORAGE vs MEMORY vs CALLDATA: Cada Gas Cuenta</h1>
+    <p>Entiende cómo la EVM almacena datos y por qué una mala elección puede multiplicar tu gas x100</p>
+    <div class="week-badge"><i class="fas fa-calendar-week"></i> Semanas 1-2: Fundamentos Avanzados de Solidity</div>
+    <div class="chips">
+      <span class="chip">Storage (persistente)</span>
+      <span class="chip">Memory (temporal)</span>
+      <span class="chip">Calldata (read-only)</span>
+      <span class="chip">Gas Optimization</span>
+    </div>
+  </div>
+
+  <div class="analogy">
+    <strong>⛽ Piénsalo así:</strong> La EVM tiene tres "lugares" para guardar datos, con costos muy distintos. <strong>Storage</strong> es como un disco duro cifrado en la blockchain — permanente pero carísimo (20,000 gas por SSTORE). <strong>Memory</strong> es como la RAM de tu computadora — temporal y barata, pero se borra al terminar la transacción. <strong>Calldata</strong> es como leer de un CD-ROM — la información viene con la llamada, no se puede modificar, y es la más barata de todas. Elegir mal puede hacer tu función 50-100x más cara.
+    <div style="margin-top:.5rem;font-size:.78rem;color:#7a5a00"><strong>📚 Fuente:</strong> Ethereum Yellow Paper (Gavin Wood) — Appendix G: Fee Schedule · Solidity Docs — Data Locations</div>
+  </div>
+
+  <div class="lab">
+    <div class="left">
+      <div class="panel">
+        <h3><i class="fas fa-gas-pump"></i> Calculadora de Gas</h3>
+        <label>Tipo de dato</label>
+        <select id="dataType">
+          <option value="uint">uint256 (32 bytes)</option>
+          <option value="bytes32">bytes32</option>
+          <option value="address">address (20 bytes)</option>
+          <option value="string">string dinámica</option>
+          <option value="array">uint[] (array dinámico)</option>
+        </select>
+        <label>Operación</label>
+        <select id="operation">
+          <option value="write">Escritura (write)</option>
+          <option value="read">Lectura (read)</option>
+          <option value="pass">Pasar a función</option>
+        </select>
+        <div class="slider-row"><label>Tamaño (slots)</label><input type="range" id="slots" min="1" max="10" value="1" oninput="document.getElementById('slotsV').textContent=this.value"><span id="slotsV">1</span></div>
+        <div class="slider-row"><label>Gas price (gwei)</label><input type="range" id="gasprice" min="5" max="100" value="20" oninput="document.getElementById('gaspriceV').textContent=this.value"><span id="gaspriceV">20</span></div>
+        <button class="btn" onclick="calcGas()"><i class="fas fa-calculator"></i> Calcular Costo</button>
+      </div>
+      <div class="tip-box">
+        <strong>💡 Regla de oro:</strong><br>
+        1. Usa <code>calldata</code> para parámetros de función que no modificas<br>
+        2. Usa <code>memory</code> para variables temporales dentro de la función<br>
+        3. Minimiza escrituras a <code>storage</code> — son las más caras<br>
+        4. Cachea variables de <code>storage</code> en <code>memory</code> si las lees múltiples veces
+      </div>
+    </div>
+
+    <div class="right">
+      <div class="panel">
+        <h3><i class="fas fa-chart-bar"></i> Comparativa de Costos de Gas</h3>
+        <div id="gasBars">
+          <p style="color:#7a5a00;font-size:.8rem">Haz clic en "Calcular Costo" para ver la comparativa</p>
+        </div>
+        <div class="result-grid" id="resultGrid" style="display:none">
+          <div class="r-card"><div class="r-val" id="rStorGas">—</div><div class="r-lbl">Storage gas</div></div>
+          <div class="r-card"><div class="r-val" id="rMemGas">—</div><div class="r-lbl">Memory gas</div></div>
+          <div class="r-card"><div class="r-val" id="rCalGas">—</div><div class="r-lbl">Calldata gas</div></div>
+          <div class="r-card"><div class="r-val" id="rStorUsd">—</div><div class="r-lbl">Storage USD</div></div>
+          <div class="r-card"><div class="r-val" id="rMemUsd">—</div><div class="r-lbl">Memory USD</div></div>
+          <div class="r-card"><div class="r-val" id="rCalUsd">—</div><div class="r-lbl">Calldata USD</div></div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3><i class="fas fa-code"></i> Código Solidity — Antes vs Después</h3>
+        <div style="display:flex;gap:.5rem;margin-bottom:.5rem">
+          <button class="btn" style="background:#1a1000;border:1px solid rgba(255,215,0,.2);color:#b8941c" onclick="showCode('bad')">❌ Sin optimizar</button>
+          <button class="btn" style="background:linear-gradient(95deg,#ffd700,#cc9900)" onclick="showCode('good')">✅ Optimizado</button>
+        </div>
+        <pre id="codeDisplay"></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="feedback" id="feedbackMsg">
+    ⛽ Selecciona el tipo de dato y operación, luego calcula el costo en gas. Observa la diferencia entre storage y calldata.
+  </div>
+
+  <div class="insignia hidden" id="insigniaArea">
+    <i class="fas fa-gas-pump"></i>
+    <h3 style="margin:.4rem 0;color:#ffd700">🏅 ¡INSIGNIA GAS OPTIMIZER!</h3>
+    <p style="font-size:.85rem;color:#ffe066">Calculaste los costos de gas y aprendiste a optimizar. ¡Un buen dev ahorra miles de dólares en gas!</p>
+  </div>
+
+  <div class="nav-links">
+    <a href="02-fundamentos-solidity.html" class="nav-link"><i class="fas fa-arrow-left"></i> Fundamentos</a>
+    <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Menú</a>
+    <a href="sc3-02-hardhat-foundry.html" class="nav-link next">Hardhat & Foundry <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Smart Contracts DeFi · Semana 1-2 · Ethereum Yellow Paper · Gas Optimization</footer>
+</div>
+
+<script>
+const STORAGE_KEY='sc3_stor';
+let calcCount=0;
+
+const CODES={
+  bad:`<span class="cm">// ❌ Ineficiente — lee de storage 3 veces</span>
+<span class="kw">function</span> <span class="fn">calculateBad</span>(<span class="cls">uint256</span>[] <span class="kw">storage</span> arr) <span class="kw">external</span> {
+    <span class="kw">for</span> (<span class="cls">uint256</span> i = <span class="num">0</span>; i < arr.length; i++) {
+        result += arr[i];    <span class="cm">// SLOAD en cada iteración</span>
+        count += arr[i];     <span class="cm">// otro SLOAD = 2 reads/iter</span>
+        emit Updated(arr[i]);<span class="cm">// y otro SLOAD más</span>
+    }
+}
+<span class="cm">// Gas: 2,100 SLOAD × 3 × arr.length = muy caro!</span>`,
+  good:`<span class="cm">// ✅ Optimizado — usa memory y calldata</span>
+<span class="kw">function</span> <span class="fn">calculateGood</span>(<span class="cls">uint256</span>[] <span class="kw">calldata</span> arr) <span class="kw">external</span> {
+    <span class="cm">// Cache length en memory (1 lectura)</span>
+    <span class="cls">uint256</span> len = arr.length;
+    <span class="cm">// Variables locales en stack/memory</span>
+    <span class="cls">uint256</span> _result = <span class="num">0</span>;
+    <span class="cls">uint256</span> _count = <span class="num">0</span>;
+    <span class="kw">for</span> (<span class="cls">uint256</span> i = <span class="num">0</span>; i < len;) {
+        <span class="cls">uint256</span> val = arr[i];   <span class="cm">// calldata: 3 gas/byte</span>
+        _result += val;
+        _count += val;
+        emit <span class="fn">Updated</span>(val);
+        <span class="kw">unchecked</span> { ++i; }       <span class="cm">// ahorra overflow check</span>
+    }
+    result = _result;          <span class="cm">// 1 sola escritura SSTORE</span>
+    count = _count;            <span class="cm">// 1 sola escritura SSTORE</span>
+}
+<span class="cm">// Gas: 5,000 SSTORE × 2 + (3 gas × bytes) × len</span>
+<span class="cm">// Ahorro: hasta 80% menos gas!</span>`
+};
+
+const GAS_COSTS={
+  write:{storage:{base:20000,extra:2900},memory:{base:3,extra:3},calldata:{base:0,extra:0}},
+  read:{storage:{base:2100,extra:100},memory:{base:3,extra:3},calldata:{base:3,extra:3}},
+  pass:{storage:{base:2100,extra:100},memory:{base:3,extra:3},calldata:{base:3,extra:3}}
+};
+
+function calcGas(){
+  const op=document.getElementById('operation').value;
+  const slots=+document.getElementById('slots').value;
+  const gpGwei=+document.getElementById('gasprice').value;
+  const ETH_USD=2600;
+  const costs=GAS_COSTS[op];
+  const storG=Math.round((costs.storage.base+costs.storage.extra*(slots-1))*slots);
+  const memG=Math.round((costs.memory.base+costs.memory.extra*(slots-1))*slots);
+  const calG=op==='write'?0:Math.round((costs.calldata.base+costs.calldata.extra*(slots-1))*slots);
+  const toUsd=g=>((g*gpGwei*1e-9)*ETH_USD).toFixed(4);
+  document.getElementById('rStorGas').textContent=storG.toLocaleString();
+  document.getElementById('rMemGas').textContent=memG.toLocaleString();
+  document.getElementById('rCalGas').textContent=calG>0?calG.toLocaleString():'N/A';
+  document.getElementById('rStorUsd').textContent='$'+toUsd(storG);
+  document.getElementById('rMemUsd').textContent='$'+toUsd(memG);
+  document.getElementById('rCalUsd').textContent=calG>0?'$'+toUsd(calG):'N/A';
+  document.getElementById('resultGrid').style.display='grid';
+  const maxG=storG;
+  const bars=document.getElementById('gasBars');
+  bars.innerHTML=`
+    <div class="gas-bar-wrap"><div class="gas-label"><span class="gas-lbl-name">🔴 Storage</span><span class="gas-lbl-cost">${storG.toLocaleString()} gas</span></div><div class="gas-bar storage" style="width:${Math.min(100,(storG/maxG)*100)}%">&nbsp;</div></div>
+    <div class="gas-bar-wrap"><div class="gas-label"><span class="gas-lbl-name">🟡 Memory</span><span class="gas-lbl-cost">${memG.toLocaleString()} gas</span></div><div class="gas-bar memory" style="width:${Math.max(1,(memG/maxG)*100)}%">&nbsp;</div></div>
+    <div class="gas-bar-wrap"><div class="gas-label"><span class="gas-lbl-name">🟢 Calldata</span><span class="gas-lbl-cost">${calG>0?calG.toLocaleString()+'gas':'N/A (write)'}</span></div><div class="gas-bar calldata" style="width:${calG>0?Math.max(1,(calG/maxG)*100):0}%">&nbsp;</div></div>
+  `;
+  const ratio=Math.round(storG/Math.max(1,calG||memG));
+  document.getElementById('feedbackMsg').innerHTML=`⛽ <strong>Storage es ~${ratio}x más caro</strong> que la alternativa. Con ${slots} slot(s) y ${gpGwei} gwei de gas price, una sola escritura a storage cuesta <strong>$${toUsd(storG)}</strong>. En un loop de 100 iteraciones esto sería <strong>$${(+toUsd(storG)*100).toFixed(2)}</strong>.`;
+  calcCount++;
+  if(calcCount>=3&&!localStorage.getItem(STORAGE_KEY)){localStorage.setItem(STORAGE_KEY,'true');document.getElementById('insigniaArea').classList.remove('hidden');}
+}
+
+function showCode(type){
+  document.getElementById('codeDisplay').innerHTML=CODES[type];
+}
+
+showCode('bad');
+if(localStorage.getItem(STORAGE_KEY))document.getElementById('insigniaArea').classList.remove('hidden');
+</script>
+</body>
+</html>

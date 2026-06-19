@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Smart Contracts DeFi | Deployment y Proyecto Final</title>
+  <meta property="og:title" content="Smart Contracts DeFi | Deployment y Proyecto Final">
+  <meta property="og:description" content="Aprende a desplegar smart contracts en testnets y mainnet. Integración con ethers.js, verificación en Etherscan y configuración de multisig.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Israel Romero Portfolio">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Smart Contracts DeFi | Deployment y Proyecto Final">
+  <meta name="twitter:description" content="Despliega tus contratos en mainnet. Ethers.js, Hardhat, Etherscan y multisig.">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    :root { --accent: #00ffc8; --accent-dim: rgba(0,255,200,0.15); --accent-glow: rgba(0,255,200,0.3);
+      --bg: #0b0d1a; --surface: rgba(16,20,40,0.85); --text: #e0e6f0; --text-dim: #8892b0;
+      --radius: 16px; --shadow: 0 8px 40px rgba(0,0,0,0.5); --border: 1px solid rgba(0,255,200,0.18);
+      --font-mono: 'Press Start 2P',monospace; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; min-height: 100vh; }
+    a { color: var(--accent); text-decoration: none; transition: .3s; }
+    a:hover { filter: brightness(1.3); }
+    .container { max-width: 1020px; margin: 0 auto; padding: 0 24px; }
+
+    .hero { text-align: center; padding: 60px 24px 40px; position: relative; }
+    .hero::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 120px; height: 2px; background: linear-gradient(90deg,transparent,var(--accent),transparent); }
+    .hero h1 { font-family: var(--font-mono); font-size: 1.4rem; color: var(--accent); text-shadow: 0 0 30px var(--accent-glow); letter-spacing: 2px; margin-bottom: 8px; }
+    .hero p { color: var(--text-dim); font-size: 1.05rem; max-width: 600px; margin: 0 auto; }
+
+    .card { background: var(--surface); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: var(--border); border-radius: var(--radius); padding: 28px; margin-bottom: 28px; box-shadow: var(--shadow); transition: .3s; }
+    .card:hover { border-color: rgba(0,255,200,0.35); }
+    .card-title { font-family: var(--font-mono); font-size: .85rem; color: var(--accent); margin-bottom: 16px; letter-spacing: 1px; display: flex; align-items: center; gap: 10px; }
+    .card-title i { font-size: 1.1rem; }
+
+    .analogy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px; }
+    .analogy-item { background: var(--accent-dim); border-radius: 10px; padding: 16px; text-align: center; font-size: .9rem; }
+    .analogy-item i { font-size: 1.5rem; color: var(--accent); display: block; margin-bottom: 6px; }
+    .analogy-item span { color: var(--accent); font-weight: 600; }
+
+    .network-selector { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 20px; }
+    .net-btn { background: transparent; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 12px 20px; color: var(--text-dim); cursor: pointer; transition: .3s; font-family: 'Inter',sans-serif; font-size: .85rem; text-align: center; min-width: 110px; }
+    .net-btn:hover { border-color: var(--accent); color: var(--text); }
+    .net-btn.active { border-color: var(--accent); background: var(--accent-dim); color: var(--accent); }
+    .net-btn .net-icon { font-size: 1.2rem; display: block; margin-bottom: 4px; }
+    .net-btn .net-label { font-size: .7rem; text-transform: uppercase; letter-spacing: 1px; }
+
+    .deploy-panel { display: flex; flex-wrap: wrap; gap: 20px; }
+    .deploy-left { flex: 1; min-width: 260px; }
+    .deploy-right { flex: 1; min-width: 260px; background: rgba(0,0,0,0.2); border-radius: 12px; padding: 18px; font-family: 'Courier New',monospace; font-size: .8rem; line-height: 1.6; color: #88ff88; max-height: 320px; overflow-y: auto; }
+
+    .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+    .form-group label { font-size: .8rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); }
+    .form-group input, .form-group select { background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 10px 14px; color: var(--text); font-size: .9rem; font-family: 'Inter',sans-serif; outline: none; transition: .3s; }
+    .form-group input:focus, .form-group select:focus { border-color: var(--accent); box-shadow: 0 0 16px var(--accent-glow); }
+    .form-group select option { background: #1a1a2e; }
+
+    .btn-action { width: 100%; background: linear-gradient(135deg,#00a87a,var(--accent)); border: none; border-radius: 10px; padding: 14px; color: #0b0d1a; font-family: var(--font-mono); font-size: .8rem; font-weight: 700; cursor: pointer; transition: .3s; letter-spacing: 1px; text-transform: uppercase; }
+    .btn-action:hover { transform: translateY(-2px); box-shadow: 0 8px 30px var(--accent-glow); }
+    .btn-action:disabled { opacity: .4; cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-action.secondary { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
+    .btn-action.secondary:hover { background: var(--accent-dim); }
+
+    .terminal-line { margin-bottom: 4px; }
+    .terminal-line .prompt { color: var(--accent); }
+    .terminal-line .success { color: #00ff88; }
+    .terminal-line .info { color: #88ccff; }
+    .terminal-line .warn { color: #ffc800; }
+    .terminal-line .error { color: #ff5050; }
+
+    .step-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap: 14px; }
+    .step-item { background: rgba(0,0,0,0.2); border-radius: 12px; padding: 20px; text-align: center; position: relative; }
+    .step-num { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: var(--accent); color: #0b0d1a; font-family: var(--font-mono); font-size: .6rem; padding: 2px 10px; border-radius: 10px; font-weight: 700; }
+    .step-item i { font-size: 1.8rem; color: var(--accent); display: block; margin-bottom: 8px; }
+    .step-item h4 { font-size: .85rem; margin-bottom: 6px; }
+    .step-item p { font-size: .75rem; color: var(--text-dim); line-height: 1.4; }
+
+    .interact-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
+    .interact-row input { flex: 1; min-width: 120px; background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 10px 14px; color: var(--text); font-size: .9rem; font-family: 'Inter',sans-serif; outline: none; }
+    .interact-row input:focus { border-color: var(--accent); }
+    .interact-row input::placeholder { color: var(--text-dim); opacity: .5; }
+    .btn-sm { background: var(--accent); border: none; border-radius: 8px; padding: 10px 18px; color: #0b0d1a; font-weight: 700; cursor: pointer; transition: .3s; font-family: 'Inter',sans-serif; font-size: .8rem; }
+    .btn-sm:hover { transform: translateY(-2px); box-shadow: 0 4px 15px var(--accent-glow); }
+    .btn-sm:disabled { opacity: .4; cursor: not-allowed; }
+
+    .badge-earned { display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg,#1a2a1a,#0d1f0d); border: 1px solid var(--accent); border-radius: 20px; padding: 8px 18px; font-family: var(--font-mono); font-size: .65rem; color: var(--accent); animation: badgePulse 2s ease-in-out infinite; }
+    @keyframes badgePulse { 0%,100% { box-shadow: 0 0 8px var(--accent-glow); } 50% { box-shadow: 0 0 24px var(--accent-glow); } }
+    .badge-hidden { display: none; }
+    .btn-reset { background: transparent; border: 1px solid rgba(255,80,80,0.3); border-radius: 6px; padding: 6px 14px; color: #ff5050; font-size: .7rem; cursor: pointer; transition: .3s; font-family: 'Inter',sans-serif; }
+    .btn-reset:hover { background: rgba(255,80,80,0.1); border-color: #ff5050; }
+
+    .module-nav { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 40px 0; flex-wrap: wrap; }
+    .module-nav a { display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; border-radius: 10px; font-size: .9rem; font-weight: 500; transition: .3s; background: var(--surface); border: var(--border); }
+    .module-nav a:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 4px 20px var(--accent-glow); }
+    .module-nav .nav-center { font-family: var(--font-mono); font-size: .7rem; color: var(--text-dim); }
+
+    .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--surface); backdrop-filter: blur(16px); border: 1px solid var(--accent); border-radius: 12px; padding: 14px 24px; color: var(--text); font-size: .85rem; box-shadow: 0 8px 40px rgba(0,0,0,0.6); z-index: 999; transition: transform .4s, opacity .4s; opacity: 0; pointer-events: none; max-width: 90vw; text-align: center; }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    .footer { text-align: center; padding: 40px 24px; border-top: 1px solid rgba(255,255,255,0.05); color: var(--text-dim); font-size: .8rem; margin-top: 40px; }
+    @media (max-width: 600px) { .hero h1 { font-size: 1rem; } .analogy-grid { grid-template-columns: 1fr; } .module-nav { flex-direction: column; } }
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../index.html#cursos"><i class="fas fa-arrow-left"></i> Portfolio</a><a href="index.html"><i class="fas fa-layer-group"></i> Cursos</a><span class="brand-badge">Smart Contracts DeFi</span></nav>
+
+  <section class="hero">
+    <span class="hero-icon" style="font-size:3rem;">🚀</span>
+    <h1>DEPLOYMENT & PROYECTO FINAL</h1>
+    <p>De testnets a mainnet — lanza tu protocolo DeFi al mundo real</p>
+  </section>
+
+  <div class="container">
+    <div class="card">
+      <div class="card-title"><i class="fas fa-lightbulb"></i> ANALOGÍA · El Lanzamiento de un Cohete</div>
+      <p style="margin-bottom:14px;color:var(--text-dim);font-size:.9rem;">
+        Desplegar un smart contract es como lanzar un cohete al espacio. Primero haces pruebas en tierra (local network con Hardhat),
+        luego pruebas de vuelo suborbital (testnet como Sepolia), y finalmente el lanzamiento oficial (mainnet).
+        Cada etapa tiene sus propios protocolos de seguridad y verificación. El <strong>multisig</strong> es como tener
+        dos capitanes que deben girar la llave al mismo tiempo para lanzar.
+      </p>
+      <div class="analogy-grid">
+        <div class="analogy-item"><i class="fas fa-flask"></i> <span>Testnet</span><br>Simulador de vuelo gratis</div>
+        <div class="analogy-item"><i class="fas fa-globe"></i> <span>Mainnet</span><br>Lanzamiento real con ETH de verdad</div>
+        <div class="analogy-item"><i class="fas fa-check-double"></i> <span>Verificación</span><br>Publicar planos del cohete</div>
+        <div class="analogy-item"><i class="fas fa-users"></i> <span>Multisig</span><br>Dos llaves para el despegue</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><i class="fas fa-rocket"></i> SIMULADOR DE DEPLOY</div>
+      <p style="color:var(--text-dim);font-size:.85rem;margin-bottom:16px;">
+        Selecciona una red, elige tu contrato y haz clic en "Desplegar". Observa el log de la transacción en tiempo real.
+      </p>
+      <div class="network-selector" id="netSelector">
+        <button class="net-btn active" data-net="hardhat"><span class="net-icon">🛠️</span><span class="net-label">Hardhat Local</span></button>
+        <button class="net-btn" data-net="sepolia"><span class="net-icon">🧪</span><span class="net-label">Sepolia</span></button>
+        <button class="net-btn" data-net="holesky"><span class="net-icon">🔬</span><span class="net-label">Holesky</span></button>
+        <button class="net-btn" data-net="mainnet"><span class="net-icon">🌐</span><span class="net-label">Ethereum Mainnet</span></button>
+      </div>
+      <div class="deploy-panel">
+        <div class="deploy-left">
+          <div class="form-group">
+            <label>Contrato a desplegar</label>
+            <select id="contractSelect"><option value="TokenERC20">TokenERC20.sol</option><option value="SimpleDEX">SimpleDEX.sol</option><option value="LendingPool">LendingPool.sol</option></select>
+          </div>
+          <div class="form-group" id="constructorArgs">
+            <label>Argumentos del constructor</label>
+            <input type="text" id="constructorInput" placeholder='Ej: "MyToken", "MTK", 1000000' value='"MyToken", "MTK", 1000000'>
+          </div>
+          <div class="form-group">
+            <label>Cuenta a usar</label>
+            <input type="text" id="deployAccount" value="0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266" readonly style="font-family:monospace;font-size:.7rem;">
+          </div>
+          <div style="display:flex;gap:10px;">
+            <button class="btn-action" id="deployBtn"><i class="fas fa-rocket"></i> Desplegar</button>
+            <button class="btn-action secondary" id="verifyBtn" disabled><i class="fas fa-check-double"></i> Verificar</button>
+          </div>
+        </div>
+        <div class="deploy-right" id="deployLog">
+          <div class="terminal-line"><span class="prompt">$</span> <span class="info">Ready to deploy. Select network and contract.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><i class="fas fa-plug"></i> CONECTAR CON ETHERs.JS</div>
+      <p style="color:var(--text-dim);font-size:.85rem;margin-bottom:14px;">
+        Una vez desplegado el contrato, puedes interactuar con él usando ethers.js desde el frontend. Simula una conexión aquí.
+      </p>
+      <div style="display:flex;flex-wrap:wrap;gap:20px;">
+        <div style="flex:1;min-width:220px;">
+          <div class="form-group">
+            <label>Dirección del contrato</label>
+            <input type="text" id="contractAddress" placeholder="0x..." value="0x5FbDB2315678afecb367f032d93F642f64180aa3">
+          </div>
+          <div class="form-group">
+            <label>Función a llamar</label>
+            <select id="funcSelect"><option value="name">name() → string</option><option value="symbol">symbol() → string</option><option value="totalSupply">totalSupply() → uint</option><option value="balanceOf">balanceOf(address) → uint</option></select>
+          </div>
+          <div class="interact-row">
+            <input type="text" id="funcArg" placeholder="Arg (si aplica, ej: 0x...)">
+            <button class="btn-sm" id="callBtn">Call</button>
+          </div>
+        </div>
+        <div style="flex:1;min-width:220px;background:rgba(0,0,0,0.2);border-radius:12px;padding:14px;font-family:'Courier New',monospace;font-size:.8rem;line-height:1.6;color:#88ccff;" id="callResult">
+          <span class="terminal-line"><span class="prompt">$</span> ethers result will appear here...</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><i class="fas fa-list"></i> HOJA DE RUTA: DE CERO A MAINNET</div>
+      <div class="step-grid">
+        <div class="step-item"><span class="step-num">1</span><i class="fas fa-laptop-code"></i><h4>Desarrollo Local</h4><p>Hardhat / Foundry. Pruebas con chai, fuzzing con forge. Asegura cobertura >90%.</p></div>
+        <div class="step-item"><span class="step-num">2</span><i class="fas fa-flask"></i><h4>Testnet Sepolia</h4><p>Consigue ETH gratis de faucets. Despliega, prueba con usuarios reales. ⚡ Fuente: sepoliafaucet.com, alchemy.com/faucets</p></div>
+        <div class="step-item"><span class="step-num">3</span><i class="fas fa-shield-alt"></i><h4>Auditoría</h4><p>Slither + Mythril + revisión manual. Usa code4rena o sherlock para auditoría profesional si es serio.</p></div>
+        <div class="step-item"><span class="step-num">4</span><i class="fas fa-check-double"></i><h4>Verificación Etherscan</h4><p>Sube el código fuente. Etherscan lo compila y verifica que coincida con el bytecode on-chain.</p></div>
+        <div class="step-item"><span class="step-num">5</span><i class="fas fa-users"></i><h4>Multisig</h4><p>Transfiere el ownership a un Gnosis Safe multisig (2/3 firmantes). Nunca controls un contrato serio desde una sola EOA.</p></div>
+        <div class="step-item"><span class="step-num">6</span><i class="fas fa-globe"></i><h4>Mainnet 🚀</h4><p>Despliegue final. ETH real, riesgos reales. Monitorea 24/7. Felicidades, eres un desarrollador DeFi en producción.</p></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><i class="fas fa-tasks"></i> PROYECTO FINAL: TU PROTOCOLO DEFI</div>
+      <p style="color:var(--text-dim);font-size:.9rem;margin-bottom:16px;">
+        Has llegado al final del curso. Ahora es tu turno de diseñar, implementar y desplegar tu propio protocolo DeFi. 
+        Aquí tienes ideas para tu proyecto final:
+      </p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;">
+        <div style="background:var(--accent-dim);border-radius:10px;padding:16px;border:1px solid rgba(0,255,200,0.15);">
+          <h4 style="font-size:.9rem;margin-bottom:6px;">📈 Yield Aggregator</h4>
+          <p style="font-size:.8rem;color:var(--text-dim);">Automatiza la búsqueda del mejor APY entre protocolos de lending. Como Yearn Finance pero versión simplificada.</p>
+        </div>
+        <div style="background:var(--accent-dim);border-radius:10px;padding:16px;border:1px solid rgba(0,255,200,0.15);">
+          <h4 style="font-size:.9rem;margin-bottom:6px;">🏛️ DAO de Gobernanza</h4>
+          <p style="font-size:.8rem;color:var(--text-dim);">Crea un token de gobernanza, un timelock y un sistema de votación. Los holders deciden el futuro del protocolo.</p>
+        </div>
+        <div style="background:var(--accent-dim);border-radius:10px;padding:16px;border:1px solid rgba(0,255,200,0.15);">
+          <h4 style="font-size:.9rem;margin-bottom:6px;">💱 Stablecoin Algorítmica</h4>
+          <p style="font-size:.8rem;color:var(--text-dim);">Implementa una stablecoin con mecanismo de expansión/contracción similar a Frax o una CDP tipo MakerDAO.</p>
+        </div>
+        <div style="background:var(--accent-dim);border-radius:10px;padding:16px;border:1px solid rgba(0,255,200,0.15);">
+          <h4 style="font-size:.9rem;margin-bottom:6px;">🔗 Puente Cross-Chain</h4>
+          <p style="font-size:.8rem;color:var(--text-dim);">Contrato que bloquea tokens en una red y los mintea en otra usando un relayer centralizado (versión simplificada).</p>
+        </div>
+      </div>
+      <div style="margin-top:18px;padding:16px;background:rgba(0,0,0,0.2);border-radius:10px;">
+        <p style="font-size:.85rem;color:var(--text-dim);">
+          <strong>📌 Requisitos mínimos del proyecto final:</strong><br>
+          ✅ Al menos 2 contratos inteligentes interactuando entre sí<br>
+          ✅ Tests unitarios con Hardhat/Foundry (≥80% cobertura)<br>
+          ✅ Auditoría con Slither (sin issues críticos)<br>
+          ✅ Despliegue en Sepolia con verificación en Etherscan<br>
+          ✅ Frontend básico con ethers.js o viem<br>
+          ✅ README con documentación técnica y de usuario
+        </p>
+      </div>
+    </div>
+
+    <div class="card" style="text-align:center;">
+      <div style="display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;">
+        <span id="badgeDeployer" class="badge-hidden badge-earned"><i class="fas fa-certificate"></i> DEPLOYER 🚀</span>
+        <button class="btn-reset" id="resetBtn"><i class="fas fa-trash-alt"></i> Reset</button>
+      </div>
+    </div>
+
+    <div class="module-nav">
+      <a href="07-quiz-repaso.html"><i class="fas fa-chevron-left"></i> Anterior</a>
+      <span class="nav-center">Módulo 8 de 9</span>
+      <a href="09-certificado.html">Siguiente <i class="fas fa-chevron-right"></i></a>
+    </div>
+    <div style="text-align:center;margin-bottom:20px;">
+      <a href="index.html" style="color:var(--text-dim);font-size:.85rem;"><i class="fas fa-th-large"></i> Volver al índice del curso</a>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p>Smart Contracts DeFi · Módulo 8 — Deployment & Proyecto Final</p>
+    <p style="margin-top:4px;">&copy; 2026 Israel Romero · Hecho con <span style="color:var(--accent);">❤</span> y código descentralizado</p>
+    <p style="margin-top:6px;font-size:.7rem;color:var(--text-dim);">📚 Fuentes: Hardhat docs (hardhat.org), Etherscan verification (docs.etherscan.io), Gnosis Safe (safe.global), OpenZeppelin Defender</p>
+  </footer>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="../../assets/js/cookie-consent.js"></script>
+  <script>
+    (function() {
+      const STORAGE_KEY = 'sc_deploy8';
+
+      const networkData = {
+        hardhat: { chainId: 31337, rpc: 'http://127.0.0.1:8545', explorer: 'N/A', currency: 'ETH (simulado)', faucet: 'N/A', color: '#ff6b35' },
+        sepolia: { chainId: 11155111, rpc: 'https://rpc.sepolia.org', explorer: 'sepolia.etherscan.io', currency: 'SepoliaETH', faucet: 'sepoliafaucet.com', color: '#ff6b35' },
+        holesky: { chainId: 17000, rpc: 'https://rpc.holesky.ethpandaops.io', explorer: 'holesky.etherscan.io', currency: 'HoleskyETH', faucet: 'holesky-faucet.ekta.io', color: '#8b5cf6' },
+        mainnet: { chainId: 1, rpc: 'https://eth.llamarpc.com', explorer: 'etherscan.io', currency: 'ETH (real)', faucet: '💰 COMPRA ETH', color: '#627eea' }
+      };
+
+      const contractTemplates = {
+        TokenERC20: { args: ['"Token", "TKN", 1000000'], bytecode: '0x6080604052...a264', address: '0x5FbDB2...0aa3', gas: '1,245,321' },
+        SimpleDEX: { args: ['"0xTokenAddress"'], bytecode: '0x6080604052...b4c8', address: '0xe7f172...4b2f', gas: '2,104,567' },
+        LendingPool: { args: ['"0xTokenA"', '"0xTokenB"', '2500'], bytecode: '0x6080604052...f1e2', address: '0x9fE467...2b47', gas: '3,421,890' }
+      };
+
+      const state = { deployed: false, contractType: null, network: 'hardhat', interacted: false, badgeEarned: false };
+
+      function loadState() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) { const p = JSON.parse(raw); if (p && typeof p === 'object') Object.assign(state, p); }
+        } catch(_) {}
+      }
+      function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+
+      let toastTimer = null;
+      function showToast(msg) {
+        const el = document.getElementById('toast');
+        el.textContent = msg; el.classList.add('show');
+        clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
+      }
+
+      function randomHex(n) { const c='0123456789abcdef'; let r=''; for(let i=0;i<n;i++) r+=c[Math.floor(Math.random()*16)]; return r; }
+
+      function addLog(cls, msg) {
+        const log = document.getElementById('deployLog');
+        const div = document.createElement('div');
+        div.className = 'terminal-line';
+        div.innerHTML = `<span class="prompt">$</span> <span class="${cls}">${msg}</span>`;
+        log.appendChild(div);
+        log.scrollTop = log.scrollHeight;
+      }
+
+      function clearLog() {
+        document.getElementById('deployLog').innerHTML = '<div class="terminal-line"><span class="prompt">$</span> <span class="info">Ready to deploy.</span></div>';
+      }
+
+      async function deployContract() {
+        const net = state.network;
+        const netInfo = networkData[net];
+        const contract = document.getElementById('contractSelect').value;
+        const args = document.getElementById('constructorInput').value;
+
+        if (net === 'mainnet') {
+          if (!confirm('⚠️ ESTÁS SIMULANDO UN DEPLOY EN MAINNET. En la vida real, esto cuesta ETH real y es irreversible. ¿Continuar de todos modos (simulación)?')) return;
+        }
+
+        clearLog();
+        addLog('info', `Network: ${net} (Chain ID: ${netInfo.chainId})`);
+        addLog('info', `RPC: ${netInfo.rpc}`);
+        addLog('info', `Contract: ${contract}.sol`);
+        addLog('info', `Constructor args: ${args}`);
+        addLog('info', `Account: ${document.getElementById('deployAccount').value}`);
+        addLog('warn', '⏳ Compiling...');
+
+        await sleep(600 + Math.random() * 400);
+        addLog('success', '✓ Compiled successfully (1 file, no warnings)');
+
+        addLog('warn', `⏳ Deploying to ${net}...`);
+
+        await sleep(800 + Math.random() * 600);
+        const tmpl = contractTemplates[contract];
+        const addr = '0x' + randomHex(40);
+
+        addLog('success', `✓ Transaction hash: 0x${randomHex(64)}`);
+        addLog('success', `✓ Contract deployed at: ${addr}`);
+        addLog('info', `⛽ Gas used: ${tmpl.gas}`);
+        addLog('info', `🔗 Explorer: ${netInfo.explorer === 'N/A' ? 'Local (no explorer)' : 'https://' + netInfo.explorer + '/address/' + addr}`);
+
+        if (net === 'mainnet') {
+          addLog('warn', '⚠️ MAINNET LIVE — This is a real deployment!');
+          addLog('success', '🎉 Congratulations! Your contract is live on Ethereum mainnet!');
+        }
+
+        state.deployed = true;
+        state.contractType = contract;
+        document.getElementById('contractAddress').value = addr;
+        document.getElementById('verifyBtn').disabled = false;
+        document.getElementById('deployBtn').disabled = true;
+        checkBadge();
+        saveState();
+        showToast(`✅ ${contract} desplegado en ${net}: ${addr.substring(0,10)}...`);
+      }
+
+      function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+      function verifyContract() {
+        const addr = document.getElementById('contractAddress').value;
+        addLog('info', `🔍 Verifying contract at ${addr}...`);
+        addLog('warn', '⏳ Sending source code to explorer...');
+        setTimeout(() => {
+          addLog('success', '✓ Source code matches bytecode!');
+          addLog('success', `✅ Verified on ${networkData[state.network].explorer}`);
+          showToast('✅ Contrato verificado en Etherscan!');
+          document.getElementById('verifyBtn').disabled = true;
+          state.interacted = true;
+          checkBadge();
+          saveState();
+        }, 1000);
+      }
+
+      function callContract() {
+        const func = document.getElementById('funcSelect').value;
+        const arg = document.getElementById('funcArg').value;
+        const addr = document.getElementById('contractAddress').value || '0x...';
+        const resultEl = document.getElementById('callResult');
+
+        const mockResults = {
+          name: '"MyToken"',
+          symbol: '"MTK"',
+          totalSupply: '1,000,000 (0x0DE0B6B3A7640000)',
+          balanceOf: arg ? `1,234 (${arg.substring(0,10)}...)` : 'Error: address required'
+        };
+        const result = mockResults[func] || '0x';
+        const from = document.getElementById('deployAccount').value.substring(0,10);
+
+        resultEl.innerHTML = `<div class="terminal-line"><span class="prompt">$</span> ${func}() on ${addr.substring(0,10)}...</div><div class="terminal-line"><span class="prompt">&gt;</span> from: ${from}...</div><div class="terminal-line"><span class="prompt">&gt;</span> <span class="success">${func}: ${result}</span></div>`;
+
+        state.interacted = true;
+        checkBadge();
+        saveState();
+      }
+
+      function checkBadge() {
+        if (state.deployed && state.interacted && !state.badgeEarned) {
+          state.badgeEarned = true;
+          saveState();
+          showToast('🏅 ¡DEPLOYER! Has desplegado y verificado un contrato.');
+        }
+        const badge = document.getElementById('badgeDeployer');
+        if (state.badgeEarned) badge.classList.remove('badge-hidden');
+        else badge.classList.add('badge-hidden');
+      }
+
+      function resetAll() {
+        if (state.deployed) { if (!confirm('¿Resetear? Perderás tu progreso y badge.')) return; }
+        state.deployed = false; state.contractType = null; state.interacted = false; state.badgeEarned = false;
+        clearLog(); document.getElementById('deployBtn').disabled = false; document.getElementById('verifyBtn').disabled = true;
+        document.getElementById('contractAddress').value = '0x5FbDB2315678afecb367f032d93F642f64180aa3';
+        document.getElementById('callResult').innerHTML = '<span class="terminal-line"><span class="prompt">$</span> ethers result will appear here...';
+        document.getElementById('badgeDeployer').classList.add('badge-hidden');
+        saveState(); showToast('🔄 Estado restablecido');
+      }
+
+      // Network selector
+      document.querySelectorAll('.net-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          document.querySelectorAll('.net-btn').forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+          state.network = this.dataset.net;
+        });
+      });
+
+      document.getElementById('deployBtn').addEventListener('click', deployContract);
+      document.getElementById('verifyBtn').addEventListener('click', verifyContract);
+      document.getElementById('callBtn').addEventListener('click', callContract);
+      document.getElementById('resetBtn').addEventListener('click', resetAll);
+
+      // Contract selector updates args
+      document.getElementById('contractSelect').addEventListener('change', function() {
+        const tmpl = contractTemplates[this.value];
+        document.getElementById('constructorInput').value = tmpl.args.map((a,i) => i === tmpl.args.length-1 ? a : a).join(', ');
+      });
+
+      loadState();
+      if (state.deployed) {
+        document.getElementById('deployBtn').disabled = true;
+        document.getElementById('verifyBtn').disabled = false;
+      }
+      if (state.badgeEarned) document.getElementById('badgeDeployer').classList.remove('badge-hidden');
+    })();
+  </script>
+</body>
+</html>

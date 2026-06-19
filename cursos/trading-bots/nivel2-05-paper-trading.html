@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Bot Trader N2 | Paper Trading Simulator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{background:linear-gradient(145deg,#001428 0%,#002040 100%);font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem;}
+    .container{max-width:1300px;width:100%;background:rgba(0,14,35,.85);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(0,180,255,.25);box-shadow:0 25px 45px rgba(0,0,0,.6);overflow:hidden;}
+    .hero{background:linear-gradient(95deg,#001020,#001c38);padding:1.8rem 2rem;text-align:center;border-bottom:2px solid #00b4ff;}
+    .hero h1{font-size:1.8rem;font-weight:800;background:linear-gradient(135deg,#ccecff,#80d0ff,#00b4ff);-webkit-background-clip:text;background-clip:text;color:transparent;}
+    .hero p{margin-top:.5rem;font-size:.95rem;color:#60b0d0;}
+    .badge{display:inline-block;background:#002244;border:1px solid #00b4ff44;color:#00b4ff;font-size:.7rem;padding:.2rem .8rem;border-radius:1rem;margin-top:.4rem;}
+    .analogy-card{background:#001428cc;margin:1.5rem 2rem;padding:1.2rem 1.8rem;border-radius:2rem;border-left:8px solid #00b4ff;font-size:.93rem;line-height:1.6;}
+    .analogy-card strong{color:#80d0ff;}
+    .sim-layout{display:flex;flex-wrap:wrap;gap:1.2rem;padding:0 2rem 1.5rem;}
+    .chart-col{flex:2;min-width:300px;}
+    .controls-col{flex:1;min-width:240px;display:flex;flex-direction:column;gap:.8rem;}
+    .box{background:#001428dd;border-radius:2rem;padding:1.2rem;border:1px solid #00b4ff22;}
+    .box h3{font-size:.9rem;font-weight:700;color:#80d0ff;margin-bottom:.8rem;}
+    .price-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem;}
+    .price-big{font-size:2rem;font-weight:800;font-family:'JetBrains Mono',monospace;}
+    .price-chg{font-size:.85rem;padding:.2rem .7rem;border-radius:.8rem;font-weight:700;}
+    .ticker-select{background:#002244;border:1px solid #00b4ff33;color:#eef5ff;padding:.4rem .8rem;border-radius:.8rem;font-size:.85rem;font-family:'Inter',sans-serif;}
+    canvas#priceChart{width:100%;border-radius:1rem;display:block;}
+    .orderbook{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;}
+    .ob-side{background:#000e22;border-radius:1rem;padding:.6rem;}
+    .ob-header{font-size:.7rem;font-weight:700;margin-bottom:.3rem;}
+    .ob-ask{color:#ff6666;}.ob-bid{color:#00ff88;}
+    .ob-row{display:flex;justify-content:space-between;font-size:.7rem;font-family:monospace;padding:.1rem 0;}
+    .portfolio-stats{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;}
+    .ps-card{background:#000e22;border-radius:1rem;padding:.5rem .7rem;text-align:center;}
+    .ps-val{font-size:1.1rem;font-weight:800;font-family:monospace;}
+    .ps-lbl{font-size:.65rem;color:#4488aa;margin-top:.1rem;}
+    .order-form{display:flex;flex-direction:column;gap:.5rem;}
+    .of-label{font-size:.73rem;color:#4488aa;text-transform:uppercase;letter-spacing:.04rem;}
+    .of-input{background:#002244;border:1px solid #00b4ff33;color:#eef5ff;padding:.45rem .8rem;border-radius:.8rem;font-size:.85rem;font-family:'Inter',sans-serif;width:100%;}
+    .of-tabs{display:flex;gap:.3rem;}
+    .of-tab{background:#002244;border:1px solid #003366;color:#80a0c0;padding:.35rem .8rem;border-radius:.8rem;cursor:pointer;font-size:.78rem;transition:.2s;}
+    .of-tab.active{background:#003366;border-color:#00b4ff;color:#00b4ff;}
+    .btn-buy{background:linear-gradient(95deg,#00b4ff,#0077cc);border:none;padding:.7rem;font-weight:700;border-radius:1.5rem;cursor:pointer;color:#fff;font-size:.9rem;flex:1;transition:.2s;}
+    .btn-sell{background:linear-gradient(95deg,#ff5050,#cc2222);border:none;padding:.7rem;font-weight:700;border-radius:1.5rem;cursor:pointer;color:#fff;font-size:.9rem;flex:1;transition:.2s;}
+    .btn-buy:hover,.btn-sell:hover{transform:translateY(-2px);}
+    .trades-list{max-height:180px;overflow-y:auto;}
+    .trade-item{display:flex;gap:.4rem;font-size:.73rem;font-family:monospace;padding:.25rem 0;border-bottom:1px solid #001c38;}
+    .feedback{background:#00000088;margin:0 2rem 1rem;padding:.9rem;border-radius:1.5rem;text-align:center;border-left:4px solid #00b4ff;font-size:.9rem;line-height:1.5;}
+    .insignia{text-align:center;background:#001020;border-radius:2rem;margin:0 2rem 1.5rem;padding:1rem;border:1px dashed gold;}
+    .insignia i{font-size:2.5rem;color:gold;}
+    .hidden{display:none;}
+    .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.5rem 2rem;}
+    .nav-link{background:#2c3e66;padding:.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:.5rem;transition:.2s;}
+    .nav-link:hover{transform:translateY(-2px);}
+    .nav-link.next{background:linear-gradient(95deg,#f0a500,#ff6a00);color:#1e1a0c;}
+    .nav-link.menu{background:#1a2a4a;border:1px solid #00b4ff;}
+    footer{text-align:center;padding:1rem;font-size:.75rem;border-top:1px solid #001428;}
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+<div class="container">
+  <div class="hero">
+    <h1>🎮 PAPER TRADING SIMULATOR: Aprende Sin Perder Dinero Real</h1>
+    <p>Un exchange simulado con precios en movimiento, orderbook en vivo y tracking de portafolio</p>
+    <span class="badge">⚡ NIVEL 2 — Módulo Avanzado</span>
+  </div>
+  <div class="analogy-card">
+    <strong>🎯 Piénsalo así:</strong> Paper trading es como el simulador de vuelo antes de volar un avión real. Los pilotos de línea aérea pasan <strong>cientos de horas en simulador</strong> antes de tocar un avión real. Un bot trader debería hacer lo mismo: al menos 30 días de paper trading exitoso antes de usar dinero real. La diferencia clave: el paper trading <strong>no replica el slippage, las emociones ni la liquidez real</strong> — pero es tu mejor aliado para detectar bugs y ajustar parámetros.
+    <br><br>
+    <strong>📚 Fuentes:</strong> Aronson, D. (2006) — <em>"Evidence-Based Technical Analysis"</em>. Wiley. / Kahneman, D. (2011) — <em>"Thinking, Fast and Slow"</em>. Farrar, Straus and Giroux.
+  </div>
+  <div class="sim-layout">
+    <div class="chart-col">
+      <div class="box">
+        <div class="price-header">
+          <div>
+            <select class="ticker-select" id="tickerSelect" onchange="changeTicker()">
+              <option value="btc">BTC/USDT</option>
+              <option value="eth">ETH/USDT</option>
+              <option value="sol">SOL/USDT</option>
+              <option value="bnb">BNB/USDT</option>
+            </select>
+          </div>
+          <div>
+            <div class="price-big" id="priceDisplay">$—</div>
+            <div class="price-chg" id="priceChg" style="background:#002a10;color:#00ff88;">+0.00%</div>
+          </div>
+          <div style="font-size:.75rem;color:#4488aa;text-align:right;">
+            Vol 24h: <span id="vol24h" style="color:#80d0ff;">—</span><br>
+            High: <span id="high24h" style="color:#00ff88;">—</span> / Low: <span id="low24h" style="color:#ff6666;">—</span>
+          </div>
+        </div>
+        <canvas id="priceChart" height="200"></canvas>
+        <div style="display:flex;justify-content:space-between;margin-top:.4rem;font-size:.7rem;color:#4488aa;">
+          <span id="chartTimeStart">—</span><span>Tiempo real simulado</span><span>Ahora</span>
+        </div>
+      </div>
+      <div class="box" style="margin-top:1rem;">
+        <h3><i class="fas fa-list-ul"></i> Orderbook en Vivo</h3>
+        <div class="orderbook">
+          <div class="ob-side"><div class="ob-header ob-ask">ASKS (Vendedores)</div><div id="askBook"></div></div>
+          <div class="ob-side"><div class="ob-header ob-bid">BIDS (Compradores)</div><div id="bidBook"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="controls-col">
+      <div class="box">
+        <h3><i class="fas fa-wallet"></i> Mi Portafolio (Paper)</h3>
+        <div class="portfolio-stats">
+          <div class="ps-card"><div class="ps-val" id="portTotal" style="color:#00b4ff">$10,000</div><div class="ps-lbl">Valor Total</div></div>
+          <div class="ps-card"><div class="ps-val" id="portCash" style="color:#ffd700">$10,000</div><div class="ps-lbl">Cash (USDT)</div></div>
+          <div class="ps-card"><div class="ps-val" id="portPnl" style="color:#888">$0.00</div><div class="ps-lbl">P&L Total</div></div>
+          <div class="ps-card"><div class="ps-val" id="portPnlPct" style="color:#888">0.00%</div><div class="ps-lbl">Retorno</div></div>
+        </div>
+        <div style="margin-top:.6rem;font-size:.75rem;color:#4488aa;" id="positionInfo">Sin posición abierta.</div>
+      </div>
+      <div class="box">
+        <h3><i class="fas fa-shopping-cart"></i> Nueva Orden</h3>
+        <div class="order-form">
+          <div>
+            <div class="of-label">Tipo</div>
+            <div class="of-tabs">
+              <div class="of-tab active" data-t="market" onclick="setOrderType(this)">Market</div>
+              <div class="of-tab" data-t="limit" onclick="setOrderType(this)">Limit</div>
+            </div>
+          </div>
+          <div>
+            <div class="of-label">Cantidad (USDT)</div>
+            <input class="of-input" type="number" id="orderAmt" value="500" min="10">
+          </div>
+          <div id="limitPriceRow" style="display:none;">
+            <div class="of-label">Precio Límite</div>
+            <input class="of-input" type="number" id="limitPrice" placeholder="$0.00">
+          </div>
+          <div style="display:flex;gap:.4rem;">
+            <button class="btn-buy" onclick="placeOrder('buy')">▲ COMPRAR</button>
+            <button class="btn-sell" onclick="placeOrder('sell')">▼ VENDER</button>
+          </div>
+        </div>
+      </div>
+      <div class="box">
+        <h3><i class="fas fa-history"></i> Historial de Trades</h3>
+        <div class="trades-list" id="tradesList"><div style="color:#4488aa;font-size:.78rem;">Sin trades aún.</div></div>
+      </div>
+    </div>
+  </div>
+  <div id="feedbackMsg" class="feedback">🎮 Haz trades con tu portafolio de $10,000 en paper money. Compra y vende al menos 3 veces para desbloquear la insignia. ¡Recuerda que aquí no pierdes dinero real!</div>
+  <div id="insigniaArea" class="insignia hidden">
+    <i class="fas fa-gamepad"></i>
+    <h3>🏅 ¡INSIGNIA DE PAPER TRADER! 🏅</h3>
+    <p>Completaste sesión de paper trading. ¡30 días de esto y estarás listo para live trading!</p>
+  </div>
+  <div class="nav-links">
+    <a href="nivel2-04-portfolio.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+    <a href="nivel2-06-errores-comunes.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Bot Trader Adventure · Nivel 2 Módulo 5 · Aronson (2006) · Kahneman (2011)</footer>
+</div>
+<script>
+const STORAGE_KEY='tbot_n2paper';
+let completed=false, trades=[], tradeCount=0;
+
+const TICKERS={btc:{name:'BTC/USDT',base:44000,vol:0.015},eth:{name:'ETH/USDT',base:2400,vol:0.018},sol:{name:'SOL/USDT',base:105,vol:0.025},bnb:{name:'BNB/USDT',base:380,vol:0.014}};
+let currentTicker='btc', prices=[], priceInterval=null;
+let cash=10000, holdings=0, holdingTicker=null, entryPrice=0;
+let orderType='market';
+
+function generatePrices(base,vol,n=80){
+  const p=[base];
+  for(let i=1;i<n;i++) p.push(p[i-1]*(1+(Math.random()-0.5)*vol*2));
+  return p;
+}
+
+function changeTicker(){
+  currentTicker=document.getElementById('tickerSelect').value;
+  const t=TICKERS[currentTicker];
+  prices=generatePrices(t.base,t.vol);
+  updateDisplay();
+}
+
+function updateDisplay(){
+  const t=TICKERS[currentTicker];
+  const price=prices[prices.length-1];
+  const open=prices[0];
+  const chg=(price-open)/open*100;
+  const high=Math.max(...prices);
+  const low=Math.min(...prices);
+
+  document.getElementById('priceDisplay').textContent='$'+price.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const chgEl=document.getElementById('priceChg');
+  chgEl.textContent=(chg>=0?'+':'')+chg.toFixed(2)+'%';
+  chgEl.style.background=chg>=0?'#002a10':'#2a0808';
+  chgEl.style.color=chg>=0?'#00ff88':'#ff6666';
+  document.getElementById('high24h').textContent='$'+high.toFixed(0);
+  document.getElementById('low24h').textContent='$'+low.toFixed(0);
+  document.getElementById('vol24h').textContent=(Math.random()*2+0.5).toFixed(2)+'B';
+
+  drawChart();
+  renderOrderbook(price);
+  updatePortfolio(price);
+}
+
+function drawChart(){
+  const canvas=document.getElementById('priceChart');
+  const W=canvas.parentElement.clientWidth-30;
+  canvas.width=W;canvas.height=200;
+  const ctx=canvas.getContext('2d');
+  ctx.fillStyle='#000e22';ctx.fillRect(0,0,W,200);
+
+  const n=prices.length;
+  const mn=Math.min(...prices)*0.998, mx=Math.max(...prices)*1.002;
+  const yS=v=>190-((v-mn)/(mx-mn))*180;
+  const xS=i=>(i/(n-1))*(W-20)+10;
+
+  const grad=ctx.createLinearGradient(0,0,0,200);
+  grad.addColorStop(0,'rgba(0,180,255,0.25)');grad.addColorStop(1,'rgba(0,180,255,0)');
+  ctx.beginPath();ctx.moveTo(xS(0),yS(prices[0]));
+  prices.forEach((p,i)=>ctx.lineTo(xS(i),yS(p)));
+  ctx.lineTo(xS(n-1),200);ctx.lineTo(xS(0),200);ctx.closePath();ctx.fillStyle=grad;ctx.fill();
+
+  ctx.beginPath();ctx.strokeStyle='#00b4ff';ctx.lineWidth=2;
+  prices.forEach((p,i)=>i===0?ctx.moveTo(xS(i),yS(p)):ctx.lineTo(xS(i),yS(p)));
+  ctx.stroke();
+
+  if(holdings>0&&entryPrice>0){
+    ctx.strokeStyle='rgba(255,215,0,0.5)';ctx.lineWidth=1;ctx.setLineDash([4,4]);
+    const ey=yS(entryPrice);ctx.beginPath();ctx.moveTo(0,ey);ctx.lineTo(W,ey);ctx.stroke();ctx.setLineDash([]);
+    ctx.font='10px Inter';ctx.fillStyle='#ffd700';ctx.fillText('Entrada $'+entryPrice.toFixed(0),5,ey-4);
+  }
+}
+
+function renderOrderbook(price){
+  const asks=[],bids=[];
+  for(let i=0;i<5;i++){
+    asks.push({p:(price*(1+0.0001*(i+1))).toFixed(2),v:(Math.random()*5+0.1).toFixed(3)});
+    bids.push({p:(price*(1-0.0001*(i+1))).toFixed(2),v:(Math.random()*5+0.1).toFixed(3)});
+  }
+  document.getElementById('askBook').innerHTML=asks.reverse().map(a=>`<div class="ob-row ob-ask"><span>$${a.p}</span><span>${a.v}</span></div>`).join('');
+  document.getElementById('bidBook').innerHTML=bids.map(b=>`<div class="ob-row ob-bid"><span>$${b.p}</span><span>${b.v}</span></div>`).join('');
+}
+
+function updatePortfolio(price){
+  const holdingVal=holdingTicker===currentTicker?holdings*price:0;
+  const total=cash+holdingVal;
+  const pnl=total-10000;
+  const pnlPct=pnl/10000*100;
+  document.getElementById('portTotal').textContent='$'+total.toFixed(2);
+  document.getElementById('portCash').textContent='$'+cash.toFixed(2);
+  document.getElementById('portPnl').textContent=(pnl>=0?'+':'')+pnl.toFixed(2);
+  document.getElementById('portPnl').style.color=pnl>=0?'#00ff88':'#ff6666';
+  document.getElementById('portPnlPct').textContent=(pnlPct>=0?'+':'')+pnlPct.toFixed(2)+'%';
+  document.getElementById('portPnlPct').style.color=pnlPct>=0?'#00ff88':'#ff6666';
+  if(holdings>0&&holdingTicker===currentTicker){
+    const unreal=holdings*(price-entryPrice);
+    document.getElementById('positionInfo').innerHTML=`<span style="color:#ffd700">📦 Posición abierta:</span> ${holdings.toFixed(4)} ${currentTicker.toUpperCase()} · Entrada $${entryPrice.toFixed(2)} · P&L: <span style="color:${unreal>=0?'#00ff88':'#ff6666'}">${unreal>=0?'+':''}$${unreal.toFixed(2)}</span>`;
+  } else {
+    document.getElementById('positionInfo').textContent='Sin posición abierta.';
+  }
+}
+
+function setOrderType(btn){
+  orderType=btn.dataset.t;
+  document.querySelectorAll('.of-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('limitPriceRow').style.display=orderType==='limit'?'block':'none';
+}
+
+function placeOrder(side){
+  const price=prices[prices.length-1];
+  const execPrice=orderType==='limit'?(+document.getElementById('limitPrice').value||price):price*(1+(side==='buy'?0.0003:-0.0003));
+  const amt=+document.getElementById('orderAmt').value||500;
+
+  if(side==='buy'){
+    if(amt>cash){document.getElementById('feedbackMsg').innerHTML='❌ Cash insuficiente. Vende primero o reduce el monto.';return;}
+    const qty=amt/execPrice;
+    cash-=amt;
+    if(holdingTicker===currentTicker){holdings+=qty;entryPrice=(entryPrice+execPrice)/2;}
+    else{holdings=qty;holdingTicker=currentTicker;entryPrice=execPrice;}
+  } else {
+    if(holdings<=0||holdingTicker!==currentTicker){document.getElementById('feedbackMsg').innerHTML='❌ No tienes posición en '+TICKERS[currentTicker].name;return;}
+    const sellAmt=Math.min(holdings,(amt/execPrice));
+    const pnl=sellAmt*(execPrice-entryPrice);
+    cash+=sellAmt*execPrice;holdings-=sellAmt;
+    if(holdings<0.0001){holdings=0;holdingTicker=null;}
+    document.getElementById('feedbackMsg').innerHTML=`${pnl>=0?'✅ Trade exitoso':'📉 Trade cerrado'}: P&L = <strong style="color:${pnl>=0?'#00ff88':'#ff6666'}">${pnl>=0?'+':''}$${pnl.toFixed(2)}</strong>`;
+  }
+
+  const tradeEntry={side,price:execPrice.toFixed(2),amt,time:new Date().toLocaleTimeString()};
+  trades.unshift(tradeEntry);tradeCount++;
+  document.getElementById('tradesList').innerHTML=trades.slice(0,20).map(t=>`
+    <div class="trade-item">
+      <span style="color:${t.side==='buy'?'#00ff88':'#ff6666'};font-weight:700">${t.side.toUpperCase()}</span>
+      <span>$${t.price}</span>
+      <span>$${t.amt}</span>
+      <span style="color:#4488aa">${t.time}</span>
+    </div>`).join('');
+
+  updatePortfolio(prices[prices.length-1]);
+
+  if(tradeCount>=3&&!completed){
+    completed=true;localStorage.setItem(STORAGE_KEY,'true');
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').innerHTML+='<br><strong style="color:#00b4ff">🎓 ¡MÓDULO COMPLETADO! Completaste tu sesión de paper trading. Próximo paso: 30 días de paper trading antes de ir live.</strong>';
+  }
+}
+
+function tick(){
+  const t=TICKERS[currentTicker];
+  const last=prices[prices.length-1];
+  const newPrice=last*(1+(Math.random()-0.49)*t.vol*0.4);
+  prices.push(newPrice);
+  if(prices.length>120)prices.shift();
+  updateDisplay();
+}
+
+changeTicker();
+priceInterval=setInterval(tick,2000);
+if(localStorage.getItem(STORAGE_KEY)==='true'){completed=true;document.getElementById('insigniaArea').classList.remove('hidden');}
+</script>
+  <script src="../../assets/js/cookie-consent.js"></script>
+</body>
+</html>
+
+
+

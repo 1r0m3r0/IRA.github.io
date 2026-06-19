@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Curso 3: Cuantitativa | ANOVA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%);background-size:200% 200%;animation:gradientShift 20s ease infinite;font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
+    @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+    .modulo-container{max-width:1300px;width:100%;background:rgba(15,25,45,0.65);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(20,184,166,0.25);box-shadow:0 25px 45px rgba(0,0,0,0.5);overflow:hidden}
+    .hero-header{background:linear-gradient(95deg,#0b1120,#111a2e);padding:2rem 2rem 1.5rem;text-align:center;border-bottom:2px solid #14b8a6}
+    .hero-header h1{font-size:2.6rem;font-weight:800;background:linear-gradient(135deg,#FFF,#5eead4,#14b8a6);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .hero-header p{font-size:1.1rem;color:#99f6e4;margin-top:0.5rem;font-weight:500}
+    .badge-area{display:flex;justify-content:center;gap:1rem;margin-top:1.2rem;flex-wrap:wrap}
+    .chip{background:rgba(20,184,166,0.15);border:1px solid #14b8a6;padding:0.4rem 1rem;border-radius:40px;font-size:0.8rem;font-weight:600}
+    .analogy-card{background:#1e2a3acc;margin:1.5rem 2rem;padding:1.2rem 1.8rem;border-radius:2rem;border-left:8px solid #14b8a6;font-size:1rem;line-height:1.6}
+    .main-area{padding:0 2rem 2rem}
+    .anova-groups{display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;margin:1rem 0}
+    .anova-group{flex:1;min-width:150px;background:#0f1a2ce0;border-radius:1.5rem;padding:1rem;text-align:center;border:1px solid rgba(20,184,166,0.15)}
+    .anova-group h4{color:#5eead4;margin-bottom:0.3rem}
+    .group-dot{display:inline-block;width:12px;height:12px;border-radius:50%;margin:0.1rem}
+    .group-mean-line{height:3px;background:#ffd700;margin:0.4rem 0;border-radius:2px;position:relative}
+    .group-mean-line::after{content:"μ";position:absolute;right:-15px;top:-8px;font-size:0.7rem;color:#ffd700}
+    .anova-stats{display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;margin:0.8rem 0}
+    .stat-pill{background:#0f1a2ce0;border-radius:1.5rem;padding:0.5rem 1.2rem;text-align:center;border:1px solid rgba(20,184,166,0.1);min-width:90px}
+    .stat-pill h4{font-size:0.65rem;color:#99f6e4}
+    .stat-pill .val{font-size:1.3rem;font-weight:700}
+    .btn-action{background:linear-gradient(95deg,#14b8a6,#5eead4);border:none;padding:0.7rem 1.5rem;font-weight:bold;border-radius:3rem;cursor:pointer;font-size:0.9rem;transition:0.2s;color:#0a0f1e;font-family:'Inter',sans-serif;margin:0.3rem}
+    .btn-action:hover{transform:translateY(-2px);box-shadow:0 0 15px rgba(20,184,166,0.5)}
+    .reset-btn{background:#2c3e66;border:none;padding:0.7rem 1.2rem;font-weight:bold;border-radius:3rem;cursor:pointer;color:#eef5ff;font-family:'Inter',sans-serif;font-size:0.9rem;transition:0.2s}
+    .feedback{background:#00000099;margin:0 2rem 1.5rem;padding:1rem;border-radius:1.5rem;text-align:center;font-weight:500;border-left:4px solid #14b8a6}
+    .insignia{text-align:center;background:#0c1b2f;border-radius:2rem;margin:0 2rem 1.5rem;padding:1rem;border:1px dashed gold}
+    .insignia i{font-size:2.5rem;color:gold}
+    .hidden{display:none}
+    .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.5rem 2rem}
+    .nav-link{background:#2c3e66;padding:0.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:0.5rem;transition:0.2s}
+    .nav-link:hover{transform:translateY(-2px);box-shadow:0 0 10px rgba(20,184,166,0.4)}
+    .nav-link.next{background:linear-gradient(95deg,#14b8a6,#5eead4);color:#0a0f1e}
+    .nav-link.menu{background:#1a2a4a;border:1px solid #14b8a6}
+    .nav-link.disabled{opacity:0.4;pointer-events:none}
+    footer{text-align:center;padding:1.2rem;font-size:0.8rem;border-top:1px solid rgba(20,184,166,0.2)}
+    @media(max-width:800px){.hero-header h1{font-size:1.9rem}}
+  </style>
+  <link rel="stylesheet" href="../../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a><a href="../index.html">Programa Metodolog&iacute;a</a></nav>
+
+<div class="modulo-container">
+  <div class="hero-header">
+    <h1><i class="fas fa-layer-group"></i> ANOVA, MANOVA y Modelos Mixtos</h1>
+    <p>&iquest;Las diferencias entre grupos son reales o es ruido?</p>
+    <div class="badge-area">
+      <span class="chip"><i class="fas fa-calculator"></i> F-stat</span>
+      <span class="chip"><i class="fas fa-search-plus"></i> Post-hoc</span>
+    </div>
+  </div>
+
+  <div class="analogy-card">
+    <strong><i class="fas fa-weight"></i> Piénsalo así:</strong> ANOVA compara si las diferencias entre grupos son mayores que las diferencias dentro de los grupos. Es como preguntar: &iquest;la altura de tres monta&ntilde;as se distingue del desnivel del terreno en cada una?
+  </div>
+
+  <div class="main-area">
+    <div style="text-align:center;margin-bottom:0.5rem;">
+      <p style="color:#99f6e4;font-weight:600;"><i class="fas fa-dice"></i> Pulsa "Nuevos datos" para generar grupos con diferentes medias</p>
+    </div>
+    <div style="text-align:center;">
+      <button id="newAnovaDataBtn" class="btn-action"><i class="fas fa-dice"></i> Nuevos datos</button>
+      <button id="separateGroupsBtn" class="reset-btn"><i class="fas fa-arrows-alt"></i> Separar grupos (aumentar efecto)</button>
+    </div>
+    <div class="anova-groups" id="anovaGroups"></div>
+    <div class="anova-stats">
+      <div class="stat-pill"><h4>F-stat</h4><div class="val" id="fStat" style="color:#14b8a6">-</div></div>
+      <div class="stat-pill"><h4>p-valor</h4><div class="val" id="pVal" style="color:#5eead4">-</div></div>
+      <div class="stat-pill"><h4>SS entre</h4><div class="val" id="ssBet" style="color:#99f6e4">-</div></div>
+      <div class="stat-pill"><h4>SS dentro</h4><div class="val" id="ssWit" style="color:#ffd700">-</div></div>
+    </div>
+  </div>
+
+  <div id="feedbackMsg" class="feedback">
+    <i class="fas fa-lightbulb"></i> Pulsa "Nuevos datos" para generar una simulaci&oacute;n de ANOVA con tres grupos. Observa el estad&iacute;stico F y el p-valor.
+  </div>
+
+  <div id="insigniaArea" class="insignia hidden">
+    <i class="fas fa-medal"></i>
+    <h3>&#127941; Analista de Varianza &#127941;</h3>
+    <p>&iexcl;Interpretas ANOVA y sabes cu&aacute;ndo las diferencias entre grupos son significativas!</p>
+  </div>
+
+  <div class="nav-links">
+    <a href="07-regresion-logistica.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
+    <a href="09-series-temporales.html" id="nextLink8" class="nav-link next disabled">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Programa Metodolog&iacute;a &middot; Curso 3: Investigaci&oacute;n Cuantitativa</footer>
+</div>
+
+<script>
+  const STORAGE_KEY = 'meto_3_08';
+  let anovaData = [];
+  let interactions = 0;
+  let offset = 0;
+
+  const COLORS = ['#14b8a6', '#5eead4', '#ffd700'];
+
+  function generateAnovaData(sep) {
+    anovaData = [];
+    const means = [5 + sep, 7 + sep, 9 + sep];
+    const groups = ['Control', 'Bajo', 'Alto'];
+    for (let g = 0; g < 3; g++) {
+      for (let i = 0; i < 8; i++) {
+        anovaData.push({ group: g, label: groups[g], value: means[g] + (Math.random() - 0.5) * 4 });
+      }
+    }
+    interactions++;
+    renderAnovaGroups();
+    computeAnova();
+    document.getElementById('feedbackMsg').innerHTML = '<i class="fas fa-check-circle" style="color:#14b8a6"></i> Datos generados. Interacci&oacute;n #' + interactions + '.';
+    if (interactions >= 2) {
+      document.getElementById('insigniaArea').classList.remove('hidden');
+      localStorage.setItem(STORAGE_KEY, 'done');
+      document.getElementById('nextLink8').classList.remove('disabled');
+    }
+  }
+
+  function renderAnovaGroups() {
+    const container = document.getElementById('anovaGroups');
+    container.innerHTML = '';
+    const groups = {};
+    anovaData.forEach(p => {
+      if (!groups[p.group]) groups[p.group] = [];
+      groups[p.group].push(p.value);
+    });
+    Object.entries(groups).forEach(([g, vals]) => {
+      const div = document.createElement('div');
+      div.className = 'anova-group';
+      const mean = vals.reduce((s,v) => s + v, 0) / vals.length;
+      div.innerHTML = '<h4>' + ['Control', 'Bajo', 'Alto'][parseInt(g)] + '</h4>';
+      vals.forEach(v => {
+        const dot = document.createElement('span');
+        dot.className = 'group-dot';
+        dot.style.background = COLORS[parseInt(g)];
+        const h = Math.max(4, (v / 15) * 80);
+        dot.style.height = h + 'px';
+        dot.style.width = '8px';
+        dot.style.borderRadius = '4px';
+        dot.style.verticalAlign = 'bottom';
+        div.appendChild(dot);
+        div.appendChild(document.createTextNode(' '));
+      });
+      div.innerHTML += '<div class="group-mean-line" style="width:60%;margin:0.4rem auto;background:' + COLORS[parseInt(g)] + '"></div>';
+      div.innerHTML += '<div style="font-size:0.8rem;">&mu; = ' + mean.toFixed(1) + '</div>';
+      container.appendChild(div);
+    });
+  }
+
+  function computeAnova() {
+    const groups = {};
+    anovaData.forEach(p => {
+      if (!groups[p.group]) groups[p.group] = [];
+      groups[p.group].push(p.value);
+    });
+    const k = Object.keys(groups).length;
+    const allVals = anovaData.map(p => p.value);
+    const grandMean = allVals.reduce((s,v) => s + v, 0) / allVals.length;
+    let ssBetween = 0, ssWithin = 0;
+    Object.values(groups).forEach(vals => {
+      const gMean = vals.reduce((s,v) => s + v, 0) / vals.length;
+      ssBetween += vals.length * (gMean - grandMean) ** 2;
+      vals.forEach(v => { ssWithin += (v - gMean) ** 2; });
+    });
+    const n = allVals.length;
+    const dfBetween = k - 1;
+    const dfWithin = n - k;
+    const msBetween = ssBetween / dfBetween;
+    const msWithin = ssWithin / dfWithin;
+    const f = msWithin > 0 ? msBetween / msWithin : 0;
+    const p = 1 - fStatCDF(f, dfBetween, dfWithin);
+
+    document.getElementById('fStat').textContent = f.toFixed(2);
+    document.getElementById('pVal').textContent = p.toFixed(4);
+    document.getElementById('ssBet').textContent = ssBetween.toFixed(1);
+    document.getElementById('ssWit').textContent = ssWithin.toFixed(1);
+  }
+
+  function fStatCDF(f, d1, d2) {
+    const x = (d1 * f) / (d1 * f + d2);
+    return 1 - regularizedIncBeta(x, d1/2, d2/2);
+  }
+
+  function regularizedIncBeta(x, a, b) {
+    if (x < 0 || x > 1) return 0;
+    if (x === 0 || x === 1) return x;
+    const bt = Math.exp(logBeta(a, b) + a * Math.log(x) + b * Math.log(1 - x));
+    if (x < (a + 1) / (a + b + 2)) return bt * contFrac(a, b, x) / a;
+    return 1 - bt * contFrac(b, a, 1 - x) / b;
+  }
+
+  function logBeta(a, b) {
+    return lgamma(a) + lgamma(b) - lgamma(a + b);
+  }
+
+  function lgamma(z) {
+    const g = 7;
+    const c = [0.99999999999980993, 676.5203681218851, -1259.1392167224028, 771.32342877765313, -176.61502916214059, 12.507343278686905, -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
+    if (z < 0.5) return Math.PI / Math.sin(Math.PI * z) - lgamma(1 - z);
+    z -= 1;
+    let x = c[0];
+    for (let i = 1; i < g + 2; i++) x += c[i] / (z + i);
+    const t = z + g + 0.5;
+    return 0.5 * Math.log(2 * Math.PI) + (z + 0.5) * Math.log(t) - t + Math.log(x);
+  }
+
+  function contFrac(a, b, x) {
+    const maxIter = 100;
+    const eps = 1e-10;
+    let qab = a + b;
+    let qap = a + 1;
+    let qam = a - 1;
+    let c = 1;
+    let d = 1 - qab * x / qap;
+    if (Math.abs(d) < eps) d = eps;
+    d = 1 / d;
+    let result = d;
+    for (let m = 1; m <= maxIter; m++) {
+      let m2 = 2 * m;
+      let aa = m * (b - m) * x / ((qam + m2) * (a + m2));
+      d = 1 + aa * d;
+      if (Math.abs(d) < eps) d = eps;
+      c = 1 + aa / c;
+      if (Math.abs(c) < eps) c = eps;
+      d = 1 / d;
+      result *= d * c;
+      aa = -(a + m) * (qab + m) * x / ((a + m2) * (qap + m2));
+      d = 1 + aa * d;
+      if (Math.abs(d) < eps) d = eps;
+      c = 1 + aa / c;
+      if (Math.abs(c) < eps) c = eps;
+      d = 1 / d;
+      let delta = d * c;
+      result *= delta;
+      if (Math.abs(delta - 1) < eps) break;
+    }
+    return result;
+  }
+
+  document.getElementById('newAnovaDataBtn').addEventListener('click', () => generateAnovaData(0));
+  document.getElementById('separateGroupsBtn').addEventListener('click', () => {
+    offset += 1.5;
+    generateAnovaData(offset);
+    document.getElementById('feedbackMsg').innerHTML = '<i class="fas fa-arrows-alt" style="color:#ffd700"></i> Grupos m&aacute;s separados. El estad&iacute;stico F deber&iacute;a aumentar.';
+  });
+
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) {
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('nextLink8').classList.remove('disabled');
+    document.getElementById('feedbackMsg').innerHTML = '<i class="fas fa-check-circle" style="color:#14b8a6"></i> \u00a1M\u00f3dulo completado!';
+  }
+
+  generateAnovaData(0);
+</script>
+</body>
+</html>

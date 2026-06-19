@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Probabilidad | 📊 Variables Aleatorias Discretas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:linear-gradient(135deg,#0a0f1e,#0c1222 50%,#111a2e); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+    .course-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,102,192,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+    .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #ff66c0; }
+    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#ff99d6,#ff66c0); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .hero-header p { font-size:1.1rem; color:#f0c0e0; margin-top:0.5rem; font-weight:500; }
+    .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+    .chip { background:rgba(255,102,192,0.15); border:1px solid #ff66c0; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+    .progress-section { padding:1.2rem 2rem; border-bottom:1px solid #1a2a4a; }
+    .progress-bar-outer { background:#1a2a4a; border-radius:20px; height:16px; overflow:hidden; }
+    .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#ff66c0,#ff3399); border-radius:20px; transition:width 0.5s ease; }
+    .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
+    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ff66c0; font-size:1rem; line-height:1.6; }
+    .main-area { padding:1.5rem 2rem; }
+    .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#ff66c0; }
+    .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
+    .info-panel { background:rgba(10,20,40,0.7); border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
+    .info-panel h3 { color:#ff99d6; font-size:1rem; margin-bottom:0.5rem; }
+    .info-panel p { font-size:0.85rem; color:#b9ccee; line-height:1.6; }
+    .info-panel .formula { background:#0a0f1e; padding:0.5rem; border-radius:0.8rem; text-align:center; font-family:monospace; font-size:0.9rem; color:#ff99d6; margin-top:0.5rem; }
+    .dist-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
+    .dist-card { background:rgba(10,20,40,0.7); border-radius:1.5rem; padding:1.2rem; border:1px solid #ff66c0; }
+    .dist-card h3 { color:#ff99d6; font-size:1rem; margin-bottom:0.5rem; }
+    .dist-card p { font-size:0.82rem; color:#b9ccee; line-height:1.6; }
+    .dist-card .formula { background:#0a0f1e; padding:0.4rem; border-radius:0.5rem; text-align:center; font-family:monospace; font-size:0.85rem; color:#ff99d6; margin-top:0.4rem; }
+    .sim-bar { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #ff66c0; margin-bottom:1.5rem; }
+    .quiz-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #ff66c0; margin-bottom:1.5rem; }
+    .quiz-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#ff66c0; }
+    .question { background:#0f1a2c; margin:0.8rem 0; padding:0.8rem 1rem; border-radius:1.2rem; }
+    .question p { font-weight:600; margin-bottom:0.5rem; font-size:0.95rem; }
+    .options { display:flex; flex-wrap:wrap; gap:0.6rem; }
+    .opt { background:#1e2a3e; padding:0.3rem 0.9rem; border-radius:2rem; cursor:pointer; transition:0.2s; font-size:0.85rem; }
+    .opt:hover { background:#2c3e66; transform:translateY(-2px); }
+    .opt.selected { background:#ff66c0; color:#000; font-weight:bold; box-shadow:0 0 8px #ff66c0; }
+    .opt.correct { background:#00cc88; color:#000; }
+    .opt.wrong { background:#ff4455; color:#fff; }
+    .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #ff66c0; }
+    .btn-action { background:linear-gradient(95deg,#ff66c0,#ff3399); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin-top:1rem; }
+    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(255,102,192,0.5); }
+    .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
+    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin-top:1.5rem; padding:1rem; border:1px dashed gold; }
+    .insignia i { font-size:2.5rem; color:gold; }
+    .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
+    .hidden { display:none; }
+    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(255,102,192,0.4); }
+    .nav-link.next { background:linear-gradient(95deg,#ff66c0,#ff3399); color:#1e1a0c; }
+    .nav-link.menu { background:#1a2a4a; border:1px solid #ff66c0; }
+    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .info-grid { grid-template-columns:1fr; } .dist-grid { grid-template-columns:1fr; } }
+  </style>
+  <link rel="stylesheet" href="../../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a><a href="../index.html">Programa Estad&iacute;stica</a></nav>
+  <div class="course-container" id="app">
+    <div class="hero-header">
+      <h1>📊 Variables Aleatorias Discretas</h1>
+      <p>Bernoulli, Binomial, Poisson y Geom&eacute;trica</p>
+      <div class="badge-area">
+        <span class="chip"><i class="fas fa-coin"></i> Bernoulli</span>
+        <span class="chip"><i class="fas fa-chart-bar"></i> Binomial</span>
+        <span class="chip"><i class="fas fa-wave-square"></i> Poisson</span>
+        <span class="chip"><i class="fas fa-redo"></i> Geom&eacute;trica</span>
+      </div>
+    </div>
+    <div class="progress-section">
+      <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+      <span class="progress-text" id="progressText">M&oacute;dulo 4 de 12</span>
+    </div>
+    <div class="analogy-card">
+      <strong>💡 Piénsalo así:</strong> Las variables aleatorias discretas son como m&aacute;quinas expendedoras: solo devuelven ciertos valores espec&iacute;ficos (una lata, un chocolate, unas papas). No puedes obtener "media lata". Las distribuciones discretas modelan situaciones donde los resultados son contables: n&uacute;mero de &eacute;xitos, cantidad de llamadas, etc.
+    </div>
+    <div class="main-area">
+      <div class="section-title"><i class="fas fa-th"></i> Distribuciones Discretas</div>
+      <div class="dist-grid">
+        <div class="dist-card">
+          <h3>🪙 Bernoulli(p)</h3>
+          <p>Un solo ensayo con probabilidad p de &eacute;xito. X ~ Ber(p). P(X=1)=p, P(X=0)=1-p.</p>
+          <div class="formula">P(X=x) = p^x (1-p)^(1-x)</div>
+        </div>
+        <div class="dist-card">
+          <h3>📊 Binomial(n, p)</h3>
+          <p>Suma de n Bernoulli independientes. X ~ Bin(n,p). N&uacute;mero de &eacute;xitos en n ensayos.</p>
+          <div class="formula">P(X=k) = C(n,k) p^k (1-p)^(n-k)</div>
+        </div>
+        <div class="dist-card">
+          <h3>📞 Poisson(&lambda;)</h3>
+          <p>Eventos raros en intervalo fijo. X ~ Poi(&lambda;). Llamadas, accidentes, llegadas.</p>
+          <div class="formula">P(X=k) = e^(-&lambda;) &lambda;^k / k!</div>
+        </div>
+        <div class="dist-card">
+          <h3>🔄 Geom&eacute;trica(p)</h3>
+          <p>N&uacute;mero de ensayos hasta el primer &eacute;xito. X ~ Geo(p).</p>
+          <div class="formula">P(X=k) = (1-p)^(k-1) p</div>
+        </div>
+      </div>
+
+      <div class="sim-bar">
+        <div class="section-title"><i class="fas fa-play"></i> Simulador Binomial</div>
+        <p style="color:#b9ccee;margin-bottom:0.8rem;">Ajusta los par&aacute;metros y simula la distribuci&oacute;n binomial.</p>
+        <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:center;">
+          <label style="color:#b9ccee;">n (ensayos): <input type="range" id="binomN" min="1" max="30" value="10" style="width:120px;"><span id="binomNVal" style="color:#ff99d6;">10</span></label>
+          <label style="color:#b9ccee;">p (prob): <input type="range" id="binomP" min="0" max="100" value="50" style="width:120px;"><span id="binomPVal" style="color:#ff99d6;">0.5</span></label>
+          <button id="simBinomBtn" class="btn-action" style="margin:0;">📊 Simular</button>
+        </div>
+        <div id="binomResult" style="background:#0a0f1e;border-radius:1rem;padding:1rem;margin-top:1rem;text-align:center;font-size:0.9rem;color:#b9ccee;">
+          Presiona "Simular" para ver la distribuci&oacute;n.
+        </div>
+      </div>
+
+      <div class="quiz-area">
+        <div class="quiz-title"><i class="fas fa-question-circle"></i> Mini Quiz: Distribuciones Discretas</div>
+        <div id="quizContainer"></div>
+        <button id="submitQuizBtn" class="btn-action">✅ Verificar respuestas</button>
+        <div id="insigniaArea" class="insignia hidden">
+          <i class="fas fa-medal"></i>
+          <h3>🏅 Conquistador Discreto 🏅</h3>
+          <p>Dominas las distribuciones discretas: Bernoulli, Binomial, Poisson y Geom&eacute;trica.</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre distribuciones discretas.</div>
+
+    <div class="nav-links">
+      <a href="03-condicional-bayes.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
+      <a href="05-variables-continuas.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <footer><i class="fas fa-dice"></i> Probabilidad y Fundamentos · M&oacute;dulo 4</footer>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'prog_est_1_04';
+    const PROGRESS_KEY = 'prog_est_1_progress';
+    const questions = [
+      { text: "¿Cuántos parámetros tiene una distribución Bernoulli?", options: ["0", "1 (p)", "2 (n, p)", "3"], correct: 1 },
+      { text: "La distribución Binomial es la suma de n variables:", options: ["Poisson independientes", "Bernoulli independientes", "Geométricas independientes", "Normales independientes"], correct: 1 },
+      { text: "¿Qué distribución usarías para modelar el número de llamadas que llegan a un call center por hora?", options: ["Binomial", "Bernoulli", "Poisson", "Geométrica"], correct: 2 },
+      { text: "Si X ~ Bin(10, 0.5), ¿cuál es el valor esperado E[X]?", options: ["2.5", "5", "10", "0.5"], correct: 1 },
+      { text: "La distribución Geométrica cuenta:", options: ["El número de éxitos en n ensayos", "El número de ensayos hasta el primer éxito", "El número de eventos en un intervalo", "El número de fracasos en n ensayos"], correct: 1 }
+    ];
+    let userAnswers = new Array(questions.length).fill(null);
+    let quizCompleted = false;
+
+    function saveProgress() {
+      let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+      if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
+      localStorage.setItem(STORAGE_KEY, 'true');
+    }
+
+    function updateProgress() {
+      let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+      document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
+      document.getElementById('progressText').textContent = 'M\u00f3dulo '+(p.length || 1)+' de 12';
+    }
+
+    function renderQuestions() {
+      const container = document.getElementById('quizContainer');
+      container.innerHTML = '';
+      questions.forEach((q, idx) => {
+        const qDiv = document.createElement('div'); qDiv.classList.add('question');
+        qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
+        const optsDiv = qDiv.querySelector('.options');
+        q.options.forEach((opt, optIdx) => {
+          const span = document.createElement('div'); span.classList.add('opt');
+          span.textContent = opt; span.dataset.qIdx = idx; span.dataset.optIdx = optIdx;
+          span.addEventListener('click', function() {
+            if (quizCompleted) return;
+            this.parentElement.querySelectorAll('.opt').forEach(c => c.classList.remove('selected'));
+            this.classList.add('selected'); userAnswers[idx] = optIdx; updateBtnState();
+          });
+          optsDiv.appendChild(span);
+        });
+        container.appendChild(qDiv);
+      });
+    }
+
+    function updateBtnState() {
+      document.getElementById('submitQuizBtn').disabled = userAnswers.some(a => a === null) || quizCompleted;
+    }
+
+    function handleSubmit() {
+      if (quizCompleted) return;
+      if (userAnswers.some(a => a === null)) { document.getElementById('feedbackMsg').textContent = '⚠️ Responde todas las preguntas primero.'; return; }
+      let correct = 0;
+      questions.forEach((q, i) => { if (userAnswers[i] === q.correct) correct++; });
+      const total = questions.length; const passed = correct >= Math.ceil(total * 0.6);
+      document.querySelectorAll('.question').forEach((qDiv, idx) => {
+        const opts = qDiv.querySelectorAll('.opt');
+        opts.forEach((o, oi) => {
+          o.classList.remove('selected');
+          if (oi === questions[idx].correct) o.classList.add('correct');
+          else if (oi === userAnswers[idx]) o.classList.add('wrong');
+        });
+      });
+      if (passed) {
+        quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+        document.getElementById('insigniaArea').classList.remove('hidden');
+        document.getElementById('feedbackMsg').textContent = '🎉 ' + correct + '/' + total + ' correctas. ¡Las discretas no tienen secreto!';
+        saveProgress(); updateProgress();
+      } else {
+        document.getElementById('feedbackMsg').textContent = '❌ ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. ¡Reintenta!';
+      }
+    }
+
+    function restoreProgress() {
+      const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+      if (p.includes(STORAGE_KEY)) {
+        quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+        document.getElementById('insigniaArea').classList.remove('hidden');
+        document.getElementById('feedbackMsg').textContent = '🏆 Ya completaste este m&oacute;dulo.';
+        document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
+      }
+    }
+
+    document.getElementById('binomN').addEventListener('input', function() {
+      document.getElementById('binomNVal').textContent = this.value;
+    });
+    document.getElementById('binomP').addEventListener('input', function() {
+      document.getElementById('binomPVal').textContent = (this.value / 100).toFixed(2);
+    });
+
+    function simBinomial() {
+      const n = parseInt(document.getElementById('binomN').value);
+      const p = parseInt(document.getElementById('binomP').value) / 100;
+      const trials = 5000;
+      let counts = new Array(n + 1).fill(0);
+      for (let t = 0; t < trials; t++) {
+        let s = 0;
+        for (let i = 0; i < n; i++) if (Math.random() < p) s++;
+        counts[s]++;
+      }
+      const maxCount = Math.max(...counts);
+      let html = '<div style="display:flex;align-items:flex-end;gap:2px;height:120px;padding:0 0.5rem;overflow-x:auto;">';
+      for (let i = 0; i <= n; i++) {
+        const h = (counts[i] / maxCount) * 100;
+        html += '<div style="flex:1;min-width:16px;"><div style="height:' + h + 'px;background:linear-gradient(to top,#ff66c0,#ff99d6);border-radius:3px 3px 0 0;" title="' + i + ': ' + counts[i] + '"></div><div style="font-size:0.6rem;text-align:center;color:#8899cc;">' + i + '</div></div>';
+      }
+      html += '</div><p style="font-size:0.8rem;color:#8899cc;margin-top:0.5rem;">' + trials + ' simulaciones · n=' + n + ', p=' + p.toFixed(2) + '</p>';
+      document.getElementById('binomResult').innerHTML = html;
+    }
+
+    document.getElementById('simBinomBtn').addEventListener('click', simBinomial);
+    document.getElementById('submitQuizBtn').addEventListener('click', handleSubmit);
+    renderQuestions(); updateBtnState(); restoreProgress(); updateProgress();
+  </script>
+  <script src="../../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

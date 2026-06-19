@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MQL5 · Funciones y Preprocesador</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    :root {
+      --bg: #0a0f1e; --bg2: #0c1222; --bg3: #111a2e;
+      --glass: rgba(15,25,45,0.65); --border: rgba(255,255,255,0.06);
+      --text: #e0e6f0; --text2: #8899cc; --accent: #ffd700;
+      --accent-dim: rgba(255,215,0,0.15); --font: 'Inter', sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: var(--font); background: linear-gradient(135deg,var(--bg),var(--bg2),var(--bg3));
+      background-size: 400% 400%; animation: gradShift 20s ease infinite;
+      color: var(--text); min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; padding: 1rem;
+    }
+    @keyframes gradShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+    .brand-return-nav {
+      width: 100%; max-width: 900px; display: flex; gap: 1rem; padding: 0.75rem 1rem;
+      background: rgba(15,25,45,0.5); backdrop-filter: blur(10px); border-radius: 60px;
+      margin-bottom: 1.5rem; border: 1px solid var(--border);
+    }
+    .brand-return-nav a {
+      color: var(--text2); text-decoration: none; font-size: 0.85rem; font-weight: 500;
+      padding: 0.4rem 1rem; border-radius: 60px; transition: all 0.3s;
+    }
+    .brand-return-nav a:hover { background: var(--accent-dim); color: var(--accent); }
+    .course-container {
+      width: 100%; max-width: 900px; background: var(--glass); backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px); border-radius: 3rem; padding: 2.5rem 2.8rem;
+      border: 1px solid var(--border); box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+    }
+    @media(max-width:600px){ .course-container{ padding:1.5rem 1.2rem; border-radius:2rem; } }
+    .hero-header { text-align: center; margin-bottom: 1.8rem; }
+    .hero-header h1 {
+      font-size: 2.4rem; font-weight: 800; background: linear-gradient(135deg,var(--accent),#fff);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      margin-bottom: 0.4rem;
+    }
+    .hero-header p { color: var(--text2); font-size: 1.05rem; font-weight: 400; }
+    .badge-area { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; margin-top: 0.8rem; }
+    .badge {
+      background: var(--accent-dim); color: var(--accent); padding: 0.3rem 1rem; border-radius: 60px;
+      font-size: 0.75rem; font-weight: 600; border: 1px solid rgba(255,215,0,0.2);
+    }
+    .progress-section { margin: 1.2rem 0; }
+    .progress-bar-outer { background: #1a2a4a; border-radius: 20px; height: 20px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg,var(--accent),#fff); border-radius: 20px; transition: width 0.5s ease; }
+    .progress-text { text-align: center; font-size: 0.85rem; color: #8899cc; margin-top: 0.3rem; }
+    .analogy-card {
+      background: rgba(255,255,255,0.03); border-left: 8px solid var(--accent);
+      border-radius: 1.5rem; padding: 1.5rem 1.8rem; margin-bottom: 2rem;
+    }
+    .analogy-card .icon { font-size: 1.8rem; margin-bottom: 0.3rem; }
+    .analogy-card p { font-size: 0.95rem; line-height: 1.6; color: #c8d0e0; }
+    #mainArea { margin-bottom: 1.5rem; }
+    .round-title { font-size: 1.1rem; font-weight: 700; color: var(--accent); margin-bottom: 0.5rem; }
+    .round-hint { font-size: 0.85rem; color: var(--text2); margin-bottom: 1rem; }
+    .slots-container { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; margin-bottom: 1.5rem; }
+    .slot {
+      background: rgba(255,255,255,0.04); border: 2px dashed rgba(255,255,255,0.15); border-radius: 12px;
+      min-width: 90px; min-height: 56px; display: flex; flex-direction: column; align-items: center;
+      justify-content: center; padding: 0.3rem 0.6rem; font-size: 0.75rem; color: var(--text2);
+      transition: all 0.3s; flex: 1 0 80px;
+    }
+    .slot.filled { border-style: solid; border-color: var(--accent); background: var(--accent-dim); color: var(--text); }
+    .slot .slot-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.6; margin-bottom: 2px; }
+    .slot .slot-value { font-weight: 600; font-size: 0.85rem; font-family: 'Courier New', monospace; }
+    .pool-container { display: flex; flex-wrap: wrap; gap: 0.6rem; justify-content: center; margin-bottom: 1.2rem; }
+    .pool-block {
+      background: rgba(255,255,255,0.06); border: 1px solid var(--border); border-radius: 10px;
+      padding: 0.6rem 1.2rem; cursor: pointer; font-family: 'Courier New', monospace;
+      font-size: 0.85rem; transition: all 0.3s; user-select: none;
+    }
+    .pool-block:hover { background: rgba(255,255,255,0.12); border-color: var(--accent); transform: translateY(-2px); }
+    .pool-block.used { opacity: 0.25; pointer-events: none; }
+    .pool-block.wrong { animation: shake 0.4s; border-color: #ff5050; background: rgba(255,80,80,0.15); }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
+    .btn {
+      background: var(--accent); color: #0a0f1e; border: none; padding: 0.7rem 2rem; border-radius: 60px;
+      font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: all 0.3s; display: inline-block;
+    }
+    .btn:hover { transform: scale(1.04); box-shadow: 0 0 30px rgba(255,215,0,0.3); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-outline {
+      background: transparent; border: 2px solid var(--accent); color: var(--accent); padding: 0.5rem 1.5rem;
+      border-radius: 60px; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.3s;
+    }
+    .btn-outline:hover { background: var(--accent-dim); }
+    #feedbackMsg {
+      text-align: center; padding: 0.8rem; border-radius: 16px; font-weight: 500; margin: 1rem 0;
+      min-height: 3rem; display: flex; align-items: center; justify-content: center;
+    }
+    #feedbackMsg.success { background: rgba(0,200,100,0.12); color: #00c864; }
+    #feedbackMsg.error { background: rgba(255,80,80,0.12); color: #ff5050; }
+    #feedbackMsg.info { background: rgba(43,158,255,0.12); color: #2b9eff; }
+    #insigniaArea {
+      display: none; text-align: center; padding: 1.5rem; border: 2px dashed var(--accent);
+      border-radius: 2rem; margin: 1.2rem 0; background: var(--accent-dim);
+    }
+    #insigniaArea.show { display: block; }
+    #insigniaArea .insignia-text { font-size: 1.6rem; font-weight: 800; color: var(--accent); }
+    .section-divider { border: none; height: 1px; background: linear-gradient(90deg,transparent,var(--accent),transparent); margin: 1.5rem 0; }
+    .match-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+    @media(max-width:600px){ .match-grid{ grid-template-columns:1fr; } }
+    .match-term, .match-def {
+      padding: 1rem; border-radius: 14px; border: 2px solid var(--border); cursor: pointer;
+      text-align: center; font-weight: 500; transition: all 0.3s;
+    }
+    .match-term:hover, .match-def:hover { border-color: var(--accent); background: var(--accent-dim); }
+    .match-term.selected, .match-def.selected { border-color: var(--accent); background: var(--accent-dim); }
+    .match-term.matched, .match-def.matched { opacity: 0.4; pointer-events: none; border-color: #00c864; background: rgba(0,200,100,0.1); }
+    .match-term { font-family: 'Courier New', monospace; }
+    .nav-links {
+      display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; gap: 0.5rem;
+    }
+    .nav-links a {
+      color: var(--text2); text-decoration: none; font-size: 0.85rem; font-weight: 500;
+      padding: 0.5rem 1.2rem; border-radius: 60px; border: 1px solid var(--border);
+      transition: all 0.3s; display: flex; align-items: center; gap: 0.4rem;
+    }
+    .nav-links a:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+    .nav-links a.menu-link { background: var(--accent); color: #0a0f1e; border-color: var(--accent); font-weight: 700; }
+    .nav-links a.menu-link:hover { box-shadow: 0 0 20px rgba(255,215,0,0.3); }
+    footer { text-align: center; margin-top: 1.5rem; color: var(--text2); font-size: 0.75rem; opacity: 0.6; }
+    .code-preview {
+      background: rgba(0,0,0,0.3); border-radius: 14px; padding: 1.2rem; font-family: 'Courier New', monospace;
+      font-size: 0.85rem; line-height: 1.6; margin-top: 1rem; white-space: pre-wrap; color: var(--accent);
+      border: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+  <nav class="brand-return-nav">
+    <a href="../../index.html"><i class="fas fa-arrow-left"></i> Portfolio</a>
+    <a href="../../cursos/index.html"><i class="fas fa-graduation-cap"></i> Cursos</a>
+  </nav>
+  <div class="course-container">
+    <header class="hero-header">
+      <h1>🔧 Funciones y Preprocesador</h1>
+      <p>Las funciones son las herramientas de tu caja mágica de MQL5</p>
+      <div class="badge-area">
+        <span class="badge"><i class="fas fa-code"></i> MQL5</span>
+        <span class="badge"><i class="fas fa-cubes"></i> Funciones</span>
+        <span class="badge"><i class="fas fa-hashtag"></i> Preprocesador</span>
+      </div>
+    </header>
+
+    <div class="progress-section">
+      <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+      <div class="progress-text" id="progressText">Cargando…</div>
+    </div>
+
+    <div class="analogy-card">
+      <div class="icon">💡</div>
+      <p><strong>Piénsalo así:</strong> Una función es como una receta de cocina: tienes ingredientes (parámetros), instrucciones (cuerpo) y un resultado final (return). El preprocesador son las notas que pegas en el refrigerador antes de empezar a cocinar.</p>
+    </div>
+
+    <div id="mainArea"></div>
+    <div id="feedbackMsg"></div>
+
+    <div id="insigniaArea">
+      <div style="font-size:3rem;margin-bottom:0.5rem;">🏅</div>
+      <div class="insignia-text">¡Chef de Funciones!</div>
+      <p style="color:var(--text2);margin-top:0.3rem;">Has dominado el arte de las funciones y el preprocesador en MQL5.</p>
+    </div>
+
+    <div class="nav-links">
+      <a href="04-control-flujo.html"><i class="fas fa-chevron-left"></i> Anterior</a>
+      <a href="index.html" class="menu-link"><i class="fas fa-th"></i> Menú</a>
+      <a href="06-poo-clases.html">Siguiente <i class="fas fa-chevron-right"></i></a>
+    </div>
+
+    <footer>MQL5 · Curso de Trading Algorítmico</footer>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'mql5_05';
+    const ACCENT = '#ffd700';
+
+    const rounds = [
+      {
+        label: 'Ronda 1 · Función simple void',
+        hint: 'Orden: tipo de retorno → nombre → parámetros → apertura → cuerpo → cierre',
+        blocks: [
+          { text: 'void', id: 'b0' },
+          { text: 'OnTick', id: 'b1' },
+          { text: '()', id: 'b2' },
+          { text: '{', id: 'b3' },
+          { text: 'Print("Tick recibido");', id: 'b4' },
+          { text: '}', id: 'b5' }
+        ],
+        answer: ['b0','b1','b2','b3','b4','b5'],
+        labels: ['Tipo retorno','Nombre función','Parámetros','Apertura {','Cuerpo','Cierre }'],
+        code: 'void OnTick()\n{\n   Print("Tick recibido");\n}'
+      },
+      {
+        label: 'Ronda 2 · Función int con parámetros',
+        hint: 'Una función que calcula un promedio móvil simple',
+        blocks: [
+          { text: 'int', id: 'c0' },
+          { text: 'CalcularSMA', id: 'c1' },
+          { text: '(int periodo, int desplazamiento)', id: 'c2' },
+          { text: '{', id: 'c3' },
+          { text: 'return suma/periodo;', id: 'c4' },
+          { text: '}', id: 'c5' }
+        ],
+        answer: ['c0','c1','c2','c3','c4','c5'],
+        labels: ['Tipo retorno','Nombre función','Parámetros','Apertura {','Return','Cierre }'],
+        code: 'int CalcularSMA(int periodo, int desplazamiento)\n{\n   return suma/periodo;\n}'
+      },
+      {
+        label: 'Ronda 3 · Función con parámetros por defecto',
+        hint: 'Una función que calcula el tamaño de lote con riesgo default',
+        blocks: [
+          { text: 'double', id: 'd0' },
+          { text: 'CalcularLotes', id: 'd1' },
+          { text: '(double riesgo = 1.0)', id: 'd2' },
+          { text: '{', id: 'd3' },
+          { text: 'return AccountBalance()*riesgo/100;', id: 'd4' },
+          { text: '}', id: 'd5' }
+        ],
+        answer: ['d0','d1','d2','d3','d4','d5'],
+        labels: ['Tipo retorno','Nombre función','Parámetros default','Apertura {','Return','Cierre }'],
+        code: 'double CalcularLotes(double riesgo = 1.0)\n{\n   return AccountBalance()*riesgo/100;\n}'
+      }
+    ];
+
+    const preprocessorItems = [
+      { term: '#define', def: 'Crea constantes y macros', id: 'p0' },
+      { term: '#include', def: 'Importa archivos de biblioteca', id: 'p1' },
+      { term: '#property', def: 'Define propiedades del EA/indicador', id: 'p2' }
+    ];
+
+    let currentRound = 0;
+    let placed = [];
+    let selectedTerm = null;
+    let phase = 'puzzle'; // 'puzzle' | 'preprocessor'
+    let preprocMatched = [];
+
+    function shuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function showFeedback(msg, type) {
+      const el = document.getElementById('feedbackMsg');
+      el.textContent = msg;
+      el.className = type || 'info';
+    }
+
+    function clearFeedback() {
+      const el = document.getElementById('feedbackMsg');
+      el.textContent = '';
+      el.className = '';
+    }
+
+    function renderPuzzle() {
+      const area = document.getElementById('mainArea');
+      const r = rounds[currentRound];
+      const shuffled = shuffle(r.blocks);
+
+      let html = `<div class="round-title">${r.label}</div>
+        <div class="round-hint">${r.hint}</div>
+        <div class="slots-container">`;
+      for (let i = 0; i < r.blocks.length; i++) {
+        const filled = placed[i] !== undefined;
+        const block = filled ? r.blocks.find(b => b.id === placed[i]) : null;
+        html += `<div class="slot ${filled?'filled':''}" data-slot="${i}">
+          <div class="slot-label">${r.labels[i]}</div>
+          ${filled ? `<div class="slot-value">${block.text}</div>` : '<div class="slot-value" style="opacity:0.2">—</div>'}
+        </div>`;
+      }
+      html += `</div><div class="pool-container">`;
+      for (const b of shuffled) {
+        const used = placed.includes(b.id);
+        html += `<div class="pool-block ${used?'used':''}" data-id="${b.id}">${b.text}</div>`;
+      }
+      html += `</div>
+        <div style="text-align:center;">
+          <button class="btn" id="verifyBtn">✓ Verificar</button>
+          <button class="btn-outline" id="resetBtn" style="margin-left:0.5rem;">↺ Reiniciar</button>
+        </div>`;
+      if (placed.length === r.blocks.length && placed.every((id,i) => id === r.answer[i])) {
+        html += `<div class="code-preview">${r.code}</div>`;
+      }
+      area.innerHTML = html;
+
+      document.querySelectorAll('.pool-block:not(.used)').forEach(el => {
+        el.addEventListener('click', () => {
+          if (placed.length >= rounds[currentRound].blocks.length) return;
+          const id = el.dataset.id;
+          placed.push(id);
+          renderPuzzle();
+          clearFeedback();
+        });
+      });
+
+      document.querySelectorAll('.slot.filled').forEach(el => {
+        el.addEventListener('click', () => {
+          const idx = parseInt(el.dataset.slot);
+          placed.splice(idx, 1);
+          renderPuzzle();
+          clearFeedback();
+        });
+      });
+
+      document.getElementById('verifyBtn').addEventListener('click', verifyPuzzle);
+      const resetBtn = document.getElementById('resetBtn');
+      if (resetBtn) resetBtn.addEventListener('click', () => { placed = []; renderPuzzle(); clearFeedback(); });
+    }
+
+    function verifyPuzzle() {
+      const r = rounds[currentRound];
+      if (placed.length < r.blocks.length) {
+        showFeedback('❖ Coloca todos los bloques antes de verificar.', 'error');
+        return;
+      }
+      for (let i = 0; i < r.blocks.length; i++) {
+        if (placed[i] !== r.answer[i]) {
+          showFeedback('✗ El orden no es correcto. Revisa y vuelve a intentar.', 'error');
+          return;
+        }
+      }
+      showFeedback(`✓ ¡Perfecto! Has ordenado la función correctamente.`, 'success');
+      if (currentRound < rounds.length - 1) {
+        setTimeout(() => { currentRound++; placed = []; renderPuzzle(); clearFeedback(); }, 1200);
+      } else {
+        setTimeout(() => {
+          phase = 'preprocessor';
+          preprocMatched = [];
+          renderPreprocessor();
+        }, 1200);
+      }
+    }
+
+    function renderPreprocessor() {
+      const area = document.getElementById('mainArea');
+      let html = `<div class="round-title" style="color:var(--accent);">🔗 Directivas del Preprocesador</div>
+        <div class="round-hint" style="margin-bottom:1rem;">Haz clic en un término y luego en su definición para emparejar.</div>
+        <div class="match-grid">`;
+      const mixedDefs = shuffle(preprocessorItems);
+      for (const item of preprocessorItems) {
+        const matched = preprocMatched.includes(item.id);
+        const sel = selectedTerm === item.id;
+        html += `<div class="match-term ${matched?'matched':''} ${sel?'selected':''}" data-pt="${item.id}">${item.term}</div>`;
+      }
+      for (const item of mixedDefs) {
+        const matched = preprocMatched.includes(item.id);
+        const sel = selectedTerm === ('def_'+item.id);
+        html += `<div class="match-def ${matched?'matched':''} ${sel?'selected':''}" data-pd="${item.id}">${item.def}</div>`;
+      }
+      html += `</div><div style="text-align:center;">
+        <button class="btn-outline" id="completeBtn" ${preprocMatched.length<preprocessorItems.length?'disabled':''}>🎉 Completar Módulo</button>
+      </div>`;
+      area.innerHTML = html;
+
+      document.querySelectorAll('.match-term:not(.matched)').forEach(el => {
+        el.addEventListener('click', () => {
+          selectedTerm = el.dataset.pt;
+          renderPreprocessor();
+        });
+      });
+      document.querySelectorAll('.match-def:not(.matched)').forEach(el => {
+        el.addEventListener('click', () => {
+          if (!selectedTerm) { showFeedback('Primero haz clic en un término (#define, #include o #property).', 'error'); return; }
+          const defId = el.dataset.pd;
+          if (selectedTerm === defId) {
+            preprocMatched.push(defId);
+            selectedTerm = null;
+            showFeedback('✓ ¡Coincidencia correcta!', 'success');
+            renderPreprocessor();
+            if (preprocMatched.length === preprocessorItems.length) {
+              document.getElementById('completeBtn').disabled = false;
+            }
+          } else {
+            showFeedback('✗ Esa no es la definición correcta. Intenta de nuevo.', 'error');
+            selectedTerm = null;
+            renderPreprocessor();
+          }
+        });
+      });
+
+      const completeBtn = document.getElementById('completeBtn');
+      if (completeBtn) {
+        completeBtn.addEventListener('click', completeModule);
+      }
+    }
+
+    function completeModule() {
+      document.getElementById('feedbackMsg').textContent = '';
+      document.getElementById('feedbackMsg').className = '';
+      document.getElementById('mainArea').innerHTML = `<div style="text-align:center;padding:2rem;">
+        <div style="font-size:3rem;margin-bottom:0.5rem;">🎉</div>
+        <div style="font-size:1.3rem;font-weight:700;color:var(--accent);">¡Módulo completado!</div>
+        <p style="color:var(--text2);margin-top:0.5rem;">Has dominado las funciones y el preprocesador de MQL5.</p>
+      </div>`;
+      document.getElementById('insigniaArea').classList.add('show');
+      updateProgress();
+    }
+
+    function updateProgress() {
+      let p = JSON.parse(localStorage.getItem('mql5_progress')) || [];
+      if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem('mql5_progress', JSON.stringify(p)); }
+      const progressFill = document.getElementById('progressFill');
+      const progressText = document.getElementById('progressText');
+      if (progressFill) progressFill.style.width = Math.round((p.length/26)*100)+'%';
+      if (progressText) progressText.textContent = `${STORAGE_KEY} — ${p.length} de 26 módulos`;
+    }
+
+    renderPuzzle();
+    updateProgress();
+  </script>
+</body>
+</html>

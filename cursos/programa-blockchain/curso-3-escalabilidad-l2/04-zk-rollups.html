@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>ZK-Rollups | Curso 3</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:linear-gradient(135deg,#0a0f1e,#0c1222 100%); font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+    .course-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(0,82,255,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+    .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #0052ff; }
+    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#5588ff,#0052ff); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .hero-header p { font-size:1.1rem; color:#b9d4ff; margin-top:0.3rem; }
+    .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+    .chip { background:rgba(0,82,255,0.15); border:1px solid #0052ff; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #0052ff; font-size:1rem; line-height:1.6; }
+    .main-area { padding:0 2rem 2rem; }
+    .sim-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; border:1px solid #0052ff; margin:1.5rem 0; }
+    .sim-area h3 { margin-bottom:0.5rem; }
+    .zk-demo { display:flex; flex-direction:column; gap:0.8rem; }
+    .zk-row { display:flex; align-items:center; gap:0.8rem; padding:0.8rem; background:#0f1a2c; border-radius:1rem; }
+    .zk-row .label { min-width:120px; font-weight:600; color:#5588ff; }
+    .zk-row .value { font-family:monospace; font-size:0.85rem; color:#b9ccee; word-break:break-all; }
+    .zk-proof-visual { background:#0a0f1e; border-radius:1rem; padding:1rem; border:1px solid #2c3e66; margin:0.5rem 0; position:relative; overflow:hidden; min-height:80px; }
+    .zk-proof-visual .proof-line { font-family:monospace; font-size:0.75rem; color:#5588ff; word-break:break-all; line-height:1.8; }
+    .zk-status { padding:0.5rem 1rem; border-radius:1rem; font-size:0.85rem; font-weight:600; }
+    .zk-status.generating { background:rgba(255,179,71,0.15); border:1px solid #ffb347; color:#ffb347; }
+    .zk-status.verified { background:rgba(0,255,200,0.15); border:1px solid #00ffc8; color:#00ffc8; }
+    .zk-status.pending { background:rgba(44,62,102,0.3); border:1px solid #2c3e66; color:#8899bb; }
+    .btn-action { background:linear-gradient(95deg,#0052ff,#5588ff); border:none; padding:0.7rem 1.5rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:0.95rem; transition:0.2s; color:#fff; }
+    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(0,82,255,0.4); }
+    .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin:1.5rem 0; }
+    .info-card { background:#0f1a2c; border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
+    .info-card h4 { color:#5588ff; margin-bottom:0.3rem; }
+    .info-card p, .info-card li { font-size:0.85rem; line-height:1.5; color:#b9ccee; }
+    .info-card ul { padding-left:1.2rem; }
+    .feedback { background:#00000099; margin:1rem 0; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #0052ff; }
+    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:1rem 0; padding:1rem; border:1px dashed gold; }
+    .insignia i { font-size:2.5rem; color:gold; }
+    .hidden { display:none; }
+    .quiz-embedded { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; border:1px solid #0052ff; margin:1.5rem 0; }
+    .question { background:#0f1a2c; margin:0.8rem 0; padding:0.8rem 1rem; border-radius:1.2rem; }
+    .question p { font-weight:600; margin-bottom:0.4rem; font-size:0.9rem; }
+    .options { display:flex; flex-wrap:wrap; gap:0.8rem; }
+    .opt { background:#1e2a3e; padding:0.3rem 0.9rem; border-radius:2rem; cursor:pointer; transition:0.2s; font-size:0.85rem; }
+    .opt:hover { background:#2c3e66; transform:translateY(-2px); }
+    .opt.selected { background:#0052ff; color:#fff; font-weight:bold; }
+    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; font-size:0.95rem; }
+    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(0,82,255,0.4); }
+    .nav-link.next { background:linear-gradient(95deg,#0052ff,#5588ff); color:#fff; }
+    .nav-link.menu { background:#1a2a4a; border:1px solid #0052ff; }
+    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+    @media (max-width:800px) { .hero-header h1 { font-size:1.8rem; } .info-grid { grid-template-columns:1fr; } }
+  </style>
+  <link rel="stylesheet" href="../../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a><a href="../index.html">Programa Blockchain</a></nav>
+<div class="course-container">
+  <div class="hero-header">
+    <h1> ZK-ROLLUPS: ZKSYNC, STARKNET, SCROLL</h1>
+    <p>Magia matem&aacute;tica: pruebas de validez sin revelar datos</p>
+    <div class="badge-area">
+      <span class="chip"><i class="fas fa-magic"></i> Validity Proofs</span>
+      <span class="chip"><i class="fas fa-calculator"></i> zk-SNARKs / STARKs</span>
+      <span class="chip"><i class="fas fa-bolt"></i> Finalidad inmediata</span>
+    </div>
+  </div>
+  <div class="analogy-card">
+    <strong> Piénsalo así:</strong> Un ZK-rollup es como un mago que hace un truco y te da una prueba matem&aacute;tica de que fue real sin mostrarte c&oacute;mo lo hizo. No necesitas confiar en el mago — la prueba es suficiente para verificar que el truco ocurri&oacute;. As&iacute; funcionan los validity proofs: generas una prueba criptogr&aacute;fica de que todas las transacciones son correctas y la publicas en L1.
+  </div>
+  <div class="main-area">
+    <div class="sim-area">
+      <h3><i class="fas fa-magic"></i> Demostraci&oacute;n: Validity Proof</h3>
+      <div class="zk-demo">
+        <div class="zk-row"><span class="label"><i class="fas fa-arrow-right"></i> T&uacute; env&iacute;as:</span><span class="value">0.5 ETH a 0x742...f9E2</span></div>
+        <div class="zk-row"><span class="label"><i class="fas fa-cog"></i> Prover genera:</span><span class="value" id="proofStatus"><span class="zk-status pending">Esperando...</span></span></div>
+        <div class="zk-proof-visual" id="proofVisual">
+          <div class="proof-line" id="proofLine1" style="opacity:0.3;">Generando prueba zk-SNARK...</div>
+          <div class="proof-line" id="proofLine2" style="opacity:0.2;">Circuitos R1CS construidos</div>
+          <div class="proof-line" id="proofLine3" style="opacity:0.1;">Trusted setup verificada</div>
+        </div>
+        <div class="zk-row"><span class="label"><i class="fas fa-check-circle"></i> L1 verifica:</span><span class="value" id="verifyStatus"><span class="zk-status pending">Pendiente</span></span></div>
+      </div>
+      <div style="text-align:center;margin:1rem 0;">
+        <button class="btn-action" id="genProofBtn"> Generar y Verificar Prueba</button>
+      </div>
+      <div id="zkResult" class="feedback" style="margin-top:0.5rem;"> Haz clic para ver un ZK proof en acci&oacute;n.</div>
+    </div>
+    <div class="info-grid">
+      <div class="info-card">
+        <h4>zk-SNARKs vs zk-STARKs</h4>
+        <p><strong>SNARKs</strong> (Succinct Non-interactive Argument of Knowledge): pruebas peque&ntilde;as (~200 bytes), requieren trusted setup, r&aacute;pidas de verificar. <strong>STARKs</strong> (Scalable Transparent Arguments of Knowledge): pruebas m&aacute;s grandes (~100KB), no requieren trusted setup, resistentes a quantum. Starknet usa STARKs, zkSync usa SNARKs.</p>
+      </div>
+      <div class="info-card">
+        <h4>2026: ZK en Producci&oacute;n</h4>
+        <ul>
+          <li>zkSync Era: zkEVM tipo 4, miles de dApps</li>
+          <li>Starknet: STARKs nativos, CairoVM maduro</li>
+          <li>Scroll: zkEVM tipo 2, m&aacute;xima compatibilidad</li>
+          <li>Mejoras en prover efficiency: proofs en segundos</li>
+          <li>Costos de prueba reducidos 10x desde 2025</li>
+        </ul>
+      </div>
+    </div>
+    <div class="quiz-embedded">
+      <h3><i class="fas fa-question-circle"></i> Mini-quiz: ZK-Rollups</h3>
+      <div id="quizContainer"></div>
+      <button id="submitQuizBtn" class="btn-action"> Validar</button>
+      <div id="feedbackMsg" class="feedback"> Genera un ZK proof con el bot&oacute;n de arriba.</div>
+      <div id="insigniaArea" class="insignia hidden">
+        <i class="fas fa-medal"></i>
+        <h3> INSIGNIA EXPERTO EN ZK </h3>
+        <p>&iexcl;Entiendes las pruebas de validez y la magia matem&aacute;tica de los ZK-rollups!</p>
+      </div>
+    </div>
+  </div>
+  <div class="nav-links">
+    <a href="03-optimistic-rollups.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
+    <a href="05-base-l2-2026.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Programa Blockchain &middot; Curso 3: Escalabilidad, L2s y Nueva Arquitectura &middot; M&oacute;dulo 4</footer>
+</div>
+<script>
+  const STORAGE_KEY = 'block_3_04';
+  let proofGenerated = false;
+  let quizCompleted = false;
+  document.getElementById('genProofBtn').addEventListener('click', function() {
+    var btn = this;
+    btn.disabled = true;
+    btn.textContent = ' Generando prueba...';
+    document.getElementById('proofStatus').innerHTML = '<span class="zk-status generating"> Generando prueba zk...</span>';
+    document.getElementById('verifyStatus').innerHTML = '<span class="zk-status pending">Esperando prueba</span>';
+    document.getElementById('proofLine1').style.opacity = '0.5';
+    document.getElementById('proofLine2').style.opacity = '0.3';
+    document.getElementById('proofLine3').style.opacity = '0.2';
+    document.getElementById('zkResult').textContent = ' Construyendo circuitos R1CS y generando witness...';
+    setTimeout(function() {
+      document.getElementById('proofLine1').style.opacity = '1';
+      document.getElementById('proofLine1').textContent = 'Proof: zkSNARK_0x7a3f...9b2e (288 bytes)';
+      document.getElementById('proofLine2').style.opacity = '1';
+      document.getElementById('proofLine2').textContent = 'Public inputs: 0x742...f9E2 | 0.5 ETH | nonce: 42';
+      document.getElementById('proofLine3').style.opacity = '1';
+      document.getElementById('proofLine3').textContent = 'Verified in L1合约: 0xE3c...7a1 @ block 19,482,301';
+      document.getElementById('proofStatus').innerHTML = '<span class="zk-status verified"> Prueba generada en 3.2s</span>';
+      document.getElementById('verifyStatus').innerHTML = '<span class="zk-status verified"> Verificada en L1 en 0.01s</span>';
+      document.getElementById('zkResult').textContent = ' &iexcl;Prueba v&aacute;lida! La transacci&oacute;n de 0.5 ETH queda finalizada en L1 sin revelar datos.';
+      document.getElementById('zkResult').style.borderLeftColor = '#00ffc8';
+      btn.disabled = false;
+      btn.textContent = ' Generar y Verificar Prueba';
+      proofGenerated = true;
+    }, 2000);
+  });
+  const questions = [
+    { text: "&iquest;Qu&eacute; tipo de prueba usan los ZK-Rollups?", options: ["Fraud proofs", "Validity proofs", "Proof of work", "Proof of stake"], correct: 1 },
+    { text: "&iquest;Cu&aacute;l es la diferencia clave entre zk-SNARKs y zk-STARKs?", options: ["SNARKs requieren trusted setup, STARKs no", "STARKs son m&aacute;s peque&ntilde;os", "SNARKs son resistentes a quantum", "No hay diferencia"], correct: 0 },
+    { text: "&iquest;Qu&eacute; ventaja tienen los ZK-Rollups sobre los Optimistic?", options: ["Mayor seguridad", "Finalidad inmediata sin periodo de disputa", "Menor costo siempre", "Mejor descentralizaci&oacute;n"], correct: 1 }
+  ];
+  let userAnswers = new Array(questions.length).fill(null);
+  const quizContainer = document.getElementById('quizContainer');
+  const submitBtn = document.getElementById('submitQuizBtn');
+  const insigniaDiv = document.getElementById('insigniaArea');
+  const feedbackMsg = document.getElementById('feedbackMsg');
+  function renderQuestions() {
+    quizContainer.innerHTML = '';
+    questions.forEach(function(q, idx) {
+      var qDiv = document.createElement('div');
+      qDiv.classList.add('question');
+      qDiv.innerHTML = '<p>' + q.text + '</p><div class="options" id="qopt-' + idx + '"></div>';
+      var optionsDiv = qDiv.querySelector('.options');
+      q.options.forEach(function(opt, optIdx) {
+        var optSpan = document.createElement('div');
+        optSpan.classList.add('opt');
+        optSpan.textContent = opt;
+        optSpan.dataset.qIdx = idx;
+        optSpan.dataset.optIdx = optIdx;
+        optSpan.addEventListener('click', function(e) {
+          if (quizCompleted) return;
+          var parent = optSpan.parentElement;
+          Array.from(parent.children).forEach(function(c) { c.classList.remove('selected'); });
+          optSpan.classList.add('selected');
+          userAnswers[idx] = optIdx;
+        });
+        optionsDiv.appendChild(optSpan);
+      });
+      quizContainer.appendChild(qDiv);
+    });
+  }
+  function handleSubmit() {
+    if (quizCompleted) { feedbackMsg.textContent = ' Ya tienes la insignia!'; return; }
+    var allAnswered = userAnswers.every(function(a) { return a !== null; });
+    if (!allAnswered) { feedbackMsg.textContent = ' Responde todas las preguntas.'; return; }
+    var correct = 0;
+    for (var i = 0; i < questions.length; i++) { if (userAnswers[i] === questions[i].correct) correct++; }
+    if (correct >= 2) {
+      quizCompleted = true;
+      insigniaDiv.classList.remove('hidden');
+      localStorage.setItem(STORAGE_KEY, 'true');
+      feedbackMsg.textContent = ' &iexcl;Excelente! ' + correct + '/3 correctas. Has dominado los ZK-Rollups.';
+      document.querySelectorAll('.opt').forEach(function(o) { o.style.pointerEvents = 'none'; });
+      submitBtn.disabled = true;
+    } else {
+      feedbackMsg.textContent = ' Obtuviste ' + correct + '/3. Genera m&aacute;s proofs y vuelve a intentarlo.';
+    }
+  }
+  function restoreProgress() {
+    var completed = localStorage.getItem(STORAGE_KEY);
+    if (completed === 'true') {
+      quizCompleted = true;
+      insigniaDiv.classList.remove('hidden');
+      submitBtn.disabled = true;
+      feedbackMsg.textContent = ' M&oacute;dulo completado!';
+      document.querySelectorAll('.opt').forEach(function(o) { o.style.pointerEvents = 'none'; });
+    }
+  }
+  renderQuestions();
+  submitBtn.addEventListener('click', handleSubmit);
+  restoreProgress();
+</script>
+<script src="../../../assets/js/cookie-consent.js"></script></body>
+</html>

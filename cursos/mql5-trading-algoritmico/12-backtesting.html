@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>MQL5 | Backtesting y Optimización</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../assets/css/theme.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%);background-size:200% 200%;animation:gradientShift 20s ease infinite;font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
+@keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.modulo-container{max-width:1300px;width:100%;background:rgba(15,25,45,0.65);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(255,100,220,0.25);box-shadow:0 25px 45px rgba(0,0,0,0.5);overflow:hidden}
+.hero-header{background:linear-gradient(95deg,#0b1120 0%,#111a2e 100%);padding:2rem 2rem 1.5rem 2rem;text-align:center;border-bottom:2px solid #ff64dc}
+.hero-header h1{font-size:2.6rem;font-weight:800;background:linear-gradient(135deg,#FFF,#ff99e6,#ff64dc);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-header p{color:#bcc9f0;margin-top:.5rem;font-size:1.1rem}
+.badge-area{display:flex;justify-content:center;gap:1rem;margin-top:1.2rem;flex-wrap:wrap}
+.chip{background:rgba(255,100,220,0.15);border:1px solid #ff64dc;padding:0.4rem 1rem;border-radius:40px;font-size:0.8rem;font-weight:600;color:#ddd}
+.analogy-card{background:#1e2a3acc;margin:1.5rem 2rem;padding:1.2rem 1.8rem;border-radius:2rem;border-left:8px solid #ff64dc;font-size:1rem;line-height:1.6}
+.progress-section{margin:1rem 2rem 0}
+.progress-bar-outer{background:#1a2a4a;border-radius:20px;height:20px;overflow:hidden}
+.progress-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,#ff64dc,#fff);border-radius:20px;transition:width 0.5s ease}
+.progress-text{text-align:center;font-size:0.85rem;color:#8899cc;margin-bottom:.5rem}
+.main-area{padding:1rem 2rem}
+.tabs{display:flex;gap:.5rem;margin-bottom:1.5rem;flex-wrap:wrap}
+.tab-btn{background:#1a2a4a;border:1px solid #3a4a6a;padding:.7rem 1.5rem;border-radius:2rem;cursor:pointer;color:#8899cc;font-family:'Inter',sans-serif;font-size:.85rem;transition:.2s}
+.tab-btn:hover{background:#2a3a5a;color:#eef5ff}
+.tab-btn.active{background:rgba(255,100,220,0.2);border-color:#ff64dc;color:#ff64dc;font-weight:600}
+.tab-content{display:none}
+.tab-content.active{display:block}
+.settings-panel{background:#0a1020;border-radius:2rem;padding:1.5rem;border:1px solid #2a3a5a;margin-bottom:1.5rem}
+.settings-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem}
+.form-group{margin-bottom:.8rem}
+.form-group label{display:block;font-size:.8rem;color:#8899cc;margin-bottom:.3rem}
+.form-group input,.form-group select{width:100%;padding:.6rem;background:#1a2a4a;border:1px solid #3a4a6a;border-radius:.8rem;color:#eef5ff;font-family:'Inter',sans-serif;font-size:.85rem;transition:.2s}
+.form-group input:focus,.form-group select:focus{border-color:#ff64dc;outline:none}
+.btn-action{background:linear-gradient(95deg,#ff64dc,#ff30c0);border:none;padding:0.8rem 1.8rem;font-weight:bold;border-radius:3rem;cursor:pointer;font-size:1rem;transition:0.2s;color:#fff;font-family:'Inter',sans-serif}
+.btn-action:hover{transform:translateY(-2px);box-shadow:0 0 15px rgba(255,100,220,0.5)}
+.btn-action:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-secondary{background:#2c3e66;border:none;padding:.6rem 1.2rem;border-radius:2rem;cursor:pointer;color:#eef5ff;font-family:'Inter',sans-serif;font-size:.85rem;transition:.2s}
+.btn-secondary:hover{background:#3a4e76}
+.results-panel{background:#0a1020;border-radius:2rem;padding:1.5rem;border:1px solid #2a3a5a;margin-bottom:1.5rem}
+.equity-chart{background:#0d1525;border-radius:1rem;padding:1rem;margin-bottom:1rem;border:1px solid #2a3a5a}
+.equity-chart canvas{width:100%;height:200px;border-radius:.5rem}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1rem}
+.stat-card{background:#0d1525;border-radius:1rem;padding:1rem;text-align:center;border:1px solid #2a3a5a}
+.stat-card .label{font-size:.7rem;color:#8899cc;text-transform:uppercase;letter-spacing:.5px}
+.stat-card .value{font-size:1.4rem;font-weight:700;margin-top:.3rem}
+.stat-card .value.green{color:#00c853}
+.stat-card .value.red{color:#ff1744}
+.stat-card .value.gold{color:#ffd700}
+.stat-card .value.magenta{color:#ff64dc}
+.trade-table{width:100%;border-collapse:collapse;font-size:.78rem;margin-top:1rem}
+.trade-table th{background:#1a2a4a;padding:.4rem;text-align:left;color:#8899cc;border-bottom:2px solid #3a4a6a}
+.trade-table td{padding:.4rem;border-bottom:1px solid #2a3a5a}
+.opt-table{width:100%;border-collapse:collapse;font-size:.75rem;margin-top:1rem}
+.opt-table th{background:#1a2a4a;padding:.4rem;text-align:left;color:#8899cc;border-bottom:2px solid #3a4a6a;cursor:pointer}
+.opt-table th:hover{color:#ff64dc}
+.opt-table td{padding:.4rem;border-bottom:1px solid #2a3a5a}
+.opt-table .best{background:rgba(0,200,83,0.1)}
+.slider-container{margin-bottom:1rem}
+.slider-container input[type="range"]{width:100%;-webkit-appearance:none;background:#2a3a5a;height:6px;border-radius:3px;outline:none}
+.slider-container input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#ff64dc;cursor:pointer}
+.progress-bar{width:100%;background:#1a2a4a;border-radius:10px;height:24px;overflow:hidden;margin:1rem 0;position:relative}
+.progress-bar-fill-sim{height:100%;width:0%;background:linear-gradient(90deg,#ff64dc,#fff);border-radius:10px;transition:width 0.1s}
+.progress-bar-label{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;font-size:.75rem;color:#fff;font-weight:600}
+.feedback{background:#00000099;margin:0 2rem 1.5rem 2rem;padding:1rem;border-radius:1.5rem;text-align:center;font-weight:500;border-left:4px solid #ff64dc;min-height:3rem}
+.insignia{text-align:center;background:#0c1b2f;border-radius:2rem;margin:0 2rem 1.5rem;padding:1rem;border:2px dashed gold}
+.insignia i{font-size:2.5rem;color:gold}
+.insignia h3{color:gold;margin:.5rem 0}
+.hidden{display:none!important}
+.nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.5rem 2rem}
+.nav-link{background:#2c3e66;padding:0.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:0.5rem;transition:0.2s}
+.nav-link:hover{transform:translateY(-2px);box-shadow:0 0 10px rgba(255,100,220,0.4)}
+.nav-link.next{background:linear-gradient(95deg,#f0a500,#ff6a00);color:#1e1a0c}
+.nav-link.menu{background:#1a2a4a;border:1px solid #3399ff}
+.nav-link.prev{background:#1a2a4a;border:1px solid #666}
+footer{text-align:center;padding:1.2rem;font-size:0.8rem;border-top:1px solid #2c3e66;color:#8899cc}
+@media(max-width:900px){
+  .settings-grid{grid-template-columns:1fr}
+  .stats-grid{grid-template-columns:1fr}
+  .hero-header h1{font-size:1.9rem}
+  .analogy-card{margin:1rem}
+  .feedback{margin:0 1rem 1rem}
+  .main-area{padding:1rem}
+}
+.forward-badge{display:inline-block;background:rgba(255,215,0,0.15);border:1px solid #ffd700;padding:.2rem .6rem;border-radius:1rem;font-size:.7rem;color:#ffd700}
+</style>
+</head>
+<body>
+<div class="modulo-container">
+  <nav class="brand-return-nav">
+    <a href="../../index.html">&larr; Portfolio</a>
+    <a href="../../cursos/index.html">Cursos</a>
+  </nav>
+
+  <div class="hero-header">
+    <h1>⏱️ Backtesting y Optimización</h1>
+    <p>"Viaja en el tiempo para probar tu estrategia sin arriesgar un centavo"</p>
+    <div class="badge-area">
+      <span class="chip"><i class="fas fa-flask"></i> Strategy Tester</span>
+      <span class="chip"><i class="fas fa-sliders"></i> Optimización</span>
+      <span class="chip"><i class="fas fa-forward"></i> Forward Test</span>
+    </div>
+  </div>
+
+  <div class="progress-section">
+    <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+    <div class="progress-text" id="progressText">Módulo 12 de 26</div>
+  </div>
+
+  <div class="analogy-card">
+    <strong>✈️ Piénsalo así:</strong> El backtesting es como un simulador de vuelo para traders. Puedes estrellar tu avión (estrategia) mil veces sin lastimarte, y cada vez aprendes algo nuevo. La optimización es como ajustar las alas para volar más rápido. En MQL5, el <strong>Strategy Tester</strong> hace exactamente eso.
+  </div>
+
+  <div class="main-area">
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="backtest">⚙️ Backtest</button>
+      <button class="tab-btn" data-tab="optimization">🔬 Optimización</button>
+      <button class="tab-btn" data-tab="forward">📈 Forward Test</button>
+    </div>
+
+    <div class="tab-content active" id="tab-backtest">
+      <div class="settings-panel">
+        <h3 style="color:#bcc9f0;margin-bottom:1rem"><i class="fas fa-sliders"></i> Parámetros del Backtest</h3>
+        <div class="settings-grid">
+          <div class="form-group"><label>Símbolo</label><select id="btSymbol"><option>EURUSD</option><option>GBPUSD</option><option>BTCUSD</option></select></div>
+          <div class="form-group"><label>Timeframe</label><select id="btTF"><option value="M15">M15</option><option value="H1">H1</option><option value="H4" selected>H4</option><option value="D1">D1</option></select></div>
+          <div class="form-group"><label>Depósito Inicial ($)</label><input type="number" id="btDeposit" value="10000" min="1000" max="100000" step="1000"></div>
+          <div class="form-group"><label>Fast MA Period</label><input type="number" id="btFast" value="10" min="5" max="50"></div>
+          <div class="form-group"><label>Slow MA Period</label><input type="number" id="btSlow" value="30" min="10" max="100"></div>
+          <div class="form-group"><label>Lote Fijo</label><input type="number" id="btLots" value="0.1" min="0.01" max="10" step="0.01"></div>
+        </div>
+        <div class="slider-container" style="margin-top:.5rem">
+          <label style="font-size:.8rem;color:#8899cc">Período de Prueba <span id="dateRangeLabel">2024 — 2025</span></label>
+          <input type="range" id="dateSlider" min="0" max="100" value="80">
+          <div style="display:flex;justify-content:space-between;font-size:.7rem;color:#666"><span>Ene 2024</span><span>Dic 2025</span></div>
+        </div>
+        <button class="btn-action" id="runBacktestBtn"><i class="fas fa-play"></i> Ejecutar Backtest</button>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-optimization">
+      <div class="settings-panel">
+        <h3 style="color:#bcc9f0;margin-bottom:1rem"><i class="fas fa-microchip"></i> Optimización de Parámetros</h3>
+        <div class="settings-grid">
+          <div class="form-group"><label>Fast MA — Desde</label><input type="number" id="optFastFrom" value="5" min="2" max="50"></div>
+          <div class="form-group"><label>Fast MA — Hasta</label><input type="number" id="optFastTo" value="30" min="2" max="50"></div>
+          <div class="form-group"><label>Fast MA — Paso</label><input type="number" id="optFastStep" value="5" min="1" max="20"></div>
+          <div class="form-group"><label>Slow MA — Desde</label><input type="number" id="optSlowFrom" value="20" min="5" max="100"></div>
+          <div class="form-group"><label>Slow MA — Hasta</label><input type="number" id="optSlowTo" value="60" min="5" max="100"></div>
+          <div class="form-group"><label>Slow MA — Paso</label><input type="number" id="optSlowStep" value="10" min="5" max="30"></div>
+        </div>
+        <button class="btn-action" id="runOptimizeBtn"><i class="fas fa-flask"></i> Iniciar Optimización</button>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-forward">
+      <div class="settings-panel">
+        <h3 style="color:#bcc9f0;margin-bottom:1rem"><i class="fas fa-forward"></i> Forward Test</h3>
+        <p style="color:#8899cc;font-size:.85rem;margin-bottom:1rem">Prueba los parámetros óptimos encontrados en la optimización con datos fuera de muestra (último 20% del período).</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+          <div class="form-group"><label>Fast MA</label><input type="number" id="fwFast" value="10"></div>
+          <div class="form-group"><label>Slow MA</label><input type="number" id="fwSlow" value="30"></div>
+        </div>
+        <button class="btn-action" id="runForwardBtn"><i class="fas fa-forward"></i> Ejecutar Forward Test</button>
+        <button class="btn-secondary" id="useOptParamsBtn" disabled><i class="fas fa-copy"></i> Usar parámetros óptimos</button>
+      </div>
+    </div>
+
+    <div class="results-panel">
+      <div class="equity-chart">
+        <canvas id="equityCanvas" width="900" height="200"></canvas>
+      </div>
+
+      <div id="simProgress" class="progress-bar" style="display:none">
+        <div class="progress-bar-fill-sim" id="simProgressFill"></div>
+        <div class="progress-bar-label" id="simProgressLabel">0%</div>
+      </div>
+
+      <div class="stats-grid" id="statsGrid" style="display:none">
+        <div class="stat-card"><div class="label">Total Trades</div><div class="value magenta" id="statTrades">0</div></div>
+        <div class="stat-card"><div class="label">Win Rate</div><div class="value green" id="statWinRate">0%</div></div>
+        <div class="stat-card"><div class="label">Profit Factor</div><div class="value gold" id="statProfitFactor">0.00</div></div>
+        <div class="stat-card"><div class="label">Max Drawdown</div><div class="value red" id="statDrawdown">0%</div></div>
+        <div class="stat-card"><div class="label">Sharpe Ratio</div><div class="value green" id="statSharpe">0.00</div></div>
+        <div class="stat-card"><div class="label">Recovery Factor</div><div class="value gold" id="statRecovery">0.00</div></div>
+      </div>
+
+      <div id="tradesContainer" style="display:none">
+        <h4 style="color:#bcc9f0;margin-bottom:.5rem"><i class="fas fa-list"></i> Lista de Trades</h4>
+        <div style="max-height:200px;overflow-y:auto" id="tradesTableWrap">
+          <table class="trade-table"><thead><tr><th>#</th><th>Fecha</th><th>Tipo</th><th>Entrada</th><th>Salida</th><th>Pips</th><th>P&L</th></tr></thead><tbody id="tradesBody"></tbody></table>
+        </div>
+      </div>
+
+      <div id="optResults" style="display:none">
+        <h4 style="color:#bcc9f0;margin-bottom:.5rem"><i class="fas fa-table"></i> Resultados de Optimización</h4>
+        <p style="color:#8899cc;font-size:.8rem;margin-bottom:.5rem">Ordenado por Profit Factor. <span style="color:#00c853">Verde</span> = mejor resultado.</p>
+        <div style="max-height:250px;overflow-y:auto">
+          <table class="opt-table"><thead><tr><th>Fast MA</th><th>Slow MA</th><th>Trades</th><th>Win Rate</th><th>Profit Factor</th><th>Drawdown</th></tr></thead><tbody id="optBody"></tbody></table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="feedbackMsg" class="feedback">💡 Configura los parámetros y ejecuta un backtest, luego optimiza y haz forward test para ganar tu insignia.</div>
+
+  <div id="insigniaArea" class="insignia hidden">
+    <i class="fas fa-medal"></i>
+    <h3>🏅 Strategy Tester 🏅</h3>
+    <p>¡Eres un maestro del backtesting! Has probado, optimizado y validado tu estrategia como un profesional cuantitativo. 🚀</p>
+  </div>
+
+  <div class="nav-links">
+    <a href="11-primer-ea.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+    <a href="13-money-management.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+
+  <footer><i class="fas fa-crown"></i> MQL5 Trading Algorítmico · Domina el arte del trading automatizado</footer>
+</div>
+<script>
+const STORAGE_KEY = 'mql5_12';
+let completed = false;
+let backtestRun = false;
+let optimized = false;
+let forwardRun = false;
+let optBestFast = 10, optBestSlow = 30;
+
+function initProgress(){
+  const p = JSON.parse(localStorage.getItem('mql5_progress')) || [];
+  const pf = document.getElementById('progressFill');
+  const pt = document.getElementById('progressText');
+  if(pf) pf.style.width = Math.round((p.length/26)*100)+'%';
+  if(pt) pt.textContent = p.length+' de 26 módulos';
+  if(p.includes(STORAGE_KEY)){
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    completed = true;
+  }
+}
+
+function saveProgress(){
+  let p = JSON.parse(localStorage.getItem('mql5_progress')) || [];
+  if(!p.includes(STORAGE_KEY)){p.push(STORAGE_KEY);localStorage.setItem('mql5_progress',JSON.stringify(p));}
+  const pf = document.getElementById('progressFill');
+  const pt = document.getElementById('progressText');
+  if(pf) pf.style.width = Math.round((p.length/26)*100)+'%';
+  if(pt) pt.textContent = p.length+' de 26 módulos';
+}
+
+// Tabs
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
+  });
+});
+
+// Date slider
+document.getElementById('dateSlider').addEventListener('input',function(){
+  document.getElementById('dateRangeLabel').textContent = '2024 — '+(2024+Math.round(this.value/100*1.5*12/12));
+});
+
+function simulateBacktest(fast, slow, deposit, isForward){
+  const trades = [];
+  let balance = deposit;
+  let peak = deposit;
+  let maxDD = 0;
+  let winning = 0, losing = 0;
+  let totalProfit = 0, totalLoss = 0;
+  let returns = [];
+  let price = 1.1000;
+  let inPos = false;
+  let entryPrice = 0;
+  let fastMA = 1.0950;
+  let slowMA = 1.0900;
+  const numTrades = isForward ? 15 : 35 + Math.floor(Math.random()*20);
+  const timeline = [{balance,b:balance}];
+
+  for(let i=0;i<numTrades;i++){
+    price += (Math.random()-0.48)*0.01;
+    if(price<1.05) price=1.05;
+    if(price>1.15) price=1.15;
+    fastMA = fastMA*0.8 + price*0.2;
+    slowMA = slowMA*0.92 + price*0.08;
+
+    const crossBuy = fastMA>slowMA && !inPos;
+    const crossSell = fastMA<slowMA && inPos;
+
+    if(crossBuy){
+      inPos=true;
+      entryPrice=price;
+    }
+    if(crossSell && inPos){
+      inPos=false;
+      const pips=(price-entryPrice)/0.0001;
+      const pl = pips * 0.1 * 10 + (Math.random()-0.5)*20;
+      balance+=pl;
+      const trade = {type:'SELL',entry:entryPrice.toFixed(5),exit:price.toFixed(5),pips:pips.toFixed(1),pl:pl.toFixed(2)};
+      trades.push(trade);
+      if(pl>0){winning++;totalProfit+=pl;}else{losing++;totalLoss+=Math.abs(pl);}
+      returns.push(pl/balance*100);
+      timeline.push({balance,b:balance});
+      if(balance>peak) peak=balance;
+      const dd=(peak-balance)/peak*100;
+      if(dd>maxDD) maxDD=dd;
+    }
+  }
+
+  if(inPos){
+    price += (Math.random()-0.5)*0.005;
+    const pips=(price-entryPrice)/0.0001;
+    const pl = pips * 0.1 * 10 + (Math.random()-0.5)*20;
+    balance+=pl;
+    const trade = {type:'SELL',entry:entryPrice.toFixed(5),exit:price.toFixed(5),pips:pips.toFixed(1),pl:pl.toFixed(2)};
+    trades.push(trade);
+    if(pl>0){winning++;totalProfit+=pl;}else{losing+=1;totalLoss+=Math.abs(pl);}
+    returns.push(pl/balance*100);
+    timeline.push({balance,b:balance});
+    if(balance>peak) peak=balance;
+    const dd=(peak-balance)/peak*100;
+    if(dd>maxDD) maxDD=dd;
+  }
+
+  const total = trades.length;
+  const winRate = total>0?winning/total*100:0;
+  const profitFactor = totalLoss>0?totalProfit/totalLoss:totalProfit>0?999:0;
+  const avgReturn = returns.length>0?returns.reduce((a,b)=>a+b,0)/returns.length:0;
+  const stdDev = returns.length>1?Math.sqrt(returns.map(r=>(r-avgReturn)**2).reduce((a,b)=>a+b,0)/(returns.length-1)):1;
+  const sharpe = stdDev>0?(avgReturn/100)/stdDev*Math.sqrt(252):0;
+  const recoveryFactor = maxDD>0?((balance-deposit)/deposit*100)/maxDD:0;
+
+  return {trades, balance, profitFactor, winRate, maxDD, sharpe, recoveryFactor, total, totalProfit, timeline, totalTrades:trades.length};
+}
+
+document.getElementById('runBacktestBtn').addEventListener('click',()=>{
+  const fast = parseInt(document.getElementById('btFast').value)||10;
+  const slow = parseInt(document.getElementById('btSlow').value)||30;
+  const deposit = parseFloat(document.getElementById('btDeposit').value)||10000;
+  runBacktest(fast, slow, deposit, false);
+});
+
+function runBacktest(fast, slow, deposit, isForward){
+  const progressBar = document.getElementById('simProgress');
+  const fill = document.getElementById('simProgressFill');
+  const label = document.getElementById('simProgressLabel');
+  progressBar.style.display = 'block';
+  fill.style.width = '0%';
+  label.textContent = '0%';
+
+  const canvas = document.getElementById('equityCanvas');
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+
+  let progress = 0;
+  let result = null;
+
+  function animate(){
+    progress += 2 + Math.random()*3;
+    if(progress>100) progress=100;
+    fill.style.width = progress+'%';
+    label.textContent = Math.round(progress)+'%';
+
+    // Draw animated chart
+    ctx.clearRect(0,0,w,h);
+    ctx.fillStyle = '#0d1525';
+    ctx.fillRect(0,0,w,h);
+
+    if(progress>=100){
+      result = simulateBacktest(fast, slow, deposit, isForward);
+      showResults(result, isForward);
+      progressBar.style.display = 'none';
+      backtestRun = true;
+      checkCompletion();
+      return;
+    }
+    // Simulate curve during progress
+    const pts = 40;
+    const values = [];
+    let v = deposit;
+    for(let i=0;i<pts;i++){
+      v += (Math.random()-0.47)*(deposit*0.02);
+      values.push(v);
+    }
+    const min = Math.min(...values), max = Math.max(...values);
+    const range = max-min||1;
+    const pad = 10, ch = h-pad*2;
+    // Fill
+    const grad = ctx.createLinearGradient(0,0,0,h);
+    grad.addColorStop(0,'rgba(255,100,220,0.15)');
+    grad.addColorStop(1,'rgba(255,100,220,0.01)');
+    ctx.beginPath();
+    values.forEach((v,i)=>{const x=i/(pts-1)*(w-pad*2)+pad;const y=pad+(max-v)/range*ch;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
+    ctx.lineTo(w-pad, h-pad); ctx.lineTo(pad, h-pad); ctx.closePath();
+    ctx.fillStyle = grad;
+    ctx.fill();
+    // Line
+    ctx.strokeStyle = '#ff64dc';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    values.forEach((v,i)=>{const x=i/(pts-1)*(w-pad*2)+pad;const y=pad+(max-v)/range*ch;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
+    ctx.stroke();
+    // Labels
+    ctx.fillStyle = '#8899cc';
+    ctx.font = '11px Inter';
+    ctx.fillText('$'+values[values.length-1].toFixed(0), w-100, pad+15);
+    ctx.fillStyle = '#666';
+    ctx.fillText('Equity Curve (simulando...)', pad+5, pad+15);
+
+    setTimeout(animate, 80);
+  }
+  animate();
+}
+
+function showResults(r, isForward){
+  const canvas = document.getElementById('equityCanvas');
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle = '#0d1525';
+  ctx.fillRect(0,0,w,h);
+
+  const values = r.timeline.map(t=>t.b);
+  const min = Math.min(...values), max = Math.max(...values);
+  const range = max-min||1;
+  const pad = 10, ch = h-pad*2;
+
+  // Fill
+  const grad = ctx.createLinearGradient(0,0,0,h);
+  grad.addColorStop(0,'rgba(255,100,220,0.15)');
+  grad.addColorStop(1,'rgba(255,100,220,0.01)');
+  ctx.beginPath();
+  values.forEach((v,i)=>{const x=i/(values.length-1)*(w-pad*2)+pad;const y=pad+(max-v)/range*ch;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
+  ctx.lineTo(w-pad, h-pad); ctx.lineTo(pad, h-pad); ctx.closePath();
+  ctx.fillStyle = grad;
+  ctx.fill();
+  // Line
+  ctx.strokeStyle = '#ff64dc';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  values.forEach((v,i)=>{const x=i/(values.length-1)*(w-pad*2)+pad;const y=pad+(max-v)/range*ch;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
+  ctx.stroke();
+  // Start/End markers
+  ctx.fillStyle = '#8899cc';
+  ctx.font = '11px Inter';
+  ctx.fillText('$'+values[0].toFixed(0), pad+5, h-pad-5);
+  ctx.fillText('$'+values[values.length-1].toFixed(0), w-100, pad+15);
+
+  // Stats
+  document.getElementById('statTrades').textContent = r.totalTrades;
+  document.getElementById('statWinRate').textContent = r.winRate.toFixed(1)+'%';
+  document.getElementById('statProfitFactor').textContent = r.profitFactor.toFixed(2);
+  document.getElementById('statDrawdown').textContent = r.maxDD.toFixed(2)+'%';
+  document.getElementById('statSharpe').textContent = r.sharpe.toFixed(2);
+  document.getElementById('statRecovery').textContent = r.recoveryFactor.toFixed(2);
+  document.getElementById('statsGrid').style.display = 'grid';
+
+  // Trades table
+  const tbody = document.getElementById('tradesBody');
+  tbody.innerHTML = r.trades.map((t,i)=>{
+    const pl = parseFloat(t.pl);
+    return '<tr>'+
+      '<td>'+(i+1)+'</td>'+
+      '<td>2024-'+(String(Math.floor(Math.random()*12+1)).padStart(2,'0'))+'-'+(String(Math.floor(Math.random()*28+1)).padStart(2,'0'))+'</td>'+
+      '<td>'+(t.type==='BUY'?'🟢 BUY':'🔴 SELL')+'</td>'+
+      '<td>'+t.entry+'</td>'+
+      '<td>'+t.exit+'</td>'+
+      '<td>'+t.pips+(t.pips>0?' 📈':' 📉')+'</td>'+
+      '<td class="'+(pl>=0?'profit':'loss')+'" style="'+(pl>=0?'color:#00c853':'color:#ff1744')+'">'+(pl>=0?'+':'')+pl.toFixed(2)+'</td>'+
+    '</tr>';
+  }).join('');
+  document.getElementById('tradesContainer').style.display = 'block';
+
+  const tag = isForward?'🧪 FORWARD TEST':'📊 BACKTEST';
+  document.getElementById('feedbackMsg').innerHTML = '✅ '+tag+' completado — '+r.totalTrades+' trades | Profit Factor: '+r.profitFactor.toFixed(2)+' | Balance final: $'+r.balance.toFixed(2);
+}
+
+// Optimization
+document.getElementById('runOptimizeBtn').addEventListener('click',()=>{
+  const fastFrom = parseInt(document.getElementById('optFastFrom').value)||5;
+  const fastTo = parseInt(document.getElementById('optFastTo').value)||30;
+  const fastStep = parseInt(document.getElementById('optFastStep').value)||5;
+  const slowFrom = parseInt(document.getElementById('optSlowFrom').value)||20;
+  const slowTo = parseInt(document.getElementById('optSlowTo').value)||60;
+  const slowStep = parseInt(document.getElementById('optSlowStep').value)||10;
+  const deposit = parseFloat(document.getElementById('btDeposit').value)||10000;
+
+  const progressBar = document.getElementById('simProgress');
+  const fill = document.getElementById('simProgressFill');
+  const label = document.getElementById('simProgressLabel');
+  progressBar.style.display = 'block';
+
+  const results = [];
+  let done = 0;
+  const totalCombos = Math.ceil((fastTo-fastFrom)/fastStep+1) * Math.ceil((slowTo-slowFrom)/slowStep+1);
+
+  for(let f=fastFrom;f<=fastTo;f+=fastStep){
+    for(let s=slowFrom;s<=slowTo;s+=slowStep){
+      if(s<=f) continue;
+      const r = simulateBacktest(f, s, deposit, false);
+      results.push({fast:f,slow:s,trades:r.totalTrades,winRate:r.winRate,pf:r.profitFactor,dd:r.maxDD});
+    }
+  }
+
+  results.sort((a,b)=>b.pf-a.pf);
+
+  const optBody = document.getElementById('optBody');
+  optBody.innerHTML = results.map((r,i)=>{
+    const cls = i===0?' class="best"':'';
+    return '<tr'+cls+'><td>'+r.fast+'</td><td>'+r.slow+'</td><td>'+r.trades+'</td><td>'+r.winRate.toFixed(1)+'%</td><td style="color:'+(r.pf>1.5?'#00c853':r.pf>1?'#ffd700':'#ff1744')+'">'+r.pf.toFixed(2)+'</td><td>'+r.dd.toFixed(2)+'%</td></tr>';
+  }).join('');
+  document.getElementById('optResults').style.display = 'block';
+  progressBar.style.display = 'none';
+
+  if(results.length>0){
+    optBestFast = results[0].fast;
+    optBestSlow = results[0].slow;
+    document.getElementById('useOptParamsBtn').disabled = false;
+    document.getElementById('fwFast').value = optBestFast;
+    document.getElementById('fwSlow').value = optBestSlow;
+  }
+
+  optimized = true;
+  checkCompletion();
+  document.getElementById('feedbackMsg').innerHTML = '✅ Optimización completada: '+results.length+' combinaciones probadas. Mejor: Fast='+results[0].fast+', Slow='+results[0].slow+' (PF: '+results[0].pf.toFixed(2)+')';
+});
+
+document.getElementById('useOptParamsBtn').addEventListener('click',()=>{
+  document.getElementById('fwFast').value = optBestFast;
+  document.getElementById('fwSlow').value = optBestSlow;
+  document.getElementById('feedbackMsg').innerHTML = '📋 Parámetros óptimos cargados: Fast='+optBestFast+', Slow='+optBestSlow;
+});
+
+document.getElementById('runForwardBtn').addEventListener('click',()=>{
+  const fast = parseInt(document.getElementById('fwFast').value)||10;
+  const slow = parseInt(document.getElementById('fwSlow').value)||30;
+  const deposit = parseFloat(document.getElementById('btDeposit').value)||10000;
+  runBacktest(fast, slow, deposit, true);
+  forwardRun = true;
+  checkCompletion();
+});
+
+function checkCompletion(){
+  if(!completed && backtestRun && optimized && forwardRun){
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').innerHTML = '🎉 ¡LO LOGRASTE, ESTRATEGA! Has completado backtest, optimización y forward test como un profesional cuantitativo. ¡Insignia desbloqueada!';
+    saveProgress();
+    completed = true;
+  }
+}
+
+window.addEventListener('load',initProgress);
+</script>
+</body>
+</html>

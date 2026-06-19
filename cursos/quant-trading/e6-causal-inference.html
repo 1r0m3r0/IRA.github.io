@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Quant Trading | Causal Inference en Finanzas 🔬</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%);background-size:200% 200%;animation:gradientShift 20s ease infinite;font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem;}
+    @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+    .modulo-container{max-width:1300px;width:100%;background:rgba(15,25,45,0.65);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(255,102,192,0.25);box-shadow:0 25px 45px rgba(0,0,0,0.5);overflow:hidden;}
+    .hero-header{background:linear-gradient(95deg,#0b1120 0%,#111a2e 100%);padding:2rem 2rem 1.5rem;text-align:center;border-bottom:2px solid #ff66c0;}
+    .hero-header h1{font-size:2.6rem;font-weight:800;background:linear-gradient(135deg,#FFF,#ff99d6,#ff66c0);-webkit-background-clip:text;background-clip:text;color:transparent;}
+    .hero-header p{font-size:1.1rem;color:#cc99bb;margin-top:0.5rem;font-weight:500;}
+    .badge-area{display:flex;justify-content:center;gap:1rem;margin-top:1.2rem;flex-wrap:wrap;}
+    .chip{background:rgba(255,102,192,0.15);border:1px solid #ff66c0;padding:0.4rem 1rem;border-radius:40px;font-size:0.8rem;font-weight:600;}
+    .analogy-card{background:#1e2a3acc;margin:1.5rem 2rem;padding:1.2rem 1.8rem;border-radius:2rem;border-left:8px solid #ff66c0;font-size:1rem;line-height:1.6;}
+    .progress-section{margin:0 2rem;}
+    .progress-bar-outer{background:#1a2a4a;border-radius:20px;height:20px;overflow:hidden;}
+    .progress-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,#ff66c0,#fff);border-radius:20px;transition:width 0.5s ease;}
+    .progress-text{text-align:center;font-size:0.85rem;color:#8899cc;margin:0.4rem 0 1rem;}
+    .main-area{padding:1.5rem 2rem;display:flex;flex-direction:column;gap:1.5rem;}
+    .panel{background:rgba(0,10,25,0.7);border-radius:1.5rem;padding:1.3rem;border:1px solid rgba(255,102,192,0.2);}
+    .panel h3{font-size:1.1rem;margin-bottom:0.8rem;color:#ff99dd;display:flex;align-items:center;gap:0.5rem;}
+    .dag-container{position:relative;min-height:250px;background:#0a0f1e;border-radius:1rem;border:1px solid #1a2a4a;overflow:hidden;}
+    .dag-node{position:absolute;min-width:90px;padding:0.6rem 1rem;border-radius:1rem;font-size:0.8rem;font-weight:600;text-align:center;cursor:pointer;background:#1a2a4a;border:2px solid transparent;transition:0.3s;z-index:2;}
+    .dag-node:hover{transform:scale(1.05);}
+    .dag-node.variable{border-color:#8899cc;}
+    .dag-node.treatment{border-color:#ff66c0;background:rgba(255,102,192,0.15);}
+    .dag-node.outcome{border-color:#00ff88;background:rgba(0,255,136,0.1);}
+    .dag-node.confounder{border-color:#ffaa00;background:rgba(255,170,0,0.1);}
+    .dag-node.selected{border-color:#fff;box-shadow:0 0 15px rgba(255,102,192,0.5);}
+    .dag-node .dag-icon{font-size:1.2rem;display:block;margin-bottom:0.2rem;}
+    .dag-controls{display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.8rem;}
+    .scenario-btn{background:#0f1a2c;border:1px solid #1a2a4a;padding:0.4rem 0.8rem;border-radius:1rem;font-size:0.75rem;cursor:pointer;transition:0.2s;color:#eef5ff;}
+    .scenario-btn:hover{border-color:#ff66c0;}
+    .scenario-btn.active{background:rgba(255,102,192,0.2);border-color:#ff66c0;}
+    .btn-action{background:linear-gradient(95deg,#ff66c0,#ff3399);border:none;padding:0.8rem 1.8rem;font-weight:bold;border-radius:3rem;cursor:pointer;font-size:1rem;transition:0.2s;color:#1e1a0c;}
+    .btn-action:hover{transform:translateY(-2px);box-shadow:0 0 15px rgba(255,102,192,0.5);}
+    .btn-action:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
+    .feedback{background:#00000099;margin:0 2rem 1.5rem;padding:1rem;border-radius:1.5rem;text-align:center;font-weight:500;border-left:4px solid #ff66c0;}
+    .insignia{text-align:center;background:#0c1b2f;border-radius:2rem;margin:0 2rem 1.5rem;padding:1rem;border:2px dashed gold;}
+    .insignia i{font-size:2.5rem;color:gold;}
+    .hidden{display:none !important;}
+    .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.5rem 2rem;}
+    .nav-link{background:#2c3e66;padding:0.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:0.5rem;transition:0.2s;font-size:0.95rem;}
+    .nav-link:hover{transform:translateY(-2px);box-shadow:0 0 10px rgba(255,102,192,0.4);}
+    .nav-link.next{background:linear-gradient(95deg,#ff66c0,#ff3399);color:#1e1a0c;}
+    .nav-link.menu{background:#1a2a4a;border:1px solid #ff66c0;}
+    footer{text-align:center;padding:1.2rem;font-size:0.8rem;border-top:1px solid #2c3e66;color:#667799;}
+    .dag-svg{position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none;}
+    .dag-svg line{stroke:rgba(255,255,255,0.3);stroke-width:2;}
+    .dag-svg .arrow{fill:rgba(255,255,255,0.3);}
+    .calc-info{background:#0f1a2c;border-radius:0.8rem;padding:0.8rem;margin-top:0.5rem;font-size:0.85rem;}
+    .calc-info h4{color:#ff99dd;margin-bottom:0.3rem;}
+    @media(max-width:800px){.hero-header h1{font-size:1.9rem;}}
+  </style>
+</head>
+<body>
+<nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+<div class="modulo-container">
+  <div class="hero-header">
+    <h1>🔗 Causal Inference en Finanzas</h1>
+    <p>"Correlación no es causalidad — el do-calculus sí lo es"</p>
+    <div class="badge-area">
+      <span class="chip"><i class="fas fa-project-diagram"></i> DAG</span>
+      <span class="chip"><i class="fas fa-calculus"></i> do-calculus</span>
+      <span class="chip"><i class="fas fa-crosshairs"></i> Causalidad</span>
+    </div>
+  </div>
+  <div class="analogy-card">
+    <strong><i class="fas fa-puzzle-piece"></i> Piénsalo así:</strong> Si ves que los bomberos apagan más fuegos en días calurosos, ¿significa que los bomberos causan el calor? Por supuesto que no — hay una variable oculta (la temperatura) que causa ambos. Los DAGs son mapas que dibujan estas relaciones causales. El do-calculus te permite responder: "¿qué pasaría si forzamos X?" (intervención) en lugar de "¿qué pasa cuando X ocurre?" (observación).
+  </div>
+  <div class="progress-section">
+    <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+    <div class="progress-text" id="progressText">Módulo E6 de 10</div>
+  </div>
+  <div class="main-area">
+    <div class="panel">
+      <h3><i class="fas fa-project-diagram"></i> DAG Builder — Modelo Causal</h3>
+      <div class="scenario-select" style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.8rem;">
+        <button class="scenario-btn active" data-dag="ipo">Impacto IPO en Precio</button>
+        <button class="scenario-btn" data-dag="rates">Tasas → Mercado</button>
+        <button class="scenario-btn" data-dag="sentiment">Sentiment → Returns</button>
+      </div>
+      <div class="dag-container" id="dagContainer"></div>
+    </div>
+    <div class="panel">
+      <h3><i class="fas fa-crosshairs"></i> do-Calculus Aplicado</h3>
+      <p style="font-size:0.85rem;color:#8899cc;margin-bottom:0.5rem;">Haz clic en un nodo para seleccionarlo como intervención (do-calculus):</p>
+      <div id="doCalcInfo" class="calc-info">
+        <h4>📊 Resultado</h4>
+        <p style="color:#8899cc;">Selecciona un escenario y haz clic en un nodo del DAG para aplicar do-calculus y ver el efecto causal estimado.</p>
+      </div>
+      <button id="applyDoBtn" class="btn-action" style="margin-top:0.5rem;"><i class="fas fa-calculus"></i> Aplicar do(X)</button>
+    </div>
+  </div>
+  <div id="feedbackMsg" class="feedback">💡 Explora los DAGs causales y aplica do-calculus para descubrir relaciones causales reales</div>
+  <div id="insigniaArea" class="insignia hidden">
+    <i class="fas fa-medal"></i>
+    <h3>🏅 Causal Explorer 🏅</h3>
+    <p>Has dominado los DAGs causales y el do-calculus. ¡La causalidad ya no es un misterio para ti!</p>
+  </div>
+  <div class="nav-links">
+    <a href="e5-options-volatilidad.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+    <a href="e7-meta-labeling.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Quant Trading · Modo Experto · Domina las fronteras del análisis cuantitativo</footer>
+</div>
+<script>
+const STORAGE_KEY='quant_trading_e6';
+const dagScenarios={
+  ipo:{
+    name:'Impacto IPO en Precio',
+    nodes:[
+      {id:'ipo',label:'IPO',type:'treatment',x:120,y:120,icon:'📋'},
+      {id:'demand',label:'Demanda',type:'confounder',x:300,y:30,icon:'📈'},
+      {id:'price',label:'Precio',type:'outcome',x:500,y:120,icon:'💰'},
+      {id:'volatility',label:'Volatilidad',type:'variable',x:300,y:220,icon:'🌊'}
+    ],
+    edges:[{from:'demand',to:'ipo'},{from:'demand',to:'price'},{from:'ipo',to:'price'},{from:'ipo',to:'volatility'}],
+    calc:[
+      {node:'ipo',effect:'do(IPO=True) → Precio +12.4% [Efecto causal directo]',adj:'Ajustando por Demanda (confounder): E[Precio|do(IPO)] = Σᵈ E[Precio|IPO,Demanda=d] × P(Demanda=d)'},
+      {node:'demand',effect:'do(Demanda=Alta) → Precio +23.8%, IPO +15.2%',adj:'La demanda es confounder: afecta tanto a IPO como a Precio. Hay que ajustar para evitar sesgo.'},
+      {node:'price',effect:'do(Precio=100) → No afecta IPO (es el outcome)',adj:'El precio es el outcome final. Intervenir en él no tiene sentido causal.'},
+      {node:'volatility',effect:'do(Volatilidad=Baja) → IPO -3.2% [Efecto indirecto]',adj:'La volatilidad es mediadora en la ruta IPO→Volatilidad→Precio. El efecto total de IPO en Precio incluye la ruta directa y la ruta por Volatilidad.'}
+    ]
+  },
+  rates:{
+    name:'Tasas → Mercado',
+    nodes:[
+      {id:'fed',label:'FED Rate',type:'treatment',x:80,y:100,icon:'🏦'},
+      {id:'inflation',label:'Inflación',type:'confounder',x:300,y:30,icon:'🔥'},
+      {id:'bonds',label:'Bond Yields',type:'variable',x:160,y:210,icon:'📜'},
+      {id:'equity',label:'Equity Mkt',type:'outcome',x:500,y:120,icon:'📊'},
+      {id:'earnings',label:'Earnings',type:'variable',x:500,y:220,icon:'💵'}
+    ],
+    edges:[{from:'inflation',to:'fed'},{from:'inflation',to:'equity'},{from:'fed',to:'bonds'},{from:'fed',to:'equity'},{from:'bonds',to:'equity'},{from:'equity',to:'earnings'}],
+    calc:[
+      {node:'fed',effect:'do(FED Rate=5%) → Equity -8.2% [Efecto causal directo + indirecto vía Bonds]',adj:'El efecto total incluye: ruta directa (FED→Equity) e indirecta (FED→Bonds→Equity). Ajuste por Inflación necesario.'},
+      {node:'bonds',effect:'do(Bond Yields=4.5%) → Equity -3.1% [Efecto mediado]',adj:'Los bonds son un mediador en el camino causal. Si intervenimos en bonds, bloqueamos la ruta FED→Bonds→Equity.'},
+      {node:'inflation',effect:'do(Inflación=3%) → FED Rate +0.75%, Equity -2.4%',adj:'La inflación es confounder. Afecta tanto a FED como a Equity. Ajuste por back-door criterion.'},
+      {node:'equity',effect:'do(Equity=+10%) → Earnings +4.1% [Efecto causal en earnings]',adj:'Equity es treatment de earnings. No hay confounders abiertos en esta relación.'}
+    ]
+  },
+  sentiment:{
+    name:'Sentiment → Returns',
+    nodes:[
+      {id:'news',label:'News Sent.',type:'treatment',x:100,y:100,icon:'📰'},
+      {id:'social',label:'Social Buzz',type:'variable',x:100,y:220,icon:'💬'},
+      {id:'trading',label:'Trading Vol.',type:'confounder',x:330,y:130,icon:'📊'},
+      {id:'returns',label:'Returns',type:'outcome',x:530,y:100,icon:'📈'},
+      {id:'vol',label:'Volatilidad',type:'variable',x:530,y:230,icon:'📉'}
+    ],
+    edges:[{from:'trading',to:'news'},{from:'trading',to:'returns'},{from:'news',to:'returns'},{from:'social',to:'news'},{from:'social',to:'vol'},{from:'news',to:'vol'},{from:'vol',to:'returns'}],
+    calc:[
+      {node:'news',effect:'do(News Sent=Positivo) → Returns +1.2% (1d) [Efecto causal directo]',adj:'El efecto causal de News en Returns está confundido por Trading Vol. Ajuste back-door por Trading Vol y Social Buzz.'},
+      {node:'social',effect:'do(Social Buzz=Alto) → News Sent +0.8σ, Vol +2.1%',adj:'Social Buzz afecta tanto a News (ruta indirecta) como a Vol. No hay back-door path abierto.'},
+      {node:'trading',effect:'do(Trading Vol=Alto) → News Sent -0.3σ, Returns +4.5%',adj:'Trading Vol es un confounder: causa tanto News como Returns. Back-door criterion requiere ajustar por Trading Vol para estimar efecto causal de News en Returns.'},
+      {node:'vol',effect:'do(Vol=20%) → Returns -1.8% [Efecto mediado parcial]',adj:'Vol es mediador en News→Vol→Returns. Si intervenimos en Vol, bloqueamos parte del efecto causal de News.'}
+    ]
+  }
+};
+let currentDag='ipo';
+let selectedNode=null;
+function renderDAG(scenarioId){
+  const scene=dagScenarios[scenarioId];
+  if(!scene)return;
+  const container=document.getElementById('dagContainer');
+  container.innerHTML='<svg class="dag-svg" id="dagSvg"></svg>';
+  const svg=document.getElementById('dagSvg');
+  let svgContent='';
+  scene.edges.forEach(e=>{
+    const from=scene.nodes.find(n=>n.id===e.from);
+    const to=scene.nodes.find(n=>n.id===e.to);
+    if(from&&to){
+      svgContent+=`<line x1="${from.x+45}" y1="${from.y+20}" x2="${to.x}" y2="${to.y+20}" stroke="rgba(255,255,255,0.3)" stroke-width="2" marker-end="url(#arrow)"/>`;
+    }
+  });
+  svg.innerHTML=svgContent;
+  scene.nodes.forEach(n=>{
+    const div=document.createElement('div');
+    div.className='dag-node '+n.type;
+    div.dataset.node=n.id;
+    div.style.left=n.x+'px';div.style.top=n.y+'px';
+    div.innerHTML='<span class="dag-icon">'+n.icon+'</span>'+n.label;
+    div.addEventListener('click',function(){
+      document.querySelectorAll('.dag-node').forEach(d=>d.classList.remove('selected'));
+      this.classList.add('selected');
+      selectedNode=this.dataset.node;
+      const calc=scene.calc.find(c=>c.node===selectedNode);
+      const info=document.getElementById('doCalcInfo');
+      if(calc)info.innerHTML='<h4>🎯 Intervención: do('+selectedNode+')</h4><p style="color:#ff99dd;margin:0.5rem 0;">'+calc.effect+'</p><p style="color:#8899cc;font-size:0.8rem;"><strong>Back-door adjustment:</strong> '+calc.adj+'</p>';
+      else info.innerHTML='<h4>⚡ do('+selectedNode+')</h4><p style="color:#ff99dd;">Haz clic en "Aplicar do(X)" para calcular</p>';
+    });
+    container.appendChild(div);
+  });
+  selectedNode=null;
+  document.getElementById('doCalcInfo').innerHTML='<h4>📊 Resultado</h4><p style="color:#8899cc;">Selecciona un nodo del DAG para aplicar do-calculus y ver el efecto causal estimado.</p>';
+}
+document.querySelectorAll('[data-dag]').forEach(btn=>{
+  btn.addEventListener('click',function(){
+    document.querySelectorAll('[data-dag]').forEach(b=>b.classList.remove('active'));
+    this.classList.add('active');
+    currentDag=this.dataset.dag;
+    renderDAG(currentDag);
+  });
+});
+document.getElementById('applyDoBtn').addEventListener('click',function(){
+  if(!selectedNode){document.getElementById('feedbackMsg').textContent='⚠️ Haz clic en un nodo del DAG primero para seleccionar la intervención';return;}
+  const scene=dagScenarios[currentDag];
+  if(!scene)return;
+  const calc=scene.calc.find(c=>c.node===selectedNode);
+  if(calc){
+    document.getElementById('feedbackMsg').textContent='🧮 do('+selectedNode+') aplicado: '+calc.effect;
+    updateProgressLocal();
+  }
+});
+function getProgress(){return JSON.parse(localStorage.getItem('qt_progress')||'[]');}
+function updateProgressLocal(){
+  let p=getProgress();
+  if(!p.includes(STORAGE_KEY)){p.push(STORAGE_KEY);localStorage.setItem('qt_progress',JSON.stringify(p));
+    const pf=document.getElementById('progressFill'),pt=document.getElementById('progressText');
+    if(pf)pf.style.width=Math.round((p.length/10)*100)+'%';
+    if(pt)pt.textContent=p.length+' de 10 módulos';
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').textContent='🏅 ¡Completado! Has ganado la insignia Causal Explorer. + '+document.getElementById('feedbackMsg').textContent.replace('🏅 ¡Completado! Has ganado la insignia Causal Explorer. + ','');
+  }
+}
+function initE6(){
+  renderDAG(currentDag);
+  const p=getProgress();
+  if(p.includes(STORAGE_KEY)){document.getElementById('insigniaArea').classList.remove('hidden');document.getElementById('feedbackMsg').textContent='🏅 ¡Completado! Has ganado la insignia Causal Explorer.';}
+  const pf=document.getElementById('progressFill'),pt=document.getElementById('progressText');
+  if(pf)pf.style.width=Math.round((p.length/10)*100)+'%';
+  if(pt)pt.textContent=p.length+' de 10 módulos';
+}
+initE6();
+</script>
+<script src="../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

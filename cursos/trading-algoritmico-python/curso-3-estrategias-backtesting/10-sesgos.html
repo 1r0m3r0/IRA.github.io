@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Estrategias y Backtesting | Sesgos Mortales</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #111a2e 100%);
+      background-size: 200% 200%; animation: gradientShift 20s ease infinite;
+      font-family: 'Inter', sans-serif; color: #eef5ff; min-height: 100vh;
+      display: flex; align-items: center; justify-content: center; padding: 2rem 1rem;
+    }
+    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+    .curso3-container {
+      max-width: 1300px; width: 100%;
+      background: rgba(15, 25, 45, 0.65); backdrop-filter: blur(12px);
+      border-radius: 3rem; border: 1px solid rgba(255, 80, 80, 0.25);
+      box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden;
+    }
+    .hero-header { background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%); padding: 2rem 2rem 1.5rem; text-align: center; border-bottom: 2px solid #ff5050; }
+    .hero-header h1 { font-size: 2.6rem; font-weight: 800; background: linear-gradient(135deg, #FFF, #ff9090, #ff5050); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .hero-header p { font-size: 1.1rem; color: #b9e2ff; margin-top: 0.3rem; }
+    .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
+    .chip { background: rgba(255,80,80,0.15); border: 1px solid #ff5050; padding: 0.3rem 1rem; border-radius: 40px; font-size: 0.8rem; font-weight: 600; }
+    .analogy-card { background: #1e2a3acc; margin: 1.5rem 2rem; padding: 1.2rem 1.8rem; border-radius: 2rem; border-left: 8px solid #ff5050; font-size: 1rem; line-height: 1.6; }
+    .main-area { padding: 0.5rem 2rem; }
+    .feedback { background: #00000099; margin: 1.5rem 2rem; padding: 1rem; border-radius: 1.5rem; text-align: center; font-weight: 500; border-left: 4px solid #ff5050; }
+    .insignia { text-align: center; background: #0c1b2f; border-radius: 2rem; margin: 0 2rem 1.5rem; padding: 1rem; border: 1px dashed gold; }
+    .insignia i { font-size: 2.5rem; color: gold; }
+    .hidden { display: none; }
+    .btn-action { background: linear-gradient(95deg, #f0a500, #ff6a00); border: none; padding: 0.8rem 1.8rem; font-weight: bold; border-radius: 3rem; cursor: pointer; font-size: 1rem; transition: 0.2s; color: #1e1a0c; }
+    .btn-action:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(240,165,0,0.5); }
+    .btn-action.small { padding: 0.4rem 1rem; font-size: 0.8rem; }
+    .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
+    .nav-link { background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem; font-weight: 600; text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; }
+    .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(255,80,80,0.4); }
+    .nav-link.next { background: linear-gradient(95deg, #f0a500, #ff6a00); color: #1e1a0c; }
+    .nav-link.menu { background: #1a2a4a; border: 1px solid #3399ff; }
+    footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
+    .timer { font-size: 1.5rem; font-weight: 700; text-align: center; margin: 0.5rem 0; }
+    .timer.warning { color: #ff5050; animation: pulse 1s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+    .bug-card { background: #1a2640cc; border-radius: 1.5rem; padding: 1.2rem; margin: 1rem 0; border: 1px solid #2c3e66; }
+    .bug-card h3 { color: #ff5050; }
+    .bug-card .code-snippet { background: #080e1a; padding: 0.8rem; border-radius: 0.8rem; font-family: 'Courier New', monospace; font-size: 0.8rem; margin: 0.5rem 0; overflow-x: auto; white-space: pre-wrap; }
+    .bug-card input { width: 100%; padding: 0.5rem; border-radius: 0.6rem; border: 1px solid #2c3e66; background: #0f1a2e; color: #eef5ff; margin: 0.3rem 0; }
+    .bug-card .identify-btn { margin: 0.3rem 0; }
+    .bug-card .result { margin-top: 0.5rem; font-weight: 600; }
+    .bug-card .result.correct { color: #00ff88; }
+    .bug-card .result.wrong { color: #ff5050; }
+    .bug-status { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 1rem; font-size: 0.75rem; margin-left: 0.5rem; }
+    .bug-status.found { background: #0a2a1a; border: 1px solid #00ff88; color: #00ff88; }
+    .bug-status.pending { background: #2a2a0a; border: 1px solid #ffd700; color: #ffd700; }
+    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
+  </style>
+  <link rel="stylesheet" href="../../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a></nav>
+
+  <div class="curso3-container">
+    <div class="hero-header">
+      <h1>🐛 SESGOS MORTALES</h1>
+      <p>Look-ahead, survivorship, overfitting y data snooping</p>
+      <div class="badge-area">
+        <span class="chip"><i class="fas fa-bug"></i> 3 Bugs</span>
+        <span class="chip"><i class="fas fa-clock"></i> 4 min</span>
+      </div>
+    </div>
+    <div class="analogy-card"><strong>🐛 Piénsalo así:</strong> Los sesgos en backtesting son como espejismos en el desierto: ves un oasis que parece real, pero al llegar solo hay arena. Si no los detectas, tu estrategia "ganadora" se desvanecerá en Trading real.</div>
+    <div class="main-area">
+      <div id="timerDisplay" class="timer"><i class="fas fa-hourglass-half"></i> 4:00</div>
+
+      <div class="bug-card" data-bug="0">
+        <h3>🐛 Bug #1 <span class="bug-status pending">Pendiente</span></h3>
+        <div class="code-snippet">def generar_senal(df, i):
+    # Señal de compra si el precio de cierre sube mañana
+    if df['cierre'].iloc[i+1] > df['cierre'].iloc[i]:
+        return 1  # COMPRAR
+    return 0</div>
+        <p style="font-size:0.85rem;">¿Qué sesgo tiene este código?</p>
+        <input type="text" class="bug-input" data-bug="0" placeholder="Escribe el nombre del sesgo...">
+        <button class="btn-action small identify-btn" data-bug="0">Identificar</button>
+        <div class="result" id="bugResult0"></div>
+      </div>
+
+      <div class="bug-card" data-bug="1">
+        <h3>🐛 Bug #2 <span class="bug-status pending">Pendiente</span></h3>
+        <div class="code-snippet"># Backtest S&P 500: solo incluimos empresas que
+# están en el índice HOY (excluimos las quebradas)</div>
+        <p style="font-size:0.85rem;">¿Qué sesgo introduce esto?</p>
+        <input type="text" class="bug-input" data-bug="1" placeholder="Escribe el nombre del sesgo...">
+        <button class="btn-action small identify-btn" data-bug="1">Identificar</button>
+        <div class="result" id="bugResult1"></div>
+      </div>
+
+      <div class="bug-card" data-bug="2">
+        <h3>🐛 Bug #3 <span class="bug-status pending">Pendiente</span></h3>
+        <div class="code-snippet"># Optimizamos 50 parámetros en 100 velas de datos
+best = grid_search(df, params=50)
+# Resultado: Sharpe 3.5 en muestra</div>
+        <p style="font-size:0.85rem;">¿Qué sesgo es este?</p>
+        <input type="text" class="bug-input" data-bug="2" placeholder="Escribe el nombre del sesgo...">
+        <button class="btn-action small identify-btn" data-bug="2">Identificar</button>
+        <div class="result" id="bugResult2"></div>
+      </div>
+    </div>
+    <div id="feedbackMsg" class="feedback">💡 Encuentra los 3 sesgos en el código. Escribe el nombre y presiona "Identificar". ¡Tienes 4 minutos!</div>
+    <div id="insigniaArea" class="insignia hidden">
+      <i class="fas fa-medal"></i>
+      <h3>🏅 CAZADOR DE SESGOS 🏅</h3>
+      <p>¡Eres un detective de backtesting! Sabes identificar los sesgos más mortales.</p>
+    </div>
+    <div class="nav-links">
+      <a href="09-walk-forward.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
+      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+      <a href="11-optimizacion.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <footer><i class="fas fa-crown"></i> Estrategias y Backtesting · Trading Algorítmico con Python</footer>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'py_trade_3_10';
+    const answers = ['look-ahead', 'survivorship', 'overfitting'];
+    const displayNames = ['Look-ahead bias', 'Survivorship bias', 'Overfitting'];
+    let bugsFound = [false, false, false];
+    let secondsLeft = 240;
+    let timerInterval = null;
+    let ended = false;
+
+    function startTimer() {
+      timerInterval = setInterval(() => {
+        secondsLeft--;
+        const min = Math.floor(secondsLeft / 60);
+        const sec = secondsLeft % 60;
+        document.getElementById('timerDisplay').innerHTML = '<i class="fas fa-hourglass-half"></i> ' + min + ':' + sec.toString().padStart(2, '0');
+        if (secondsLeft <= 30) document.getElementById('timerDisplay').classList.add('warning');
+        if (secondsLeft <= 0) {
+          clearInterval(timerInterval);
+          ended = true;
+          document.getElementById('feedbackMsg').textContent = '⏰ ¡Tiempo agotado! Encontrados ' + bugsFound.filter(Boolean).length + '/3 sesgos.';
+        }
+      }, 1000);
+    }
+
+    function checkAnswer(bugIdx) {
+      if (ended || bugsFound[bugIdx]) return;
+      const input = document.querySelectorAll('.bug-input')[bugIdx];
+      const answer = input.value.trim().toLowerCase();
+      const resultEl = document.getElementById('bugResult' + bugIdx);
+      if (answer.includes(answers[bugIdx])) {
+        bugsFound[bugIdx] = true;
+        const card = document.querySelectorAll('.bug-card')[bugIdx];
+        card.querySelector('.bug-status').textContent = '✓ Encontrado';
+        card.querySelector('.bug-status').className = 'bug-status found';
+        resultEl.textContent = '✅ ¡Correcto! Es ' + displayNames[bugIdx] + '.';
+        resultEl.className = 'result correct';
+        document.getElementById('feedbackMsg').textContent = '🔍 Bug #' + (bugIdx+1) + ' encontrado: ' + displayNames[bugIdx];
+        if (bugsFound.every(v => v)) {
+          document.getElementById('feedbackMsg').textContent = '🎉 ¡Los 3 sesgos identificados! Eres un verdadero cazador de sesgos.';
+          document.getElementById('insigniaArea').classList.remove('hidden');
+          localStorage.setItem(STORAGE_KEY, 'true');
+          clearInterval(timerInterval);
+        }
+      } else {
+        resultEl.textContent = '❌ Incorrecto. Intenta de nuevo.';
+        resultEl.className = 'result wrong';
+        setTimeout(() => { resultEl.textContent = ''; resultEl.className = 'result'; }, 2000);
+      }
+    }
+
+    document.querySelectorAll('.identify-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        checkAnswer(parseInt(this.dataset.bug));
+      });
+    });
+
+    document.querySelectorAll('.bug-input').forEach(inp => {
+      inp.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          checkAnswer(parseInt(this.dataset.bug));
+        }
+      });
+    });
+
+    startTimer();
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Curso 5 — Multi-símbolo, ML y ONNX</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #111a2e 100%);
+      background-size: 200% 200%; animation: gradientShift 20s ease infinite;
+      font-family: 'Inter', sans-serif; color: #eef5ff; min-height: 100vh;
+      display: flex; align-items: center; justify-content: center; padding: 2rem 1rem;
+    }
+    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+    .course-container {
+      max-width: 1200px; width: 100%;
+      background: rgba(15, 25, 45, 0.65); backdrop-filter: blur(12px);
+      border-radius: 3rem; border: 1px solid rgba(255, 102, 192, 0.25);
+      box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden;
+    }
+    .hero-header {
+      background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%);
+      padding: 2.5rem 2rem 2rem; text-align: center;
+      border-bottom: 2px solid #ff66c0;
+    }
+    .hero-header h1 {
+      font-size: 2.8rem; font-weight: 800;
+      background: linear-gradient(135deg, #FFF, #ff99cc, #ff66c0);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .hero-header p { font-size: 1.1rem; color: #e6b8d4; margin-top: 0.5rem; }
+    .hero-header .sub { font-size: 0.85rem; color: #8899bb; margin-top: 0.3rem; }
+    .badge-area { display: flex; justify-content: center; gap: 1rem; margin: 1.2rem 0 0.5rem; flex-wrap: wrap; }
+    .chip { background: rgba(255,102,192,0.15); border: 1px solid #ff66c0; padding: 0.4rem 1rem; border-radius: 40px; font-size: 0.8rem; font-weight: 600; }
+    .progress-section { padding: 1.2rem 2rem; border-bottom: 1px solid #1a2a4a; }
+    .progress-bar-outer { background: #1a2a4a; border-radius: 20px; height: 16px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #ff66c0, #ff3090); border-radius: 20px; transition: width 0.5s ease; }
+    .progress-text { display: block; text-align: center; margin-top: 0.3rem; font-size: 0.8rem; color: #8899cc; }
+    .course-desc { padding: 1.5rem 2rem; background: rgba(0, 10, 25, 0.5); border-bottom: 1px solid #2c3e66; }
+    .course-desc p { max-width: 800px; margin: 0 auto; line-height: 1.7; color: #b9ccee; text-align: center; }
+    .module-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.2rem; padding: 2rem; }
+    .module-card {
+      background: rgba(10, 20, 40, 0.7); border-radius: 1.5rem; padding: 1.5rem;
+      border: 1px solid #2c3e66; transition: 0.2s; cursor: pointer; text-decoration: none; color: inherit;
+      display: flex; flex-direction: column;
+    }
+    .module-card:hover { transform: translateY(-4px); border-color: #ff66c0; box-shadow: 0 0 20px rgba(255,102,192,0.2); }
+    .module-card .mod-num { font-size: 0.75rem; font-weight: 700; color: #ff66c0; text-transform: uppercase; letter-spacing: 2px; }
+    .module-card h3 { color: #eef5ff; font-size: 1.1rem; margin: 0.4rem 0; }
+    .module-card p { font-size: 0.85rem; color: #8899bb; line-height: 1.5; flex: 1; }
+    .module-card .badge-row { margin-top: 0.8rem; display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; }
+    .module-card .badge { background: rgba(255,102,192,0.1); border: 1px solid #ff66c0; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.7rem; color: #ff99cc; }
+    .module-card .status { margin-left: auto; font-size: 0.8rem; }
+    .module-card .status.done { color: #00ff88; }
+    .module-card .status.pending { color: #667; }
+    .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
+    .nav-link { background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem; font-weight: 600; text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; }
+    .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(255,102,192,0.4); }
+    .nav-link.menu { background: #1a2a4a; border: 1px solid #ff66c0; }
+    footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
+    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .module-grid { grid-template-columns:1fr; } }
+  </style>
+  <link rel="stylesheet" href="../../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a></nav>
+  <div class="course-container">
+    <div class="hero-header">
+      <h1>🧠 Curso 5: EAs Avanzados</h1>
+      <p>Multi-símbolo, Machine Learning y ONNX - Lleva tus EAs al siguiente nivel</p>
+      <div class="badge-area">
+        <span class="chip"><i class="fas fa-cubes"></i> 12 módulos</span>
+        <span class="chip"><i class="fas fa-brain"></i> ML · ONNX · OpenBLAS</span>
+        <span class="chip"><i class="fas fa-database"></i> SQLite · WebRequest</span>
+      </div>
+      <div class="sub"><i class="fas fa-arrow-down"></i> Elige un módulo para empezar</div>
+    </div>
+    <div class="progress-section">
+      <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+      <span class="progress-text" id="progressText">0 de 12 módulos</span>
+    </div>
+    <div class="course-desc">
+      <p>Domina la creación de Expert Advisors multi-símbolo y multi-timeframe, indicadores personalizados, paneles gráficos, álgebra lineal con OpenBLAS, inferencia ONNX con GPU, redes neuronales desde cero, persistencia SQLite y comunicación con APIs externas. El curso más avanzado del programa.</p>
+    </div>
+    <div class="module-grid" id="moduleGrid">
+      <a href="01-portal.html" class="module-card" data-key="mql5_5_01">
+        <div class="mod-num">Módulo 01</div>
+        <h3>🚀 Portal Avanzado</h3>
+        <p>Evalúa tu nivel con un quiz sobre conceptos avanzados de MQL5. Descubre qué tanto dominas antes de empezar.</p>
+        <div class="badge-row">
+          <span class="badge">Quiz</span>
+          <span class="badge">120s</span>
+          <span class="status pending" id="status-01">⬜ Pendiente</span>
+        </div>
+      </a>
+      <a href="02-multi-simbolo.html" class="module-card" data-key="mql5_5_02">
+        <div class="mod-num">Módulo 02</div>
+        <h3>🌍 EAs Multi-símbolo</h3>
+        <p>Portfolio builder, correlación, balanceo, P&L multi-símbolo. Tu EA opera como director de orquesta.</p>
+        <div class="badge-row">
+          <span class="badge">Portfolio</span>
+          <span class="badge">Heatmap</span>
+          <span class="status pending" id="status-02">⬜ Pendiente</span>
+        </div>
+      </a>
+      <a href="03-multi-timeframe.html" class="module-card" data-key="mql5_5_03">
+        <div class="mod-num">Módulo 03</div>
+        <h3>📊 EAs Multi-timeframe</h3>
+        <p>Señales jerárquicas, confirmación en múltiples temporalidades. Construye sistemas de alta precisión.</p>
+        <div class="badge-row">
+          <span class="badge">Timeframe</span>
+          <span class="badge">Jerarquía</span>
+          <span class="status pending" id="status-03">⬜ Pendiente</span>
+        </div>
+      </a>
+      <a href="04-indicadores-propios.html" class="module-card" data-key="mql5_5_04">
+        <div class="mod-num">Módulo 04</div>
+        <h3>📐 Indicadores Personalizados</h3>
+        <p>OnCalculate, buffer types, DRAW_STYLES. Crea indicadores únicos con tu propia lógica.</p>
+        <div class="badge-row">
+          <span class="badge">OnCalculate</span>
+          <span class="badge">DRAW</span>
+          <span class="status pending" id="status-04">⬜ Pendiente</span>
+        </div>
+      </a>
+      <a href="05-objetos-graficos.html" class="module-card" data-key="mql5_5_05">
+        <div class="mod-num">Módulo 05</div>
+        <h3>🎨 Objetos Gráficos y Paneles</h3>
+        <p>Crea paneles interactivos drag & drop, botones, labels, ventanas flotantes para tus EAs.</p>
+        <div class="badge-row">
+          <span class="badge">Paneles</span>
+          <span class="badge">Drag & Drop</span>
+          <span class="status pending" id="status-05">⬜ Pendiente</span>
+        </div>
+      </a>
+      <a href="06-matrices-openblas.html" class="module-card" data-key="mql5_5_06">
+        <div class="mod-num">Módulo 06</div>
+        <h3>🧮 Matrices y OpenBLAS</h3>
+        <p>Matrix/Vector operations, OpenBLAS API, L1 trend filter. Matemáticas de alto rendimiento.</p>
+        <div class="badge-row">
+          <span class="badge">OpenBLAS</span>
+          <span class="badge">Matrix</span>
+          <span class="status pending" id="status-06">⬜ Pendiente</span>
+        </div>
+      </a>
+      <a href="07-algebra-lineal.html" class="module-card" data-key="mql5_5_07">
+        <div class="mod-num">Módulo 07</div>
+        <h3>📈 Álgebra Lineal en Trading</h3>
+        <p>Correlación, covarianza, regresión, L1 trend filter. Aplica álgebra lineal a estrategias reales.</p>
+        <div class="badge-row">
+          <span class="badge">Regresión</span>
+          <span class="badge">Correlación</span>
+          <span class="status pending" id="status-07">⬜ Pendiente</span>
+        </div>
+      </a>
+      <a href="08-onnx-ml.html" class="module-card" data-key="mql5_5_08">
+        <div class="mod-num">Módulo 08</div>
+        <h3>🤖 ML con ONNX</h3>
+        <p>Carga modelos ONNX, inferencia GPU/CPU, flags ONNX. Integra machine learning real en tu EA.</p>
+        <div class="badge-row">
+          <span class="badge">ONNX</span>
+          <span class="badge">CUDA</span>
+          <span class="badge">GPU</span>
+          <span class="status pending" id="status-08">⬜ Pendiente</span>
+        </div>
+      </a>
+      <a href="09-redes-neuronales.html" class="module-card" data-key="mql5_5_09">
+        <div class="mod-num">Módulo 09</div>
+        <h3>🧠 Redes Neuronales con Matrix</h3>
+        <p>MLP desde cero con la Matrix class. Visualizador de arquitectura, forward pass y entrenamiento.</p>
+        <div class="badge-row">
+          <span class="badge">MLP</span>
+          <span class="badge">Matrix</span>
+          <span class="status pending" id="status-09">⬜ Pendiente</span>
+        </div>
+      </a>
+      <a href="10-sqlite.html" class="module-card" data-key="mql5_5_10">
+        <div class="mod-num">Módulo 10</div>
+        <h3>🗄️ SQLite y Persistencia</h3>
+        <p>DatabaseOpen, SQL Console, Trade Logger, Query Builder. Tu EA nunca olvidará nada.</p>
+        <div class="badge-row">
+          <span class="badge">SQLite</span>
+          <span class="badge">Persistencia</span>
+          <span class="status pending" id="status-10">⬜ Pendiente</span>
+        </div>
+      </a>
+      <a href="11-webrequest.html" class="module-card" data-key="mql5_5_11">
+        <div class="mod-num">Módulo 11</div>
+        <h3>🌐 WebRequest y APIs</h3>
+        <p>HTTP GET/POST, JSON parsing, APIs externas. Conecta tu EA al mundo exterior.</p>
+        <div class="badge-row">
+          <span class="badge">HTTP</span>
+          <span class="badge">JSON</span>
+          <span class="badge">API</span>
+          <span class="status pending" id="status-11">⬜ Pendiente</span>
+        </div>
+      </a>
+      <a href="12-certificado.html" class="module-card" data-key="mql5_5_12">
+        <div class="mod-num">Módulo 12</div>
+        <h3>🎓 Certificado Final</h3>
+        <p>Proyecto: EA multi-símbolo con ML + SQLite logging. Examen final + certificado personalizado.</p>
+        <div class="badge-row">
+          <span class="badge">Project</span>
+          <span class="badge">Exam</span>
+          <span class="status pending" id="status-12">⬜ Pendiente</span>
+        </div>
+      </a>
+    </div>
+    <div class="nav-links">
+      <a href="../../index.html" class="nav-link menu"><i class="fas fa-arrow-left"></i> Volver al Programa</a>
+      <a href="../../../cursos/index.html" class="nav-link menu"><i class="fas fa-th"></i> Catálogo</a>
+    </div>
+    <footer><i class="fas fa-crown"></i> Curso 5: EAs Avanzados · Multi-símbolo, ML y ONNX · 12 módulos interactivos</footer>
+  </div>
+  <script>
+    const PROGRESS_KEY = 'mql5_5_progress';
+    const MODULE_KEYS = [
+      'mql5_5_01','mql5_5_02','mql5_5_03','mql5_5_04','mql5_5_05','mql5_5_06',
+      'mql5_5_07','mql5_5_08','mql5_5_09','mql5_5_10','mql5_5_11','mql5_5_12'
+    ];
+    function updateProgress() {
+      const progress = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+      const done = progress.length;
+      const total = 12;
+      const pct = Math.min(100, Math.round((done / total) * 100));
+      document.getElementById('progressFill').style.width = pct + '%';
+      document.getElementById('progressText').textContent = done + ' de ' + total + ' módulos';
+      MODULE_KEYS.forEach((key, i) => {
+        const num = String(i + 1).padStart(2, '0');
+        const el = document.getElementById('status-' + num);
+        if (el) {
+          if (progress.includes(key)) {
+            el.innerHTML = '✅ Completado';
+            el.className = 'status done';
+          } else {
+            el.innerHTML = '⬜ Pendiente';
+            el.className = 'status pending';
+          }
+        }
+      });
+    }
+    updateProgress();
+  </script>
+  <script src="../../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

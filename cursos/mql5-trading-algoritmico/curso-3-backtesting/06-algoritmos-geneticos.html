@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Curso 3 | Algoritmos Genéticos</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../../assets/css/theme.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%);background-size:200% 200%;animation:gradientShift 20s ease infinite;font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
+@keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.modulo-container{max-width:1300px;width:100%;background:rgba(15,25,45,0.65);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(255,100,220,0.25);box-shadow:0 25px 45px rgba(0,0,0,0.5);overflow:hidden}
+.hero-header{background:linear-gradient(95deg,#0b1120 0%,#111a2e 100%);padding:2rem 2rem 1.5rem 2rem;text-align:center;border-bottom:2px solid #ff64dc}
+.hero-header h1{font-size:2.6rem;font-weight:800;background:linear-gradient(135deg,#FFF,#ff99e6,#ff64dc);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-header p{color:#f0ccee;margin-top:.5rem;font-size:1.1rem}
+.badge-area{display:flex;justify-content:center;gap:1rem;margin-top:1.2rem;flex-wrap:wrap}
+.chip{background:rgba(255,100,220,0.15);border:1px solid #ff64dc;padding:0.4rem 1rem;border-radius:40px;font-size:0.8rem;font-weight:600;color:#ddd}
+.analogy-card{background:#1e2a3acc;margin:1.5rem 2rem;padding:1.2rem 1.8rem;border-radius:2rem;border-left:8px solid #ff64dc;font-size:1rem;line-height:1.6}
+.progress-section{margin:1rem 2rem 0}
+.progress-bar-outer{background:#1a2a4a;border-radius:20px;height:20px;overflow:hidden}
+.progress-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,#ff64dc,#fff);border-radius:20px;transition:width 0.5s ease}
+.progress-text{text-align:center;font-size:0.85rem;color:#8899cc;margin-bottom:.5rem}
+.main-area{padding:1rem 2rem}
+.ga-panel{background:#0a1020;border-radius:2rem;padding:1.5rem;border:1px solid #2a3a5a;margin-bottom:1.5rem}
+.ga-controls{display:flex;gap:1rem;flex-wrap:wrap;align-items:end;margin-bottom:1rem}
+.ga-controls .form-group{min-width:120px}
+.form-group label{display:block;font-size:.8rem;color:#8899cc;margin-bottom:.3rem}
+.form-group input,.form-group select{width:100%;padding:.6rem;background:#1a2a4a;border:1px solid #3a4a6a;border-radius:.8rem;color:#eef5ff;font-family:'Inter',sans-serif;font-size:.85rem;transition:.2s}
+.form-group input:focus,.form-group select:focus{border-color:#ff64dc;outline:none}
+.btn-action{background:linear-gradient(95deg,#ff64dc,#ff30c0);border:none;padding:0.8rem 1.8rem;font-weight:bold;border-radius:3rem;cursor:pointer;font-size:1rem;transition:0.2s;color:#fff;font-family:'Inter',sans-serif}
+.btn-action:hover{transform:translateY(-2px);box-shadow:0 0 15px rgba(255,100,220,0.5)}
+.btn-action:disabled{opacity:.5;cursor:not-allowed}
+.ga-visual{display:grid;grid-template-columns:2fr 1fr;gap:1.2rem;margin-bottom:1rem}
+.ga-canvas-wrap{background:#0d1525;border-radius:1rem;padding:1rem}
+.ga-canvas-wrap canvas{width:100%;height:260px;border-radius:.5rem}
+.ga-stats{background:#0d1525;border-radius:1rem;padding:1rem;border:1px solid #2a3a5a}
+.ga-stat{margin:.6rem 0;padding:.4rem 0;border-bottom:1px solid #1a2a4a}
+.ga-stat .lbl{font-size:.7rem;color:#8899cc;text-transform:uppercase}
+.ga-stat .val{font-size:1.2rem;font-weight:700;color:#ff64dc}
+.ga-population{background:#0d1525;border-radius:1rem;padding:1rem;margin-top:1rem;border:1px solid #2a3a5a}
+.pop-individual{display:flex;align-items:center;gap:.5rem;margin:.3rem 0;padding:.3rem;border-radius:.5rem;font-size:.8rem}
+.pop-individual .bar{flex:1;height:12px;border-radius:6px;background:#1a2a4a;overflow:hidden}
+.pop-individual .bar-fill{height:100%;border-radius:6px;transition:width .3s}
+.pop-individual .fitness{min-width:50px;text-align:right;font-weight:600}
+.feedback{background:#00000099;margin:0 2rem 1.5rem 2rem;padding:1rem;border-radius:1.5rem;text-align:center;font-weight:500;border-left:4px solid #ff64dc;min-height:3rem}
+.insignia{text-align:center;background:#0c1b2f;border-radius:2rem;margin:0 2rem 1.5rem;padding:1rem;border:2px dashed gold}
+.insignia i{font-size:2.5rem;color:gold}
+.insignia h3{color:gold;margin:.5rem 0}
+.hidden{display:none!important}
+.nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.5rem 2rem}
+.nav-link{background:#2c3e66;padding:0.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:0.5rem;transition:0.2s}
+.nav-link:hover{transform:translateY(-2px);box-shadow:0 0 10px rgba(255,100,220,0.4)}
+.nav-link.next{background:linear-gradient(95deg,#f0a500,#ff6a00);color:#1e1a0c}
+.nav-link.menu{background:#1a2a4a;border:1px solid #ff64dc}
+.nav-link.prev{background:#1a2a4a;border:1px solid #666}
+footer{text-align:center;padding:1.2rem;font-size:0.8rem;border-top:1px solid #2c3e66;color:#8899cc}
+@media(max-width:900px){.ga-visual{grid-template-columns:1fr}.hero-header h1{font-size:1.9rem}.analogy-card{margin:1rem}.feedback{margin:0 1rem 1rem}.main-area{padding:1rem}}
+</style>
+</head>
+<body>
+<nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a><a href="../index.html">Programa MQL5</a></nav>
+<div class="modulo-container">
+  <div class="hero-header">
+    <h1>🧬 Algoritmos Genéticos</h1>
+    <p>"La evolución de Darwin aplicada a la búsqueda de parámetros óptimos"</p>
+    <div class="badge-area">
+      <span class="chip"><i class="fas fa-dna"></i> Selección</span>
+      <span class="chip"><i class="fas fa-random"></i> Cruce</span>
+      <span class="chip"><i class="fas fa-bolt"></i> Mutación</span>
+    </div>
+  </div>
+
+  <div class="progress-section">
+    <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+    <div class="progress-text" id="progressText">Módulo 6 de 12</div>
+  </div>
+
+  <div class="analogy-card">
+    <strong>🧬 Piénsalo así:</strong> Un algoritmo genético es como la evolución de las especies en time-lapse. Tienes una población de "criaturas" (conjuntos de parámetros). Las más aptas (mejor profit factor) se cruzan y tienen descendencia. De vez en cuando hay mutaciones (cambios aleatorios). Después de muchas generaciones, obtienes una criatura superior — tu estrategia optimizada.
+  </div>
+
+  <div class="main-area">
+    <div class="ga-panel">
+      <h3 style="color:#bcc9f0;margin-bottom:1rem"><i class="fas fa-dna"></i> Simulador de Evolución Genética</h3>
+      <div class="ga-controls">
+        <div class="form-group"><label>Población</label><input type="number" id="popSize" value="20" min="10" max="50"></div>
+        <div class="form-group"><label>Generaciones</label><input type="number" id="generations" value="20" min="5" max="50"></div>
+        <div class="form-group"><label>Mutación (%)</label><input type="number" id="mutationRate" value="15" min="5" max="50"></div>
+        <button class="btn-action" id="evolveBtn"><i class="fas fa-play"></i> Evolucionar</button>
+      </div>
+
+      <div class="ga-visual">
+        <div class="ga-canvas-wrap">
+          <canvas id="gaCanvas" width="900" height="260"></canvas>
+        </div>
+        <div class="ga-stats">
+          <h4 style="color:#bcc9f0;margin-bottom:.5rem">Estadísticas</h4>
+          <div class="ga-stat"><div class="lbl">Generación</div><div class="val" id="genCounter">0 / 0</div></div>
+          <div class="ga-stat"><div class="lbl">Mejor Fitness</div><div class="val" id="bestFitness">0.00</div></div>
+          <div class="ga-stat"><div class="lbl">Fitness Promedio</div><div class="val" id="avgFitness">0.00</div></div>
+          <div class="ga-stat"><div class="lbl">Diversidad</div><div class="val" id="diversityVal">100%</div></div>
+        </div>
+      </div>
+
+      <div class="ga-population" id="populationDiv">
+        <h4 style="color:#bcc9f0;margin-bottom:.5rem">Población Actual</h4>
+        <div id="popContainer"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="feedbackMsg" class="feedback">💡 Configura la población, generaciones y tasa de mutación, luego observa la evolución en tiempo real.</div>
+
+  <div id="insigniaArea" class="insignia hidden">
+    <i class="fas fa-medal"></i>
+    <h3>🏅 Genetic Master 🏅</h3>
+    <p>¡Has dominado los algoritmos genéticos! La evolución de las especies aplicada al trading. 🧬</p>
+  </div>
+
+  <div class="nav-links">
+    <a href="05-optimizacion.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+    <a href="07-walk-forward.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-flask"></i> Curso 3: Backtesting y Validación Cuantitativa</footer>
+</div>
+
+<script>
+const STORAGE_KEY = 'mql5_3_06';
+let completed = false;
+let gaRun = false;
+
+function initProgress(){
+  const p = JSON.parse(localStorage.getItem('mql5_3_progress')) || [];
+  const pf = document.getElementById('progressFill');
+  const pt = document.getElementById('progressText');
+  if(pf) pf.style.width = Math.round((p.length/12)*100)+'%';
+  if(pt) pt.textContent = p.length+' de 12 módulos';
+  if(p.includes(STORAGE_KEY)){
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    completed = true;
+  }
+}
+
+function saveProgress(){
+  let p = JSON.parse(localStorage.getItem('mql5_3_progress')) || [];
+  if(!p.includes(STORAGE_KEY)){p.push(STORAGE_KEY);localStorage.setItem('mql5_3_progress',JSON.stringify(p));}
+  const pf = document.getElementById('progressFill');
+  const pt = document.getElementById('progressText');
+  if(pf) pf.style.width = Math.round((p.length/12)*100)+'%';
+  if(pt) pt.textContent = p.length+' de 12 módulos';
+}
+
+// GA Simulator
+class GeneticOptimizer {
+  constructor(popSize, mutationRate, geneCount){
+    this.popSize = popSize;
+    this.mutationRate = mutationRate;
+    this.geneCount = geneCount;
+    this.generation = 0;
+    this.bestHistory = [];
+    this.avgHistory = [];
+    this.population = [];
+    this.initPopulation();
+  }
+
+  initPopulation(){
+    this.population = [];
+    for(let i=0;i<this.popSize;i++){
+      const genes = [];
+      for(let j=0;j<this.geneCount;j++){
+        genes.push(Math.random());
+      }
+      this.population.push({genes, fitness:0});
+    }
+    this.evaluate();
+  }
+
+  evaluate(){
+    for(let ind of this.population){
+      const x = ind.genes[0];
+      const y = ind.genes[1];
+      ind.fitness = Math.sin(x*10)*Math.cos(y*10)*0.5 + 0.5 + (1-Math.abs(x-0.5))+ (1-Math.abs(y-0.5))*0.3 + Math.random()*0.05;
+    }
+    this.population.sort((a,b)=>b.fitness-a.fitness);
+  }
+
+  select(){
+    const totalFitness = this.population.reduce((s,i)=>s+i.fitness,0);
+    const r = Math.random()*totalFitness;
+    let cum = 0;
+    for(let ind of this.population){
+      cum += ind.fitness;
+      if(cum >= r) return ind;
+    }
+    return this.population[this.population.length-1];
+  }
+
+  crossover(p1, p2){
+    const point = Math.floor(Math.random()*this.geneCount);
+    const child = {genes:[], fitness:0};
+    for(let i=0;i<this.geneCount;i++){
+      child.genes.push(i<point ? p1.genes[i] : p2.genes[i]);
+    }
+    return child;
+  }
+
+  mutate(ind){
+    const child = {genes:[...ind.genes], fitness:0};
+    for(let i=0;i<this.geneCount;i++){
+      if(Math.random() < this.mutationRate/100){
+        child.genes[i] += (Math.random()-0.5)*0.2;
+        if(child.genes[i]<0) child.genes[i]=0;
+        if(child.genes[i]>1) child.genes[i]=1;
+      }
+    }
+    return child;
+  }
+
+  nextGeneration(){
+    const newPop = [this.population[0], this.population[1]];
+    while(newPop.length < this.popSize){
+      const p1 = this.select();
+      const p2 = this.select();
+      let child = this.crossover(p1, p2);
+      child = this.mutate(child);
+      newPop.push(child);
+    }
+    this.population = newPop;
+    this.evaluate();
+    this.generation++;
+    const best = this.population[0].fitness;
+    const avg = this.population.reduce((s,i)=>s+i.fitness,0)/this.population.length;
+    this.bestHistory.push(best);
+    this.avgHistory.push(avg);
+    return {best, avg};
+  }
+}
+
+let ga = null;
+let running = false;
+
+document.getElementById('evolveBtn').addEventListener('click', function(){
+  if(running) return;
+  running = true;
+  const popSize = parseInt(document.getElementById('popSize').value)||20;
+  const generations = parseInt(document.getElementById('generations').value)||20;
+  const mutationRate = parseInt(document.getElementById('mutationRate').value)||15;
+
+  ga = new GeneticOptimizer(popSize, mutationRate, 2);
+  let gen = 0;
+
+  function step(){
+    if(gen >= generations){
+      running = false;
+      document.getElementById('feedbackMsg').innerHTML = '✅ Evolución completada: '+generations+' generaciones. Mejor fitness: '+ga.population[0].fitness.toFixed(4);
+      gaRun = true;
+      if(!completed){
+        document.getElementById('insigniaArea').classList.remove('hidden');
+        document.getElementById('feedbackMsg').innerHTML = '🎉 ¡Evolución completada! Has visto la selección natural en acción. ¡Insignia desbloqueada!';
+        saveProgress();
+        completed = true;
+      }
+      return;
+    }
+    const stats = ga.nextGeneration();
+    gen++;
+
+    // Update display
+    document.getElementById('genCounter').textContent = gen+' / '+generations;
+    document.getElementById('bestFitness').textContent = stats.best.toFixed(4);
+    document.getElementById('avgFitness').textContent = stats.avg.toFixed(4);
+
+    const unique = new Set(ga.population.map(p=>Math.round(p.fitness*100)));
+    document.getElementById('diversityVal').textContent = Math.round(unique.size/ga.popSize*100)+'%';
+
+    drawGAChart(ga);
+    drawPopulation(ga);
+
+    setTimeout(step, 200);
+  }
+  step();
+});
+
+function drawGAChart(ga){
+  const canvas = document.getElementById('gaCanvas');
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle = '#0d1525';
+  ctx.fillRect(0,0,w,h);
+
+  const maxGen = parseInt(document.getElementById('generations').value)||20;
+  const pad = 40, ch = h-pad*2;
+
+  if(ga.bestHistory.length < 2) return;
+
+  const allVals = [...ga.bestHistory, ...ga.avgHistory];
+  const min = Math.min(...allVals, 0);
+  const max = Math.max(...allVals, 1);
+  const range = max-min||1;
+
+  // Best line
+  ctx.strokeStyle = '#ff64dc';
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ga.bestHistory.forEach((v,i)=>{
+    const x = i/(maxGen-1)*(w-pad*2)+pad;
+    const y = pad+(max-v)/range*ch;
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+
+  // Avg line
+  ctx.strokeStyle = '#00e0ff';
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([4,4]);
+  ctx.beginPath();
+  ga.avgHistory.forEach((v,i)=>{
+    const x = i/(maxGen-1)*(w-pad*2)+pad;
+    const y = pad+(max-v)/range*ch;
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.fillStyle = '#8899cc';
+  ctx.font = '11px Inter';
+  ctx.fillText('Mejor (sólido) · Promedio (discontinuo)', pad+5, pad+15);
+  ctx.fillStyle = '#ff64dc';
+  ctx.fillText('■ Best', w-120, pad+15);
+  ctx.fillStyle = '#00e0ff';
+  ctx.fillText('■ Avg', w-120, pad+35);
+
+  ctx.fillStyle = '#667';
+  ctx.font = '10px Inter';
+  ctx.textAlign = 'center';
+  for(let i=0;i<maxGen;i+=Math.max(1,Math.floor(maxGen/5))){
+    ctx.fillText(i, pad+i/(maxGen-1)*(w-pad*2), h-5);
+  }
+  ctx.textAlign = 'start';
+}
+
+function drawPopulation(ga){
+  const container = document.getElementById('popContainer');
+  container.innerHTML = '';
+  ga.population.slice(0,10).forEach((ind,i)=>{
+    const div = document.createElement('div');
+    div.className = 'pop-individual';
+    const pct = Math.round(ind.fitness*100);
+    const color = pct > 70 ? '#ff64dc' : pct > 40 ? '#00e0ff' : '#8899cc';
+    div.innerHTML = '<span style="width:30px;font-size:.7rem;color:#667">#'+(i+1)+'</span>'+
+      '<div class="bar"><div class="bar-fill" style="width:'+pct+'%;background:'+color+'"></div></div>'+
+      '<span class="fitness" style="color:'+color+'">'+ind.fitness.toFixed(3)+'</span>';
+    container.appendChild(div);
+  });
+}
+
+window.addEventListener('load', initProgress);
+</script>
+<script src="../../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

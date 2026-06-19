@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Producción | Automatización con Scripts</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+    .mod-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,215,0,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+    .hero-header { background:linear-gradient(95deg,#0b1120 0%,#111a2e 100%); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #ffd700; }
+    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#ffe87c,#ffd700); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .hero-header p { font-size:1.1rem; color:#ffe87c; margin-top:0.5rem; }
+    .badge-area { display:flex; justify-content:center; gap:1rem; margin:1.2rem 0 0.5rem; flex-wrap:wrap; }
+    .chip { background:rgba(255,215,0,0.15); border:1px solid #ffd700; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+    .progress-section { padding:1.2rem 2rem; border-bottom:1px solid #2a2a1a; }
+    .progress-bar-outer { background:#2a2a1a; border-radius:20px; height:16px; overflow:hidden; }
+    .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#ffd700,#ffaa00); border-radius:20px; transition:width 0.5s ease; }
+    .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#aa9944; }
+    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ffd700; font-size:1rem; line-height:1.6; }
+    .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #ffd700; }
+    .btn-action { background:linear-gradient(95deg,#ffd700,#ffaa00); border:none; padding:0.8rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; display:inline-flex; align-items:center; gap:0.5rem; }
+    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(255,215,0,0.5); }
+    .btn-action.small { padding:0.4rem 1rem; font-size:0.85rem; }
+    .section-title { font-size:1.3rem; font-weight:700; color:#ffd700; margin:1.5rem 2rem 1rem; display:flex; align-items:center; gap:0.6rem; }
+    .script-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:1rem; margin:0 2rem 1.5rem; }
+    .script-card { background:rgba(0,10,25,0.7); border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; transition:0.2s; }
+    .script-card:hover { border-color:#ffd700; }
+    .script-card h4 { color:#ffd700; display:flex; align-items:center; gap:0.5rem; }
+    .script-card p { font-size:0.85rem; color:#8899bb; margin:0.5rem 0; }
+    .script-card .code-snip { background:#0d1117; padding:0.5rem; border-radius:0.6rem; font-size:0.7rem; font-family:'Consolas',monospace; color:#c9d1d9; margin:0.5rem 0; overflow-x:auto; }
+    .log-panel { background:#0d1117; border-radius:1rem; margin:0 2rem 1.5rem; padding:0.8rem; font-family:'Consolas',monospace; font-size:0.75rem; max-height:150px; overflow-y:auto; border:1px solid #2c3e66; }
+    .log-panel .log-entry { padding:0.15rem 0; }
+    .log-panel .log-entry.ok { color:#00cc88; }
+    .log-panel .log-entry.err { color:#ff4455; }
+    .log-panel .log-entry.info { color:#8899bb; }
+    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:0 2rem 1.5rem; padding:1rem; border:1px dashed gold; }
+    .insignia i { font-size:2.5rem; color:gold; }
+    .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
+    .hidden { display:none; }
+    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(255,215,0,0.4); }
+    .nav-link.next { background:linear-gradient(95deg,#ffd700,#ffaa00); color:#1e1a0c; }
+    .nav-link.menu { background:#1a2a4a; border:1px solid #ffd700; }
+    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .script-grid { grid-template-columns:1fr; } }
+  </style>
+  <link rel="stylesheet" href="../../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a><a href="../index.html">Programa MQL5</a></nav>
+  <div class="mod-container" id="app">
+    <div class="hero-header">
+      <h1>Automatización con Scripts</h1>
+      <p>Cierra, exporta y opera en batch desde un solo script</p>
+      <div class="badge-area">
+        <span class="chip"><i class="fas fa-terminal"></i> Scripts</span>
+        <span class="chip"><i class="fas fa-tasks"></i> Batch</span>
+        <span class="chip"><i class="fas fa-file-export"></i> Export</span>
+      </div>
+    </div>
+    <div class="progress-section">
+      <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+      <span class="progress-text" id="progressText">Módulo 6 de 12</span>
+    </div>
+    <div class="analogy-card">
+      <strong>Piensa así:</strong> Los scripts en MQL5 son como la escoba automática de la casa. No necesitas pensar — solo ejecutas y hace todo: cierra ventanas (posiciones), organiza el inventario (exporta datos) y limpia varias habitaciones a la vez (batch operations).
+    </div>
+
+    <div class="section-title"><i class="fas fa-terminal"></i> Scripts de Automatización</div>
+    <div class="script-grid">
+      <div class="script-card">
+        <h4><i class="fas fa-times-circle"></i> CloseAll</h4>
+        <p>Cierra todas las posiciones abiertas y elimina órdenes pendientes.</p>
+        <div class="code-snip">CloseAll(SELECT_BY_POS); // Cierra todo</div>
+        <button class="btn-action small sim-script" data-script="closeall"><i class="fas fa-play"></i> Simular</button>
+      </div>
+      <div class="script-card">
+        <h4><i class="fas fa-file-export"></i> ExportTrades</h4>
+        <p>Exporta historial de trades a CSV con todas las métricas.</p>
+        <div class="code-snip">FileWrite(handle, "Symbol,Profit,Time");</div>
+        <button class="btn-action small sim-script" data-script="export"><i class="fas fa-play"></i> Simular</button>
+      </div>
+      <div class="script-card">
+        <h4><i class="fas fa-balance-scale"></i> BatchCancel</h4>
+        <p>Cancelar órdenes por símbolo, tipo o dirección.</p>
+        <div class="code-snip">if(OrderType()==ORDER_TYPE_BUY_LIMIT) ...</div>
+        <button class="btn-action small sim-script" data-script="batch"><i class="fas fa-play"></i> Simular</button>
+      </div>
+      <div class="script-card">
+        <h4><i class="fas fa-chart-line"></i> ProfitReport</h4>
+        <p>Genera reporte de profit/loss por símbolo en HTML.</p>
+        <div class="code-snip">HistorySelect(0, TimeCurrent());</div>
+        <button class="btn-action small sim-script" data-script="profit"><i class="fas fa-play"></i> Simular</button>
+      </div>
+    </div>
+
+    <div class="section-title"><i class="fas fa-list"></i> Log de Ejecución</div>
+    <div class="log-panel" id="logPanel">
+      <div class="log-entry info">Sistema listo. Selecciona un script para ejecutar.</div>
+    </div>
+
+    <div id="feedbackMsg" class="feedback">Ejecuta al menos un script para completar el módulo.</div>
+    <div id="insigniaArea" class="insignia hidden">
+      <i class="fas fa-medal"></i>
+      <h3>Script Master</h3>
+      <p>Automatizas tareas repetitivas como un profesional. ¡Tu tiempo vale oro!</p>
+    </div>
+    <div class="nav-links">
+      <a href="05-depth-market.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+      <a href="07-vps-despliegue.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <footer><i class="fas fa-cloud-upload-alt"></i> Curso 6: Producción y Publicación Profesional · Automatiza. Publica. Escala.</footer>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'mql5_6_06';
+    const PROGRESS_KEY = 'mql5_6_progress';
+    let completed = false;
+
+    function updateProgress() {
+      const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+      document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
+      document.getElementById('progressText').textContent = 'M\u00f3dulo '+(p.length+1)+' de 12';
+    }
+
+    function saveProgress() {
+      let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+      if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
+      localStorage.setItem(STORAGE_KEY, 'true');
+    }
+
+    const logs = {
+      closeall: [
+        '2026.06.18 14:30:22.001 CloseAll iniciado',
+        '2026.06.18 14:30:22.050 Cerrado EURUSD Buy 0.10 @ 1.1045 - Profit: +.40',
+        '2026.06.18 14:30:22.080 Cerrado GBPUSD Sell 0.05 @ 1.2710 - Profit: -.20',
+        '2026.06.18 14:30:22.100 Cerrado USDJPY Buy 0.15 @ 141.50 - Profit: +.75',
+        '2026.06.18 14:30:22.120 Eliminada orden pendiente EURUSD Buy Limit',
+        '2026.06.18 14:30:22.150 CloseAll completado. Profit total: +.95'
+      ],
+      export: [
+        '2026.06.18 14:31:05.001 ExportTrades iniciado',
+        '2026.06.18 14:31:05.030 Abriendo archivo: trades_20260618.csv',
+        '2026.06.18 14:31:05.050 Exportando 47 trades...',
+        '2026.06.18 14:31:05.080 Trade #1: EURUSD Buy 2026-05-01 +.40',
+        '2026.06.18 14:31:05.110 Trade #25: GBPUSD Sell 2026-05-15 -.20',
+        '2026.06.18 14:31:05.150 Exportación completa. Archivo: 2.4 KB'
+      ],
+      batch: [
+        '2026.06.18 14:31:45.001 BatchCancel iniciado',
+        '2026.06.18 14:31:45.020 Filtro: EURUSD, Buy Limits',
+        '2026.06.18 14:31:45.040 Cancelando orden #145782 EURUSD Buy Limit @ 1.0950',
+        '2026.06.18 14:31:45.060 Cancelando orden #145783 EURUSD Buy Limit @ 1.0920',
+        '2026.06.18 14:31:45.080 2 órdenes canceladas exitosamente'
+      ],
+      profit: [
+        '2026.06.18 14:32:10.001 ProfitReport iniciado',
+        '2026.06.18 14:32:10.030 Escaneando historial (últimos 30 días)...',
+        '2026.06.18 14:32:10.060 EURUSD: +.50 (12 trades)',
+        '2026.06.18 14:32:10.080 GBPUSD: -.20 (8 trades)',
+        '2026.06.18 14:32:10.100 USDJPY: +.30 (15 trades)',
+        '2026.06.18 14:32:10.120 Profit total: +.60 | Reporte: profit_report.html'
+      ]
+    };
+
+    document.querySelectorAll('.sim-script').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const script = this.dataset.script;
+        const panel = document.getElementById('logPanel');
+        panel.innerHTML = '';
+        (logs[script] || ['Ejecutando...']).forEach(line => {
+          const div = document.createElement('div');
+          div.className = 'log-entry ' + (line.includes('Error') || line.includes('-') ? 'err' : line.includes('completado') || line.includes('total') ? 'ok' : 'info');
+          div.textContent = line;
+          panel.appendChild(div);
+        });
+        panel.scrollTop = panel.scrollHeight;
+        completeModule();
+      });
+    });
+
+    function completeModule() {
+      if (completed) return;
+      completed = true;
+      document.getElementById('insigniaArea').classList.remove('hidden');
+      document.getElementById('feedbackMsg').textContent = 'Scripts de automatización dominados. ¡Siguiente módulo!';
+      saveProgress(); updateProgress();
+    }
+
+    function restoreProgress() {
+      const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+      if (p.includes(STORAGE_KEY)) {
+        completed = true;
+        document.getElementById('insigniaArea').classList.remove('hidden');
+        document.getElementById('feedbackMsg').textContent = 'Ya completaste este módulo. Continúa al siguiente.';
+      }
+    }
+    restoreProgress(); updateProgress();
+  </script>
+  <script src="../../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

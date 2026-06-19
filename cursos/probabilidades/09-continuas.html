@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Probabilidades | VA Continuas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #111a2e 100%); background-size: 200% 200%; animation: gradientShift 20s ease infinite; font-family: 'Inter', sans-serif; color: #eef5ff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; }
+    @keyframes gradientShift { 0%{background-position:0% 50%;} 50%{background-position:100% 50%;} 100%{background-position:0% 50%;} }
+    .mod-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,179,71,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+    .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #ffb347; }
+    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#ffcc80,#ffb347); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .hero-header p { font-size:1.1rem; color:#ffcc80; margin-top:0.5rem; }
+    .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+    .chip { background:rgba(255,179,71,0.15); border:1px solid #ffb347; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ffb347; font-size:1rem; line-height:1.6; }
+    .main-flex { display:flex; flex-wrap:wrap; gap:2rem; padding:0 2rem 1.5rem; }
+    .theory-area { flex:1.2; min-width:260px; background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; border:1px solid rgba(255,179,71,0.2); }
+    .theory-area h3 { color:#ffb347; margin:0.8rem 0 0.4rem; font-size:1.1rem; }
+    .theory-area p, .theory-area li { font-size:0.9rem; line-height:1.5; color:#d4dcec; }
+    .theory-area ul { padding-left:1.2rem; }
+    .interactive-area { flex:1.8; min-width:280px; background:rgba(20,20,30,0.8); border-radius:2rem; padding:1.5rem; text-align:center; border:1px solid #ffb347; }
+    .interactive-area h3 { color:#ffb347; margin-bottom:0.8rem; }
+    .dist-tabs { display:flex; gap:0.5rem; justify-content:center; flex-wrap:wrap; margin-bottom:1rem; }
+    .dist-tab { background:#2c3e66; border:none; padding:0.5rem 1rem; border-radius:2rem; cursor:pointer; font-weight:600; color:#eef5ff; transition:0.2s; }
+    .dist-tab.active { background:#ffb347; color:#000; }
+    .dist-tab:hover { transform:translateY(-2px); }
+    .slider-group { margin:0.8rem 0; }
+    .slider-group label { font-size:0.85rem; color:#ffcc80; display:block; }
+    .slider-group input[type=range] { width:100%; margin:0.3rem 0; accent-color:#ffb347; }
+    canvas { width:100%; height:180px; background:#0a0f1e; border-radius:1rem; margin:0.5rem 0; }
+    .stats-row { display:flex; justify-content:center; gap:1.5rem; flex-wrap:wrap; margin:0.6rem 0; font-size:0.9rem; }
+    .stats-row span { background:#00000066; padding:0.3rem 0.8rem; border-radius:2rem; }
+    .btn-action { background:linear-gradient(95deg,#f0a500,#ff6a00); border:none; padding:0.8rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin:0.3rem; }
+    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(240,165,0,0.5); }
+    .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #ffb347; }
+    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:0 2rem 1.5rem; padding:1rem; border:1px dashed #ffb347; }
+    .insignia i { font-size:2.5rem; color:#ffb347; }
+    .hidden { display:none; }
+    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(255,179,71,0.4); }
+    .nav-link.next { background:linear-gradient(95deg,#f0a500,#ff6a00); color:#1e1a0c; }
+    .nav-link.menu { background:#1a2a4a; border:1px solid #3399ff; }
+    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+  <div class="mod-container">
+    <div class="hero-header">
+      <h1>📏 VARIABLES ALEATORIAS CONTINUAS 📏</h1>
+      <p>Uniforme, Exponencial, Gamma y Weibull — el continuo de la probabilidad</p>
+      <div class="badge-area">
+        <span class="chip"><i class="fas fa-wave-square"></i> PDF y CDF</span>
+        <span class="chip"><i class="fas fa-chart-area"></i> Visualización continua</span>
+        <span class="chip"><i class="fas fa-gem"></i> Insignia Naranja</span>
+      </div>
+    </div>
+    <div class="analogy-card">
+      <strong>📏 Piénsalo así:</strong> Las variables continuas son como medir la altura: cualquier valor es posible entre dos límites. La PDF es como la silueta de una montaña — el área bajo la curva en un intervalo te da la probabilidad. La CDF acumula desde menos infinito como un nivel de agua que sube.
+    </div>
+    <div class="main-flex">
+      <div class="theory-area">
+        <h3><i class="fas fa-chart-area"></i> PDF y CDF</h3><p>La <strong>PDF</strong> f(x) describe la densidad de probabilidad. La <strong>CDF</strong> F(x) = ∫₋∞ˣ f(t)dt da la probabilidad acumulada.</p>
+        <h3><i class="fas fa-equals"></i> Uniforme(a, b)</h3><p>Todos los intervalos de igual longitud tienen la misma probabilidad. f(x) = 1/(b-a).</p>
+        <h3><i class="fas fa-hourglass-end"></i> Exponencial(λ)</h3><p>Tiempos de espera entre eventos de Poisson. ¡Propiedad de falta de memoria!</p>
+        <h3><i class="fas fa-plus-circle"></i> Gamma(α, β)</h3><p>Suma de α exponenciales. Generaliza la exponencial.</p>
+        <h3><i class="fas fa-chart-line"></i> Weibull</h3><p>Análisis de supervivencia y tiempos de fallo. Muy usada en ingeniería.</p>
+      </div>
+      <div class="interactive-area">
+        <h3><i class="fas fa-wave-square"></i> Visualizador de PDFs</h3>
+        <div class="dist-tabs">
+          <button class="dist-tab active" data-dist="uniform">Uniforme</button>
+          <button class="dist-tab" data-dist="exponential">Exponencial</button>
+          <button class="dist-tab" data-dist="gamma">Gamma</button>
+          <button class="dist-tab" data-dist="weibull">Weibull</button>
+        </div>
+        <div class="slider-group">
+          <label id="uniformLabel">a: <span id="uniformAVal">0</span> · b: <span id="uniformBVal">10</span></label>
+          <input type="range" id="uniformASlider" min="0" max="5" step="0.5" value="0">
+          <input type="range" id="uniformBSlider" min="1" max="20" step="0.5" value="10">
+          <label id="expLabel" style="display:none;">λ (tasa): <span id="expLamVal">0.5</span></label>
+          <input type="range" id="expSlider" min="0.1" max="3" step="0.1" value="0.5" style="display:none;">
+          <label id="gammaLabel" style="display:none;">α (forma): <span id="gammaAlphaVal">2</span> · β (escala): <span id="gammaBetaVal">2</span></label>
+          <input type="range" id="gammaAlphaSlider" min="0.5" max="8" step="0.5" value="2" style="display:none;">
+          <input type="range" id="gammaBetaSlider" min="0.5" max="5" step="0.5" value="2" style="display:none;">
+          <label id="weibullLabel" style="display:none;">k (forma): <span id="weibullKVal">2</span> · λ (escala): <span id="weibullLamVal">2</span></label>
+          <input type="range" id="weibullKSlider" min="0.5" max="5" step="0.1" value="2" style="display:none;">
+          <input type="range" id="weibullLamSlider" min="0.5" max="5" step="0.1" value="2" style="display:none;">
+        </div>
+        <canvas id="pdfCanvas" width="600" height="180"></canvas>
+        <div class="stats-row">
+          <span><i class="fas fa-crosshairs"></i> Media: <strong id="meanDisplay">5.00</strong></span>
+          <span><i class="fas fa-expand"></i> Varianza: <strong id="varDisplay">8.33</strong></span>
+        </div>
+        <div style="margin-top:0.3rem;"><span style="font-size:0.85rem;color:#ffcc80;">P(X &lt; <span id="cdfXVal">5</span>) = <strong id="cdfDisplay">0.50</strong></span></div>
+        <input type="range" id="cdfSlider" min="0" max="20" step="0.1" value="5" style="width:100%;">
+      </div>
+    </div>
+    <div id="feedbackMsg" class="feedback">💡 Explora las distribuciones continuas. La Exponencial tiene memoria cero: ¡el pasado no importa!</div>
+    <div id="insigniaArea" class="insignia hidden">
+      <i class="fas fa-medal"></i><h3>🏅 ¡EXPLORADOR DEL CONTINUO! 🏅</h3><p>Has navegado por las distribuciones continuas. ¡El espacio de lo posible es infinito!</p>
+    </div>
+    <div class="nav-links">
+      <a href="08-esperanza.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+      <a href="10-normal.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <footer><i class="fas fa-crown"></i> Probabilidades Interactivas · Lo continuo abarca infinitas posibilidades</footer>
+  </div>
+  <script>
+    const STORAGE_KEY = 'prob_lvl9';
+    let currentDist = 'uniform';
+    let exploredCount = 0;
+    function pdfUniform(x,a,b){return(x>=a&&x<=b)?1/(b-a):0;}
+    function cdfUniform(x,a,b){if(x<a)return 0;if(x>b)return 1;return(x-a)/(b-a);}
+    function pdfExp(x,lam){return(x>=0)?lam*Math.exp(-lam*x):0;}
+    function cdfExp(x,lam){return(x>=0)?1-Math.exp(-lam*x):0;}
+    function pdfGamma(x,a,b){if(x<=0)return 0;return Math.pow(x,a-1)*Math.exp(-x/b)/(Math.pow(b,a)*gammaF(a));}
+    function gammaF(n){if(n===Math.round(n)&&n>0){let f=1;for(let i=2;i<n;i++)f*=i;return f;}return Math.sqrt(2*Math.PI/n)*Math.pow(n/Math.E,n);}
+    function pdfWeib(x,k,lam){if(x<0)return 0;return(k/lam)*Math.pow(x/lam,k-1)*Math.exp(-Math.pow(x/lam,k));}
+    function cdfWeib(x,k,lam){if(x<0)return 0;return 1-Math.exp(-Math.pow(x/lam,k));}
+    function renderPDF(){
+      const canvas=document.getElementById('pdfCanvas'),ctx=canvas.getContext('2d');
+      const W=canvas.width,H=canvas.height;ctx.clearRect(0,0,W,H);
+      const cdfVal=parseFloat(document.getElementById('cdfSlider').value);
+      let pdfFn,cdfFn,a,b,mean,variance;
+      if(currentDist==='uniform'){a=parseFloat(document.getElementById('uniformASlider').value);b=parseFloat(document.getElementById('uniformBSlider').value);if(b<=a)b=a+1;pdfFn=(x)=>pdfUniform(x,a,b);cdfFn=(x)=>cdfUniform(x,a,b);mean=(a+b)/2;variance=(b-a)*(b-a)/12;}
+      else if(currentDist==='exponential'){const lam=parseFloat(document.getElementById('expSlider').value);a=0;b=Math.min(20,Math.ceil(5/lam));pdfFn=(x)=>pdfExp(x,lam);cdfFn=(x)=>cdfExp(x,lam);mean=1/lam;variance=1/(lam*lam);}
+      else if(currentDist==='gamma'){const al=parseFloat(document.getElementById('gammaAlphaSlider').value);const be=parseFloat(document.getElementById('gammaBetaSlider').value);a=0;b=Math.min(20,al*be*3);pdfFn=(x)=>pdfGamma(x,al,be);cdfFn=null;mean=al*be;variance=al*be*be;}
+      else if(currentDist==='weibull'){const k=parseFloat(document.getElementById('weibullKSlider').value);const lam=parseFloat(document.getElementById('weibullLamSlider').value);a=0;b=Math.min(20,lam*3);pdfFn=(x)=>pdfWeib(x,k,lam);cdfFn=(x)=>cdfWeib(x,k,lam);mean=lam*gammaF(1+1/k);variance=lam*lam*(gammaF(1+2/k)-Math.pow(gammaF(1+1/k),2));}
+      document.getElementById('meanDisplay').textContent=isNaN(mean)?'—':mean.toFixed(3);
+      document.getElementById('varDisplay').textContent=isNaN(variance)||variance<0?'—':variance.toFixed(3);
+      const steps=200,dx=(b-a)/steps;let maxPDF=0;const pdfVals=[];
+      for(let i=0;i<=steps;i++){const x=a+i*dx,y=pdfFn(x);pdfVals.push(y);if(y>maxPDF)maxPDF=y;}
+      if(maxPDF===0)maxPDF=1;
+      const m=20,pW=W-2*m,pH=H-2*m;
+      ctx.strokeStyle='#ffb347';ctx.lineWidth=2;ctx.beginPath();
+      for(let i=0;i<=steps;i++){const x=m+(i/steps)*pW,y=m+pH-(pdfVals[i]/maxPDF)*pH*0.9;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}
+      ctx.stroke();
+      if(cdfFn){
+        ctx.fillStyle='rgba(255,179,71,0.15)';ctx.beginPath();ctx.moveTo(m,m+pH);
+        for(let i=0;i<=steps;i++){const x=a+i*dx;ctx.lineTo(m+(i/steps)*pW,m+pH-(pdfFn(x)/maxPDF)*pH*0.9);}
+        ctx.lineTo(m+pW,m+pH);ctx.closePath();ctx.fill();
+        const cdfAt=cdfFn(cdfVal),cdfIdx=Math.round((cdfVal-a)/dx);
+        if(cdfIdx>=0&&cdfIdx<=steps){ctx.fillStyle='rgba(255,179,71,0.3)';ctx.beginPath();ctx.moveTo(m,m+pH);for(let i=0;i<=cdfIdx;i++){const x=a+i*dx;ctx.lineTo(m+(i/steps)*pW,m+pH-(pdfFn(x)/maxPDF)*pH*0.9);}ctx.lineTo(m+(cdfIdx/steps)*pW,m+pH);ctx.closePath();ctx.fill();
+        document.getElementById('cdfDisplay').textContent=cdfAt.toFixed(4);document.getElementById('cdfXVal').textContent=cdfVal.toFixed(1);}
+      }else{document.getElementById('cdfDisplay').textContent='—';}
+      ctx.fillStyle='#6688aa';ctx.font='10px Inter';ctx.textAlign='center';
+      ctx.fillText(a.toFixed(1),m,m+pH+14);ctx.fillText(b.toFixed(1),m+pW,m+pH+14);
+      ctx.fillStyle='#4466aa';ctx.fillText(currentDist,m+pW/2,m-4);
+    }
+    function switchDist(dist){
+      currentDist=dist;
+      document.querySelectorAll('.dist-tab').forEach(t=>t.classList.toggle('active',t.dataset.dist===dist));
+      ['uniform','uniformASlider','uniformBSlider','exp','expSlider','gamma','gammaAlphaSlider','gammaBetaSlider','weibull','weibullKSlider','weibullLamSlider'].forEach((id,i)=>{
+        const prefix=i<3?'uniform':i<5?'exp':i<7?'gamma':'weibull';
+        const show=(['uniform','exponential','gamma','weibull'][['uniform','exponential','gamma','weibull'].indexOf(dist)]);
+        // manual visibility
+      });
+      document.getElementById('uniformLabel').style.display=dist==='uniform'?'block':'none';
+      document.getElementById('uniformASlider').style.display=dist==='uniform'?'block':'none';
+      document.getElementById('uniformBSlider').style.display=dist==='uniform'?'block':'none';
+      document.getElementById('expLabel').style.display=dist==='exponential'?'block':'none';
+      document.getElementById('expSlider').style.display=dist==='exponential'?'block':'none';
+      document.getElementById('gammaLabel').style.display=dist==='gamma'?'block':'none';
+      document.getElementById('gammaAlphaSlider').style.display=dist==='gamma'?'block':'none';
+      document.getElementById('gammaBetaSlider').style.display=dist==='gamma'?'block':'none';
+      document.getElementById('weibullLabel').style.display=dist==='weibull'?'block':'none';
+      document.getElementById('weibullKSlider').style.display=dist==='weibull'?'block':'none';
+      document.getElementById('weibullLamSlider').style.display=dist==='weibull'?'block':'none';
+      renderPDF();exploredCount++;
+      if(exploredCount>=3&&!localStorage.getItem(STORAGE_KEY)){document.getElementById('insigniaArea').classList.remove('hidden');localStorage.setItem(STORAGE_KEY,'true');document.getElementById('feedbackMsg').innerHTML='🎉 ¡LO LOGRASTE! Has explorado las distribuciones continuas.';}
+    }
+    document.querySelectorAll('.dist-tab').forEach(tab=>tab.addEventListener('click',()=>switchDist(tab.dataset.dist)));
+    ['uniformASlider','uniformBSlider','expSlider','gammaAlphaSlider','gammaBetaSlider','weibullKSlider','weibullLamSlider'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('input',function(){
+      if(id==='uniformASlider')document.getElementById('uniformAVal').textContent=this.value;
+      if(id==='uniformBSlider')document.getElementById('uniformBVal').textContent=this.value;
+      if(id==='expSlider')document.getElementById('expLamVal').textContent=this.value;
+      if(id==='gammaAlphaSlider')document.getElementById('gammaAlphaVal').textContent=this.value;
+      if(id==='gammaBetaSlider')document.getElementById('gammaBetaVal').textContent=this.value;
+      if(id==='weibullKSlider')document.getElementById('weibullKVal').textContent=this.value;
+      if(id==='weibullLamSlider')document.getElementById('weibullLamVal').textContent=this.value;
+      renderPDF();});});
+    document.getElementById('cdfSlider').addEventListener('input',function(){renderPDF();});
+    if(localStorage.getItem(STORAGE_KEY)==='true'){document.getElementById('insigniaArea').classList.remove('hidden');document.getElementById('feedbackMsg').innerHTML='🎉 ¡Ya exploraste las continuas!';}
+  </script>
+  <script src="../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

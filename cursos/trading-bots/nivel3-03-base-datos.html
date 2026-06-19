@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bot Trader | Bases de Datos para Trading</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700;14..32,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    body{background:linear-gradient(145deg,#0a0a00,#1a1400);font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:2rem 1rem}
+    .container{max-width:1300px;width:100%;background:rgba(20,16,0,.88);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(255,200,0,.22);box-shadow:0 25px 55px rgba(0,0,0,.65);overflow:hidden}
+    .hero{background:linear-gradient(95deg,#0c0c00,#181200);padding:1.8rem 2rem;text-align:center;border-bottom:2px solid #ffc800}
+    .hero h1{font-size:1.9rem;font-weight:800;background:linear-gradient(135deg,#fffacc,#ffe066,#ffc800);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .hero p{margin-top:.5rem;font-size:.95rem;color:#aa9900}
+    .chips{display:flex;justify-content:center;gap:.6rem;flex-wrap:wrap;margin-top:.7rem}
+    .chip{background:rgba(255,200,0,.1);border:1px solid rgba(255,200,0,.3);color:#aa9900;font-size:.72rem;padding:.25rem .8rem;border-radius:2rem}
+    .week-badge{display:inline-block;background:rgba(255,200,0,.15);border:1px solid #ffc800;color:#ffc800;font-size:.75rem;font-weight:700;padding:.3rem 1rem;border-radius:2rem;margin-top:.5rem}
+    .analogy{background:#141000cc;margin:1.4rem 2rem;padding:1.1rem 1.7rem;border-radius:2rem;border-left:7px solid #ffc800;font-size:.9rem;line-height:1.65}
+    .analogy strong{color:#ffe066}
+    .lab{display:flex;flex-wrap:wrap;gap:1.4rem;padding:0 1.8rem 1.5rem}
+    .left{flex:0 0 280px;display:flex;flex-direction:column;gap:.9rem}
+    .right{flex:1;min-width:300px;display:flex;flex-direction:column;gap:.9rem}
+    .panel{background:#141000dd;border-radius:1.8rem;padding:1.2rem 1.3rem;border:1px solid rgba(255,200,0,.15)}
+    .panel h3{font-size:.88rem;font-weight:700;color:#ffe066;margin-bottom:.7rem;display:flex;align-items:center;gap:.4rem}
+    label{font-size:.72rem;color:#887700;text-transform:uppercase;letter-spacing:.06rem;display:block;margin-bottom:.3rem;margin-top:.5rem}
+    select{width:100%;background:#0c0a00;border:1px solid rgba(255,200,0,.2);color:#eef5ff;padding:.45rem .7rem;border-radius:.75rem;font-size:.82rem;font-family:'Inter',sans-serif}
+    .db-tabs{display:flex;gap:.4rem;margin-bottom:.6rem}
+    .db-tab{background:#181400;border:1px solid rgba(255,200,0,.2);color:#aa9900;padding:.4rem 1rem;border-radius:2rem;cursor:pointer;font-size:.78rem;font-weight:600;transition:.15s;flex:1;text-align:center}
+    .db-tab.active{background:#201800;border-color:#ffc800;color:#ffe066}
+    pre{background:#080600;border-radius:1rem;padding:1rem;font-family:'JetBrains Mono',monospace;font-size:.73rem;line-height:1.7;overflow-x:auto;color:#fff8cc;border:1px solid rgba(255,200,0,.12)}
+    .kw{color:#ffc800}.fn{color:#ffe066}.cm{color:#887700}.str{color:#80eeaa}.num{color:#ff9944}.cls{color:#ff9e40}
+    .schema-field{display:flex;align-items:center;gap:.6rem;padding:.4rem .7rem;background:#100e00;border-radius:.75rem;margin-bottom:.3rem;border:1px solid rgba(255,200,0,.12)}
+    .schema-field .fname{font-family:'JetBrains Mono',monospace;font-size:.78rem;color:#ffe066;min-width:100px}
+    .schema-field .ftype{font-size:.72rem;color:#aa8800;flex:1}
+    .schema-field .fkey{font-size:.65rem;color:#ffc800;background:rgba(255,200,0,.15);padding:.1rem .4rem;border-radius:.4rem}
+    .btn{background:linear-gradient(95deg,#ffc800,#cc9900);border:none;padding:.75rem 1.4rem;font-weight:700;border-radius:2rem;cursor:pointer;color:#0c0800;font-size:.88rem;width:100%;margin-top:.4rem;transition:.2s;display:flex;align-items:center;justify-content:center;gap:.5rem}
+    .btn:hover{transform:translateY(-2px);box-shadow:0 0 20px rgba(255,200,0,.3)}
+    .sim-log{background:#050400;border-radius:1rem;padding:.8rem;font-family:'JetBrains Mono',monospace;font-size:.72rem;max-height:180px;overflow-y:auto;border:1px solid rgba(255,200,0,.1)}
+    .sim-log p{padding:.12rem 0;border-bottom:1px solid rgba(255,200,0,.05)}
+    .log-ok{color:#00ff88}.log-info{color:#ffe066}.log-warn{color:#ff9944}
+    .stats-row{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.5rem}
+    .stat-mini{flex:1;min-width:80px;background:#100e00;border-radius:1rem;padding:.5rem;text-align:center;border:1px solid rgba(255,200,0,.12)}
+    .stat-mini .sv{font-size:1.1rem;font-weight:800;font-family:monospace;color:#ffc800}
+    .stat-mini .sl{font-size:.62rem;color:#887700;margin-top:.1rem}
+    .query-btns{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.6rem}
+    .qbtn{background:#181400;border:1px solid rgba(255,200,0,.2);color:#aa9900;padding:.35rem .8rem;border-radius:1rem;cursor:pointer;font-size:.75rem;font-weight:600;transition:.15s}
+    .qbtn:hover{background:#201c00;border-color:#ffc800;color:#ffe066}
+    table{width:100%;border-collapse:collapse;font-size:.72rem;font-family:'JetBrains Mono',monospace}
+    th{background:#181400;color:#ffc800;padding:.4rem .5rem;text-align:right;border-bottom:1px solid rgba(255,200,0,.2)}
+    th:first-child{text-align:left}
+    td{padding:.28rem .5rem;text-align:right;border-bottom:1px solid rgba(255,200,0,.07);color:#fff8cc}
+    td:first-child{text-align:left;color:#aa9900}
+    .feedback{background:#00000088;margin:0 1.8rem 1rem;padding:.85rem 1.2rem;border-radius:1.5rem;text-align:center;border-left:4px solid #ffc800;font-size:.88rem;line-height:1.55}
+    .insignia{text-align:center;background:#141000;border-radius:2rem;margin:0 1.8rem 1.5rem;padding:1rem;border:1px dashed gold}
+    .insignia i{font-size:2.4rem;color:gold}
+    .hidden{display:none}
+    .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.4rem 2rem}
+    .nav-link{background:#1a1800;padding:.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:.5rem;font-size:.88rem;transition:.2s}
+    .nav-link:hover{transform:translateY(-2px)}
+    .nav-link.next{background:linear-gradient(95deg,#f0a500,#ff6a00);color:#1e1a0c}
+    footer{text-align:center;padding:1rem;font-size:.72rem;border-top:1px solid #141000;color:#887700}
+    @media(max-width:860px){.hero h1{font-size:1.4rem}.left{flex:1;min-width:100%}}
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+<nav class="brand-return-nav">
+  <a href="../../index.html">&larr; Portfolio</a>
+  <a href="../../cursos/index.html">Cursos</a>
+</nav>
+<div class="container">
+  <div class="hero">
+    <h1>🗄️ BASES DE DATOS: PostgreSQL & MongoDB para Traders</h1>
+    <p>Almacena millones de velas OHLCV, historial de trades y señales sin perder un byte</p>
+    <div class="week-badge"><i class="fas fa-calendar-week"></i> Semanas 3-4: Exchange Connections</div>
+    <div class="chips">
+      <span class="chip">TimescaleDB para OHLCV</span>
+      <span class="chip">MongoDB para señales</span>
+      <span class="chip">Indices por timestamp</span>
+      <span class="chip">Queries de backtest</span>
+    </div>
+  </div>
+
+  <div class="analogy">
+    <strong>🗄️ Piénsalo así:</strong> Un bot sin base de datos es como un trader con memoria de 5 minutos. Cada vez que reinicias el script, pierdes todo el historial. <strong>PostgreSQL con TimescaleDB</strong> es ideal para datos de series de tiempo (millones de velas OHLCV indexadas por timestamp en microsegundos). <strong>MongoDB</strong> es mejor para documentos flexibles: señales de trading que varían de estrategia en estrategia, configuraciones de bots, logs de errores. En producción usarás ambas.
+    <div style="margin-top:.5rem;font-size:.78rem;color:#887700"><strong>📚 Fuentes:</strong> TimescaleDB docs — timescale.com · PyMongo docs — pymongo.readthedocs.io · SQLAlchemy docs para ORM</div>
+  </div>
+
+  <div class="lab">
+    <div class="left">
+      <div class="panel">
+        <h3><i class="fas fa-database"></i> Motor de BD</h3>
+        <div class="db-tabs">
+          <div class="db-tab active" id="tab-pg" onclick="setDB('pg')">🐘 PostgreSQL</div>
+          <div class="db-tab" id="tab-mongo" onclick="setDB('mongo')">🍃 MongoDB</div>
+        </div>
+        <label>Tabla / Colección</label>
+        <select id="table" onchange="updateSchema()">
+          <option value="ohlcv">ohlcv_data</option>
+          <option value="trades">trade_history</option>
+          <option value="signals">trading_signals</option>
+          <option value="portfolio">portfolio_state</option>
+        </select>
+        <label>Operación</label>
+        <select id="operation">
+          <option value="insert">INSERT / insertOne</option>
+          <option value="select">SELECT / find</option>
+          <option value="agg">Agregación / pipeline</option>
+          <option value="index">CREATE INDEX</option>
+        </select>
+        <button class="btn" onclick="runOperation()"><i class="fas fa-play"></i> Ejecutar</button>
+      </div>
+
+      <div class="panel">
+        <h3><i class="fas fa-chart-bar"></i> Estadísticas de BD</h3>
+        <div class="stats-row">
+          <div class="stat-mini"><div class="sv" id="sRows">0</div><div class="sl">Filas insertadas</div></div>
+          <div class="stat-mini"><div class="sv" id="sOps">0</div><div class="sl">Operaciones</div></div>
+          <div class="stat-mini"><div class="sv" id="sMs">0ms</div><div class="sl">Última query</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="right">
+      <div class="panel">
+        <h3 id="schemaTitle"><i class="fas fa-table"></i> Schema — ohlcv_data</h3>
+        <div id="schemaView"></div>
+      </div>
+
+      <div class="panel">
+        <h3><i class="fas fa-terminal"></i> Log de Operaciones</h3>
+        <div class="query-btns">
+          <div class="qbtn" onclick="quickQuery('bulk')">▶ Bulk insert 1000 velas</div>
+          <div class="qbtn" onclick="quickQuery('range')">▶ Query por rango</div>
+          <div class="qbtn" onclick="quickQuery('agg')">▶ OHLCV semanal</div>
+          <div class="qbtn" onclick="quickQuery('index')">▶ Ver índices</div>
+        </div>
+        <div class="sim-log" id="simLog">
+          <p class="log-info">💡 Selecciona una tabla y operación, luego presiona Ejecutar.</p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3><i class="fas fa-code"></i> Código Python</h3>
+        <pre id="codeBox"><span class="cm"># El código aparecerá aquí según la operación seleccionada</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="feedback" id="feedbackMsg">
+    🗄️ Explora las diferentes tablas y operaciones. Cada operación muestra el código Python real que usarías con <strong>psycopg2</strong> o <strong>pymongo</strong>.
+  </div>
+
+  <div class="insignia hidden" id="insigniaArea">
+    <i class="fas fa-database"></i>
+    <h3 style="margin:.4rem 0;color:#ffd700">🏅 ¡INSIGNIA DATABASE ARCHITECT!</h3>
+    <p style="font-size:.85rem;color:#ffe066">Has diseñado esquemas para datos financieros. ¡Un bot sin BD no sobrevive en producción!</p>
+  </div>
+
+  <div class="nav-links">
+    <a href="nivel3-02-visualizacion.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Menú</a>
+    <a href="nivel3-04-manejo-errores.html" class="nav-link next">Error Handling <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Bot Trader Adventure · Semana 3-4 · PostgreSQL + TimescaleDB + MongoDB</footer>
+</div>
+
+<script>
+const STORAGE_KEY = 'tbot_db';
+let dbType = 'pg', ops = 0, rows = 0;
+
+const SCHEMAS = {
+  pg: {
+    ohlcv: [
+      {name:'id',type:'BIGSERIAL',key:'PK'},
+      {name:'symbol',type:'VARCHAR(20)',key:'IDX'},
+      {name:'timestamp',type:'TIMESTAMPTZ',key:'IDX'},
+      {name:'open',type:'NUMERIC(20,8)',key:''},
+      {name:'high',type:'NUMERIC(20,8)',key:''},
+      {name:'low',type:'NUMERIC(20,8)',key:''},
+      {name:'close',type:'NUMERIC(20,8)',key:''},
+      {name:'volume',type:'NUMERIC(30,8)',key:''}
+    ],
+    trades: [
+      {name:'id',type:'BIGSERIAL',key:'PK'},
+      {name:'bot_id',type:'VARCHAR(50)',key:'IDX'},
+      {name:'symbol',type:'VARCHAR(20)',key:'IDX'},
+      {name:'side',type:"ENUM('buy','sell')",key:''},
+      {name:'price',type:'NUMERIC(20,8)',key:''},
+      {name:'quantity',type:'NUMERIC(20,8)',key:''},
+      {name:'fee',type:'NUMERIC(20,8)',key:''},
+      {name:'pnl',type:'NUMERIC(20,8)',key:''},
+      {name:'created_at',type:'TIMESTAMPTZ',key:'IDX'}
+    ],
+    signals: [
+      {name:'id',type:'BIGSERIAL',key:'PK'},
+      {name:'strategy',type:'VARCHAR(50)',key:'IDX'},
+      {name:'symbol',type:'VARCHAR(20)',key:''},
+      {name:'signal',type:"ENUM('BUY','SELL','HOLD')",key:''},
+      {name:'confidence',type:'NUMERIC(5,4)',key:''},
+      {name:'params',type:'JSONB',key:''},
+      {name:'timestamp',type:'TIMESTAMPTZ',key:'IDX'}
+    ],
+    portfolio: [
+      {name:'id',type:'BIGSERIAL',key:'PK'},
+      {name:'bot_id',type:'VARCHAR(50)',key:'IDX'},
+      {name:'cash',type:'NUMERIC(20,8)',key:''},
+      {name:'total_value',type:'NUMERIC(20,8)',key:''},
+      {name:'positions',type:'JSONB',key:''},
+      {name:'drawdown',type:'NUMERIC(8,4)',key:''},
+      {name:'recorded_at',type:'TIMESTAMPTZ',key:'IDX'}
+    ]
+  },
+  mongo: {
+    ohlcv: [
+      {name:'_id',type:'ObjectId',key:'PK'},
+      {name:'symbol',type:'String',key:'IDX'},
+      {name:'timestamp',type:'Date',key:'IDX'},
+      {name:'ohlcv',type:'{ o,h,l,c,v: Number }',key:''},
+      {name:'indicators',type:'{ ma20, rsi, macd: Number }',key:''}
+    ],
+    trades: [
+      {name:'_id',type:'ObjectId',key:'PK'},
+      {name:'botId',type:'String',key:'IDX'},
+      {name:'symbol',type:'String',key:''},
+      {name:'side',type:"'buy'|'sell'",key:''},
+      {name:'entry',type:'{ price, qty, fee }',key:''},
+      {name:'exit',type:'{ price, qty, fee, pnl }',key:''},
+      {name:'tags',type:'[String]',key:''}
+    ],
+    signals: [
+      {name:'_id',type:'ObjectId',key:'PK'},
+      {name:'strategy',type:'String',key:'IDX'},
+      {name:'symbol',type:'String',key:''},
+      {name:'signal',type:"'BUY'|'SELL'|'HOLD'",key:''},
+      {name:'confidence',type:'Number',key:''},
+      {name:'features',type:'{ [key]: Number }',key:''},
+      {name:'createdAt',type:'Date',key:'IDX'}
+    ],
+    portfolio: [
+      {name:'_id',type:'ObjectId',key:'PK'},
+      {name:'botId',type:'String',key:'IDX'},
+      {name:'snapshot',type:'Date',key:'IDX'},
+      {name:'cash',type:'Number',key:''},
+      {name:'positions',type:'[{ symbol, qty, avgPrice }]',key:''},
+      {name:'metrics',type:'{ sharpe, drawdown, pnl }',key:''}
+    ]
+  }
+};
+
+const CODES = {
+  pg: {
+    insert: {
+      ohlcv:`<span class="kw">import</span> psycopg2\n<span class="kw">from</span> psycopg2.extras <span class="kw">import</span> execute_values\n\nconn = psycopg2.<span class="fn">connect</span>(<span class="str">"host=localhost dbname=trading user=bot"</span>)\ncur = conn.<span class="fn">cursor</span>()\n\n<span class="cm"># Bulk insert - mucho más rápido que INSERT one-by-one</span>\nrecords = [(symbol, ts, o, h, l, c, v) <span class="kw">for</span> candle <span class="kw">in</span> ohlcv_data]\n<span class="fn">execute_values</span>(cur,\n    <span class="str">"""INSERT INTO ohlcv_data (symbol, timestamp, open, high, low, close, volume)\n       VALUES %s ON CONFLICT DO NOTHING"""</span>,\n    records, page_size=<span class="num">1000</span>)\nconn.<span class="fn">commit</span>()`,
+      trades:`cur.<span class="fn">execute</span>(<span class="str">"""\n    INSERT INTO trade_history (bot_id, symbol, side, price, quantity, fee, pnl)\n    VALUES (%s, %s, %s, %s, %s, %s, %s)\n    RETURNING id\n"""</span>, (bot_id, symbol, side, price, qty, fee, pnl))\ntrade_id = cur.<span class="fn">fetchone</span>()[<span class="num">0</span>]\nconn.<span class="fn">commit</span>()`,
+      signals:`cur.<span class="fn">execute</span>(<span class="str">"""\n    INSERT INTO trading_signals (strategy, symbol, signal, confidence, params)\n    VALUES (%s, %s, %s, %s, %s::jsonb)\n"""</span>, (strategy, symbol, signal, confidence, json.<span class="fn">dumps</span>(params)))`
+    },
+    select: {
+      ohlcv:`<span class="cm"># Query con rango de fechas (usa el índice de timestamp)</span>\ncur.<span class="fn">execute</span>(<span class="str">"""\n    SELECT timestamp, open, high, low, close, volume\n    FROM ohlcv_data\n    WHERE symbol = %s\n      AND timestamp BETWEEN %s AND %s\n    ORDER BY timestamp ASC\n"""</span>, (<span class="str">'BTC/USDT'</span>, start_date, end_date))\ndf = pd.<span class="fn">DataFrame</span>(cur.<span class="fn">fetchall</span>(),\n     columns=[<span class="str">'ts'</span>,<span class="str">'o'</span>,<span class="str">'h'</span>,<span class="str">'l'</span>,<span class="str">'c'</span>,<span class="str">'v'</span>])`,
+      trades:`cur.<span class="fn">execute</span>(<span class="str">"""\n    SELECT *, (pnl / price / quantity * 100) AS pnl_pct\n    FROM trade_history\n    WHERE bot_id = %s AND pnl > 0\n    ORDER BY created_at DESC LIMIT 50\n"""</span>, (bot_id,))`
+    },
+    agg: {
+      ohlcv:`<span class="cm"># OHLCV diario → semanal (TimescaleDB time_bucket)</span>\ncur.<span class="fn">execute</span>(<span class="str">"""\n    SELECT\n        time_bucket(<span class="str">'1 week'</span>, timestamp) AS week,\n        FIRST(open, timestamp) AS open,\n        MAX(high) AS high,\n        MIN(low) AS low,\n        LAST(close, timestamp) AS close,\n        SUM(volume) AS volume\n    FROM ohlcv_data\n    WHERE symbol = %s\n    GROUP BY week ORDER BY week\n"""</span>, (<span class="str">'BTC/USDT'</span>,))`
+    },
+    index: {
+      ohlcv:`<span class="cm"># Índices críticos para rendimiento</span>\ncur.<span class="fn">execute</span>(<span class="str">"""\n    CREATE INDEX CONCURRENTLY idx_ohlcv_sym_ts\n    ON ohlcv_data (symbol, timestamp DESC);\n\n    <span class="cm">-- TimescaleDB hypertable (particionado por tiempo)</span>\n    SELECT create_hypertable(<span class="str">'ohlcv_data'</span>, <span class="str">'timestamp'</span>,\n        chunk_time_interval => INTERVAL <span class="str">'1 day'</span>);\n"""</span>)`
+    }
+  },
+  mongo: {
+    insert: {
+      ohlcv:`<span class="kw">from</span> pymongo <span class="kw">import</span> MongoClient\n\nclient = <span class="fn">MongoClient</span>(<span class="str">'mongodb://localhost:27017'</span>)\ndb = client[<span class="str">'trading'</span>]\ncollection = db[<span class="str">'ohlcv'</span>]\n\n<span class="cm"># Bulk insert eficiente</span>\ndocs = [{\n    <span class="str">'symbol'</span>: candle[<span class="str">'symbol'</span>],\n    <span class="str">'timestamp'</span>: candle[<span class="str">'timestamp'</span>],\n    <span class="str">'ohlcv'</span>: {<span class="str">'o'</span>:candle[<span class="str">'open'</span>], <span class="str">'h'</span>:candle[<span class="str">'high'</span>],\n               <span class="str">'l'</span>:candle[<span class="str">'low'</span>], <span class="str">'c'</span>:candle[<span class="str">'close'</span>]}\n} <span class="kw">for</span> candle <span class="kw">in</span> raw_data]\n\ncollection.<span class="fn">insert_many</span>(docs, ordered=<span class="kw">False</span>)`,
+      signals:`collection.<span class="fn">insert_one</span>({\n    <span class="str">'strategy'</span>: <span class="str">'ma_cross'</span>,\n    <span class="str">'symbol'</span>: <span class="str">'BTC/USDT'</span>,\n    <span class="str">'signal'</span>: <span class="str">'BUY'</span>,\n    <span class="str">'confidence'</span>: <span class="num">0.78</span>,\n    <span class="str">'features'</span>: {<span class="str">'rsi'</span>: <span class="num">28.5</span>, <span class="str">'macd'</span>: <span class="num">-0.002</span>},\n    <span class="str">'createdAt'</span>: datetime.<span class="fn">utcnow</span>()\n})`
+    },
+    select: {
+      ohlcv:`<span class="cm"># Query con rango de fechas</span>\nresults = collection.<span class="fn">find</span>({\n    <span class="str">'symbol'</span>: <span class="str">'BTC/USDT'</span>,\n    <span class="str">'timestamp'</span>: {<span class="str">'$gte'</span>: start, <span class="str">'$lte'</span>: end}\n}).sort(<span class="str">'timestamp'</span>, <span class="num">1</span>)\ndf = pd.<span class="fn">DataFrame</span>(results)`,
+      signals:`<span class="cm"># Buscar señales BUY con alta confianza</span>\nresults = collection.<span class="fn">find</span>({\n    <span class="str">'signal'</span>: <span class="str">'BUY'</span>,\n    <span class="str">'confidence'</span>: {<span class="str">'$gte'</span>: <span class="num">0.7</span>}\n}).sort(<span class="str">'createdAt'</span>, -<span class="num">1</span>).limit(<span class="num">10</span>)`
+    },
+    agg: {
+      ohlcv:`<span class="cm"># Aggregation pipeline — OHLCV semanal</span>\npipeline = [\n    {<span class="str">'$match'</span>: {<span class="str">'symbol'</span>: <span class="str">'BTC/USDT'</span>}},\n    {<span class="str">'$group'</span>: {\n        <span class="str">'_id'</span>: {<span class="str">'$week'</span>: <span class="str">'$timestamp'</span>},\n        <span class="str">'open'</span>: {<span class="str">'$first'</span>: <span class="str">'$ohlcv.o'</span>},\n        <span class="str">'high'</span>: {<span class="str">'$max'</span>: <span class="str">'$ohlcv.h'</span>},\n        <span class="str">'low'</span>: {<span class="str">'$min'</span>: <span class="str">'$ohlcv.l'</span>},\n        <span class="str">'close'</span>: {<span class="str">'$last'</span>: <span class="str">'$ohlcv.c'</span>}\n    }}\n]\nlist(collection.<span class="fn">aggregate</span>(pipeline))`
+    },
+    index: {
+      ohlcv:`<span class="cm"># Índice compuesto para queries de trading</span>\ncollection.<span class="fn">create_index</span>([\n    (<span class="str">'symbol'</span>, pymongo.ASCENDING),\n    (<span class="str">'timestamp'</span>, pymongo.DESCENDING)\n], background=<span class="kw">True</span>, unique=<span class="kw">False</span>)\n\n<span class="cm"># TTL index para auto-expirar datos viejos</span>\ncollection.<span class="fn">create_index</span>(\n    <span class="str">'timestamp'</span>, expireAfterSeconds=<span class="num">7776000</span>  <span class="cm"># 90 días</span>\n)`
+    }
+  }
+};
+
+function setDB(db) {
+  dbType = db;
+  ['pg','mongo'].forEach(t => document.getElementById('tab-'+t).classList.toggle('active', t===db));
+  updateSchema();
+}
+
+function updateSchema() {
+  const tbl = document.getElementById('table').value;
+  const schema = SCHEMAS[dbType][tbl] || [];
+  document.getElementById('schemaTitle').innerHTML = `<i class="fas fa-table"></i> Schema — ${dbType==='pg'?'🐘 PostgreSQL':'🍃 MongoDB'} → ${tbl}`;
+  document.getElementById('schemaView').innerHTML = schema.map(f=>`
+    <div class="schema-field">
+      <span class="fname">${f.name}</span>
+      <span class="ftype">${f.type}</span>
+      ${f.key?`<span class="fkey">${f.key}</span>`:''}
+    </div>`).join('');
+}
+
+let logLines = 0;
+function log(msg, cls='log-info') {
+  const l = document.getElementById('simLog');
+  const p = document.createElement('p');
+  p.className = cls;
+  p.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+  l.prepend(p);
+  logLines++;
+  ops++;
+  document.getElementById('sOps').textContent = ops;
+}
+
+function runOperation() {
+  const tbl = document.getElementById('table').value;
+  const op  = document.getElementById('operation').value;
+  const codeMap = CODES[dbType]?.[op]?.[tbl] || CODES[dbType]?.[op]?.ohlcv;
+  document.getElementById('codeBox').innerHTML = codeMap || `<span class="cm"># Ver código para ${dbType}/${op}/${tbl}</span>`;
+
+  const t0 = Date.now();
+  setTimeout(() => {
+    const ms = Date.now() - t0 + Math.round(Math.random()*12);
+    document.getElementById('sMs').textContent = ms + 'ms';
+    if (op==='insert') {
+      const n = Math.round(50+Math.random()*200);
+      rows += n;
+      document.getElementById('sRows').textContent = rows;
+      log(`✅ INSERT OK — ${n} registros en ${ms}ms`, 'log-ok');
+    } else if (op==='select') {
+      log(`✅ SELECT devolvió ${Math.round(100+Math.random()*500)} filas en ${ms}ms`, 'log-ok');
+    } else if (op==='agg') {
+      log(`✅ Agregación completada — 52 buckets semanales en ${ms}ms`, 'log-ok');
+    } else if (op==='index') {
+      log(`✅ Índice creado en ${tbl}. Queries ~100x más rápidas.`, 'log-ok');
+    }
+    document.getElementById('feedbackMsg').innerHTML = `🗄️ <strong>${op}</strong> sobre <strong>${tbl}</strong> completado en ${ms}ms. ${op==='index'?'Los índices son <strong>críticos</strong> para backtests sobre millones de velas.':'Revisa el código Python arriba.'}`;
+    checkCompletion();
+  }, 200 + Math.random()*300);
+}
+
+function quickQuery(type) {
+  if (type==='bulk') {
+    rows += 1000;
+    document.getElementById('sRows').textContent = rows;
+    log('✅ Bulk INSERT 1000 velas OHLCV — 45ms (execute_values)', 'log-ok');
+  } else if (type==='range') {
+    log('✅ SELECT 365 días BTC/USDT — 12ms (índice: sym+ts)', 'log-ok');
+  } else if (type==='agg') {
+    log('✅ Agregación semanal OHLCV (TimescaleDB time_bucket) — 8ms', 'log-ok');
+  } else if (type==='index') {
+    log('ℹ️ Índices activos: idx_ohlcv_sym_ts, idx_trades_bot, idx_signals_strategy', 'log-info');
+  }
+  ops++;
+  document.getElementById('sOps').textContent = ops;
+  checkCompletion();
+}
+
+function checkCompletion() {
+  if (ops >= 5 && !localStorage.getItem(STORAGE_KEY)) {
+    localStorage.setItem(STORAGE_KEY, 'true');
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').innerHTML += '<br><strong style="color:#ffc800">🎓 ¡Insignia Database Architect desbloqueada!</strong>';
+  }
+}
+
+updateSchema();
+if (localStorage.getItem(STORAGE_KEY)) document.getElementById('insigniaArea').classList.remove('hidden');
+</script>
+</body>
+</html>

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Bot Trader | Quiz Final — ¡Demuestra tu Poder!</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{background:linear-gradient(145deg,#0d001e 0%,#1a0030 100%);font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem;}
+    .container{max-width:850px;width:100%;background:rgba(12,0,25,.85);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(255,200,0,.3);box-shadow:0 25px 45px rgba(0,0,0,.7);overflow:hidden;}
+    .hero{background:linear-gradient(95deg,#0d001a,#160030);padding:1.8rem 2rem;text-align:center;border-bottom:2px solid gold;}
+    .hero h1{font-family:'Press Start 2P',monospace;font-size:1.3rem;line-height:1.5;background:linear-gradient(135deg,#fff9cc,#ffd700,#ff9900);-webkit-background-clip:text;background-clip:text;color:transparent;}
+    .hero-sub{margin-top:.5rem;font-size:.9rem;color:#ccaa44;}
+    .scoreboard{display:flex;justify-content:center;gap:1.5rem;flex-wrap:wrap;padding:1rem 2rem .5rem;background:#1a001a44;}
+    .score-chip{background:#1a001a;border:1px solid #443300;padding:.5rem 1.2rem;border-radius:2rem;text-align:center;}
+    .score-val{font-family:'Press Start 2P',monospace;font-size:1rem;color:gold;}
+    .score-lbl{font-size:.65rem;color:#aa8844;margin-top:.2rem;}
+    .timer-bar{height:6px;background:#220000;margin:0 2rem;border-radius:3px;overflow:hidden;}
+    .timer-fill{height:100%;background:linear-gradient(90deg,#00ff88,#ffaa00,#ff3333);border-radius:3px;transition:width .5s linear;}
+    .quiz-area{padding:1.5rem 2rem;}
+    .qnum{font-family:'Press Start 2P',monospace;font-size:.65rem;color:#aa8844;margin-bottom:.5rem;}
+    .question{font-size:1.1rem;font-weight:700;line-height:1.5;margin-bottom:1rem;color:#fff9ee;}
+    .options{display:flex;flex-direction:column;gap:.6rem;}
+    .opt{background:#1a001a;border:2px solid #330044;border-radius:1.2rem;padding:.8rem 1.2rem;cursor:pointer;font-size:.9rem;transition:.2s;user-select:none;line-height:1.4;}
+    .opt:hover:not(.locked){background:#2a0033;border-color:#885500;}
+    .opt.correct{background:#0a2f0a;border-color:#00cc55;color:#00ff88;}
+    .opt.wrong{background:#2f0a0a;border-color:#cc2222;color:#ff6666;}
+    .opt.locked{cursor:not-allowed;}
+    .explanation{background:#1a001a;border-left:4px solid gold;padding:.8rem 1rem;border-radius:.8rem;margin-top:.8rem;font-size:.85rem;line-height:1.5;display:none;}
+    .explanation.show{display:block;}
+    .btn-next{background:linear-gradient(95deg,#ffd700,#ff9900);border:none;padding:.75rem 2rem;font-weight:800;border-radius:2rem;cursor:pointer;color:#1a0000;font-size:.9rem;margin-top:1rem;display:none;}
+    .btn-next.show{display:inline-block;}
+    #resultScreen{display:none;text-align:center;padding:2rem;}
+    .result-rank{font-family:'Press Start 2P',monospace;font-size:1.8rem;margin-bottom:.5rem;}
+    .result-score{font-size:1.2rem;margin-bottom:.5rem;color:#ffd700;}
+    .result-detail{font-size:.85rem;color:#aa8844;line-height:1.6;margin-bottom:1rem;}
+    .stars{font-size:2rem;margin-bottom:.5rem;}
+    .leaderboard{background:#0d001a;border-radius:1.5rem;padding:1rem;margin:1rem auto;max-width:400px;border:1px solid gold;}
+    .lb-row{display:flex;justify-content:space-between;padding:.3rem .5rem;font-size:.82rem;border-bottom:1px solid #220022;}
+    .lb-row.you{background:#1a0033;color:gold;}
+    .btn-redo{background:#1a0033;border:1px solid #ffd700;padding:.7rem 1.5rem;border-radius:2rem;cursor:pointer;color:#ffd700;font-size:.85rem;margin-top:.5rem;}
+    .btn-next-final{background:linear-gradient(95deg,#ffd700,#ff9900);border:none;padding:.8rem 2rem;font-weight:800;border-radius:2rem;cursor:pointer;color:#1a0000;font-size:.95rem;margin-top:.5rem;}
+    .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.5rem 2rem;}
+    .nav-link{background:#2c3e66;padding:.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:.5rem;transition:.2s;}
+    .nav-link:hover{transform:translateY(-2px);}
+    .nav-link.next{background:linear-gradient(95deg,#ffd700,#ff9900);color:#1a0000;}
+    .nav-link.menu{background:#1a2a4a;border:1px solid gold;}
+    footer{text-align:center;padding:1rem;font-size:.75rem;border-top:1px solid #1a001a;}
+    @media(max-width:600px){.hero h1{font-size:.95rem;}.score-val{font-size:.8rem;}}
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+<div class="container">
+  <div class="hero">
+    <h1>⚡ QUIZ SHOW ⚡<br>BOT TRADER FINAL</h1>
+    <p class="hero-sub">15 preguntas · 20 segundos cada una · 80% para ganar la corona</p>
+  </div>
+  <div class="scoreboard">
+    <div class="score-chip"><div class="score-val" id="scoreVal">0</div><div class="score-lbl">Puntos</div></div>
+    <div class="score-chip"><div class="score-val" id="qNumVal">1/15</div><div class="score-lbl">Pregunta</div></div>
+    <div class="score-chip"><div class="score-val" id="streakVal">0</div><div class="score-lbl">Racha 🔥</div></div>
+    <div class="score-chip"><div class="score-val" id="timerVal">20</div><div class="score-lbl">Segundos</div></div>
+  </div>
+  <div class="timer-bar"><div class="timer-fill" id="timerFill" style="width:100%"></div></div>
+
+  <div class="quiz-area" id="quizArea">
+    <div class="qnum" id="qNum">PREGUNTA 1 DE 15</div>
+    <div class="question" id="questionText"></div>
+    <div class="options" id="optionsArea"></div>
+    <div class="explanation" id="explanationBox"></div>
+    <button class="btn-next" id="btnNext" onclick="nextQuestion()">Siguiente →</button>
+  </div>
+
+  <div id="resultScreen">
+    <div class="stars" id="starsArea"></div>
+    <div class="result-rank" id="resultRank"></div>
+    <div class="result-score" id="resultScore"></div>
+    <div class="result-detail" id="resultDetail"></div>
+    <div class="leaderboard" id="leaderboard"></div>
+    <div style="display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap;margin-top:.5rem;">
+      <button class="btn-redo" onclick="restartQuiz()"><i class="fas fa-redo"></i> Repetir Quiz</button>
+      <a href="12-certificado.html"><button class="btn-next-final">🏆 Obtener Certificado</button></a>
+    </div>
+  </div>
+
+  <div class="nav-links" id="navLinks">
+    <a href="10-construye-tu-bot.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+    <a href="12-certificado.html" class="nav-link next">Certificado <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Bot Trader Adventure · Quiz Final · 15 preguntas sobre Trading Algorítmico y Python</footer>
+</div>
+<script>
+const STORAGE_KEY='tbot_quiz11';
+const QUESTIONS=[
+  {q:"¿Qué es el 'overfitting' en Machine Learning para trading?",opts:["El modelo aprende los datos históricos tan bien que falla con datos nuevos","El modelo es demasiado simple y no aprende patrones","El modelo tarda demasiado en entrenar","El modelo usa demasiada memoria RAM"],correct:0,exp:"El overfitting ocurre cuando el modelo memoriza el ruido del pasado en lugar de aprender patrones generalizables. Un modelo sobreentrenado con curva de equidad perfecta en backtest y pésima en live trading es la señal clásica. Solución: cross-validation y regularización."},
+  {q:"¿Qué significa un Sharpe Ratio de 2.5?",opts:["La estrategia genera 2.5x su volatilidad en retornos ajustados al riesgo","La estrategia pierde 2.5 veces más de lo que gana","El drawdown máximo es 2.5%","Se hacen 2.5 trades por semana"],correct:0,exp:"Sharpe = (Retorno - Tasa libre de riesgo) / Desviación estándar de retornos. Un Sharpe > 1 es bueno, > 2 es excelente, > 3 es excepcional. Desarrollado por William Sharpe en 1966, es la métrica estándar de riesgo-retorno institucional."},
+  {q:"¿Para qué sirve la librería 'ccxt' en Python?",opts:["Conectarse a más de 100 exchanges de criptomonedas con una API unificada","Calcular indicadores técnicos","Hacer backtesting de estrategias","Visualizar gráficos de candlestick"],correct:0,exp:"ccxt (CryptoCurrency eXchange Trading) es la librería estándar para conectar Python con exchanges como Binance, Coinbase, Kraken, etc. Ofrece una API unificada: fetch_ohlcv(), create_order(), fetch_balance() funcionan igual en todos los exchanges."},
+  {q:"¿Cuál es la fórmula del Kelly Criterion?",opts:["f* = (p·b - q) / b","f* = Retorno / Volatilidad","f* = Capital · Win Rate","f* = (Ganancias - Pérdidas) / Capital"],correct:0,exp:"Kelly: f* = (p·b - q) / b donde p=probabilidad de ganar, q=1-p, b=ratio ganancia/pérdida. Un Kelly positivo indica ventaja estadística. Usa Half-Kelly en práctica para reducir la volatilidad del portafolio. Inventado por J.L. Kelly Jr. en 1956."},
+  {q:"¿Qué es el 'data snooping bias' en backtesting?",opts:["Optimizar una estrategia tanto con los mismos datos que usarás para validarla que los resultados son ilusorios","No tener suficientes datos para el backtest","Usar datos en tiempo real en lugar de históricos","Calcular mal el drawdown"],correct:0,exp:"El data snooping (o look-ahead bias) es el error de usar los mismos datos para desarrollar Y validar una estrategia. El modelo 've el futuro' porque fue optimizado con datos que incluyen el período de prueba. Solución: walk-forward testing con datos out-of-sample."},
+  {q:"¿Qué indica un RSI de 25?",opts:["El activo está sobrevendido (posible señal de compra en estrategias mean-reversion)","El activo está sobrecomprado (señal de venta)","El RSI es neutro","El volumen es muy bajo"],correct:0,exp:"RSI < 30 = zona de sobreventa. RSI > 70 = zona de sobrecompra. Desarrollado por J. Welles Wilder Jr. en 1978 (New Concepts in Technical Trading Systems). En estrategias de mean reversion, RSI < 30 genera señal de compra esperando el rebote."},
+  {q:"¿Qué hace 'df.rolling(20).mean()' en pandas?",opts:["Calcula la media móvil de 20 períodos","Filtra las últimas 20 filas del DataFrame","Elimina las filas con valores nulos","Calcula la varianza de 20 períodos"],correct:0,exp:"rolling(window) crea una 'ventana deslizante' de N períodos. .mean() calcula el promedio dentro de esa ventana. Esto genera la Media Móvil Simple (SMA). Para MA exponencial se usa .ewm(span=N).mean(). Referencia: McKinney (2017) 'Python for Data Analysis'."},
+  {q:"¿Qué es el 'Max Drawdown' de una estrategia?",opts:["La mayor caída porcentual desde un pico de equity hasta el siguiente valle","El número máximo de trades perdedores consecutivos","La pérdida máxima en un solo trade","El porcentaje de trades perdedores"],correct:0,exp:"Max Drawdown = max(equity) - min(equity posterior) / max(equity). Mide el peor escenario que un inversor real habría experimentado. Un DD > 30% hace que la mayoría de inversores abandone la estrategia. Calmar Ratio = Retorno Anual / |MaxDD| mide eficiencia ajustada."},
+  {q:"¿Cuál es la diferencia entre 'paper trading' y 'live trading'?",opts:["Paper trading simula operaciones con dinero virtual; live trading usa dinero real","Paper trading es más rápido que live trading","Paper trading solo funciona con criptomonedas","No hay diferencia práctica entre ellos"],correct:0,exp:"Paper trading ('trading en papel') es la práctica de simular operaciones sin dinero real. Es esencial antes del live trading para detectar bugs, evaluar el desempeño real y ganar confianza. NUNCA lances un bot en live sin al menos 30 días de paper trading exitoso."},
+  {q:"¿Qué librerías de Python son más usadas para indicadores técnicos?",opts:["pandas-ta y TA-Lib","NumPy y Matplotlib","scikit-learn y TensorFlow","ccxt y alpaca-trade-api"],correct:0,exp:"pandas-ta es la librería moderna para indicadores técnicos en Python. TA-Lib es la clásica (basada en C). Ambas calculan RSI, MACD, Bollinger Bands, ATR, y decenas más. pandas-ta es más fácil de usar: df.ta.rsi() o df.ta.macd() directamente sobre DataFrames."},
+  {q:"En gestión de riesgo, ¿qué significa '1% rule'?",opts:["Nunca arriesgar más del 1% del capital total en un solo trade","Obtener 1% de retorno diario","Usar solo el 1% del tiempo del día para trading","El stop loss siempre es 1% del precio de entrada"],correct:0,exp:"La '1% rule' (Van Tharp, 2006) establece que el riesgo máximo por trade es 1% del capital total. Si tienes $10,000, el máximo a perder en una posición es $100. Esto garantiza que incluso una racha de 20 pérdidas seguidas solo te costa 18% del capital, no la quiebra."},
+  {q:"¿Qué es el 'Profit Factor' en backtesting?",opts:["Ganancias brutas totales dividido entre pérdidas brutas totales","Porcentaje de trades ganadores","Retorno total dividido entre capital inicial","Número de trades ganadores sobre perdedores"],correct:0,exp:"Profit Factor = Suma(ganancias) / Suma(pérdidas). Un PF > 1 significa que la estrategia es rentable. PF > 1.5 es bueno, PF > 2 es excelente. Una estrategia con PF < 1 pierde dinero sistemáticamente. Úsalo junto con el Sharpe Ratio para evaluar calidad."},
+  {q:"¿Para qué sirve 'yfinance' en Python?",opts:["Descargar datos históricos de acciones, ETFs y criptomonedas de Yahoo Finance gratis","Calcular indicadores técnicos automáticamente","Ejecutar órdenes en bolsa","Construir interfaces gráficas de trading"],correct:0,exp:"yfinance es la librería no-oficial que accede a la API de Yahoo Finance. yf.download('AAPL', period='5y', interval='1d') descarga 5 años de datos diarios de Apple gratis. También soporta BTC-USD, ETH-USD, SPY, etc. No requiere API key."},
+  {q:"¿Qué es una 'mean reversion' strategy?",opts:["Apostar a que los precios que se alejaron de su media histórica eventualmente regresarán a ella","Seguir la tendencia del mercado al alza","Comprar en rupturas de máximos históricos","Mantener posiciones a largo plazo sin importar el precio"],correct:0,exp:"Mean reversion asume que los precios oscilan alrededor de un valor promedio y se 'revertierten' cuando se alejan demasiado. RSI < 30 en una acción de bajo riesgo es una señal clásica de mean reversion. Opuesto al trend following (momentum). Funciona mejor en mercados laterales."},
+  {q:"¿Cuánto tiempo deberías hacer paper trading antes de ir live con tu bot?",opts:["Al menos 30 días para capturar diferentes condiciones de mercado","Solo 1-2 días son suficientes si el backtest es bueno","No es necesario si el backtest muestra buenas métricas","1 semana es más que suficiente"],correct:0,exp:"30 días mínimo es el estándar profesional. Esto permite que el bot experimente diferentes fases del mercado (tendencia, lateral, volátil), múltiples eventos macroeconómicos y detectar bugs que no aparecieron en backtesting. Un buen backtest NO garantiza buen live trading."}
+];
+
+const STORAGE_LB='tbot_leaderboard';
+let currentQ=0, score=0, streak=0, maxStreak=0, answered=false, timerVal=20, timerInterval=null;
+let scores=[];
+
+function saveScore(){
+  const name=localStorage.getItem('tbot_playerName')||'Anónimo';
+  const lb=JSON.parse(localStorage.getItem(STORAGE_LB)||'[]');
+  lb.push({name,score,date:new Date().toLocaleDateString()});
+  lb.sort((a,b)=>b.score-a.score);
+  localStorage.setItem(STORAGE_LB,JSON.stringify(lb.slice(0,10)));
+  return lb;
+}
+
+function renderQ(){
+  clearInterval(timerInterval);
+  const q=QUESTIONS[currentQ];
+  document.getElementById('qNum').textContent=`PREGUNTA ${currentQ+1} DE ${QUESTIONS.length}`;
+  document.getElementById('qNumVal').textContent=`${currentQ+1}/${QUESTIONS.length}`;
+  document.getElementById('questionText').textContent=q.q;
+  document.getElementById('explanationBox').className='explanation';
+  document.getElementById('explanationBox').textContent='';
+  document.getElementById('btnNext').className='btn-next';
+  answered=false;
+
+  const opts=q.opts.map((o,i)=>`<div class="opt" data-idx="${i}" onclick="chooseOpt(${i})">${String.fromCharCode(65+i)}. ${o}</div>`).join('');
+  document.getElementById('optionsArea').innerHTML=opts;
+
+  timerVal=20;
+  document.getElementById('timerVal').textContent=timerVal;
+  document.getElementById('timerFill').style.width='100%';
+  timerInterval=setInterval(()=>{
+    timerVal--;
+    document.getElementById('timerVal').textContent=timerVal;
+    document.getElementById('timerFill').style.width=(timerVal/20*100)+'%';
+    if(timerVal<=0){clearInterval(timerInterval);if(!answered)timeOut();}
+  },1000);
+}
+
+function timeOut(){
+  answered=true;streak=0;document.getElementById('streakVal').textContent=streak;
+  document.querySelectorAll('.opt').forEach(o=>o.classList.add('locked'));
+  document.querySelectorAll('.opt')[QUESTIONS[currentQ].correct].classList.add('correct');
+  document.getElementById('explanationBox').textContent='⏰ Tiempo agotado. '+QUESTIONS[currentQ].exp;
+  document.getElementById('explanationBox').className='explanation show';
+  document.getElementById('btnNext').className='btn-next show';
+}
+
+function chooseOpt(idx){
+  if(answered)return;
+  answered=true;clearInterval(timerInterval);
+  const q=QUESTIONS[currentQ];
+  document.querySelectorAll('.opt').forEach(o=>o.classList.add('locked'));
+  const opts=document.querySelectorAll('.opt');
+  if(idx===q.correct){
+    opts[idx].classList.add('correct');
+    const bonus=Math.ceil(timerVal/4);
+    const pts=100+bonus*10;
+    score+=pts;streak++;maxStreak=Math.max(maxStreak,streak);
+    document.getElementById('scoreVal').textContent=score;
+    document.getElementById('streakVal').textContent=streak;
+    document.getElementById('explanationBox').textContent=`✅ ¡Correcto! +${pts} puntos (+${bonus*10} por velocidad). ${q.exp}`;
+  } else {
+    opts[idx].classList.add('wrong');
+    opts[q.correct].classList.add('correct');
+    streak=0;document.getElementById('streakVal').textContent=0;
+    document.getElementById('explanationBox').textContent=`❌ Incorrecto. La respuesta correcta es: ${String.fromCharCode(65+q.correct)}. ${q.exp}`;
+  }
+  document.getElementById('explanationBox').className='explanation show';
+  document.getElementById('btnNext').className='btn-next show';
+}
+
+function nextQuestion(){
+  currentQ++;
+  if(currentQ>=QUESTIONS.length){showResults();return;}
+  renderQ();
+}
+
+function showResults(){
+  clearInterval(timerInterval);
+  document.getElementById('quizArea').style.display='none';
+  document.getElementById('resultScreen').style.display='block';
+  document.getElementById('navLinks').style.display='none';
+  const pct=score/(QUESTIONS.length*110)*100;
+  const rank=score>=1400?'🏆 MASTER QUANT':score>=1000?'⭐ ALGO TRADER PRO':score>=600?'📊 ANALIST JR':'🎯 APRENDIZ';
+  const stars=score>=1400?'⭐⭐⭐⭐⭐':score>=1000?'⭐⭐⭐⭐':score>=600?'⭐⭐⭐':'⭐⭐';
+  document.getElementById('starsArea').textContent=stars;
+  document.getElementById('resultRank').textContent=rank;
+  document.getElementById('resultScore').textContent=`${score} puntos · Racha máxima: ${maxStreak} 🔥`;
+  document.getElementById('resultDetail').innerHTML=`Completaste las 15 preguntas sobre Trading Algorítmico.<br>${score>=1100?'¡Resultados excepcionales! Estás listo para el certificado.':score>=600?'¡Buen trabajo! Repasa los módulos que fallaste antes de certificarte.':'Repasa los módulos del curso y vuelve a intentarlo.'}`;
+
+  const lb=saveScore();
+  localStorage.setItem(STORAGE_KEY,'true');
+
+  const myPos=lb.findIndex(e=>e.score===score);
+  document.getElementById('leaderboard').innerHTML='<div style="font-weight:700;color:gold;margin-bottom:.5rem;font-size:.85rem;">🏆 RANKING LOCAL</div>'+
+    lb.slice(0,5).map((e,i)=>`<div class="lb-row${e.score===score&&i===myPos?' you':''}">`+
+      `<span>#${i+1} ${i===0?'👑':''} ${e.name}</span><span>${e.score} pts</span><span>${e.date}</span></div>`).join('');
+}
+
+function restartQuiz(){
+  currentQ=0;score=0;streak=0;maxStreak=0;answered=false;
+  document.getElementById('scoreVal').textContent=0;
+  document.getElementById('streakVal').textContent=0;
+  document.getElementById('quizArea').style.display='block';
+  document.getElementById('resultScreen').style.display='none';
+  document.getElementById('navLinks').style.display='flex';
+  renderQ();
+}
+
+renderQ();
+if(localStorage.getItem(STORAGE_KEY)==='true'){
+  document.getElementById('navLinks').innerHTML+=`<div style="text-align:center;color:gold;font-size:.8rem;padding:.5rem;">✅ Quiz completado. ¡Obtén tu certificado!</div>`;
+}
+</script>
+  <script src="../../assets/js/cookie-consent.js"></script>
+</body>
+</html>
+
+
+

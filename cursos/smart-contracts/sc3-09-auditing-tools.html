@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Auditing Tools | Smart Contracts DeFi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700;14..32,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    body{background:linear-gradient(145deg,#140004,#200008);font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:2rem 1rem}
+    .container{max-width:1300px;width:100%;background:rgba(20,0,4,.9);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(255,40,80,.2);box-shadow:0 25px 55px rgba(0,0,0,.65);overflow:hidden}
+    .hero{background:linear-gradient(95deg,#140004,#200008);padding:1.8rem 2rem;text-align:center;border-bottom:2px solid #ff2850}
+    .hero h1{font-size:1.9rem;font-weight:800;background:linear-gradient(135deg,#ffccdd,#ff8899,#ff2850);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .hero p{margin-top:.5rem;font-size:.95rem;color:#660022}
+    .chips{display:flex;justify-content:center;gap:.6rem;flex-wrap:wrap;margin-top:.7rem}
+    .chip{background:rgba(255,40,80,.1);border:1px solid rgba(255,40,80,.3);color:#660022;font-size:.72rem;padding:.25rem .8rem;border-radius:2rem}
+    .week-badge{display:inline-block;background:rgba(255,40,80,.15);border:1px solid #ff2850;color:#ff2850;font-size:.75rem;font-weight:700;padding:.3rem 1rem;border-radius:2rem;margin-top:.5rem}
+    .analogy{background:#140004cc;margin:1.4rem 2rem;padding:1.1rem 1.7rem;border-radius:2rem;border-left:7px solid #ff2850;font-size:.9rem;line-height:1.65}
+    .analogy strong{color:#ff8899}
+    .tabs{display:flex;gap:.4rem;padding:.8rem 2rem 0;flex-wrap:wrap}
+    .tab{background:#180006;border:1px solid rgba(255,40,80,.2);color:#660022;padding:.45rem 1.1rem;border-radius:2rem 2rem 0 0;cursor:pointer;font-size:.82rem;font-weight:600;transition:.15s}
+    .tab.active{background:#200008;border-color:#ff2850;border-bottom:1px solid #200008;color:#ff8899}
+    .tab-content{display:none;padding:0 2rem 1.2rem}
+    .tab-content.active{display:block}
+    .panel{background:#180006cc;border-radius:1.8rem;padding:1.2rem 1.3rem;border:1px solid rgba(255,40,80,.12);margin-top:.8rem}
+    .panel h3{font-size:.88rem;font-weight:700;color:#ff8899;margin-bottom:.7rem}
+    .two-col{display:flex;gap:1rem;flex-wrap:wrap}
+    .col{flex:1;min-width:260px}
+    pre{background:#0c0002;border-radius:1rem;padding:.9rem 1rem;font-family:'JetBrains Mono',monospace;font-size:.71rem;line-height:1.75;overflow-x:auto;color:#ffccdd;border:1px solid rgba(255,40,80,.1);white-space:pre}
+    .kw{color:#ff79c6}.fn{color:#50fa7b}.str{color:#f1fa8c}.num{color:#bd93f9}.cm{color:#6272a4;font-style:italic}.cls{color:#8be9fd}
+    .btn{background:linear-gradient(95deg,#ff2850,#cc0022);border:none;padding:.65rem 1.3rem;font-weight:700;border-radius:2rem;cursor:pointer;color:#fff;font-size:.85rem;transition:.2s;display:inline-flex;align-items:center;gap:.5rem}
+    .btn:hover{transform:translateY(-2px);box-shadow:0 0 18px rgba(255,40,80,.4)}
+    select{background:#0c0002;border:1px solid rgba(255,40,80,.2);color:#eef5ff;padding:.45rem .7rem;border-radius:.75rem;font-size:.82rem;font-family:'Inter',sans-serif;width:100%}
+    .vuln-card{background:#0c0002;border-radius:1rem;padding:.8rem;border-left:4px solid #ff2850;margin:.4rem 0;cursor:pointer;transition:.15s}
+    .vuln-card:hover{border-color:#ff8899;background:#140004}
+    .vuln-card.selected{border-color:#ff8899;background:#1a0008}
+    .vuln-title{font-size:.82rem;font-weight:700;color:#ff8899}
+    .vuln-sev{font-size:.62rem;font-weight:700;padding:.1rem .4rem;border-radius:.4rem;margin-left:.4rem}
+    .sev-crit{background:rgba(255,0,50,.2);color:#ff2850}
+    .sev-high{background:rgba(255,100,0,.15);color:#ff6400}
+    .sev-med{background:rgba(255,200,0,.1);color:#ffcc00}
+    .vuln-desc{font-size:.72rem;color:#660022;margin-top:.2rem;line-height:1.4}
+    .scan-output{background:#030001;border:1px solid rgba(255,40,80,.2);border-radius:1rem;padding:.8rem;font-family:'JetBrains Mono',monospace;font-size:.7rem;line-height:1.8;min-height:120px;max-height:250px;overflow-y:auto}
+    .scan-crit{color:#ff2850}.scan-high{color:#ff6400}.scan-med{color:#ffcc00}.scan-info{color:#8899bb}.scan-ok{color:#50fa7b}
+    .feedback{background:#00000088;margin:0 1.8rem 1rem;padding:.85rem 1.2rem;border-radius:1.5rem;text-align:center;border-left:4px solid #ff2850;font-size:.88rem;line-height:1.55}
+    .insignia{text-align:center;background:#140004;border-radius:2rem;margin:0 1.8rem 1.5rem;padding:1rem;border:1px dashed gold}
+    .insignia i{font-size:2.4rem;color:gold}
+    .hidden{display:none}
+    .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.4rem 2rem}
+    .nav-link{background:#180006;padding:.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:.5rem;font-size:.88rem;transition:.2s}
+    .nav-link:hover{transform:translateY(-2px)}
+    .nav-link.next{background:linear-gradient(95deg,#f0a500,#ff6a00);color:#1e1a0c}
+    footer{text-align:center;padding:1rem;font-size:.72rem;border-top:1px solid #140004;color:#660022}
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+<nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+<div class="container">
+  <div class="hero">
+    <h1>🔍 SECURITY AUDITING: Caza de Vulnerabilidades</h1>
+    <p>Slither, Mythril, Echidna — las herramientas que usan los mejores auditores del mundo</p>
+    <div class="week-badge"><i class="fas fa-calendar-week"></i> Semana 9: Security Auditing</div>
+    <div class="chips"><span class="chip">Reentrancy</span><span class="chip">Integer Overflow</span><span class="chip">Slither</span><span class="chip">Mythril</span><span class="chip">Echidna Fuzzing</span></div>
+  </div>
+  <div class="analogy">
+    <strong>🔍 Auditar = ser el ladrón antes que el ladrón:</strong> Los auditores de smart contracts piensan como atacantes. El <strong>DAO Hack (2016, $60M)</strong>, el <strong>Ronin Bridge hack (2022, $625M)</strong>, el <strong>Poly Network hack (2021, $611M)</strong> — todos eran vulnerabilidades que una buena auditoría habría detectado. <strong>Slither</strong> analiza el AST del código en segundos. <strong>Mythril</strong> hace análisis simbólico buscando rutas de ejecución maliciosas. <strong>Echidna</strong> hace fuzzing de propiedades invariantes. Ninguna herramienta lo detecta todo — necesitas las tres.
+    <div style="margin-top:.5rem;font-size:.78rem;color:#660022"><strong>📚 Refs:</strong> Trail of Bits — Slither/Echidna · ConsenSys Diligence — Mythril · Rekt.news — Top Hacks Database</div>
+  </div>
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('vulns')"><i class="fas fa-bug"></i> Vulnerabilidades</div>
+    <div class="tab" onclick="switchTab('slither')"><i class="fas fa-search"></i> Slither</div>
+    <div class="tab" onclick="switchTab('mythril')"><i class="fas fa-brain"></i> Mythril</div>
+    <div class="tab" onclick="switchTab('echidna')"><i class="fas fa-random"></i> Echidna</div>
+  </div>
+
+  <!-- Vulnerabilidades -->
+  <div class="tab-content active" id="tab-vulns">
+    <div class="panel">
+      <h3><i class="fas fa-skull"></i> Top Vulnerabilidades de Smart Contracts</h3>
+      <div class="two-col">
+        <div class="col" id="vulnList"></div>
+        <div class="col">
+          <div id="vulnDetail">
+            <div style="color:#660022;font-size:.8rem;padding:1rem;text-align:center">Selecciona una vulnerabilidad para ver el ejemplo de código</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slither -->
+  <div class="tab-content" id="tab-slither">
+    <div class="panel">
+      <h3><i class="fas fa-terminal"></i> Slither — Análisis Estático</h3>
+      <div class="two-col">
+        <div class="col">
+          <label>Contrato a analizar</label>
+          <select id="slitherContract">
+            <option value="reentrancy">VulnerableBank.sol (reentrancy)</option>
+            <option value="overflow">UnsafeToken.sol (overflow)</option>
+            <option value="access">NoAccessControl.sol (privilegio)</option>
+            <option value="clean">SafeToken.sol (sin bugs)</option>
+          </select>
+          <button class="btn" style="width:100%;margin-top:.5rem" onclick="runSlither()"><i class="fas fa-search"></i> slither contrato.sol</button>
+          <div style="margin-top:.6rem;font-size:.72rem;color:#660022">Slither analiza el código en segundos sin ejecutarlo. Detecta ~80 tipos de bugs comunes.</div>
+        </div>
+        <div class="col">
+          <div class="scan-output" id="slitherOutput">
+            <span class="scan-info">$ slither --version</span><br>
+            <span class="scan-ok">Slither 0.10.0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mythril -->
+  <div class="tab-content" id="tab-mythril">
+    <div class="panel">
+      <h3><i class="fas fa-brain"></i> Mythril — Análisis Simbólico</h3>
+      <pre><span class="cm"># Mythril analiza rutas de ejecución simbólicamente</span>
+<span class="cm"># Detecta: reentrancy, integer overflow, unprotected selfdestruct</span>
+$ myth analyze VulnerableBank.sol
+
+<span class="cm">==== Reentrancy =====</span>
+SWC ID: <span class="num">107</span>
+Severity: <span class="str">High</span>
+Contract: VulnerableBank
+Function name: withdraw(uint256)
+PC address: <span class="num">0x4a2</span>
+
+Description:
+External call to user-supplied address followed by state change.
+An attacker may cause a reentrant call to VulnerableBank.withdraw().
+
+Initial State:
+<span class="str">Account: [ATTACKER]</span> Balance: <span class="num">1 ETH</span>
+
+Transaction Sequence:
+1. VulnerableBank.deposit() value=<span class="num">1 ETH</span>
+2. <span class="str">AttackContract.attack()</span>
+   Triggers: VulnerableBank.withdraw(<span class="num">1000000000000000000</span>)
+   ReEnters: VulnerableBank.withdraw(<span class="num">1000000000000000000</span>) [× 10]
+   Drains: <span class="num">10 ETH</span> total
+
+<span class="cm">==== Integer Overflow (no detectado en Solidity 0.8+) ====</span>
+SWC ID: <span class="num">101</span>
+Note: SafeMath built-in desde Solidity 0.8.0</pre>
+      <button class="btn" style="margin-top:.5rem" onclick="runMythril()"><i class="fas fa-play"></i> Simular Mythril</button>
+      <div class="scan-output" id="mythrilOutput" style="margin-top:.5rem;min-height:60px"></div>
+    </div>
+  </div>
+
+  <!-- Echidna -->
+  <div class="tab-content" id="tab-echidna">
+    <div class="panel">
+      <h3><i class="fas fa-random"></i> Echidna — Property-Based Fuzzing</h3>
+      <pre><span class="cm">// echidna-test.sol — Propiedades que SIEMPRE deben cumplirse</span>
+<span class="kw">contract</span> <span class="cls">BankTest</span> <span class="kw">is</span> <span class="cls">VulnerableBank</span> {
+    <span class="cm">// Echidna buscará inputs que violen esta propiedad</span>
+    <span class="kw">function</span> <span class="fn">echidna_balance_invariant</span>() <span class="kw">public view returns</span> (<span class="cls">bool</span>) {
+        <span class="cm">// El balance del contrato nunca debe bajar a 0 si hay depósitos</span>
+        <span class="kw">return</span> <span class="cls">address</span>(<span class="kw">this</span>).<span class="fn">balance</span> >= totalDeposits;
+    }
+
+    <span class="kw">function</span> <span class="fn">echidna_no_free_money</span>() <span class="kw">public view returns</span> (<span class="cls">bool</span>) {
+        <span class="cm">// Nadie puede retirar más de lo que depositó</span>
+        <span class="kw">return</span> withdrawals[<span class="fn">msg.sender</span>] <= deposits[<span class="fn">msg.sender</span>];
+    }
+}
+
+<span class="cm"># Ejecutar:</span>
+$ echidna BankTest.sol --contract BankTest --config echidna.yaml
+<span class="cm"># echidna.yaml:</span>
+<span class="cm"># testLimit: 50000</span>
+<span class="cm"># seqLen: 100</span>
+<span class="cm"># shrinkLimit: 5000</span></pre>
+      <button class="btn" style="margin-top:.5rem" onclick="runEchidna()"><i class="fas fa-random"></i> Ejecutar Echidna (simulado)</button>
+      <div class="scan-output" id="echidnaOutput" style="margin-top:.5rem;min-height:60px"></div>
+    </div>
+  </div>
+
+  <div class="feedback" id="feedbackMsg">🔍 Explora las vulnerabilidades y ejecuta las herramientas de auditoría. ¡Detectar un bug antes del deploy puede salvar millones de dólares!</div>
+  <div class="insignia hidden" id="insigniaArea">
+    <i class="fas fa-shield-virus"></i>
+    <h3 style="margin:.4rem 0;color:#ffd700">🏅 ¡INSIGNIA SMART AUDITOR!</h3>
+    <p style="font-size:.85rem;color:#ff8899">Usaste las tres herramientas de auditoría. ¡Un auditor certificado puede ganar $50k+ por auditoría!</p>
+  </div>
+  <div class="nav-links">
+    <a href="sc3-08-interest-liquidation.html" class="nav-link"><i class="fas fa-arrow-left"></i> Interest & Liq.</a>
+    <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Menú</a>
+    <a href="sc3-10-ethersjs-frontend.html" class="nav-link next">ethers.js Frontend <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Smart Contracts DeFi · Semana 9 · Slither · Mythril · Echidna · Trail of Bits</footer>
+</div>
+<script>
+const STORAGE_KEY='sc3_audit';
+const visitedTabs=new Set(['vulns']);
+let toolsUsed=0;
+
+function switchTab(t){
+  document.querySelectorAll('.tab').forEach((el,i)=>{const ts=['vulns','slither','mythril','echidna'];el.classList.toggle('active',ts[i]===t);});
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+  document.getElementById('tab-'+t).classList.add('active');
+  visitedTabs.add(t);checkProgress();
+}
+
+const VULNS=[
+  {id:'reentrancy',title:'Reentrancy Attack',sev:'crit',sevL:'CRITICAL',desc:'El contrato llama a una dirección externa antes de actualizar su estado. El atacante llama a withdraw() en bucle.',bad:`<span class="cm">// ❌ VULNERABLE — DAO Hack (2016)</span>
+<span class="kw">function</span> <span class="fn">withdraw</span>() <span class="kw">external</span> {
+    <span class="cls">uint256</span> bal = balances[<span class="fn">msg.sender</span>];
+    (bool ok,) = <span class="fn">msg.sender</span>.<span class="fn">call</span>{value: bal}(<span class="str">""</span>);
+    <span class="kw">require</span>(ok);
+    balances[<span class="fn">msg.sender</span>] = <span class="num">0</span>; <span class="cm">// Demasiado tarde</span>
+}`,
+   good:`<span class="cm">// ✅ FIJO — Checks-Effects-Interactions</span>
+<span class="kw">function</span> <span class="fn">withdraw</span>() <span class="kw">external nonReentrant</span> {
+    <span class="cls">uint256</span> bal = balances[<span class="fn">msg.sender</span>];
+    balances[<span class="fn">msg.sender</span>] = <span class="num">0</span>; <span class="cm">// Efecto primero</span>
+    (bool ok,) = <span class="fn">msg.sender</span>.<span class="fn">call</span>{value: bal}(<span class="str">""</span>);
+    <span class="kw">require</span>(ok);
+}`},
+  {id:'overflow',title:'Integer Overflow',sev:'high',sevL:'HIGH',desc:'Operaciones aritméticas que desbordan el tipo. Solucionado en Solidity 0.8+ pero aún relevante en versiones antiguas.',bad:`<span class="cm">// ❌ Pre-0.8: overflow silencioso</span>
+<span class="kw">function</span> <span class="fn">transfer</span>(<span class="cls">uint256</span> amount) <span class="kw">external</span> {
+    <span class="cm">// Si amount = 2^256 - balance, overflow a 0</span>
+    require(balances[msg.sender] - amount >= 0);
+    balances[msg.sender] -= amount; <span class="cm">// wraparound!</span>
+}`,
+   good:`<span class="cm">// ✅ Solidity 0.8+ — reverts automático</span>
+<span class="kw">pragma solidity</span> ^<span class="num">0.8.0</span>; <span class="cm">// SafeMath built-in</span>
+<span class="kw">function</span> <span class="fn">transfer</span>(<span class="cls">uint256</span> amount) <span class="kw">external</span> {
+    balances[<span class="fn">msg.sender</span>] -= amount; <span class="cm">// Revert si neg.</span>
+    balances[to] += amount;
+}`},
+  {id:'txorigin',title:'tx.origin Auth',sev:'high',sevL:'HIGH',desc:'Usar tx.origin para autenticación permite phishing. Siempre usa msg.sender.',bad:`<span class="cm">// ❌ tx.origin es explotable</span>
+<span class="kw">function</span> <span class="fn">transfer</span>(<span class="cls">address</span> to) <span class="kw">external</span> {
+    <span class="cm">// Atacante crea contrato intermedio y engaña al usuario</span>
+    <span class="kw">require</span>(<span class="fn">tx.origin</span> == owner, <span class="str">"Not owner"</span>);
+    <span class="fn">to.transfer</span>(<span class="cls">address</span>(<span class="kw">this</span>).<span class="fn">balance</span>);
+}`,
+   good:`<span class="cm">// ✅ Siempre msg.sender</span>
+<span class="kw">function</span> <span class="fn">transfer</span>(<span class="cls">address</span> to) <span class="kw">external</span> {
+    <span class="kw">require</span>(<span class="fn">msg.sender</span> == owner, <span class="str">"Not owner"</span>);
+    <span class="fn">payable</span>(to).<span class="fn">transfer</span>(<span class="cls">address</span>(<span class="kw">this</span>).<span class="fn">balance</span>);
+}`},
+  {id:'selfdestruct',title:'Unprotected selfdestruct',sev:'crit',sevL:'CRITICAL',desc:'selfdestruct sin control de acceso permite que cualquiera destruya el contrato.',bad:`<span class="cm">// ❌ Cualquiera puede destruir el contrato</span>
+<span class="kw">function</span> <span class="fn">destroy</span>() <span class="kw">external</span> {
+    <span class="fn">selfdestruct</span>(<span class="fn">payable</span>(<span class="fn">msg.sender</span>));
+}`,
+   good:`<span class="cm">// ✅ Solo el owner, con timelock</span>
+<span class="kw">function</span> <span class="fn">destroy</span>() <span class="kw">external onlyOwner</span> {
+    <span class="kw">require</span>(<span class="fn">block.timestamp</span> >= shutdownTime, <span class="str">"Timelock"</span>);
+    <span class="fn">selfdestruct</span>(<span class="fn">payable</span>(owner));
+}`},
+];
+
+function buildVulnList(){
+  const list=document.getElementById('vulnList');
+  list.innerHTML=VULNS.map(v=>`<div class="vuln-card" id="vc-${v.id}" onclick="showVuln('${v.id}')">
+    <div><span class="vuln-title">${v.title}</span><span class="vuln-sev sev-${v.sev}">${v.sevL}</span></div>
+    <div class="vuln-desc">${v.desc}</div>
+  </div>`).join('');
+}
+
+function showVuln(id){
+  document.querySelectorAll('.vuln-card').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('vc-'+id).classList.add('selected');
+  const v=VULNS.find(x=>x.id===id);
+  document.getElementById('vulnDetail').innerHTML=`<div style="font-size:.72rem;color:#660022;margin-bottom:.3rem">❌ Código vulnerable:</div><pre>${v.bad}</pre><div style="font-size:.72rem;color:#50fa7b;margin:.4rem 0">✅ Corrección:</div><pre>${v.good}</pre>`;
+  toolsUsed++;checkProgress();
+  document.getElementById('feedbackMsg').innerHTML=`🔍 <strong>${v.title} (${v.sevL}):</strong> ${v.desc} Usa las herramientas de la derecha para detectarlo automáticamente.`;
+}
+
+const SLITHER_OUTPUTS={
+  reentrancy:[['scan-info','Analyzing VulnerableBank.sol...'],['scan-crit','VulnerableBank.withdraw() (VulnerableBank.sol#12-17)'],['scan-crit','Reentrancy in VulnerableBank.withdraw():'],['scan-crit','External calls: msg.sender.call{value: amount}("")'],['scan-crit','State variables written after external call: balances[msg.sender]'],['scan-crit','Reference: SWC-107'],['scan-med','VulnerableBank (VulnerableBank.sol#1-25)'],['scan-med','Missing events for critical function: withdraw'],['scan-ok',''],['scan-ok','2 critical, 1 medium, 0 low findings'],],
+  overflow:[['scan-info','Analyzing UnsafeToken.sol (pragma 0.7.6)...'],['scan-high','Integer Overflow: transfer() uses unchecked arithmetic'],['scan-high','balances[msg.sender] - amount can underflow'],['scan-med','Missing zero-address check in constructor'],['scan-ok','1 high, 1 medium findings'],],
+  access:[['scan-info','Analyzing NoAccessControl.sol...'],['scan-crit','selfdestruct called in destroy() with no access control'],['scan-crit','Anyone can call NoAccessControl.destroy()'],['scan-high','setOwner() has no access control'],['scan-ok','2 critical, 1 high findings'],],
+  clean:[['scan-info','Analyzing SafeToken.sol...'],['scan-ok','SafeToken (SafeToken.sol#1-60)'],['scan-ok','All checks passed'],['scan-ok','0 critical, 0 high, 0 medium, 2 low (informational)'],['scan-info','Low: SafeToken.constructor() — consider emitting an event'],],
+};
+
+async function runSlither(){
+  const contract=document.getElementById('slitherContract').value;
+  const out=document.getElementById('slitherOutput');
+  out.innerHTML='<span class="scan-info">$ slither '+contract+'.sol --json -</span><br>';
+  await new Promise(r=>setTimeout(r,400));
+  for(const [cls,line] of SLITHER_OUTPUTS[contract]){
+    await new Promise(r=>setTimeout(r,60));
+    out.innerHTML+=`<span class="${cls}">${line}</span><br>`;
+    out.scrollTop=out.scrollHeight;
+  }
+  toolsUsed++;checkProgress();
+  document.getElementById('feedbackMsg').innerHTML=`🐍 <strong>Slither completado.</strong> Analizó el AST del contrato en milisegundos. ${contract==='clean'?'Sin vulnerabilidades críticas — buen trabajo.':'Encontró vulnerabilidades que deben corregirse antes del deploy.'}`;
+}
+
+async function runMythril(){
+  const lines=[['scan-info','$ myth analyze VulnerableBank.sol --execution-timeout 30'],['scan-info','Running MythX analysis...'],['scan-crit','Issue 1: Reentrancy (SWC-107)'],['scan-crit','  Function: withdraw()'],['scan-crit','  Tx sequence: deposit(1 ETH) → attack() → [reenter × N]'],['scan-high','Issue 2: Missing access control on destroy()'],['scan-ok','Total: 1 critical, 1 high, 0 medium'],];
+  const out=document.getElementById('mythrilOutput');out.innerHTML='';
+  for(const [cls,line] of lines){await new Promise(r=>setTimeout(r,80));out.innerHTML+=`<span class="${cls}">${line}</span><br>`;out.scrollTop=out.scrollHeight;}
+  toolsUsed++;checkProgress();
+}
+
+async function runEchidna(){
+  const runs=Math.floor(Math.random()*20000)+30000;
+  const lines=[['scan-info',`$ echidna BankTest.sol --contract BankTest`],['scan-info',`Analyzing contract...`],['scan-info',`Running ${runs.toLocaleString()} test sequences...`],['scan-crit','PROPERTY VIOLATED: echidna_balance_invariant'],['scan-crit','Counterexample found:'],['scan-crit','  Call 1: deposit(1000000000000000000)'],['scan-crit','  Call 2: attack() [reentrant]'],['scan-crit','  Final balance: 0 (expected >= 1000000000000000000)'],['scan-ok','Shrunk to minimal reproducer: 2 transactions'],];
+  const out=document.getElementById('echidnaOutput');out.innerHTML='';
+  for(const [cls,line] of lines){await new Promise(r=>setTimeout(r,100));out.innerHTML+=`<span class="${cls}">${line}</span><br>`;out.scrollTop=out.scrollHeight;}
+  toolsUsed++;checkProgress();
+  document.getElementById('feedbackMsg').innerHTML=`🎲 <strong>Echidna encontró una violación de invariante</strong> con ${runs.toLocaleString()} tests. Esto confirma la reentrancy: el saldo bajó a 0 cuando no debería. Echidna encontró automáticamente la secuencia de ataque mínima.`;
+}
+
+function checkProgress(){
+  if((visitedTabs.size>=3||toolsUsed>=3)&&!localStorage.getItem(STORAGE_KEY)){localStorage.setItem(STORAGE_KEY,'true');document.getElementById('insigniaArea').classList.remove('hidden');}
+}
+
+buildVulnList();
+if(localStorage.getItem(STORAGE_KEY))document.getElementById('insigniaArea').classList.remove('hidden');
+</script>
+</body>
+</html>

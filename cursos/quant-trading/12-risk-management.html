@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Quant Trading | Risk Management</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+    .modulo-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,80,80,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+    .hero-header { background:linear-gradient(95deg,#0b1120 0%,#111a2e 100%); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #ff5050; }
+    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#ff9999,#ff5050); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+    .chip { background:rgba(255,80,80,0.15); border:1px solid #ff5050; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ff5050; font-size:1rem; line-height:1.6; }
+    .main-area { padding:1.5rem 2rem; display:flex; flex-direction:column; gap:1.5rem; }
+    .grid-2col { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; }
+    .panel { background:rgba(10,18,40,0.7); border-radius:1.8rem; padding:1.5rem; border:1px solid rgba(255,80,80,0.15); }
+    .panel h3 { font-size:1.2rem; margin-bottom:1rem; color:#ff9999; }
+    .param-row { display:flex; align-items:center; gap:1rem; margin-bottom:0.8rem; flex-wrap:wrap; }
+    .param-row label { min-width:140px; font-weight:600; }
+    .param-row input { flex:1; max-width:200px; background:#1a2a44; border:1px solid #ff505055; color:#fff; padding:0.4rem 0.8rem; border-radius:8px; }
+    .param-row input[type=range] { accent-color:#ff5050; height:6px; max-width:250px; }
+    .param-row .val { font-weight:700; color:#ff5050; min-width:40px; text-align:right; }
+    .stat-row { display:flex; justify-content:space-between; padding:0.5rem 0; border-bottom:1px solid rgba(255,80,80,0.1); }
+    .stat-row .label { color:#8899bb; }
+    .stat-row .value { font-weight:700; color:#ff5050; }
+    .stat-row .value.green { color:#00e676; }
+    canvas { width:100%; max-width:500px; height:280px; border-radius:1.2rem; background:#080e1a; display:block; margin:0 auto; }
+    .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #ff5050; }
+    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:0 2rem 1.5rem; padding:1rem; border:1px dashed gold; }
+    .insignia i { font-size:2.5rem; color:gold; }
+    .hidden { display:none; }
+    .btn-action { background:linear-gradient(95deg,#f0a500,#ff6a00); border:none; padding:0.8rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; color:#1e1a0c; transition:0.2s; }
+    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(240,165,0,0.5); }
+    .btn-danger { background:linear-gradient(95deg,#ff5050,#cc0000); }
+    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(255,80,80,0.4); }
+    .nav-link.next { background:linear-gradient(95deg,#f0a500,#ff6a00); color:#1e1a0c; }
+    .nav-link.menu { background:#1a2a4a; border:1px solid #3399ff; }
+    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .grid-2col { grid-template-columns:1fr; } }
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+  <div class="modulo-container">
+    <div class="hero-header">
+      <h1><i class="fas fa-shield-alt"></i> Risk Management</h1>
+      <p>Mide y gestiona el riesgo como un quant de Wall Street</p>
+      <div class="badge-area">
+        <span class="chip"><i class="fas fa-percentage"></i> VaR</span>
+        <span class="chip"><i class="fas fa-chart-area"></i> CVaR</span>
+        <span class="chip"><i class="fas fa-chart-line"></i> Drawdown</span>
+      </div>
+    </div>
+    <div class="analogy-card">
+      <strong><i class="fas fa-lightbulb"></i> Piénsalo así:</strong> El riesgo en trading es como el cinturón de seguridad del auto. No planeas chocar, pero cuando pasa, el cinturón te salva. VaR (Value at Risk) te dice: "en el peor 1% de los días, perderás hasta X". CVaR te dice: "y cuando sea peor que eso, perderás en promedio Y". El drawdown es la caída desde el pico — como ver tu cuenta pasar de $100K a $70K. Los quants no evitan el riesgo, lo miden y lo doman.
+    </div>
+    <div class="main-area">
+      <div class="grid-2col">
+        <div class="panel">
+          <h3><i class="fas fa-sliders-h"></i> Parámetros de Riesgo</h3>
+          <div class="param-row"><label>Confianza</label><input type="range" id="confidence" min="90" max="99" value="95"><span class="val" id="confVal">95%</span></div>
+          <div class="param-row"><label>Días (holding)</label><input type="range" id="holding" min="1" max="30" value="1"><span class="val" id="holdVal">1d</span></div>
+          <div class="param-row"><label>Capital ($)</label><input type="number" id="capital" value="100000" step="10000" style="flex:1;max-width:200px;background:#1a2a44;border:1px solid #ff505055;color:#fff;padding:0.4rem 0.8rem;border-radius:8px;"></div>
+          <button class="btn-action" id="calcVarBtn"><i class="fas fa-calculator"></i> Calcular VaR / CVaR</button>
+          <button class="btn-action btn-danger" id="simDrawBtn" style="margin-top:0.5rem;background:linear-gradient(95deg,#ff5050,#cc0000);"><i class="fas fa-chart-line"></i> Simular Drawdown</button>
+        </div>
+        <div class="panel">
+          <h3><i class="fas fa-chart-pie"></i> Resultados</h3>
+          <div class="stat-row"><span class="label">VaR (95%)</span><span class="value" id="varVal">$-</span></div>
+          <div class="stat-row"><span class="label">CVaR (95%)</span><span class="value" id="cvarVal">$-</span></div>
+          <div class="stat-row"><span class="label">Drawdown Máx</span><span class="value" id="maxDDVal">-</span></div>
+          <div class="stat-row"><span class="label">Drawdown Actual</span><span class="value" id="currentDDVal">-</span></div>
+          <div class="stat-row"><span class="label">Vol. Diaria (est.)</span><span class="value" id="volEst">2.4%</span></div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3><i class="fas fa-chart-area"></i> Simulación de Drawdown</h3>
+        <canvas id="ddCanvas"></canvas>
+      </div>
+    </div>
+    <div id="feedbackMsg" class="feedback">💡 Ajusta el nivel de confianza y el capital, luego calcula el VaR. ¡Conoce tu riesgo antes de operar!</div>
+    <div id="insigniaArea" class="insignia hidden">
+      <i class="fas fa-medal"></i>
+      <h3>🏅 Risk Manager 🏅</h3>
+      <p>Has aprendido a medir y gestionar el riesgo. ¡Los quants más prudentes duran más!</p>
+    </div>
+    <div class="nav-links">
+      <a href="11-portfolio-optimization.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+      <a href="13-nlp-financiero.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <footer><i class="fas fa-crown"></i> Quant Trading · Domina los algoritmos que mueven Wall Street</footer>
+  </div>
+  <script>
+    const STORAGE_KEY = 'quant_trading_12';
+    let ddData = [];
+
+    document.getElementById('confidence').addEventListener('input',function(){
+      document.getElementById('confVal').textContent=this.value+'%';
+    });
+    document.getElementById('holding').addEventListener('input',function(){
+      document.getElementById('holdVal').textContent=this.value+'d';
+    });
+
+    function calcVaR() {
+      const conf = parseInt(document.getElementById('confidence').value)/100;
+      const hold = parseInt(document.getElementById('holding').value);
+      const cap = parseFloat(document.getElementById('capital').value)||100000;
+      const dailyVol = 0.024;
+      const mu = 0.0008;
+      const volH = dailyVol*Math.sqrt(hold);
+      const muH = mu*hold;
+      const z = 2.326; // 99%
+      if(conf>=0.99) z=2.326;
+      else if(conf>=0.975) z=1.96;
+      else if(conf>=0.95) z=1.645;
+      else z=1.282;
+
+      const varNorm = cap*(muH - z*volH);
+      const cvarNorm = cap*(muH - (volH*Math.exp(-z*z/2))/(Math.sqrt(2*Math.PI)*(1-conf)));
+
+      document.getElementById('varVal').textContent = '$'+(Math.abs(varNorm).toFixed(0)).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+      document.getElementById('cvarVal').textContent = '$'+(Math.abs(cvarNorm).toFixed(0)).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+      document.getElementById('volEst').textContent = (dailyVol*100*Math.sqrt(hold)).toFixed(2)+'%';
+
+      document.getElementById('feedbackMsg').innerHTML = '📊 VaR: $'+Math.abs(varNorm).toFixed(0)+' | CVaR: $'+Math.abs(cvarNorm).toFixed(0)+' | Confianza: '+document.getElementById('confidence').value+'%';
+      localStorage.setItem(STORAGE_KEY,'completed');
+      document.getElementById('insigniaArea').classList.remove('hidden');
+    }
+
+    function simulateDrawdown() {
+      const cap = parseFloat(document.getElementById('capital').value)||100000;
+      const days = 252;
+      const dailyVol = 0.024;
+      const mu = 0.0008;
+      let portfolio = new Array(days);
+      let val = cap;
+      let peak = cap;
+      let maxDD = 0;
+      let currentDD = 0;
+
+      for(let i=0;i<days;i++) {
+        let r = mu + dailyVol*randomNormal();
+        val = val*(1+r);
+        if(val<0) val=0;
+        if(val>peak) peak=val;
+        let dd = (val-peak)/peak*100;
+        if(dd<maxDD) maxDD=dd;
+        if(i===days-1) currentDD=dd;
+        portfolio[i] = {val,peak,dd};
+      }
+      ddData = portfolio;
+
+      document.getElementById('maxDDVal').textContent = maxDD.toFixed(2)+'%';
+      document.getElementById('currentDDVal').textContent = currentDD.toFixed(2)+'%';
+
+      drawDDChart(portfolio);
+      document.getElementById('feedbackMsg').innerHTML = '📉 Drawdown máximo: '+maxDD.toFixed(2)+'% | Caída actual: '+currentDD.toFixed(2)+'%';
+      localStorage.setItem(STORAGE_KEY,'completed');
+      document.getElementById('insigniaArea').classList.remove('hidden');
+    }
+
+    function randomNormal() {
+      let u=0,v=0;
+      while(u===0) u=Math.random();
+      while(v===0) v=Math.random();
+      return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
+    }
+
+    function drawDDChart(data) {
+      const canvas = document.getElementById('ddCanvas');
+      const ctx = canvas.getContext('2d');
+      const rect = canvas.parentElement.getBoundingClientRect();
+      const dpr = window.devicePixelRatio||1;
+      canvas.width = (rect.width-32)*dpr;
+      canvas.height = 280*dpr;
+      canvas.style.width = (rect.width-32)+'px';
+      canvas.style.height = '280px';
+      ctx.scale(dpr,dpr);
+      const W = canvas.width/dpr, H = canvas.height/dpr;
+      ctx.clearRect(0,0,W,H);
+      const pad = {t:20,r:20,b:30,l:50};
+      const plotW = W-pad.l-pad.r, plotH = H-pad.t-pad.b;
+
+      const vals = data.map(d=>d.val);
+      const ddVals = data.map(d=>d.dd);
+      const minVal = Math.min(...vals)*0.95;
+      const maxVal = Math.max(...vals)*1.05;
+      const minDD = Math.min(...ddVals)*1.1;
+      const maxDD = 2;
+
+      function x(i) { return pad.l+(i/data.length)*plotW; }
+      function yVal(v) { return pad.t+plotH-((v-minVal)/(maxVal-minVal))*plotH; }
+      function yDD(v) { return pad.t+plotH-((v-minDD)/(maxDD-minDD))*plotH; }
+
+      // grid
+      ctx.strokeStyle='#1a2a44'; ctx.lineWidth=0.5;
+      for(let i=0;i<=5;i++) {
+        let vy = pad.t+(i/5)*plotH;
+        ctx.beginPath(); ctx.moveTo(pad.l,vy); ctx.lineTo(pad.l+plotW,vy); ctx.stroke();
+      }
+      ctx.fillStyle='#8899bb'; ctx.font='10px Inter'; ctx.textAlign='center';
+      ctx.fillText('Días',pad.l+plotW/2,H-5);
+
+      // portfolio value
+      ctx.beginPath();
+      ctx.strokeStyle='#00e676';
+      ctx.lineWidth=2;
+      data.forEach((d,i)=>{
+        if(i===0) ctx.moveTo(x(i),yVal(d.val));
+        else ctx.lineTo(x(i),yVal(d.val));
+      });
+      ctx.stroke();
+
+      // drawdown fill
+      ctx.beginPath();
+      ctx.moveTo(x(0),yDD(0));
+      data.forEach((d,i)=>ctx.lineTo(x(i),yDD(d.dd)));
+      ctx.lineTo(x(data.length-1),yDD(0));
+      ctx.closePath();
+      ctx.fillStyle='rgba(255,80,80,0.2)';
+      ctx.fill();
+      ctx.beginPath();
+      ctx.strokeStyle='#ff5050';
+      ctx.lineWidth=2;
+      data.forEach((d,i)=>{
+        if(i===0) ctx.moveTo(x(i),yDD(d.dd));
+        else ctx.lineTo(x(i),yDD(d.dd));
+      });
+      ctx.stroke();
+
+      // legend
+      ctx.fillStyle='#00e676'; ctx.font='11px Inter'; ctx.textAlign='left';
+      ctx.fillRect(pad.l+10,pad.t+10,12,3); ctx.fillText('Portfolio',pad.l+26,pad.t+14);
+      ctx.fillStyle='#ff5050';
+      ctx.fillRect(pad.l+10,pad.t+26,12,3); ctx.fillText('Drawdown',pad.l+26,pad.t+30);
+    }
+
+    document.getElementById('calcVarBtn').addEventListener('click',calcVaR);
+    document.getElementById('simDrawBtn').addEventListener('click',simulateDrawdown);
+
+    if(localStorage.getItem(STORAGE_KEY)==='completed') {
+      document.getElementById('insigniaArea').classList.remove('hidden');
+    }
+  </script>
+  <script src="../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Curso 5 | 📊 EAs Multi-timeframe</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="../../../assets/css/theme.css">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:linear-gradient(135deg,#0a0f1e,#0c1222,#111a2e); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+    .modulo-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,102,192,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+    .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #ff66c0; }
+    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#ff99dd,#ff66c0); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .hero-header p { font-size:1.1rem; color:#e6b8d4; margin-top:0.5rem; font-weight:500; }
+    .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+    .chip { background:rgba(255,102,192,0.15); border:1px solid #ff66c0; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ff66c0; font-size:1rem; line-height:1.6; }
+    .main-area { padding:1.5rem 2rem; display:flex; flex-direction:column; gap:1.5rem; }
+    .panel { background:rgba(0,10,25,0.7); border-radius:1.5rem; padding:1.3rem; border:1px solid rgba(255,102,192,0.2); }
+    .panel h3 { font-size:1.1rem; margin-bottom:0.8rem; color:#ff99dd; display:flex; align-items:center; gap:0.5rem; }
+    .tf-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:0.6rem; }
+    .tf-card { background:#0f1a2c; border:1px solid #2a3a5a; border-radius:1rem; padding:0.8rem; text-align:center; cursor:pointer; transition:0.2s; }
+    .tf-card:hover { border-color:#ff66c0; transform:translateY(-2px); }
+    .tf-card.active { border-color:#ff66c0; background:rgba(255,102,192,0.1); }
+    .tf-card .tf-name { font-weight:700; font-size:0.95rem; }
+    .tf-card .tf-desc { font-size:0.7rem; color:#8899cc; }
+    .tf-card .signal { display:inline-block; width:12px; height:12px; border-radius:50%; margin-top:0.4rem; }
+    .signal-buy { background:#00ff88; }
+    .signal-sell { background:#ff4455; }
+    .signal-neutral { background:#667; }
+    .hierarchy { display:flex; flex-direction:column; gap:0.8rem; }
+    .h-level { display:flex; align-items:center; gap:1rem; padding:0.6rem 1rem; background:#0f1a2c; border-radius:1rem; border-left:4px solid #ff66c0; }
+    .h-level .lbl { font-weight:600; min-width:100px; font-size:0.85rem; }
+    .h-level .bar { flex:1; height:10px; background:#1a2a4a; border-radius:5px; overflow:hidden; }
+    .h-level .bar-fill { height:100%; border-radius:5px; transition:width 0.5s; }
+    .h-level .arrow { font-size:1.2rem; color:#ff66c0; }
+    .btn-action { background:linear-gradient(95deg,#ff66c0,#ff3399); border:none; padding:0.8rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; }
+    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(255,102,192,0.5); }
+    .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
+    .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #ff66c0; }
+    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:0 2rem 1.5rem; padding:1rem; border:2px dashed gold; }
+    .insignia i { font-size:2.5rem; color:gold; }
+    .hidden { display:none !important; }
+    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; font-size:0.95rem; }
+    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(255,102,192,0.4); }
+    .nav-link.next { background:linear-gradient(95deg,#ff66c0,#ff3399); color:#1e1a0c; }
+    .nav-link.menu { background:#1a2a4a; border:1px solid #ff66c0; }
+    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; color:#667799; }
+    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
+  </style>
+</head>
+<body>
+<nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a></nav>
+<div class="modulo-container">
+  <div class="hero-header">
+    <h1>📊 EAs Multi-timeframe</h1>
+    <p>"Señales de alta precisión confirmadas en múltiples temporalidades"</p>
+    <div class="badge-area">
+      <span class="chip"><i class="fas fa-clock"></i> Timeframes</span>
+      <span class="chip"><i class="fas fa-sitemap"></i> Jerarquía</span>
+      <span class="chip"><i class="fas fa-check-double"></i> Confirmación</span>
+    </div>
+  </div>
+  <div class="analogy-card">
+    <strong><i class="fas fa-binoculars"></i> Piénsalo así:</strong> Un EA multi-timeframe es como un explorador que usa un mapa satelital (mensual) para ver el panorama general, luego un mapa callejero (diario) para planificar la ruta, y finalmente una brújula (1h) para dar cada paso. Cada timeframe confirma al anterior.
+  </div>
+  <div class="main-area">
+    <div class="panel">
+      <h3><i class="fas fa-layer-group"></i> Jerarquía de Timeframes</h3>
+      <p style="font-size:0.85rem;color:#99aacc;margin-bottom:0.8rem;">Activa/desactiva cada timeframe y configura su dirección de señal:</p>
+      <div class="hierarchy" id="hierarchyContainer"></div>
+    </div>
+    <div class="panel">
+      <h3><i class="fas fa-signal"></i> Señal Consolidada</h3>
+      <div style="display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;">
+        <div id="signalIndicator" style="width:80px;height:80px;border-radius:50%;background:#1a2a4a;display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:800;border:3px solid #667;">—</div>
+        <div>
+          <div style="font-size:0.85rem;color:#99aacc;">Señal final:</div>
+          <div id="signalLabel" style="font-size:1.3rem;font-weight:700;color:#8899cc;">Esperando configuración</div>
+          <div style="font-size:0.75rem;color:#667;margin-top:0.3rem;">Se necesitan ≥3 timeframes en la misma dirección</div>
+        </div>
+      </div>
+      <div style="margin-top:1rem;">
+        <button class="btn-action" onclick="runConfirmation()">🔄 Generar Señales Aleatorias</button>
+      </div>
+    </div>
+    <div class="panel">
+      <h3><i class="fas fa-code"></i> Código MQL5: OnTick Multi-TF</h3>
+      <div id="codeDisplay" style="background:#0b1120;border-radius:1rem;padding:1rem;font-family:'Courier New',monospace;font-size:0.8rem;color:#00ff88;white-space:pre-wrap;border:1px solid #1a2a4a;min-height:100px;">// Activa timeframes arriba para ver el código generado</div>
+    </div>
+  </div>
+  <div id="feedbackMsg" class="feedback">💡 Configura la dirección de cada timeframe y genera señales para ver la consolidación jerárquica.</div>
+  <div id="insigniaArea" class="insignia hidden">
+    <i class="fas fa-medal"></i>
+    <h3>🏅 Arquitecto Temporal 🏅</h3>
+    <p>Has dominado la jerarquía multi-timeframe. Tus señales ahora tienen confirmación en cada nivel.</p>
+  </div>
+  <div class="nav-links">
+    <a href="02-multi-simbolo.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+    <a href="04-indicadores-propios.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Curso 5: EAs Avanzados · Multi-símbolo, ML y ONNX</footer>
+</div>
+<script>
+const STORAGE_KEY = 'mql5_5_03';
+const TFS = [
+  { id: 'MN1', label: 'Mensual', weight: 5, dir: 'neutral' },
+  { id: 'W1', label: 'Semanal', weight: 4, dir: 'neutral' },
+  { id: 'D1', label: 'Diario', weight: 3, dir: 'neutral' },
+  { id: 'H4', label: '4 Horas', weight: 2, dir: 'neutral' },
+  { id: 'H1', label: '1 Hora', weight: 1, dir: 'neutral' }
+];
+let tfStates = TFS.map(t => ({ ...t }));
+function getProgress() { return JSON.parse(localStorage.getItem('mql5_5_progress')) || []; }
+function renderHierarchy() {
+  const c = document.getElementById('hierarchyContainer');
+  c.innerHTML = tfStates.map((tf, i) => {
+    const dirMap = { buy: 'BUY', sell: 'SELL', neutral: '—' };
+    const pctMap = { buy: 75, sell: 75, neutral: 20 };
+    const colorMap = { buy: '#00ff88', sell: '#ff4455', neutral: '#667' };
+    return `<div class="h-level">
+      <div class="lbl"><strong>${tf.id}</strong> <span style="color:#8899cc;font-weight:400;">${tf.label}</span></div>
+      <div class="bar"><div class="bar-fill" style="width:${pctMap[tf.dir]}%;background:${colorMap[tf.dir]};"></div></div>
+      <div style="display:flex;gap:0.3rem;">
+        <button class="btn-sm" style="background:#0f1a2c;border:1px solid ${tf.dir==='buy'?'#00ff88':'#2a3a5a'};color:${tf.dir==='buy'?'#00ff88':'#667'};padding:0.2rem 0.6rem;border-radius:1rem;font-size:0.7rem;cursor:pointer;" onclick="setDir(${i},'buy')">BUY</button>
+        <button class="btn-sm" style="background:#0f1a2c;border:1px solid ${tf.dir==='sell'?'#ff4455':'#2a3a5a'};color:${tf.dir==='sell'?'#ff4455':'#667'};padding:0.2rem 0.6rem;border-radius:1rem;font-size:0.7rem;cursor:pointer;" onclick="setDir(${i},'sell')">SELL</button>
+        <button class="btn-sm" style="background:#0f1a2c;border:1px solid ${tf.dir==='neutral'?'#ff66c0':'#2a3a5a'};color:${tf.dir==='neutral'?'#ff66c0':'#667'};padding:0.2rem 0.6rem;border-radius:1rem;font-size:0.7rem;cursor:pointer;" onclick="setDir(${i},'neutral')">—</button>
+      </div>
+      <div style="font-size:0.8rem;font-weight:600;color:${colorMap[tf.dir]};">${dirMap[tf.dir]}</div>
+    </div>`;
+  }).join('');
+}
+function setDir(idx, dir) { tfStates[idx].dir = dir; renderHierarchy(); updateSignal(); updateCode(); }
+function updateSignal() {
+  const buys = tfStates.filter(t => t.dir === 'buy').length;
+  const sells = tfStates.filter(t => t.dir === 'sell').length;
+  const signal = document.getElementById('signalIndicator');
+  const label = document.getElementById('signalLabel');
+  if (buys >= 3) {
+    signal.style.background = 'rgba(0,255,136,0.2)'; signal.style.borderColor = '#00ff88'; signal.textContent = '📈';
+    label.textContent = '🟢 SEÑAL COMPRA CONFIRMADA (' + buys + ' TF)'; label.style.color = '#00ff88';
+  } else if (sells >= 3) {
+    signal.style.background = 'rgba(255,68,85,0.2)'; signal.style.borderColor = '#ff4455'; signal.textContent = '📉';
+    label.textContent = '🔴 SEÑAL VENTA CONFIRMADA (' + sells + ' TF)'; label.style.color = '#ff4455';
+  } else {
+    signal.style.background = '#1a2a4a'; signal.style.borderColor = '#667'; signal.textContent = '—';
+    label.textContent = '⚪ SIN CONFIRMACIÓN (' + buys + ' BUY / ' + sells + ' SELL)'; label.style.color = '#8899cc';
+  }
+}
+function updateCode() {
+  const active = tfStates.filter(t => t.dir !== 'neutral');
+  if (active.length === 0) {
+    document.getElementById('codeDisplay').innerHTML = '// Activa al menos un timeframe con dirección BUY/SELL';
+    return;
+  }
+  const dirMap = { buy: 'BUY', sell: 'SELL' };
+  const code = active.map(t => {
+    return `   <span class="type">int</span> handle_${t.id} = iCustom(_Symbol, PERIOD_${t.id === 'MN1' ? 'MN1' : t.id}, <span class="string">"my_indicator"</span>);\n   <span class="type">double</span> signal_${t.id};\n   CopyBuffer(handle_${t.id}, 0, 0, 1, signal_${t.id});\n   <span class="keyword">if</span>(signal_${t.id} == ${dirMap[t.dir] === 'BUY' ? '1' : '-1'}) { /* ${t.id} confirma */ }`;
+  }).join('\n');
+  document.getElementById('codeDisplay').innerHTML = `<span class="comment">// Multi-timeframe signal consolidation — ${active.length} TFs activos</span>\n<span class="keyword">void</span> <span class="type">OnTick</span>() {\n${code}\n}`.replace(/<span class="type">/g, '<span style="color:#66ccff;">').replace(/<span class="string">/g, '<span style="color:#ff99dd;">').replace(/<span class="keyword">/g, '<span style="color:#ff66c0;">').replace(/<span class="comment">/g, '<span style="color:#667799;">');
+}
+function runConfirmation() {
+  tfStates = tfStates.map(t => {
+    const r = Math.random();
+    return { ...t, dir: r < 0.33 ? 'buy' : r < 0.66 ? 'sell' : 'neutral' };
+  });
+  renderHierarchy(); updateSignal(); updateCode();
+  const buys = tfStates.filter(t => t.dir === 'buy').length;
+  const sells = tfStates.filter(t => t.dir === 'sell').length;
+  const confirmed = buys >= 3 || sells >= 3;
+  if (confirmed) {
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    const p = getProgress();
+    if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem('mql5_5_progress', JSON.stringify(p)); }
+    document.getElementById('feedbackMsg').textContent = '🏆 ¡Señal confirmada! Has dominado la jerarquía multi-timeframe.';
+  } else {
+    document.getElementById('feedbackMsg').textContent = '🔄 Señales generadas pero sin confirmación. Necesitas ≥3 TF en la misma dirección.';
+  }
+}
+const style = document.createElement('style'); style.textContent = '.btn-sm:hover { opacity:0.8; }'; document.head.appendChild(style);
+renderHierarchy(); updateSignal(); updateCode();
+(function() { const p = getProgress(); if (p.includes(STORAGE_KEY)) { document.getElementById('insigniaArea').classList.remove('hidden'); document.getElementById('feedbackMsg').textContent = '🏅 Ya completaste este módulo.'; } })();
+</script>
+<script src="../../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

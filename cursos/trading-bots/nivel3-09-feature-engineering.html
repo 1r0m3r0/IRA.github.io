@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bot Trader | Feature Engineering para ML</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700;14..32,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    body{background:linear-gradient(145deg,#0a0014,#12001e);font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:2rem 1rem}
+    .container{max-width:1300px;width:100%;background:rgba(10,0,22,.88);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(200,80,255,.22);box-shadow:0 25px 55px rgba(0,0,0,.65);overflow:hidden}
+    .hero{background:linear-gradient(95deg,#070010,#0e0018);padding:1.8rem 2rem;text-align:center;border-bottom:2px solid #c850ff}
+    .hero h1{font-size:1.9rem;font-weight:800;background:linear-gradient(135deg,#f0d0ff,#dd88ff,#c850ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .hero p{margin-top:.5rem;font-size:.95rem;color:#8833aa}
+    .chips{display:flex;justify-content:center;gap:.6rem;flex-wrap:wrap;margin-top:.7rem}
+    .chip{background:rgba(200,80,255,.1);border:1px solid rgba(200,80,255,.3);color:#8833aa;font-size:.72rem;padding:.25rem .8rem;border-radius:2rem}
+    .week-badge{display:inline-block;background:rgba(200,80,255,.15);border:1px solid #c850ff;color:#c850ff;font-size:.75rem;font-weight:700;padding:.3rem 1rem;border-radius:2rem;margin-top:.5rem}
+    .analogy{background:#0a0014cc;margin:1.4rem 2rem;padding:1.1rem 1.7rem;border-radius:2rem;border-left:7px solid #c850ff;font-size:.9rem;line-height:1.65}
+    .analogy strong{color:#dd88ff}
+    .lab{display:flex;flex-wrap:wrap;gap:1.4rem;padding:0 1.8rem 1.5rem}
+    .left{flex:0 0 280px;display:flex;flex-direction:column;gap:.9rem}
+    .right{flex:1;min-width:300px;display:flex;flex-direction:column;gap:.9rem}
+    .panel{background:#0a0014dd;border-radius:1.8rem;padding:1.2rem 1.3rem;border:1px solid rgba(200,80,255,.15)}
+    .panel h3{font-size:.88rem;font-weight:700;color:#dd88ff;margin-bottom:.7rem}
+    label{font-size:.72rem;color:#6622aa;text-transform:uppercase;letter-spacing:.06rem;display:block;margin-bottom:.3rem;margin-top:.5rem}
+    select{width:100%;background:#070010;border:1px solid rgba(200,80,255,.2);color:#eef5ff;padding:.45rem .7rem;border-radius:.75rem;font-size:.82rem;font-family:'Inter',sans-serif}
+    .feat-grid{display:grid;grid-template-columns:1fr 1fr;gap:.4rem}
+    .feat-chip{display:flex;align-items:center;gap:.4rem;padding:.4rem .6rem;background:#0e0018;border:1px solid rgba(200,80,255,.18);border-radius:.8rem;cursor:pointer;transition:.15s;font-size:.73rem}
+    .feat-chip:hover{border-color:#c850ff}
+    .feat-chip.selected{background:#1a0030;border-color:#c850ff;color:#c850ff}
+    .feat-chip input[type=checkbox]{accent-color:#c850ff}
+    .btn{background:linear-gradient(95deg,#c850ff,#8833cc);border:none;padding:.7rem 1.4rem;font-weight:700;border-radius:2rem;cursor:pointer;color:#fff;font-size:.88rem;width:100%;margin-top:.4rem;transition:.2s;display:flex;align-items:center;justify-content:center;gap:.5rem}
+    .btn:hover{transform:translateY(-2px);box-shadow:0 0 18px rgba(200,80,255,.4)}
+    pre{background:#050010;border-radius:1rem;padding:1rem;font-family:'JetBrains Mono',monospace;font-size:.73rem;line-height:1.7;overflow-x:auto;color:#f0d0ff;border:1px solid rgba(200,80,255,.12)}
+    .kw{color:#c850ff}.fn{color:#dd88ff}.cm{color:#6622aa}.str{color:#80eeaa}.num{color:#ffd070}
+    canvas{border-radius:1rem;display:block}
+    .corr-cell{display:inline-block;width:100%;height:100%;border-radius:.2rem}
+    table{width:100%;border-collapse:collapse;font-size:.68rem;font-family:'JetBrains Mono',monospace}
+    th{background:#100020;color:#c850ff;padding:.35rem .4rem;text-align:center;border-bottom:1px solid rgba(200,80,255,.2);font-size:.65rem}
+    td{padding:.25rem .4rem;text-align:center;border-bottom:1px solid rgba(200,80,255,.06)}
+    .importance-bar{height:14px;border-radius:.25rem;background:linear-gradient(90deg,#c850ff,#8833cc);margin:1px 0;transition:.6s}
+    .fi-row{display:flex;align-items:center;gap:.5rem;padding:.2rem 0;border-bottom:1px solid rgba(200,80,255,.06)}
+    .fi-name{font-size:.72rem;color:#dd88ff;min-width:80px;font-family:'JetBrains Mono',monospace}
+    .fi-bar-wrap{flex:1;background:#100020;border-radius:.25rem;height:14px;overflow:hidden}
+    .fi-val{font-size:.7rem;color:#c850ff;min-width:36px;text-align:right;font-family:monospace}
+    .feedback{background:#00000088;margin:0 1.8rem 1rem;padding:.85rem 1.2rem;border-radius:1.5rem;text-align:center;border-left:4px solid #c850ff;font-size:.88rem;line-height:1.55}
+    .insignia{text-align:center;background:#0a0014;border-radius:2rem;margin:0 1.8rem 1.5rem;padding:1rem;border:1px dashed gold}
+    .insignia i{font-size:2.4rem;color:gold}
+    .hidden{display:none}
+    .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.4rem 2rem}
+    .nav-link{background:#0e0020;padding:.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:.5rem;font-size:.88rem;transition:.2s}
+    .nav-link:hover{transform:translateY(-2px)}
+    .nav-link.next{background:linear-gradient(95deg,#f0a500,#ff6a00);color:#1e1a0c}
+    footer{text-align:center;padding:1rem;font-size:.72rem;border-top:1px solid #0a0014;color:#6622aa}
+    @media(max-width:860px){.hero h1{font-size:1.4rem}.left{flex:1;min-width:100%}}
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+<nav class="brand-return-nav">
+  <a href="../../index.html">&larr; Portfolio</a>
+  <a href="../../cursos/index.html">Cursos</a>
+</nav>
+<div class="container">
+  <div class="hero">
+    <h1>🧬 FEATURE ENGINEERING: La Alquimia del Machine Learning</h1>
+    <p>Transforma precios crudos en señales que un modelo ML puede entender. El 80% del trabajo de un quant.</p>
+    <div class="week-badge"><i class="fas fa-calendar-week"></i> Semanas 9-10: Machine Learning para Trading</div>
+    <div class="chips">
+      <span class="chip">Lag features</span>
+      <span class="chip">Rolling statistics</span>
+      <span class="chip">Ratio features</span>
+      <span class="chip">Feature importance</span>
+    </div>
+  </div>
+
+  <div class="analogy">
+    <strong>🧬 Piénsalo así:</strong> Un modelo ML no puede "ver" un gráfico de velas — solo entiende números. El feature engineering es el proceso de convertir el gráfico en una tabla de señales numéricas. En lugar de darle el precio de hoy, le das: el retorno de los últimos 5 días, si el RSI está por debajo de 30, la relación entre volumen hoy vs promedio de 20 días, si el precio está sobre la MA20. Ese conjunto de señales es lo que el modelo aprende a combinar para predecir la dirección del mercado.
+    <div style="margin-top:.5rem;font-size:.78rem;color:#6622aa"><strong>📚 Fuentes:</strong> López de Prado, M. (2018) — <em>"Advances in Financial Machine Learning"</em>. Wiley (capítulos 3-5 sobre feature engineering). / Guyon & Elisseeff (2003) — <em>"An Introduction to Feature Selection"</em>.</div>
+  </div>
+
+  <div class="lab">
+    <div class="left">
+      <div class="panel">
+        <h3><i class="fas fa-tools"></i> Seleccionar Features</h3>
+        <label>Categoría base</label>
+        <select id="baseData" onchange="buildFeatures()">
+          <option value="ohlcv">OHLCV estándar</option>
+          <option value="crypto">Crypto on-chain</option>
+          <option value="sentiment">Sentiment + news</option>
+        </select>
+        <label>Features a incluir</label>
+        <div class="feat-grid" id="featGrid"></div>
+        <label style="margin-top:.8rem">Transformación extra</label>
+        <select id="transform">
+          <option value="none">Sin transformación</option>
+          <option value="log">Log returns</option>
+          <option value="zscore">Z-score normalización</option>
+          <option value="rank">Rank (quantile)</option>
+        </select>
+        <label>Target variable</label>
+        <select id="target">
+          <option value="dir1">Dirección 1 día (clasificación)</option>
+          <option value="dir5">Dirección 5 días (clasificación)</option>
+          <option value="ret1">Retorno 1 día (regresión)</option>
+        </select>
+        <button class="btn" onclick="buildFeatures()"><i class="fas fa-cogs"></i> Construir Features</button>
+      </div>
+    </div>
+
+    <div class="right">
+      <div class="panel">
+        <h3><i class="fas fa-table"></i> Feature Matrix <span id="featureCount" style="font-weight:400;font-size:.75rem;color:#6622aa"></span></h3>
+        <div style="overflow-x:auto;max-height:200px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#6622aa #0a0014" id="featureTable"></div>
+      </div>
+
+      <div class="panel">
+        <h3><i class="fas fa-sort-amount-down"></i> Feature Importance (Random Forest)</h3>
+        <div id="importanceChart"></div>
+      </div>
+
+      <div class="panel">
+        <h3><i class="fas fa-th"></i> Correlation Matrix entre Features</h3>
+        <canvas id="corrCanvas"></canvas>
+        <div style="font-size:.7rem;color:#6622aa;margin-top:.3rem;text-align:center">Verde = correlación positiva · Rojo = negativa · Blanco = sin correlación</div>
+      </div>
+
+      <div class="panel">
+        <h3><i class="fas fa-code"></i> Python — pandas-ta + Feature Engineering</h3>
+        <pre id="codeBox"></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="feedback" id="feedbackMsg">
+    🧬 Selecciona las features que quieres incluir y construye la matriz. Analiza la <strong>Feature Importance</strong> para eliminar las que no aportan señal al modelo.
+  </div>
+
+  <div class="insignia hidden" id="insigniaArea">
+    <i class="fas fa-dna"></i>
+    <h3 style="margin:.4rem 0;color:#ffd700">🏅 ¡INSIGNIA FEATURE ALCHEMIST!</h3>
+    <p style="font-size:.85rem;color:#dd88ff">Construiste features de calidad institucional. ¡El modelo tan bueno como los datos que le des!</p>
+  </div>
+
+  <div class="nav-links">
+    <a href="nivel3-08-dca-backtrader.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Menú</a>
+    <a href="nivel3-10-hyperparametros.html" class="nav-link next">Hiperparámetros <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Bot Trader Adventure · Semana 9-10 · López de Prado (2018) "Advances in Financial Machine Learning"</footer>
+</div>
+
+<script>
+const STORAGE_KEY = 'tbot_feat';
+let buildsCount = 0;
+
+const FEATURE_SETS = {
+  ohlcv: [
+    {id:'ret1','label':'Return 1d','val':()=>+(Math.random()-.5).toFixed(4)},
+    {id:'ret5','label':'Return 5d','val':()=>+(Math.random()-.5).toFixed(4)},
+    {id:'ma20','label':'MA20 ratio','val':()=>+(0.98+Math.random()*.04).toFixed(4)},
+    {id:'rsi14','label':'RSI(14)','val':()=>+(30+Math.random()*40).toFixed(1)},
+    {id:'bbw','label':'BB Width','val':()=>+(0.01+Math.random()*.05).toFixed(4)},
+    {id:'macd','label':'MACD Hist','val':()=>+(Math.random()-.5).toFixed(4)},
+    {id:'atr','label':'ATR %','val':()=>+(0.01+Math.random()*.04).toFixed(4)},
+    {id:'vol_ratio','label':'Vol/MA20','val':()=>+(0.5+Math.random()*2).toFixed(2)},
+    {id:'candle_size','label':'Candle body','val':()=>+(Math.random()*.02).toFixed(4)},
+    {id:'upper_shadow','label':'Upper shadow','val':()=>+(Math.random()*.01).toFixed(4)},
+  ],
+  crypto: [
+    {id:'ntvol','label':'NTV (on-chain vol)','val':()=>+(Math.random()*1e6).toFixed(0)},
+    {id:'hashrate','label':'Hash rate chg','val':()=>+(Math.random()-.5).toFixed(4)},
+    {id:'nvt','label':'NVT ratio','val':()=>+(50+Math.random()*50).toFixed(1)},
+    {id:'whale','label':'Whale txns','val':()=>+(Math.random()*100).toFixed(0)},
+    {id:'fear_greed','label':'Fear & Greed','val':()=>+(30+Math.random()*40).toFixed(0)},
+    {id:'funding','label':'Funding rate','val':()=>+(Math.random()-.5).toFixed(4)},
+  ],
+  sentiment: [
+    {id:'news_sent','label':'News sentiment','val':()=>+(Math.random()-.5).toFixed(3)},
+    {id:'twitter_vol','label':'Twitter volume','val':()=>+(Math.random()*1e5).toFixed(0)},
+    {id:'reddit_sent','label':'Reddit score','val':()=>+(Math.random()-.5).toFixed(3)},
+    {id:'google','label':'Google Trends','val':()=>+(50+Math.random()*50).toFixed(0)},
+  ]
+};
+
+const IMPORTANCE_BASE = {
+  ret5:0.18,rsi14:0.15,vol_ratio:0.12,ma20:0.11,bbw:0.09,macd:0.08,
+  atr:0.07,ret1:0.07,candle_size:0.06,upper_shadow:0.04,
+  ntvol:0.14,hashrate:0.10,nvt:0.09,whale:0.08,fear_greed:0.12,funding:0.11,
+  news_sent:0.20,twitter_vol:0.15,reddit_sent:0.12,google:0.08
+};
+
+let selected = new Set(['ret1','ret5','ma20','rsi14','vol_ratio','macd']);
+
+function initFeatGrid() {
+  const base = document.getElementById('baseData').value;
+  const feats = FEATURE_SETS[base];
+  document.getElementById('featGrid').innerHTML = feats.map(f=>`
+    <label class="feat-chip ${selected.has(f.id)?'selected':''}" onclick="toggleFeat('${f.id}',this)">
+      <input type="checkbox" ${selected.has(f.id)?'checked':''} style="pointer-events:none">
+      ${f.label}
+    </label>`).join('');
+}
+
+function toggleFeat(id, el) {
+  if(selected.has(id)) selected.delete(id); else selected.add(id);
+  el.classList.toggle('selected');
+}
+
+function buildFeatures() {
+  initFeatGrid();
+  const base = document.getElementById('baseData').value;
+  const feats = FEATURE_SETS[base].filter(f=>selected.has(f.id));
+  if(!feats.length){document.getElementById('feedbackMsg').textContent='⚠️ Selecciona al menos una feature.';return;}
+
+  const rows = 10;
+  const matrix = Array.from({length:rows},()=>feats.map(f=>f.val()));
+
+  // Table
+  document.getElementById('featureCount').textContent = `(${feats.length} features × ${rows} muestras)`;
+  let html=`<table><tr><th>sample</th>${feats.map(f=>`<th>${f.label}</th>`).join('')}<th>target</th></tr>`;
+  matrix.forEach((row,i)=>{
+    const tgt = Math.random()>.5?'BUY':'SELL';
+    html+=`<tr><td style="color:#6622aa">#${i+1}</td>${row.map(v=>`<td>${typeof v==='number'&&Math.abs(v)<1?v.toFixed(4):v}</td>`).join('')}<td style="color:${tgt==='BUY'?'#00ff88':'#ff5566'};font-weight:700">${tgt}</td></tr>`;
+  });
+  html+='</table>';
+  document.getElementById('featureTable').innerHTML=html;
+
+  // Feature importance
+  const importances = feats.map(f=>({name:f.label,imp:IMPORTANCE_BASE[f.id]||Math.random()*.08+.02}));
+  const total = importances.reduce((a,b)=>a+b.imp,0);
+  importances.forEach(f=>f.imp/=total);
+  importances.sort((a,b)=>b.imp-a.imp);
+  document.getElementById('importanceChart').innerHTML = importances.map(f=>`
+    <div class="fi-row">
+      <div class="fi-name">${f.name}</div>
+      <div class="fi-bar-wrap"><div class="importance-bar" style="width:${(f.imp*100).toFixed(0)}%"></div></div>
+      <div class="fi-val">${(f.imp*100).toFixed(1)}%</div>
+    </div>`).join('');
+
+  // Correlation matrix
+  const corrCanvas=document.getElementById('corrCanvas');
+  const W=corrCanvas.parentElement.clientWidth-30;
+  const n=feats.length;
+  const cw=Math.min(Math.floor((W-40)/n),35);
+  corrCanvas.width=W;corrCanvas.height=cw*n+20;
+  const ctx=corrCanvas.getContext('2d');
+  ctx.fillStyle='#070010';ctx.fillRect(0,0,W,corrCanvas.height);
+  for(let i=0;i<n;i++)for(let j=0;j<n;j++){
+    const c=i===j?1:(Math.random()-.5)*1.4;
+    const a=Math.min(1,Math.abs(c));
+    ctx.fillStyle=c>0?`rgba(200,80,255,${.15+a*.75})`:`rgba(255,85,102,${.15+a*.75})`;
+    ctx.fillRect(20+j*cw,10+i*cw,cw-1,cw-1);
+    ctx.fillStyle='#fff';ctx.font='7px Inter';ctx.textAlign='center';
+    ctx.fillText(c.toFixed(1),20+j*cw+cw/2,10+i*cw+cw/2+3);
+  }
+  ctx.fillStyle='#dd88ff';ctx.font='7px Inter';ctx.textAlign='right';
+  feats.forEach((f,i)=>ctx.fillText(f.label.slice(0,8),18,10+i*cw+cw/2+3));
+
+  // Code
+  document.getElementById('codeBox').innerHTML = `<span class="kw">import</span> pandas_ta <span class="kw">as</span> ta\n<span class="kw">import</span> pandas <span class="kw">as</span> pd\n\n<span class="kw">def</span> <span class="fn">build_features</span>(df):\n    <span class="cm"># Retornos con diferentes horizontes</span>\n    df[<span class="str">'ret_1d'</span>] = df[<span class="str">'close'</span>].<span class="fn">pct_change</span>(<span class="num">1</span>)\n    df[<span class="str">'ret_5d'</span>] = df[<span class="str">'close'</span>].<span class="fn">pct_change</span>(<span class="num">5</span>)\n    <span class="cm"># Indicadores técnicos</span>\n    df[<span class="str">'rsi'</span>]  = ta.<span class="fn">rsi</span>(df[<span class="str">'close'</span>], length=<span class="num">14</span>)\n    df[<span class="str">'macd'</span>] = ta.<span class="fn">macd</span>(df[<span class="str">'close'</span>])[<span class="str">'MACDh_12_26_9'</span>]\n    df[<span class="str">'atr'</span>]  = ta.<span class="fn">atr</span>(df[<span class="str">'high'</span>], df[<span class="str">'low'</span>], df[<span class="str">'close'</span>])\n    <span class="cm"># Ratios y relaciones</span>\n    df[<span class="str">'ma20'</span>] = df[<span class="str">'close'</span>] / df[<span class="str">'close'</span>].<span class="fn">rolling</span>(<span class="num">20</span>).<span class="fn">mean</span>()\n    df[<span class="str">'vol_ratio'</span>] = df[<span class="str">'volume'</span>] / df[<span class="str">'volume'</span>].<span class="fn">rolling</span>(<span class="num">20</span>).<span class="fn">mean</span>()\n    <span class="cm"># Target: dirección siguiente día</span>\n    df[<span class="str">'target'</span>] = (df[<span class="str">'close'</span>].<span class="fn">shift</span>(-<span class="num">1</span>) > df[<span class="str">'close'</span>]).<span class="fn">astype</span>(<span class="num">int</span>)\n    <span class="kw">return</span> df.<span class="fn">dropna</span>()`;
+
+  buildsCount++;
+  document.getElementById('feedbackMsg').innerHTML = `🧬 Feature matrix generada: <strong>${feats.length} features</strong>. La más importante es <strong>${importances[0].name}</strong> (${(importances[0].imp*100).toFixed(1)}%). Elimina features con &lt;3% importancia — solo añaden ruido al modelo.`;
+  if(buildsCount>=2&&!localStorage.getItem(STORAGE_KEY)){localStorage.setItem(STORAGE_KEY,'true');document.getElementById('insigniaArea').classList.remove('hidden');}
+}
+
+document.getElementById('baseData').addEventListener('change', initFeatGrid);
+initFeatGrid();
+buildFeatures();
+if(localStorage.getItem(STORAGE_KEY))document.getElementById('insigniaArea').classList.remove('hidden');
+</script>
+</body>
+</html>

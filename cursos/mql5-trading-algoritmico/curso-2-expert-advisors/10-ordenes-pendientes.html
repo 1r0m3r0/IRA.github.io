@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Curso 2 | Órdenes Pendientes</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../../assets/css/theme.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%);background-size:200% 200%;animation:gradientShift 20s ease infinite;font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
+@keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.modulo-container{max-width:1300px;width:100%;background:rgba(15,25,45,0.65);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(0,255,200,0.25);box-shadow:0 25px 45px rgba(0,0,0,0.5);overflow:hidden}
+.hero-header{background:linear-gradient(95deg,#0b1120 0%,#111a2e 100%);padding:2rem 2rem 1.5rem;text-align:center;border-bottom:2px solid #00ffc8}
+.hero-header h1{font-size:2.6rem;font-weight:800;background:linear-gradient(135deg,#FFF,#66ffdd,#00ffc8);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-header p{color:#bcc9f0;margin-top:.5rem;font-size:1.1rem}
+.badge-area{display:flex;justify-content:center;gap:1rem;margin-top:1.2rem;flex-wrap:wrap}
+.chip{background:rgba(0,255,200,0.15);border:1px solid #00ffc8;padding:0.4rem 1rem;border-radius:40px;font-size:0.8rem;font-weight:600;color:#ddd}
+.analogy-card{background:#1e2a3acc;margin:1.5rem 2rem;padding:1.2rem 1.8rem;border-radius:2rem;border-left:8px solid #00ffc8;font-size:1rem;line-height:1.6}
+.progress-section{margin:1rem 2rem 0}
+.progress-bar-outer{background:#1a2a4a;border-radius:20px;height:20px;overflow:hidden}
+.progress-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,#00ffc8,#fff);border-radius:20px;transition:width 0.5s ease}
+.progress-text{text-align:center;font-size:0.85rem;color:#8899cc;margin-bottom:.5rem}
+.main-area{padding:1rem 2rem}
+.order-grid{display:grid;grid-template-columns:2fr 1fr;gap:1.5rem;margin-bottom:1.5rem}
+.builder-panel{background:#0a1020;border-radius:2rem;padding:1.5rem;border:1px solid #2a3a5a}
+.builder-panel h3{color:#bcc9f0;margin-bottom:1rem;border-bottom:1px solid #2a3a5a;padding-bottom:.5rem}
+.form-group{margin-bottom:.8rem}
+.form-group label{display:block;font-size:.8rem;color:#8899cc;margin-bottom:.3rem}
+.form-group input,.form-group select{width:100%;padding:.5rem;background:#1a2a4a;border:1px solid #3a4a6a;border-radius:.8rem;color:#eef5ff;font-family:'Inter',sans-serif;font-size:.85rem}
+.form-group input:focus,.form-group select:focus{border-color:#00ffc8;outline:none}
+.form-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.8rem}
+.price-visualization{background:#0d1525;border-radius:1.5rem;padding:1.5rem;margin-bottom:1rem;border:1px solid #3a4a6a;position:relative;min-height:200px}
+.price-line{position:relative;height:180px;background:#0a1020;border-radius:1rem;overflow:hidden}
+.price-line .level{position:absolute;left:0;right:0;height:2px;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:600}
+.price-line .level .lbl{position:absolute;left:8px}
+.price-line .level .price-val{position:absolute;right:8px}
+.price-line .market{background:#3399ff;top:40%;color:#3399ff;z-index:2;height:3px}
+.price-line .limit-buy{background:#00c853;z-index:1}
+.price-line .limit-sell{background:#ff1744;z-index:1}
+.price-line .stop-buy{background:#ffd700;z-index:1}
+.price-line .stop-sell{background:#ff66cc;z-index:1}
+.order-list-panel{background:#0a1020;border-radius:2rem;padding:1.5rem;border:1px solid #2a3a5a}
+.order-list-panel h3{color:#bcc9f0;margin-bottom:1rem}
+.pending-table{width:100%;border-collapse:collapse;font-size:.78rem}
+.pending-table th{background:#1a2a4a;padding:.4rem;text-align:left;color:#8899cc;border-bottom:2px solid #3a4a6a}
+.pending-table td{padding:.4rem;border-bottom:1px solid #2a3a5a}
+.code-preview{background:#0d1525;border-radius:1rem;padding:.8rem;font-family:'Courier New',monospace;font-size:.72rem;border:1px solid #3a4a6a;margin-top:.8rem;overflow-x:auto}
+.code-preview .keyw{color:#ff79c6}
+.code-preview .type{color:#8be9fd}
+.code-preview .func{color:#50fa7b}
+.code-preview .num{color:#bd93f9}
+.code-preview .str{color:#f1fa8c}
+.btn-group{display:flex;gap:.8rem;flex-wrap:wrap;margin-top:.5rem}
+.btn-action{background:linear-gradient(95deg,#00ffc8,#00cc99);border:none;padding:0.7rem 1.5rem;font-weight:bold;border-radius:3rem;cursor:pointer;font-size:.9rem;transition:0.2s;color:#0a1a1a;font-family:'Inter',sans-serif}
+.btn-action:hover{transform:translateY(-2px);box-shadow:0 0 15px rgba(0,255,200,0.5)}
+.btn-action:disabled{opacity:.5;cursor:not-allowed}
+.btn-danger{background:#ff174466;border:1px solid #ff1744;padding:.4rem .8rem;border-radius:2rem;cursor:pointer;color:#ff1744;font-family:'Inter',sans-serif;font-size:.75rem;transition:.2s}
+.btn-danger:hover{background:#ff174488}
+.feedback{background:#00000099;margin:0 2rem 1.5rem;padding:1rem;border-radius:1.5rem;text-align:center;font-weight:500;border-left:4px solid #00ffc8;min-height:3rem}
+.insignia{text-align:center;background:#0c1b2f;border-radius:2rem;margin:0 2rem 1.5rem;padding:1rem;border:2px dashed gold}
+.insignia i{font-size:2.5rem;color:gold}
+.insignia h3{color:gold;margin:.5rem 0}
+.hidden{display:none!important}
+.nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.5rem 2rem}
+.nav-link{background:#2c3e66;padding:0.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:0.5rem;transition:0.2s}
+.nav-link:hover{transform:translateY(-2px);box-shadow:0 0 10px rgba(0,255,200,0.4)}
+.nav-link.next{background:linear-gradient(95deg,#00ffc8,#00cc99);color:#0a1a1a}
+.nav-link.menu{background:#1a2a4a;border:1px solid #00ffc8}
+.nav-link.prev{background:#1a2a4a;border:1px solid #666}
+footer{text-align:center;padding:1.2rem;font-size:0.8rem;border-top:1px solid #2c3e66;color:#8899cc}
+@media(max-width:800px){.order-grid{grid-template-columns:1fr}.form-row{grid-template-columns:1fr}.hero-header h1{font-size:1.9rem}}
+</style>
+</head>
+<body>
+<div class="modulo-container">
+  <nav class="brand-return-nav">
+    <a href="../../../index.html">&larr; Portfolio</a>
+    <a href="../../../cursos/index.html">Cursos</a>
+    <a href="../index.html">Menú MQL5</a>
+  </nav>
+
+  <div class="hero-header">
+    <h1>📌 Órdenes Pendientes</h1>
+    <p>"Limit, Stop y la estrategia de esperar el precio perfecto"</p>
+    <div class="badge-area">
+      <span class="chip"><i class="fas fa-arrow-down"></i> Buy Limit</span>
+      <span class="chip"><i class="fas fa-arrow-up"></i> Sell Stop</span>
+      <span class="chip"><i class="fas fa-hourglass-half"></i> OrderSend</span>
+    </div>
+  </div>
+
+  <div class="progress-section">
+    <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+    <div class="progress-text" id="progressText">Módulo 10 de 12</div>
+  </div>
+
+  <div class="analogy-card">
+    <strong>💡 Piénsalo así:</strong> Las órdenes pendientes son como poner trampas inteligentes: Buy Limit = "si el precio baja a X, compra automáticamente (más barato)", Sell Limit = "si sube a X, vende automáticamente (más caro)", Buy Stop = "si rompe resistencia al alza, compra", Sell Stop = "si rompe soporte a la baja, vende". Tu EA puede ponerlas y olvidarse — el mercado las activará cuando toquen el precio.
+  </div>
+
+  <div class="main-area">
+    <div class="order-grid">
+      <div class="builder-panel">
+        <h3><i class="fas fa-tools"></i> Constructor de Órdenes Pendientes</h3>
+        
+        <div class="price-visualization">
+          <div class="price-line" id="priceLine">
+            <div class="level market" style="top:40%"><span class="lbl" style="color:#3399ff">⟐ Mercado</span><span class="price-val" id="marketPriceLbl" style="color:#3399ff">1.1000</span></div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group"><label>Tipo</label>
+            <select id="selType">
+              <option value="OP_BUYLIMIT">Buy Limit</option>
+              <option value="OP_SELLLIMIT">Sell Limit</option>
+              <option value="OP_BUYSTOP">Buy Stop</option>
+              <option value="OP_SELLSTOP">Sell Stop</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Símbolo</label>
+            <select id="selSym"><option>EURUSD</option><option>GBPUSD</option><option>BTCUSD</option></select>
+          </div>
+          <div class="form-group"><label>Volumen</label><input type="number" id="inpVol" value="0.1" step="0.01" min="0.01"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Precio</label><input type="number" id="inpPrice" step="0.00001" placeholder="Ej: 1.0950"></div>
+          <div class="form-group"><label>SL</label><input type="number" id="inpSL" step="0.00001" placeholder="0"></div>
+          <div class="form-group"><label>TP</label><input type="number" id="inpTP" step="0.00001" placeholder="0"></div>
+        </div>
+        <div class="form-group"><label>Expiración</label>
+          <select id="selExp">
+            <option value="0">GTC (Good Till Cancelled)</option>
+            <option value="86400">1 día</option>
+            <option value="604800">1 semana</option>
+          </select>
+        </div>
+        <div class="btn-group">
+          <button class="btn-action" id="placeBtn"><i class="fas fa-plus-circle"></i> Colocar Orden</button>
+          <button class="btn-action" id="randomBtn" style="background:linear-gradient(95deg,#ffd700,#ffa500);color:#1a1a1a"><i class="fas fa-dice"></i> Aleatoria</button>
+        </div>
+
+        <div class="code-preview" id="codePreview">
+          <span style="color:#666">// Código MQL5 generado automáticamente</span><br>
+          <span class="keyw">MqlTradeRequest</span> req = {};<br>
+          req.action   = <span class="str">TRADE_ACTION_PENDING</span>;<br>
+          req.symbol   = <span class="str">_Symbol</span>;<br>
+          req.volume   = <span class="num">0.1</span>;<br>
+          req.type     = <span class="str">ORDER_TYPE_BUY_LIMIT</span>;<br>
+          req.price    = <span class="num">1.09500</span>;<br>
+          req.sl       = <span class="num">0</span>;<br>
+          req.tp       = <span class="num">0</span>;<br>
+          <span class="func">OrderSend</span>(req, result);
+        </div>
+      </div>
+
+      <div class="order-list-panel">
+        <h3><i class="fas fa-list"></i> Órdenes Pendientes</h3>
+        <table class="pending-table">
+          <thead><tr><th>#</th><th>Tipo</th><th>Precio</th><th>Vol</th><th>Estado</th><th></th></tr></thead>
+          <tbody id="pendBody"><tr><td colspan="6" style="text-align:center;color:#666;padding:.8rem">Sin órdenes pendientes</td></tr></tbody>
+        </table>
+        <div style="margin-top:.8rem">
+          <button class="btn-danger" id="cancelAllBtn" disabled style="width:100%"><i class="fas fa-trash"></i> Cancelar Todas</button>
+        </div>
+        <div style="margin-top:1rem;font-size:.75rem;color:#8899cc;text-align:center">
+          <div>Órdenes activas: <span id="pendCount" style="color:#00ffc8">0</span></div>
+          <div>Órdenes ejecutadas: <span id="execCount" style="color:#00c853">0</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="feedbackMsg" class="feedback">💡 Configura una orden pendiente y ajústala en la visualización de precios.</div>
+
+  <div id="insigniaArea" class="insignia hidden">
+    <i class="fas fa-medal"></i>
+    <h3>🏅 Estratega de Órdenes 🏅</h3>
+    <p>¡Dominas las órdenes pendientes! Buy Limit, Sell Stop — cualquier escenario está bajo tu control.</p>
+  </div>
+
+  <div class="nav-links">
+    <a href="09-gestion-posiciones.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+    <a href="11-primer-ea.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Curso 2 · Expert Advisors Profesionales</footer>
+</div>
+
+<script>
+const STORAGE_KEY = 'mql5_2_10';
+const PROGRESS_KEY = 'mql5_2_progress';
+const TYPE_LABELS = {OP_BUYLIMIT:'🟢 Buy Limit',OP_SELLLIMIT:'🔴 Sell Limit',OP_BUYSTOP:'🟡 Buy Stop',OP_SELLSTOP:'🟣 Sell Stop'};
+const TYPE_COLORS = {OP_BUYLIMIT:'#00c853',OP_SELLLIMIT:'#ff1744',OP_BUYSTOP:'#ffd700',OP_SELLSTOP:'#ff66cc'};
+let marketPrice = 1.1000;
+let pendingOrders = [];
+let executedCount = 0;
+let completed = false;
+let priceHistory = [];
+
+function initProgress(){
+  const p = JSON.parse(localStorage.getItem(PROGRESS_KEY)) || [];
+  const pf = document.getElementById('progressFill');
+  const pt = document.getElementById('progressText');
+  if(pf) pf.style.width = Math.round((p.length/12)*100)+'%';
+  if(pt) pt.textContent = p.length+' de 12 módulos';
+  if(p.includes(STORAGE_KEY)){
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    completed = true;
+  }
+}
+
+function saveProgress(){
+  let p = JSON.parse(localStorage.getItem(PROGRESS_KEY)) || [];
+  if(!p.includes(STORAGE_KEY)){p.push(STORAGE_KEY);localStorage.setItem(PROGRESS_KEY,JSON.stringify(p));}
+  const pf = document.getElementById('progressFill');
+  const pt = document.getElementById('progressText');
+  if(pf) pf.style.width = Math.round((p.length/12)*100)+'%';
+  if(pt) pt.textContent = p.length+' de 12 módulos';
+}
+
+function updatePrice(){
+  marketPrice += (Math.random()-0.48)*0.003;
+  if(marketPrice<1.07) marketPrice=1.07;
+  if(marketPrice>1.13) marketPrice=1.13;
+  document.getElementById('marketPriceLbl').textContent = marketPrice.toFixed(5);
+  checkActivations();
+  drawPriceLevels();
+}
+
+function drawPriceLevels(){
+  const line = document.getElementById('priceLine');
+  const existing = line.querySelectorAll('.level:not(.market)');
+  existing.forEach(e=>e.remove());
+  const minP = 1.07, maxP = 1.13, range = maxP-minP;
+  pendingOrders.forEach(o=>{
+    const pct = (o.price - minP)/range;
+    const top = Math.max(2, Math.min(98, (1-pct)*100));
+    const div = document.createElement('div');
+    div.className = 'level '+o.type;
+    div.style.top = top+'%';
+    div.style.background = TYPE_COLORS[o.type];
+    div.style.height = '3px';
+    div.style.zIndex = '1';
+    div.innerHTML = `<span class="lbl" style="color:${TYPE_COLORS[o.type]}">${TYPE_LABELS[o.type]}</span><span class="price-val" style="color:${TYPE_COLORS[o.type]}">${o.price.toFixed(5)}</span>`;
+    line.appendChild(div);
+  });
+}
+
+function checkActivations(){
+  const toRemove = [];
+  pendingOrders.forEach((o,i)=>{
+    let activated = false;
+    switch(o.type){
+      case 'OP_BUYLIMIT': activated = marketPrice <= o.price; break;
+      case 'OP_SELLLIMIT': activated = marketPrice >= o.price; break;
+      case 'OP_BUYSTOP': activated = marketPrice >= o.price; break;
+      case 'OP_SELLSTOP': activated = marketPrice <= o.price; break;
+    }
+    if(activated){
+      toRemove.push(i);
+      executedCount++;
+      addAction('⚡ Ejecutada: '+TYPE_LABELS[o.type]+' @ '+o.price.toFixed(5), '#00c853');
+    }
+  });
+  toRemove.reverse().forEach(i=>pendingOrders.splice(i,1));
+  if(toRemove.length>0) updatePendUI();
+}
+
+function placeOrder(type, price, vol, sl, tp){
+  if(!price || price<=0){document.getElementById('feedbackMsg').innerHTML='⚠️ Ingresa un precio válido.';return;}
+  const minP=1.07, maxP=1.13;
+  if(price<minP||price>maxP){document.getElementById('feedbackMsg').innerHTML='⚠️ El precio debe estar entre '+minP+' y '+maxP;return;}
+  const order = {type, price, vol, sl, tp, time:new Date().toLocaleTimeString()};
+  pendingOrders.push(order);
+  addAction('📌 Colocada: '+TYPE_LABELS[type]+' @ '+price.toFixed(5)+' Vol: '+vol, '#ffd700');
+  updatePendUI();
+  drawPriceLevels();
+  updateCodePreview(type, price, vol, sl, tp);
+  document.getElementById('feedbackMsg').innerHTML = '📌 Orden '+TYPE_LABELS[type]+' colocada @ '+price.toFixed(5);
+}
+
+function addAction(msg, color='#8899cc'){
+  // We use feedback as log since there's no action log here
+}
+
+function updatePendUI(){
+  const tbody = document.getElementById('pendBody');
+  if(pendingOrders.length===0){
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#666;padding:.8rem">Sin órdenes pendientes</td></tr>';
+  } else {
+    tbody.innerHTML = pendingOrders.map((o,i)=>
+      '<tr><td>'+(i+1)+'</td><td style="color:'+TYPE_COLORS[o.type]+'">'+TYPE_LABELS[o.type]+'</td><td>'+o.price.toFixed(5)+'</td><td>'+o.vol.toFixed(2)+'</td><td style="color:#ffd700">⏳ Pendiente</td><td><button class="btn-danger" onclick="cancelOrder('+i+')" style="padding:.2rem .5rem;font-size:.65rem">✕</button></td></tr>'
+    ).join('');
+  }
+  document.getElementById('pendCount').textContent = pendingOrders.length;
+  document.getElementById('execCount').textContent = executedCount;
+  document.getElementById('cancelAllBtn').disabled = pendingOrders.length===0;
+  checkCompletion();
+}
+
+function cancelOrder(idx){
+  const o = pendingOrders[idx];
+  pendingOrders.splice(idx,1);
+  updatePendUI();
+  drawPriceLevels();
+  document.getElementById('feedbackMsg').innerHTML = '🗑️ Orden cancelada: '+TYPE_LABELS[o.type];
+}
+
+function cancelAll(){
+  const n = pendingOrders.length;
+  pendingOrders = [];
+  updatePendUI();
+  drawPriceLevels();
+  document.getElementById('feedbackMsg').innerHTML = '🗑️ '+n+' órdenes canceladas.';
+}
+
+function updateCodePreview(type, price, vol, sl, tp){
+  const typeMap = {OP_BUYLIMIT:'ORDER_TYPE_BUY_LIMIT', OP_SELLLIMIT:'ORDER_TYPE_SELL_LIMIT', OP_BUYSTOP:'ORDER_TYPE_BUY_STOP', OP_SELLSTOP:'ORDER_TYPE_SELL_STOP'};
+  const el = document.getElementById('codePreview');
+  el.innerHTML = `<span style="color:#666">// Código MQL5 generado</span><br>
+<span class="keyw">MqlTradeRequest</span> req = {};<br>
+req.action   = <span class="str">TRADE_ACTION_PENDING</span>;<br>
+req.symbol   = <span class="str">_Symbol</span>;<br>
+req.volume   = <span class="num">${vol.toFixed(2)}</span>;<br>
+req.type     = <span class="str">${typeMap[type]}</span>;<br>
+req.price    = <span class="num">${price.toFixed(5)}</span>;<br>
+req.sl       = <span class="num">${sl||0}</span>;<br>
+req.tp       = <span class="num">${tp||0}</span>;<br>
+req.magic    = <span class="num">1001</span>;<br>
+<span class="func">OrderSend</span>(req, result);`;
+}
+
+function placeFromForm(){
+  const type = document.getElementById('selType').value;
+  const vol = parseFloat(document.getElementById('inpVol').value)||0.1;
+  const price = parseFloat(document.getElementById('inpPrice').value);
+  const sl = parseFloat(document.getElementById('inpSL').value)||0;
+  const tp = parseFloat(document.getElementById('inpTP').value)||0;
+  placeOrder(type, price, vol, sl, tp);
+}
+
+function randomOrder(){
+  const types = ['OP_BUYLIMIT','OP_SELLLIMIT','OP_BUYSTOP','OP_SELLSTOP'];
+  const type = types[Math.floor(Math.random()*4)];
+  const vol = Math.round((0.01+Math.random()*0.99)*100)/100;
+  let price;
+  switch(type){
+    case 'OP_BUYLIMIT': price = marketPrice - 0.001 - Math.random()*0.005; break;
+    case 'OP_SELLLIMIT': price = marketPrice + 0.001 + Math.random()*0.005; break;
+    case 'OP_BUYSTOP': price = marketPrice + 0.001 + Math.random()*0.005; break;
+    case 'OP_SELLSTOP': price = marketPrice - 0.001 - Math.random()*0.005; break;
+  }
+  price = Math.round(price*100000)/100000;
+  document.getElementById('selType').value = type;
+  document.getElementById('inpVol').value = vol.toFixed(2);
+  document.getElementById('inpPrice').value = price.toFixed(5);
+  document.getElementById('inpSL').value = '';
+  document.getElementById('inpTP').value = '';
+  placeFromForm();
+}
+
+function checkCompletion(){
+  if(!completed && (pendingOrders.length>0 || executedCount>=2)){
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').innerHTML = '🎉 ¡Has colocado órdenes pendientes como un profesional! ¡Insignia desbloqueada!';
+    saveProgress();
+    completed = true;
+  }
+}
+
+document.getElementById('placeBtn').addEventListener('click', placeFromForm);
+document.getElementById('randomBtn').addEventListener('click', randomOrder);
+document.getElementById('cancelAllBtn').addEventListener('click', cancelAll);
+document.getElementById('selType').addEventListener('change', function(){
+  const price = parseFloat(document.getElementById('inpPrice').value);
+  if(price) updateCodePreview(this.value, price, parseFloat(document.getElementById('inpVol').value)||0.1, 0, 0);
+});
+
+window.addEventListener('load',()=>{
+  initProgress();
+  updatePrice();
+  setInterval(updatePrice, 3000);
+});
+</script>
+<script src="../../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

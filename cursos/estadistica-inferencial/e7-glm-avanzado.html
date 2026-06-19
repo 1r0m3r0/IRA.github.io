@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Estadística Inferencial | GLM Avanzado</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%);background-size:200% 200%;animation:gradientShift 20s ease infinite;font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
+    @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+    .container{max-width:1300px;width:100%;background:rgba(15,25,45,0.65);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(255,102,192,0.25);box-shadow:0 25px 45px rgba(0,0,0,0.5);overflow:hidden}
+    .hero-header{background:linear-gradient(95deg,#0b1120 0%,#111a2e 100%);padding:2rem 2rem 1.5rem;text-align:center;border-bottom:2px solid #ff66c0}
+    .hero-header h1{font-size:2.6rem;font-weight:800;background:linear-gradient(135deg,#FFF,#ff99dd,#ff66c0);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .hero-header p{font-size:1.1rem;color:#ffb3e6;margin-top:0.5rem;font-weight:500}
+    .badge-area{display:flex;justify-content:center;gap:1rem;margin-top:1.2rem;flex-wrap:wrap}
+    .chip{background:rgba(255,102,192,0.15);border:1px solid #ff66c0;padding:0.4rem 1rem;border-radius:40px;font-size:0.8rem;font-weight:600}
+    .analogy-card{background:#1e2a3acc;margin:1.5rem 2rem;padding:1.2rem 1.8rem;border-radius:2rem;border-left:8px solid #ff66c0;font-size:1rem;line-height:1.6}
+    .main-area{padding:0 2rem 1rem;display:flex;flex-direction:column;gap:1.5rem}
+    .glm-panel{background:#0f1a2be0;border-radius:2rem;padding:1.5rem;border:1px solid rgba(255,102,192,0.2)}
+    .glm-panel h3{font-size:1.2rem;margin-bottom:0.8rem;color:#ff99dd}
+    .model-selector{display:flex;flex-wrap:wrap;gap:0.6rem;margin-bottom:1rem;justify-content:center}
+    .model-btn{background:#1a2a4a;border:2px solid transparent;padding:0.6rem 1.2rem;border-radius:2rem;cursor:pointer;font-weight:600;font-size:0.85rem;transition:0.2s;color:#ccdeff;font-family:'Inter',sans-serif}
+    .model-btn.active{background:#ff66c0;color:#1e1a0c;border-color:#ff66c0}
+    .model-btn:hover{border-color:#ff66c0;transform:translateY(-2px)}
+    .model-demo{background:#0a0f1e;border-radius:1.5rem;padding:1.2rem;margin-top:0.5rem}
+    .model-demo h4{font-size:1.1rem;color:#ff99dd;margin-bottom:0.8rem}
+    .formula-box{background:#00000066;padding:0.8rem;border-radius:0.8rem;font-family:monospace;font-size:0.9rem;margin-bottom:0.8rem;border:1px solid rgba(255,102,192,0.15)}
+    .sim-data{display:flex;flex-wrap:wrap;gap:0.5rem;margin:0.5rem 0}
+    .sim-point{background:#1a2a4a;padding:0.4rem 0.6rem;border-radius:0.5rem;font-size:0.75rem;font-family:monospace;border:1px solid rgba(255,102,192,0.2)}
+    .result-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0.8rem;margin-top:1rem}
+    .metric{background:#1a2a4a;padding:0.7rem;border-radius:1rem;text-align:center}
+    .metric .val{font-size:1.2rem;font-weight:700;color:#ff99dd}
+    .metric .lbl{font-size:0.7rem;color:#8899bb;margin-top:0.2rem}
+    .roc-viz{width:100%;height:100px;position:relative;margin-top:0.8rem;background:#0a0f1e;border-radius:0.8rem;overflow:hidden}
+    .roc-viz canvas{width:100%;height:100%}
+    .btn-action{background:linear-gradient(95deg,#ff66c0,#ff3388);border:none;padding:0.8rem 1.8rem;font-weight:700;border-radius:3rem;cursor:pointer;font-size:1rem;transition:0.2s;color:#1e1a0c;font-family:'Inter',sans-serif;display:inline-flex;align-items:center;gap:0.5rem}
+    .btn-action:hover{transform:translateY(-2px);box-shadow:0 0 15px rgba(255,102,192,0.5)}
+    .feedback{background:#00000099;margin:0 2rem 1.5rem;padding:1rem;border-radius:1.5rem;text-align:center;font-weight:500;border-left:4px solid #ff66c0}
+    .insignia{text-align:center;background:#0c1b2f;border-radius:2rem;margin:0 2rem 1.5rem;padding:1rem;border:1px dashed gold}
+    .insignia i{font-size:2.5rem;color:gold}
+    .hidden{display:none}
+    .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.5rem 2rem}
+    .nav-link{background:#2c3e66;padding:0.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:0.5rem;transition:0.2s}
+    .nav-link:hover{transform:translateY(-2px);box-shadow:0 0 10px rgba(255,102,192,0.4)}
+    .nav-link.next{background:linear-gradient(95deg,#ff66c0,#ff3388);color:#1e1a0c}
+    .nav-link.menu{background:#1a2a4a;border:1px solid #ff66c0}
+    footer{text-align:center;padding:1.2rem;font-size:0.8rem;border-top:1px solid #2c3e66}
+    @media(max-width:800px){.hero-header h1{font-size:1.9rem}}
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+  <div class="container">
+    <div class="hero-header">
+      <h1>🔧 GLM Avanzado 🔧</h1>
+      <p>Para cada tipo de dato, su modelo</p>
+      <div class="badge-area">
+        <span class="chip"><i class="fas fa-code-branch"></i> Logit</span>
+        <span class="chip"><i class="fas fa-list"></i> Multinomial</span>
+        <span class="chip"><i class="fas fa-sort-amount-up"></i> Ordinal</span>
+        <span class="chip"><i class="fas fa-chart-line"></i> Poisson</span>
+      </div>
+    </div>
+    <div class="analogy-card">
+      <strong>🔪 Piénsalo así:</strong> Los modelos lineales generalizados son como una navaja suiza: cada tipo de dato tiene su herramienta. Logit para binario, Poisson para conteos, Multinomial para categorías. Todos son GLMs, pero cada uno con su "link function" específica.
+    </div>
+    <div class="main-area">
+      <div class="glm-panel">
+        <h3><i class="fas fa-tools"></i> Navaja Suiza de Modelos</h3>
+        <p style="font-size:0.85rem;color:#b9c8e6;margin-bottom:1rem">Selecciona un modelo para ver cómo funciona con datos simulados.</p>
+        <div class="model-selector" id="modelSelector">
+          <button class="model-btn active" data-model="logit">Logit</button>
+          <button class="model-btn" data-model="probit">Probit</button>
+          <button class="model-btn" data-model="multinomial">Multinomial</button>
+          <button class="model-btn" data-model="ordinal">Ordinal</button>
+          <button class="model-btn" data-model="poisson">Poisson</button>
+          <button class="model-btn" data-model="negbin">Neg. Binomial</button>
+        </div>
+        <div class="model-demo" id="modelDemo"></div>
+      </div>
+    </div>
+    <div id="feedbackMsg" class="feedback">
+      💡 Explora cada modelo GLM. Para cada tipo de variable dependiente existe una distribución y link function adecuadas.
+    </div>
+    <div id="insigniaArea" class="insignia hidden">
+      <i class="fas fa-medal"></i>
+      <h3>🏅 Ingeniero de GLMs 🏅</h3>
+      <p>¡Dominas la navaja suiza de los modelos! Logit, Probit, Poisson, NegBin... cada dato tiene su modelo.</p>
+    </div>
+    <div class="nav-links">
+      <a href="e6-manova.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+      <a href="e8-causalidad.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <footer><i class="fas fa-crown"></i> Estadística Inferencial Interactiva · Modo Experto</footer>
+  </div>
+  <script>
+    (function(){
+      const STORAGE_KEY='est_inf_e7';
+      let completed=false;
+      let viewedModels=new Set();
+
+      const models={
+        logit:{
+          name:'Logit (regresión logística binaria)',
+          desc:'Para variables dependientes binarias (0/1). Link function: logit(p)=ln(p/(1-p)).',
+          formula:'P(Y=1) = 1/(1+exp(-(β₀+β₁·X)))',
+          use:'Compra/no compra, enfermo/sano, conversión binaria',
+          metrics:{OR:'2.45',AUC:'0.87',Accuracy:'82%'},
+          simData:['0: X=1.2','1: X=2.8','0: X=0.5','1: X=3.1','1: X=2.3','0: X=0.8']
+        },
+        probit:{
+          name:'Probit (link probit)',
+          desc:'Alternativa al logit. Usa la función de distribución acumulada normal inversa.',
+          formula:'P(Y=1) = Φ(β₀+β₁·X) donde Φ es la CDF normal',
+          use:'Similar a logit, pero con supuestos de normalidad. Común en toxicología.',
+          metrics:{Coef:'1.83',AUC:'0.85','LogLik':'-42.3'},
+          simData:['0: X=1.0','0: X=1.5','1: X=2.5','1: X=3.0','1: X=2.8','0: X=0.9']
+        },
+        multinomial:{
+          name:'Logit Multinomial',
+          desc:'Para >2 categorías no ordenadas. Una categoría base, coeficientes para cada alternativa.',
+          formula:'P(Y=j) = exp(βⱼ·X)/Σₖ exp(βₖ·X)',
+          use:'Elección de transporte (auto/bus/tren), diagnóstico (A/B/C), voto',
+          metrics:{Accuracy:'76%','McFadden R²':'0.31',Categories:'3'},
+          simData:['A: X₁=2.1','B: X₁=4.3','C: X₁=1.2','A: X₁=1.8','B: X₁=3.9','C: X₁=0.7']
+        },
+        ordinal:{
+          name:'Logit Ordinal (proporcional odds)',
+          desc:'Para categorías ordenadas (bajo/medio/alto). Un solo coeficiente, múltiples thresholds.',
+          formula:'ln(P(Y≤j)/P(Y>j)) = τⱼ - β·X',
+          use:'Rating (1-5 estrellas), nivel educativo, severidad (leve/moderado/grave)',
+          metrics:{PseudoR²:'0.28','Thresholds':'4','Proportional odds':'✓'},
+          simData:['1: X=0.5','2: X=1.2','3: X=2.1','4: X=2.8','5: X=3.5','3: X=1.9']
+        },
+        poisson:{
+          name:'Regresión Poisson',
+          desc:'Para datos de conteo (0,1,2,...). Link: log. Asume media = varianza.',
+          formula:'ln(μ) = β₀+β₁·X, donde Y~Poisson(μ)',
+          use:'Número de accidentes, ventas diarias, visitas al sitio',
+          metrics:{IRR:'1.42',Deviance:'28.3',Overdispersion:'1.02'},
+          simData:['0: X=0.2','3: X=2.1','1: X=1.0','5: X=3.2','2: X=1.8','4: X=2.7']
+        },
+        negbin:{
+          name:'Binomial Negativa',
+          desc:'Para conteos con sobredispersión (varianza > media). Parámetro θ adicional.',
+          formula:'ln(μ) = β₀+β₁·X, Y~NegBin(μ, θ)',
+          use:'Conteos con mucha variabilidad, como reclamos de seguros, días de hospitalización',
+          metrics:{IRR:'1.38',θ:'0.84',Dispersion:'1.19'},
+          simData:['0: X=0.1','8: X=2.5','2: X=0.9','12: X=3.5','3: X=1.2','6: X=2.0']
+        }
+      };
+
+      const demoEl=document.getElementById('modelDemo');
+      const feedbackEl=document.getElementById('feedbackMsg');
+      const insigniaEl=document.getElementById('insigniaArea');
+
+      function renderModel(key){
+        const m=models[key];
+        viewedModels.add(key);
+        const simHtml=m.simData.map(d=>`<span class="sim-point">${d}</span>`).join('');
+        const metricsHtml=Object.entries(m.metrics).map(([k,v])=>
+          `<div class="metric"><div class="val">${v}</div><div class="lbl">${k}</div></div>`
+        ).join('');
+        const html=`
+          <h4>${m.name}</h4>
+          <p style="font-size:0.85rem;color:#b9c8e6;margin-bottom:0.5rem">${m.desc}</p>
+          <div class="formula-box">${m.formula}</div>
+          <p style="font-size:0.8rem;color:#8899bb;margin-bottom:0.5rem">📌 <strong>Cuándo usarlo:</strong> ${m.use}</p>
+          <div class="sim-data">${simHtml}</div>
+          <div class="result-metrics">${metricsHtml}</div>
+          <div class="roc-viz">
+            <canvas id="rocCanvas"></canvas>
+          </div>
+        `;
+        demoEl.innerHTML=html;
+        drawROC(key);
+
+        if(viewedModels.size>=3&&!completed){
+          completed=true;
+          localStorage.setItem(STORAGE_KEY,'completed');
+          insigniaEl.classList.remove('hidden');
+          feedbackEl.innerHTML='🎉 ¡Excelente! Has explorado '+viewedModels.size+' modelos GLM. Cada tipo de dato tiene su herramienta.';
+        }
+      }
+
+      function drawROC(modelKey){
+        const canvas=document.getElementById('rocCanvas');
+        if(!canvas)return;
+        const w=canvas.parentElement.clientWidth;
+        const h=canvas.parentElement.clientHeight;
+        canvas.width=w;
+        canvas.height=h;
+        const ctx=canvas.getContext('2d');
+        ctx.clearRect(0,0,w,h);
+
+        const colors={'logit':'#ff66c0','probit':'#66ccff','multinomial':'#ffcc44','ordinal':'#66ff99','poisson':'#ff8844','negbin':'#cc66ff'};
+        const color=colors[modelKey]||'#ff66c0';
+
+        ctx.strokeStyle='#2c3e66';
+        ctx.lineWidth=1;
+        ctx.beginPath();
+        ctx.moveTo(10,h-10);
+        ctx.lineTo(w-10,h-10);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(10,0);
+        ctx.lineTo(10,h-10);
+        ctx.stroke();
+
+        ctx.strokeStyle=color;
+        ctx.lineWidth=2.5;
+        ctx.beginPath();
+        const points=20;
+        for(let i=0;i<=points;i++){
+          const tpr=1-Math.pow(1-i/points,1.2+Math.random()*0.3);
+          const fpr=1-Math.pow(1-i/points,2.5);
+          const x=10+(w-20)*fpr;
+          const y=(h-10)*(1-tpr);
+          if(i===0)ctx.moveTo(x,y);
+          else ctx.lineTo(x,y);
+        }
+        ctx.stroke();
+
+        ctx.setLineDash([3,3]);
+        ctx.strokeStyle='#444466';
+        ctx.lineWidth=1;
+        ctx.beginPath();
+        ctx.moveTo(10,h-10);
+        ctx.lineTo(w-10,0);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        ctx.fillStyle='#8899bb';
+        ctx.font='9px Inter';
+        ctx.fillText('FPR',w-30,h-2);
+        ctx.fillText('TPR',2,10);
+        ctx.fillStyle=color;
+        ctx.font='bold 9px Inter';
+        ctx.fillText('ROC',w-40,20);
+      }
+
+      document.querySelectorAll('.model-btn').forEach(btn=>{
+        btn.addEventListener('click',function(){
+          document.querySelectorAll('.model-btn').forEach(b=>b.classList.remove('active'));
+          this.classList.add('active');
+          renderModel(this.dataset.model);
+        });
+      });
+
+      if(localStorage.getItem(STORAGE_KEY)==='completed'){
+        completed=true;
+        viewedModels=new Set(['logit','poisson','negbin','multinomial']);
+        renderModel('logit');
+        document.querySelectorAll('.model-btn').forEach(b=>b.classList.remove('active'));
+        document.querySelector('.model-btn[data-model="logit"]').classList.add('active');
+        insigniaEl.classList.remove('hidden');
+        feedbackEl.innerHTML='🎉 ¡Bienvenido de vuelta! Ya completaste este módulo.';
+      }else{
+        renderModel('logit');
+      }
+    })();
+  </script>
+</body>
+</html>

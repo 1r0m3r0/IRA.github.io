@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Est. Descriptiva | 📊 Visualización de Datos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:linear-gradient(135deg,#0a0f1e,#0c1222 50%,#111a2e); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+    .course-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(0,224,255,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+    .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #00e0ff; }
+    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#7af2ff,#00e0ff); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .hero-header p { font-size:1.1rem; color:#b9e2ff; margin-top:0.5rem; font-weight:500; }
+    .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+    .chip { background:rgba(0,224,255,0.15); border:1px solid #00e0ff; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+    .progress-section { padding:1.2rem 2rem; border-bottom:1px solid #1a2a4a; }
+    .progress-bar-outer { background:#1a2a4a; border-radius:20px; height:16px; overflow:hidden; }
+    .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#00e0ff,#0088ff); border-radius:20px; transition:width 0.5s ease; }
+    .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
+    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #00e0ff; font-size:1rem; line-height:1.6; }
+    .main-area { padding:1.5rem 2rem; }
+    .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#00e0ff; }
+    .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
+    .info-panel { background:rgba(10,20,40,0.7); border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
+    .info-panel h3 { color:#7af2ff; font-size:1rem; margin-bottom:0.5rem; }
+    .info-panel p { font-size:0.85rem; color:#b9ccee; line-height:1.6; }
+    .sim-area { background:rgba(0,10,25,0.5); border-radius:2rem; padding:1.5rem; margin-bottom:1.5rem; border:1px solid #2c3e66; }
+    .sim-area h3 { color:#00e0ff; margin-bottom:1rem; }
+    .viz-canvas { display:block; margin:0 auto; background:#0a0f1e; border-radius:1rem; border:1px solid #2c3e66; }
+    .chart-selector { display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:1rem; justify-content:center; }
+    .chart-btn { background:#1e2a3e; border:1px solid #2c3e66; padding:0.4rem 1rem; border-radius:2rem; cursor:pointer; color:#b9ccee; font-size:0.8rem; transition:0.2s; }
+    .chart-btn:hover { border-color:#00e0ff; }
+    .chart-btn.active { background:#00e0ff; color:#000; font-weight:bold; border-color:#00e0ff; }
+    .quiz-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #3399ff; margin-bottom:1.5rem; }
+    .quiz-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#00e0ff; }
+    .question { background:#0f1a2c; margin:0.8rem 0; padding:0.8rem 1rem; border-radius:1.2rem; }
+    .question p { font-weight:600; margin-bottom:0.5rem; font-size:0.95rem; }
+    .options { display:flex; flex-wrap:wrap; gap:0.6rem; }
+    .opt { background:#1e2a3e; padding:0.3rem 0.9rem; border-radius:2rem; cursor:pointer; transition:0.2s; font-size:0.85rem; }
+    .opt:hover { background:#2c3e66; transform:translateY(-2px); }
+    .opt.selected { background:#00e0ff; color:#000; font-weight:bold; box-shadow:0 0 8px cyan; }
+    .opt.correct { background:#00cc88; color:#000; }
+    .opt.wrong { background:#ff4455; color:#fff; }
+    .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #00e0ff; }
+    .btn-action { background:linear-gradient(95deg,#f0a500,#ff6a00); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin-top:1rem; }
+    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(240,165,0,0.5); }
+    .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
+    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin-top:1.5rem; padding:1rem; border:1px dashed gold; }
+    .insignia i { font-size:2.5rem; color:gold; }
+    .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
+    .hidden { display:none; }
+    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(0,224,255,0.4); }
+    .nav-link.next { background:linear-gradient(95deg,#f0a500,#ff6a00); color:#1e1a0c; }
+    .nav-link.menu { background:#1a2a4a; border:1px solid #3399ff; }
+    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .info-grid { grid-template-columns:1fr; } }
+  </style>
+  <link rel="stylesheet" href="../../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a><a href="../index.html">Programa Estadística</a></nav>
+  <div class="course-container" id="app">
+    <div class="hero-header">
+      <h1>📊 Visualización de Datos</h1>
+      <p>Un gráfico vale más que mil números</p>
+      <div class="badge-area">
+        <span class="chip"><i class="fas fa-chart-bar"></i> Barras</span>
+        <span class="chip"><i class="fas fa-chart-area"></i> Histograma</span>
+        <span class="chip"><i class="fas fa-chart-line"></i> Boxplot</span>
+        <span class="chip"><i class="fas fa-circle"></i> Dispersión</span>
+      </div>
+    </div>
+    <div class="progress-section">
+      <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+      <span class="progress-text" id="progressText">Módulo 3 de 12</span>
+    </div>
+    <div class="analogy-card">
+      <strong>💡 Piénsalo así:</strong> Si los datos fueran una novela, los gráficos serían su portada. Una buena portada te cuenta la esencia de la historia sin tener que leer cada página. La visualización transforma números en historias visuales que cualquier persona puede entender.
+    </div>
+    <div class="main-area">
+      <div class="section-title"><i class="fas fa-palette"></i> Tipos de Gráficos</div>
+      <div class="info-grid">
+        <div class="info-panel">
+          <h3><i class="fas fa-chart-bar"></i> Barras</h3>
+          <p>Para variables cualitativas o discretas. La altura representa la frecuencia. Las barras no se tocan.</p>
+        </div>
+        <div class="info-panel">
+          <h3><i class="fas fa-chart-area"></i> Histograma</h3>
+          <p>Para variables continuas agrupadas en intervalos. Las barras se tocan, mostrando la densidad.</p>
+        </div>
+        <div class="info-panel">
+          <h3><i class="fas fa-chart-line"></i> Boxplot</h3>
+          <p>Resume la distribución: mediana, cuartiles y valores atípicos. Perfecto para comparar grupos.</p>
+        </div>
+        <div class="info-panel">
+          <h3><i class="fas fa-circle"></i> Dispersión</h3>
+          <p>Relaciona dos variables numéricas. Cada punto representa una observación (X, Y).</p>
+        </div>
+      </div>
+
+      <div class="section-title"><i class="fas fa-draw-polygon"></i> Simulador de Gráficos</div>
+      <div class="sim-area">
+        <div class="chart-selector">
+          <button class="chart-btn active" data-chart="bars">Barras</button>
+          <button class="chart-btn" data-chart="histogram">Histograma</button>
+          <button class="chart-btn" data-chart="boxplot">Boxplot</button>
+          <button class="chart-btn" data-chart="scatter">Dispersión</button>
+        </div>
+        <canvas id="chartCanvas" class="viz-canvas" width="600" height="320"></canvas>
+        <p id="chartCaption" style="text-align:center;font-size:0.8rem;color:#8899cc;margin-top:0.8rem;">Gráfico de Barras — Frecuencia de colores favoritos</p>
+      </div>
+
+      <div class="quiz-area">
+        <div class="quiz-title"><i class="fas fa-question-circle"></i> Mini Quiz: Visualización</div>
+        <div id="quizContainer"></div>
+        <button id="submitQuizBtn" class="btn-action">✅ Verificar respuestas</button>
+        <div id="insigniaArea" class="insignia hidden">
+          <i class="fas fa-medal"></i>
+          <h3>🎨 Maestro Visual 🎨</h3>
+          <p>Sabes elegir el gráfico adecuado para cada tipo de dato. ¡Impresionante!</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre tipos de gráficos y su uso.</div>
+
+    <div class="nav-links">
+      <a href="02-organizacion-datos.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+      <a href="04-tendencia-central.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <footer><i class="fas fa-chart-bar"></i> Curso 2: Estadística Descriptiva · Módulo 3 de 12</footer>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'prog_est_2_03';
+    const PROGRESS_KEY = 'prog_est_2_progress';
+    const questions = [
+      { text: "¿Qué gráfico es más adecuado para mostrar la distribución de edades en una población?", options: ["Gráfico de barras", "Histograma", "Gráfico circular", "Diagrama de dispersión"], correct: 1 },
+      { text: "En un histograma, las barras:", options: ["Están separadas", "Se tocan entre sí", "Son circulares", "Muestran porcentajes"], correct: 1 },
+      { text: "¿Qué gráfico es mejor para comparar la mediana entre varios grupos?", options: ["Barras apiladas", "Boxplot", "Histograma", "Dispersión"], correct: 1 },
+      { text: "Un diagrama de dispersión se usa para:", options: ["Mostrar frecuencias", "Comparar categorías", "Relacionar dos variables numéricas", "Mostrar tendencia central"], correct: 2 },
+      { text: "¿Qué elemento NO aparece en un boxplot?", options: ["Mediana", "Cuartiles", "Media aritmética", "Valores atípicos"], correct: 2 }
+    ];
+    let userAnswers = new Array(questions.length).fill(null);
+    let quizCompleted = false;
+
+    function saveProgress() {
+      let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+      if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
+      localStorage.setItem(STORAGE_KEY, 'true');
+    }
+
+    function updateProgress() {
+      let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+      document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
+      document.getElementById('progressText').textContent = 'M\u00f3dulo '+(p.length || 1)+' de 12';
+    }
+
+    const canvas = document.getElementById('chartCanvas');
+    const ctx = canvas.getContext('2d');
+
+    function drawBars() {
+      const data = { Rojo: 12, Azul: 18, Verde: 9, Amarillo: 7, Negro: 14 };
+      const labels = Object.keys(data); const values = Object.values(data);
+      const max = Math.max(...values); const w = 80; const pad = 60; const base = 280;
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      ctx.strokeStyle = '#2c3e66'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(pad-10,20); ctx.lineTo(pad-10,base); ctx.lineTo(canvas.width-20,base);
+      ctx.stroke();
+      labels.forEach((l,i) => {
+        const h = (values[i]/max)*200; const x = pad + 15 + i * (w+15);
+        const grad = ctx.createLinearGradient(x,base,x,base-h);
+        grad.addColorStop(0,'#00e0ff'); grad.addColorStop(1,'#0088ff');
+        ctx.fillStyle = grad; ctx.beginPath(); ctx.roundRect(x,base-h,w-10,h,4); ctx.fill();
+        ctx.fillStyle = '#b9ccee'; ctx.font = '12px Inter'; ctx.textAlign = 'center';
+        ctx.fillText(l,x+w/2-5,base+18);
+        ctx.fillStyle = '#7af2ff'; ctx.font = 'bold 12px Inter';
+        ctx.fillText(values[i],x+w/2-5,base-h-6);
+      });
+      document.getElementById('chartCaption').textContent = 'Gráfico de Barras — Frecuencia de colores favoritos';
+    }
+
+    function drawHistogram() {
+      const data = [18,19,19,20,21,21,22,22,22,23,24,24,25,25,26,27,28,30,32,35];
+      const bins = 6; const min = 18; const max = 36; const binW = (max-min)/bins;
+      const counts = new Array(bins).fill(0);
+      data.forEach(v => { const idx = Math.min(bins-1, Math.floor((v-min)/binW)); counts[idx]++; });
+      const maxC = Math.max(...counts); const pad = 60; const base = 280; const fullW = canvas.width-pad-20;
+      const barW = fullW / bins;
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      ctx.strokeStyle = '#2c3e66'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(pad-10,20); ctx.lineTo(pad-10,base); ctx.lineTo(canvas.width-20,base);
+      ctx.stroke();
+      counts.forEach((c,i) => {
+        const h = (c/maxC)*200; const x = pad + i*barW;
+        const grad = ctx.createLinearGradient(x,base,x,base-h);
+        grad.addColorStop(0,'#00e0ff'); grad.addColorStop(1,'#0088ff');
+        ctx.fillStyle = grad; ctx.beginPath(); ctx.roundRect(x,base-h,barW-2,h,0); ctx.fill();
+        ctx.fillStyle = '#8899cc'; ctx.font = '10px Inter'; ctx.textAlign = 'center';
+        const lo = Math.round(min+i*binW); const hi = Math.round(min+(i+1)*binW);
+        ctx.fillText(lo+'-'+(hi-1),x+barW/2,base+16);
+      });
+      document.getElementById('chartCaption').textContent = 'Histograma — Distribución de edades (20 personas)';
+    }
+
+    function drawBoxplot() {
+      const data = [18,19,19,20,21,21,22,22,22,23,24,24,25,25,26,27,28,30,32,35];
+      const sorted = [...data].sort((a,b)=>a-b); const n = sorted.length;
+      const q1 = sorted[Math.floor(n*0.25)]; const med = sorted[Math.floor(n*0.5)];
+      const q3 = sorted[Math.floor(n*0.75)]; const iqr = q3-q1;
+      const minVal = sorted[0]; const maxVal = sorted[n-1];
+      const padL = 60; const padR = 40; const w = canvas.width-padL-padR;
+      const baseY = 180; const boxH = 60; const y0 = baseY-boxH/2;
+      const scale = (v) => padL + ((v-minVal)/(maxVal-minVal))*w;
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      ctx.strokeStyle = '#2c3e66'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(padL,baseY); ctx.lineTo(padL+w,baseY); ctx.stroke();
+      ctx.strokeStyle = '#00e0ff'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(scale(minVal),baseY); ctx.lineTo(scale(q1),baseY); ctx.stroke();
+      ctx.strokeStyle = '#00e0ff'; ctx.lineWidth = 2;
+      ctx.strokeRect(scale(q1),y0,scale(q3)-scale(q1),boxH);
+      ctx.strokeStyle = '#ffaa00'; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(scale(med),y0); ctx.lineTo(scale(med),y0+boxH); ctx.stroke();
+      ctx.strokeStyle = '#00e0ff'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(scale(q3),baseY); ctx.lineTo(scale(maxVal),baseY); ctx.stroke();
+      ctx.fillStyle = '#b9ccee'; ctx.font = '11px Inter'; ctx.textAlign = 'center';
+      ctx.fillText('Min: '+minVal,scale(minVal),baseY+25);
+      ctx.fillText('Q1: '+q1,scale(q1),baseY+25);
+      ctx.fillText('Med: '+med,scale(med),baseY-15);
+      ctx.fillText('Q3: '+q3,scale(q3),baseY+25);
+      ctx.fillText('Max: '+maxVal,scale(maxVal),baseY+25);
+      document.getElementById('chartCaption').textContent = 'Boxplot — Edades, Mediana='+med+', IQR='+iqr;
+    }
+
+    function drawScatter() {
+      const points = [[2,3],[3,5],[4,4],[5,6],[6,5],[7,7],[8,6],[9,8],[10,7],[11,9],[12,8],[13,10]];
+      const pad = 60; const baseX = pad; const baseY = 280;
+      const plotW = canvas.width-pad-20; const plotH = 240;
+      const scale = (v,min,max,r) => baseX + ((v-min)/(max-min))*r;
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      ctx.strokeStyle = '#2c3e66'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(baseX-10,baseY); ctx.lineTo(baseX+plotW,baseY); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(baseX,20); ctx.lineTo(baseX,baseY); ctx.stroke();
+      ctx.fillStyle = '#00e0ff';
+      points.forEach(([x,y]) => {
+        const px = scale(x,2,13,plotW); const py = scale(y,3,10,plotH);
+        ctx.beginPath(); ctx.arc(px,baseY-py,5,0,Math.PI*2); ctx.fill();
+      });
+      ctx.fillStyle = '#b9ccee'; ctx.font = '10px Inter'; ctx.textAlign = 'center';
+      ctx.fillText('Horas estudio',baseX+plotW/2,baseY+20);
+      ctx.save(); ctx.translate(12,150); ctx.rotate(-Math.PI/2); ctx.fillText('Calificación',0,0); ctx.restore();
+      document.getElementById('chartCaption').textContent = 'Diagrama de Dispersión — Horas de estudio vs Calificación';
+    }
+
+    if (!CanvasRenderingContext2D.prototype.roundRect) {
+      CanvasRenderingContext2D.prototype.roundRect = function(x,y,w,h,r) {
+        if (r > w/2) r = w/2; if (r > h/2) r = h/2;
+        this.moveTo(x+r,y); this.lineTo(x+w-r,y); this.quadraticCurveTo(x+w,y,x+w,y+r);
+        this.lineTo(x+w,y+h-r); this.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+        this.lineTo(x+r,y+h); this.quadraticCurveTo(x,y+h,x,y+h-r);
+        this.lineTo(x,y+r); this.quadraticCurveTo(x,y,x+r,y); this.closePath(); return this;
+      };
+    }
+
+    document.querySelectorAll('.chart-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.chart-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        const type = this.dataset.chart;
+        if (type === 'bars') drawBars();
+        else if (type === 'histogram') drawHistogram();
+        else if (type === 'boxplot') drawBoxplot();
+        else if (type === 'scatter') drawScatter();
+      });
+    });
+
+    drawBars();
+
+    function renderQuestions() {
+      const container = document.getElementById('quizContainer');
+      container.innerHTML = '';
+      questions.forEach((q, idx) => {
+        const qDiv = document.createElement('div'); qDiv.classList.add('question');
+        qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
+        const optsDiv = qDiv.querySelector('.options');
+        q.options.forEach((opt, optIdx) => {
+          const span = document.createElement('div'); span.classList.add('opt');
+          span.textContent = opt; span.dataset.qIdx = idx; span.dataset.optIdx = optIdx;
+          span.addEventListener('click', function() {
+            if (quizCompleted) return;
+            this.parentElement.querySelectorAll('.opt').forEach(c => c.classList.remove('selected'));
+            this.classList.add('selected'); userAnswers[idx] = optIdx; updateBtnState();
+          });
+          optsDiv.appendChild(span);
+        });
+        container.appendChild(qDiv);
+      });
+    }
+
+    function updateBtnState() {
+      document.getElementById('submitQuizBtn').disabled = userAnswers.some(a => a === null) || quizCompleted;
+    }
+
+    function handleSubmit() {
+      if (quizCompleted) return;
+      if (userAnswers.some(a => a === null)) { document.getElementById('feedbackMsg').textContent = '⚠️ Responde todas las preguntas primero.'; return; }
+      let correct = 0;
+      questions.forEach((q, i) => { if (userAnswers[i] === q.correct) correct++; });
+      const total = questions.length; const passed = correct >= Math.ceil(total * 0.6);
+      document.querySelectorAll('.question').forEach((qDiv, idx) => {
+        const opts = qDiv.querySelectorAll('.opt');
+        opts.forEach((o, oi) => {
+          o.classList.remove('selected');
+          if (oi === questions[idx].correct) o.classList.add('correct');
+          else if (oi === userAnswers[idx]) o.classList.add('wrong');
+        });
+      });
+      if (passed) {
+        quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+        document.getElementById('insigniaArea').classList.remove('hidden');
+        document.getElementById('feedbackMsg').textContent = '🎉 ¡Excelente! Dominas la visualización de datos.';
+        saveProgress(); updateProgress();
+      } else {
+        document.getElementById('feedbackMsg').textContent = '❌ ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. ¡Reintenta!';
+      }
+    }
+
+    function restoreProgress() {
+      const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+      if (p.includes(STORAGE_KEY)) {
+        quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+        document.getElementById('insigniaArea').classList.remove('hidden');
+        document.getElementById('feedbackMsg').textContent = '🏆 Ya completaste este módulo.';
+        document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
+      }
+    }
+
+    document.getElementById('submitQuizBtn').addEventListener('click', handleSubmit);
+    renderQuestions(); updateBtnState(); restoreProgress(); updateProgress();
+  </script>
+  <script src="../../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

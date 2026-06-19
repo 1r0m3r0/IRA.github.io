@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Quant Trading | Portfolio Optimization</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+    .modulo-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,215,0,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+    .hero-header { background:linear-gradient(95deg,#0b1120 0%,#111a2e 100%); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #ffd700; }
+    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#ffddaa,#ffd700); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+    .chip { background:rgba(255,215,0,0.15); border:1px solid #ffd700; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ffd700; font-size:1rem; line-height:1.6; }
+    .main-area { padding:1.5rem 2rem; display:flex; flex-direction:column; gap:1.5rem; }
+    .grid-2col { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; }
+    .panel { background:rgba(10,18,40,0.7); border-radius:1.8rem; padding:1.5rem; border:1px solid rgba(255,215,0,0.15); }
+    .panel h3 { font-size:1.2rem; margin-bottom:1rem; color:#ffddaa; }
+    .asset-row { display:flex; align-items:center; gap:1rem; margin-bottom:0.8rem; flex-wrap:wrap; }
+    .asset-row label { min-width:80px; font-weight:600; }
+    .asset-row input[type=range] { flex:1; accent-color:#ffd700; height:6px; }
+    .asset-row input[type=number] { width:70px; background:#1a2a44; border:1px solid #ffd70055; color:#fff; padding:0.3rem; border-radius:8px; text-align:center; font-weight:700; }
+    .weight-display { min-width:40px; text-align:right; font-weight:700; color:#ffd700; }
+    .method-select { display:flex; gap:0.8rem; flex-wrap:wrap; margin-bottom:1rem; }
+    .method-btn { background:#1a2a44; border:1px solid #2c3e66; padding:0.6rem 1.2rem; border-radius:2rem; cursor:pointer; font-weight:600; color:#eef5ff; transition:0.2s; }
+    .method-btn.active { background:#ffd70033; border-color:#ffd700; color:#ffd700; }
+    .method-btn:hover { transform:translateY(-2px); }
+    .stat-row { display:flex; justify-content:space-between; padding:0.5rem 0; border-bottom:1px solid rgba(255,215,0,0.1); }
+    .stat-row .label { color:#8899bb; }
+    .stat-row .value { font-weight:700; color:#ffd700; }
+    canvas { width:100%; max-width:500px; height:300px; border-radius:1.2rem; background:#080e1a; display:block; margin:0 auto; }
+    .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #ffd700; }
+    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:0 2rem 1.5rem; padding:1rem; border:1px dashed gold; }
+    .insignia i { font-size:2.5rem; color:gold; }
+    .hidden { display:none; }
+    .btn-action { background:linear-gradient(95deg,#f0a500,#ff6a00); border:none; padding:0.8rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; color:#1e1a0c; transition:0.2s; }
+    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(240,165,0,0.5); }
+    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(255,215,0,0.4); }
+    .nav-link.next { background:linear-gradient(95deg,#f0a500,#ff6a00); color:#1e1a0c; }
+    .nav-link.menu { background:#1a2a4a; border:1px solid #3399ff; }
+    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .grid-2col { grid-template-columns:1fr; } }
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+  <div class="modulo-container">
+    <div class="hero-header">
+      <h1><i class="fas fa-chart-pie"></i> Portfolio Optimization</h1>
+      <p>Construye el portafolio óptimo con métodos cuantitativos reales</p>
+      <div class="badge-area">
+        <span class="chip"><i class="fas fa-calculator"></i> Mean-Variance</span>
+        <span class="chip"><i class="fas fa-balance-scale"></i> Risk Parity</span>
+        <span class="chip"><i class="fas fa-project-diagram"></i> HRP</span>
+      </div>
+    </div>
+    <div class="analogy-card">
+      <strong><i class="fas fa-lightbulb"></i> Piénsalo así:</strong> Tu portafolio es como una pizza. Si solo pones pepperoni (una acción), cuando se acabe el pepperoni te quedas sin pizza. Un portafolio óptimo es como una pizza con ingredientes variados: si no hay queso, aún tienes pepperoni. La optimización encuentra la combinación perfecta para que cada rebanada te dé la mayor satisfacción (retorno) posible con el menor riesgo de indigestión (volatilidad).
+    </div>
+    <div class="main-area">
+      <div class="grid-2col">
+        <div class="panel">
+          <h3><i class="fas fa-weight-hanging"></i> Asignación de Activos</h3>
+          <div class="asset-row"><label><i class="fas fa-chart-line"></i> Stocks</label><input type="range" id="w0" min="0" max="100" value="40"><input type="number" id="n0" min="0" max="100" value="40" step="1"><span class="weight-display" id="d0">40%</span></div>
+          <div class="asset-row"><label><i class="fas fa-hand-holding-usd"></i> Bonds</label><input type="range" id="w1" min="0" max="100" value="30"><input type="number" id="n1" min="0" max="100" value="30" step="1"><span class="weight-display" id="d1">30%</span></div>
+          <div class="asset-row"><label><i class="fab fa-bitcoin"></i> Crypto</label><input type="range" id="w2" min="0" max="100" value="20"><input type="number" id="n2" min="0" max="100" value="20" step="1"><span class="weight-display" id="d2">20%</span></div>
+          <div class="asset-row"><label><i class="fas fa-coins"></i> Gold</label><input type="range" id="w3" min="0" max="100" value="10"><input type="number" id="n3" min="0" max="100" value="10" step="1"><span class="weight-display" id="d3">10%</span></div>
+          <div class="stat-row"><span class="label">Total Asignado</span><span class="value" id="totalWeight">100%</span></div>
+        </div>
+        <div class="panel">
+          <h3><i class="fas fa-microchip"></i> Método de Optimización</h3>
+          <div class="method-select">
+            <button class="method-btn active" data-method="mv">Mean-Variance</button>
+            <button class="method-btn" data-method="rp">Risk Parity</button>
+            <button class="method-btn" data-method="hrp">HRP</button>
+          </div>
+          <div id="statsArea">
+            <div class="stat-row"><span class="label">Retorno Esperado</span><span class="value" id="retVal">8.2%</span></div>
+            <div class="stat-row"><span class="label">Riesgo (Vol)</span><span class="value" id="riskVal">12.4%</span></div>
+            <div class="stat-row"><span class="label">Sharpe Ratio</span><span class="value" id="sharpeVal">0.66</span></div>
+            <div class="stat-row"><span class="label">Diversificación</span><span class="value" id="divVal">78%</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3><i class="fas fa-chart-line"></i> Frontera Eficiente</h3>
+        <canvas id="frontierCanvas"></canvas>
+      </div>
+      <button class="btn-action" id="optimizeBtn" style="width:fit-content;margin:0 auto;"><i class="fas fa-cogs"></i> Optimizar Portafolio</button>
+    </div>
+    <div id="feedbackMsg" class="feedback">💡 Ajusta los pesos de cada activo y haz clic en "Optimizar Portafolio". ¡Busca el mayor retorno con el menor riesgo!</div>
+    <div id="insigniaArea" class="insignia hidden">
+      <i class="fas fa-medal"></i>
+      <h3>🏅 Portfolio Optimizer 🏅</h3>
+      <p>Has dominado la optimización de portafolios. ¡Los mercados están a tu favor!</p>
+    </div>
+    <div class="nav-links">
+      <a href="10-backtesting.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+      <a href="12-risk-management.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <footer><i class="fas fa-crown"></i> Quant Trading · Domina los algoritmos que mueven Wall Street</footer>
+  </div>
+  <script>
+    const STORAGE_KEY = 'quant_trading_11';
+    let method = 'mv';
+    const assets = ['Stocks','Bonds','Crypto','Gold'];
+    const expRet = [12,4,18,6];
+    const vol = [18,6,35,14];
+    const corr = [[1,0.3,0.6,0.1],[0.3,1,0.2,0.3],[0.6,0.2,1,0.15],[0.1,0.3,0.15,1]];
+
+    function getWeights() {
+      let w = [];
+      for(let i=0;i<4;i++) {
+        let v = parseInt(document.getElementById('w'+i).value);
+        w.push(v/100);
+      }
+      let s = w.reduce((a,b)=>a+b,0);
+      if(s===0) return [0.25,0.25,0.25,0.25];
+      return w.map(x=>x/s);
+    }
+
+    function setWeight(i,val) {
+      let pct = Math.round(val*100);
+      document.getElementById('w'+i).value = pct;
+      document.getElementById('n'+i).value = pct;
+      document.getElementById('d'+i).textContent = pct+'%';
+      updateTotal();
+    }
+
+    function updateTotal() {
+      let w = getWeights();
+      let s = Math.round(w.reduce((a,b)=>a+b,0)*100);
+      document.getElementById('totalWeight').textContent = s+'%';
+    }
+
+    function syncSliders() {
+      for(let i=0;i<4;i++) {
+        let v = parseInt(document.getElementById('w'+i).value);
+        document.getElementById('n'+i).value = v;
+        document.getElementById('d'+i).textContent = v+'%';
+      }
+      updateTotal();
+    }
+
+    function syncInputs() {
+      for(let i=0;i<4;i++) {
+        let v = parseInt(document.getElementById('n'+i).value);
+        if(isNaN(v)) v=0;
+        v=Math.max(0,Math.min(100,v));
+        document.getElementById('w'+i).value = v;
+        document.getElementById('d'+i).textContent = v+'%';
+      }
+      updateTotal();
+    }
+
+    function portfolioStats(w) {
+      let ret = 0, risk = 0;
+      for(let i=0;i<4;i++) ret += w[i]*expRet[i];
+      for(let i=0;i<4;i++) {
+        for(let j=0;j<4;j++) {
+          risk += w[i]*w[j]*vol[i]*vol[j]*corr[i][j];
+        }
+      }
+      risk = Math.sqrt(risk);
+      let sharpe = risk>0 ? (ret-2)/risk : 0;
+      let div = 0;
+      for(let i=0;i<4;i++) div += w[i]*w[i];
+      div = (1-div)*100;
+      return {ret,risk,sharpe,div};
+    }
+
+    function computeFrontier() {
+      const points = [];
+      const w = getWeights();
+      for(let a=0;a<=100;a+=2) {
+        let wa = a/100;
+        let wb = 1-wa;
+        let mix = w.map((x,i)=>x*wa + (1/4)*wb);
+        let s = mix.reduce((a,b)=>a+b,0);
+        if(s>0) mix = mix.map(x=>x/s);
+        let st = portfolioStats(mix);
+        points.push({risk:st.risk,ret:st.ret});
+      }
+      return points;
+    }
+
+    function drawFrontier(highlight) {
+      const canvas = document.getElementById('frontierCanvas');
+      const ctx = canvas.getContext('2d');
+      const rect = canvas.parentElement.getBoundingClientRect();
+      const dpr = window.devicePixelRatio||1;
+      canvas.width = (rect.width-32)*dpr;
+      canvas.height = 300*dpr;
+      canvas.style.width = (rect.width-32)+'px';
+      canvas.style.height = '300px';
+      ctx.scale(dpr,dpr);
+      const W = canvas.width/dpr, H = canvas.height/dpr;
+      ctx.clearRect(0,0,W,H);
+
+      const points = computeFrontier();
+      let maxR = Math.max(...points.map(p=>p.ret))*1.2;
+      let maxV = Math.max(...points.map(p=>p.risk))*1.2;
+      if(maxR<5) maxR=20; if(maxV<5) maxV=25;
+      const pad = {t:20,r:20,b:30,l:45};
+      const plotW = W-pad.l-pad.r, plotH = H-pad.t-pad.b;
+
+      function x(v) { return pad.l+(v/maxV)*plotW; }
+      function y(r) { return pad.t+plotH-(r/maxR)*plotH; }
+
+      // grid
+      ctx.strokeStyle='#1a2a44';
+      ctx.lineWidth=0.5;
+      for(let i=0;i<=5;i++) {
+        let vx = pad.l+(i/5)*plotW;
+        ctx.beginPath(); ctx.moveTo(vx,pad.t); ctx.lineTo(vx,pad.t+plotH); ctx.stroke();
+        let vy = pad.t+(i/5)*plotH;
+        ctx.beginPath(); ctx.moveTo(pad.l,vy); ctx.lineTo(pad.l+plotW,vy); ctx.stroke();
+      }
+      // axis labels
+      ctx.fillStyle='#8899bb'; ctx.font='10px Inter'; ctx.textAlign='center';
+      ctx.fillText('Riesgo (Vol %)',pad.l+plotW/2,H-5);
+      for(let i=0;i<=5;i++) { ctx.fillText(Math.round((i/5)*maxV),pad.l+(i/5)*plotW,H-12); }
+      ctx.save(); ctx.translate(10,pad.t+plotH/2); ctx.rotate(-Math.PI/2); ctx.fillText('Retorno %',0,0); ctx.restore();
+
+      // frontier curve
+      ctx.beginPath();
+      ctx.strokeStyle='#ffd700';
+      ctx.lineWidth=2.5;
+      points.forEach((p,i)=>{
+        if(i===0) ctx.moveTo(x(p.risk),y(p.ret));
+        else ctx.lineTo(x(p.risk),y(p.ret));
+      });
+      ctx.stroke();
+
+      // highlight current
+      if(highlight) {
+        ctx.beginPath();
+        ctx.arc(x(highlight.risk),y(highlight.ret),7,0,Math.PI*2);
+        ctx.fillStyle='#ffd700';
+        ctx.fill();
+        ctx.strokeStyle='#fff';
+        ctx.lineWidth=2;
+        ctx.stroke();
+        ctx.fillStyle='#fff';
+        ctx.font='bold 11px Inter';
+        ctx.textAlign='left';
+        ctx.fillText('Tu Portafolio',x(highlight.risk)+12,y(highlight.ret)+4);
+      }
+    }
+
+    function optimize() {
+      let w = getWeights();
+      if(method==='rp') {
+        let invVol = vol.map(v=>1/v);
+        let s = invVol.reduce((a,b)=>a+b,0);
+        w = invVol.map(x=>x/s);
+        for(let i=0;i<4;i++) setWeight(i,w[i]);
+      } else if(method==='hrp') {
+        let totalCorr = corr.map((row,i)=>{
+          let s = row.reduce((a,b)=>a+b,0);
+          return s/row.length;
+        });
+        let minCorr = Math.min(...totalCorr);
+        let weights = totalCorr.map(c=>1/(c-minCorr+0.5));
+        let s = weights.reduce((a,b)=>a+b,0);
+        w = weights.map(x=>x/s);
+        for(let i=0;i<4;i++) setWeight(i,w[i]);
+      } else {
+        syncSliders();
+        w = getWeights();
+      }
+      let stats = portfolioStats(w);
+      document.getElementById('retVal').textContent = stats.ret.toFixed(2)+'%';
+      document.getElementById('riskVal').textContent = stats.risk.toFixed(2)+'%';
+      document.getElementById('sharpeVal').textContent = stats.sharpe.toFixed(2);
+      document.getElementById('divVal').textContent = stats.div.toFixed(0)+'%';
+      drawFrontier(stats);
+      document.getElementById('feedbackMsg').innerHTML = '✅ Retorno: '+stats.ret.toFixed(2)+'% | Riesgo: '+stats.risk.toFixed(2)+'% | Sharpe: '+stats.sharpe.toFixed(2)+' | ¡Portafolio optimizado!';
+      localStorage.setItem(STORAGE_KEY,'completed');
+      document.getElementById('insigniaArea').classList.remove('hidden');
+    }
+
+    for(let i=0;i<4;i++) {
+      document.getElementById('w'+i).addEventListener('input',syncSliders);
+      document.getElementById('n'+i).addEventListener('input',syncInputs);
+    }
+    document.querySelectorAll('.method-btn').forEach(btn=>{
+      btn.addEventListener('click',function(){
+        document.querySelectorAll('.method-btn').forEach(b=>b.classList.remove('active'));
+        this.classList.add('active');
+        method = this.dataset.method;
+      });
+    });
+    document.getElementById('optimizeBtn').addEventListener('click',optimize);
+
+    if(localStorage.getItem(STORAGE_KEY)==='completed') {
+      document.getElementById('insigniaArea').classList.remove('hidden');
+      optimize();
+    } else {
+      optimize();
+    }
+
+    window.addEventListener('resize',()=>{
+      if(localStorage.getItem(STORAGE_KEY)==='completed') optimize();
+      else drawFrontier(null);
+    });
+  </script>
+  <script src="../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

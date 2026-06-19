@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Modelos Predictivos | ✅ Validación y Selección de Modelos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:linear-gradient(135deg,#0a0f1e,#0c1222 50%,#111a2e); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+    .course-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,100,220,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+    .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #ff64dc; }
+    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#ff9cf0,#ff64dc); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .hero-header p { font-size:1.1rem; color:#e2b9ff; margin-top:0.5rem; font-weight:500; }
+    .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+    .chip { background:rgba(255,100,220,0.15); border:1px solid #ff64dc; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+    .progress-section { padding:1.2rem 2rem; border-bottom:1px solid #1a2a4a; }
+    .progress-bar-outer { background:#1a2a4a; border-radius:20px; height:16px; overflow:hidden; }
+    .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#ff64dc,#cc44bb); border-radius:20px; transition:width 0.5s ease; }
+    .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
+    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ff64dc; font-size:1rem; line-height:1.6; }
+    .main-area { padding:1.5rem 2rem; }
+    .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#ff64dc; }
+    .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
+    .info-panel { background:rgba(10,20,40,0.7); border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
+    .info-panel h3 { color:#ff9cf0; font-size:1rem; margin-bottom:0.5rem; }
+    .info-panel p { font-size:0.85rem; color:#b9ccee; line-height:1.6; }
+    .sim-box { background:#0f1a2c; border-radius:1.5rem; padding:1.5rem; margin-bottom:1.5rem; border:1px solid #2c3e66; text-align:center; }
+    .sim-btn { background:linear-gradient(95deg,#ff64dc,#cc44bb); border:none; padding:0.6rem 1.5rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:0.95rem; color:#fff; transition:0.2s; margin:0.3rem; }
+    .sim-btn:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(255,100,220,0.4); }
+    .sim-btn.secondary { background:#2c3e66; }
+    .quiz-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #ff64dc; margin-bottom:1.5rem; }
+    .quiz-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#ff64dc; }
+    .question { background:#0f1a2c; margin:0.8rem 0; padding:0.8rem 1rem; border-radius:1.2rem; }
+    .question p { font-weight:600; margin-bottom:0.5rem; font-size:0.95rem; }
+    .options { display:flex; flex-wrap:wrap; gap:0.6rem; }
+    .opt { background:#1e2a3e; padding:0.3rem 0.9rem; border-radius:2rem; cursor:pointer; transition:0.2s; font-size:0.85rem; }
+    .opt:hover { background:#2c3e66; transform:translateY(-2px); }
+    .opt.selected { background:#ff64dc; color:#000; font-weight:bold; box-shadow:0 0 8px #ff64dc; }
+    .opt.correct { background:#00cc88; color:#000; }
+    .opt.wrong { background:#ff4455; color:#fff; }
+    .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #ff64dc; }
+    .btn-action { background:linear-gradient(95deg,#ff64dc,#cc44bb); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#fff; margin-top:1rem; }
+    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(255,100,220,0.5); }
+    .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
+    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin-top:1.5rem; padding:1rem; border:1px dashed gold; }
+    .insignia i { font-size:2.5rem; color:gold; }
+    .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
+    .hidden { display:none; }
+    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(255,100,220,0.4); }
+    .nav-link.next { background:linear-gradient(95deg,#ff64dc,#cc44bb); color:#fff; }
+    .nav-link.menu { background:#1a2a4a; border:1px solid #ff64dc; }
+    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .info-grid { grid-template-columns:1fr; } }
+  </style>
+  <link rel="stylesheet" href="../../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a><a href="../index.html">Programa Estadística</a></nav>
+  <div class="course-container" id="app">
+    <div class="hero-header">
+      <h1>✅ Validación y Selección de Modelos</h1>
+      <p>Cross-validation, AIC/BIC, overfitting, métricas de rendimiento</p>
+      <div class="badge-area">
+        <span class="chip"><i class="fas fa-check-double"></i> Cross-Validation</span>
+        <span class="chip"><i class="fas fa-balance-scale"></i> AIC/BIC</span>
+        <span class="chip"><i class="fas fa-chart-bar"></i> Métricas</span>
+      </div>
+    </div>
+    <div class="progress-section">
+      <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+      <span class="progress-text" id="progressText">Módulo 11 de 12</span>
+    </div>
+    <div class="analogy-card">
+      <strong>💡 Piénsalo así:</strong> Validar un modelo es como probar un avión en un simulador antes del vuelo real. Cross-validation es como hacer muchas pruebas con diferentes condiciones climáticas simuladas. AIC/BIC son como el peso del avión: castigan por ser demasiado pesado (complejo). Overfitting es un avión que funciona perfecto en el simulador pero se estrella en la realidad.
+    </div>
+    <div class="main-area">
+      <div class="section-title"><i class="fas fa-cubes"></i> Métodos de Validación</div>
+      <div class="info-grid">
+        <div class="info-panel">
+          <h3>🔄 K-Fold Cross-Validation</h3>
+          <p>Divide los datos en k partes iguales. Entrena con k-1 partes y prueba con la restante. Repite k veces. La métrica final es el promedio de las k iteraciones. k=5 o k=10 son típicos. Reduce la varianza de la estimación del error.</p>
+        </div>
+        <div class="info-panel">
+          <h3>📏 AIC y BIC</h3>
+          <p>Criterios de información para selección de modelos. AIC = -2·log(L) + 2k. BIC = -2·log(L) + k·log(n). Ambos penalizan la complejidad (k = número de parámetros). BIC penaliza más que AIC. Menor valor = mejor modelo.</p>
+        </div>
+        <div class="info-panel">
+          <h3>⚠️ Overfitting (Sobreajuste)</h3>
+          <p>Ocurre cuando el modelo se ajusta demasiado a los datos de entrenamiento, aprendiendo ruido en lugar de señal. Síntomas: rendimiento excelente en train pero pobre en test. Se combate con regularización, CV, más datos o modelos más simples.</p>
+        </div>
+        <div class="info-panel">
+          <h3>📊 Métricas de Rendimiento</h3>
+          <p>Regresión: MSE, RMSE, MAE, R², MAPE. Clasificación: accuracy, precision, recall, F1, AUC-ROC, matriz de confusión. La elección depende del problema: ¿priorizas evitar falsos positivos o falsos negativos?</p>
+        </div>
+      </div>
+
+      <div class="sim-box">
+        <p style="margin-bottom:0.8rem;color:#b9ccee;">📊 <strong>Simulador de Overfitting</strong></p>
+        <p style="font-size:0.85rem;color:#8899bb;">Ajusta la complejidad del modelo y observa cómo el error en test aumenta cuando sobreajustas.</p>
+        <div style="margin:0.8rem 0;">
+          <label style="color:#ff9cf0;font-size:0.8rem;">Complejidad del modelo (grados polinomio)</label><br>
+          <input type="range" id="polySlider" min="1" max="15" step="1" value="3" style="width:200px;" oninput="drawOverfitting()"><br>
+          <span id="polyVal" style="color:#fff;font-weight:bold;">3</span>
+        </div>
+        <canvas id="overfitCanvas" width="500" height="260"></canvas>
+        <p id="overfitInfo" style="font-size:0.85rem;color:#b9ccee;margin-top:0.5rem;"></p>
+      </div>
+
+      <div class="quiz-area">
+        <div class="quiz-title"><i class="fas fa-question-circle"></i> Mini Quiz: Validación y Selección</div>
+        <div id="quizContainer"></div>
+        <button id="submitQuizBtn" class="btn-action">✅ Verificar respuestas</button>
+        <div id="insigniaArea" class="insignia hidden">
+          <i class="fas fa-medal"></i>
+          <h3>🏅 Validador/a Definitivo/a 🏅</h3>
+          <p>Has dominado la validación y selección de modelos. Sabes elegir y evaluar modelos como un verdadero estadístico.</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre validación de modelos y métricas.</div>
+
+    <div class="nav-links">
+      <a href="10-pca-analisis-factorial.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+      <a href="12-certificado.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <footer><i class="fas fa-chart-line"></i> Curso 4: Modelos Predictivos · Validación y Selección</footer>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'prog_est_4_11';
+    const PROGRESS_KEY = 'prog_est_4_progress';
+    const questions = [
+      { text: "¿Cuántas veces se entrena el modelo en K-Fold CV?", options: ["K veces", "1 vez", "K/2 veces", "2K veces"], correct: 0 },
+      { text: "¿Qué criterio penaliza más la complejidad?", options: ["BIC", "AIC", "R²", "Ninguno"], correct: 0 },
+      { text: "¿Qué es overfitting?", options: ["Modelo se ajusta al ruido en train y falla en test", "Modelo no se ajusta lo suficiente", "Modelo tiene alta varianza en los datos"], correct: 0 },
+      { text: "¿Qué métrica es más robusta para clasificación desbalanceada?", options: ["F1-score", "Accuracy", "Error absoluto"], correct: 0 },
+      { text: "¿Qué significa AIC?", options: ["Akaike Information Criterion", "Akaike Index of Complexity", "Adjusted Information Criterion"], correct: 0 }
+    ];
+    let userAnswers = new Array(questions.length).fill(null);
+    let quizCompleted = false;
+    let overfitData = [];
+
+    function saveProgress() {
+      let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+      if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
+      localStorage.setItem(STORAGE_KEY, 'true');
+    }
+
+    function updateProgress() {
+      let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+      document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
+      document.getElementById('progressText').textContent = 'M\u00f3dulo '+(p.length || 11)+' de 12';
+    }
+
+    function renderQuestions() {
+      const container = document.getElementById('quizContainer');
+      container.innerHTML = '';
+      questions.forEach((q, idx) => {
+        const qDiv = document.createElement('div'); qDiv.classList.add('question');
+        qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
+        const optsDiv = qDiv.querySelector('.options');
+        q.options.forEach((opt, optIdx) => {
+          const span = document.createElement('div'); span.classList.add('opt');
+          span.textContent = opt; span.dataset.qIdx = idx; span.dataset.optIdx = optIdx;
+          span.addEventListener('click', function() {
+            if (quizCompleted) return;
+            this.parentElement.querySelectorAll('.opt').forEach(c => c.classList.remove('selected'));
+            this.classList.add('selected'); userAnswers[idx] = optIdx; updateBtnState();
+          });
+          optsDiv.appendChild(span);
+        });
+        container.appendChild(qDiv);
+      });
+    }
+
+    function updateBtnState() {
+      document.getElementById('submitQuizBtn').disabled = userAnswers.some(a => a === null) || quizCompleted;
+    }
+
+    function handleSubmit() {
+      if (quizCompleted) return;
+      if (userAnswers.some(a => a === null)) { document.getElementById('feedbackMsg').textContent = '⚠️ Responde todas las preguntas primero.'; return; }
+      let correct = 0;
+      questions.forEach((q, i) => { if (userAnswers[i] === q.correct) correct++; });
+      const total = questions.length; const passed = correct >= Math.ceil(total * 0.6);
+      document.querySelectorAll('.question').forEach((qDiv, idx) => {
+        const opts = qDiv.querySelectorAll('.opt');
+        opts.forEach((o, oi) => {
+          o.classList.remove('selected');
+          if (oi === questions[idx].correct) o.classList.add('correct');
+          else if (oi === userAnswers[idx]) o.classList.add('wrong');
+        });
+      });
+      if (passed) {
+        quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+        document.getElementById('insigniaArea').classList.remove('hidden');
+        document.getElementById('feedbackMsg').textContent = '🎉 ¡Excelente! Has dominado la validación de modelos.';
+        saveProgress(); updateProgress();
+      } else {
+        document.getElementById('feedbackMsg').textContent = '❌ ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. ¡Reintenta!';
+      }
+    }
+
+    function restoreProgress() {
+      const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+      if (p.includes(STORAGE_KEY)) {
+        quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+        document.getElementById('insigniaArea').classList.remove('hidden');
+        document.getElementById('feedbackMsg').textContent = '🏆 Ya completaste este módulo.';
+        document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
+      }
+    }
+
+    function generateOverfitData() {
+      overfitData = [];
+      for(let i=0;i<12;i++){
+        const x = Math.random()*2-1;
+        const y = 0.5 + 0.8*x + 0.3*Math.sin(x*5) + (Math.random()-0.5)*0.15;
+        overfitData.push({x,y});
+      }
+    }
+
+    function drawOverfitting() {
+      const deg = parseInt(document.getElementById('polySlider').value);
+      document.getElementById('polyVal').textContent = deg;
+      if(overfitData.length===0) generateOverfitData();
+
+      const canvas = document.getElementById('overfitCanvas');
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      const pad = 40; const w = canvas.width-pad*2; const h = canvas.height-pad*2;
+
+      overfitData.forEach(d => {
+        const px = pad + (d.x+1)/2*w;
+        const py = pad + h - (d.y/1.5)*h;
+        ctx.beginPath(); ctx.arc(px, py, 4, 0, Math.PI*2);
+        ctx.fillStyle = '#8899bb'; ctx.fill();
+      });
+
+      let trainErr = 0, testErr = 0;
+      ctx.strokeStyle = '#ff64dc'; ctx.lineWidth = 2; ctx.beginPath();
+      const nCurve = 100;
+      let coeffs = [];
+      for(let i=0;i<=deg;i++) coeffs.push((Math.random()-0.5)*0.1);
+
+      for(let i=0;i<=nCurve;i++){
+        const x = -1 + (i/nCurve)*2;
+        let y = 0.5;
+        for(let j=0;j<=deg;j++){
+          y += coeffs[j] * Math.pow(x, j);
+        }
+        const px = pad + (x+1)/2*w;
+        const py = pad + h - (y/1.5)*h;
+        i===0 ? ctx.moveTo(px,py) : ctx.lineTo(px,py);
+      }
+      ctx.stroke();
+
+      overfitData.forEach(d => {
+        let pred = 0.5;
+        for(let j=0;j<=deg;j++) pred += coeffs[j] * Math.pow(d.x, j);
+        trainErr += (d.y - pred)**2;
+      });
+      trainErr = Math.sqrt(trainErr/overfitData.length);
+
+      for(let i=0;i<30;i++){
+        const x = Math.random()*2-1;
+        const trueY = 0.5 + 0.8*x + 0.3*Math.sin(x*5) + (Math.random()-0.5)*0.2;
+        let pred = 0.5;
+        for(let j=0;j<=deg;j++) pred += coeffs[j] * Math.pow(x, j);
+        testErr += (trueY - pred)**2;
+      }
+      testErr = Math.sqrt(testErr/30);
+
+      ctx.fillStyle = '#b9ccee'; ctx.font='10px Inter'; ctx.textAlign='center';
+      ctx.fillText('X', pad+w/2, canvas.height-5);
+      ctx.save(); ctx.translate(8, pad+h/2); ctx.rotate(-Math.PI/2); ctx.fillText('Y', 0, 0); ctx.restore();
+      document.getElementById('overfitInfo').innerHTML = 'Grado: <strong>'+deg+'</strong> | Train RMSE: <strong style="color:#00ff88;">'+trainErr.toFixed(4)+'</strong> | Test RMSE: <strong style="color:'+(testErr>0.3?'#ff4455':'#00ff88')+';">'+testErr.toFixed(4)+'</strong> '+(testErr > trainErr*1.5 ? '⚠️ ¡Posible overfitting!' : '✅ Buen balance');
+    }
+
+    document.getElementById('submitQuizBtn').addEventListener('click', handleSubmit);
+    renderQuestions(); updateBtnState(); restoreProgress(); updateProgress(); generateOverfitData(); drawOverfitting();
+  </script>
+  <script src="../../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

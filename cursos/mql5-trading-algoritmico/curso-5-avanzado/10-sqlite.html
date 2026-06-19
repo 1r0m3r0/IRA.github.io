@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Curso 5 | 🗄️ SQLite y Persistencia</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="../../../assets/css/theme.css">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+    .modulo-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,102,192,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+    .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #ff66c0; }
+    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#ffb0d8,#ff66c0); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .hero-header p { font-size:1.1rem; color:#ffccdd; margin-top:0.5rem; font-weight:500; }
+    .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+    .chip { background:rgba(255,102,192,0.15); border:1px solid #ff66c0; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ff66c0; font-size:1rem; line-height:1.6; }
+    .main-area { padding:1.5rem 2rem; }
+    .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#ff66c0; }
+    .sql-console { background:#0b1120; border-radius:1rem; padding:1rem; margin:0.5rem 0; border:1px solid #ff66c055; }
+    .sql-console .prompt { color:#ff66c0; font-weight:700; }
+    .sql-input { width:100%; background:#0b1120; border:1px solid #2a3d5a; border-radius:0.5rem; padding:0.6rem; color:#00ff88; font-family:'Courier New',monospace; font-size:0.85rem; margin:0.3rem 0; }
+    .sql-input:focus { border-color:#ff66c0; outline:none; }
+    .sql-output { background:#0b1120; border:1px solid #2a3d5a; border-radius:0.5rem; padding:0.6rem; min-height:60px; max-height:200px; overflow-y:auto; font-family:'Courier New',monospace; font-size:0.8rem; color:#00ff88; margin-top:0.3rem; }
+    .sql-table { width:100%; border-collapse:collapse; font-size:0.75rem; }
+    .sql-table th { background:#1a2a4a; color:#ff66c0; padding:0.4rem; text-align:left; border:1px solid #2a3d5a; }
+    .sql-table td { padding:0.3rem 0.4rem; border:1px solid #2a3d5a; }
+    .tool-card { background:#0d1830; border-radius:1.5rem; padding:1.2rem; margin:1rem 0; border:1px solid #ff66c055; }
+    .tool-card h3 { color:#ff66c0; margin-bottom:0.8rem; display:flex; align-items:center; gap:0.5rem; }
+    .query-builder { display:flex; flex-wrap:wrap; gap:1rem; }
+    .qb-section { flex:1; min-width:200px; background:#0b1120; border-radius:0.8rem; padding:0.8rem; border:1px solid #2a3d5a; }
+    .qb-section h4 { color:#ff66c0; font-size:0.8rem; margin-bottom:0.5rem; }
+    .qb-section label { display:flex; align-items:center; gap:0.3rem; font-size:0.8rem; margin:0.2rem 0; }
+    .qb-section input[type=checkbox] { accent-color:#ff66c0; }
+    .qb-section select { background:#1a2a4a; color:#eef5ff; border:1px solid #ff66c0; border-radius:0.4rem; padding:0.2rem 0.4rem; width:100%; }
+    .qb-section input[type=text] { background:#1a2a4a; border:1px solid #2a3d5a; border-radius:0.4rem; padding:0.3rem; color:#eef5ff; width:100%; }
+    .preset-btn { background:#1a2a4a; border:1px solid #ff66c0; padding:0.4rem 0.8rem; border-radius:2rem; color:#eef5ff; font-weight:600; cursor:pointer; transition:0.2s; font-size:0.75rem; }
+    .preset-btn:hover { background:#ff66c0; color:#0b1120; }
+    .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #ff66c0; }
+    .btn-action { background:linear-gradient(95deg,#ff66c0,#ff3399); border:none; padding:0.6rem 1.4rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:0.9rem; transition:0.2s; color:#1e1a0c; margin-top:0.5rem; }
+    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(255,102,192,0.5); }
+    .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
+    .btn-op { background:#1a2a4a; border:1px solid #ff66c0; padding:0.5rem 1rem; border-radius:2rem; color:#eef5ff; font-weight:600; cursor:pointer; transition:0.2s; font-size:0.8rem; }
+    .btn-op:hover { background:#ff66c0; color:#0b1120; }
+    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:0 2rem 1.5rem; padding:1rem; border:1px dashed gold; }
+    .insignia i { font-size:2.5rem; color:gold; }
+    .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
+    .hidden { display:none; }
+    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(255,102,192,0.4); }
+    .nav-link.next { background:linear-gradient(95deg,#ff66c0,#ff3399); color:#1e1a0c; }
+    .nav-link.menu { background:#1a2a4a; border:1px solid #ff66c0; }
+    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+    .tab-bar { display:flex; gap:0.5rem; margin-bottom:1rem; flex-wrap:wrap; }
+    .tab-btn { background:#0b1120; border:1px solid #2a3d5a; padding:0.5rem 1rem; border-radius:2rem; cursor:pointer; font-size:0.8rem; color:#8899cc; transition:0.2s; }
+    .tab-btn.active { background:#ff66c0; color:#0b1120; border-color:#ff66c0; font-weight:600; }
+    .tab-content { display:none; } .tab-content.active { display:block; }
+    .code-panel { background:#0b1120; border-radius:1rem; padding:1rem; margin:0.5rem 0; border:1px solid #ff66c055; }
+    .code-panel pre { font-family:'Courier New',monospace; font-size:0.8rem; color:#00ff88; white-space:pre-wrap; }
+    .table-grid { display:flex; gap:1rem; flex-wrap:wrap; }
+    .table-card { background:#0b1120; border:1px solid #2a3d5a; border-radius:0.8rem; padding:0.8rem; flex:1; min-width:200px; }
+    .table-card h4 { color:#66ccff; font-size:0.85rem; margin-bottom:0.4rem; }
+    .table-card .col { font-size:0.7rem; color:#8899cc; display:flex; gap:0.3rem; }
+    .table-card .col .pk { color:gold; }
+    .design-game { background:#0d1830; border-radius:1.5rem; padding:1.2rem; margin:1rem 0; border:1px solid gold; }
+    .design-game h3 { color:gold; margin-bottom:0.8rem; }
+    .design-slot { background:#0b1120; border:2px dashed #2a3d5a; border-radius:0.8rem; padding:0.6rem; margin:0.3rem 0; cursor:pointer; transition:0.2s; }
+    .design-slot.filled { border-color:#ff66c0; border-style:solid; }
+    .design-pool { display:flex; flex-wrap:wrap; gap:0.4rem; margin:0.5rem 0; }
+    .design-chip { background:#1a2a4a; border:1px solid #ff66c0; border-radius:2rem; padding:0.3rem 0.7rem; font-size:0.75rem; cursor:pointer; transition:0.2s; }
+    .design-chip:hover { background:#ff66c0; color:#0b1120; }
+    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .query-builder { flex-direction:column; } }
+  </style>
+</head>
+<body>
+<nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a></nav>
+<div class="modulo-container">
+  <div class="hero-header">
+    <h1>🗄️ SQLite y Persistencia de Datos</h1>
+    <p>Tu EA nunca olvidará nada — bases de datos desde MQL5</p>
+    <div class="badge-area">
+      <span class="chip"><i class="fas fa-database"></i> SQLite</span>
+      <span class="chip"><i class="fas fa-terminal"></i> Queries</span>
+      <span class="chip"><i class="fas fa-pen"></i> Trade Logger</span>
+    </div>
+  </div>
+  <div class="analogy-card">
+    <strong>💡 Piénsalo así:</strong> SQLite para tu EA es como una libreta de bitácora para un capitán de barco. Registra cada trade, cada decisión, cada resultado. Cuando algo sale mal, puedes revisar el registro y aprender.
+  </div>
+  <div class="main-area">
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="explorer">📂 Explorer</button>
+      <button class="tab-btn" data-tab="console">💻 SQL Console</button>
+      <button class="tab-btn" data-tab="logger">📝 Trade Logger</button>
+      <button class="tab-btn" data-tab="builder">🔧 Query Builder</button>
+      <button class="tab-btn" data-tab="analytics">📊 Analytics</button>
+      <button class="tab-btn" data-tab="design">🎮 DB Design</button>
+    </div>
+    <div id="tab-explorer" class="tab-content active">
+      <div class="section-title"><i class="fas fa-folder-open"></i> Database Explorer</div>
+      <p style="color:#b9e2ff;margin-bottom:0.8rem;">Base de datos: <strong style="color:#ff66c0;">trading_log.db</strong> — tablas disponibles:</p>
+      <div id="dbTables" class="table-grid"></div>
+      <div class="code-panel" style="margin-top:1rem;"><pre id="explorerCode"><span style="color:#667799;">// Conectar a base de datos en MQL5</span>
+<span style="color:#66ccff;">int</span> db = DatabaseOpen(<span style="color:#ff99dd;">"trading_log.db"</span>, DATABASE_OPEN_READWRITE | DATABASE_OPEN_CREATE);
+<span style="color:#ff66c0;">if</span>(db != INVALID_HANDLE) {
+   <span style="color:#66ccff;">Print</span>(<span style="color:#ff99dd;">"Base de datos abierta correctamente"</span>);
+   DatabaseClose(db);
+}</pre></div>
+    </div>
+    <div id="tab-console" class="tab-content">
+      <div class="section-title"><i class="fas fa-terminal"></i> SQL Console</div>
+      <p style="color:#b9e2ff;margin-bottom:0.5rem;">Escribe cualquier consulta SQL sobre la base de datos simulada:</p>
+      <div class="sql-console"><div><span class="prompt">sqlite&gt;</span> <input type="text" id="sqlInput" class="sql-input" placeholder="SELECT * FROM trades LIMIT 10" onkeydown="if(event.key==='Enter')runSQL()"></div>
+        <div style="display:flex;gap:0.5rem;margin:0.3rem 0;"><button class="btn-op" onclick="runSQL()">▶ Ejecutar</button><button class="btn-op" onclick="document.getElementById('sqlInput').value='';document.getElementById('sqlOutput').innerHTML=''">🧹 Limpiar</button></div>
+        <div id="sqlOutput" class="sql-output">-- Resultados aparecerán aquí --</div>
+      </div>
+      <div class="code-panel"><pre id="consoleCode"><span style="color:#667799;">// DatabasePrepare + DatabaseExecute + DatabaseRead</span>
+<span style="color:#66ccff;">int</span> db = DatabaseOpen(<span style="color:#ff99dd;">"trading_log.db"</span>, DATABASE_OPEN_READWRITE);
+<span style="color:#66ccff;">int</span> stmt = DatabasePrepare(db, <span style="color:#ff99dd;">"SELECT * FROM trades WHERE profit > 0"</span>);
+<span style="color:#ff66c0;">while</span>(DatabaseRead(stmt)) {
+   <span style="color:#66ccff;">string</span> symbol = DatabaseGetString(stmt, 1);
+   <span style="color:#66ccff;">double</span> profit = DatabaseGetDouble(stmt, 5);
+   <span style="color:#66ccff;">Print</span>(symbol, <span style="color:#ff99dd;">" - Profit: "</span>, profit);
+}
+DatabaseFinalize(stmt);
+DatabaseClose(db);</pre></div>
+    </div>
+    <div id="tab-logger" class="tab-content">
+      <div class="section-title"><i class="fas fa-pen"></i> Trade Logger Simulator</div>
+      <div class="tool-card"><p style="color:#b9e2ff;margin-bottom:0.8rem;">Genera trades simulados y se insertan automáticamente en la base de datos:</p>
+        <button class="btn-op" onclick="generateTrade()">🎲 Generate Trade</button>
+        <button class="btn-op" onclick="showAllTrades()">📋 Ver Todos</button>
+        <div id="tradeTable" style="margin-top:0.8rem;"></div>
+      </div>
+      <div class="code-panel"><pre id="loggerCode"><span style="color:#667799;">// Insertar un trade en MQL5</span>
+<span style="color:#66ccff;">int</span> db = DatabaseOpen(<span style="color:#ff99dd;">"trading_log.db"</span>, DATABASE_OPEN_READWRITE);
+<span style="color:#66ccff;">int</span> stmt = DatabasePrepare(db, <span style="color:#ff99dd;">"INSERT INTO trades (symbol,volume,price,profit) VALUES (?,?,?,?)"</span>);
+DatabaseBind(stmt, 0, <span style="color:#ff99dd;">"BTCUSD"</span>);
+DatabaseBind(stmt, 1, 0.1);
+DatabaseBind(stmt, 2, 45000.0);
+DatabaseBind(stmt, 3, 250.0);
+DatabaseExecute(stmt);
+DatabaseFinalize(stmt);
+DatabaseClose(db);</pre></div>
+    </div>
+    <div id="tab-builder" class="tab-content">
+      <div class="section-title"><i class="fas fa-tools"></i> Query Builder</div>
+      <p style="color:#b9e2ff;margin-bottom:0.5rem;">Construye tu query SQL visualmente:</p>
+      <div class="query-builder">
+        <div class="qb-section"><h4>📌 Select Fields</h4><label><input type="checkbox" class="qb-field" value="symbol" checked> symbol</label><label><input type="checkbox" class="qb-field" value="volume" checked> volume</label><label><input type="checkbox" class="qb-field" value="price"> price</label><label><input type="checkbox" class="qb-field" value="profit" checked> profit</label><label><input type="checkbox" class="qb-field" value="entry_time"> entry_time</label><label><input type="checkbox" class="qb-field" value="exit_time"> exit_time</label><label><input type="checkbox" class="qb-field" value="status"> status</label></div>
+        <div class="qb-section"><h4>📋 From</h4><select id="qbTable"><option value="trades">trades</option><option value="indicators">indicators</option><option value="logs">logs</option></select></div>
+        <div class="qb-section"><h4>🔍 Where</h4><select id="qbWhereCol"><option value="">None</option><option value="symbol">symbol</option><option value="status">status</option><option value="profit > 0">profit &gt; 0</option></select><input type="text" id="qbWhereVal" placeholder="Valor (ej: BTCUSD)" style="margin-top:0.3rem;"></div>
+        <div class="qb-section"><h4>📊 Order By</h4><select id="qbOrder"><option value="">None</option><option value="entry_time">entry_time</option><option value="profit">profit</option></select><select id="qbOrderDir" style="margin-top:0.3rem;"><option value="ASC">ASC</option><option value="DESC">DESC</option></select></div>
+        <div class="qb-section"><h4>🔢 Limit</h4><input type="number" id="qbLimit" value="10" min="1" max="100"></div>
+      </div>
+      <div style="margin-top:0.8rem;"><button class="btn-op" onclick="buildQuery()">🔨 Generar Query</button><button class="btn-op" onclick="runBuiltQuery()">▶ Ejecutar</button></div>
+      <div class="sql-console" style="margin-top:0.5rem;"><div><span class="prompt">SQL Generado:</span></div><div id="builtSQL" class="sql-output" style="color:#ff66c0;">-- Construye tu query arriba --</div></div>
+      <div class="sql-console"><div><span class="prompt">Resultado:</span></div><div id="builtResult" class="sql-output">-- Ejecuta la query para ver resultados --</div></div>
+    </div>
+    <div id="tab-analytics" class="tab-content">
+      <div class="section-title"><i class="fas fa-chart-bar"></i> Analytics Queries</div>
+      <p style="color:#b9e2ff;margin-bottom:0.5rem;">Queries predefinidas para analizar tu base de datos:</p>
+      <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;">
+        <button class="preset-btn" onclick="runPreset('best')">🏆 Best Pairs</button>
+        <button class="preset-btn" onclick="runPreset('winrate')">📅 Win Rate</button>
+        <button class="preset-btn" onclick="runPreset('duration')">⏱ Avg Duration</button>
+        <button class="preset-btn" onclick="runPreset('total')">💰 Total P&L</button>
+      </div>
+      <div id="analyticsOutput" class="sql-output" style="min-height:100px;">-- Selecciona una query predefinida --</div>
+    </div>
+    <div id="tab-design" class="tab-content">
+      <div class="section-title"><i class="fas fa-puzzle-piece"></i> Database Design Game</div>
+      <div class="design-game"><h3>🎯 Diseña la tabla "signals"</h3>
+        <p style="color:#b9e2ff;font-size:0.85rem;margin-bottom:0.8rem;">Selecciona las columnas en el orden correcto para una tabla de señales:</p>
+        <div id="designSlots"></div><div class="design-pool" id="designPool"></div>
+        <button class="btn-op" onclick="checkDesign()">✅ Verificar Diseño</button>
+        <div id="designResult" style="margin-top:0.8rem;font-weight:600;"></div>
+      </div>
+    </div>
+    <div id="insigniaArea" class="insignia hidden">
+      <i class="fas fa-medal"></i>
+      <h3>🏅 Administrador de Datos 🏅</h3>
+      <p>Has dominado SQLite y la persistencia de datos en MQL5. ¡Tu EA nunca olvidará nada!</p>
+    </div>
+  </div>
+  <div id="feedbackMsg" class="feedback">💡 Explora el Database Explorer, usa la SQL Console y genera trades para probar el logger.</div>
+  <div class="nav-links">
+    <a href="09-redes-neuronales.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+    <a href="11-webrequest.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Curso 5: EAs Avanzados · Multi-símbolo, ML y ONNX</footer>
+</div>
+<script>
+const STORAGE_KEY='mql5_5_10';
+function updateProgress(){let p=JSON.parse(localStorage.getItem('mql5_5_progress'))||[];if(!p.includes(STORAGE_KEY)){p.push(STORAGE_KEY);localStorage.setItem('mql5_5_progress',JSON.stringify(p))}}
+document.querySelectorAll('.tab-btn').forEach(b=>{b.addEventListener('click',function(){document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.tab-content').forEach(x=>x.classList.remove('active'));this.classList.add('active');document.getElementById('tab-'+this.dataset.tab).classList.add('active')})});
+const dbSchema={trades:[{name:'id',type:'INTEGER PK'},{name:'symbol',type:'TEXT'},{name:'volume',type:'REAL'},{name:'price',type:'REAL'},{name:'profit',type:'REAL'},{name:'entry_time',type:'DATETIME'},{name:'exit_time',type:'DATETIME'},{name:'status',type:'TEXT'}],indicators:[{name:'id',type:'INTEGER PK'},{name:'symbol',type:'TEXT'},{name:'indicator_name',type:'TEXT'},{name:'value',type:'REAL'},{name:'timestamp',type:'DATETIME'}],logs:[{name:'id',type:'INTEGER PK'},{name:'level',type:'TEXT'},{name:'message',type:'TEXT'},{name:'ea_name',type:'TEXT'},{name:'timestamp',type:'DATETIME'}]};
+const mockData={trades:[],indicators:[],logs:[]};
+const symbols=['BTCUSD','ETHUSD','SOLUSD','ADAUSD','DOTUSD'];
+const statuses=['open','closed','pending'];
+for(let i=0;i<50;i++){const symbol=symbols[Math.floor(Math.random()*symbols.length)];const d=new Date(Date.now()-Math.random()*30*24*3600000);const exit=d.getTime()+Math.random()*7*24*3600000;mockData.trades.push({id:i+1,symbol,volume:+(Math.random()*2+0.01).toFixed(2),price:+(Math.random()*50000+10).toFixed(2),profit:+((Math.random()-0.4)*500).toFixed(2),entry_time:d.toISOString().slice(0,19).replace('T',' '),exit_time:new Date(exit).toISOString().slice(0,19).replace('T',' '),status:statuses[Math.floor(Math.random()*statuses.length)]})}
+for(let i=0;i<30;i++)mockData.indicators.push({id:i+1,symbol:symbols[Math.floor(Math.random()*symbols.length)],indicator_name:['RSI','MACD','MA','BB'][Math.floor(Math.random()*4)],value:+((Math.random()*100)).toFixed(2),timestamp:new Date(Date.now()-Math.random()*30*24*3600000).toISOString().slice(0,19).replace('T',' ')});
+for(let i=0;i<20;i++)mockData.logs.push({id:i+1,level:['INFO','WARN','ERROR'][Math.floor(Math.random()*3)],message:['Trade executed','Connection lost','Order rejected','Optimization started'][Math.floor(Math.random()*4)],ea_name:['GridBot','ScalperX','TrendHunter'][Math.floor(Math.random()*3)],timestamp:new Date(Date.now()-Math.random()*7*24*3600000).toISOString().slice(0,19).replace('T',' ')});
+function initExplorer(){const c=document.getElementById('dbTables');c.innerHTML='';Object.entries(dbSchema).forEach(([name,cols])=>{const d=document.createElement('div');d.classList.add('table-card');d.innerHTML='<h4><i class="fas fa-table"></i> '+name+'</h4>'+cols.map(c2=>'<div class="col">'+(c2.name==='id'?'<span class="pk">🔑</span> ':'')+c2.name+' <span class="type">('+c2.type+')</span></div>').join('');c.appendChild(d)})}
+function renderTable(data,title){if(!data||data.length===0)return'<p style="color:#667799;">No hay datos</p>';let html='<table class="sql-table"><thead><tr>'+Object.keys(data[0]).map(k=>'<th>'+k+'</th>').join('')+'</tr></thead><tbody>';data.slice(0,20).forEach(r=>{html+='<tr>'+Object.values(r).map(v=>'<td>'+v+'</td>').join('')+'</tr>'});if(data.length>20)html+='<tr><td colspan="'+Object.keys(data[0]).length+'" style="color:#667799;text-align:center;">... y '+(data.length-20)+' más</td></tr>';return html+'</tbody></table>';}
+function runSQL(){const input=document.getElementById('sqlInput').value.trim().toUpperCase();const out=document.getElementById('sqlOutput');if(!input){out.innerHTML='⚠️ Escribe una consulta SQL.';return}let result;if(input.startsWith('SELECT'))result=mockSelect(input);else if(input.startsWith('INSERT')){mockInsert();result='✅ 1 fila insertada.'}else if(input.startsWith('UPDATE'))result='✅ Filas actualizadas (simulado).';else if(input.startsWith('DELETE'))result='✅ Filas eliminadas (simulado).';else result='⚠️ Solo SELECT, INSERT, UPDATE, DELETE soportados.';if(typeof result==='string')out.innerHTML=result;else out.innerHTML=renderTable(result,'');document.getElementById('feedbackMsg').textContent='▶ Consulta ejecutada: '+input.slice(0,50)+'...';}
+function mockSelect(query){const lower=query.toLowerCase();let table='trades';if(lower.includes('from trades'))table='trades';else if(lower.includes('from indicators'))table='indicators';else if(lower.includes('from logs'))table='logs';let data=[...mockData[table]];if(lower.includes('where')){const wherePart=query.split('where')[1].split(/order by|limit|group by/)[0].trim();const parts=wherePart.split('=');if(parts.length===2){const col=parts[0].trim().toLowerCase(),val=parts[1].trim().replace(/'/g,'');data=data.filter(r=>String(r[col]||'').toLowerCase()===val.toLowerCase())}else if(wherePart.includes('profit > 0')){data=data.filter(r=>r.profit>0)}else if(wherePart.includes('profit < 0')){data=data.filter(r=>r.profit<0)}}if(lower.includes('group by')){const groupCol=query.split('group by')[1].trim().split(/\s/)[0];const agg=data.reduce((acc,r)=>{const key=r[groupCol]||'unknown';if(!acc[key])acc[key]={[groupCol]:key,count:0,total_profit:0,avg_profit:0};acc[key].count++;acc[key].total_profit=+(acc[key].total_profit+(r.profit||0)).toFixed(2);return acc},{});data=Object.values(agg);data.forEach(d=>d.avg_profit=+(d.total_profit/d.count).toFixed(2))}if(lower.includes('order by')){const orderPart=query.split('order by')[1].trim().split(/\s/);const col=orderPart[0].replace(',',''),dir=orderPart[1]||'ASC';data.sort((a,b)=>{const v=(a[col]||'')>(b[col]||'')?1:-1;return dir==='DESC'?-v:v})}const limitMatch=query.match(/limit\s+(\d+)/i);if(limitMatch)data=data.slice(0,parseInt(limitMatch[1]));return data.length?data:[{message:'No results'}];}
+function mockInsert(){}
+let tradeCount=mockData.trades.length;
+function generateTrade(){tradeCount++;const symbol=symbols[Math.floor(Math.random()*symbols.length)];const profit=+((Math.random()-0.4)*500).toFixed(2);const t={id:tradeCount,symbol,volume:+((Math.random()*2+0.01).toFixed(2)),price:+((Math.random()*50000+10).toFixed(2)),profit,entry_time:new Date().toISOString().slice(0,19).replace('T',' '),exit_time:'',status:profit>0?'closed':'open'};mockData.trades.unshift(t);document.getElementById('tradeTable').innerHTML=renderTable(mockData.trades,'');document.getElementById('feedbackMsg').textContent='🎲 Trade generado: '+symbol+' | Profit: $'+profit.toFixed(2);updateProgress();document.getElementById('insigniaArea').classList.remove('hidden');}
+function showAllTrades(){document.getElementById('tradeTable').innerHTML=renderTable(mockData.trades,'Trade Log');document.getElementById('feedbackMsg').textContent='📋 Mostrando todos los trades.'}
+function buildQuery(){const fields=Array.from(document.querySelectorAll('.qb-field:checked')).map(c=>c.value).join(',')||'*';const table=document.getElementById('qbTable').value;const whereCol=document.getElementById('qbWhereCol').value;const whereVal=document.getElementById('qbWhereVal').value.trim();const order=document.getElementById('qbOrder').value;const orderDir=document.getElementById('qbOrderDir').value;const limit=document.getElementById('qbLimit').value;let sql='SELECT '+fields+' FROM '+table;if(whereCol&&whereVal)sql+=' WHERE '+whereCol+' = \''+whereVal+'\'';else if(whereCol&&!whereVal&&whereCol!=='None')sql+=' WHERE '+whereCol;if(order)sql+=' ORDER BY '+order+' '+orderDir;if(limit)sql+=' LIMIT '+limit;sql+=';';document.getElementById('builtSQL').innerHTML=sql;document.getElementById('feedbackMsg').textContent='🔨 Query generada.';}
+function runBuiltQuery(){const sql=document.getElementById('builtSQL').textContent;if(sql.startsWith('--')){document.getElementById('feedbackMsg').textContent='⚠️ Primero genera una query.';return}const result=mockSelect(sql);document.getElementById('builtResult').innerHTML=typeof result==='string'?result:renderTable(result,'');}
+function runPreset(type){let sql,result;switch(type){case'best':sql='SELECT symbol, SUM(profit) as total_profit, COUNT(*) as trades FROM trades GROUP BY symbol ORDER BY total_profit DESC';break;case'winrate':sql='SELECT status, COUNT(*) as count FROM trades GROUP BY status';break;case'duration':sql='SELECT AVG(duration) FROM trades';result=[{avg_duration:'2.3 days (simulated)'}];break;case'total':sql='SELECT SUM(profit) as total_pnl, AVG(profit) as avg_profit FROM trades';break}
+if(!result)result=mockSelect(sql);document.getElementById('analyticsOutput').innerHTML=typeof result==='string'?result:renderTable(result,'');document.getElementById('feedbackMsg').textContent='📊 Analítica: '+type;}
+const designCols=['id','symbol','signal_type','price','confidence','timestamp'];const designOrder=['id','symbol','signal_type','price','confidence','timestamp'];let designSelected=[];
+function initDesign(){const slots=document.getElementById('designSlots');const pool=document.getElementById('designPool');slots.innerHTML='<p style="color:#667799;font-size:0.8rem;margin-bottom:0.5rem;">Selecciona columnas en orden:</p>';designOrder.forEach((_,idx)=>{const d=document.createElement('div');d.classList.add('design-slot');d.id='dslot'+idx;d.textContent=(idx+1)+'. ___';slots.appendChild(d)});pool.innerHTML='';const shuffled=[...designCols].sort(()=>Math.random()-0.5);shuffled.forEach(c=>{const s=document.createElement('span');s.classList.add('design-chip');s.textContent=c;s.addEventListener('click',function(){if(designSelected.includes(c)){const idx=designSelected.indexOf(c);designSelected.splice(idx,1);document.getElementById('dslot'+idx).textContent=(idx+1)+'. ___';document.getElementById('dslot'+idx).classList.remove('filled');this.style.opacity='1'}else if(designSelected.length<6){const next=designSelected.length;designSelected.push(c);document.getElementById('dslot'+next).textContent=(next+1)+'. '+c;document.getElementById('dslot'+next).classList.add('filled');this.style.opacity='0.5'}});pool.appendChild(s)})}
+function checkDesign(){let correct=0;designSelected.forEach((c,i)=>{if(c===designOrder[i])correct++});const result=document.getElementById('designResult');if(correct===6){result.innerHTML='✅ ¡Perfecto! Diseñaste la tabla signals correctamente.';document.getElementById('insigniaArea').classList.remove('hidden');updateProgress();document.getElementById('feedbackMsg').textContent='🏆 ¡Módulo completado! Eres Administrador de Datos.'}else{result.innerHTML='❌ '+correct+' de 6 en orden correcto.';document.getElementById('feedbackMsg').textContent='💪 Sigue intentando.'}}
+initExplorer();initDesign();
+(function(){const p=JSON.parse(localStorage.getItem('mql5_5_progress'))||[];if(p.includes(STORAGE_KEY)){document.getElementById('insigniaArea').classList.remove('hidden');document.getElementById('feedbackMsg').textContent='🏅 Ya completaste este módulo.'}})();
+</script>
+<script src="../../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

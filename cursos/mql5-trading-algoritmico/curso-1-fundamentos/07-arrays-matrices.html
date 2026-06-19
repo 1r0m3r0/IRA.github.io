@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Fundamentos MQL5 | 📦 Arrays, Matrices y Structs</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:linear-gradient(135deg,#0a0f1e,#0c1222 50%,#111a2e); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+    .course-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(0,224,255,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+    .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #00e0ff; }
+    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#7af2ff,#00e0ff); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .hero-header p { font-size:1.1rem; color:#b9e2ff; margin-top:0.5rem; font-weight:500; }
+    .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+    .chip { background:rgba(0,224,255,0.15); border:1px solid #00e0ff; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+    .progress-section { padding:1.2rem 2rem; border-bottom:1px solid #1a2a4a; }
+    .progress-bar-outer { background:#1a2a4a; border-radius:20px; height:16px; overflow:hidden; }
+    .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#00e0ff,#0088ff); border-radius:20px; transition:width 0.5s ease; }
+    .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
+    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #00e0ff; font-size:1rem; line-height:1.6; }
+    .main-area { padding:1.5rem 2rem; }
+    .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#00e0ff; }
+    .simulator-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #3399ff; margin-bottom:1.5rem; }
+    .array-vis { display:flex; flex-wrap:wrap; gap:0.4rem; margin:1rem 0; min-height:60px; padding:0.8rem; background:#0a0e1a; border-radius:1rem; border:1px solid #2c3e66; }
+    .array-cell { background:#1a2a44; border:1px solid #2c3e66; border-radius:0.5rem; padding:0.4rem 0.6rem; font-family:'Fira Code',monospace; font-size:0.75rem; min-width:40px; text-align:center; transition:0.2s; }
+    .array-cell.highlight { border-color:#ffcc44; background:#2a1a0a; }
+    .sim-controls { display:flex; flex-wrap:wrap; gap:0.8rem; margin:1rem 0; }
+    .sim-controls input, .sim-controls select { background:#1a2a44; color:#eef5ff; border:1px solid #00e0ff; border-radius:0.8rem; padding:0.4rem 0.8rem; font-size:0.85rem; }
+    .sim-controls button { background:linear-gradient(95deg,#f0a500,#ff6a00); border:none; padding:0.5rem 1.2rem; border-radius:2rem; font-weight:600; cursor:pointer; font-size:0.85rem; color:#1e1a0c; transition:0.2s; }
+    .sim-controls button:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(240,165,0,0.5); }
+    .struct-box { background:rgba(0,10,25,0.5); border-radius:1.2rem; padding:1rem; border:1px solid #3399ff; margin-top:1rem; }
+    .struct-box h3 { color:#7af2ff; font-size:1rem; margin-bottom:0.5rem; }
+    .struct-field { display:flex; gap:0.5rem; font-family:'Fira Code',monospace; font-size:0.8rem; padding:0.3rem 0; border-bottom:1px solid #1a2a4a; }
+    .struct-field .field-name { color:#ffbb66; } .struct-field .field-type { color:#55ddff; } .struct-field .field-desc { color:#8899bb; font-family:'Inter',sans-serif; }
+    .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #00e0ff; }
+    .btn-action { background:linear-gradient(95deg,#f0a500,#ff6a00); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin-top:1rem; }
+    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(240,165,0,0.5); }
+    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:1.5rem 0; padding:1rem; border:1px dashed gold; }
+    .insignia i { font-size:2.5rem; color:gold; }
+    .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
+    .hidden { display:none; }
+    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(0,224,255,0.4); }
+    .nav-link.next { background:linear-gradient(95deg,#f0a500,#ff6a00); color:#1e1a0c; }
+    .nav-link.menu { background:#1a2a4a; border:1px solid #3399ff; }
+    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+    @media (max-width:800px) { .hero-header h1{font-size:1.9rem} }
+  </style>
+  <link rel="stylesheet" href="../../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a></nav>
+  <div class="course-container" id="app">
+    <div class="hero-header">
+      <h1>📦 Arrays, Matrices y Structs</h1>
+      <p>Agrupa y organiza datos como un profesional</p>
+      <div class="badge-area">
+        <span class="chip"><i class="fas fa-th"></i> Arrays</span>
+        <span class="chip"><i class="fas fa-table"></i> Matrices</span>
+        <span class="chip"><i class="fas fa-cube"></i> MqlRates · MqlTick</span>
+      </div>
+    </div>
+    <div class="progress-section">
+      <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+      <span class="progress-text" id="progressText">Módulo 7 de 12</span>
+    </div>
+    <div class="analogy-card">
+      <strong>💡 Piénsalo así:</strong> Un array es como una fila de casilleros numerados. Cada casillero guarda un valor y lo accedes por su número (índice). Una matriz es como un edificio de casilleros con pisos y columnas. Los structs son como fichas con varios campos: nombre, edad, etc.
+    </div>
+    <div class="main-area">
+      <div class="simulator-area">
+        <div class="section-title"><i class="fas fa-play"></i> Simulador de Arrays</div>
+        <p style="color:#b9e2ff;margin-bottom:0.8rem;">Crea, modifica y ordena arrays dinámicamente.</p>
+        <div class="sim-controls">
+          <input type="number" id="arrayValue" placeholder="Valor" value="42" min="0" max="999">
+          <button onclick="addToArray()">➕ Añadir</button>
+          <button onclick="sortArrayAsc()">📈 Ordenar ↑</button>
+          <button onclick="sortArrayDesc()">📉 Ordenar ↓</button>
+          <button onclick="reverseArray()">🔄 Invertir</button>
+          <button onclick="clearArray()">🗑️ Limpiar</button>
+          <input type="number" id="searchValue" placeholder="Buscar..." style="width:100px;">
+          <button onclick="searchArray()">🔍 Buscar</button>
+        </div>
+        <div class="array-vis" id="arrayVisual"></div>
+        <div id="arrayStatus" style="font-size:0.8rem;color:#8899cc;text-align:center;">Array vacío. Añade valores para comenzar.</div>
+      </div>
+
+      <div class="struct-box">
+        <h3><i class="fas fa-cube"></i> Estructuras de Mercado en MQL5</h3>
+        <div class="struct-field"><span class="field-type">struct</span> <span class="field-name">MqlRates</span></div>
+        <div class="struct-field"><span class="field-type">double</span> <span class="field-name">open;</span> <span class="field-desc">— Precio de apertura</span></div>
+        <div class="struct-field"><span class="field-type">double</span> <span class="field-name">high;</span> <span class="field-desc">— Precio máximo</span></div>
+        <div class="struct-field"><span class="field-type">double</span> <span class="field-name">low;</span> <span class="field-desc">— Precio mínimo</span></div>
+        <div class="struct-field"><span class="field-type">double</span> <span class="field-name">close;</span> <span class="field-desc">— Precio de cierre</span></div>
+        <div class="struct-field"><span class="field-type">long</span> <span class="field-name">tick_volume;</span> <span class="field-desc">— Volumen en ticks</span></div>
+        <div class="struct-field" style="margin-top:0.8rem;"><span class="field-type">struct</span> <span class="field-name">MqlTick</span></div>
+        <div class="struct-field"><span class="field-type">double</span> <span class="field-name">bid;</span> <span class="field-desc">— Precio bid actual</span></div>
+        <div class="struct-field"><span class="field-type">double</span> <span class="field-name">ask;</span> <span class="field-desc">— Precio ask actual</span></div>
+        <div class="struct-field"><span class="field-type">double</span> <span class="field-name">last;</span> <span class="field-desc">— Precio de la última operación</span></div>
+        <div class="struct-field"><span class="field-type">long</span> <span class="field-name">volume;</span> <span class="field-desc">— Volumen actual</span></div>
+      </div>
+
+      <button id="completeBtn" class="btn-action">🏁 Completar módulo</button>
+      <div id="insigniaArea" class="insignia hidden">
+        <i class="fas fa-medal"></i>
+        <h3>🏅 Organizador de Datos 🏅</h3>
+        <p>Has dominado arrays, matrices y estructuras en MQL5. ¡Sabes organizar datos como un profesional!</p>
+      </div>
+    </div>
+
+    <div id="feedbackMsg" class="feedback">💡 Usa los controles del simulador para experimentar con arrays. ¡Al menos añade 3 valores antes de completar!</div>
+
+    <div class="nav-links">
+      <a href="06-poo-clases.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+      <a href="08-debugging.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <footer><i class="fas fa-robot"></i> MQL5 & Trading Algorítmico · Programa. Automatiza. Gana.</footer>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'mql5_1_07';
+    const PROGRESS_KEY = 'mql5_1_progress';
+    let arrayData = [];
+    let completed = false;
+
+    function saveProgress() {
+      let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+      if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
+      localStorage.setItem(STORAGE_KEY, 'true');
+    }
+
+    function updateProgress() {
+      let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+      document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
+      document.getElementById('progressText').textContent = 'M\u00f3dulo '+(p.length || 1)+' de 12';
+    }
+
+    function renderArray() {
+      const vis = document.getElementById('arrayVisual');
+      vis.innerHTML = '';
+      if (arrayData.length === 0) {
+        vis.innerHTML = '<span style="color:#667;font-size:0.85rem;">⬜ Array vacío</span>';
+      } else {
+        arrayData.forEach((val, idx) => {
+          const cell = document.createElement('div');
+          cell.classList.add('array-cell');
+          cell.textContent = val;
+          cell.title = '[' + idx + '] = ' + val;
+          vis.appendChild(cell);
+        });
+      }
+      document.getElementById('arrayStatus').textContent = 'Array: ' + arrayData.length + ' elemento(s)';
+    }
+
+    window.addToArray = function() {
+      const val = parseInt(document.getElementById('arrayValue').value);
+      if (!isNaN(val)) { arrayData.push(val); renderArray(); }
+    };
+
+    window.sortArrayAsc = function() {
+      arrayData.sort((a,b) => a-b); renderArray();
+    };
+
+    window.sortArrayDesc = function() {
+      arrayData.sort((a,b) => b-a); renderArray();
+    };
+
+    window.reverseArray = function() {
+      arrayData.reverse(); renderArray();
+    };
+
+    window.clearArray = function() {
+      arrayData = []; renderArray();
+    };
+
+    window.searchArray = function() {
+      const val = parseInt(document.getElementById('searchValue').value);
+      if (isNaN(val)) return;
+      const cells = document.querySelectorAll('.array-cell');
+      cells.forEach(c => c.classList.remove('highlight'));
+      const idx = arrayData.indexOf(val);
+      if (idx >= 0 && cells[idx]) {
+        cells[idx].classList.add('highlight');
+        document.getElementById('arrayStatus').textContent = '🔍 ' + val + ' encontrado en [' + idx + ']';
+      } else {
+        document.getElementById('arrayStatus').textContent = '🔍 ' + val + ' no encontrado';
+      }
+    };
+
+    document.getElementById('completeBtn').addEventListener('click', function() {
+      if (completed) return;
+      if (arrayData.length < 3) {
+        document.getElementById('feedbackMsg').textContent = '⚠️ Añade al menos 3 valores al array antes de completar.';
+        return;
+      }
+      completed = true;
+      document.getElementById('insigniaArea').classList.remove('hidden');
+      document.getElementById('feedbackMsg').textContent = '🎉 ¡Has experimentado con arrays! Módulo completado.';
+      saveProgress(); updateProgress();
+    });
+
+    function restoreProgress() {
+      const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+      if (p.includes(STORAGE_KEY)) {
+        completed = true; document.getElementById('insigniaArea').classList.remove('hidden');
+        document.getElementById('feedbackMsg').textContent = '🏆 Ya completaste este módulo.';
+        document.getElementById('completeBtn').disabled = true;
+      }
+    }
+
+    renderArray();
+    updateProgress(); restoreProgress();
+  </script>
+  <script src="../../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

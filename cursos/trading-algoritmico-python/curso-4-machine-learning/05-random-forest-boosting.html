@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>ML para Trading | Random Forest y Boosting</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #111a2e 100%);
+      background-size: 200% 200%; animation: gradientShift 20s ease infinite;
+      font-family: 'Inter', sans-serif; color: #eef5ff; min-height: 100vh;
+      display: flex; align-items: center; justify-content: center; padding: 2rem 1rem;
+    }
+    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+    .curso4-container {
+      max-width: 1300px; width: 100%;
+      background: rgba(15, 25, 45, 0.65); backdrop-filter: blur(12px);
+      border-radius: 3rem; border: 1px solid rgba(0,255,200,0.25);
+      box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden;
+    }
+    .hero-header { background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%); padding: 2rem 2rem 1.5rem; text-align: center; border-bottom: 2px solid #00ffc8; }
+    .hero-header h1 { font-size: 2.6rem; font-weight: 800; background: linear-gradient(135deg, #FFF, #66ffdd, #00ffc8); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .hero-header p { font-size: 1.1rem; color: #b9e2ff; margin-top: 0.3rem; }
+    .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
+    .chip { background: rgba(0,255,200,0.15); border: 1px solid #00ffc8; padding: 0.3rem 1rem; border-radius: 40px; font-size: 0.8rem; font-weight: 600; }
+    .analogy-card { background: #1e2a3acc; margin: 1.5rem 2rem; padding: 1.2rem 1.8rem; border-radius: 2rem; border-left: 8px solid #00ffc8; font-size: 1rem; line-height: 1.6; }
+    .main-area { padding: 0.5rem 2rem; }
+    .param-row { display: flex; gap: 1.5rem; flex-wrap: wrap; justify-content: center; margin: 1rem 0; }
+    .param-row label { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; font-size: 0.9rem; }
+    .param-row input[type=range] { width: 140px; }
+    .param-row .val { font-family: monospace; font-weight: 700; }
+    .round-counter { text-align: center; margin: 0.5rem 0; font-size: 1.1rem; }
+    .result-bars { display: flex; justify-content: center; gap: 2rem; margin: 1rem 0; }
+    .result-bars .bar-wrap { text-align: center; }
+    .result-bars .bar { width: 60px; height: 120px; background: #1a2a4a; border-radius: 0.5rem; position: relative; margin: 0 auto; overflow: hidden; }
+    .result-bars .bar .fill { position: absolute; bottom: 0; width: 100%; border-radius: 0.5rem; transition: height 0.5s; }
+    .result-bars .bar .fill.train { background: #00ffc8; }
+    .result-bars .bar .fill.test { background: #2b9eff; }
+    .result-bars .bar-label { font-size: 0.8rem; margin-top: 0.3rem; }
+    .feedback { background: #00000099; margin: 1.5rem 2rem; padding: 1rem; border-radius: 1.5rem; text-align: center; font-weight: 500; border-left: 4px solid #00ffc8; }
+    .insignia { text-align: center; background: #0c1b2f; border-radius: 2rem; margin: 0 2rem 1.5rem; padding: 1rem; border: 1px dashed gold; }
+    .insignia i { font-size: 2.5rem; color: gold; }
+    .hidden { display: none; }
+    .btn-action { background: linear-gradient(95deg, #f0a500, #ff6a00); border: none; padding: 0.8rem 1.8rem; font-weight: bold; border-radius: 3rem; cursor: pointer; font-size: 1rem; transition: 0.2s; color: #1e1a0c; }
+    .btn-action:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(240,165,0,0.5); }
+    .btn-action:disabled { opacity: 0.4; cursor: not-allowed; }
+    .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
+    .nav-link { background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem; font-weight: 600; text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; }
+    .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(0,255,200,0.4); }
+    .nav-link.next { background: linear-gradient(95deg, #f0a500, #ff6a00); color: #1e1a0c; }
+    .nav-link.menu { background: #1a2a4a; border: 1px solid #3399ff; }
+    footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
+    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
+  </style>
+  <link rel="stylesheet" href="../../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../../../index.html">&larr; Portfolio</a><a href="../../../../cursos/index.html">Cursos</a></nav>
+
+  <div class="curso4-container">
+    <div class="hero-header">
+      <h1>🌲 Random Forest y Boosting</h1>
+      <p>XGBoost y LightGBM para señales de trading</p>
+      <div class="badge-area">
+        <span class="chip"><i class="fas fa-tree"></i> Ensemble</span>
+        <span class="chip"><i class="fas fa-tachometer-alt"></i> 3 rondas</span>
+      </div>
+    </div>
+    <div class="analogy-card"><strong>🌲 Piénsalo así:</strong> Un solo árbol puede equivocarse, pero un bosque (Random Forest) toma la decisión de todos. Boosting es como aprender de errores: cada nuevo árbol se enfoca en los fallos del anterior. Juntos son imparables.</div>
+    <div class="main-area">
+      <div class="round-counter" id="roundDisplay">Ronda 1 / 3</div>
+      <div class="param-row">
+        <label>n_estimators: <input type="range" id="nest" min="10" max="200" value="50" step="10"><span id="nestVal" class="val">50</span></label>
+        <label>max_depth: <input type="range" id="mdep" min="3" max="15" value="5" step="1"><span id="mdepVal" class="val">5</span></label>
+        <label>learning_rate: <input type="range" id="lr" min="1" max="30" value="10" step="1"><span id="lrVal" class="val">0.10</span></label>
+      </div>
+      <div class="result-bars">
+        <div class="bar-wrap"><div class="bar"><div class="fill train" id="trainBar" style="height:70%"></div></div><div class="bar-label">Train</div></div>
+        <div class="bar-wrap"><div class="bar"><div class="fill test" id="testBar" style="height:50%"></div></div><div class="bar-label">Test</div></div>
+      </div>
+      <p style="text-align:center" id="resultLabel">Train: 70% · Test: 50%</p>
+      <div style="text-align:center;margin:0.5rem 0"><button id="trainBtn" class="btn-action"><i class="fas fa-play"></i> Entrenar</button></div>
+    </div>
+    <div id="feedbackMsg" class="feedback">💡 Ajusta los parámetros y entrena para ver accuracy en train vs test. 3 rondas para completar.</div>
+    <div id="insigniaArea" class="insignia hidden">
+      <i class="fas fa-medal"></i>
+      <h3>🏅 ENSEMBLE MASTER 🏅</h3>
+      <p>Has dominado Random Forest y Boosting. Sabes cómo evitar overfitting con ensembles.</p>
+    </div>
+    <div class="nav-links">
+      <a href="04-regresion-lineal-logistica.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+      <a href="06-svm-regimenes.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <footer><i class="fas fa-crown"></i> ML para Trading · Trading Algorítmico con Python</footer>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'py_trade_4_05';
+    let round = 1;
+    const maxRounds = 3;
+
+    ['nest','mdep','lr'].forEach(id => {
+      document.getElementById(id).addEventListener('input', () => {
+        document.getElementById(id+'Val').textContent = id==='lr' ? (parseInt(document.getElementById(id).value)/100).toFixed(2) : document.getElementById(id).value;
+      });
+    });
+
+    function simulateTrain() {
+      const nest = parseInt(document.getElementById('nest').value);
+      const mdep = parseInt(document.getElementById('mdep').value);
+      const lr = parseInt(document.getElementById('lr').value)/100;
+
+      const baseTrain = 0.5 + nest/400 + mdep/40;
+      const trainAcc = Math.min(0.98, baseTrain + lr*0.2);
+      const overfitPenalty = (nest/200) * (mdep/15) * 0.2;
+      const testAcc = Math.max(0.3, trainAcc - overfitPenalty - (1-lr)*0.05);
+
+      const tH = trainAcc*100;
+      const teH = testAcc*100;
+
+      document.getElementById('trainBar').style.height = tH + '%';
+      document.getElementById('testBar').style.height = teH + '%';
+      document.getElementById('resultLabel').textContent = 'Train: ' + tH.toFixed(0) + '% · Test: ' + teH.toFixed(0) + '%';
+
+      const diff = trainAcc - testAcc;
+      let msg = '';
+      if (diff > 0.25) msg = '⚠️ ¡Overfitting! Train mucho mayor que Test. Reduce n_estimators o max_depth.';
+      else if (diff > 0.1) msg = '🔶 Cierto sobreajuste. Ajusta los parámetros.';
+      else msg = '✅ Buen balance train/test. ¡Excelente configuración!';
+
+      if (round >= maxRounds) {
+        localStorage.setItem(STORAGE_KEY, 'true');
+        document.getElementById('insigniaArea').classList.remove('hidden');
+        msg += ' 🎉 ¡Módulo completado!';
+      }
+
+      document.getElementById('feedbackMsg').textContent = msg;
+      document.getElementById('trainBtn').disabled = round >= maxRounds;
+    }
+
+    document.getElementById('trainBtn').addEventListener('click', () => {
+      simulateTrain();
+      if (round < maxRounds) {
+        round++;
+        document.getElementById('roundDisplay').textContent = 'Ronda ' + round + ' / ' + maxRounds;
+        document.getElementById('trainBtn').disabled = false;
+      } else {
+        document.getElementById('roundDisplay').textContent = '✅ Completado';
+        document.getElementById('trainBtn').disabled = true;
+      }
+    });
+  </script>
+</body>
+</html>
+

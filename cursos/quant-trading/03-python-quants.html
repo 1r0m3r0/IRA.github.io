@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Quant Trading | Python para Quants</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    :root { --accent: #2b9eff; --accent-rgb: 43,158,255; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 100%);
+      font-family: 'Inter', sans-serif;
+      color: #eef5ff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+    .modulo-container {
+      max-width: 1300px;
+      width: 100%;
+      background: rgba(15,25,45,0.65);
+      backdrop-filter: blur(12px);
+      border-radius: 3rem;
+      border: 1px solid rgba(var(--accent-rgb),0.25);
+      box-shadow: 0 25px 45px rgba(0,0,0,0.5), 0 0 0 1px rgba(var(--accent-rgb),0.1) inset;
+      overflow: hidden;
+    }
+    .hero-header {
+      background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%);
+      padding: 2rem 2rem 1.5rem 2rem;
+      text-align: center;
+      border-bottom: 2px solid var(--accent);
+    }
+    .hero-header h1 {
+      font-size: 2.8rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #FFF, #99ccff, var(--accent));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .hero-header p { font-size: 1.2rem; color: #b9d9ff; margin-top: 0.5rem; font-weight: 500; }
+    .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1.2rem; flex-wrap: wrap; }
+    .chip { background: rgba(var(--accent-rgb),0.15); border: 1px solid var(--accent); padding: 0.4rem 1rem; border-radius: 40px; font-size: 0.8rem; font-weight: 600; backdrop-filter: blur(4px); }
+    .analogy-card {
+      background: #1e2a3acc;
+      margin: 1.5rem 2rem;
+      padding: 1.2rem 1.8rem;
+      border-radius: 2rem;
+      border-left: 8px solid var(--accent);
+      font-size: 1rem;
+      line-height: 1.4;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .analogy-text i { font-size: 2rem; margin-right: 0.5rem; color: var(--accent); }
+    .analogy-highlight { background: #00000066; padding: 0.5rem 1rem; border-radius: 2rem; font-weight: bold; color: var(--accent); }
+    .main-area { padding: 1.5rem 2rem 2rem 2rem; }
+    .sandbox-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      color: var(--accent);
+    }
+    .dataframe-area {
+      background: #0a1220;
+      border-radius: 1.5rem;
+      padding: 1rem;
+      overflow-x: auto;
+      border: 1px solid #2a3a55;
+      font-family: 'Inter', monospace;
+      font-size: 0.85rem;
+    }
+    .dataframe-area table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .dataframe-area th {
+      background: #1a2a44;
+      color: var(--accent);
+      padding: 0.5rem;
+      text-align: right;
+      border-bottom: 2px solid var(--accent);
+    }
+    .dataframe-area td {
+      padding: 0.4rem 0.5rem;
+      text-align: right;
+      border-bottom: 1px solid #1a2a3a;
+    }
+    .dataframe-area td:first-child, .dataframe-area th:first-child { text-align: left; font-weight: 600; }
+    .dataframe-area tr:hover td { background: #1a2a3a; }
+    .ops-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      margin-top: 1.2rem;
+    }
+    .op-btn {
+      background: rgba(var(--accent-rgb),0.15);
+      border: 1px solid var(--accent);
+      padding: 0.6rem 1.2rem;
+      border-radius: 2rem;
+      cursor: pointer;
+      font-weight: 600;
+      color: #eef5ff;
+      transition: 0.2s;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+    }
+    .op-btn:hover { background: var(--accent); color: #000; transform: translateY(-2px); }
+    .op-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+    .result-box {
+      background: #0f1a2c;
+      border-radius: 1.2rem;
+      padding: 1rem;
+      margin-top: 1rem;
+      border-left: 4px solid var(--accent);
+      min-height: 3rem;
+    }
+    .result-box .code-line {
+      color: #66d9ff;
+      font-family: monospace;
+      margin-bottom: 0.3rem;
+    }
+    .result-box .result-val {
+      color: #aaffaa;
+      font-weight: 600;
+    }
+    .feedback {
+      background: #00000099;
+      margin: 0 2rem 1.5rem 2rem;
+      padding: 1rem;
+      border-radius: 1.5rem;
+      text-align: center;
+      font-weight: 500;
+      border-left: 4px solid var(--accent);
+    }
+    .insignia {
+      text-align: center;
+      background: #0c1b2f;
+      border-radius: 2rem;
+      margin: 1.5rem 2rem;
+      padding: 1rem;
+      border: 2px solid gold;
+    }
+    .insignia i { font-size: 2.5rem; color: gold; }
+    .hidden { display: none; }
+    .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
+    .nav-link { background: #2c3e66; border: none; padding: 0.7rem 1.5rem; border-radius: 3rem; font-weight: 600; cursor: pointer; text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; font-size: 0.95rem; }
+    .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(var(--accent-rgb),0.4); }
+    .nav-link.prev { background: #2c3e66; }
+    .nav-link.next { background: linear-gradient(95deg, #f0a500, #ff6a00); color: #1e1a0c; }
+    .nav-link.menu { background: #1a2a4a; border: 1px solid var(--accent); }
+    footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
+    @media (max-width: 800px) {
+      .hero-header h1 { font-size: 1.9rem; }
+    }
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+
+<div class="modulo-container">
+  <div class="hero-header">
+    <h1>🐍 PYTHON PARA QUANTS 🐍</h1>
+    <p>Domina pandas, numpy y el análisis de datos financieros</p>
+    <div class="badge-area">
+      <span class="chip"><i class="fas fa-code"></i> Sandbox interactivo</span>
+      <span class="chip"><i class="fas fa-table"></i> DataFrames en vivo</span>
+      <span class="chip"><i class="fas fa-gem"></i> Insignia al completar</span>
+    </div>
+  </div>
+
+  <div class="analogy-card">
+    <div class="analogy-text">
+      <i class="fas fa-toolbox"></i> <strong>🔧 La Caja de Herramientas del Mecánico:</strong> Un mecánico no arregla un motor solo con las manos. Necesita llaves, gatos y escáneres. Python es la <span class="analogy-highlight">caja de herramientas del quant</span>: pandas es el escáner de datos, numpy es el torque wrench de los cálculos.
+    </div>
+    <div><i class="fas fa-database"></i> <strong>DataFrame:</strong> Tu mesa de trabajo digital. Explora, filtra y transforma.</div>
+  </div>
+
+  <div class="main-area">
+    <div class="sandbox-title">
+      <i class="fas fa-laptop-code"></i> Sandbox: Precios de activos simulados
+    </div>
+    <div class="dataframe-area" id="dataframeArea"></div>
+    <div class="ops-grid" id="opsGrid">
+      <button class="op-btn" data-op="describe"><i class="fas fa-chart-bar"></i> describe()</button>
+      <button class="op-btn" data-op="mean"><i class="fas fa-calculator"></i> mean()</button>
+      <button class="op-btn" data-op="std"><i class="fas fa-wave-square"></i> std()</button>
+      <button class="op-btn" data-op="corr"><i class="fas fa-project-diagram"></i> corr()</button>
+      <button class="op-btn" data-op="cov"><i class="fas fa-th"></i> cov()</button>
+      <button class="op-btn" data-op="max"><i class="fas fa-arrow-up"></i> max()</button>
+      <button class="op-btn" data-op="min"><i class="fas fa-arrow-down"></i> min()</button>
+      <button class="op-btn" data-op="cumsum"><i class="fas fa-chart-line"></i> cumsum()</button>
+    </div>
+    <div class="result-box" id="resultBox">
+      <span style="color:#8899bb;">Ejecuta una operación haciendo clic en los botones de arriba.</span>
+    </div>
+  </div>
+
+  <div id="feedbackMsg" class="feedback">
+    💡 Haz clic en las operaciones para ver cómo pandas procesa los datos financieros.
+  </div>
+
+  <div id="insigniaArea" class="insignia hidden">
+    <i class="fas fa-medal"></i>
+    <h3>🏅 ¡INSIGNIA DE PYTHON QUANT! 🏅</h3>
+    <p>Has ejecutado análisis sobre datos financieros reales simulados. ¡Python es tu aliado!</p>
+    <i class="fas fa-qrcode"></i> <span style="font-family: monospace;">#PythonQuant</span>
+  </div>
+
+  <div class="nav-links">
+    <a href="02-fundamentos.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+    <a href="04-estadistica-trading.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer>
+    <i class="fas fa-brain"></i> Python · pandas · numpy · El stack cuantitativo
+  </footer>
+</div>
+
+<script>
+  const stocksData = {
+    columns: ['Fecha', 'BTC', 'ETH', 'AAPL', 'TSLA', 'SPY'],
+    rows: [
+      ['2026-01-06', 42580, 3120, 198.5, 245.2, 478.1],
+      ['2026-01-07', 43120, 3185, 199.1, 248.7, 479.5],
+      ['2026-01-08', 42750, 3150, 197.8, 242.3, 477.2],
+      ['2026-01-09', 43900, 3220, 200.2, 251.8, 481.0],
+      ['2026-01-10', 44210, 3245, 201.5, 255.6, 482.8],
+      ['2026-01-13', 43800, 3210, 200.8, 253.1, 481.5],
+      ['2026-01-14', 44550, 3280, 202.3, 258.4, 483.9],
+      ['2026-01-15', 45200, 3320, 203.7, 262.0, 485.2]
+    ]
+  };
+
+  let opsUsed = {};
+  const totalOps = 8;
+  let completed = false;
+
+  function renderDataframe() {
+    let html = '<table><thead><tr><th>Fecha</th>';
+    stocksData.columns.slice(1).forEach(function(c) {
+      html += '<th>' + c + '</th>';
+    });
+    html += '</tr></thead><tbody>';
+    stocksData.rows.forEach(function(r) {
+      html += '<tr><td>' + r[0] + '</td>';
+      for (let i = 1; i < r.length; i++) {
+        html += '<td>' + r[i].toLocaleString() + '</td>';
+      }
+      html += '</tr>';
+    });
+    html += '</tbody></table>';
+    document.getElementById('dataframeArea').innerHTML = html;
+  }
+
+  function getNumericCols() {
+    return stocksData.columns.slice(1);
+  }
+
+  function getValues(col) {
+    var idx = stocksData.columns.indexOf(col);
+    return stocksData.rows.map(function(r) { return r[idx]; });
+  }
+
+  function opDescribe() {
+    var cols = getNumericCols();
+    var html = '<div class="code-line">>>> df.describe()</div>';
+    html += '<table style="width:100%;border-collapse:collapse;margin-top:0.5rem;font-size:0.8rem;">';
+    html += '<tr><th>Stat</th>';
+    cols.forEach(function(c) { html += '<th>' + c + '</th>'; });
+    html += '</tr>';
+
+    var stats = {};
+    cols.forEach(function(c) {
+      var vals = getValues(c);
+      var sum = vals.reduce(function(a,b) { return a+b; }, 0);
+      var mean = sum / vals.length;
+      var sqDiffs = vals.map(function(v) { return (v-mean)*(v-mean); });
+      var variance = sqDiffs.reduce(function(a,b) { return a+b; }, 0) / vals.length;
+      var std = Math.sqrt(variance);
+      var max = Math.max.apply(null, vals);
+      var min = Math.min.apply(null, vals);
+      stats[c] = { mean: mean, std: std, min: min, max: max, count: vals.length };
+    });
+
+    var rows = [
+      { label: 'count', key: 'count', fmt: function(v) { return v; } },
+      { label: 'mean', key: 'mean', fmt: function(v) { return v.toFixed(2); } },
+      { label: 'std', key: 'std', fmt: function(v) { return v.toFixed(2); } },
+      { label: 'min', key: 'min', fmt: function(v) { return v.toFixed(1); } },
+      { label: 'max', key: 'max', fmt: function(v) { return v.toFixed(1); } }
+    ];
+
+    rows.forEach(function(row) {
+      html += '<tr><td style="color:#66d9ff;font-weight:600;padding:0.3rem;">' + row.label + '</td>';
+      cols.forEach(function(c) {
+        html += '<td style="padding:0.3rem 0.5rem;text-align:right;">' + row.fmt(stats[c][row.key]) + '</td>';
+      });
+      html += '</tr>';
+    });
+    html += '</table>';
+    return html;
+  }
+
+  function opMean() {
+    var cols = getNumericCols();
+    var html = '<div class="code-line">>>> df.mean()</div>';
+    cols.forEach(function(c) {
+      var vals = getValues(c);
+      var mean = vals.reduce(function(a,b) { return a+b; }, 0) / vals.length;
+      html += '<div class="code-line">  ' + c + '    <span class="result-val">' + mean.toFixed(2) + '</span></div>';
+    });
+    return html;
+  }
+
+  function opStd() {
+    var cols = getNumericCols();
+    var html = '<div class="code-line">>>> df.std()</div>';
+    cols.forEach(function(c) {
+      var vals = getValues(c);
+      var mean = vals.reduce(function(a,b) { return a+b; }, 0) / vals.length;
+      var sqDiffs = vals.map(function(v) { return (v-mean)*(v-mean); });
+      var variance = sqDiffs.reduce(function(a,b) { return a+b; }, 0) / vals.length;
+      var std = Math.sqrt(variance);
+      html += '<div class="code-line">  ' + c + '    <span class="result-val">' + std.toFixed(2) + '</span></div>';
+    });
+    return html;
+  }
+
+  function opCorr() {
+    var html = '<div class="code-line">>>> df.corr()</div>';
+    var cols = getNumericCols();
+    html += '<table style="width:100%;border-collapse:collapse;margin-top:0.5rem;font-size:0.8rem;"><tr><th></th>';
+    cols.forEach(function(c) { html += '<th>' + c + '</th>'; });
+    html += '</tr>';
+
+    function pearson(a, b) {
+      var n = a.length;
+      var sumA = a.reduce(function(s,v) { return s+v; }, 0);
+      var sumB = b.reduce(function(s,v) { return s+v; }, 0);
+      var sumAB = 0, sumA2 = 0, sumB2 = 0;
+      for (var i = 0; i < n; i++) {
+        sumAB += a[i] * b[i];
+        sumA2 += a[i] * a[i];
+        sumB2 += b[i] * b[i];
+      }
+      var num = n * sumAB - sumA * sumB;
+      var den = Math.sqrt((n * sumA2 - sumA * sumA) * (n * sumB2 - sumB * sumB));
+      return den === 0 ? 0 : num / den;
+    }
+
+    var corrData = {};
+    cols.forEach(function(c1) {
+      var v1 = getValues(c1);
+      corrData[c1] = {};
+      cols.forEach(function(c2) {
+        var v2 = getValues(c2);
+        corrData[c1][c2] = c1 === c2 ? 1.00 : pearson(v1, v2);
+      });
+    });
+
+    cols.forEach(function(c1) {
+      html += '<tr><td style="color:#66d9ff;font-weight:600;padding:0.3rem;">' + c1 + '</td>';
+      cols.forEach(function(c2) {
+        var val = corrData[c1][c2];
+        var color = val > 0.5 ? '#aaffaa' : val > 0 ? '#ffffaa' : '#ffaaaa';
+        html += '<td style="padding:0.3rem 0.5rem;text-align:right;color:' + color + ';">' + val.toFixed(2) + '</td>';
+      });
+      html += '</tr>';
+    });
+    html += '</table>';
+    return html;
+  }
+
+  function opCov() {
+    var html = '<div class="code-line">>>> df.cov()</div>';
+    var cols = getNumericCols();
+    html += '<table style="width:100%;border-collapse:collapse;margin-top:0.5rem;font-size:0.8rem;"><tr><th></th>';
+    cols.forEach(function(c) { html += '<th>' + c + '</th>'; });
+    html += '</tr>';
+
+    function covariance(a, b) {
+      var n = a.length;
+      var meanA = a.reduce(function(s,v) { return s+v; }, 0) / n;
+      var meanB = b.reduce(function(s,v) { return s+v; }, 0) / n;
+      var sum = 0;
+      for (var i = 0; i < n; i++) sum += (a[i] - meanA) * (b[i] - meanB);
+      return sum / (n - 1);
+    }
+
+    cols.forEach(function(c1) {
+      var v1 = getValues(c1);
+      html += '<tr><td style="color:#66d9ff;font-weight:600;padding:0.3rem;">' + c1 + '</td>';
+      cols.forEach(function(c2) {
+        var v2 = getValues(c2);
+        var val = c1 === c2 ? covariance(v1, v2) : covariance(v1, v2);
+        html += '<td style="padding:0.3rem 0.5rem;text-align:right;">' + val.toFixed(1) + '</td>';
+      });
+      html += '</tr>';
+    });
+    html += '</table>';
+    return html;
+  }
+
+  function opMax() {
+    var html = '<div class="code-line">>>> df.max()</div>';
+    getNumericCols().forEach(function(c) {
+      var vals = getValues(c);
+      var max = Math.max.apply(null, vals);
+      html += '<div class="code-line">  ' + c + '    <span class="result-val">' + max.toLocaleString() + '</span></div>';
+    });
+    return html;
+  }
+
+  function opMin() {
+    var html = '<div class="code-line">>>> df.min()</div>';
+    getNumericCols().forEach(function(c) {
+      var vals = getValues(c);
+      var min = Math.min.apply(null, vals);
+      html += '<div class="code-line">  ' + c + '    <span class="result-val">' + min.toLocaleString() + '</span></div>';
+    });
+    return html;
+  }
+
+  function opCumsum() {
+    var html = '<div class="code-line">>>> df.cumsum()</div>';
+    var cols = getNumericCols();
+    html += '<table style="width:100%;border-collapse:collapse;margin-top:0.5rem;font-size:0.8rem;"><tr><th>Fecha</th>';
+    cols.forEach(function(c) { html += '<th>' + c + '</th>'; });
+    html += '</tr>';
+    var cum = {};
+    cols.forEach(function(c) { cum[c] = 0; });
+    stocksData.rows.forEach(function(r) {
+      html += '<tr><td style="padding:0.3rem;color:#8899bb;">' + r[0] + '</td>';
+      for (var i = 1; i < r.length; i++) {
+        cum[cols[i-1]] += r[i];
+        html += '<td style="padding:0.3rem 0.5rem;text-align:right;">' + cum[cols[i-1]].toLocaleString() + '</td>';
+      }
+      html += '</tr>';
+    });
+    html += '</table>';
+    return html;
+  }
+
+  var ops = {
+    describe: opDescribe,
+    mean: opMean,
+    std: opStd,
+    corr: opCorr,
+    cov: opCov,
+    max: opMax,
+    min: opMin,
+    cumsum: opCumsum
+  };
+
+  var opsCount = 0;
+
+  function handleOp(opName) {
+    if (completed) return;
+    if (!opsUsed[opName]) {
+      opsUsed[opName] = true;
+      opsCount++;
+    }
+    var resultHtml = ops[opName]();
+    document.getElementById('resultBox').innerHTML = resultHtml;
+    document.getElementById('feedbackMsg').innerHTML = '🔬 Ejecutaste <strong>' + opName + '()</strong>. Operaciones distintas exploradas: ' + opsCount + '/' + totalOps;
+
+    if (opsCount >= 5 && !completed) {
+      completed = true;
+      document.getElementById('insigniaArea').classList.remove('hidden');
+      localStorage.setItem('quant_trading_03', 'true');
+      document.getElementById('feedbackMsg').innerHTML = '🎉 ¡Exploraste ' + opsCount + ' operaciones! Has dominado pandas para finanzas. ¡Insignia desbloqueada! 🎉';
+    }
+  }
+
+  function init() {
+    renderDataframe();
+    document.querySelectorAll('.op-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        handleOp(this.dataset.op);
+      });
+    });
+
+    var saved = localStorage.getItem('quant_trading_03');
+    if (saved === 'true') {
+      completed = true;
+      opsCount = totalOps;
+      document.getElementById('insigniaArea').classList.remove('hidden');
+      document.getElementById('feedbackMsg').innerHTML = '🏆 ¡Ya completaste este módulo! Todas las operaciones están disponibles.';
+      document.querySelectorAll('.op-btn').forEach(function(b) { b.disabled = true; });
+    }
+  }
+
+  init();
+</script>
+  <script src="../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

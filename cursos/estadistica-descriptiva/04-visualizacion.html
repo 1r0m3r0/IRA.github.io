@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Estadística Descriptiva | Visualización de Datos I</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 100%);
+      background-size: 200% 200%;
+      animation: gradientShift 20s ease infinite;
+      font-family: 'Inter', sans-serif;
+      color: #eef5ff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .modulo-container {
+      max-width: 1300px;
+      width: 100%;
+      background: rgba(15, 25, 45, 0.65);
+      backdrop-filter: blur(12px);
+      border-radius: 3rem;
+      border: 1px solid rgba(0, 230, 118, 0.25);
+      box-shadow: 0 25px 45px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+    }
+    .hero-header {
+      background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%);
+      padding: 2rem 2rem 1.5rem 2rem;
+      text-align: center;
+      border-bottom: 2px solid #00e676;
+    }
+    .hero-header h1 {
+      font-size: 2.6rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #FFF, #69f0ae, #00e676);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .hero-header p { font-size: 1.1rem; color: #b9f5d6; margin-top: 0.5rem; font-weight: 500; }
+    .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1.2rem; flex-wrap: wrap; }
+    .chip { background: rgba(0, 230, 118, 0.15); border: 1px solid #00e676; padding: 0.4rem 1rem; border-radius: 40px; font-size: 0.8rem; font-weight: 600; backdrop-filter: blur(4px); }
+    .analogy-card {
+      background: #1e2a3acc; margin: 1.5rem 2rem; padding: 1.2rem 1.8rem;
+      border-radius: 2rem; border-left: 8px solid #00e676;
+      font-size: 1rem; line-height: 1.6;
+    }
+    .main-area { padding: 0 2rem 1rem 2rem; }
+    .section-title { font-size: 1.3rem; font-weight: 700; margin: 1.5rem 0 1rem 0; display: flex; align-items: center; gap: 0.6rem; color: #69f0ae; }
+    .controls-row {
+      display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;
+      background: #0f1a2c; border-radius: 1.2rem; padding: 1rem; border: 1px solid #2c3e66; margin-bottom: 1rem;
+    }
+    .controls-row label { font-weight: 600; color: #b9f5d6; }
+    .controls-row select, .controls-row input {
+      background: #0a1225; border: 1px solid #2c3e66; border-radius: 1rem;
+      padding: 0.5rem 0.8rem; color: #eef5ff; font-family: 'Inter', sans-serif;
+    }
+    .controls-row select:focus, .controls-row input:focus { outline: none; border-color: #00e676; }
+    .chart-area {
+      background: #0a1225; border-radius: 1.2rem; padding: 1rem;
+      border: 1px solid #2c3e66; margin: 1rem 0; display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center;
+    }
+    .chart-area canvas { max-width: 600px; width: 100%; height: auto; background: #0a1225; border-radius: 0.8rem; }
+    .data-preview {
+      background: #0f1a2c; border-radius: 1.2rem; padding: 1rem;
+      border: 1px solid #2c3e66; margin: 1rem 0;
+    }
+    .data-preview textarea {
+      width: 100%; background: #0a1225; border: 1px solid #2c3e66;
+      border-radius: 1rem; padding: 0.8rem; color: #eef5ff; font-family: 'Inter', monospace;
+      font-size: 0.95rem; resize: vertical; min-height: 80px;
+    }
+    .data-preview textarea:focus { outline: none; border-color: #00e676; }
+    .btn-action {
+      background: linear-gradient(95deg, #f0a500, #ff6a00); border: none;
+      padding: 0.8rem 1.8rem; font-weight: bold; border-radius: 3rem;
+      cursor: pointer; font-size: 1rem; transition: 0.2s; color: #1e1a0c;
+      margin: 0.5rem 0;
+    }
+    .btn-action:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(240,165,0,0.5); }
+    .btn-secondary { background: #2c3e66; color: #eef5ff; }
+    .btn-secondary:hover { box-shadow: 0 0 10px rgba(0,230,118,0.4); }
+    .chart-type-btns { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .chart-type-btn {
+      background: #1e2a3e; border: 1px solid #2c3e66; padding: 0.4rem 1rem;
+      border-radius: 2rem; cursor: pointer; font-size: 0.85rem; font-weight: 600;
+      color: #eef5ff; transition: 0.2s;
+    }
+    .chart-type-btn:hover { transform: translateY(-2px); }
+    .chart-type-btn.active { background: #00e67633; border-color: #00e676; color: #69f0ae; box-shadow: 0 0 8px rgba(0,230,118,0.3); }
+    .feedback {
+      background: #00000099; margin: 0 2rem 1.5rem 2rem; padding: 1rem;
+      border-radius: 1.5rem; text-align: center; font-weight: 500; border-left: 4px solid #00e676;
+    }
+    .insignia { text-align: center; background: #0c1b2f; border-radius: 2rem; margin: 0 2rem 1.5rem 2rem; padding: 1rem; border: 1px dashed gold; }
+    .insignia i { font-size: 2.5rem; color: gold; }
+    .hidden { display: none; }
+    .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
+    .nav-link { background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem; font-weight: 600; text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; }
+    .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(0,230,118,0.4); }
+    .nav-link.next { background: linear-gradient(95deg, #f0a500, #ff6a00); color: #1e1a0c; }
+    .nav-link.menu { background: #1a2a4a; border: 1px solid #3399ff; }
+    .nav-link.prev { background: #1a2a4a; border: 1px solid #00e676; }
+    footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
+    @media (max-width: 800px) { .hero-header h1 { font-size: 1.9rem; } }
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+
+  <div class="modulo-container">
+    <div class="hero-header">
+      <h1>📈 VISUALIZACIÓN DE DATOS I 📈</h1>
+      <p>Domina los gráficos estadísticos: barras, pastel, histograma, polígono y ojiva</p>
+      <div class="badge-area">
+        <span class="chip"><i class="fas fa-chart-bar"></i> Barras</span>
+        <span class="chip"><i class="fas fa-chart-pie"></i> Pastel</span>
+        <span class="chip"><i class="fas fa-chart-line"></i> Histograma</span>
+        <span class="chip"><i class="fas fa-chart-scatter"></i> Polígono</span>
+      </div>
+    </div>
+
+    <div class="analogy-card">
+      <strong>🎨 Piénsalo así:</strong> Un gráfico vale más que mil números. Los datos sin visualización son como una partitura sin orquesta: la información está ahí, pero no podemos sentirla. Cada tipo de gráfico es un instrumento diferente; saber cuándo usar cada uno es el arte de la comunicación estadística.
+    </div>
+
+    <div class="main-area">
+      <div class="section-title"><i class="fas fa-database"></i> Tus datos</div>
+      <div class="data-preview">
+        <label style="font-weight:600; color:#69f0ae;">Datos para graficar (etiqueta:valor separados por coma):</label>
+        <textarea id="chartDataInput" rows="4">Manzanas:30, Peras:45, Plátanos:25, Naranjas:50, Uvas:35</textarea>
+        <button id="updateChartBtn" class="btn-action"><i class="fas fa-wand-magic-sparkles"></i> Actualizar gráfico</button>
+      </div>
+
+      <div class="section-title"><i class="fas fa-palette"></i> Tipo de gráfico</div>
+      <div class="controls-row">
+        <div class="chart-type-btns" id="chartTypeBtns">
+          <button class="chart-type-btn active" data-type="bar"><i class="fas fa-chart-bar"></i> Barras</button>
+          <button class="chart-type-btn" data-type="pie"><i class="fas fa-chart-pie"></i> Pastel</button>
+          <button class="chart-type-btn" data-type="histogram"><i class="fas fa-chart-simple"></i> Histograma</button>
+          <button class="chart-type-btn" data-type="polygon"><i class="fas fa-chart-line"></i> Polígono</button>
+          <button class="chart-type-btn" data-type="ogive"><i class="fas fa-chart-scatter"></i> Ojiva</button>
+        </div>
+      </div>
+
+      <div class="section-title"><i class="fas fa-image"></i> Visualización</div>
+      <div class="chart-area">
+        <canvas id="chartCanvas" width="600" height="350"></canvas>
+      </div>
+
+      <div class="controls-row">
+        <label for="binCount">Bins (para histograma):</label>
+        <input type="range" id="binCount" min="3" max="15" value="7">
+        <span id="binCountLabel">7</span>
+        <button id="resetDefaultBtn" class="btn-action btn-secondary"><i class="fas fa-rotate-left"></i> Datos por defecto</button>
+      </div>
+    </div>
+
+    <div id="feedbackMsg" class="feedback">💡 Cambia entre tipos de gráfico y ajusta los bins. ¡Cada visualización cuenta una historia diferente!</div>
+
+    <div id="insigniaArea" class="insignia hidden">
+      <i class="fas fa-medal"></i>
+      <h3>🏅 ¡INSIGNIA DE VISUALIZADOR DE DATOS! 🏅</h3>
+      <p>Dominas los gráficos estadísticos básicos. ¡Los datos cobran vida en tus manos!</p>
+    </div>
+
+    <div class="nav-links">
+      <a href="03-organizacion.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+      <a href="05-tendencia-central.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <footer>
+      <i class="fas fa-crown"></i> Estadística Descriptiva Interactiva · Dale vida a tus datos
+    </footer>
+  </div>
+
+  <script>
+    var STORAGE_KEY = 'est_desc_lvl4';
+    var completed = localStorage.getItem(STORAGE_KEY) === 'true';
+    var currentType = 'bar';
+    var currentLabels = [];
+    var currentValues = [];
+
+    var canvas = document.getElementById('chartCanvas');
+    var ctx = canvas.getContext('2d');
+
+    function parseData(str) {
+      var items = str.split(',').map(function(s) { return s.trim(); });
+      var labels = [];
+      var values = [];
+      items.forEach(function(item) {
+        var parts = item.split(':');
+        if (parts.length === 2) {
+          var label = parts[0].trim();
+          var val = parseFloat(parts[1].trim());
+          if (!isNaN(val)) { labels.push(label); values.push(val); }
+        }
+      });
+      return { labels: labels, values: values };
+    }
+
+    function getDefaultData() {
+      return parseData('Manzanas:30, Peras:45, Pl\u00e1tanos:25, Naranjas:50, Uvas:35');
+    }
+
+    function drawBar(labels, values) {
+      var w = canvas.width, h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+      var pad = { top: 20, bottom: 40, left: 50, right: 20 };
+      var chartW = w - pad.left - pad.right;
+      var chartH = h - pad.top - pad.bottom;
+      var maxVal = Math.max.apply(null, values);
+      var barW = chartW / labels.length * 0.7;
+      var gap = chartW / labels.length * 0.3;
+
+      ctx.strokeStyle = '#2c3e66';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(pad.left, pad.top);
+      ctx.lineTo(pad.left, pad.top + chartH);
+      ctx.lineTo(pad.left + chartW, pad.top + chartH);
+      ctx.stroke();
+
+      values.forEach(function(v, i) {
+        var x = pad.left + i * (barW + gap) + gap / 2;
+        var barH = (v / maxVal) * chartH;
+        var grad = ctx.createLinearGradient(x, pad.top + chartH, x, pad.top + chartH - barH);
+        grad.addColorStop(0, '#00e676');
+        grad.addColorStop(1, '#69f0ae');
+        ctx.fillStyle = grad;
+        ctx.fillRect(x, pad.top + chartH - barH, barW, barH);
+        ctx.fillStyle = '#eef5ff';
+        ctx.font = '11px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(labels[i], x + barW / 2, pad.top + chartH + 16);
+        ctx.fillStyle = '#69f0ae';
+        ctx.fillText(v, x + barW / 2, pad.top + chartH - barH - 5);
+      });
+    }
+
+    function drawPie(labels, values) {
+      var w = canvas.width, h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+      var total = values.reduce(function(a, b) { return a + b; }, 0);
+      var cx = w / 2, cy = h / 2, r = Math.min(w, h) / 2 - 50;
+      var startAngle = -Math.PI / 2;
+      var colors = ['#00e676','#69f0ae','#2b9eff','#ffb347','#ff5050','#9c64ff','#ff66c0','#ffd700'];
+
+      values.forEach(function(v, i) {
+        var sliceAngle = (v / total) * 2 * Math.PI;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, r, startAngle, startAngle + sliceAngle);
+        ctx.closePath();
+        ctx.fillStyle = colors[i % colors.length];
+        ctx.fill();
+        var midAngle = startAngle + sliceAngle / 2;
+        var labelR = r * 0.65;
+        var lx = cx + Math.cos(midAngle) * labelR;
+        var ly = cy + Math.sin(midAngle) * labelR;
+        ctx.fillStyle = '#000';
+        ctx.font = 'bold 12px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(labels[i] + ' ' + ((v/total)*100).toFixed(0) + '%', lx, ly + 4);
+        startAngle += sliceAngle;
+      });
+    }
+
+    function drawHistogram(labels, values) {
+      var w = canvas.width, h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+      var pad = { top: 20, bottom: 40, left: 50, right: 20 };
+      var chartW = w - pad.left - pad.right;
+      var chartH = h - pad.top - pad.bottom;
+      var maxVal = Math.max.apply(null, values);
+      var barW = chartW / values.length;
+
+      ctx.strokeStyle = '#2c3e66';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(pad.left, pad.top);
+      ctx.lineTo(pad.left, pad.top + chartH);
+      ctx.lineTo(pad.left + chartW, pad.top + chartH);
+      ctx.stroke();
+
+      values.forEach(function(v, i) {
+        var x = pad.left + i * barW;
+        var barH = (v / maxVal) * chartH;
+        ctx.fillStyle = 'rgba(0, 230, 118, 0.6)';
+        ctx.strokeStyle = '#69f0ae';
+        ctx.lineWidth = 1;
+        ctx.fillRect(x, pad.top + chartH - barH, barW, barH);
+        ctx.strokeRect(x, pad.top + chartH - barH, barW, barH);
+        ctx.fillStyle = '#eef5ff';
+        ctx.font = '10px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        if (i % 2 === 0) ctx.fillText(labels[i], x + barW / 2, pad.top + chartH + 16);
+      });
+    }
+
+    function drawPolygon(labels, values) {
+      var w = canvas.width, h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+      var pad = { top: 20, bottom: 40, left: 50, right: 20 };
+      var chartW = w - pad.left - pad.right;
+      var chartH = h - pad.top - pad.bottom;
+      var maxVal = Math.max.apply(null, values);
+      var stepX = chartW / (values.length - 1 || 1);
+
+      ctx.strokeStyle = '#2c3e66';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(pad.left, pad.top);
+      ctx.lineTo(pad.left, pad.top + chartH);
+      ctx.lineTo(pad.left + chartW, pad.top + chartH);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.strokeStyle = '#00e676';
+      ctx.lineWidth = 3;
+      values.forEach(function(v, i) {
+        var x = pad.left + i * stepX;
+        var y = pad.top + chartH - (v / maxVal) * chartH;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+
+      values.forEach(function(v, i) {
+        var x = pad.left + i * stepX;
+        var y = pad.top + chartH - (v / maxVal) * chartH;
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, 2 * Math.PI);
+        ctx.fillStyle = '#69f0ae';
+        ctx.fill();
+        ctx.fillStyle = '#eef5ff';
+        ctx.font = '10px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(v, x, y - 10);
+        if (i % 2 === 0) {
+          ctx.fillText(labels[i], x, pad.top + chartH + 16);
+        }
+      });
+    }
+
+    function drawOgive(labels, values) {
+      var cumulative = [];
+      var sum = 0;
+      values.forEach(function(v) {
+        sum += v;
+        cumulative.push(sum);
+      });
+      var w = canvas.width, h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+      var pad = { top: 20, bottom: 40, left: 50, right: 20 };
+      var chartW = w - pad.left - pad.right;
+      var chartH = h - pad.top - pad.bottom;
+      var maxVal = Math.max.apply(null, cumulative);
+      var stepX = chartW / (cumulative.length - 1 || 1);
+
+      ctx.strokeStyle = '#2c3e66';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(pad.left, pad.top);
+      ctx.lineTo(pad.left, pad.top + chartH);
+      ctx.lineTo(pad.left + chartW, pad.top + chartH);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.strokeStyle = '#00e676';
+      ctx.lineWidth = 3;
+      cumulative.forEach(function(v, i) {
+        var x = pad.left + i * stepX;
+        var y = pad.top + chartH - (v / maxVal) * chartH;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+
+      cumulative.forEach(function(v, i) {
+        var x = pad.left + i * stepX;
+        var y = pad.top + chartH - (v / maxVal) * chartH;
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, 2 * Math.PI);
+        ctx.fillStyle = '#ffb347';
+        ctx.fill();
+        ctx.fillStyle = '#eef5ff';
+        ctx.font = '10px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(v, x, y - 10);
+        if (i % 2 === 0) ctx.fillText(labels[i], x, pad.top + chartH + 16);
+      });
+    }
+
+    function drawChart(type, labels, values) {
+      if (labels.length === 0 || values.length === 0) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#8899bb';
+        ctx.font = '16px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Ingresa datos para visualizar', canvas.width/2, canvas.height/2);
+        return;
+      }
+      switch(type) {
+        case 'bar': drawBar(labels, values); break;
+        case 'pie': drawPie(labels, values); break;
+        case 'histogram': drawHistogram(labels, values); break;
+        case 'polygon': drawPolygon(labels, values); break;
+        case 'ogive': drawOgive(labels, values); break;
+      }
+    }
+
+    function getDataAndDraw() {
+      var input = document.getElementById('chartDataInput').value;
+      var parsed = parseData(input);
+      currentLabels = parsed.labels;
+      currentValues = parsed.values;
+      drawChart(currentType, currentLabels, currentValues);
+      if (currentLabels.length > 0) {
+        updateFeedback('✅ Gráfico de ' + currentType + ' generado con ' + currentLabels.length + ' categorías.', '#00e676');
+      }
+    }
+
+    function updateFeedback(msg, color) {
+      var fb = document.getElementById('feedbackMsg');
+      fb.innerHTML = msg;
+      fb.style.borderLeftColor = color || '#00e676';
+    }
+
+    function checkCompletion() {
+      if (!completed) {
+        completed = true;
+        localStorage.setItem(STORAGE_KEY, 'true');
+        document.getElementById('insigniaArea').classList.remove('hidden');
+        updateFeedback('🏆 ¡Has completado el módulo! Has explorado diferentes tipos de gráficos.', '#00e676');
+      }
+    }
+
+    document.querySelectorAll('.chart-type-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.chart-type-btn').forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        currentType = btn.dataset.type;
+        getDataAndDraw();
+        checkCompletion();
+      });
+    });
+
+    document.getElementById('updateChartBtn').addEventListener('click', function() {
+      getDataAndDraw();
+      checkCompletion();
+    });
+
+    document.getElementById('resetDefaultBtn').addEventListener('click', function() {
+      document.getElementById('chartDataInput').value = 'Manzanas:30, Peras:45, Pl\u00e1tanos:25, Naranjas:50, Uvas:35';
+      getDataAndDraw();
+    });
+
+    document.getElementById('binCount').addEventListener('input', function() {
+      document.getElementById('binCountLabel').textContent = this.value;
+    });
+
+    if (completed) {
+      document.getElementById('insigniaArea').classList.remove('hidden');
+      updateFeedback('🏆 ¡Ya completaste este módulo! Sigue explorando gráficos.', '#00e676');
+    }
+
+    var defaultData = getDefaultData();
+    currentLabels = defaultData.labels;
+    currentValues = defaultData.values;
+    drawChart('bar', currentLabels, currentValues);
+  </script>
+</body>
+</html>

@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Bot Trader | Estrategias Algorítmicas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{background:linear-gradient(145deg,#0d0520 0%,#120830 100%);font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem;}
+    .container{max-width:1250px;width:100%;background:rgba(14,8,32,.8);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(156,100,255,.3);box-shadow:0 25px 45px rgba(0,0,0,.6);overflow:hidden;}
+    .hero{background:linear-gradient(95deg,#0d0520,#120830);padding:1.8rem 2rem;text-align:center;border-bottom:2px solid #9c64ff;}
+    .hero h1{font-size:2rem;font-weight:800;background:linear-gradient(135deg,#e0c4ff,#c49aff,#9c64ff);-webkit-background-clip:text;background-clip:text;color:transparent;}
+    .hero p{margin-top:.5rem;font-size:1rem;color:#c0a0e0;}
+    .analogy-card{background:#1a0a30cc;margin:1.5rem 2rem;padding:1.2rem 1.8rem;border-radius:2rem;border-left:8px solid #9c64ff;font-size:.95rem;line-height:1.6;}
+    .analogy-card strong{color:#c49aff;}
+    .strategies-row{display:flex;flex-wrap:wrap;gap:1.5rem;padding:0 2rem 1rem;}
+    .strat-card{flex:1;min-width:250px;background:#0d0820dd;border-radius:2rem;padding:1.3rem;border:2px solid transparent;cursor:pointer;transition:all .2s;}
+    .strat-card:hover{transform:translateY(-4px);}
+    .strat-card.sel-trend{border-color:#ffd700;box-shadow:0 0 20px rgba(255,215,0,.3);}
+    .strat-card.sel-reversion{border-color:#00d4aa;box-shadow:0 0 20px rgba(0,212,170,.3);}
+    .strat-card.sel-breakout{border-color:#ff6a00;box-shadow:0 0 20px rgba(255,106,0,.3);}
+    .strat-card.sel-macd{border-color:#9c64ff;box-shadow:0 0 20px rgba(156,100,255,.3);}
+    .strat-icon{font-size:2.5rem;text-align:center;margin-bottom:.6rem;}
+    .strat-title{font-size:1.15rem;font-weight:700;text-align:center;margin-bottom:.5rem;}
+    .strat-desc{font-size:.82rem;color:#c0a0e0;line-height:1.5;text-align:center;}
+    .strat-rule{font-size:.78rem;color:#9c64ff;text-align:center;margin-top:.5rem;background:#1a0a30;padding:.4rem;border-radius:.8rem;}
+    .sim-controls{padding:0 2rem 1rem;display:flex;gap:1rem;flex-wrap:wrap;align-items:center;}
+    .btn-run{background:linear-gradient(95deg,#9c64ff,#7040cc);border:none;padding:.8rem 2rem;font-weight:bold;border-radius:3rem;cursor:pointer;font-size:1rem;color:#fff;transition:.2s;}
+    .btn-run:hover{transform:translateY(-2px);box-shadow:0 0 15px rgba(156,100,255,.5);}
+    .btn-reset{background:#2c3e66;border:none;padding:.8rem 1.5rem;font-weight:bold;border-radius:3rem;cursor:pointer;color:#eef5ff;transition:.2s;}
+    .market-select{background:#1a0a30;border:1px solid #9c64ff;color:#eef5ff;padding:.7rem 1rem;border-radius:2rem;font-size:.9rem;font-family:'Inter',sans-serif;}
+    .results-area{padding:0 2rem 1rem;display:none;}
+    .results-area.show{display:block;}
+    .results-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1rem;margin-bottom:1.2rem;}
+    .result-card{background:#0d0820;border-radius:1.5rem;padding:1rem;text-align:center;border:1px solid #9c64ff44;}
+    .result-val{font-size:1.6rem;font-weight:800;font-family:monospace;}
+    .result-lbl{font-size:.75rem;color:#c0a0e0;margin-top:.3rem;}
+    .chart-box{background:#040a18;border-radius:1.5rem;padding:.8rem;border:1px solid #1a0a3a;}
+    .chart-title{font-size:.82rem;font-weight:700;color:#c49aff;margin-bottom:.4rem;}
+    .trade-log{max-height:160px;overflow-y:auto;background:#040a18;border-radius:1.2rem;padding:.8rem;margin-top:1rem;border:1px solid #1a0a3a;}
+    .trade-item{font-size:.78rem;padding:.2rem .4rem;border-bottom:1px solid #1a0a3a22;display:flex;justify-content:space-between;}
+    .trade-item.buy{color:#00d4aa;}
+    .trade-item.sell-win{color:#7affe6;}
+    .trade-item.sell-loss{color:#ff8888;}
+    .feedback{background:#00000088;margin:0 2rem 1rem;padding:.9rem;border-radius:1.5rem;text-align:center;border-left:4px solid #9c64ff;line-height:1.5;font-size:.9rem;}
+    .insignia{text-align:center;background:#0c0d2f;border-radius:2rem;margin:0 2rem 1.5rem;padding:1rem;border:1px dashed gold;}
+    .insignia i{font-size:2.5rem;color:gold;}
+    .hidden{display:none;}
+    .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.5rem 2rem;}
+    .nav-link{background:#2c3e66;padding:.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:.5rem;transition:.2s;}
+    .nav-link:hover{transform:translateY(-2px);}
+    .nav-link.next{background:linear-gradient(95deg,#f0a500,#ff6a00);color:#1e1a0c;}
+    .nav-link.menu{background:#1a2a4a;border:1px solid #9c64ff;}
+    footer{text-align:center;padding:1rem;font-size:.75rem;border-top:1px solid #1a0a30;}
+    @media(max-width:800px){.hero h1{font-size:1.5rem;}}
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+<div class="container">
+  <div class="hero">
+    <h1>⚔️ ESTRATEGIAS ALGORÍTMICAS: El Arte de las Reglas</h1>
+    <p>Elige tu formación táctica y simula su rendimiento histórico en el mercado</p>
+  </div>
+
+  <div class="analogy-card">
+    <strong>⚽ Piénsalo así:</strong> Un director técnico elige la formación según el rival. El <strong>Trend Following</strong> (seguimiento de tendencia) es jugar al ataque — apostar a que el equipo que va ganando seguirá ganando. La <strong>Reversión a la Media</strong> es apostar al empate — cuando un equipo va muy arriba, eventualmente baja. El <strong>Breakout</strong> es aprovechar el gol que rompe el 0-0 y apostar que habrá más. Cada estrategia tiene su contexto óptimo.
+    <br><br>
+    <strong>📚 Fuente:</strong> Aronson, D. (2006) — <em>"Evidence-Based Technical Analysis"</em>. Wiley. / Antonacci, G. (2014) — <em>"Dual Momentum Investing"</em>. McGraw-Hill.
+  </div>
+
+  <div class="strategies-row">
+    <div class="strat-card" id="card-trend" onclick="selectStrategy('trend')">
+      <div class="strat-icon">📈</div>
+      <div class="strat-title" style="color:#ffd700">Trend Following</div>
+      <div class="strat-desc">Sigue la tendencia dominante. "La tendencia es tu amiga." Compra cuando MA rápida supera MA lenta; vende cuando cae.</div>
+      <div class="strat-rule">BUY: MA10 > MA30 | SELL: MA10 < MA30</div>
+    </div>
+    <div class="strat-card" id="card-reversion" onclick="selectStrategy('reversion')">
+      <div class="strat-icon">🔄</div>
+      <div class="strat-title" style="color:#00d4aa">Reversión a la Media</div>
+      <div class="strat-desc">Compra cuando el precio cae demasiado (RSI bajo). Vende cuando sube demasiado (RSI alto). Los extremos se revierten.</div>
+      <div class="strat-rule">BUY: RSI < 35 | SELL: RSI > 65</div>
+    </div>
+    <div class="strat-card" id="card-breakout" onclick="selectStrategy('breakout')">
+      <div class="strat-icon">🚀</div>
+      <div class="strat-title" style="color:#ff6a00">Breakout</div>
+      <div class="strat-desc">Entra cuando el precio rompe un nivel de resistencia. Los breakouts suelen generar movimientos explosivos.</div>
+      <div class="strat-rule">BUY: Price > Max(20 períodos) | SELL: Price < Min(20 p.)</div>
+    </div>
+    <div class="strat-card" id="card-macd" onclick="selectStrategy('macd')">
+      <div class="strat-icon">⚡</div>
+      <div class="strat-title" style="color:#9c64ff">MACD Signal</div>
+      <div class="strat-desc">Usa el cruce del MACD con su línea de señal para detectar cambios de momentum antes de que el precio los confirme.</div>
+      <div class="strat-rule">BUY: MACD > Signal | SELL: MACD < Signal</div>
+    </div>
+  </div>
+
+  <div class="sim-controls">
+    <select class="market-select" id="marketSel">
+      <option value="crypto">BTC/USDT (Cripto)</option>
+      <option value="forex">EUR/USD (Forex)</option>
+      <option value="stocks">S&P 500 (Acciones)</option>
+      <option value="volatile">MEME Coin (Alta volatilidad)</option>
+    </select>
+    <button class="btn-run" id="btnRun"><i class="fas fa-play"></i> Ejecutar Backtesting</button>
+    <button class="btn-reset" id="btnReset"><i class="fas fa-redo"></i> Reiniciar</button>
+  </div>
+
+  <div class="results-area" id="resultsArea">
+    <div class="results-grid" id="resultsGrid"></div>
+    <div class="chart-box">
+      <div class="chart-title">📊 Curva de Equity (capital a lo largo del tiempo)</div>
+      <canvas id="equityCanvas" height="160"></canvas>
+    </div>
+    <div class="trade-log" id="tradeLog"></div>
+  </div>
+
+  <div id="feedbackMsg" class="feedback">⚔️ Selecciona una estrategia y un mercado. Luego ejecuta el backtesting para ver cómo hubiera funcionado históricamente.</div>
+
+  <div id="insigniaArea" class="insignia hidden">
+    <i class="fas fa-chess-queen"></i>
+    <h3>🏅 ¡INSIGNIA DE ESTRATEGA ALGORÍTMICO! 🏅</h3>
+    <p>¡Exploraste múltiples estrategias! Recuerda: ninguna es perfecta en todos los mercados. La clave está en la diversificación y el backtesting riguroso.</p>
+  </div>
+
+  <div class="nav-links">
+    <a href="04-indicadores-tecnicos.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+    <a href="06-python-traders.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Bot Trader Adventure · Módulo 5 de 12 · Antonacci (2014) "Dual Momentum" / Aronson (2006) "Evidence-Based TA"</footer>
+</div>
+<script>
+const STORAGE_KEY = 'tbot_strat5';
+let selectedStrat = null, runsCompleted = 0, completed = false;
+
+const MARKETS = {
+  crypto: { name:'BTC/USDT', vol:0.025, trend:0.6, base:30000 },
+  forex: { name:'EUR/USD', vol:0.008, trend:0.52, base:1.10 },
+  stocks: { name:'S&P 500', vol:0.012, trend:0.58, base:4500 },
+  volatile: { name:'MEME Coin', vol:0.06, trend:0.45, base:0.01 }
+};
+
+function selectStrategy(s) {
+  selectedStrat = s;
+  ['trend','reversion','breakout','macd'].forEach(k=>{
+    const c = document.getElementById('card-'+k);
+    c.className='strat-card';
+  });
+  const colors={trend:'sel-trend',reversion:'sel-reversion',breakout:'sel-breakout',macd:'sel-macd'};
+  document.getElementById('card-'+s).className='strat-card '+colors[s];
+  document.getElementById('feedbackMsg').innerHTML = `✅ Estrategia <strong>${getStratName(s)}</strong> seleccionada. Ahora elige un mercado y ejecuta el backtesting.`;
+}
+
+function getStratName(s){return{trend:'Trend Following',reversion:'Reversión a la Media',breakout:'Breakout',macd:'MACD Signal'}[s]||s;}
+
+function generatePrices(market, n=80) {
+  const m = MARKETS[market];
+  const prices=[m.base];
+  for(let i=1;i<n;i++){
+    const trend=(Math.random()<m.trend?1:-1)*m.vol*0.3;
+    const noise=(Math.random()-0.5)*m.vol*2;
+    prices.push(Math.max(prices[i-1]*(1+trend+noise),0.0001));
+  }
+  return prices;
+}
+
+function computeMA(p,n){return p.map((_,i)=>i<n-1?null:p.slice(i-n+1,i+1).reduce((a,b)=>a+b)/n);}
+function computeRSI(p,n){
+  const r=new Array(n).fill(null);let ag=0,al=0;
+  for(let i=1;i<=n;i++){const d=p[i]-p[i-1];if(d>0)ag+=d;else al-=d;}
+  ag/=n;al/=n;
+  r.push(al===0?100:100-(100/(1+ag/al)));
+  for(let i=n+1;i<p.length;i++){const d=p[i]-p[i-1];const g=d>0?d:0;const l=d<0?-d:0;ag=(ag*(n-1)+g)/n;al=(al*(n-1)+l)/n;r.push(al===0?100:100-(100/(1+ag/al)));}
+  return r;
+}
+
+function runBacktest(prices, strat) {
+  const capital0=10000; let capital=capital0;
+  const equity=[capital0]; const trades=[];
+  let position=null; // {entry, qty}
+  const maF=computeMA(prices,10), maS=computeMA(prices,30), rsi=computeRSI(prices,14);
+  const maxN=20; // for breakout
+
+  for(let i=1;i<prices.length;i++){
+    let signal=0; // 1=buy, -1=sell
+    if(strat==='trend'){
+      if(maF[i]&&maS[i]&&maF[i-1]&&maS[i-1]){
+        if(maF[i-1]<=maS[i-1]&&maF[i]>maS[i]) signal=1;
+        if(maF[i-1]>=maS[i-1]&&maF[i]<maS[i]) signal=-1;
+      }
+    } else if(strat==='reversion'){
+      if(rsi[i]!==null){
+        if(rsi[i]<35&&!position) signal=1;
+        if(rsi[i]>65&&position) signal=-1;
+      }
+    } else if(strat==='breakout'){
+      if(i>=maxN){
+        const hi=Math.max(...prices.slice(i-maxN,i));
+        const lo=Math.min(...prices.slice(i-maxN,i));
+        if(prices[i]>hi&&!position) signal=1;
+        if(prices[i]<lo&&position) signal=-1;
+      }
+    } else if(strat==='macd'){
+      const m12=computeMA(prices.slice(0,i+1),12);
+      const m26=computeMA(prices.slice(0,i+1),26);
+      const mv12=m12[m12.length-1], mv26=m26[m26.length-1];
+      if(mv12&&mv26){
+        const macd_cur=mv12-mv26;
+        const m12p=computeMA(prices.slice(0,i),12), m26p=computeMA(prices.slice(0,i),26);
+        const mv12p=m12p[m12p.length-1], mv26p=m26p[m26p.length-1];
+        if(mv12p&&mv26p){
+          const macd_prev=mv12p-mv26p;
+          if(macd_prev<=0&&macd_cur>0) signal=1;
+          if(macd_prev>=0&&macd_cur<0) signal=-1;
+        }
+      }
+    }
+
+    if(signal===1&&!position&&capital>0){
+      const qty=capital/prices[i]*0.95;
+      position={entry:prices[i],qty,capitalAtEntry:capital};
+      capital-=position.entry*position.qty;
+      trades.push({type:'BUY',price:prices[i],i,capital});
+    } else if(signal===-1&&position){
+      const proceeds=position.qty*prices[i];
+      const pnl=proceeds-position.entry*position.qty;
+      capital+=proceeds;
+      trades.push({type:'SELL',price:prices[i],pnl,i,capital});
+      position=null;
+    }
+
+    if(position) equity.push(capital+position.qty*prices[i]);
+    else equity.push(capital);
+  }
+  if(position){
+    const proceeds=position.qty*prices[prices.length-1];
+    capital+=proceeds;
+    trades.push({type:'SELL',price:prices[prices.length-1],pnl:proceeds-position.entry*position.qty,i:prices.length-1,capital});
+  }
+
+  const totalReturn=((capital-capital0)/capital0)*100;
+  const sellTrades=trades.filter(t=>t.type==='SELL');
+  const winRate=sellTrades.length>0?Math.round(sellTrades.filter(t=>t.pnl>0).length/sellTrades.length*100):0;
+  const maxEquity=Math.max(...equity);
+  let maxDD=0,peak=equity[0];
+  equity.forEach(v=>{if(v>peak)peak=v;const dd=(peak-v)/peak*100;if(dd>maxDD)maxDD=dd;});
+  const sharpe = equity.length>1 ? (() => {
+    const returns=equity.slice(1).map((v,i)=>(v-equity[i])/equity[i]);
+    const mean=returns.reduce((a,b)=>a+b,0)/returns.length;
+    const std=Math.sqrt(returns.reduce((a,b)=>a+(b-mean)**2,0)/returns.length)||0.001;
+    return (mean/std*Math.sqrt(252)).toFixed(2);
+  })() : '—';
+
+  return {capital, totalReturn, winRate, maxDD, sharpe, trades, equity};
+}
+
+function renderEquityCurve(equity) {
+  const c=document.getElementById('equityCanvas');
+  const ctx=c.getContext('2d');
+  c.width=c.offsetWidth||800; c.height=160;
+  const W=c.width,H=c.height,m=20;
+  ctx.clearRect(0,0,W,H);
+  const min=Math.min(...equity)-500, max=Math.max(...equity)+500;
+  const xStep=(W-2*m)/(equity.length-1);
+  ctx.beginPath(); ctx.strokeStyle='#9c64ff'; ctx.lineWidth=2;
+  equity.forEach((v,i)=>{
+    const x=m+i*xStep, y=m+(H-2*m)*(1-(v-min)/(max-min||1));
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+  // Fill area
+  ctx.lineTo(m+(equity.length-1)*xStep,H-m); ctx.lineTo(m,H-m);
+  ctx.closePath(); ctx.fillStyle='rgba(156,100,255,.1)'; ctx.fill();
+  // Baseline
+  const y0=m+(H-2*m)*(1-(10000-min)/(max-min||1));
+  ctx.strokeStyle='rgba(255,255,255,.2)'; ctx.lineWidth=0.8; ctx.setLineDash([4,4]);
+  ctx.beginPath(); ctx.moveTo(m,y0); ctx.lineTo(W-m,y0); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='#9c64ff44'; ctx.font='10px Inter';
+  ctx.fillText('$10,000 inicial',m+4,y0-4);
+}
+
+function runSim() {
+  if(!selectedStrat){document.getElementById('feedbackMsg').innerHTML='⚠️ Selecciona primero una estrategia haciendo clic en una tarjeta.';return;}
+  const market=document.getElementById('marketSel').value;
+  const prices=generatePrices(market,80);
+  const res=runBacktest(prices,selectedStrat);
+  runsCompleted++;
+
+  const isGood=res.totalReturn>5;
+  document.getElementById('resultsGrid').innerHTML=`
+    <div class="result-card"><div class="result-val" style="color:${res.totalReturn>=0?'#00d4aa':'#ff4444'}">${res.totalReturn.toFixed(1)}%</div><div class="result-lbl">Retorno Total</div></div>
+    <div class="result-card"><div class="result-val" style="color:#7ab2ff">${res.winRate}%</div><div class="result-lbl">Win Rate</div></div>
+    <div class="result-card"><div class="result-val" style="color:#ff8888">${res.maxDD.toFixed(1)}%</div><div class="result-lbl">Max Drawdown</div></div>
+    <div class="result-card"><div class="result-val" style="color:#ffd700">${res.sharpe}</div><div class="result-lbl">Sharpe Ratio</div></div>
+    <div class="result-card"><div class="result-val">${res.trades.filter(t=>t.type==='SELL').length}</div><div class="result-lbl">Operaciones</div></div>
+    <div class="result-card"><div class="result-val">$${Math.round(res.capital).toLocaleString()}</div><div class="result-lbl">Capital Final</div></div>
+  `;
+  document.getElementById('resultsArea').className='results-area show';
+  renderEquityCurve(res.equity);
+
+  const log=document.getElementById('tradeLog');
+  log.innerHTML=`<div style="font-size:.8rem;font-weight:700;color:#c49aff;padding:.2rem 0;">📋 Log de operaciones (${getStratName(selectedStrat)} en ${MARKETS[market].name}):</div>`;
+  res.trades.slice(-20).forEach(t=>{
+    const div=document.createElement('div');
+    if(t.type==='BUY'){div.className='trade-item buy';div.innerHTML=`<span>🟢 COMPRA — P: ${t.price.toFixed(4)}</span><span>Capital: $${Math.round(t.capital).toLocaleString()}</span>`;}
+    else{const win=t.pnl>0;div.className='trade-item '+(win?'sell-win':'sell-loss');div.innerHTML=`<span>${win?'✅':'❌'} VENTA — P: ${t.price.toFixed(4)}</span><span>P&L: ${t.pnl>=0?'+':''}$${t.pnl.toFixed(0)} | Cap: $${Math.round(t.capital).toLocaleString()}</span>`;}
+    log.appendChild(div);
+  });
+
+  document.getElementById('feedbackMsg').innerHTML=`📊 <strong>${getStratName(selectedStrat)}</strong> en ${MARKETS[market].name}: Retorno ${res.totalReturn.toFixed(1)}% | Win Rate ${res.winRate}% | Max DD ${res.maxDD.toFixed(1)}%. ${res.totalReturn>0?'¡Estrategia positiva en este período! Recuerda: pasado ≠ futuro.':'Período desfavorable. Prueba en otro mercado o ajusta los parámetros.'}`;
+
+  if(runsCompleted>=2&&!completed){
+    completed=true;
+    localStorage.setItem(STORAGE_KEY,JSON.stringify({completed:true,runs:runsCompleted}));
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').innerHTML+='<br><strong style="color:#9c64ff">🎓 ¡Módulo completado! Probaste múltiples estrategias. ¡La clave es el contexto de mercado!</strong>';
+  }
+}
+
+document.getElementById('btnRun').addEventListener('click',runSim);
+document.getElementById('btnReset').addEventListener('click',()=>{
+  runsCompleted=0;
+  document.getElementById('resultsArea').className='results-area';
+  document.getElementById('feedbackMsg').innerHTML='⚔️ Reiniciado. Selecciona una estrategia y un mercado para empezar.';
+});
+
+try{const s=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');if(s.completed){completed=true;document.getElementById('insigniaArea').classList.remove('hidden');}}catch(e){}
+window.addEventListener('resize',()=>{if(document.getElementById('resultsArea').classList.contains('show'))renderEquityCurve([]); });
+</script>
+  <script src="../../assets/js/cookie-consent.js"></script>
+</body>
+</html>
+
+
+

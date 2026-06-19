@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Smart Contracts DeFi | Dashboard de Progreso</title>
+  <meta property="og:title" content="Smart Contracts DeFi | Dashboard de Progreso">
+  <meta property="og:description" content="Dashboard de progreso del curso Smart Contracts DeFi. Visualiza tu avance en cada módulo y las insignias obtenidas.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Israel Romero Portfolio">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Smart Contracts DeFi | Dashboard de Progreso">
+  <meta name="twitter:description" content="Dashboard de progreso del curso Smart Contracts DeFi. Visualiza tu avance en cada módulo y las insignias obtenidas.">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{background:linear-gradient(135deg,#0a0f1e,#0c1222 50%,#111a2e);background-size:200% 200%;animation:gradientShift 20s ease infinite;font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;padding:2rem 1rem;}
+    @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+    a{color:inherit;text-decoration:none;}
+    .dashboard{max-width:1200px;width:100%;margin:0 auto;background:rgba(15,25,45,0.65);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(43,158,255,0.25);box-shadow:0 25px 45px rgba(0,0,0,0.5);overflow:hidden;animation:containerGlow 4s ease-in-out infinite alternate;}
+    @keyframes containerGlow{0%{border-color:rgba(43,158,255,0.25)}100%{border-color:rgba(43,158,255,0.5)}}
+    .hero{background:linear-gradient(95deg,#0b1120,#111a2e);padding:2rem 2rem 1.5rem;text-align:center;border-bottom:2px solid #2b9eff;position:relative;overflow:hidden;}
+    .hero::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 30% 50%,rgba(43,158,255,0.06),transparent 60%);pointer-events:none;}
+    .hero h1{font-size:2.2rem;font-weight:800;background:linear-gradient(135deg,#ffd700,#ffb347,#ffd700);-webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:2px;}
+    .hero p{font-size:1.05rem;color:#b9d4ff;margin-top:.4rem;font-weight:500;}
+    .hero .sub-accent{display:inline-block;margin-top:.3rem;font-size:.8rem;background:linear-gradient(135deg,rgba(255,215,0,0.15),rgba(43,158,255,0.15));padding:.3rem 1.2rem;border-radius:2rem;color:#7ac4ff;border:1px solid rgba(43,158,255,0.2);font-weight:600;}
+    .player-badge{margin-top:1rem;display:inline-flex;align-items:center;gap:.5rem;background:linear-gradient(135deg,rgba(255,215,0,0.1),rgba(43,158,255,0.1));border:1px solid rgba(255,215,0,0.3);border-radius:2rem;padding:.5rem 1.4rem;font-size:.9rem;color:#ffd700;}
+    .player-badge i{color:#ffd700;}
+    .stats-bar{display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;padding:.8rem 2rem;background:rgba(0,0,0,0.2);border-bottom:1px solid rgba(43,158,255,0.1);}
+    .stat-item{display:flex;align-items:center;gap:.5rem;font-size:.85rem;color:#b9d4ff;}
+    .stat-item strong{color:#eef5ff;font-size:1.1rem;}
+    .stat-item.gold strong{color:#ffd700;}
+    .main-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.2rem;padding:2rem;}
+    .module-card{background:rgba(0,10,25,0.6);border-radius:1.8rem;padding:1.4rem;border:1px solid rgba(43,158,255,0.12);transition:.25s;display:flex;flex-direction:column;position:relative;overflow:hidden;}
+    .module-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:1.8rem 1.8rem 0 0;transition:.25s;}
+    .module-card.locked::before{background:linear-gradient(90deg,#555,#777,#555);}
+    .module-card.in-progress::before{background:linear-gradient(90deg,#00e0ff,#2b9eff,#00e0ff);background-size:200% 100%;animation:shimmer 2s ease-in-out infinite;}
+    .module-card.completed::before{background:linear-gradient(90deg,#ffd700,#ffb347,#ffd700);background-size:200% 100%;}
+    .module-card.locked{border-color:rgba(85,85,85,0.3);opacity:0.6;}
+    .module-card.in-progress{border-color:rgba(0,224,255,0.3);}
+    .module-card.completed{border-color:rgba(255,215,0,0.3);}
+    .module-card:hover{transform:translateY(-3px);}
+    .module-card.locked:hover{transform:none;}
+    .module-card.in-progress:hover{box-shadow:0 0 20px rgba(0,224,255,0.15);}
+    .module-card.completed:hover{box-shadow:0 0 20px rgba(255,215,0,0.15);}
+    @keyframes shimmer{0%{background-position:0%}50%{background-position:100%}100%{background-position:0%}}
+    .card-top{display:flex;align-items:center;gap:.8rem;margin-bottom:.6rem;}
+    .card-num{width:2.2rem;height:2.2rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.85rem;flex-shrink:0;}
+    .module-card.locked .card-num{background:#444;color:#888;}
+    .module-card.in-progress .card-num{background:linear-gradient(135deg,#00e0ff,#2b9eff);color:#000;}
+    .module-card.completed .card-num{background:linear-gradient(135deg,#ffd700,#ffb347);color:#1a0a00;}
+    .card-icon{font-size:1.3rem;width:1.6rem;text-align:center;}
+    .card-title{font-weight:700;font-size:.95rem;flex:1;line-height:1.3;}
+    .card-status{margin:.4rem 0 .6rem;display:flex;align-items:center;gap:.4rem;font-size:.78rem;font-weight:600;}
+    .status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;}
+    .module-card.locked .status-dot{background:#666;}
+    .module-card.in-progress .status-dot{background:#00e0ff;box-shadow:0 0 6px #00e0ff;}
+    .module-card.completed .status-dot{background:#ffd700;box-shadow:0 0 6px #ffd700;}
+    .status-label.locked{color:#888;}
+    .status-label.in-progress{color:#00e0ff;}
+    .status-label.completed{color:#ffd700;}
+    .card-score{margin:.3rem 0 .6rem;display:none;}
+    .card-score.visible{display:block;}
+    .score-label{font-size:.72rem;color:#8899bb;margin-bottom:.2rem;}
+    .score-bar-track{height:5px;background:rgba(255,255,255,0.08);border-radius:5px;overflow:hidden;}
+    .score-bar-fill{height:100%;border-radius:5px;transition:width .6s ease;}
+    .module-card.in-progress .score-bar-fill{background:linear-gradient(90deg,#00e0ff,#2b9eff);}
+    .module-card.completed .score-bar-fill{background:linear-gradient(90deg,#ffd700,#ffb347);}
+    .score-text{font-size:.72rem;color:#8899bb;margin-top:.2rem;text-align:right;}
+    .card-btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;margin-top:auto;padding:.55rem 1rem;border:none;border-radius:2rem;font-weight:700;font-size:.82rem;cursor:pointer;transition:.2s;font-family:'Inter',sans-serif;text-decoration:none;width:100%;}
+    .card-btn.locked{background:#333;color:#888;cursor:not-allowed;}
+    .card-btn.in-progress{background:linear-gradient(135deg,#00e0ff,#2b9eff);color:#000;}
+    .card-btn.completed{background:linear-gradient(135deg,#ffd700,#ffb347);color:#1a0a00;}
+    .card-btn.completed:hover{box-shadow:0 4px 15px rgba(255,215,0,0.3);transform:scale(1.02);}
+    .card-btn.in-progress:hover{box-shadow:0 4px 15px rgba(0,224,255,0.3);transform:scale(1.02);}
+    .chart-section{display:flex;flex-wrap:wrap;gap:2rem;align-items:center;justify-content:center;padding:1.5rem 2rem 2rem;border-top:1px solid rgba(43,158,255,0.1);}
+    .radial-wrap{display:flex;flex-direction:column;align-items:center;gap:.5rem;}
+    .radial-wrap svg{width:160px;height:160px;transform:rotate(-90deg);}
+    .radial-wrap .bg-circle{fill:none;stroke:rgba(255,255,255,0.06);stroke-width:8;}
+    .radial-wrap .fg-circle{fill:none;stroke-linecap:round;stroke-width:8;transition:stroke-dashoffset 1s ease;}
+    .radial-wrap .fg-circle.cyber{stroke:url(#cyberGrad);}
+    .radial-wrap .fg-circle.gold{stroke:url(#goldGrad);}
+    .radial-label{font-family:'Press Start 2P',monospace;font-size:1.5rem;margin-top:-5.5rem;position:relative;z-index:2;}
+    .radial-label.gold{color:#ffd700;}
+    .radial-label.cyan{color:#00e0ff;}
+    .chart-info{text-align:center;min-width:200px;}
+    .chart-info h3{font-size:1.1rem;margin-bottom:.3rem;}
+    .chart-info p{font-size:.85rem;color:#8899bb;}
+    .grade-title{display:inline-block;margin-top:.6rem;padding:.4rem 1.4rem;border-radius:2rem;font-weight:700;font-size:.95rem;}
+    .grade-title.S{background:linear-gradient(135deg,#ffd700,#ffb347);color:#1a0a00;box-shadow:0 0 15px rgba(255,215,0,0.3);}
+    .grade-title.A{background:linear-gradient(135deg,#00e0ff,#2b9eff);color:#000;box-shadow:0 0 15px rgba(0,224,255,0.3);}
+    .grade-title.B{background:linear-gradient(135deg,#7ac4ff,#4a8fcc);color:#000;}
+    .grade-title.C{background:linear-gradient(135deg,#f39c12,#e67e22);color:#1a0a00;}
+    .grade-title.D{background:#555;color:#ddd;}
+    .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.2rem 2rem;}
+    .nav-link{background:rgba(43,158,255,0.1);border:1px solid rgba(43,158,255,0.25);padding:.6rem 1.4rem;border-radius:3rem;font-weight:600;cursor:pointer;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:.5rem;transition:.2s;font-size:.9rem;}
+    .nav-link:hover{background:rgba(43,158,255,0.2);transform:translateY(-2px);box-shadow:0 0 10px rgba(43,158,255,.3);}
+    footer{text-align:center;padding:1.2rem;font-size:.8rem;border-top:1px solid rgba(43,158,255,0.1);}
+    @media(max-width:800px){.hero h1{font-size:1.5rem;}.main-grid{grid-template-columns:1fr;padding:1rem;}.chart-section{flex-direction:column;}}
+    @media(max-width:500px){.hero h1{font-size:1.2rem;}.dashboard{border-radius:1.5rem;}}
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a><a href="index.html">Smart Contracts DeFi</a></nav>
+  <div class="dashboard">
+    <div class="hero">
+      <h1>📊 DASHBOARD DE PROGRESO 📊</h1>
+      <p>Smart Contracts DeFi</p>
+      <div class="sub-accent"><i class="fas fa-code"></i> 9 módulos · Solidity · DeFi</div>
+      <div class="player-badge" id="playerBadge" style="display:none;">
+        <i class="fas fa-user-astronaut"></i> <span id="playerNameDisplay"></span>
+      </div>
+    </div>
+    <div class="stats-bar" id="statsBar">
+      <span class="stat-item"><i class="fas fa-check-circle gold"></i> Completados: <strong id="totalCompleted">0</strong>/9</span>
+      <span class="stat-item"><i class="fas fa-chart-line"></i> Progreso: <strong id="overallPercent">0%</strong></span>
+      <span class="stat-item gold"><i class="fas fa-trophy"></i> Rango: <strong id="gradeTitle">—</strong></span>
+    </div>
+    <div class="main-grid" id="moduleGrid">
+      <div class="module-card locked" id="card-template" style="display:none;">
+        <div class="card-top">
+          <div class="card-num"></div>
+          <span class="card-icon"></span>
+          <span class="card-title"></span>
+        </div>
+        <div class="card-status"><span class="status-dot"></span><span class="status-label"></span></div>
+        <div class="card-score"><div class="score-label">Puntuación</div><div class="score-bar-track"><div class="score-bar-fill"></div></div><div class="score-text"></div></div>
+        <a class="card-btn" href="#"></a>
+      </div>
+    </div>
+    <div class="chart-section">
+      <div class="radial-wrap">
+        <svg viewBox="0 0 160 160">
+          <defs>
+            <linearGradient id="cyberGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#00e0ff"/>
+              <stop offset="100%" stop-color="#2b9eff"/>
+            </linearGradient>
+            <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#ffd700"/>
+              <stop offset="100%" stop-color="#ff8c00"/>
+            </linearGradient>
+          </defs>
+          <circle class="bg-circle" cx="80" cy="80" r="68"/>
+          <circle class="fg-circle" id="radialCircle" cx="80" cy="80" r="68" stroke-dasharray="427.26" stroke-dashoffset="427.26"/>
+        </svg>
+        <div class="radial-label" id="radialLabel">0%</div>
+      </div>
+      <div class="chart-info">
+        <h3><i class="fas fa-crown gold"></i> Progreso Global</h3>
+        <p id="chartSubtext">Comienza tu primer módulo para ver tu avance</p>
+        <div id="gradeBadge"></div>
+      </div>
+    </div>
+    <div class="nav-links">
+      <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Menú del Curso</a>
+      <a href="01-portal-inicio.html" class="nav-link"><i class="fas fa-play"></i> Empezar</a>
+    </div>
+    <footer>
+      <i class="fas fa-crown gold"></i> Smart Contracts DeFi · Aprende Construyendo · 9 misiones por conquistar
+    </footer>
+  </div>
+  <script>
+  (function(){
+    const MODULES = [
+      { key:'sc_lvl1', num:1, icon:'fa-rocket', title:'Portal de Inicio', file:'01-portal-inicio.html', desc:'¿Qué sabes de DeFi?' },
+      { key:'sc_fund2', num:2, icon:'fa-cube', title:'Fundamentos de Solidity', file:'02-fundamentos-solidity.html', desc:'EVM y Solidity' },
+      { key:'sc_tokens3', num:3, icon:'fa-coins', title:'Tokens ERC-20', file:'03-tokens-erc20.html', desc:'Tu primera moneda' },
+      { key:'sc_dex4', num:4, icon:'fa-arrow-right-arrow-left', title:'DEX y AMM', file:'04-dex-amm.html', desc:'Corazón de DeFi' },
+      { key:'sc_lend5', num:5, icon:'fa-hand-holding-dollar', title:'Lending', file:'05-lending.html', desc:'Préstamos sin banqueros' },
+      { key:'sc_sec6', num:6, icon:'fa-shield', title:'Seguridad', file:'06-seguridad.html', desc:'Caza de vulnerabilidades' },
+      { key:'sc_quiz7', num:7, icon:'fa-gamepad', title:'Quiz Show', file:'07-quiz-repaso.html', desc:'El gran repaso' },
+      { key:'sc_deploy8', num:8, icon:'fa-cloud-upload-alt', title:'Deployment', file:'08-deployment.html', desc:'Mainnet y más allá' },
+      { key:'sc_cert9', num:9, icon:'fa-certificate', title:'Certificado', file:'09-certificado.html', desc:'Solidity Developer' }
+    ];
+
+    function readData(key) {
+      try {
+        var raw = localStorage.getItem(key);
+        if (raw === null || raw === undefined) return null;
+        if (raw === 'true' || raw === 'false') return raw === 'true' ? { _completed:true } : null;
+        var parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object') return parsed;
+        return null;
+      } catch(e) { return null; }
+    }
+
+    function getModuleStatus(key, data) {
+      if (!data) return 'locked';
+      if (key === 'sc_lvl1' || key === 'sc_fund2') return 'completed';
+      if (key === 'sc_quiz7' && typeof data.score === 'number') return 'completed';
+      if (key === 'sc_cert9') return 'completed';
+      if (key === 'sc_sec6' && data.finished) return 'completed';
+      if ((key === 'sc_tokens3' || key === 'sc_dex4' || key === 'sc_lend5') && data.token) return 'completed';
+      if (key === 'sc_deploy8' && data.badgeEarned) return 'completed';
+      if (key === 'sc_sec6' && data.started) return 'in-progress';
+      if (key === 'sc_deploy8' && data.deployed) return 'in-progress';
+      if (key === 'sc_tokens3' || key === 'sc_dex4' || key === 'sc_lend5') {
+        if (data.token || (data.balance !== undefined && data.balance > 0)) return 'completed';
+        if (data.transactions && data.transactions.length > 0) return 'in-progress';
+        return 'locked';
+      }
+      return 'locked';
+    }
+
+    function getScore(key, data) {
+      if (!data) return null;
+      if (key === 'sc_sec6' && data.finished && typeof data.score === 'number') {
+        return { score: data.score, total: 6 };
+      }
+      if (key === 'sc_quiz7' && typeof data.score === 'number') {
+        return { score: data.score, total: data.total || 10 };
+      }
+      if (key === 'sc_tokens3' && data.token) return { score: 1, total: 1 };
+      if (key === 'sc_dex4') return null;
+      if (key === 'sc_lend5') return null;
+      return null;
+    }
+
+    function getButtonConfig(status, file) {
+      if (status === 'locked') return { text:'🔒 Bloqueado', cls:'locked', href:'#' };
+      if (status === 'in-progress') return { text:'▶ Continuar', cls:'in-progress', href:file };
+      return { text:'✅ Completado', cls:'completed', href:file };
+    }
+
+    var grid = document.getElementById('moduleGrid');
+    var template = document.getElementById('card-template');
+    var completed = 0;
+    var total = MODULES.length;
+    var overallScore = 0;
+    var overallTotal = 0;
+
+    MODULES.forEach(function(mod) {
+      var data = readData(mod.key);
+      var status = getModuleStatus(mod.key, data);
+      if (status === 'completed') completed++;
+
+      var card = template.cloneNode(true);
+      card.id = '';
+      card.style.display = 'flex';
+      card.className = 'module-card ' + status;
+
+      card.querySelector('.card-num').textContent = mod.num;
+      card.querySelector('.card-icon').className = 'card-icon fas ' + mod.icon;
+      card.querySelector('.card-title').textContent = mod.title;
+
+      var statusEl = card.querySelector('.status-label');
+      statusEl.textContent = status === 'locked' ? '🔒 Bloqueado' : status === 'in-progress' ? '⚡ En progreso' : '🏆 Completado';
+      statusEl.className = 'status-label ' + status;
+
+      var scoreInfo = getScore(mod.key, data);
+      var scoreSection = card.querySelector('.card-score');
+      if (scoreInfo) {
+        var pct = Math.round((scoreInfo.score / scoreInfo.total) * 100);
+        scoreSection.querySelector('.score-bar-fill').style.width = pct + '%';
+        scoreSection.querySelector('.score-text').textContent = scoreInfo.score + ' / ' + scoreInfo.total;
+        scoreSection.classList.add('visible');
+        overallScore += scoreInfo.score;
+        overallTotal += scoreInfo.total;
+      }
+
+      var btnConfig = getButtonConfig(status, mod.file);
+      var btn = card.querySelector('.card-btn');
+      btn.textContent = btnConfig.text;
+      btn.className = 'card-btn ' + btnConfig.cls;
+      btn.href = btnConfig.href;
+
+      grid.appendChild(card);
+    });
+
+    var pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+    document.getElementById('totalCompleted').textContent = completed;
+    document.getElementById('overallPercent').textContent = pct + '%';
+
+    var radialCircle = document.getElementById('radialCircle');
+    var circumference = 427.26;
+    var offset = circumference - (pct / 100) * circumference;
+    radialCircle.style.strokeDashoffset = offset;
+    radialCircle.classList.add(pct === 100 ? 'gold' : 'cyber');
+
+    var radialLabel = document.getElementById('radialLabel');
+    radialLabel.textContent = pct + '%';
+    radialLabel.className = 'radial-label ' + (pct === 100 ? 'gold' : 'cyan');
+
+    var chartSubtext = document.getElementById('chartSubtext');
+    var gradeBadge = document.getElementById('gradeBadge');
+    var gradeTitleEl = document.getElementById('gradeTitle');
+
+    var grade;
+    if (pct === 0) { grade = '—'; chartSubtext.textContent = 'Comienza tu primer módulo para ver tu avance'; }
+    else if (pct === 100) { grade = 'S'; chartSubtext.textContent = '🎉 ¡Maestro de Smart Contracts! Curso completado.'; }
+    else if (pct >= 75) { grade = 'A'; chartSubtext.textContent = '🌟 Excelente progreso. ¡Sigue así!'; }
+    else if (pct >= 50) { grade = 'B'; chartSubtext.textContent = '💪 Buen avance. ¡Sigue conquistando módulos!'; }
+    else if (pct >= 25) { grade = 'C'; chartSubtext.textContent = '🚀 Vas por buen camino. ¡No te detengas!'; }
+    else { grade = 'D'; chartSubtext.textContent = '🌱 Todo gran viaje empieza con un paso.'; }
+
+    if (grade !== '—') {
+      gradeBadge.innerHTML = '<span class="grade-title ' + grade + '">' + grade + '</span>';
+    }
+    gradeTitleEl.textContent = grade;
+
+    var playerName = localStorage.getItem('sc_player_name');
+    if (playerName && playerName.trim()) {
+      document.getElementById('playerNameDisplay').textContent = playerName.trim();
+      document.getElementById('playerBadge').style.display = 'inline-flex';
+    }
+  })();
+  </script>
+  <script src="../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

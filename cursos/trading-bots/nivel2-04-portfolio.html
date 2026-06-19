@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Bot Trader N2 | Portfolio Optimizer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{background:linear-gradient(145deg,#0a1520 0%,#142030 100%);font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem;}
+    .container{max-width:1250px;width:100%;background:rgba(8,14,25,.85);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(255,165,0,.25);box-shadow:0 25px 45px rgba(0,0,0,.6);overflow:hidden;}
+    .hero{background:linear-gradient(95deg,#0a1018,#141e2c);padding:1.8rem 2rem;text-align:center;border-bottom:2px solid #ffa500;}
+    .hero h1{font-size:1.8rem;font-weight:800;background:linear-gradient(135deg,#fff3cc,#ffd980,#ffa500);-webkit-background-clip:text;background-clip:text;color:transparent;}
+    .hero p{margin-top:.5rem;font-size:.95rem;color:#cc9040;}
+    .badge{display:inline-block;background:#1a1000;border:1px solid #ffa50044;color:#ffa500;font-size:.7rem;padding:.2rem .8rem;border-radius:1rem;margin-top:.4rem;}
+    .analogy-card{background:#0a1520cc;margin:1.5rem 2rem;padding:1.2rem 1.8rem;border-radius:2rem;border-left:8px solid #ffa500;font-size:.93rem;line-height:1.6;}
+    .analogy-card strong{color:#ffd980;}
+    .lab{display:flex;flex-wrap:wrap;gap:1.5rem;padding:0 2rem 1.5rem;}
+    .left-col{flex:0 0 300px;min-width:260px;display:flex;flex-direction:column;gap:1rem;}
+    .right-col{flex:1;min-width:300px;display:flex;flex-direction:column;gap:1rem;}
+    .box{background:#0a1520dd;border-radius:2rem;padding:1.3rem;border:1px solid #ffa50022;}
+    .box h3{font-size:.95rem;font-weight:700;color:#ffd980;margin-bottom:.8rem;}
+    .asset-row{display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;padding:.4rem .6rem;border-radius:1rem;border:1px solid #1a2030;transition:.2s;}
+    .asset-row:hover{border-color:#ffa50044;}
+    .asset-chk{width:16px;height:16px;accent-color:#ffa500;cursor:pointer;}
+    .asset-name{font-size:.82rem;flex:1;font-weight:600;}
+    .asset-meta{font-size:.7rem;color:#887755;text-align:right;}
+    .obj-btn{background:#0a1520;border:1px solid #1a2030;color:#cc9040;padding:.4rem .8rem;border-radius:1rem;cursor:pointer;font-size:.78rem;width:100%;margin-bottom:.3rem;text-align:left;transition:.2s;font-family:'Inter',sans-serif;}
+    .obj-btn.sel{background:#1a1000;border-color:#ffa500;color:#ffd980;}
+    .constraint-row{display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem;}
+    .constraint-row label{font-size:.78rem;color:#cc9040;min-width:90px;}
+    .constraint-row input[type=range]{flex:1;accent-color:#ffa500;}
+    .constraint-row span{font-size:.78rem;color:#ffa500;min-width:35px;text-align:right;font-family:monospace;}
+    .btn-opt{background:linear-gradient(95deg,#ffa500,#cc6600);border:none;padding:.8rem 2rem;font-weight:700;border-radius:2rem;cursor:pointer;color:#1a0800;font-size:.95rem;width:100%;margin-top:.3rem;transition:.2s;}
+    .btn-opt:hover{transform:translateY(-2px);}
+    canvas{width:100%;border-radius:1rem;display:block;}
+    .weights-grid{display:flex;flex-direction:column;gap:.4rem;margin-top:.5rem;}
+    .weight-row{display:flex;align-items:center;gap:.5rem;}
+    .wr-name{font-size:.78rem;min-width:70px;color:#cc9040;}
+    .wr-track{flex:1;background:#0a1520;border-radius:.5rem;height:12px;overflow:hidden;}
+    .wr-fill{height:100%;border-radius:.5rem;transition:width .8s ease;}
+    .wr-val{font-size:.75rem;font-family:monospace;color:#ffd980;min-width:40px;text-align:right;}
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:.5rem;margin-top:.5rem;}
+    .stat-card{background:#0a1520;border-radius:1.2rem;padding:.7rem;text-align:center;border:1px solid #1a2030;}
+    .stat-val{font-size:1.3rem;font-weight:800;font-family:monospace;}
+    .stat-lbl{font-size:.65rem;color:#887755;margin-top:.1rem;}
+    .feedback{background:#00000088;margin:0 2rem 1rem;padding:.9rem;border-radius:1.5rem;text-align:center;border-left:4px solid #ffa500;font-size:.9rem;line-height:1.5;}
+    .insignia{text-align:center;background:#0a1015;border-radius:2rem;margin:0 2rem 1.5rem;padding:1rem;border:1px dashed gold;}
+    .insignia i{font-size:2.5rem;color:gold;}
+    .hidden{display:none;}
+    .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.5rem 2rem;}
+    .nav-link{background:#2c3e66;padding:.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:.5rem;transition:.2s;}
+    .nav-link:hover{transform:translateY(-2px);}
+    .nav-link.next{background:linear-gradient(95deg,#f0a500,#ff6a00);color:#1e1a0c;}
+    .nav-link.menu{background:#1a2a4a;border:1px solid #ffa500;}
+    footer{text-align:center;padding:1rem;font-size:.75rem;border-top:1px solid #0a1520;}
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+<div class="container">
+  <div class="hero">
+    <h1>📐 PORTFOLIO OPTIMIZER: Markowitz en Acción</h1>
+    <p>Optimización de portafolio por frontera eficiente — maximiza retorno ajustado por riesgo</p>
+    <span class="badge">⚡ NIVEL 2 — Módulo Avanzado</span>
+  </div>
+  <div class="analogy-card">
+    <strong>🥗 Piénsalo así:</strong> Markowitz dijo en 1952 lo que cualquier abuela sabe: <strong>"No pongas todos los huevos en una sola canasta"</strong>. Pero lo que él descubrió es más profundo: la <strong>correlación</strong> importa tanto como el retorno. Dos activos que suben y bajan juntos no diversifican nada. Dos activos con baja correlación (BTC y Gold, por ejemplo) reducen el riesgo del portafolio sin sacrificar tanto retorno. Eso es la Frontera Eficiente.
+    <br><br>
+    <strong>📚 Fuentes:</strong> Markowitz, H. (1952) — <em>"Portfolio Selection"</em>. Journal of Finance. / Sharpe, W. (1964) — <em>"Capital Asset Prices: A Theory of Market Equilibrium Under Conditions of Risk"</em>.
+  </div>
+  <div class="lab">
+    <div class="left-col">
+      <div class="box">
+        <h3><i class="fas fa-coins"></i> Activos Disponibles</h3>
+        <div id="assetList"></div>
+      </div>
+      <div class="box">
+        <h3><i class="fas fa-bullseye"></i> Objetivo</h3>
+        <button class="obj-btn sel" data-o="maxsharpe" onclick="setObj(this)">🏆 Max Sharpe Ratio</button>
+        <button class="obj-btn" data-o="minvol" onclick="setObj(this)">🛡️ Min Volatilidad</button>
+        <button class="obj-btn" data-o="maxret" onclick="setObj(this)">🚀 Max Retorno</button>
+        <button class="obj-btn" data-o="equal" onclick="setObj(this)">⚖️ Pesos Iguales</button>
+      </div>
+      <div class="box">
+        <h3><i class="fas fa-sliders-h"></i> Restricciones</h3>
+        <div class="constraint-row"><label>Max por activo</label><input type="range" id="maxW" min="10" max="100" value="40"><span id="maxWV">40%</span></div>
+        <div class="constraint-row"><label>Min por activo</label><input type="range" id="minW" min="0" max="20" value="5"><span id="minWV">5%</span></div>
+        <div class="constraint-row"><label>Risk-Free Rate</label><input type="range" id="rfRate" min="0" max="8" value="4" step="0.5"><span id="rfRateV">4%</span></div>
+        <button class="btn-opt" onclick="optimize()"><i class="fas fa-calculator"></i> Optimizar</button>
+      </div>
+    </div>
+    <div class="right-col">
+      <div class="box">
+        <h3><i class="fas fa-chart-scatter"></i> Frontera Eficiente</h3>
+        <canvas id="frontierChart" height="220"></canvas>
+      </div>
+      <div class="box">
+        <h3><i class="fas fa-pie-chart"></i> Pesos Óptimos</h3>
+        <div class="weights-grid" id="weightsGrid"><div style="color:#887755;font-size:.82rem;">Ejecuta la optimización para ver los pesos...</div></div>
+        <div class="stats-grid" id="statsGrid"></div>
+      </div>
+      <div class="box">
+        <h3><i class="fas fa-th"></i> Matriz de Correlación</h3>
+        <canvas id="corrMatrix" height="160"></canvas>
+      </div>
+    </div>
+  </div>
+  <div id="feedbackMsg" class="feedback">📐 Selecciona activos, elige un objetivo de optimización, configura restricciones y ejecuta el optimizador de Markowitz para ver los pesos óptimos del portafolio.</div>
+  <div id="insigniaArea" class="insignia hidden">
+    <i class="fas fa-chart-pie"></i>
+    <h3>🏅 ¡INSIGNIA DE PORTFOLIO MANAGER! 🏅</h3>
+    <p>Aplicaste la Teoría Moderna de Portafolios de Markowitz. ¡Ahora diversificas como un hedge fund!</p>
+  </div>
+  <div class="nav-links">
+    <a href="nivel2-03-sentiment-nlp.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+    <a href="nivel2-05-paper-trading.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Bot Trader Adventure · Nivel 2 Módulo 4 · Markowitz (1952) "Portfolio Selection" · Sharpe (1964)</footer>
+</div>
+<script>
+const STORAGE_KEY='tbot_n2port';
+let completed=false, selectedObj='maxsharpe';
+
+const ASSETS=[
+  {id:'btc',name:'Bitcoin (BTC)',ret:0.85,vol:0.72,color:'#f7931a'},
+  {id:'eth',name:'Ethereum (ETH)',ret:0.65,vol:0.68,color:'#627eea'},
+  {id:'spy',name:'S&P 500 (SPY)',ret:0.12,vol:0.18,color:'#00aaff'},
+  {id:'gold',name:'Oro (GLD)',ret:0.08,vol:0.14,color:'#ffd700'},
+  {id:'bnb',name:'Binance Coin',ret:0.45,vol:0.58,color:'#f3ba2f'},
+  {id:'tlt',name:'US Bonds (TLT)',ret:0.04,vol:0.10,color:'#88cc44'},
+  {id:'sol',name:'Solana (SOL)',ret:0.90,vol:0.80,color:'#9945ff'},
+  {id:'realestate',name:'Real Estate (VNQ)',ret:0.09,vol:0.20,color:'#ff7744'},
+];
+const CORR=[
+  [1.0,0.72,0.15,0.02,0.68,-.08,0.70,0.12],
+  [0.72,1.0,0.18,0.05,0.65,-.05,0.68,0.15],
+  [0.15,0.18,1.0,0.20,0.14,0.30,0.16,0.55],
+  [0.02,0.05,0.20,1.0,0.05,0.25,0.04,0.18],
+  [0.68,0.65,0.14,0.05,1.0,-.06,0.62,0.12],
+  [-.08,-.05,0.30,0.25,-.06,1.0,-.04,0.20],
+  [0.70,0.68,0.16,0.04,0.62,-.04,1.0,0.14],
+  [0.12,0.15,0.55,0.18,0.12,0.20,0.14,1.0],
+];
+
+let selected=new Set(['btc','eth','spy','gold']);
+
+function renderAssets(){
+  document.getElementById('assetList').innerHTML=ASSETS.map(a=>`
+    <div class="asset-row">
+      <input type="checkbox" class="asset-chk" id="chk_${a.id}" ${selected.has(a.id)?'checked':''} onchange="toggleAsset('${a.id}')">
+      <label for="chk_${a.id}" class="asset-name" style="color:${a.color};cursor:pointer;">${a.name}</label>
+      <div class="asset-meta">Ret: ${(a.ret*100).toFixed(0)}%<br>Vol: ${(a.vol*100).toFixed(0)}%</div>
+    </div>`).join('');
+}
+
+function toggleAsset(id){
+  if(selected.has(id))selected.delete(id);else selected.add(id);
+  if(selected.size<2){selected.add(id);document.getElementById('chk_'+id).checked=true;}
+}
+
+function setObj(btn){
+  selectedObj=btn.dataset.o;
+  document.querySelectorAll('.obj-btn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+}
+
+['maxW','minW','rfRate'].forEach(id=>{
+  document.getElementById(id).addEventListener('input',e=>{
+    document.getElementById(id+'V').textContent=e.target.value+'%';
+  });
+});
+
+function optimize(){
+  const assets=ASSETS.filter(a=>selected.has(a.id));
+  if(assets.length<2){document.getElementById('feedbackMsg').innerHTML='⚠️ Selecciona al menos 2 activos.';return;}
+  const n=assets.length;
+  const maxW=+document.getElementById('maxW').value/100;
+  const minW=+document.getElementById('minW').value/100;
+  const rf=+document.getElementById('rfRate').value/100;
+
+  let weights=assets.map(()=>1/n);
+
+  if(selectedObj==='maxsharpe'){
+    weights=assets.map((a,i)=>{
+      const sharpe=(a.ret-rf)/a.vol;
+      return Math.max(minW,Math.min(maxW,sharpe/(assets.reduce((s,b)=>(s+(b.ret-rf)/b.vol),0))));
+    });
+  } else if(selectedObj==='minvol'){
+    const sumInvVol=assets.reduce((s,a)=>s+1/a.vol,0);
+    weights=assets.map(a=>Math.max(minW,Math.min(maxW,(1/a.vol)/sumInvVol)));
+  } else if(selectedObj==='maxret'){
+    const sumRet=assets.reduce((s,a)=>s+a.ret,0);
+    weights=assets.map(a=>Math.max(minW,Math.min(maxW,a.ret/sumRet)));
+  }
+
+  const sumW=weights.reduce((a,b)=>a+b,0);
+  weights=weights.map(w=>w/sumW);
+
+  const portRet=weights.reduce((s,w,i)=>s+w*assets[i].ret,0);
+  let portVol=0;
+  for(let i=0;i<n;i++)for(let j=0;j<n;j++){
+    const ci=ASSETS.findIndex(a=>a.id===assets[i].id);
+    const cj=ASSETS.findIndex(a=>a.id===assets[j].id);
+    portVol+=weights[i]*weights[j]*assets[i].vol*assets[j].vol*(ci>=0&&cj>=0?CORR[ci][cj]:0.3);
+  }
+  portVol=Math.sqrt(portVol);
+  const sharpe=(portRet-rf)/portVol;
+  const dd=portVol*1.65;
+
+  const colors=['#f7931a','#627eea','#00aaff','#ffd700','#f3ba2f','#88cc44','#9945ff','#ff7744'];
+  document.getElementById('weightsGrid').innerHTML=assets.map((a,i)=>`
+    <div class="weight-row">
+      <div class="wr-name">${a.name.split(' ')[0]}</div>
+      <div class="wr-track"><div class="wr-fill" style="width:${(weights[i]*100).toFixed(1)}%;background:${a.color};"></div></div>
+      <div class="wr-val">${(weights[i]*100).toFixed(1)}%</div>
+    </div>`).join('');
+
+  document.getElementById('statsGrid').innerHTML=`
+    <div class="stat-card"><div class="stat-val" style="color:#00ff88">${(portRet*100).toFixed(1)}%</div><div class="stat-lbl">Retorno Anual</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:#ff9900">${(portVol*100).toFixed(1)}%</div><div class="stat-lbl">Volatilidad</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:#ffd700">${sharpe.toFixed(2)}</div><div class="stat-lbl">Sharpe Ratio</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:#ff5050">-${(dd*100).toFixed(1)}%</div><div class="stat-lbl">VaR 95% (1Y)</div></div>`;
+
+  drawFrontier(assets,weights,portRet,portVol,rf);
+  drawCorrMatrix(assets);
+  document.getElementById('feedbackMsg').innerHTML=`📐 Portafolio optimizado (${selectedObj}): Retorno esperado <strong>${(portRet*100).toFixed(1)}%</strong>, Volatilidad <strong>${(portVol*100).toFixed(1)}%</strong>, Sharpe <strong>${sharpe.toFixed(2)}</strong>. ${sharpe>1.5?'🏆 Portafolio excelente — Sharpe > 1.5 es clase institucional.':sharpe>1?'✅ Portafolio sólido. Sharpe > 1 es el objetivo mínimo.':'⚡ Agrega activos de menor correlación para mejorar el Sharpe.'}`;
+
+  if(!completed){completed=true;localStorage.setItem(STORAGE_KEY,'true');document.getElementById('insigniaArea').classList.remove('hidden');}
+}
+
+function drawFrontier(assets,optW,optRet,optVol,rf){
+  const canvas=document.getElementById('frontierChart');
+  const W=canvas.parentElement.clientWidth-30;
+  canvas.width=W;canvas.height=220;
+  const ctx=canvas.getContext('2d');
+  ctx.fillStyle='#080e18';ctx.fillRect(0,0,W,220);
+
+  const pts=[];
+  for(let i=0;i<300;i++){
+    const w=assets.map(()=>Math.random());
+    const sw=w.reduce((a,b)=>a+b,0);
+    const wn=w.map(v=>v/sw);
+    const r=wn.reduce((s,v,j)=>s+v*assets[j].ret,0);
+    const vol=Math.sqrt(wn.reduce((s,v,j)=>s+wn.reduce((t,u,k)=>t+v*u*assets[j].vol*assets[k].vol*CORR[ASSETS.findIndex(a=>a.id===assets[j].id)]?.[ASSETS.findIndex(a=>a.id===assets[k].id)]||0.3,0),0));
+    pts.push({r,vol,sharpe:(r-rf)/vol});
+  }
+
+  const minV=Math.min(...pts.map(p=>p.vol))*0.9, maxV=Math.max(...pts.map(p=>p.vol))*1.05;
+  const minR=Math.min(...pts.map(p=>p.r))*0.9, maxR=Math.max(...pts.map(p=>p.r))*1.05;
+  const xS=v=>(v-minV)/(maxV-minV)*(W-60)+30;
+  const yS=r=>200-((r-minR)/(maxR-minR))*180;
+
+  pts.forEach(p=>{
+    const t=Math.min(1,(p.sharpe-0.5)/2);
+    const r=Math.round(255*(1-t)), g=Math.round(200*t);
+    ctx.fillStyle=`rgba(${r},${g},50,0.5)`;
+    ctx.beginPath();ctx.arc(xS(p.vol),yS(p.r),2.5,0,2*Math.PI);ctx.fill();
+  });
+
+  ctx.fillStyle='#ffffff';ctx.strokeStyle='#ffffff';ctx.lineWidth=2;
+  ctx.beginPath();ctx.arc(xS(optVol),yS(optRet),7,0,2*Math.PI);ctx.fill();
+  ctx.strokeStyle='#ffffff';ctx.setLineDash([4,4]);
+  ctx.beginPath();ctx.moveTo(xS(0),yS(rf));ctx.lineTo(xS(optVol+0.05),yS(optRet+0.08));ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.font='11px Inter';ctx.fillStyle='#fff';ctx.fillText('★ Óptimo',xS(optVol)+10,yS(optRet)-5);
+
+  ctx.font='10px Inter';ctx.fillStyle='#887755';
+  ctx.fillText('Volatilidad →',W/2-30,215);
+  ctx.save();ctx.rotate(-Math.PI/2);ctx.fillText('Retorno →',-120,14);ctx.restore();
+}
+
+function drawCorrMatrix(assets){
+  const canvas=document.getElementById('corrMatrix');
+  const n=assets.length;
+  const W=canvas.parentElement.clientWidth-30;
+  canvas.width=W;canvas.height=Math.min(160,W*0.5);
+  const ctx=canvas.getContext('2d');
+  ctx.fillStyle='#080e18';ctx.fillRect(0,0,W,canvas.height);
+  const cell=(W-40)/n;
+  assets.forEach((a,i)=>{
+    assets.forEach((b,j)=>{
+      const ci=ASSETS.findIndex(x=>x.id===a.id);
+      const cj=ASSETS.findIndex(x=>x.id===b.id);
+      const c=ci>=0&&cj>=0?CORR[ci][cj]:0.3;
+      const intensity=Math.abs(c);
+      const r=c>0?Math.round(intensity*40):Math.round(intensity*180);
+      const g=c>0?Math.round(intensity*180):Math.round(intensity*40);
+      ctx.fillStyle=`rgb(${r},${g},30)`;
+      ctx.fillRect(40+j*cell,i*cell,cell-1,cell-1);
+      ctx.font=`${Math.max(8,Math.min(11,cell*0.5))}px JetBrains Mono`;
+      ctx.fillStyle='#fff';ctx.textAlign='center';
+      ctx.fillText(c.toFixed(1),40+j*cell+cell/2,i*cell+cell/2+4);
+    });
+    ctx.font='9px Inter';ctx.fillStyle='#887755';ctx.textAlign='right';
+    ctx.fillText(a.name.split(' ')[0].slice(0,3),35,i*cell+cell/2+4);
+  });
+}
+
+renderAssets();
+drawCorrMatrix(ASSETS.slice(0,4));
+if(localStorage.getItem(STORAGE_KEY)==='true'){completed=true;document.getElementById('insigniaArea').classList.remove('hidden');}
+</script>
+  <script src="../../assets/js/cookie-consent.js"></script>
+</body>
+</html>
+
+
+

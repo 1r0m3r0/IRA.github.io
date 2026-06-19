@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Probabilidad | 🔗 Cadenas de Markov</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:linear-gradient(135deg,#0a0f1e,#0c1222 50%,#111a2e); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+    .course-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,102,192,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+    .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #ff66c0; }
+    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#ff99d6,#ff66c0); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .hero-header p { font-size:1.1rem; color:#f0c0e0; margin-top:0.5rem; font-weight:500; }
+    .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+    .chip { background:rgba(255,102,192,0.15); border:1px solid #ff66c0; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+    .progress-section { padding:1.2rem 2rem; border-bottom:1px solid #1a2a4a; }
+    .progress-bar-outer { background:#1a2a4a; border-radius:20px; height:16px; overflow:hidden; }
+    .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#ff66c0,#ff3399); border-radius:20px; transition:width 0.5s ease; }
+    .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
+    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ff66c0; font-size:1rem; line-height:1.6; }
+    .main-area { padding:1.5rem 2rem; }
+    .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#ff66c0; }
+    .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
+    .info-panel { background:rgba(10,20,40,0.7); border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
+    .info-panel h3 { color:#ff99d6; font-size:1rem; margin-bottom:0.5rem; }
+    .info-panel p { font-size:0.85rem; color:#b9ccee; line-height:1.6; }
+    .info-panel .formula { background:#0a0f1e; padding:0.5rem; border-radius:0.8rem; text-align:center; font-family:monospace; font-size:0.9rem; color:#ff99d6; margin-top:0.5rem; }
+    .table-wrap { overflow-x:auto; margin-bottom:1.5rem; }
+    table { width:100%; border-collapse:collapse; background:rgba(10,20,40,0.7); border-radius:1rem; overflow:hidden; }
+    th { background:#ff66c0; color:#000; padding:0.5rem; font-size:0.85rem; }
+    td { padding:0.5rem; text-align:center; border-bottom:1px solid #2c3e66; font-size:0.8rem; color:#b9ccee; }
+    td:first-child { color:#ff99d6; font-weight:600; }
+    .sim-markov { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #ff66c0; margin-bottom:1.5rem; }
+    .quiz-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #ff66c0; margin-bottom:1.5rem; }
+    .quiz-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#ff66c0; }
+    .question { background:#0f1a2c; margin:0.8rem 0; padding:0.8rem 1rem; border-radius:1.2rem; }
+    .question p { font-weight:600; margin-bottom:0.5rem; font-size:0.95rem; }
+    .options { display:flex; flex-wrap:wrap; gap:0.6rem; }
+    .opt { background:#1e2a3e; padding:0.3rem 0.9rem; border-radius:2rem; cursor:pointer; transition:0.2s; font-size:0.85rem; }
+    .opt:hover { background:#2c3e66; transform:translateY(-2px); }
+    .opt.selected { background:#ff66c0; color:#000; font-weight:bold; box-shadow:0 0 8px #ff66c0; }
+    .opt.correct { background:#00cc88; color:#000; }
+    .opt.wrong { background:#ff4455; color:#fff; }
+    .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #ff66c0; }
+    .btn-action { background:linear-gradient(95deg,#ff66c0,#ff3399); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin-top:1rem; }
+    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(255,102,192,0.5); }
+    .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
+    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin-top:1.5rem; padding:1rem; border:1px dashed gold; }
+    .insignia i { font-size:2.5rem; color:gold; }
+    .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
+    .hidden { display:none; }
+    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(255,102,192,0.4); }
+    .nav-link.next { background:linear-gradient(95deg,#ff66c0,#ff3399); color:#1e1a0c; }
+    .nav-link.menu { background:#1a2a4a; border:1px solid #ff66c0; }
+    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .info-grid { grid-template-columns:1fr; } }
+  </style>
+  <link rel="stylesheet" href="../../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a><a href="../index.html">Programa Estad&iacute;stica</a></nav>
+  <div class="course-container" id="app">
+    <div class="hero-header">
+      <h1>🔗 Cadenas de Markov</h1>
+      <p>Procesos estoc&aacute;sticos donde el futuro depende solo del presente</p>
+      <div class="badge-area">
+        <span class="chip"><i class="fas fa-project-diagram"></i> Estados</span>
+        <span class="chip"><i class="fas fa-arrows-alt-h"></i> Transici&oacute;n</span>
+        <span class="chip"><i class="fas fa-balance-scale"></i> Estacionario</span>
+        <span class="chip"><i class="fas fa-sitemap"></i> Clasificaci&oacute;n</span>
+      </div>
+    </div>
+    <div class="progress-section">
+      <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+      <span class="progress-text" id="progressText">M&oacute;dulo 11 de 12</span>
+    </div>
+    <div class="analogy-card">
+      <strong>💡 Piénsalo así:</strong> Una cadena de Markov es como un juego de mesa donde tu pr&oacute;xima posici&oacute;n depende solo de d&oacute;nde est&aacute;s ahora, no de c&oacute;mo llegaste all&iacute;. No importa si ca&iacute;ste en la casilla 12 por un 6+6 o por un 4+4+4 &iexcl;el pr&oacute;ximo movimiento solo mira la casilla 12! Es la "memoria corta" de los procesos estoc&aacute;sticos.
+    </div>
+    <div class="main-area">
+      <div class="section-title"><i class="fas fa-project-diagram"></i> Conceptos de Cadenas de Markov</div>
+      <div class="info-grid">
+        <div class="info-panel">
+          <h3>🔗 Propiedad de Markov</h3>
+          <p>P(X_{n+1}=j | X_n=i, X_{n-1}=..., X_0=...) = P(X_{n+1}=j | X_n=i). El futuro solo depende del presente.</p>
+          <div class="formula">P(X_{n+1}|X_n,...,X_0) = P(X_{n+1}|X_n)</div>
+        </div>
+        <div class="info-panel">
+          <h3>📊 Matriz de Transici&oacute;n</h3>
+          <p>Matriz P donde P_{ij} = P(X_{n+1}=j | X_n=i). Cada fila suma 1.</p>
+          <div class="formula">&sum;_j P_{ij} = 1</div>
+        </div>
+        <div class="info-panel">
+          <h3>🔮 Distribuci&oacute;n Estacionaria</h3>
+          <p>Vector &pi; tal que &pi; = &pi;P. No cambia con el tiempo. Satisfecho si la cadena es irreducible y aperi&oacute;dica.</p>
+          <div class="formula">&pi; = &pi;P</div>
+        </div>
+        <div class="info-panel">
+          <h3>📋 Clasificaci&oacute;n de Estados</h3>
+          <p>Transitorio: puede no regresar. Recurrente: regresa con probabilidad 1. Absorbente: una vez all&iacute;, nunca sales.</p>
+        </div>
+      </div>
+
+      <div class="section-title"><i class="fas fa-table"></i> Ejemplo: Matriz de Transici&oacute;n (Clima)</div>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Hoy \ Ma&ntilde;ana</th><th>Soleado</th><th>Nublado</th><th>Lluvia</th></tr>
+          <tr><td>Soleado</td><td>0.7</td><td>0.2</td><td>0.1</td></tr>
+          <tr><td>Nublado</td><td>0.3</td><td>0.5</td><td>0.2</td></tr>
+          <tr><td>Lluvia</td><td>0.2</td><td>0.3</td><td>0.5</td></tr>
+        </table>
+      </div>
+
+      <div class="sim-markov">
+        <div class="section-title"><i class="fas fa-play"></i> Simulador de Cadena de Markov</div>
+        <p style="color:#b9ccee;margin-bottom:0.8rem;">Simula el clima por varios d&iacute;as usando la matriz de transici&oacute;n.</p>
+        <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:center;">
+          <label style="color:#b9ccee;">Estado inicial:
+            <select id="startState" style="background:#1e2a3e;color:#fff;border:1px solid #ff66c0;border-radius:0.5rem;padding:0.3rem 0.6rem;">
+              <option value="0">Soleado</option><option value="1">Nublado</option><option value="2">Lluvia</option>
+            </select>
+          </label>
+          <label style="color:#b9ccee;">D&iacute;as: <select id="nDays" style="background:#1e2a3e;color:#fff;border:1px solid #ff66c0;border-radius:0.5rem;padding:0.3rem 0.6rem;">
+            <option value="10">10</option><option value="30" selected>30</option><option value="100">100</option>
+          </select></label>
+          <button id="runMarkovBtn" class="btn-action" style="margin:0;">Simular</button>
+        </div>
+        <div id="markovResult" style="background:#0a0f1e;border-radius:1rem;padding:1rem;margin-top:1rem;text-align:center;font-size:0.9rem;color:#b9ccee;">
+          Presiona "Simular" para iniciar la cadena.
+        </div>
+      </div>
+
+      <div class="quiz-area">
+        <div class="quiz-title"><i class="fas fa-question-circle"></i> Mini Quiz: Cadenas de Markov</div>
+        <div id="quizContainer"></div>
+        <button id="submitQuizBtn" class="btn-action">✅ Verificar respuestas</button>
+        <div id="insigniaArea" class="insignia hidden">
+          <i class="fas fa-medal"></i>
+          <h3>🏅 Markov Master 🏅</h3>
+          <p>Comprendes las cadenas de Markov: transiciones, estados estacionarios y clasificaci&oacute;n.</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre cadenas de Markov.</div>
+
+    <div class="nav-links">
+      <a href="10-teorema-central-limite.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
+      <a href="12-certificado.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <footer><i class="fas fa-dice"></i> Probabilidad y Fundamentos · M&oacute;dulo 11</footer>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'prog_est_1_11';
+    const PROGRESS_KEY = 'prog_est_1_progress';
+    const questions = [
+      { text: "La propiedad de Markov dice que el futuro depende:", options: ["De todo el pasado", "Solo del presente", "Solo del primer estado", "Del promedio histórico"], correct: 1 },
+      { text: "En una matriz de transición, cada fila debe sumar:", options: ["0", "1", "El n\u00famero de estados", "Depende"], correct: 1 },
+      { text: "Un estado absorbente es aquel en el que:", options: ["Siempre sales", "Nunca sales una vez que entras", "Recibes muchos visitantes", "Tiene alta probabilidad"], correct: 1 },
+      { text: "La distribución estacionaria π satisface:", options: ["π = P·π", "π = π·P", "π = P²", "π = I"], correct: 1 },
+      { text: "¿Cuántos parámetros tiene una cadena de Markov con k estados?", options: ["k", "k²", "k² - k", "k - 1"], correct: 1 }
+    ];
+    let userAnswers = new Array(questions.length).fill(null);
+    let quizCompleted = false;
+
+    function saveProgress() {
+      let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+      if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
+      localStorage.setItem(STORAGE_KEY, 'true');
+    }
+
+    function updateProgress() {
+      let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+      document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
+      document.getElementById('progressText').textContent = 'M\u00f3dulo '+(p.length || 1)+' de 12';
+    }
+
+    function renderQuestions() {
+      const container = document.getElementById('quizContainer');
+      container.innerHTML = '';
+      questions.forEach((q, idx) => {
+        const qDiv = document.createElement('div'); qDiv.classList.add('question');
+        qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
+        const optsDiv = qDiv.querySelector('.options');
+        q.options.forEach((opt, optIdx) => {
+          const span = document.createElement('div'); span.classList.add('opt');
+          span.textContent = opt; span.dataset.qIdx = idx; span.dataset.optIdx = optIdx;
+          span.addEventListener('click', function() {
+            if (quizCompleted) return;
+            this.parentElement.querySelectorAll('.opt').forEach(c => c.classList.remove('selected'));
+            this.classList.add('selected'); userAnswers[idx] = optIdx; updateBtnState();
+          });
+          optsDiv.appendChild(span);
+        });
+        container.appendChild(qDiv);
+      });
+    }
+
+    function updateBtnState() {
+      document.getElementById('submitQuizBtn').disabled = userAnswers.some(a => a === null) || quizCompleted;
+    }
+
+    function handleSubmit() {
+      if (quizCompleted) return;
+      if (userAnswers.some(a => a === null)) { document.getElementById('feedbackMsg').textContent = '⚠️ Responde todas las preguntas primero.'; return; }
+      let correct = 0;
+      questions.forEach((q, i) => { if (userAnswers[i] === q.correct) correct++; });
+      const total = questions.length; const passed = correct >= Math.ceil(total * 0.6);
+      document.querySelectorAll('.question').forEach((qDiv, idx) => {
+        const opts = qDiv.querySelectorAll('.opt');
+        opts.forEach((o, oi) => {
+          o.classList.remove('selected');
+          if (oi === questions[idx].correct) o.classList.add('correct');
+          else if (oi === userAnswers[idx]) o.classList.add('wrong');
+        });
+      });
+      if (passed) {
+        quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+        document.getElementById('insigniaArea').classList.remove('hidden');
+        document.getElementById('feedbackMsg').textContent = '🎉 ' + correct + '/' + total + ' correctas. ¡Markov es pan comido!';
+        saveProgress(); updateProgress();
+      } else {
+        document.getElementById('feedbackMsg').textContent = '❌ ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. ¡Reintenta!';
+      }
+    }
+
+    function restoreProgress() {
+      const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+      if (p.includes(STORAGE_KEY)) {
+        quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+        document.getElementById('insigniaArea').classList.remove('hidden');
+        document.getElementById('feedbackMsg').textContent = '🏆 Ya completaste este m&oacute;dulo.';
+        document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
+      }
+    }
+
+    const P = [[0.7, 0.2, 0.1], [0.3, 0.5, 0.2], [0.2, 0.3, 0.5]];
+    const stateNames = ['Soleado', 'Nublado', 'Lluvia'];
+
+    function runMarkov() {
+      const s0 = parseInt(document.getElementById('startState').value);
+      const days = parseInt(document.getElementById('nDays').value);
+      let states = [s0];
+      let current = s0;
+      for (let d = 1; d < days; d++) {
+        const r = Math.random();
+        let cum = 0;
+        for (let j = 0; j < 3; j++) {
+          cum += P[current][j];
+          if (r <= cum) { current = j; break; }
+        }
+        states.push(current);
+      }
+      const counts = [0, 0, 0];
+      for (let s of states) counts[s]++;
+      const freq = counts.map(c => (c / days * 100).toFixed(1));
+      let html = '<div style="display:flex;flex-wrap:wrap;gap:0.8rem;justify-content:center;margin-bottom:1rem;">';
+      for (let i = 0; i < 3; i++) {
+        html += '<div style="background:#1e2a3e;border-radius:0.8rem;padding:0.5rem 1rem;border:1px solid #ff66c0;"><div style="font-size:0.7rem;color:#8899cc;">' + stateNames[i] + '</div><div style="font-weight:700;color:#ff99d6;">' + freq[i] + '%</div></div>';
+      }
+      html += '</div><div style="font-size:0.8rem;color:#8899cc;word-break:break-word;">';
+      for (let s of states) html += '<span style="display:inline-block;width:12px;height:12px;border-radius:50%;margin:1px;background:' + (s===0?'#ffcc00':s===1?'#8899cc':'#4455aa') + ';" title="' + stateNames[s] + '"></span>';
+      html += '</div><p style="margin-top:0.5rem;font-size:0.75rem;color:#667;">' + days + ' d&iacute;as simulados</p>';
+      document.getElementById('markovResult').innerHTML = html;
+    }
+
+    document.getElementById('submitQuizBtn').addEventListener('click', handleSubmit);
+    document.getElementById('runMarkovBtn').addEventListener('click', runMarkov);
+    renderQuestions(); updateBtnState(); restoreProgress(); updateProgress();
+  </script>
+  <script src="../../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

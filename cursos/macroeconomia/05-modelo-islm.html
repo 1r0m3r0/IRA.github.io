@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Macroeconomía Interactiva | Modelo IS-LM</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #111a2e 100%);
+      background-size: 200% 200%;
+      animation: gradientShift 20s ease infinite;
+      font-family: 'Inter', sans-serif;
+      color: #eef5ff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .islm-container {
+      max-width: 1300px; width: 100%;
+      background: rgba(15, 25, 45, 0.65);
+      backdrop-filter: blur(12px);
+      border-radius: 3rem;
+      border: 1px solid rgba(156, 100, 255, 0.25);
+      box-shadow: 0 25px 45px rgba(0,0,0,0.5);
+      overflow: hidden;
+    }
+    .hero-header {
+      background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%);
+      padding: 2rem 2rem 1.5rem 2rem;
+      text-align: center;
+      border-bottom: 2px solid #9c64ff;
+    }
+    .hero-header h1 {
+      font-size: 2.6rem; font-weight: 800;
+      background: linear-gradient(135deg, #FFF, #c89dff, #9c64ff);
+      -webkit-background-clip: text;
+      background-clip: text; color: transparent;
+    }
+    .hero-header p { font-size: 1.2rem; color: #d4bfff; margin-top: 0.5rem; font-weight: 500; }
+    .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1.2rem; flex-wrap: wrap; }
+    .chip {
+      background: rgba(156, 100, 255, 0.15);
+      border: 1px solid #9c64ff; padding: 0.4rem 1rem;
+      border-radius: 40px; font-size: 0.8rem; font-weight: 600;
+    }
+    .analogy-card {
+      background: #1e2a3acc; margin: 1.5rem 2rem; padding: 1.2rem 1.8rem;
+      border-radius: 2rem; border-left: 8px solid #9c64ff;
+      font-size: 1rem; line-height: 1.6;
+    }
+    .main-area {
+      display: flex; flex-wrap: wrap; gap: 2rem;
+      padding: 0.5rem 2rem 1rem 2rem;
+    }
+    .canvas-area { flex: 2; min-width: 300px; }
+    .canvas-area canvas {
+      width: 100%; height: auto; aspect-ratio: 4/3;
+      background: #0a0f1e; border-radius: 2rem;
+      border: 1px solid #9c64ff44; display: block;
+    }
+    .controls-area {
+      flex: 1; min-width: 240px;
+      background: rgba(0,10,25,0.7); border-radius: 2rem;
+      padding: 1.5rem; border: 1px solid #9c64ff44;
+    }
+    .controls-area h3 { color: #c89dff; margin-bottom: 1rem; font-size: 1.2rem; }
+    .slider-group { margin-bottom: 1.2rem; }
+    .slider-group label { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 0.3rem; }
+    .slider-group label span { color: #c89dff; font-weight: 700; font-family: monospace; }
+    .slider-group input[type=range] { width: 100%; accent-color: #9c64ff; }
+    .equil-stats {
+      background: #00000066; border-radius: 1.5rem; padding: 0.8rem;
+      margin-top: 1rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;
+    }
+    .equil-stats .stat { text-align: center; }
+    .equil-stats .stat .val { font-size: 1.4rem; font-weight: 700; color: #c89dff; font-family: monospace; }
+    .equil-stats .stat .lbl { font-size: 0.7rem; color: #aabbdd; }
+    .btn-compare {
+      background: #2c3e66; border: 1px solid #9c64ff; color: #eef5ff;
+      padding: 0.5rem 1rem; border-radius: 2rem; cursor: pointer;
+      font-size: 0.8rem; margin: 0.3rem; transition: 0.2s;
+    }
+    .btn-compare:hover { background: #9c64ff; color: #000; }
+    .btn-compare.active { background: #9c64ff; color: #000; font-weight: 700; }
+    .feedback {
+      background: #00000099; margin: 0 2rem 1.5rem 2rem; padding: 1rem;
+      border-radius: 1.5rem; text-align: center; font-weight: 500;
+      border-left: 4px solid #9c64ff;
+    }
+    .insignia {
+      text-align: center; background: #0c1b2f;
+      border-radius: 2rem; margin: 0 2rem 1.5rem; padding: 1rem;
+      border: 1px dashed gold;
+    }
+    .insignia i { font-size: 2.5rem; color: gold; }
+    .hidden { display: none; }
+    .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
+    .nav-link {
+      background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem;
+      font-weight: 600; text-decoration: none; color: #eef5ff;
+      display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s;
+    }
+    .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(156,100,255,0.4); }
+    .nav-link.next { background: linear-gradient(95deg, #f0a500, #ff6a00); color: #1e1a0c; }
+    .nav-link.menu { background: #1a2a4a; border: 1px solid #9c64ff; }
+    footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
+    @media (max-width: 800px) {
+      .hero-header h1 { font-size: 1.9rem; }
+      .main-area { flex-direction: column; }
+    }
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+
+  <div class="islm-container">
+    <div class="hero-header">
+      <h1>⚖️ Modelo IS-LM ⚖️</h1>
+      <p>El equilibrio macroeconómico entre el mercado de bienes y el dinero</p>
+      <div class="badge-area">
+        <span class="chip"><i class="fas fa-chart-line"></i> Curvas IS & LM</span>
+        <span class="chip"><i class="fas fa-sliders-h"></i> Política fiscal/monetaria</span>
+        <span class="chip"><i class="fas fa-balance-scale"></i> Equilibrio general</span>
+      </div>
+    </div>
+
+    <div class="analogy-card">
+      <strong>🎪 Piénsalo así:</strong> El modelo IS-LM es como dos balanzas conectadas por una polea. La balanza IS (mercado de bienes) equilibra producción y tasa de interés real; la balanza LM (mercado de dinero) equilibra oferta y demanda de dinero. Cuando mueves una, la otra también se mueve. El punto donde ambas se cruzan es el "punto dulce" donde toda la economía está en equilibrio.
+    </div>
+
+    <div class="main-area">
+      <div class="canvas-area">
+        <canvas id="islmCanvas" width="600" height="450"></canvas>
+      </div>
+      <div class="controls-area">
+        <h3><i class="fas fa-sliders-h"></i> Controles</h3>
+        <div class="slider-group">
+          <label>Gasto público (G) <span id="gVal">100</span></label>
+          <input type="range" id="gSlider" min="50" max="200" value="100" step="1">
+        </div>
+        <div class="slider-group">
+          <label>Oferta monetaria (M) <span id="mVal">100</span></label>
+          <input type="range" id="mSlider" min="50" max="200" value="100" step="1">
+        </div>
+        <div class="slider-group">
+          <label>Impuestos (t) <span id="tVal">0.25</span></label>
+          <input type="range" id="tSlider" min="0.05" max="0.50" value="0.25" step="0.01">
+        </div>
+        <div class="equil-stats">
+          <div class="stat"><div class="val" id="eqY">100.0</div><div class="lbl">Y* (Producción)</div></div>
+          <div class="stat"><div class="val" id="eqR">5.00</div><div class="lbl">r* (Tasa de interés %)</div></div>
+        </div>
+        <div style="margin-top:0.8rem; text-align:center;">
+          <button class="btn-compare" data-preset="fiscal">💼 Política Fiscal</button>
+          <button class="btn-compare" data-preset="monetary">🏦 Política Monetaria</button>
+          <button class="btn-compare" data-preset="reset">↺ Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="feedbackMsg" class="feedback">
+      💡 Mueve los sliders para ver cómo cambian las curvas IS (rojo) y LM (azul) y el nuevo equilibrio.
+    </div>
+
+    <div id="insigniaArea" class="insignia hidden">
+      <i class="fas fa-medal"></i>
+      <h3>🏅 ¡MAESTRO DEL EQUILIBRIO! 🏅</h3>
+      <p>Has explorado cómo la política fiscal y monetaria afectan la economía. ¡Dominas el modelo IS-LM!</p>
+    </div>
+
+    <div class="nav-links">
+      <a href="04-dinero-bancos.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+      <a href="06-mercado-trabajo.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <footer>
+      <i class="fas fa-crown"></i> Macroeconomía Interactiva · Modelo IS-LM: el corazón de la teoría keynesiana
+    </footer>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'macro_lvl5';
+    const canvas = document.getElementById('islmCanvas');
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    const pad = { left: 60, right: 30, top: 30, bottom: 40 };
+
+    const gSlider = document.getElementById('gSlider');
+    const mSlider = document.getElementById('mSlider');
+    const tSlider = document.getElementById('tSlider');
+    const gVal = document.getElementById('gVal');
+    const mVal = document.getElementById('mVal');
+    const tVal = document.getElementById('tVal');
+    const eqY = document.getElementById('eqY');
+    const eqR = document.getElementById('eqR');
+    const feedbackMsg = document.getElementById('feedbackMsg');
+
+    function getParams() {
+      return {
+        G: parseFloat(gSlider.value),
+        M: parseFloat(mSlider.value),
+        t: parseFloat(tSlider.value)
+      };
+    }
+
+    function solveEquilibrium(G, M, t) {
+      const a = 0.6;
+      const b = 0.3;
+      const k = 0.5;
+      const h = 15;
+      const A = 80;
+      const P = 1;
+      const denom = (1 - a * (1 - t)) * h + b * k;
+      if (Math.abs(denom) < 0.001) return { Y: 100, r: 5 };
+      const Y = (h * (A + G) + b * (M / P)) / denom;
+      const r = (k * Y - M / P) / h;
+      return { Y: Math.max(Y, 10), r: Math.max(r, 0) };
+    }
+
+    function drawGraph() {
+      const p = getParams();
+      const eq = solveEquilibrium(p.G, p.M, p.t);
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = '#0a0f1e';
+      ctx.fillRect(0, 0, W, H);
+
+      const chartW = W - pad.left - pad.right;
+      const chartH = H - pad.top - pad.bottom;
+      const Ymax = 250;
+      const rMax = 15;
+
+      function toX(Y) { return pad.left + (Y / Ymax) * chartW; }
+      function toYr(r) { return pad.top + chartH - (r / rMax) * chartH; }
+
+      // grid
+      ctx.strokeStyle = '#1a2a4a';
+      ctx.lineWidth = 0.5;
+      for (let i = 0; i <= 5; i++) {
+        const x = pad.left + (i / 5) * chartW;
+        ctx.beginPath(); ctx.moveTo(x, pad.top); ctx.lineTo(x, pad.top + chartH); ctx.stroke();
+        const y = pad.top + (i / 5) * chartH;
+        ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(pad.left + chartW, y); ctx.stroke();
+      }
+
+      // labels
+      ctx.fillStyle = '#8899bb';
+      ctx.font = '12px Inter';
+      ctx.textAlign = 'center';
+      for (let i = 0; i <= 5; i++) {
+        const val = (i / 5) * Ymax;
+        ctx.fillText(Math.round(val), pad.left + (i / 5) * chartW, H - 10);
+      }
+      ctx.textAlign = 'right';
+      for (let i = 0; i <= 5; i++) {
+        const val = (i / 5) * rMax;
+        ctx.fillText(val.toFixed(1) + '%', pad.left - 8, toYr(val) + 4);
+      }
+
+      ctx.fillStyle = '#8899bb';
+      ctx.font = '13px Inter';
+      ctx.textAlign = 'center';
+      ctx.fillText('Y (Producción)', pad.left + chartW / 2, H - 2);
+      ctx.save();
+      ctx.translate(12, pad.top + chartH / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillText('r (Tasa de interés)', 0, 0);
+      ctx.restore();
+
+      // IS curve
+      const isPoints = [];
+      for (let Y = 10; Y <= Ymax; Y += 2) {
+        const r = (1 / 0.3) * (80 + p.G - (1 - 0.6 * (1 - p.t)) * Y);
+        if (r >= 0 && r <= rMax) {
+          isPoints.push({ x: toX(Y), y: toYr(r) });
+        }
+      }
+      if (isPoints.length > 1) {
+        ctx.beginPath();
+        ctx.moveTo(isPoints[0].x, isPoints[0].y);
+        for (let i = 1; i < isPoints.length; i++) ctx.lineTo(isPoints[i].x, isPoints[i].y);
+        ctx.strokeStyle = '#ff5050';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        ctx.fillStyle = '#ff5050';
+        ctx.font = 'bold 14px Inter';
+        ctx.textAlign = 'left';
+        ctx.fillText('IS', isPoints[isPoints.length - 1].x + 5, isPoints[isPoints.length - 1].y + 4);
+      }
+
+      // LM curve
+      const lmPoints = [];
+      for (let Y = 10; Y <= Ymax; Y += 2) {
+        const r = (0.5 * Y - p.M / 1) / 15;
+        if (r >= 0 && r <= rMax) {
+          lmPoints.push({ x: toX(Y), y: toYr(r) });
+        }
+      }
+      if (lmPoints.length > 1) {
+        ctx.beginPath();
+        ctx.moveTo(lmPoints[0].x, lmPoints[0].y);
+        for (let i = 1; i < lmPoints.length; i++) ctx.lineTo(lmPoints[i].x, lmPoints[i].y);
+        ctx.strokeStyle = '#2b9eff';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        ctx.fillStyle = '#2b9eff';
+        ctx.font = 'bold 14px Inter';
+        ctx.textAlign = 'left';
+        ctx.fillText('LM', lmPoints[lmPoints.length - 1].x + 5, lmPoints[lmPoints.length - 1].y + 4);
+      }
+
+      // equilibrium point
+      const eqX = toX(eq.Y);
+      const eqY_ = toYr(eq.r);
+      ctx.beginPath();
+      ctx.arc(eqX, eqY_, 8, 0, 2 * Math.PI);
+      ctx.fillStyle = '#ffd700';
+      ctx.fill();
+      ctx.strokeStyle = '#ffd700';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // dashed lines to axes
+      ctx.setLineDash([4, 4]);
+      ctx.strokeStyle = '#ffd70044';
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(eqX, eqY_); ctx.lineTo(eqX, pad.top + chartH); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(eqX, eqY_); ctx.lineTo(pad.left, eqY_); ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.fillStyle = '#ffd700';
+      ctx.font = 'bold 12px Inter';
+      ctx.textAlign = 'left';
+      ctx.fillText('E*', eqX + 10, eqY_ - 5);
+
+      eqY.textContent = eq.Y.toFixed(1);
+      eqR.textContent = eq.r.toFixed(2);
+    }
+
+    function updateFeedback(msg) {
+      feedbackMsg.innerHTML = msg;
+    }
+
+    function checkCompletion() {
+      const p = getParams();
+      const eq = solveEquilibrium(p.G, p.M, p.t);
+      if (Math.abs(eq.Y - 100) > 30 && Math.abs(eq.r - 5) > 1.5) {
+        const ins = document.getElementById('insigniaArea');
+        if (ins.classList.contains('hidden')) {
+          ins.classList.remove('hidden');
+          localStorage.setItem(STORAGE_KEY, 'true');
+          updateFeedback('🎉 ¡HAS EXPLORADO EL ESPACIO FISCAL-MONETARIO! Has movido la economía lejos del equilibrio inicial. ¡Insignia desbloqueada!');
+        }
+      }
+    }
+
+    gSlider.addEventListener('input', () => {
+      gVal.textContent = gSlider.value;
+      drawGraph();
+      updateFeedback('💼 Cambiaste el gasto público. La curva IS se desplaza. Observa el nuevo equilibrio.');
+      checkCompletion();
+    });
+    mSlider.addEventListener('input', () => {
+      mVal.textContent = mSlider.value;
+      drawGraph();
+      updateFeedback('🏦 Cambiaste la oferta monetaria. La curva LM se desplaza. ¿Ves cómo cambia la tasa de interés?');
+      checkCompletion();
+    });
+    tSlider.addEventListener('input', () => {
+      tVal.textContent = parseFloat(tSlider.value).toFixed(2);
+      drawGraph();
+      updateFeedback('💰 Cambiaste los impuestos. La curva IS rota. Unos impuestos más altos reducen la producción de equilibrio.');
+      checkCompletion();
+    });
+
+    document.querySelectorAll('.btn-compare').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const preset = btn.dataset.preset;
+        if (preset === 'fiscal') {
+          gSlider.value = 160; gVal.textContent = '160';
+          mSlider.value = 100; mVal.textContent = '100';
+          tSlider.value = 0.25; tVal.textContent = '0.25';
+          updateFeedback('💼 Política fiscal expansiva: aumento del gasto público. La IS se desplaza a la derecha → mayor Y y mayor r.');
+        } else if (preset === 'monetary') {
+          gSlider.value = 100; gVal.textContent = '100';
+          mSlider.value = 160; mVal.textContent = '160';
+          tSlider.value = 0.25; tVal.textContent = '0.25';
+          updateFeedback('🏦 Política monetaria expansiva: aumenta la oferta monetaria. La LM se desplaza a la derecha → mayor Y, menor r.');
+        } else {
+          gSlider.value = 100; gVal.textContent = '100';
+          mSlider.value = 100; mVal.textContent = '100';
+          tSlider.value = 0.25; tVal.textContent = '0.25';
+          updateFeedback('↺ Valores iniciales restaurados. El equilibrio vuelve al punto de partida.');
+        }
+        drawGraph();
+        checkCompletion();
+      });
+    });
+
+    if (localStorage.getItem(STORAGE_KEY) === 'true') {
+      document.getElementById('insigniaArea').classList.remove('hidden');
+      updateFeedback('🏆 ¡Ya completaste este módulo! Vuelve a experimentar con los sliders.');
+    }
+
+    drawGraph();
+  </script>
+  <script src="../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

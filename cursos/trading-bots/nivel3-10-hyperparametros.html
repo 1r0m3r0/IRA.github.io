@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bot Trader | Optimización de Hiperparámetros</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700;14..32,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    body{background:linear-gradient(145deg,#001410,#002020);font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:2rem 1rem}
+    .container{max-width:1300px;width:100%;background:rgba(0,16,16,.88);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(0,220,200,.22);box-shadow:0 25px 55px rgba(0,0,0,.65);overflow:hidden}
+    .hero{background:linear-gradient(95deg,#000c0c,#001818);padding:1.8rem 2rem;text-align:center;border-bottom:2px solid #00dcc8}
+    .hero h1{font-size:1.9rem;font-weight:800;background:linear-gradient(135deg,#ccfffc,#66eeee,#00dcc8);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .hero p{margin-top:.5rem;font-size:.95rem;color:#338888}
+    .chips{display:flex;justify-content:center;gap:.6rem;flex-wrap:wrap;margin-top:.7rem}
+    .chip{background:rgba(0,220,200,.1);border:1px solid rgba(0,220,200,.3);color:#338888;font-size:.72rem;padding:.25rem .8rem;border-radius:2rem}
+    .week-badge{display:inline-block;background:rgba(0,220,200,.15);border:1px solid #00dcc8;color:#00dcc8;font-size:.75rem;font-weight:700;padding:.3rem 1rem;border-radius:2rem;margin-top:.5rem}
+    .analogy{background:#001010cc;margin:1.4rem 2rem;padding:1.1rem 1.7rem;border-radius:2rem;border-left:7px solid #00dcc8;font-size:.9rem;line-height:1.65}
+    .analogy strong{color:#66eeee}
+    .lab{display:flex;flex-wrap:wrap;gap:1.4rem;padding:0 1.8rem 1.5rem}
+    .left{flex:0 0 270px;display:flex;flex-direction:column;gap:.9rem}
+    .right{flex:1;min-width:300px;display:flex;flex-direction:column;gap:.9rem}
+    .panel{background:#001010dd;border-radius:1.8rem;padding:1.2rem 1.3rem;border:1px solid rgba(0,220,200,.15)}
+    .panel h3{font-size:.88rem;font-weight:700;color:#66eeee;margin-bottom:.7rem}
+    label{font-size:.72rem;color:#226655;text-transform:uppercase;letter-spacing:.06rem;display:block;margin-bottom:.3rem;margin-top:.5rem}
+    select{width:100%;background:#000c0c;border:1px solid rgba(0,220,200,.2);color:#eef5ff;padding:.45rem .7rem;border-radius:.75rem;font-size:.82rem;font-family:'Inter',sans-serif}
+    .slider-row{display:flex;align-items:center;gap:.4rem;margin:.25rem 0}
+    .slider-row label{min-width:110px;margin:0}
+    .slider-row input[type=range]{flex:1;accent-color:#00dcc8}
+    .slider-row span{font-size:.75rem;color:#66eeee;font-family:'JetBrains Mono',monospace;min-width:36px;text-align:right}
+    .btn{background:linear-gradient(95deg,#00dcc8,#008877);border:none;padding:.7rem 1.4rem;font-weight:700;border-radius:2rem;cursor:pointer;color:#001010;font-size:.88rem;width:100%;margin-top:.4rem;transition:.2s;display:flex;align-items:center;justify-content:center;gap:.5rem}
+    .btn:hover{transform:translateY(-2px);box-shadow:0 0 18px rgba(0,220,200,.4)}
+    pre{background:#000808;border-radius:1rem;padding:1rem;font-family:'JetBrains Mono',monospace;font-size:.73rem;line-height:1.7;overflow-x:auto;color:#ccfffc;border:1px solid rgba(0,220,200,.12)}
+    .kw{color:#00dcc8}.fn{color:#66eeee}.cm{color:#226655}.str{color:#80eeaa}.num{color:#ffd070}
+    canvas{border-radius:1rem;display:block}
+    .method-tabs{display:flex;gap:.4rem;margin-bottom:.7rem}
+    .mtab{background:#001818;border:1px solid rgba(0,220,200,.2);color:#338888;padding:.35rem .9rem;border-radius:2rem;cursor:pointer;font-size:.78rem;font-weight:600;transition:.15s;flex:1;text-align:center}
+    .mtab.active{background:#002020;border-color:#00dcc8;color:#66eeee}
+    .result-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-bottom:.6rem}
+    .r-card{background:#001818;border-radius:1rem;padding:.6rem;text-align:center;border:1px solid rgba(0,220,200,.12)}
+    .r-val{font-size:1.1rem;font-weight:800;font-family:monospace;color:#00dcc8}
+    .r-lbl{font-size:.62rem;color:#226655;margin-top:.15rem}
+    .feedback{background:#00000088;margin:0 1.8rem 1rem;padding:.85rem 1.2rem;border-radius:1.5rem;text-align:center;border-left:4px solid #00dcc8;font-size:.88rem;line-height:1.55}
+    .insignia{text-align:center;background:#001010;border-radius:2rem;margin:0 1.8rem 1.5rem;padding:1rem;border:1px dashed gold}
+    .insignia i{font-size:2.4rem;color:gold}
+    .hidden{display:none}
+    .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.4rem 2rem}
+    .nav-link{background:#001818;padding:.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:.5rem;font-size:.88rem;transition:.2s}
+    .nav-link:hover{transform:translateY(-2px)}
+    .nav-link.next{background:linear-gradient(95deg,#f0a500,#ff6a00);color:#1e1a0c}
+    footer{text-align:center;padding:1rem;font-size:.72rem;border-top:1px solid #001010;color:#226655}
+    @media(max-width:860px){.hero h1{font-size:1.4rem}.left{flex:1;min-width:100%}}
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+<nav class="brand-return-nav">
+  <a href="../../index.html">&larr; Portfolio</a>
+  <a href="../../cursos/index.html">Cursos</a>
+</nav>
+<div class="container">
+  <div class="hero">
+    <h1>🔬 HIPERPARÁMETROS: Tuneando tu Modelo ML</h1>
+    <p>Grid Search, Random Search y Bayesian Optimization — ¿cuándo usar cada uno y por qué?</p>
+    <div class="week-badge"><i class="fas fa-calendar-week"></i> Semanas 9-10: Machine Learning para Trading</div>
+    <div class="chips">
+      <span class="chip">Grid Search</span>
+      <span class="chip">Randomized Search</span>
+      <span class="chip">Optuna / Bayesian</span>
+      <span class="chip">Walk-forward CV</span>
+    </div>
+  </div>
+
+  <div class="analogy">
+    <strong>🔬 Piénsalo así:</strong> Los hiperparámetros son como los diales de un horno. Para hornear el pastel perfecto (tu modelo), necesitas ajustar temperatura (n_estimators), tiempo (max_depth), humedad (min_samples_leaf). El <strong>Grid Search</strong> prueba cada combinación posible — preciso pero lento. El <strong>Random Search</strong> samplea al azar — sorprendentemente eficiente. El <strong>Bayesian (Optuna)</strong> es el experto que recuerda qué combinaciones funcionaron mejor y dirige la búsqueda inteligentemente. Para series de tiempo, siempre usa <strong>TimeSeriesSplit</strong>, no cross-validation tradicional — de lo contrario cometerás look-ahead bias.
+    <div style="margin-top:.5rem;font-size:.78rem;color:#226655"><strong>📚 Fuentes:</strong> Bergstra & Bengio (2012) — <em>"Random Search for Hyper-Parameter Optimization"</em>. JMLR. / Akiba et al. (2019) — <em>"Optuna: A Next-generation Hyperparameter Optimization Framework"</em>.</div>
+  </div>
+
+  <div class="lab">
+    <div class="left">
+      <div class="panel">
+        <h3><i class="fas fa-flask"></i> Configurar Experimento</h3>
+        <label>Modelo ML</label>
+        <select id="model" onchange="resetSearch()">
+          <option value="rf">Random Forest</option>
+          <option value="xgb">XGBoost</option>
+          <option value="lstm">LSTM</option>
+          <option value="svm">SVM</option>
+        </select>
+        <label>Método de búsqueda</label>
+        <select id="method" onchange="resetSearch()">
+          <option value="grid">Grid Search</option>
+          <option value="random">Random Search</option>
+          <option value="bayesian">Bayesian (Optuna)</option>
+        </select>
+        <label>Rango n_estimators / units</label>
+        <div class="slider-row"><label>Min</label><input type="range" id="parMin" min="10" max="100" value="50" oninput="document.getElementById('parMinV').textContent=this.value"><span id="parMinV">50</span></div>
+        <div class="slider-row"><label>Max</label><input type="range" id="parMax" min="100" max="500" value="300" oninput="document.getElementById('parMaxV').textContent=this.value"><span id="parMaxV">300</span></div>
+        <div class="slider-row"><label>Max depth / layers</label><input type="range" id="depth" min="3" max="20" value="10" oninput="document.getElementById('depthV').textContent=this.value"><span id="depthV">10</span></div>
+        <label>N° de trials</label>
+        <div class="slider-row"><label>Trials</label><input type="range" id="trials" min="5" max="50" value="20" oninput="document.getElementById('trialsV').textContent=this.value"><span id="trialsV">20</span></div>
+        <button class="btn" onclick="runSearch()"><i class="fas fa-search"></i> Iniciar Búsqueda</button>
+      </div>
+    </div>
+
+    <div class="right">
+      <div class="panel">
+        <h3><i class="fas fa-map"></i> Heatmap de Validación (Grid Search)</h3>
+        <canvas id="heatCanvas"></canvas>
+        <div style="font-size:.7rem;color:#226655;margin-top:.3rem;text-align:center">Eje X: n_estimators · Eje Y: max_depth · Color: CV Accuracy</div>
+      </div>
+
+      <div class="panel">
+        <h3><i class="fas fa-chart-line"></i> Progreso de Optimización</h3>
+        <div class="result-grid">
+          <div class="r-card"><div class="r-val" id="rBestAcc">—</div><div class="r-lbl">Mejor Accuracy</div></div>
+          <div class="r-card"><div class="r-val" id="rBestParams">—</div><div class="r-lbl">n_estimators óptimo</div></div>
+          <div class="r-card"><div class="r-val" id="rTimeEstimate">—</div><div class="r-lbl">Tiempo total</div></div>
+          <div class="r-card"><div class="r-val" id="rTrialsDone">0</div><div class="r-lbl">Trials completados</div></div>
+          <div class="r-card"><div class="r-val" id="rImprovement">—</div><div class="r-lbl">Mejora vs baseline</div></div>
+          <div class="r-card"><div class="r-val" id="rOverfit">—</div><div class="r-lbl">Train-Val gap</div></div>
+        </div>
+        <canvas id="searchCanvas"></canvas>
+      </div>
+
+      <div class="panel">
+        <h3><i class="fas fa-code"></i> Python — Código de Optimización</h3>
+        <pre id="codeBox"></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="feedback" id="feedbackMsg">
+    🔬 Configura el experimento y ejecuta la búsqueda de hiperparámetros. Observa cómo diferentes métodos exploran el espacio de forma distinta.
+  </div>
+
+  <div class="insignia hidden" id="insigniaArea">
+    <i class="fas fa-microscope"></i>
+    <h3 style="margin:.4rem 0;color:#ffd700">🏅 ¡INSIGNIA ML OPTIMIZER!</h3>
+    <p style="font-size:.85rem;color:#66eeee">Ejecutaste búsquedas de hiperparámetros. ¡Un modelo bien tunado puede mejorar un 20% de accuracy!</p>
+  </div>
+
+  <div class="nav-links">
+    <a href="nivel3-09-feature-engineering.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Menú</a>
+    <a href="nivel3-11-docker-deploy.html" class="nav-link next">Docker Deploy <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Bot Trader Adventure · Semana 9-10 · Bergstra & Bengio (2012) · Akiba et al. (2019) Optuna</footer>
+</div>
+
+<script>
+const STORAGE_KEY='tbot_hyp';
+let searchCount=0, searchTimer;
+
+const CODES={
+  grid:{rf:`<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> GridSearchCV, TimeSeriesSplit\n<span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> RandomForestClassifier\n\nparam_grid = {\n    <span class="str">'n_estimators'</span>: [<span class="num">100</span>, <span class="num">200</span>, <span class="num">300</span>],\n    <span class="str">'max_depth'</span>: [<span class="num">5</span>, <span class="num">10</span>, <span class="num">15</span>],\n    <span class="str">'min_samples_leaf'</span>: [<span class="num">1</span>, <span class="num">5</span>, <span class="num">10</span>]\n}\n<span class="cm"># CRÍTICO: TimeSeriesSplit para evitar look-ahead bias</span>\ntscv = <span class="fn">TimeSeriesSplit</span>(n_splits=<span class="num">5</span>)\ngs = <span class="fn">GridSearchCV</span>(RandomForestClassifier(), param_grid,\n                 cv=tscv, scoring=<span class="str">'f1'</span>, n_jobs=-<span class="num">1</span>)\ngs.<span class="fn">fit</span>(X_train, y_train)\n<span class="fn">print</span>(gs.best_params_, gs.best_score_)`,
+    xgb:`<span class="kw">from</span> xgboost <span class="kw">import</span> XGBClassifier\n<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> GridSearchCV\n\nparam_grid = {\n    <span class="str">'n_estimators'</span>: [<span class="num">100</span>, <span class="num">300</span>],\n    <span class="str">'max_depth'</span>: [<span class="num">4</span>, <span class="num">6</span>, <span class="num">8</span>],\n    <span class="str">'learning_rate'</span>: [<span class="num">0.01</span>, <span class="num">0.1</span>, <span class="num">0.3</span>],\n    <span class="str">'subsample'</span>: [<span class="num">0.7</span>, <span class="num">0.9</span>]\n}\n<span class="cm"># 3x2x3x2 = 36 combinaciones × 5 folds = 180 fits</span>`
+  },
+  random:{rf:`<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> RandomizedSearchCV\n<span class="kw">from</span> scipy.stats <span class="kw">import</span> randint, uniform\n\nparam_dist = {\n    <span class="str">'n_estimators'</span>: <span class="fn">randint</span>(<span class="num">50</span>, <span class="num">500</span>),\n    <span class="str">'max_depth'</span>: <span class="fn">randint</span>(<span class="num">3</span>, <span class="num">20</span>),\n    <span class="str">'max_features'</span>: <span class="fn">uniform</span>(<span class="num">0.1</span>, <span class="num">0.9</span>),\n    <span class="str">'min_samples_split'</span>: <span class="fn">randint</span>(<span class="num">2</span>, <span class="num">20</span>)\n}\nrs = <span class="fn">RandomizedSearchCV</span>(RandomForestClassifier(),\n    param_dist, n_iter=<span class="num">50</span>, cv=tscv,\n    random_state=<span class="num">42</span>, n_jobs=-<span class="num">1</span>)\n<span class="cm"># 50 samples >> ~81% cobertura estadística del espacio</span>`
+  },
+  bayesian:{rf:`<span class="kw">import</span> optuna\n\n<span class="kw">def</span> <span class="fn">objective</span>(trial):\n    n_est = trial.<span class="fn">suggest_int</span>(<span class="str">'n_estimators'</span>, <span class="num">50</span>, <span class="num">500</span>)\n    depth = trial.<span class="fn">suggest_int</span>(<span class="str">'max_depth'</span>, <span class="num">3</span>, <span class="num">20</span>)\n    features = trial.<span class="fn">suggest_float</span>(<span class="str">'max_features'</span>, <span class="num">0.1</span>, <span class="num">1.0</span>)\n    model = <span class="fn">RandomForestClassifier</span>(\n        n_estimators=n_est, max_depth=depth,\n        max_features=features, n_jobs=-<span class="num">1</span>)\n    <span class="kw">return</span> <span class="fn">cross_val_score</span>(model, X, y, cv=tscv).<span class="fn">mean</span>()\n\nstudy = optuna.<span class="fn">create_study</span>(direction=<span class="str">'maximize'</span>)\nstudy.<span class="fn">optimize</span>(objective, n_trials=<span class="num">50</span>)\n<span class="fn">print</span>(study.best_params)  <span class="cm"># Bayesian converge en <20 trials</span>`
+  }
+};
+
+function resetSearch() {
+  document.getElementById('rBestAcc').textContent='—';
+  document.getElementById('rBestParams').textContent='—';
+  document.getElementById('rTrialsDone').textContent='0';
+  document.getElementById('rImprovement').textContent='—';
+  document.getElementById('rOverfit').textContent='—';
+  document.getElementById('rTimeEstimate').textContent='—';
+  clearInterval(searchTimer);
+  updateCode();
+}
+
+function updateCode() {
+  const model=document.getElementById('model').value;
+  const method=document.getElementById('method').value;
+  const codes=CODES[method];
+  document.getElementById('codeBox').innerHTML=(codes[model]||codes.rf)||'<span class="cm"># Ver en modo Grid Search</span>';
+}
+
+function drawHeatmap() {
+  const canvas=document.getElementById('heatCanvas');
+  const W=canvas.parentElement.clientWidth-30;
+  canvas.width=W;canvas.height=180;
+  const ctx=canvas.getContext('2d');
+  ctx.fillStyle='#000808';ctx.fillRect(0,0,W,180);
+  const xCols=['50','100','150','200','300'];
+  const yRows=['3','5','7','10','15','20'];
+  const cw=(W-50)/xCols.length,ch=150/yRows.length;
+  yRows.forEach((y,i)=>xCols.forEach((x,j)=>{
+    const acc=0.52+Math.random()*.14;
+    const a=((acc-.52)/.14);
+    ctx.fillStyle=`rgba(0,${Math.round(100+120*a)},${Math.round(150+70*a)},${.3+a*.7})`;
+    ctx.fillRect(40+j*cw,10+i*ch,cw-1,ch-1);
+    ctx.fillStyle=a>.6?'#001010':'#ccfffc';ctx.font='8px Inter';ctx.textAlign='center';
+    ctx.fillText(acc.toFixed(2),40+j*cw+cw/2,10+i*ch+ch/2+3);
+  }));
+  ctx.fillStyle='#66eeee';ctx.font='8px Inter';ctx.textAlign='right';
+  yRows.forEach((y,i)=>ctx.fillText(y,37,10+i*ch+ch/2+3));
+  ctx.textAlign='center';
+  xCols.forEach((x,j)=>ctx.fillText(x,40+j*cw+cw/2,172));
+}
+
+function runSearch() {
+  const method=document.getElementById('method').value;
+  const totalTrials=+document.getElementById('trials').value;
+  const model=document.getElementById('model').value;
+  updateCode();
+  drawHeatmap();
+
+  let done=0;
+  const canvas=document.getElementById('searchCanvas');
+  const W=canvas.parentElement.clientWidth-30;
+  canvas.width=W;canvas.height=130;
+  const ctx=canvas.getContext('2d');
+  ctx.fillStyle='#000808';ctx.fillRect(0,0,W,130);
+
+  const accs=[0.52];
+  let bestAcc=0.52;
+
+  const baselineTime = method==='grid'?totalTrials*1.8:method==='random'?totalTrials*.9:totalTrials*.7;
+  document.getElementById('rTimeEstimate').textContent=baselineTime.toFixed(0)+'s';
+
+  clearInterval(searchTimer);
+  searchTimer=setInterval(()=>{
+    done++;
+    let acc;
+    if(method==='bayesian') acc=0.54+Math.log1p(done)/Math.log1p(totalTrials)*.12+(Math.random()-.3)*.03;
+    else if(method==='random') acc=0.53+Math.random()*.13;
+    else acc=0.52+((done/totalTrials)*.08)+Math.random()*.06;
+    acc=Math.min(0.79,acc);
+    accs.push(acc);
+    if(acc>bestAcc){bestAcc=acc;document.getElementById('rBestParams').textContent=Math.round(50+Math.random()*250);}
+
+    document.getElementById('rTrialsDone').textContent=done;
+    document.getElementById('rBestAcc').textContent=(bestAcc*100).toFixed(1)+'%';
+    document.getElementById('rImprovement').textContent='+'+(((bestAcc-0.52))*100).toFixed(1)+'%';
+    document.getElementById('rOverfit').textContent=((Math.random()*.06+.02)*100).toFixed(1)+'%';
+
+    // Draw progress
+    ctx.fillStyle='#000808';ctx.fillRect(0,0,W,130);
+    const mn=0.48,mx=0.82;
+    const xS=i=>(i/(totalTrials))*(W-16)+8;
+    const yS=v=>118-((v-mn)/(mx-mn))*108;
+    ctx.strokeStyle='#ffffff11';ctx.lineWidth=1;ctx.setLineDash([3,3]);
+    [0.52,0.60,0.70].forEach(l=>{ctx.beginPath();ctx.moveTo(0,yS(l));ctx.lineTo(W,yS(l));ctx.stroke();});
+    ctx.setLineDash([]);
+    ctx.beginPath();ctx.strokeStyle='#00dcc8';ctx.lineWidth=1.5;
+    accs.forEach((v,i)=>i===0?ctx.moveTo(xS(i),yS(v)):ctx.lineTo(xS(i),yS(v)));ctx.stroke();
+    // Best line
+    ctx.strokeStyle='#ffd70066';ctx.lineWidth=1;ctx.setLineDash([4,3]);
+    ctx.beginPath();ctx.moveTo(0,yS(bestAcc));ctx.lineTo(W,yS(bestAcc));ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle='#ffd700';ctx.font='9px Inter';ctx.textAlign='right';
+    ctx.fillText('Best: '+(bestAcc*100).toFixed(1)+'%',W-4,yS(bestAcc)-4);
+
+    if(done>=totalTrials){
+      clearInterval(searchTimer);
+      searchCount++;
+      document.getElementById('feedbackMsg').innerHTML=`🔬 <strong>${method==='grid'?'Grid Search':method==='random'?'Random Search':'Bayesian Optuna'}</strong> completado. Mejor accuracy: <strong>${(bestAcc*100).toFixed(1)}%</strong> con n_estimators=${document.getElementById('rBestParams').textContent}. ${method==='bayesian'?'Bayesian convergió más rápido (menos trials necesarios).':'El Bayesian Optuna hubiera encontrado un resultado similar con la mitad de trials.'}`;
+      if(searchCount>=2&&!localStorage.getItem(STORAGE_KEY)){localStorage.setItem(STORAGE_KEY,'true');document.getElementById('insigniaArea').classList.remove('hidden');}
+    }
+  }, 80);
+}
+
+updateCode(); drawHeatmap();
+if(localStorage.getItem(STORAGE_KEY))document.getElementById('insigniaArea').classList.remove('hidden');
+</script>
+</body>
+</html>

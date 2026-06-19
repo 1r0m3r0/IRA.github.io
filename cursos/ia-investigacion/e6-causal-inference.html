@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🔗 Causal Inference con IA — IA Aplicada a la Investigación</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root { --accent: #ff66c0; --accent-glow: rgba(255,102,192,0.3); }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #111a2e 100%);
+  background-attachment: fixed;
+  color: #e0e4f0;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 1rem;
+}
+.brand-return-nav {
+  width: 100%; max-width: 900px;
+  display: flex; gap: 1rem; padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+}
+.brand-return-nav a {
+  color: #8899cc; text-decoration: none; font-size: 0.85rem;
+  padding: 0.35rem 1rem; border-radius: 20px;
+  background: rgba(15,25,45,0.5); border: 1px solid rgba(255,255,255,0.06);
+  transition: all 0.3s;
+}
+.brand-return-nav a:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+.container {
+  width: 100%; max-width: 900px;
+  background: rgba(15,25,45,0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 3rem;
+  padding: 2.5rem 2rem;
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+.hero { text-align: center; margin-bottom: 2rem; }
+.hero h1 {
+  font-size: 2.4rem; font-weight: 800;
+  background: linear-gradient(135deg, var(--accent), #ff9fd6, #fff);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.2;
+}
+.hero .subtitle {
+  font-size: 1.1rem; color: #8899cc; margin-top: 0.5rem; font-weight: 300;
+}
+.analogy-card {
+  background: rgba(10,15,30,0.5);
+  border-left: 8px solid var(--accent);
+  border-radius: 1.5rem;
+  padding: 1.5rem 1.8rem;
+  margin: 1.5rem 0;
+  font-size: 1rem; line-height: 1.6; color: #c8d0e8;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+.analogy-card i { color: var(--accent); margin-right: 0.5rem; }
+.progress-section { margin: 1.5rem 0 0.5rem; }
+.progress-bar-outer { background: #1a2a4a; border-radius: 20px; height: 20px; overflow: hidden; margin: 1rem 2rem; }
+.progress-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), #fff); border-radius: 20px; transition: width 0.5s ease; }
+.progress-text { text-align: center; font-size: 0.85rem; color: #8899cc; margin-bottom: 1rem; }
+.insignia {
+  display: none;
+  text-align: center;
+  padding: 1.2rem;
+  margin: 1rem auto;
+  max-width: 400px;
+  border: 2px dashed #ffd700;
+  border-radius: 2rem;
+  background: rgba(255,215,0,0.05);
+  color: #ffd700;
+  font-size: 1.2rem; font-weight: 600;
+  animation: insigniaPulse 2s infinite;
+}
+@keyframes insigniaPulse { 0%,100%{box-shadow:0 0 10px rgba(255,215,0,0.1)} 50%{box-shadow:0 0 30px rgba(255,215,0,0.3)} }
+.insignia.show { display: block; }
+.feedback { text-align: center; padding: 1rem; margin: 1rem 0; border-radius: 1rem; display: none; }
+.feedback.success { display: block; background: rgba(0,255,200,0.08); border: 1px solid rgba(0,255,200,0.2); color: #00ffc8; }
+.feedback.error { display: block; background: rgba(255,100,100,0.08); border: 1px solid rgba(255,100,100,0.2); color: #ff6464; }
+.nav-links { display: flex; justify-content: center; gap: 1rem; margin-top: 2rem; flex-wrap: wrap; }
+.nav-links a {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.7rem 1.8rem; border-radius: 30px;
+  text-decoration: none; font-weight: 600; font-size: 0.95rem;
+  transition: all 0.3s;
+}
+.nav-links .prev { background: rgba(255,255,255,0.06); color: #8899cc; border: 1px solid rgba(255,255,255,0.1); }
+.nav-links .prev:hover { background: rgba(255,255,255,0.12); }
+.nav-links .menu { background: rgba(255,102,192,0.15); color: var(--accent); border: 1px solid rgba(255,102,192,0.2); }
+.nav-links .menu:hover { background: rgba(255,102,192,0.25); }
+.nav-links .next { background: var(--accent); color: #fff; }
+.nav-links .next:hover { box-shadow: 0 0 25px var(--accent-glow); transform: translateY(-2px); }
+.nav-links .disabled { opacity: 0.4; pointer-events: none; }
+h2 { font-size: 1.5rem; margin: 1.5rem 0 1rem; color: #fff; }
+h2 i { color: var(--accent); margin-right: 0.5rem; }
+h3 { font-size: 1.2rem; margin: 1.2rem 0 0.8rem; color: #d0d8f0; }
+h3 i { color: var(--accent); margin-right: 0.4rem; }
+.section-box {
+  background: rgba(10,15,30,0.4);
+  border-radius: 1.2rem;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-left: 4px solid var(--accent);
+}
+.btn-primary {
+  display: inline-block;
+  padding: 0.9rem 2.5rem;
+  background: var(--accent); color: #fff; border: none;
+  border-radius: 30px;
+  font-size: 1rem; font-weight: 600;
+  cursor: pointer; transition: all 0.3s;
+}
+.btn-primary:hover { box-shadow: 0 0 30px var(--accent-glow); transform: translateY(-2px); }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+.btn-small {
+  display: inline-block;
+  padding: 0.5rem 1.5rem;
+  background: var(--accent); color: #fff; border: none;
+  border-radius: 20px;
+  font-size: 0.85rem; font-weight: 600;
+  cursor: pointer; transition: all 0.3s;
+}
+.btn-small:hover { box-shadow: 0 0 20px var(--accent-glow); }
+.btn-small:disabled { opacity: 0.4; cursor: not-allowed; }
+.spur-card {
+  background: rgba(10,15,30,0.5);
+  border-radius: 1rem;
+  padding: 1rem 1.2rem;
+  margin-bottom: 0.8rem;
+  display: flex; align-items: center; gap: 1rem;
+  flex-wrap: wrap;
+}
+.spur-card .spur-desc { flex: 1; min-width: 200px; font-size: 0.9rem; }
+.spur-card .spur-btns { display: flex; gap: 0.5rem; }
+.spur-card .spur-btns button {
+  padding: 0.3rem 1rem;
+  border-radius: 15px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: transparent; color: #b0c0e0;
+  cursor: pointer; transition: all 0.2s; font-size: 0.8rem;
+}
+.spur-card .spur-btns button:hover { background: rgba(255,255,255,0.08); }
+.spur-card .spur-btns button.correct { background: rgba(0,255,200,0.15); border-color: #00ffc8; color: #00ffc8; }
+.spur-card .spur-btns button.wrong { background: rgba(255,100,100,0.15); border-color: #ff6464; color: #ff6464; }
+.spur-card .spur-result { font-size: 0.85rem; min-width: 80px; }
+.dag-area {
+  background: rgba(10,15,30,0.5);
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  min-height: 250px;
+  position: relative;
+  overflow: hidden;
+}
+.dag-node {
+  display: inline-flex;
+  align-items: center; gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  background: rgba(255,102,192,0.12);
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+  margin: 0.3rem;
+  cursor: grab;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+.dag-node:hover { background: rgba(255,102,192,0.2); }
+.dag-arrow {
+  display: inline-block;
+  margin: 0 0.3rem;
+  color: var(--accent);
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+.confounder-item {
+  background: rgba(10,15,30,0.5);
+  border-radius: 1rem;
+  padding: 1rem 1.2rem;
+  margin-bottom: 0.8rem;
+  display: flex; align-items: center; gap: 1rem;
+  flex-wrap: wrap;
+}
+.confounder-item .conf-desc { flex: 1; font-size: 0.9rem; }
+.slider-group {
+  display: flex; align-items: center; gap: 1rem;
+  flex-wrap: wrap; margin: 0.8rem 0;
+}
+.slider-group label { min-width: 120px; font-size: 0.9rem; color: #b0c0e0; }
+.slider-group input[type="range"] {
+  flex: 1; min-width: 150px;
+  accent-color: var(--accent);
+  height: 6px;
+}
+.slider-group .slider-val { min-width: 60px; font-weight: 600; color: #fff; }
+.did-chart {
+  display: flex; align-items: flex-end; justify-content: center;
+  gap: 2rem; padding: 1.5rem; margin: 1rem 0;
+  background: rgba(10,15,30,0.5);
+  border-radius: 1rem;
+  min-height: 200px;
+}
+.did-bar {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 0.3rem;
+}
+.did-bar .bar {
+  width: 50px;
+  background: linear-gradient(180deg, var(--accent), #ff9fd6);
+  border-radius: 8px 8px 0 0;
+  transition: height 0.5s ease;
+  min-height: 4px;
+}
+.did-bar .bar.control { background: linear-gradient(180deg, #2b9eff, #7fc4ff); }
+.did-bar .label { font-size: 0.75rem; color: #8899cc; }
+.did-bar .value { font-size: 0.85rem; font-weight: 600; }
+.iv-option {
+  background: rgba(10,15,30,0.5);
+  border-radius: 1rem;
+  padding: 1rem 1.2rem;
+  margin-bottom: 0.7rem;
+  display: flex; align-items: center; gap: 1rem;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+}
+.iv-option:hover { border-color: rgba(255,102,192,0.3); }
+.iv-option.selected { border-color: var(--accent); background: rgba(255,102,192,0.1); }
+.iv-option.correct { border-color: #00ffc8; background: rgba(0,255,200,0.08); }
+.iv-option.wrong { border-color: #ff6464; background: rgba(255,100,100,0.08); }
+.iv-option .iv-radio { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #556; flex-shrink: 0; }
+.iv-option.selected .iv-radio { border-color: var(--accent); background: var(--accent); box-shadow: inset 0 0 0 3px rgba(15,25,45,1); }
+.iv-option .iv-text { flex: 1; font-size: 0.9rem; }
+.forest-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+.forest-tree {
+  background: rgba(10,15,30,0.5);
+  border-radius: 1rem;
+  padding: 1rem;
+  text-align: center;
+  border-left: 4px solid var(--accent);
+}
+.forest-tree .effect { font-size: 1.5rem; font-weight: 700; }
+.forest-tree .effect.positive { color: #00ffc8; }
+.forest-tree .effect.negative { color: #ff6464; }
+.forest-tree .effect.neutral { color: #8899cc; }
+.forest-tree .subgroup { font-size: 0.8rem; color: #8899cc; margin-top: 0.3rem; }
+.rct-field {
+  display: flex; flex-direction: column; gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+.rct-field label { font-size: 0.9rem; color: #b0c0e0; }
+.rct-field select, .rct-field input {
+  padding: 0.6rem 1rem;
+  background: rgba(10,15,30,0.6);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  color: #fff;
+  font-size: 0.9rem;
+  font-family: 'Inter', sans-serif;
+}
+.rct-field select:focus, .rct-field input:focus { outline: none; border-color: var(--accent); }
+.do-calc-box {
+  background: rgba(10,15,30,0.5);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  text-align: center;
+  font-size: 1.1rem;
+  font-family: 'Courier New', monospace;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.do-calc-box .formula { font-size: 1.4rem; font-weight: 700; color: #fff; margin: 0.5rem 0; }
+.do-calc-box .formula .accent { color: var(--accent); }
+.do-calc-box .formula .arrow { color: #00ffc8; }
+@media (max-width: 600px) {
+  .container { padding: 1.5rem 1rem; border-radius: 2rem; }
+  .hero h1 { font-size: 1.6rem; }
+  .nav-links a { padding: 0.5rem 1.2rem; font-size: 0.85rem; }
+  .did-chart { gap: 1rem; }
+  .did-bar .bar { width: 35px; }
+  .forest-grid { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+<div class="brand-return-nav">
+  <a href="../../index.html"><i class="fas fa-arrow-left"></i> Portfolio</a>
+  <a href="../index.html"><i class="fas fa-th"></i> Cursos</a>
+</div>
+<div class="container">
+  <div class="hero">
+    <h1>🔗 Causal Inference con IA</h1>
+    <p class="subtitle">"Correlación no es causalidad — pero la IA puede ayudarte a encontrar la diferencia"</p>
+  </div>
+
+  <div class="progress-section">
+    <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+    <div class="progress-text" id="progressText">Módulo 6 de 25</div>
+  </div>
+
+  <div class="insignia" id="insignia">
+    <i class="fas fa-medal"></i> 🏅 Detective Causal 🏅
+    <div style="font-size:0.8rem;margin-top:0.3rem;color:#aabbdd;">Módulo completado</div>
+  </div>
+
+  <div class="analogy-card">
+    <i class="fas fa-lightbulb"></i>
+    <strong>Analogía:</strong> La inferencia causal con IA es como tener un detective que no solo ve que dos cosas pasan juntas (correlación), sino que puede diseñar experimentos mentales para determinar si una realmente causa la otra.
+  </div>
+
+  <div class="feedback" id="feedback"></div>
+
+  <!-- 1. Correlation vs Causation -->
+  <div id="lab1" class="section-box">
+    <h3><i class="fas fa-link"></i> 1. Correlation vs Causation — ¿Cuál es causal?</h3>
+    <p style="color:#8899cc;margin-bottom:0.8rem;">Para cada par, decide si la relación es causal o es una correlación espuria.</p>
+    <div id="spuriousList"></div>
+    <button class="btn-small" id="checkSpurious" style="margin-top:0.5rem;"><i class="fas fa-check"></i> Verificar todas</button>
+  </div>
+
+  <!-- 2. DAG Builder -->
+  <div id="lab2" class="section-box">
+    <h3><i class="fas fa-project-diagram"></i> 2. DAG Builder</h3>
+    <p style="color:#8899cc;margin-bottom:0.8rem;">Arma el grafo causal. Haz clic en los nodos para añadir/eliminar flechas causales entre ellos.</p>
+    <div id="dagArea" class="dag-area">
+      <span id="dagNodes"></span>
+    </div>
+    <p style="font-size:0.85rem;color:#8899cc;" id="dagDesc">Configuración: X → Y (causal directa)</p>
+    <button class="btn-small" id="checkDag"><i class="fas fa-check"></i> Validar DAG</button>
+  </div>
+
+  <!-- 3. Confounder Finder -->
+  <div id="lab3" class="section-box">
+    <h3><i class="fas fa-search"></i> 3. Confounder Finder</h3>
+    <p style="color:#8899cc;margin-bottom:0.8rem;">Para cada relación, identifica el posible confounder que la IA sugiere.</p>
+    <div id="confounderList"></div>
+    <button class="btn-small" id="checkConfounders" style="margin-top:0.5rem;"><i class="fas fa-check"></i> Verificar</button>
+  </div>
+
+  <!-- 4. Natural Experiment Simulator -->
+  <div id="lab4" class="section-box">
+    <h3><i class="fas fa-chart-line"></i> 4. Natural Experiment Simulator (Difference-in-Differences)</h3>
+    <p style="color:#8899cc;margin-bottom:0.8rem;">Ajusta los sliders para ver cómo cambia el efecto del tratamiento en un diseño DiD.</p>
+    <div class="slider-group">
+      <label>Grupo Control (pre)</label>
+      <input type="range" id="didControlPre" min="10" max="90" value="35">
+      <span class="slider-val" id="didControlPreVal">35</span>
+    </div>
+    <div class="slider-group">
+      <label>Grupo Control (post)</label>
+      <input type="range" id="didControlPost" min="10" max="90" value="40">
+      <span class="slider-val" id="didControlPostVal">40</span>
+    </div>
+    <div class="slider-group">
+      <label>Grupo Tratamiento (pre)</label>
+      <input type="range" id="didTreatPre" min="10" max="90" value="35">
+      <span class="slider-val" id="didTreatPreVal">35</span>
+    </div>
+    <div class="slider-group">
+      <label>Grupo Tratamiento (post)</label>
+      <input type="range" id="didTreatPost" min="10" max="90" value="65">
+      <span class="slider-val" id="didTreatPostVal">65</span>
+    </div>
+    <div class="did-chart" id="didChart">
+      <div class="did-bar"><div class="bar control" id="barControlPre" style="height:70px"></div><span class="label">Control Pre</span><span class="value" id="valControlPre">35</span></div>
+      <div class="did-bar"><div class="bar control" id="barControlPost" style="height:80px"></div><span class="label">Control Post</span><span class="value" id="valControlPost">40</span></div>
+      <div class="did-bar"><div class="bar" id="barTreatPre" style="height:70px"></div><span class="label">Trat Pre</span><span class="value" id="valTreatPre">35</span></div>
+      <div class="did-bar"><div class="bar" id="barTreatPost" style="height:130px"></div><span class="label">Trat Post</span><span class="value" id="valTreatPost">65</span></div>
+    </div>
+    <p style="text-align:center;font-size:0.9rem;color:#b0c0e0;">Efecto causal estimado (DiD): <strong id="didEffect" style="color:var(--accent);">25</strong></p>
+  </div>
+
+  <!-- 5. Instrumental Variable -->
+  <div id="lab5" class="section-box">
+    <h3><i class="fas fa-guitar"></i> 5. Instrumental Variable</h3>
+    <p style="color:#8899cc;margin-bottom:0.8rem;">¿Cuál de estos es un instrumento válido para estimar el efecto de la educación en el ingreso? (Haz clic para seleccionar)</p>
+    <div id="ivOptions"></div>
+    <button class="btn-small" id="checkIv"><i class="fas fa-check"></i> Verificar</button>
+  </div>
+
+  <!-- 6. Causal Forest -->
+  <div id="lab6" class="section-box">
+    <h3><i class="fas fa-tree"></i> 6. Causal Forest — Efectos Heterogéneos</h3>
+    <p style="color:#8899cc;margin-bottom:0.8rem;">Simulación de efectos de tratamiento heterogéneos por subgrupo.</p>
+    <div class="forest-grid" id="forestGrid"></div>
+    <button class="btn-small" id="simulateForest"><i class="fas fa-sync"></i> Simular nuevo</button>
+  </div>
+
+  <!-- 7. RCT Designer -->
+  <div id="lab7" class="section-box">
+    <h3><i class="fas fa-flask"></i> 7. Randomized Control Trial Designer</h3>
+    <p style="color:#8899cc;margin-bottom:0.8rem;">Diseña tu RCT ideal.</p>
+    <div class="rct-field">
+      <label>Tamaño de muestra</label>
+      <input type="number" id="rctSample" value="500" min="10" max="10000">
+    </div>
+    <div class="rct-field">
+      <label>Método de aleatorización</label>
+      <select id="rctRandom">
+        <option value="simple">Simple</option>
+        <option value="block">Bloques</option>
+        <option value="stratified" selected>Estratificado</option>
+        <option value="minimization">Minimización</option>
+      </select>
+    </div>
+    <div class="rct-field">
+      <label>Ciego</label>
+      <select id="rctBlind">
+        <option value="open">Abierto</option>
+        <option value="single">Simple ciego</option>
+        <option value="double" selected>Doble ciego</option>
+        <option value="triple">Triple ciego</option>
+      </select>
+    </div>
+    <button class="btn-small" id="designRct"><i class="fas fa-check"></i> Evaluar diseño</button>
+    <div id="rctResult" style="margin-top:0.8rem;font-size:0.9rem;color:#8899cc;"></div>
+  </div>
+
+  <!-- 8. Do-Calculus -->
+  <div id="lab8" class="section-box">
+    <h3><i class="fas fa-calculator"></i> 8. The Do-Calculus — P(Y|do(X)) vs P(Y|X)</h3>
+    <p style="color:#8899cc;margin-bottom:0.8rem;">Judea Pearl's do-operator: La diferencia entre observar e intervenir.</p>
+    <div class="do-calc-box">
+      <div style="font-size:0.9rem;color:#b0c0e0;">Observacional: P(Y | X)</div>
+      <div class="formula">P(Y | X) = <span class="accent">0.72</span></div>
+      <div style="font-size:0.9rem;color:#b0c0e0;margin-top:1rem;">Intervencional: P(Y | do(X))</div>
+      <div class="formula">P(Y | do(X)) = <span class="arrow">0.31</span></div>
+      <p style="font-size:0.85rem;color:#8899cc;margin-top:1rem;">¡La diferencia es el sesgo por confounders! P(Y|X) incluye correlación espuria, P(Y|do(X)) estima el verdadero efecto causal.</p>
+    </div>
+    <p style="font-size:0.85rem;color:#b0c0e0;margin-top:0.5rem;">La "regla del do-calculus" permite expresar P(Y|do(X)) en términos de distribuciones observables si el DAG es conocido y satisface ciertos criterios.</p>
+  </div>
+
+  <div class="nav-links">
+    <a href="e5-prisma-automatizado.html" class="prev"><i class="fas fa-chevron-left"></i> Anterior</a>
+    <a href="../index.html" class="menu"><i class="fas fa-th"></i> Menú</a>
+    <a href="e7-ai-scientist.html" class="next">Siguiente <i class="fas fa-chevron-right"></i></a>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'ia_inv_e6';
+
+const spuriousData = [
+  { desc: 'Ventas de helados 🍦 → Ahogamientos 🏊', causal: false, answer: null },
+  { desc: 'Fumar 🚬 → Cáncer de pulmón 🫁', causal: true, answer: null },
+  { desc: 'Cigüeñas → Nacimientos 👶', causal: false, answer: null },
+  { desc: 'Ejercicio 🏃 → Salud cardiovascular ❤️', causal: true, answer: null },
+  { desc: 'Número de películas de Nicolas Cage → Ahogamientos en piscinas', causal: false, answer: null },
+  { desc: 'Vacunas 💉 → Inmunidad 🛡️', causal: true, answer: null },
+  { desc: 'Consumo de chocolate 🍫 → Premios Nobel 🏆', causal: false, answer: null },
+  { desc: 'Uso de cinturón de seguridad → Supervivencia en accidentes', causal: true, answer: null },
+  { desc: 'Ventas de videojuegos 🎮 → Rendimiento escolar 📉', causal: false, answer: null },
+  { desc: 'Educación 📚 → Ingresos económicos 💰', causal: true, answer: null }
+];
+
+const confounderProblems = [
+  { rel: 'Helados → Ahogamientos', conf: 'Temperatura (más calor → más helados y más gente en piscinas)', options: ['Temperatura', 'Edad', 'Ingresos', 'Género'], correct: 0 },
+  { rel: 'Cigüeñas → Nacimientos', conf: 'Área rural (más cigüeñas en zonas rurales donde también hay más nacimientos)', options: ['Área rural', 'Tecnología', 'Educación', 'Deporte'], correct: 0 },
+  { rel: 'Ejercicio → Salud', conf: 'Nivel socioeconómico (quienes pueden pagar gimnasio también tienen mejor salud)', options: ['Nivel socioeconómico', 'Clima', 'Altura', 'Alimentación'], correct: 0 }
+];
+
+const ivData = [
+  { text: 'Distancia a la universidad más cercana 🏫', valid: true, reason: 'Afecta la educación (acceso) pero no el ingreso directamente' },
+  { text: 'Ingreso de los padres 💵', valid: false, reason: 'Afecta tanto la educación como el ingreso directamente (confounder)' },
+  { text: 'Número de hermanos 👨‍👩‍👧‍👦', valid: false, reason: 'Puede afectar educación (recursos) y también ingreso (redes familiares)' },
+  { text: 'Sexo del estudiante ♂️♀️', valid: false, reason: 'Confounder: afecta acceso a educación y salarios en muchos contextos' }
+];
+
+const forestSubgroups = ['Jóvenes (<25)', 'Adultos (25-45)', 'Mayores (>45)', 'Mujeres', 'Hombres', 'Baja educación', 'Alta educación', 'Urbanos', 'Rurales', 'Bajo ingreso', 'Alto ingreso', 'Con comorbilidades'];
+
+function updateProgress() {
+  let p = JSON.parse(localStorage.getItem('ia_inv_progress') || '[]');
+  if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem('ia_inv_progress', JSON.stringify(p)); }
+  const pf = document.getElementById('progressFill');
+  const pt = document.getElementById('progressText');
+  if(pf) pf.style.width = Math.round((p.length/25)*100)+'%';
+  if(pt) pt.textContent = p.length+' de 25 módulos';
+}
+
+function checkCompletion() {
+  let p = JSON.parse(localStorage.getItem('ia_inv_progress') || '[]');
+  if (p.includes(STORAGE_KEY)) {
+    document.getElementById('insignia').classList.add('show');
+  }
+}
+
+function showFeedback(msg, type) {
+  const fb = document.getElementById('feedback');
+  fb.textContent = msg;
+  fb.className = 'feedback ' + type;
+  fb.style.display = 'block';
+  setTimeout(() => { fb.style.display = 'none'; }, 3000);
+}
+
+function completeModule() {
+  document.getElementById('insignia').classList.add('show');
+  showFeedback('🏅 ¡Has completado el Detective Causal Lab!', 'success');
+  updateProgress();
+}
+
+// 1. Spurious correlations
+(function renderSpurious() {
+  const container = document.getElementById('spuriousList');
+  spuriousData.forEach((item, i) => {
+    const card = document.createElement('div');
+    card.className = 'spur-card';
+    card.innerHTML = `
+      <span class="spur-desc">${item.desc}</span>
+      <div class="spur-btns" data-idx="${i}">
+        <button class="spur-causal" data-idx="${i}" data-val="true">Causal</button>
+        <button class="spur-spurious" data-idx="${i}" data-val="false">Espuria</button>
+      </div>
+      <span class="spur-result" id="spurResult${i}"></span>
+    `;
+    container.appendChild(card);
+  });
+  document.querySelectorAll('.spur-causal, .spur-spurious').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const idx = parseInt(this.dataset.idx);
+      spuriousData[idx].answer = this.dataset.val === 'true';
+      const btns = this.parentElement.querySelectorAll('button');
+      btns.forEach(b => { b.classList.remove('correct', 'wrong'); });
+      this.classList.add(this.dataset.val === (spuriousData[idx].causal ? 'true' : 'false') ? 'correct' : 'wrong');
+    });
+  });
+})();
+
+document.getElementById('checkSpurious').addEventListener('click', () => {
+  let correct = 0;
+  spuriousData.forEach((item, i) => {
+    const resultEl = document.getElementById('spurResult' + i);
+    if (item.answer === null) {
+      resultEl.textContent = '❓ Sin respuesta';
+      resultEl.style.color = '#8899cc';
+    } else if (item.answer === item.causal) {
+      resultEl.textContent = '✅ Correcto';
+      resultEl.style.color = '#00ffc8';
+      correct++;
+    } else {
+      resultEl.textContent = '❌ Incorrecto';
+      resultEl.style.color = '#ff6464';
+    }
+  });
+  showFeedback(`Resultado: ${correct}/${spuriousData.length} correctos`, correct >= 7 ? 'success' : 'error');
+  if (correct >= 7) completeModule();
+});
+
+// 2. DAG
+const dagNodes = ['X (Tratamiento)', 'Y (Outcome)', 'Z (Confounder)', 'M (Mediador)'];
+let dagEdges = [];
+let dagSelected = null;
+
+function renderDag() {
+  const container = document.getElementById('dagNodes');
+  container.innerHTML = '';
+  dagNodes.forEach((name, i) => {
+    const node = document.createElement('span');
+    node.className = 'dag-node' + (dagSelected === i ? ' selected' : '');
+    node.textContent = name;
+    node.dataset.idx = i;
+    node.addEventListener('click', () => {
+      if (dagSelected === null) {
+        dagSelected = i;
+        node.style.outline = '2px solid #fff';
+      } else if (dagSelected === i) {
+        dagSelected = null;
+        node.style.outline = 'none';
+      } else {
+        const from = dagSelected;
+        const to = i;
+        const existing = dagEdges.findIndex(e => e.from === from && e.to === to);
+        if (existing >= 0) {
+          dagEdges.splice(existing, 1);
+        } else {
+          dagEdges.push({ from, to });
+        }
+        dagSelected = null;
+        document.querySelectorAll('.dag-node').forEach(n => n.style.outline = 'none');
+      }
+      renderEdges();
+    });
+    container.appendChild(node);
+  });
+  renderEdges();
+  updateDagDesc();
+}
+
+function renderEdges() {
+  const existing = document.querySelectorAll('.dag-arrow');
+  existing.forEach(e => e.remove());
+  dagEdges.forEach(edge => {
+    const arrow = document.createElement('span');
+    arrow.className = 'dag-arrow';
+    arrow.textContent = '→';
+    const source = document.querySelector(`.dag-node[data-idx="${edge.from}"]`);
+    if (source) source.insertAdjacentElement('afterend', arrow);
+    const target = document.querySelector(`.dag-node[data-idx="${edge.to}"]`);
+    const arrow2 = document.createElement('span');
+    arrow2.className = 'dag-arrow';
+    arrow2.textContent = `(${dagNodes[edge.from]} → ${dagNodes[edge.to]})`;
+    arrow2.style.fontSize = '0.7rem';
+    arrow2.style.color = '#667';
+    arrow2.style.marginLeft = '0.2rem';
+    arrow2.addEventListener('click', () => {
+      dagEdges = dagEdges.filter(e => !(e.from === edge.from && e.to === edge.to));
+      renderEdges();
+      updateDagDesc();
+    });
+    if (target) target.insertAdjacentElement('beforebegin', arrow2);
+  });
+}
+
+function updateDagDesc() {
+  const desc = document.getElementById('dagDesc');
+  if (dagEdges.length === 0) {
+    desc.textContent = 'Configuración: Sin flechas. Haz clic en un nodo origen, luego en un nodo destino.';
+  } else {
+    const txt = dagEdges.map(e => `${dagNodes[e.from]} → ${dagNodes[e.to]}`).join(', ');
+    desc.textContent = `Flechas: ${txt}`;
+  }
+}
+
+document.getElementById('checkDag').addEventListener('click', () => {
+  const hasXtoY = dagEdges.some(e => e.from === 0 && e.to === 1);
+  const hasZ = dagEdges.some(e => e.from === 2 && (e.to === 0 || e.to === 1));
+  if (hasXtoY) {
+    showFeedback('✅ DAG válido: X → Y identificado. ' + (hasZ ? 'Confounder Z incluido. ¡Correcto!' : 'Considera añadir Z como confounder.'), 'success');
+    if (hasZ) completeModule();
+  } else {
+    showFeedback('❌ Falta la flecha causal X → Y', 'error');
+  }
+});
+
+renderDag();
+
+// 3. Confounders
+(function renderConfounders() {
+  const container = document.getElementById('confounderList');
+  confounderProblems.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'confounder-item';
+    let optsHtml = '';
+    item.options.forEach((opt, j) => {
+      optsHtml += `<button class="btn-small conf-btn" data-problem="${i}" data-opt="${j}" style="background:transparent;border:1px solid rgba(255,255,255,0.15);color:#b0c0e0;margin:0.2rem;">${opt}</button> `;
+    });
+    div.innerHTML = `
+      <span class="conf-desc"><strong>${item.rel}</strong> — Posible confounder:</span>
+      <div>${optsHtml}</div>
+      <span class="conf-result" id="confResult${i}"></span>
+    `;
+    container.appendChild(div);
+  });
+  document.querySelectorAll('.conf-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const pIdx = parseInt(this.dataset.problem);
+      const optIdx = parseInt(this.dataset.opt);
+      const problem = confounderProblems[pIdx];
+      const resultEl = document.getElementById('confResult' + pIdx);
+      const btns = this.parentElement.querySelectorAll('.conf-btn');
+      btns.forEach(b => b.style.borderColor = 'rgba(255,255,255,0.15)');
+      if (optIdx === problem.correct) {
+        this.style.borderColor = '#00ffc8';
+        resultEl.textContent = '✅ ' + problem.conf;
+        resultEl.style.color = '#00ffc8';
+      } else {
+        this.style.borderColor = '#ff6464';
+        resultEl.textContent = '❌ Intenta de nuevo';
+        resultEl.style.color = '#ff6464';
+      }
+    });
+  });
+})();
+
+document.getElementById('checkConfounders').addEventListener('click', () => {
+  let ok = 0;
+  confounderProblems.forEach((p, i) => {
+    const resultEl = document.getElementById('confResult' + i);
+    if (resultEl.textContent.includes('✅')) ok++;
+  });
+  showFeedback(`Confounders identificados: ${ok}/${confounderProblems.length}`, ok === confounderProblems.length ? 'success' : 'error');
+  if (ok === confounderProblems.length) completeModule();
+});
+
+// 4. DiD Simulator
+function updateDid() {
+  const cp = parseInt(document.getElementById('didControlPre').value);
+  const cpost = parseInt(document.getElementById('didControlPost').value);
+  const tp = parseInt(document.getElementById('didTreatPre').value);
+  const tpost = parseInt(document.getElementById('didTreatPost').value);
+  document.getElementById('didControlPreVal').textContent = cp;
+  document.getElementById('didControlPostVal').textContent = cpost;
+  document.getElementById('didTreatPreVal').textContent = tp;
+  document.getElementById('didTreatPostVal').textContent = tpost;
+  document.getElementById('barControlPre').style.height = (cp * 2) + 'px';
+  document.getElementById('barControlPost').style.height = (cpost * 2) + 'px';
+  document.getElementById('barTreatPre').style.height = (tp * 2) + 'px';
+  document.getElementById('barTreatPost').style.height = (tpost * 2) + 'px';
+  document.getElementById('valControlPre').textContent = cp;
+  document.getElementById('valControlPost').textContent = cpost;
+  document.getElementById('valTreatPre').textContent = tp;
+  document.getElementById('valTreatPost').textContent = tpost;
+  const diffControl = cpost - cp;
+  const diffTreat = tpost - tp;
+  const did = diffTreat - diffControl;
+  document.getElementById('didEffect').textContent = did;
+}
+document.querySelectorAll('#lab4 input[type="range"]').forEach(el => {
+  el.addEventListener('input', updateDid);
+});
+updateDid();
+
+// 5. Instrumental Variable
+(function renderIv() {
+  const container = document.getElementById('ivOptions');
+  ivData.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'iv-option';
+    div.dataset.idx = i;
+    div.innerHTML = `
+      <div class="iv-radio"></div>
+      <span class="iv-text">${item.text}</span>
+    `;
+    div.addEventListener('click', function() {
+      document.querySelectorAll('.iv-option').forEach(o => o.classList.remove('selected', 'correct', 'wrong'));
+      this.classList.add('selected');
+    });
+    container.appendChild(div);
+  });
+})();
+
+document.getElementById('checkIv').addEventListener('click', () => {
+  const selected = document.querySelector('.iv-option.selected');
+  if (!selected) { showFeedback('Selecciona un instrumento primero', 'error'); return; }
+  const idx = parseInt(selected.dataset.idx);
+  if (ivData[idx].valid) {
+    selected.classList.add('correct');
+    showFeedback('✅ Correcto! ' + ivData[idx].reason, 'success');
+    completeModule();
+  } else {
+    selected.classList.add('wrong');
+    showFeedback('❌ No es un instrumento válido. ' + ivData[idx].reason, 'error');
+  }
+});
+
+// 6. Causal Forest
+function simulateForest() {
+  const grid = document.getElementById('forestGrid');
+  grid.innerHTML = '';
+  forestSubgroups.forEach(sg => {
+    const effect = (Math.random() * 6 - 1).toFixed(1);
+    const effectNum = parseFloat(effect);
+    let cls = 'neutral';
+    if (effectNum > 1.5) cls = 'positive';
+    else if (effectNum < -0.5) cls = 'negative';
+    const div = document.createElement('div');
+    div.className = 'forest-tree';
+    div.innerHTML = `<div class="effect ${cls}">${effectNum > 0 ? '+' : ''}${effectNum}</div><div class="subgroup">${sg}</div>`;
+    grid.appendChild(div);
+  });
+  showFeedback('🌲 Bosque causal simulado. Efectos heterogéneos visibles.', 'success');
+}
+document.getElementById('simulateForest').addEventListener('click', simulateForest);
+simulateForest();
+
+// 7. RCT Designer
+document.getElementById('designRct').addEventListener('click', () => {
+  const sample = parseInt(document.getElementById('rctSample').value);
+  const method = document.getElementById('rctRandom').value;
+  const blind = document.getElementById('rctBlind').value;
+  let score = 0;
+  let notes = [];
+  if (sample >= 100) { score++; } else { notes.push('Muestra muy pequeña (<100)'); }
+  if (sample >= 500) { score++; }
+  if (method === 'stratified' || method === 'minimization') { score++; } else { notes.push('Usa estratificación o minimización para mejor balance'); }
+  if (blind === 'double' || blind === 'triple') { score++; } else { notes.push('El doble ciego reduce sesgos'); }
+  if (blind === 'triple') { score++; }
+  let total = 5;
+  const resultEl = document.getElementById('rctResult');
+  const pct = Math.round((score / total) * 100);
+  resultEl.innerHTML = `<strong>Puntuación de diseño: ${pct}%</strong><br>${notes.length ? '⚠️ ' + notes.join('; ') : '✅ Diseño robusto'}`;
+  if (pct >= 80) {
+    showFeedback('✅ RCT bien diseñado!', 'success');
+    completeModule();
+  }
+});
+
+// 8. Do-Calculus
+const doBox = document.querySelector('.do-calc-box');
+doBox.addEventListener('click', () => {
+  const obsVal = (0.5 + Math.random() * 0.4).toFixed(2);
+  const intVal = (0.1 + Math.random() * 0.5).toFixed(2);
+  doBox.querySelector('.formula .accent').textContent = obsVal;
+  doBox.querySelector('.formula .arrow').textContent = intVal;
+});
+
+checkCompletion();
+</script>
+<footer style="width:100%;max-width:900px;text-align:center;padding:2rem 1rem;color:#445;font-size:0.8rem;margin-top:1rem;">
+  <i class="fas fa-graduation-cap"></i> IA Aplicada a la Investigación — Módulo 6: Causal Inference
+</footer>
+</body>
+</html>

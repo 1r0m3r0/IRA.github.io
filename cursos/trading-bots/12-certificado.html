@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Bot Trader | Certificado de Finalización</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Playfair+Display:ital,wght@0,700;1,400&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{background:linear-gradient(145deg,#0a0e1a 0%,#0f1830 100%);font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem;}
+    .page-wrap{max-width:1000px;width:100%;}
+    .name-form{background:rgba(15,24,48,.85);backdrop-filter:blur(10px);border-radius:2rem;border:1px solid rgba(255,215,0,.3);padding:1.5rem 2rem;margin-bottom:1.5rem;text-align:center;}
+    .name-form h2{font-size:1rem;color:#ffd700;margin-bottom:.8rem;}
+    .name-form input{background:#0a1228;border:1px solid #443300;color:#eef5ff;padding:.6rem 1.2rem;border-radius:3rem;font-size:1rem;width:100%;max-width:380px;font-family:'Inter',sans-serif;}
+    .name-form .btn-gen{background:linear-gradient(95deg,#ffd700,#ff9900);border:none;padding:.7rem 1.8rem;font-weight:700;border-radius:3rem;cursor:pointer;color:#1a0000;font-size:.95rem;margin-top:.7rem;transition:.2s;}
+    .name-form .btn-gen:hover{transform:translateY(-2px);}
+    .cert-outer{background:rgba(8,12,28,.9);backdrop-filter:blur(10px);border-radius:2rem;border:1px solid rgba(255,215,0,.3);padding:.5rem;margin-bottom:1.5rem;position:relative;overflow:hidden;}
+    canvas#certCanvas{display:block;width:100%;border-radius:1.5rem;}
+    .actions{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem;}
+    .btn-action{padding:.75rem 1.8rem;border-radius:3rem;font-weight:700;cursor:pointer;font-size:.9rem;display:inline-flex;align-items:center;gap:.5rem;transition:.2s;text-decoration:none;}
+    .btn-print{background:linear-gradient(95deg,#ffd700,#ff9900);border:none;color:#1a0000;}
+    .btn-share{background:#1a2a4a;border:1px solid #ffd70066;color:#ffd700;}
+    .btn-home{background:#1a2a4a;border:1px solid #33aaff66;color:#80ccff;}
+    .btn-action:hover{transform:translateY(-2px);}
+    .progress-summary{background:rgba(8,12,28,.85);border-radius:2rem;border:1px solid rgba(255,215,0,.2);padding:1.4rem;margin-bottom:1.5rem;}
+    .progress-summary h3{color:#ffd700;font-size:1rem;margin-bottom:.8rem;}
+    .modules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.5rem;}
+    .mod-item{background:#0a1228;border-radius:1rem;padding:.5rem .9rem;font-size:.78rem;display:flex;align-items:center;gap:.5rem;border:1px solid #1a2a4a;}
+    .mod-item.done{border-color:#00cc5544;color:#88ffaa;}
+    .mod-item.done i{color:#00ff88;}
+    .mod-item.pending i{color:#555;}
+    .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:.5rem 0 1.5rem;}
+    .nav-link{background:#2c3e66;padding:.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:.5rem;transition:.2s;}
+    .nav-link:hover{transform:translateY(-2px);}
+    .nav-link.menu{background:#1a2a4a;border:1px solid gold;}
+    @media print{.name-form,.actions,.progress-summary,.nav-links,nav{display:none!important;}}
+    @media(max-width:600px){.btn-action{font-size:.8rem;padding:.6rem 1.2rem;}}
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+<div class="page-wrap">
+  <div class="name-form">
+    <h2><i class="fas fa-graduation-cap"></i> ¿A nombre de quién emitimos el certificado?</h2>
+    <input type="text" id="studentName" placeholder="Tu nombre completo..." maxlength="50">
+    <br>
+    <button class="btn-gen" onclick="generateCert()"><i class="fas fa-certificate"></i> Generar Certificado</button>
+  </div>
+
+  <div class="cert-outer">
+    <canvas id="certCanvas"></canvas>
+  </div>
+
+  <div class="actions">
+    <button class="btn-action btn-print" onclick="window.print()"><i class="fas fa-print"></i> Imprimir / Guardar PDF</button>
+    <button class="btn-action btn-share" id="btnShare" onclick="shareImg()"><i class="fas fa-share-alt"></i> Compartir Imagen</button>
+    <a href="index.html" class="btn-action btn-home"><i class="fas fa-home"></i> Volver al Menú</a>
+  </div>
+
+  <div class="progress-summary">
+    <h3><i class="fas fa-list-check"></i> Módulos Completados</h3>
+    <div class="modules-grid" id="modulesGrid"></div>
+  </div>
+
+  <div class="nav-links">
+    <a href="11-quiz-repaso.html" class="nav-link"><i class="fas fa-arrow-left"></i> Quiz Final</a>
+    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú del Curso</a>
+    <a href="../../cursos/index.html" class="nav-link" style="background:linear-gradient(95deg,#ffd700,#ff9900);color:#1a0000;"><i class="fas fa-th"></i> Todos los Cursos</a>
+  </div>
+</div>
+<script>
+const ALL_MODULES=[
+  {key:'tbot_lvl1',name:'01 · Portal de Inicio'},
+  {key:'tbot_emo2',name:'02 · Mercados y Emociones'},
+  {key:'tbot_candl3',name:'03 · Candlestick Lab'},
+  {key:'tbot_ind4',name:'04 · Indicadores Técnicos'},
+  {key:'tbot_strat5',name:'05 · Estrategias Algorítmicas'},
+  {key:'tbot_py6',name:'06 · Python para Traders'},
+  {key:'tbot_ml7',name:'07 · Machine Learning'},
+  {key:'tbot_bt8',name:'08 · Backtesting Avanzado'},
+  {key:'tbot_risk9',name:'09 · Gestión de Riesgo'},
+  {key:'tbot_builder10',name:'10 · Construye tu Bot'},
+  {key:'tbot_quiz11',name:'11 · Quiz Final'},
+  {key:'tbot_n2api',name:'N2-01 · APIs & Exchanges'},
+  {key:'tbot_n2lstm',name:'N2-02 · LSTM Deep Learning'},
+  {key:'tbot_n2nlp',name:'N2-03 · Sentiment & NLP'},
+  {key:'tbot_n2port',name:'N2-04 · Portfolio Optimizer'},
+  {key:'tbot_n2paper',name:'N2-05 · Paper Trading'},
+  {key:'tbot_n2err',name:'N2-06 · Errores Comunes'},
+];
+
+function getCompletedModules(){
+  return ALL_MODULES.map(m=>({...m,done:!!localStorage.getItem(m.key)}));
+}
+
+function renderModules(){
+  const mods=getCompletedModules();
+  const done=mods.filter(m=>m.done).length;
+  document.getElementById('modulesGrid').innerHTML=mods.map(m=>`
+    <div class="mod-item ${m.done?'done':'pending'}">
+      <i class="fas ${m.done?'fa-check-circle':'fa-circle'}"></i>
+      ${m.name}
+    </div>`).join('');
+}
+
+function generateCert(){
+  const rawName=document.getElementById('studentName').value.trim();
+  const name=rawName||localStorage.getItem('tbot_playerName')||'Explorador Bot Trader';
+  if(rawName) localStorage.setItem('tbot_playerName',name);
+  localStorage.setItem('tbot_cert12','true');
+
+  const canvas=document.getElementById('certCanvas');
+  const mods=getCompletedModules();
+  const doneMods=mods.filter(m=>m.done);
+
+  const W=900,H=640;
+  canvas.width=W;canvas.height=H;
+  const ctx=canvas.getContext('2d');
+
+  // Background
+  const bg=ctx.createLinearGradient(0,0,W,H);
+  bg.addColorStop(0,'#06091a');bg.addColorStop(0.5,'#0b1228');bg.addColorStop(1,'#0a0f1e');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+
+  // Outer border double
+  ctx.strokeStyle='rgba(255,215,0,0.8)';ctx.lineWidth=4;ctx.strokeRect(16,16,W-32,H-32);
+  ctx.strokeStyle='rgba(255,215,0,0.3)';ctx.lineWidth=1.5;ctx.strokeRect(24,24,W-48,H-48);
+
+  // Corner ornaments
+  function corner(x,y,dx,dy){
+    ctx.strokeStyle='rgba(255,215,0,0.6)';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(x,y+dy*30);ctx.lineTo(x,y);ctx.lineTo(x+dx*30,y);ctx.stroke();
+  }
+  corner(24,24,1,1);corner(W-24,24,-1,1);corner(24,H-24,1,-1);corner(W-24,H-24,-1,-1);
+
+  // Header glow
+  const hGrad=ctx.createLinearGradient(W/2-200,40,W/2+200,100);
+  hGrad.addColorStop(0,'#ff9900');hGrad.addColorStop(0.5,'#ffd700');hGrad.addColorStop(1,'#ff9900');
+  ctx.font='bold 13px Inter, sans-serif';ctx.fillStyle='rgba(255,215,0,0.5)';ctx.textAlign='center';
+  ctx.fillText('ISRAEL ROMERO · ISRAELROMERO.XYZ',W/2,52);
+
+  ctx.font='bold 11px Inter';ctx.fillStyle='rgba(255,215,0,0.4)';
+  ctx.fillText('CERTIFICADO DE FINALIZACIÓN',W/2,74);
+
+  // Divider
+  ctx.strokeStyle='rgba(255,215,0,0.4)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(80,84);ctx.lineTo(W-80,84);ctx.stroke();
+
+  // Robot emoji / icon
+  ctx.font='56px serif';ctx.textAlign='center';ctx.fillText('🤖',W/2,152);
+
+  // Course title
+  ctx.font='bold 28px Playfair Display, serif';
+  const titleGrad=ctx.createLinearGradient(W/2-200,160,W/2+200,200);
+  titleGrad.addColorStop(0,'#ffeebb');titleGrad.addColorStop(0.5,'#ffd700');titleGrad.addColorStop(1,'#ff9900');
+  ctx.fillStyle=titleGrad;ctx.textAlign='center';
+  ctx.fillText('Trading Bots con Python & Machine Learning',W/2,188);
+
+  // "This certifies that"
+  ctx.font='16px Inter';ctx.fillStyle='rgba(200,180,100,0.8)';ctx.textAlign='center';
+  ctx.fillText('Este certificado acredita que',W/2,226);
+
+  // Student name
+  ctx.font='bold italic 38px Playfair Display, serif';
+  const nameGrad=ctx.createLinearGradient(W/2-250,230,W/2+250,280);
+  nameGrad.addColorStop(0,'#fff');nameGrad.addColorStop(0.5,'#ffd700');nameGrad.addColorStop(1,'#fff');
+  ctx.fillStyle=nameGrad;ctx.textAlign='center';
+  ctx.fillText(name,W/2,278);
+
+  // Underline name
+  const nameW=ctx.measureText(name).width;
+  ctx.strokeStyle='rgba(255,215,0,0.5)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(W/2-nameW/2-10,286);ctx.lineTo(W/2+nameW/2+10,286);ctx.stroke();
+
+  // Completion text
+  ctx.font='14px Inter';ctx.fillStyle='rgba(200,180,100,0.8)';ctx.textAlign='center';
+  ctx.fillText('ha completado exitosamente el curso de',W/2,312);
+
+  // Modules line
+  ctx.font='13px Inter';ctx.fillStyle='rgba(150,200,100,0.9)';ctx.textAlign='center';
+  ctx.fillText(`${doneMods.length} de ${ALL_MODULES.length} módulos · ${doneMods.length>=11?'Certificación completa':'Certificación parcial'}`,W/2,334);
+
+  // Horizontal divider
+  ctx.strokeStyle='rgba(255,215,0,0.25)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(120,350);ctx.lineTo(W-120,350);ctx.stroke();
+
+  // Skills row
+  const skills=['Análisis Técnico','Backtesting','Machine Learning','Python Trading','Gestión de Riesgo'];
+  const colW=(W-160)/skills.length;
+  skills.forEach((s,i)=>{
+    const cx=80+colW*i+colW/2;
+    ctx.font='bold 11px Inter';ctx.fillStyle='rgba(255,215,0,0.7)';ctx.textAlign='center';
+    ctx.fillText('✓',cx,378);
+    ctx.font='10px Inter';ctx.fillStyle='rgba(180,160,80,0.8)';
+    ctx.fillText(s,cx,393);
+  });
+
+  // Bottom section
+  ctx.strokeStyle='rgba(255,215,0,0.25)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(120,408);ctx.lineTo(W-120,408);ctx.stroke();
+
+  // Date | Instructor | ID
+  const today=new Date().toLocaleDateString('es-ES',{year:'numeric',month:'long',day:'numeric'});
+  const certId='TBT-'+Math.random().toString(36).substr(2,8).toUpperCase();
+
+  // Left: date
+  ctx.textAlign='left';ctx.font='11px Inter';ctx.fillStyle='rgba(180,160,80,0.7)';
+  ctx.fillText('Fecha de emisión',100,440);
+  ctx.font='bold 13px Inter';ctx.fillStyle='rgba(255,215,0,0.9)';
+  ctx.fillText(today,100,458);
+
+  // Center: instructor
+  ctx.textAlign='center';ctx.font='italic 13px Playfair Display';ctx.fillStyle='rgba(255,215,0,0.9)';
+  ctx.fillText('Israel Romero',W/2,450);
+  ctx.font='10px Inter';ctx.fillStyle='rgba(180,160,80,0.6)';
+  ctx.fillText('Instructor · israelromero.xyz',W/2,464);
+  // Underline signature
+  ctx.strokeStyle='rgba(255,215,0,0.4)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(W/2-70,468);ctx.lineTo(W/2+70,468);ctx.stroke();
+
+  // Right: ID
+  ctx.textAlign='right';ctx.font='11px Inter';ctx.fillStyle='rgba(180,160,80,0.7)';
+  ctx.fillText('ID de Certificado',W-100,440);
+  ctx.font='bold 12px monospace';ctx.fillStyle='rgba(255,215,0,0.8)';
+  ctx.fillText(certId,W-100,458);
+
+  // Footer
+  ctx.textAlign='center';ctx.font='10px Inter';ctx.fillStyle='rgba(120,100,40,0.6)';
+  ctx.fillText('israelromero.xyz · Trading Bots con Python & Machine Learning · 2025',W/2,H-28);
+
+  renderModules();
+}
+
+function shareImg(){
+  const canvas=document.getElementById('certCanvas');
+  canvas.toBlob(blob=>{
+    if(navigator.share&&navigator.canShare({files:[new File([blob],'certificado.png',{type:'image/png'})]})){
+      navigator.share({title:'Mi Certificado Bot Trader',files:[new File([blob],'certificado.png',{type:'image/png'})]});
+    } else {
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(blob);
+      a.download='certificado-bot-trader.png';
+      a.click();
+    }
+  });
+}
+
+window.addEventListener('load',()=>{
+  const savedName=localStorage.getItem('tbot_playerName');
+  if(savedName)document.getElementById('studentName').value=savedName;
+  renderModules();
+  generateCert();
+});
+</script>
+  <script src="../../assets/js/cookie-consent.js"></script>
+</body>
+</html>
+
+
+

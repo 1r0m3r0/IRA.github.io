@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Macroeconomía Interactiva | Mercado de Trabajo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #1a0e0e 100%);
+      background-size: 200% 200%;
+      animation: gradientShift 20s ease infinite;
+      font-family: 'Inter', sans-serif;
+      color: #eef5ff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .labor-container {
+      max-width: 1300px; width: 100%;
+      background: rgba(15, 25, 45, 0.65);
+      backdrop-filter: blur(12px);
+      border-radius: 3rem;
+      border: 1px solid rgba(255, 80, 80, 0.25);
+      box-shadow: 0 25px 45px rgba(0,0,0,0.5);
+      overflow: hidden;
+    }
+    .hero-header {
+      background: linear-gradient(95deg, #0b1120 0%, #1a0e0e 100%);
+      padding: 2rem 2rem 1.5rem 2rem;
+      text-align: center;
+      border-bottom: 2px solid #ff5050;
+    }
+    .hero-header h1 {
+      font-size: 2.6rem; font-weight: 800;
+      background: linear-gradient(135deg, #FFF, #ff9090, #ff5050);
+      -webkit-background-clip: text;
+      background-clip: text; color: transparent;
+    }
+    .hero-header p { font-size: 1.2rem; color: #ffb0b0; margin-top: 0.5rem; font-weight: 500; }
+    .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1.2rem; flex-wrap: wrap; }
+    .chip {
+      background: rgba(255,80,80,0.15);
+      border: 1px solid #ff5050; padding: 0.4rem 1rem;
+      border-radius: 40px; font-size: 0.8rem; font-weight: 600;
+    }
+    .analogy-card {
+      background: #1e2a3acc; margin: 1.5rem 2rem; padding: 1.2rem 1.8rem;
+      border-radius: 2rem; border-left: 8px solid #ff5050;
+      font-size: 1rem; line-height: 1.6;
+    }
+    .main-area {
+      display: flex; flex-wrap: wrap; gap: 2rem;
+      padding: 0.5rem 2rem 1rem 2rem;
+    }
+    .canvas-area { flex: 1.6; min-width: 300px; }
+    .canvas-area canvas {
+      width: 100%; height: auto; aspect-ratio: 4/3;
+      background: #0a0f1e; border-radius: 2rem;
+      border: 1px solid #ff505044; display: block;
+    }
+    .controls-area {
+      flex: 1; min-width: 240px;
+      background: rgba(0,10,25,0.7); border-radius: 2rem;
+      padding: 1.5rem; border: 1px solid #ff505044;
+    }
+    .controls-area h3 { color: #ff9090; margin-bottom: 1rem; font-size: 1.2rem; }
+    .slider-group { margin-bottom: 1.2rem; }
+    .slider-group label { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 0.3rem; }
+    .slider-group label span { color: #ff9090; font-weight: 700; font-family: monospace; }
+    .slider-group input[type=range] { width: 100%; accent-color: #ff5050; }
+    .btn-action {
+      background: linear-gradient(95deg, #ff5050, #cc3333); border: none;
+      padding: 0.8rem 1.8rem; font-weight: bold; border-radius: 3rem;
+      cursor: pointer; font-size: 1rem; transition: 0.2s; color: #fff;
+      margin: 0.5rem 0;
+    }
+    .btn-action:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(255,80,80,0.5); }
+    .labor-stats {
+      background: #00000066; border-radius: 1.5rem; padding: 0.8rem;
+      margin-top: 1rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem;
+    }
+    .labor-stats .stat { text-align: center; padding: 0.3rem; }
+    .labor-stats .stat .val { font-size: 1.2rem; font-weight: 700; color: #ff9090; font-family: monospace; }
+    .labor-stats .stat .lbl { font-size: 0.65rem; color: #aabbdd; }
+    .data-input { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.5rem 0; }
+    .data-input input {
+      background: #1a2a3e; border: 1px solid #ff505044; border-radius: 1rem;
+      padding: 0.4rem 0.8rem; color: #eef5ff; width: 100px; font-family: monospace;
+    }
+    .data-input label { font-size: 0.8rem; display: flex; flex-direction: column; align-items: center; gap: 0.2rem; }
+    .feedback {
+      background: #00000099; margin: 0 2rem 1.5rem 2rem; padding: 1rem;
+      border-radius: 1.5rem; text-align: center; font-weight: 500;
+      border-left: 4px solid #ff5050;
+    }
+    .insignia {
+      text-align: center; background: #0c1b2f;
+      border-radius: 2rem; margin: 0 2rem 1.5rem; padding: 1rem;
+      border: 1px dashed gold;
+    }
+    .insignia i { font-size: 2.5rem; color: gold; }
+    .hidden { display: none; }
+    .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
+    .nav-link {
+      background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem;
+      font-weight: 600; text-decoration: none; color: #eef5ff;
+      display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s;
+    }
+    .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(255,80,80,0.4); }
+    .nav-link.next { background: linear-gradient(95deg, #f0a500, #ff6a00); color: #1e1a0c; }
+    .nav-link.menu { background: #1a2a4a; border: 1px solid #ff5050; }
+    footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
+    @media (max-width: 800px) {
+      .hero-header h1 { font-size: 1.9rem; }
+      .main-area { flex-direction: column; }
+    }
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+
+  <div class="labor-container">
+    <div class="hero-header">
+      <h1>👷 Mercado de Trabajo 👷</h1>
+      <p>Salarios, empleo y la tasa natural de desempleo</p>
+      <div class="badge-area">
+        <span class="chip"><i class="fas fa-users"></i> Oferta y demanda laboral</span>
+        <span class="chip"><i class="fas fa-chart-bar"></i> Indicadores de empleo</span>
+        <span class="chip"><i class="fas fa-sort-numeric-up"></i> NAIRU</span>
+      </div>
+    </div>
+
+    <div class="analogy-card">
+      <strong>🎭 Piénsalo así:</strong> El mercado laboral es como una sala de audiciones para una obra de teatro. Los trabajadores son los actores (ofrecen su talento) y las empresas son los directores de casting (demandan talento). El salario es como el caché que negocian. A veces hay actores esperando (desempleo), otras veces hay papeles que nadie quiere (vacantes). El salario mínimo es como un piso mínimo de caché que el sindicato de actores exige.
+    </div>
+
+    <div class="main-area">
+      <div class="canvas-area">
+        <canvas id="laborCanvas" width="600" height="450"></canvas>
+      </div>
+      <div class="controls-area">
+        <h3><i class="fas fa-sliders-h"></i> Controles del mercado</h3>
+        <div class="slider-group">
+          <label>Salario mínimo <span id="minWageVal">0</span></label>
+          <input type="range" id="minWageSlider" min="0" max="12" value="0" step="0.5">
+        </div>
+        <div class="slider-group">
+          <label>Poder de negociación <span id="bargVal">0.50</span></label>
+          <input type="range" id="bargSlider" min="0.1" max="0.9" value="0.5" step="0.05">
+        </div>
+        <div class="slider-group">
+          <label>Productividad laboral <span id="prodVal">10</span></label>
+          <input type="range" id="prodSlider" min="5" max="20" value="10" step="0.5">
+        </div>
+
+        <h3 style="margin-top:1rem;"><i class="fas fa-calculator"></i> Calculadora laboral</h3>
+        <div class="data-input">
+          <label>Población activa <input type="number" id="activePop" value="5000" min="100"></label>
+          <label>Ocupados <input type="number" id="employed" value="4500" min="0"></label>
+          <label>Pob. en edad <input type="number" id="workingAge" value="7000" min="100"></label>
+        </div>
+        <button id="calcBtn" class="btn-action"><i class="fas fa-calculator"></i> Calcular indicadores</button>
+
+        <div class="labor-stats">
+          <div class="stat"><div class="val" id="unempRate">5.00</div><div class="lbl">Tasa de desempleo %</div></div>
+          <div class="stat"><div class="val" id="activityRate">71.43</div><div class="lbl">Tasa de actividad %</div></div>
+          <div class="stat"><div class="val" id="nairuRate">5.0</div><div class="lbl">NAIRU %</div></div>
+          <div class="stat"><div class="val" id="empLevel">4500</div><div class="lbl">Ocupados</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="feedbackMsg" class="feedback">
+      💡 Ajusta el salario mínimo y observa cómo cambian el empleo y el desempleo en el gráfico.
+    </div>
+
+    <div id="insigniaArea" class="insignia hidden">
+      <i class="fas fa-medal"></i>
+      <h3>🏅 ¡EXPERTO LABORAL! 🏅</h3>
+      <p>Has analizado el mercado de trabajo, calculado indicadores clave y comprendido la NAIRU. ¡Impresionante!</p>
+    </div>
+
+    <div class="nav-links">
+      <a href="05-modelo-islm.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+      <a href="07-oferta-agregada.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <footer>
+      <i class="fas fa-crown"></i> Macroeconomía Interactiva · El trabajo dignifica: entendiendo el mercado laboral
+    </footer>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'macro_lvl6';
+    const canvas = document.getElementById('laborCanvas');
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    const pad = { left: 60, right: 30, top: 30, bottom: 40 };
+
+    const minWageSlider = document.getElementById('minWageSlider');
+    const bargSlider = document.getElementById('bargSlider');
+    const prodSlider = document.getElementById('prodSlider');
+    const minWageVal = document.getElementById('minWageVal');
+    const bargVal = document.getElementById('bargVal');
+    const prodVal = document.getElementById('prodVal');
+    const feedbackMsg = document.getElementById('feedbackMsg');
+    const activePop = document.getElementById('activePop');
+    const employed = document.getElementById('employed');
+    const workingAge = document.getElementById('workingAge');
+    const unempRate = document.getElementById('unempRate');
+    const activityRate = document.getElementById('activityRate');
+    const nairuRate = document.getElementById('nairuRate');
+    const empLevel = document.getElementById('empLevel');
+
+    function drawGraph() {
+      const minWage = parseFloat(minWageSlider.value);
+      const barg = parseFloat(bargSlider.value);
+      const prod = parseFloat(prodSlider.value);
+
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = '#0a0f1e';
+      ctx.fillRect(0, 0, W, H);
+
+      const chartW = W - pad.left - pad.right;
+      const chartH = H - pad.top - pad.bottom;
+      const Lmax = 100;
+      const Wmax = 20;
+
+      function toX(L) { return pad.left + (L / Lmax) * chartW; }
+      function toYw(w) { return pad.top + chartH - (w / Wmax) * chartH; }
+
+      ctx.strokeStyle = '#1a2a4a';
+      ctx.lineWidth = 0.5;
+      for (let i = 0; i <= 5; i++) {
+        const x = pad.left + (i / 5) * chartW;
+        ctx.beginPath(); ctx.moveTo(x, pad.top); ctx.lineTo(x, pad.top + chartH); ctx.stroke();
+        const y = pad.top + (i / 5) * chartH;
+        ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(pad.left + chartW, y); ctx.stroke();
+      }
+
+      ctx.fillStyle = '#8899bb';
+      ctx.font = '12px Inter';
+      ctx.textAlign = 'center';
+      for (let i = 0; i <= 5; i++) {
+        ctx.fillText(Math.round((i / 5) * Lmax), pad.left + (i / 5) * chartW, H - 10);
+      }
+      ctx.textAlign = 'right';
+      for (let i = 0; i <= 5; i++) {
+        ctx.fillText((i / 5) * Wmax, pad.left - 8, toYw((i / 5) * Wmax) + 4);
+      }
+      ctx.fillStyle = '#8899bb';
+      ctx.font = '13px Inter';
+      ctx.textAlign = 'center';
+      ctx.fillText('L (Empleo)', pad.left + chartW / 2, H - 2);
+      ctx.save();
+      ctx.translate(12, pad.top + chartH / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillText('Salario real (W/P)', 0, 0);
+      ctx.restore();
+
+      // Labor demand (Price Setting)
+      const wPS = prod;
+      ctx.beginPath();
+      ctx.moveTo(pad.left, toYw(wPS));
+      ctx.lineTo(pad.left + chartW, toYw(wPS));
+      ctx.strokeStyle = '#2b9eff';
+      ctx.lineWidth = 3;
+      ctx.setLineDash([6, 4]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#2b9eff';
+      ctx.font = 'bold 13px Inter';
+      ctx.textAlign = 'left';
+      ctx.fillText('PS (Demanda laboral)', pad.left + chartW * 0.6, toYw(wPS) - 5);
+
+      // Wage setting (WS) curve
+      ctx.beginPath();
+      const wsPoints = [];
+      for (let L = 10; L <= 95; L += 2) {
+        const unemp = 1 - L / 100;
+        const w = barg * prod * (1 - 0.8 * unemp);
+        wsPoints.push({ x: toX(L), y: toYw(Math.max(w, 0.1)) });
+      }
+      if (wsPoints.length > 1) {
+        ctx.beginPath();
+        ctx.moveTo(wsPoints[0].x, wsPoints[0].y);
+        for (let i = 1; i < wsPoints.length; i++) ctx.lineTo(wsPoints[i].x, wsPoints[i].y);
+        ctx.strokeStyle = '#ff5050';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        ctx.fillStyle = '#ff5050';
+        ctx.font = 'bold 13px Inter';
+        ctx.textAlign = 'left';
+        ctx.fillText('WS (Salarios)', wsPoints[wsPoints.length - 1].x - 60, wsPoints[wsPoints.length - 1].y - 8);
+      }
+
+      // Equilibrium
+      let eqL = 85;
+      let eqW = wPS;
+      for (let L = 10; L <= 95; L += 1) {
+        const unemp = 1 - L / 100;
+        const w = barg * prod * (1 - 0.8 * unemp);
+        if (Math.abs(w - wPS) < 0.15) {
+          eqL = L;
+          eqW = (w + wPS) / 2;
+          break;
+        }
+      }
+
+      // Natural rate
+      const naturalRate = (1 - eqL / 100) * 100;
+
+      // Minimum wage effect
+      if (minWage > 0) {
+        ctx.setLineDash([4, 4]);
+        ctx.strokeStyle = '#ffd700';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        const mwY = toYw(minWage);
+        ctx.moveTo(pad.left, mwY);
+        ctx.lineTo(pad.left + chartW, mwY);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = '#ffd700';
+        ctx.font = 'bold 12px Inter';
+        ctx.textAlign = 'left';
+        ctx.fillText('Salario mínimo', pad.left + chartW * 0.7, mwY - 5);
+
+        if (minWage > eqW) {
+          eqL = eqL - (minWage - eqW) * 2;
+          eqL = Math.max(eqL, 50);
+          updateFeedback(`⚠️ El salario mínimo (${minWage.toFixed(1)}) está por encima del equilibrio (${eqW.toFixed(1)}). Se reduce el empleo a ~${eqL.toFixed(0)}.`);
+        } else {
+          updateFeedback(`✅ El salario mínimo (${minWage.toFixed(1)}) está por debajo del equilibrio y no afecta el empleo.`);
+        }
+      } else {
+        updateFeedback(`💡 Equilibrio natural: empleo = ${eqL.toFixed(0)}%, desempleo natural = ${naturalRate.toFixed(1)}%`);
+      }
+
+      const eqX = toX(eqL);
+      const eqY_ = toYw(eqW);
+      ctx.beginPath();
+      ctx.arc(eqX, eqY_, 8, 0, 2 * Math.PI);
+      ctx.fillStyle = '#ffd700';
+      ctx.fill();
+      ctx.strokeStyle = '#ffd700';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      ctx.fillStyle = '#ffd700';
+      ctx.font = 'bold 11px Inter';
+      ctx.textAlign = 'left';
+      ctx.fillText('E*', eqX + 10, eqY_ - 5);
+
+      nairuRate.textContent = naturalRate.toFixed(1);
+
+      if (Math.abs(minWage) > 0.1 || barg > 0.6 || prod > 14) {
+        const ins = document.getElementById('insigniaArea');
+        if (ins.classList.contains('hidden')) {
+          ins.classList.remove('hidden');
+          localStorage.setItem(STORAGE_KEY, 'true');
+        }
+      }
+    }
+
+    function updateFeedback(msg) {
+      feedbackMsg.innerHTML = msg;
+    }
+
+    function calcIndicators() {
+      const act = parseFloat(activePop.value) || 0;
+      const emp = parseFloat(employed.value) || 0;
+      const wa = parseFloat(workingAge.value) || 1;
+      const unemp = act - emp;
+      const ur = act > 0 ? (unemp / act) * 100 : 0;
+      const ar = wa > 0 ? (act / wa) * 100 : 0;
+      unempRate.textContent = ur.toFixed(2);
+      activityRate.textContent = ar.toFixed(2);
+      empLevel.textContent = emp;
+      if (ur < 10 && ar > 50) {
+        const ins = document.getElementById('insigniaArea');
+        if (ins.classList.contains('hidden')) {
+          ins.classList.remove('hidden');
+          localStorage.setItem(STORAGE_KEY, 'true');
+        }
+      }
+      updateFeedback(`📊 Desempleo: ${ur.toFixed(1)}% | Actividad: ${ar.toFixed(1)}% | Ocupados: ${emp}`);
+    }
+
+    minWageSlider.addEventListener('input', () => {
+      minWageVal.textContent = minWageSlider.value;
+      drawGraph();
+    });
+    bargSlider.addEventListener('input', () => {
+      bargVal.textContent = parseFloat(bargSlider.value).toFixed(2);
+      drawGraph();
+    });
+    prodSlider.addEventListener('input', () => {
+      prodVal.textContent = prodSlider.value;
+      drawGraph();
+    });
+
+    document.getElementById('calcBtn').addEventListener('click', calcIndicators);
+
+    if (localStorage.getItem(STORAGE_KEY) === 'true') {
+      document.getElementById('insigniaArea').classList.remove('hidden');
+    }
+
+    drawGraph();
+  </script>
+  <script src="../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

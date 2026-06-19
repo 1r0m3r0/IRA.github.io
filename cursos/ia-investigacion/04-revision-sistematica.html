@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📋 Revisión Sistemática con IA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root { --accent: #ffd700; --accent-glow: rgba(255,215,0,0.3); }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #111a2e 100%);
+  background-attachment: fixed;
+  color: #e0e4f0;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 1rem;
+}
+.brand-return-nav {
+  width: 100%; max-width: 900px;
+  display: flex; gap: 1rem; padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+}
+.brand-return-nav a {
+  color: #8899cc; text-decoration: none; font-size: 0.85rem;
+  padding: 0.35rem 1rem; border-radius: 20px;
+  background: rgba(15,25,45,0.5); border: 1px solid rgba(255,255,255,0.06);
+  transition: all 0.3s;
+}
+.brand-return-nav a:hover { background: var(--accent); color: #000; border-color: var(--accent); }
+.container {
+  width: 100%; max-width: 900px;
+  background: rgba(15,25,45,0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 3rem;
+  padding: 2.5rem 2rem;
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+.hero { text-align: center; margin-bottom: 2rem; }
+.hero h1 {
+  font-size: 2.4rem; font-weight: 800;
+  background: linear-gradient(135deg, var(--accent), #ffed7a, #fff);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.2;
+}
+.hero .subtitle {
+  font-size: 1.1rem; color: #8899cc; margin-top: 0.5rem; font-weight: 300;
+}
+.analogy-card {
+  background: rgba(10,15,30,0.5);
+  border-left: 8px solid var(--accent);
+  border-radius: 1.5rem;
+  padding: 1.5rem 1.8rem;
+  margin: 1.5rem 0;
+  font-size: 1rem; line-height: 1.6; color: #c8d0e8;
+}
+.analogy-card i { color: var(--accent); margin-right: 0.5rem; }
+.progress-section { margin: 1.5rem 0 0.5rem; }
+.progress-bar-outer { background: #1a2a4a; border-radius: 20px; height: 20px; overflow: hidden; margin: 1rem 2rem; }
+.progress-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent, #ffd700), #fff); border-radius: 20px; transition: width 0.5s ease; }
+.progress-text { text-align: center; font-size: 0.85rem; color: #8899cc; margin-bottom: 1rem; }
+.insignia {
+  display: none;
+  text-align: center;
+  padding: 1.2rem;
+  margin: 1rem auto;
+  max-width: 400px;
+  border: 2px dashed #ffd700;
+  border-radius: 2rem;
+  background: rgba(255,215,0,0.05);
+  color: #ffd700;
+  font-size: 1.2rem; font-weight: 600;
+  animation: insigniaPulse 2s infinite;
+}
+@keyframes insigniaPulse { 0%,100%{box-shadow:0 0 10px rgba(255,215,0,0.1)} 50%{box-shadow:0 0 30px rgba(255,215,0,0.3)} }
+.insignia.show { display: block; }
+.feedback { text-align: center; padding: 1rem; margin: 1rem 0; border-radius: 1rem; display: none; }
+.feedback.success { display: block; background: rgba(0,255,200,0.08); border: 1px solid rgba(0,255,200,0.2); color: #00ffc8; }
+.feedback.error { display: block; background: rgba(255,100,100,0.08); border: 1px solid rgba(255,100,100,0.2); color: #ff6464; }
+.nav-links { display: flex; justify-content: center; gap: 1rem; margin-top: 2rem; flex-wrap: wrap; }
+.nav-links a {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.7rem 1.8rem; border-radius: 30px;
+  text-decoration: none; font-weight: 600; font-size: 0.95rem;
+  transition: all 0.3s;
+}
+.nav-links .prev { background: rgba(255,255,255,0.06); color: #8899cc; border: 1px solid rgba(255,255,255,0.1); }
+.nav-links .prev:hover { background: rgba(255,255,255,0.12); }
+.nav-links .menu { background: rgba(255,215,0,0.15); color: #ffd700; border: 1px solid rgba(255,215,0,0.2); }
+.nav-links .menu:hover { background: rgba(255,215,0,0.25); }
+.nav-links .next { background: var(--accent); color: #000; }
+.nav-links .next:hover { box-shadow: 0 0 25px var(--accent-glow); transform: translateY(-2px); }
+h2 { font-size: 1.5rem; margin: 1.5rem 0 1rem; color: #fff; }
+h2 i { color: var(--accent); margin-right: 0.5rem; }
+h3 { font-size: 1.2rem; margin: 1rem 0 0.8rem; color: #d0d8f0; }
+
+.prisma-flow { display: flex; flex-direction: column; gap: 0.8rem; margin: 1.5rem 0; position: relative; }
+.prisma-step {
+  display: flex; align-items: center; gap: 1rem;
+  background: rgba(10,15,30,0.4);
+  border-radius: 1.2rem;
+  padding: 1rem 1.5rem;
+  border-left: 4px solid var(--accent);
+  transition: all 0.3s;
+}
+.prisma-step.completed { border-left-color: #00ffc8; background: rgba(0,255,200,0.05); }
+.prisma-step .step-icon {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: rgba(255,215,0,0.1);
+  border: 2px solid var(--accent);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; font-size: 1.1rem;
+}
+.prisma-step.completed .step-icon { background: rgba(0,255,200,0.1); border-color: #00ffc8; color: #00ffc8; }
+.prisma-step .step-content { flex: 1; }
+.prisma-step .step-content .label { font-weight: 600; font-size: 0.9rem; }
+.prisma-step .step-content .desc { font-size: 0.8rem; color: #8899cc; }
+.prisma-step .step-number {
+  font-size: 1.8rem; font-weight: 800; color: rgba(255,215,0,0.15);
+  min-width: 50px; text-align: right;
+}
+.prisma-step.completed .step-number { color: rgba(0,255,200,0.15); }
+.step-input {
+  display: inline-block;
+  width: 80px; padding: 0.4rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(10,15,30,0.6);
+  color: #fff; font-size: 0.9rem;
+  text-align: center; margin: 0 0.3rem;
+  outline: none;
+}
+.step-input:focus { border-color: var(--accent); }
+.step-btn {
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  border: none;
+  background: var(--accent); color: #000;
+  font-size: 0.8rem; font-weight: 600;
+  cursor: pointer; transition: all 0.2s;
+}
+.step-btn:hover { box-shadow: 0 0 15px var(--accent-glow); }
+.step-btn:disabled { opacity: 0.4; cursor: default; box-shadow: none; }
+
+.prisma-diagram {
+  display: flex; flex-direction: column; align-items: center;
+  margin: 2rem 0; padding: 1.5rem;
+  background: rgba(10,15,30,0.3);
+  border-radius: 1.5rem;
+  border: 1px solid rgba(255,255,255,0.04);
+}
+.prisma-box {
+  background: rgba(10,15,30,0.6);
+  border: 2px solid var(--accent);
+  border-radius: 1rem;
+  padding: 1rem 2rem;
+  text-align: center;
+  min-width: 250px;
+  transition: all 0.3s;
+}
+.prisma-box .big-num { font-size: 2.5rem; font-weight: 800; color: #fff; }
+.prisma-box .big-label { font-size: 0.85rem; color: #8899cc; }
+.prisma-arrow { color: var(--accent); font-size: 1.5rem; padding: 0.2rem 0; }
+.prisma-arrow .fa-times { color: #ff6464; }
+
+.abstract-card {
+  background: rgba(10,15,30,0.4);
+  border-radius: 0.8rem;
+  padding: 0.8rem 1rem;
+  margin: 0.5rem 0;
+  border-left: 3px solid #8899cc;
+  cursor: pointer; transition: all 0.2s;
+  font-size: 0.85rem;
+}
+.abstract-card:hover { border-left-color: var(--accent); background: rgba(255,215,0,0.05); }
+.abstract-card .ab-title { font-weight: 600; color: #d0d8f0; }
+.abstract-card .ab-text { color: #8899cc; margin-top: 0.3rem; }
+.abstract-card .ab-actions { margin-top: 0.5rem; display: flex; gap: 0.5rem; }
+.abstract-card .ab-actions button {
+  padding: 0.2rem 0.8rem;
+  border-radius: 15px;
+  border: none; font-size: 0.75rem;
+  cursor: pointer; font-weight: 600;
+}
+.btn-include { background: #00ffc8; color: #000; }
+.btn-exclude { background: #ff6464; color: #fff; }
+.btn-include.selected { box-shadow: 0 0 10px rgba(0,255,200,0.5); }
+.btn-exclude.selected { box-shadow: 0 0 10px rgba(255,100,100,0.5); }
+
+.scite-badge {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+.scite-badge.supporting { background: rgba(0,255,200,0.1); color: #00ffc8; border: 1px solid rgba(0,255,200,0.2); }
+.scite-badge.contradicting { background: rgba(255,100,100,0.1); color: #ff6464; border: 1px solid rgba(255,100,100,0.2); }
+.scite-badge.neutral { background: rgba(255,215,0,0.1); color: #ffd700; border: 1px solid rgba(255,215,0,0.2); }
+
+.connected-graph {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem;
+  margin: 1rem 0; padding: 1rem;
+  background: rgba(10,15,30,0.3);
+  border-radius: 1rem;
+  min-height: 120px;
+}
+.graph-node {
+  width: 90px; height: 90px;
+  border-radius: 50%;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  font-size: 0.6rem; text-align: center; padding: 0.4rem;
+  border: 2px solid var(--accent);
+  background: rgba(10,15,30,0.7);
+  transition: all 0.3s;
+  cursor: default;
+}
+.graph-node.center { border-width: 3px; border-color: #fff; width: 110px; height: 110px; font-size: 0.7rem; }
+.graph-node.connected { border-color: #8899cc; opacity: 0.7; }
+
+.btn-primary {
+  display: inline-block;
+  padding: 0.8rem 2rem;
+  background: var(--accent); color: #000; border: none;
+  border-radius: 30px;
+  font-size: 0.95rem; font-weight: 600;
+  cursor: pointer; transition: all 0.3s;
+}
+.btn-primary:hover { box-shadow: 0 0 25px var(--accent-glow); transform: translateY(-2px); }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+@media (max-width: 600px) {
+  .container { padding: 1.5rem 1rem; border-radius: 2rem; }
+  .hero h1 { font-size: 1.6rem; }
+  .prisma-step { flex-wrap: wrap; }
+  .nav-links a { padding: 0.5rem 1.2rem; font-size: 0.85rem; }
+  .prisma-box { min-width: 180px; }
+}
+</style>
+</head>
+<body>
+<div class="brand-return-nav">
+  <a href="../../index.html"><i class="fas fa-arrow-left"></i> Portfolio</a>
+  <a href="../index.html"><i class="fas fa-th"></i> Cursos</a>
+</div>
+<div class="container">
+  <div class="hero">
+    <h1>📋 Revisión Sistemática con IA</h1>
+    <p class="subtitle">De 500 papers a 20 relevantes en minutos — con metodología rigurosa</p>
+  </div>
+
+  <div class="progress-section">
+    <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+    <div class="progress-text" id="progressText">Módulo 4 de 25</div>
+  </div>
+
+  <div class="insignia" id="insignia">
+    <i class="fas fa-medal"></i> 🏅 Metodólogo Sistemático 🏅
+    <div style="font-size:0.8rem;margin-top:0.3rem;color:#aabbdd;">Módulo completado</div>
+  </div>
+
+  <div class="analogy-card">
+    <i class="fas fa-lightbulb"></i>
+    <strong>Analogía:</strong> Una revisión sistemática sin IA es como buscar un error en un libro de 1000 páginas sin índice. Los filtros de IA son tu índice + resaltador + post-its, todo en uno.
+  </div>
+
+  <div class="feedback" id="feedback"></div>
+
+  <h2><i class="fas fa-project-diagram"></i> Constructor PRISMA Interactivo</h2>
+  <p style="color:#8899cc;margin-bottom:1rem;">Guía tu revisión a través de las 5 fases PRISMA. Introduce datos y aplica filtros con IA.</p>
+
+  <!-- PRISMA Flow -->
+  <div class="prisma-flow" id="prismaFlow">
+    <div class="prisma-step" data-step="1">
+      <div class="step-icon">1</div>
+      <div class="step-content">
+        <div class="label">Fase 1: Registros identificados</div>
+        <div class="desc">Introduce el número de registros encontrados en tu búsqueda.</div>
+        <div style="margin-top:0.5rem;">
+          <input type="number" class="step-input" id="prisma1" value="500" min="1">
+          <button class="step-btn" onclick="applyPrisma1()">Aplicar</button>
+        </div>
+      </div>
+      <div class="step-number">01</div>
+    </div>
+    <div class="prisma-step" data-step="2">
+      <div class="step-icon">2</div>
+      <div class="step-content">
+        <div class="label">Fase 2: Eliminación de duplicados</div>
+        <div class="desc">La IA detecta y elimina duplicados automáticamente (estimado 15%).</div>
+        <div style="margin-top:0.5rem;">
+          <span id="prisma2Display">—</span>
+          <button class="step-btn" onclick="applyPrisma2()" id="prisma2Btn">Eliminar duplicados</button>
+        </div>
+      </div>
+      <div class="step-number">02</div>
+    </div>
+    <div class="prisma-step" data-step="3">
+      <div class="step-icon">3</div>
+      <div class="step-content">
+        <div class="label">Fase 3: Cribado</div>
+        <div class="desc">Aplica filtros de IA: año, citas, metodología.</div>
+        <div style="margin-top:0.5rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
+          <select id="filterYear" style="padding:0.4rem;border-radius:8px;background:rgba(10,15,30,0.6);color:#fff;border:1px solid rgba(255,255,255,0.1);">
+            <option value="0">Desde 2020</option>
+            <option value="1">Desde 2022</option>
+            <option value="2">Desde 2024</option>
+          </select>
+          <select id="filterCites" style="padding:0.4rem;border-radius:8px;background:rgba(10,15,30,0.6);color:#fff;border:1px solid rgba(255,255,255,0.1);">
+            <option value="0">Cualquier citas</option>
+            <option value="1">≥ 10 citas</option>
+            <option value="2">≥ 50 citas</option>
+          </select>
+          <button class="step-btn" onclick="applyPrisma3()">Aplicar filtros IA</button>
+        </div>
+        <div style="margin-top:0.5rem;"><span id="prisma3Display">—</span></div>
+      </div>
+      <div class="step-number">03</div>
+    </div>
+    <div class="prisma-step" data-step="4">
+      <div class="step-icon">4</div>
+      <div class="step-content">
+        <div class="label">Fase 4: Evaluación de texto completo</div>
+        <div class="desc">Lee los abstracts y decide si incluir o excluir cada estudio.</div>
+        <div id="abstractList" style="margin-top:0.5rem;"></div>
+      </div>
+      <div class="step-number">04</div>
+    </div>
+    <div class="prisma-step" data-step="5">
+      <div class="step-icon">5</div>
+      <div class="step-content">
+        <div class="label">Fase 5: Estudios incluidos</div>
+        <div class="desc">¡Revisión completa! Revisa el diagrama PRISMA final.</div>
+        <div style="margin-top:0.5rem;"><span id="prisma5Display">—</span></div>
+      </div>
+      <div class="step-number">05</div>
+    </div>
+  </div>
+
+  <!-- PRISMA Diagram -->
+  <div class="prisma-diagram" id="prismaDiagram">
+    <div class="prisma-box" id="prismaBox1"><div class="big-num" id="dia1">500</div><div class="big-label">Registros identificados</div></div>
+    <div class="prisma-arrow"><i class="fas fa-arrow-down"></i></div>
+    <div class="prisma-box" id="prismaBox2"><div class="big-num" id="dia2">—</div><div class="big-label">Tras eliminar duplicados</div></div>
+    <div class="prisma-arrow"><i class="fas fa-arrow-down"></i></div>
+    <div class="prisma-box" id="prismaBox3"><div class="big-num" id="dia3">—</div><div class="big-label">Tras cribado</div></div>
+    <div class="prisma-arrow"><i class="fas fa-arrow-down"></i></div>
+    <div class="prisma-box" id="prismaBox4"><div class="big-num" id="dia4">—</div><div class="big-label">Texto completo evaluado</div></div>
+    <div class="prisma-arrow" style="color:#00ffc8;"><i class="fas fa-arrow-down"></i></div>
+    <div class="prisma-box" style="border-color:#00ffc8;" id="prismaBox5"><div class="big-num" id="dia5">—</div><div class="big-label">Incluidos en la síntesis</div></div>
+  </div>
+
+  <!-- Scite & Connected Papers -->
+  <h2><i class="fas fa-quote-right"></i> Verificador de Citas (Simulado Scite.ai)</h2>
+  <div id="scitePanel" style="margin:1rem 0;">
+    <div class="abstract-card">
+      <div class="ab-title">Deep Learning for Climate Prediction <span class="scite-badge supporting">78% Supporting</span></div>
+      <div class="ab-text">Citado por 23 artículos: 18 apoyan, 3 contradicen, 2 neutros.</div>
+    </div>
+    <div class="abstract-card">
+      <div class="ab-title">AI-Assisted Drug Discovery <span class="scite-badge supporting">65% Supporting</span></div>
+      <div class="ab-text">Citado por 45 artículos: 29 apoyan, 10 contradicen, 6 neutros.</div>
+    </div>
+    <div class="abstract-card">
+      <div class="ab-title">Transformers in Medical Imaging <span class="scite-badge contradicting">34% Supporting</span></div>
+      <div class="ab-text">Citado por 32 artículos: 11 apoyan, 18 contradicen, 3 neutros.</div>
+    </div>
+  </div>
+
+  <h2><i class="fas fa-share-alt"></i> Mapa de Papers Conectados</h2>
+  <div class="connected-graph" id="graphView">
+    <div class="graph-node center"><strong>IA en<br>Salud</strong></div>
+    <div class="graph-node connected">ML en<br>Diagnóstico</div>
+    <div class="graph-node connected">NLP en<br>Historiales</div>
+    <div class="graph-node connected">Visión en<br>Rayos X</div>
+    <div class="graph-node connected">Robótica<br>Quirúrgica</div>
+    <div class="graph-node connected">Ética de<br>IA Médica</div>
+  </div>
+
+  <div style="text-align:center;margin-top:1.5rem;">
+    <button class="btn-primary" onclick="completeModule()"><i class="fas fa-check-circle"></i> Completar módulo</button>
+  </div>
+
+  <div class="nav-links">
+    <a href="03-busqueda-literatura.html" class="prev"><i class="fas fa-chevron-left"></i> Anterior</a>
+    <a href="../index.html" class="menu"><i class="fas fa-th"></i> Menú</a>
+    <a href="05-lectura-sintesis.html" class="next">Siguiente <i class="fas fa-chevron-right"></i></a>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'ia_inv_04';
+let prismaState = { p1: 500, p2: null, p3: null, p4: null, p5: null, step: 0 };
+let includedCount = 0;
+
+const abstracts = [
+  { title: 'Machine Learning for COVID-19 Diagnosis', text: 'Estudio retrospectivo que evalúa 4 algoritmos de ML para diagnóstico por imágenes. Sensibilidad del 92% y especificidad del 88%. Muestra: 1,200 pacientes.' },
+  { title: 'NLP for Electronic Health Records', text: 'Revisión de técnicas NLP para extraer información de historiales clínicos. BERT y GPT muestran F1-score >0.90 en 5 de 7 tareas.' },
+  { title: 'Deep Learning in Genomic Medicine', text: 'Redes neuronales profundas aplicadas a predicción de variantes patogénicas. AUC de 0.94 en validación externa.' },
+  { title: 'Computer Vision for Radiology', text: 'Comparativa de 8 arquitecturas CNN para detección de nódulos pulmonares. EfficientNet logra sensibilidad del 96%.' },
+  { title: 'AI Ethics in Clinical Decision Support', text: 'Análisis cualitativo de sesgos algorítmicos en 15 sistemas CDS. Identifica 3 categorías principales de sesgo no reportado.' }
+];
+
+function updateProgress() {
+  let p = JSON.parse(localStorage.getItem('ia_inv_progress') || '[]');
+  if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem('ia_inv_progress', JSON.stringify(p)); }
+  const pf = document.getElementById('progressFill');
+  const pt = document.getElementById('progressText');
+  if(pf) pf.style.width = Math.round((p.length/25)*100)+'%';
+  if(pt) pt.textContent = p.length+' de 25 módulos';
+}
+
+function checkCompletion() {
+  let p = JSON.parse(localStorage.getItem('ia_inv_progress') || '[]');
+  if (p.includes(STORAGE_KEY)) {
+    document.getElementById('insignia').classList.add('show');
+  }
+}
+
+function showFeedback(msg, type) {
+  const fb = document.getElementById('feedback');
+  fb.textContent = msg;
+  fb.className = 'feedback ' + type;
+  fb.style.display = 'block';
+  setTimeout(() => { fb.style.display = 'none'; }, 4000);
+}
+
+function updateDiagram() {
+  const d1 = document.getElementById('dia1');
+  const d2 = document.getElementById('dia2');
+  const d3 = document.getElementById('dia3');
+  const d4 = document.getElementById('dia4');
+  const d5 = document.getElementById('dia5');
+
+  d1.textContent = prismaState.p1 || '—';
+  d2.textContent = prismaState.p2 !== null ? prismaState.p2 : '—';
+  d3.textContent = prismaState.p3 !== null ? prismaState.p3 : '—';
+  d4.textContent = prismaState.p4 !== null ? prismaState.p4 : '—';
+  d5.textContent = prismaState.p5 !== null ? prismaState.p5 : '—';
+
+  document.querySelectorAll('.prisma-step').forEach(s => {
+    const idx = parseInt(s.dataset.step);
+    if (idx <= prismaState.step) s.classList.add('completed');
+    else s.classList.remove('completed');
+  });
+}
+
+function applyPrisma1() {
+  const v = parseInt(document.getElementById('prisma1').value) || 500;
+  prismaState.p1 = v;
+  prismaState.step = 1;
+  updateDiagram();
+  showFeedback('✅ Fase 1: ' + v + ' registros identificados', 'success');
+}
+
+function applyPrisma2() {
+  if (prismaState.p1 === null) { showFeedback('Completa la Fase 1 primero', 'error'); return; }
+  const dedup = Math.round(prismaState.p1 * 0.85);
+  prismaState.p2 = dedup;
+  prismaState.step = 2;
+  document.getElementById('prisma2Display').textContent = dedup + ' registros (se eliminaron ' + (prismaState.p1 - dedup) + ' duplicados)';
+  document.getElementById('prisma2Btn').disabled = true;
+  updateDiagram();
+  showFeedback('✅ Fase 2: ' + dedup + ' registros tras eliminar duplicados', 'success');
+}
+
+function applyPrisma3() {
+  if (prismaState.p2 === null) { showFeedback('Completa la Fase 2 primero', 'error'); return; }
+  const yearVal = parseInt(document.getElementById('filterYear').value);
+  const citeVal = parseInt(document.getElementById('filterCites').value);
+  let remaining = prismaState.p2;
+  if (yearVal === 1) remaining = Math.round(remaining * 0.7);
+  else if (yearVal === 2) remaining = Math.round(remaining * 0.4);
+  if (citeVal === 1) remaining = Math.round(remaining * 0.6);
+  else if (citeVal === 2) remaining = Math.round(remaining * 0.3);
+  prismaState.p3 = Math.max(remaining, 5);
+  prismaState.step = 3;
+  document.getElementById('prisma3Display').textContent = prismaState.p3 + ' registros tras filtros de IA';
+  updateDiagram();
+
+  // Generate abstracts
+  const list = document.getElementById('abstractList');
+  list.innerHTML = '';
+  const count = Math.min(5, prismaState.p3);
+  for (let i = 0; i < Math.min(count, abstracts.length); i++) {
+    const a = abstracts[i];
+    list.innerHTML += '<div class="abstract-card" data-idx="' + i + '"><div class="ab-title">' + a.title + '</div><div class="ab-text">' + a.text + '</div><div class="ab-actions"><button class="btn-include" onclick="includeAbstract(' + i + ', this)">Incluir</button><button class="btn-exclude" onclick="excludeAbstract(' + i + ', this)">Excluir</button></div></div>';
+  }
+  showFeedback('✅ Fase 3: ' + prismaState.p3 + ' registros después del cribado', 'success');
+}
+
+function includeAbstract(idx, btn) {
+  const card = btn.closest('.abstract-card');
+  if (card.dataset.status === 'included') return;
+  card.dataset.status = 'included';
+  card.style.borderLeftColor = '#00ffc8';
+  btn.classList.add('selected');
+  card.querySelector('.btn-exclude').classList.remove('selected');
+  includedCount++;
+  checkPrisma4();
+}
+
+function excludeAbstract(idx, btn) {
+  const card = btn.closest('.abstract-card');
+  if (card.dataset.status === 'excluded') return;
+  card.dataset.status = 'excluded';
+  card.style.borderLeftColor = '#ff6464';
+  btn.classList.add('selected');
+  card.querySelector('.btn-include').classList.remove('selected');
+  includedCount = Math.max(0, includedCount - (card.dataset.wasIncluded ? 1 : 0));
+  card.dataset.wasIncluded = 'false';
+  checkPrisma4();
+}
+
+function checkPrisma4() {
+  const cards = document.querySelectorAll('#abstractList .abstract-card');
+  const decided = document.querySelectorAll('#abstractList .abstract-card[data-status]');
+  if (decided.length >= cards.length && cards.length > 0) {
+    prismaState.p4 = includedCount;
+    prismaState.p5 = Math.max(1, Math.round(includedCount * 0.8));
+    prismaState.step = 5;
+    document.getElementById('prisma4Display').textContent = prismaState.p4 + ' incluidos para evaluación';
+    document.getElementById('prisma5Display').textContent = '🎉 ' + prismaState.p5 + ' estudios incluidos en la síntesis final';
+    updateDiagram();
+    showFeedback('✅ Revisión completa: ' + prismaState.p5 + ' estudios incluidos en la síntesis', 'success');
+  }
+}
+
+function completeModule() {
+  if (prismaState.step < 5) {
+    showFeedback('Completa todas las fases PRISMA primero', 'error');
+    return;
+  }
+  document.getElementById('insignia').classList.add('show');
+  showFeedback('🏅 ¡Revisión sistemática completa!', 'success');
+  updateProgress();
+}
+
+checkCompletion();
+</script>
+</body>
+</html>

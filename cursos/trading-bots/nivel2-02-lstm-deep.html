@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Bot Trader N2 | LSTM & Deep Learning</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{background:linear-gradient(145deg,#100020 0%,#1e003a 100%);font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem;}
+    .container{max-width:1200px;width:100%;background:rgba(12,0,28,.85);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(200,100,255,.25);box-shadow:0 25px 45px rgba(0,0,0,.6);overflow:hidden;}
+    .hero{background:linear-gradient(95deg,#100020,#1e003a);padding:1.8rem 2rem;text-align:center;border-bottom:2px solid #c864ff;}
+    .hero h1{font-size:1.8rem;font-weight:800;background:linear-gradient(135deg,#f0d0ff,#dd99ff,#c864ff);-webkit-background-clip:text;background-clip:text;color:transparent;}
+    .hero p{margin-top:.5rem;font-size:.95rem;color:#aa70dd;}
+    .badge{display:inline-block;background:#220044;border:1px solid #c864ff44;color:#c864ff;font-size:.7rem;padding:.2rem .8rem;border-radius:1rem;margin-top:.4rem;}
+    .analogy-card{background:#1a002acc;margin:1.5rem 2rem;padding:1.2rem 1.8rem;border-radius:2rem;border-left:8px solid #c864ff;font-size:.93rem;line-height:1.6;}
+    .analogy-card strong{color:#dd99ff;}
+    .lab{padding:0 2rem 1.5rem;display:flex;flex-direction:column;gap:1.5rem;}
+    .section-title{font-size:1rem;font-weight:700;color:#dd99ff;margin-bottom:.8rem;}
+    .lstm-viz{background:#12002add;border-radius:2rem;padding:1.4rem;border:1px solid #c864ff22;}
+    .cells-row{display:flex;gap:.8rem;overflow-x:auto;padding:.5rem 0;}
+    .lstm-cell{flex:0 0 90px;background:#220044;border-radius:1rem;padding:.8rem .5rem;text-align:center;border:1px solid #440066;cursor:pointer;transition:.3s;user-select:none;}
+    .lstm-cell:hover,.lstm-cell.active{background:#330055;border-color:#c864ff;box-shadow:0 0 12px rgba(200,100,255,.3);}
+    .lstm-cell .t-label{font-size:.65rem;color:#aa70dd;}
+    .lstm-cell .t-val{font-size:1rem;font-family:'JetBrains Mono',monospace;color:#dd99ff;margin:.3rem 0;}
+    .lstm-cell .gates{font-size:.6rem;color:#884488;}
+    .cell-detail{background:#1a002add;border-radius:1.5rem;padding:1rem;margin-top:.8rem;min-height:60px;font-size:.82rem;line-height:1.6;border:1px solid #c864ff22;}
+    .network-builder{background:#12002add;border-radius:2rem;padding:1.4rem;border:1px solid #c864ff22;}
+    .layers-area{display:flex;flex-wrap:wrap;gap:1rem;align-items:center;justify-content:center;padding:.5rem 0;}
+    .layer-node{background:#220044;border-radius:1rem;padding:.7rem 1rem;text-align:center;min-width:90px;border:2px solid #440066;position:relative;cursor:pointer;transition:.2s;}
+    .layer-node.selected{border-color:#c864ff;background:#330055;}
+    .layer-node .ln-type{font-size:.7rem;color:#c864ff;font-weight:700;}
+    .layer-node .ln-size{font-size:1.1rem;font-weight:800;font-family:monospace;color:#dd99ff;}
+    .layer-arrow{font-size:1.2rem;color:#440066;}
+    .add-layer{background:#1a0033;border:1px dashed #440066;border-radius:1rem;padding:.7rem 1rem;cursor:pointer;color:#440066;font-size:.8rem;min-width:80px;text-align:center;transition:.2s;}
+    .add-layer:hover{border-color:#c864ff;color:#c864ff;}
+    .layer-controls{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.8rem;}
+    .lc-btn{background:#220044;border:1px solid #440066;color:#aa70dd;padding:.35rem .8rem;border-radius:1rem;cursor:pointer;font-size:.78rem;transition:.2s;}
+    .lc-btn:hover{border-color:#c864ff;color:#c864ff;}
+    .train-box{background:#12002add;border-radius:2rem;padding:1.4rem;border:1px solid #c864ff22;}
+    .config-row{display:flex;flex-wrap:wrap;gap:.8rem;margin-bottom:.8rem;}
+    .cfg{flex:1;min-width:120px;}
+    .cfg label{font-size:.75rem;color:#aa70dd;display:block;margin-bottom:.2rem;}
+    select,.cfg input[type=range]{width:100%;background:#220044;border:1px solid #440066;color:#eef5ff;padding:.4rem .6rem;border-radius:.8rem;font-size:.82rem;font-family:'Inter',sans-serif;}
+    .cfg .range-row{display:flex;align-items:center;gap:.3rem;}
+    .cfg .range-row input{flex:1;accent-color:#c864ff;}
+    .cfg .range-row span{font-size:.78rem;color:#c864ff;min-width:35px;text-align:right;font-family:monospace;}
+    .btn-train{background:linear-gradient(95deg,#c864ff,#8822cc);border:none;padding:.8rem 2rem;font-weight:700;border-radius:2rem;cursor:pointer;color:#fff;font-size:.95rem;transition:.2s;width:100%;margin-top:.5rem;}
+    .btn-train:hover{transform:translateY(-2px);box-shadow:0 0 15px rgba(200,100,255,.4);}
+    .epoch-log{background:#0d0018;border-radius:1rem;padding:.7rem .9rem;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:#c864ff;min-height:80px;max-height:150px;overflow-y:auto;line-height:1.6;border:1px solid #22003a;}
+    .metrics-row{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:.8rem;}
+    .ml-metric{background:#1a0033;border-radius:1.2rem;padding:.6rem 1rem;text-align:center;border:1px solid #44006622;flex:1;min-width:100px;}
+    .ml-metric .mv{font-size:1.3rem;font-weight:800;font-family:monospace;}
+    .ml-metric .ml{font-size:.68rem;color:#aa70dd;margin-top:.1rem;}
+    canvas#lossChart{width:100%;border-radius:1rem;display:block;margin-top:.6rem;}
+    .feedback{background:#00000088;margin:0 2rem 1rem;padding:.9rem;border-radius:1.5rem;text-align:center;border-left:4px solid #c864ff;font-size:.9rem;line-height:1.5;}
+    .insignia{text-align:center;background:#100020;border-radius:2rem;margin:0 2rem 1.5rem;padding:1rem;border:1px dashed gold;}
+    .insignia i{font-size:2.5rem;color:gold;}
+    .hidden{display:none;}
+    .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.5rem 2rem;}
+    .nav-link{background:#2c3e66;padding:.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:.5rem;transition:.2s;}
+    .nav-link:hover{transform:translateY(-2px);}
+    .nav-link.next{background:linear-gradient(95deg,#f0a500,#ff6a00);color:#1e1a0c;}
+    .nav-link.menu{background:#1a2a4a;border:1px solid #c864ff;}
+    footer{text-align:center;padding:1rem;font-size:.75rem;border-top:1px solid #1a002a;}
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+<div class="container">
+  <div class="hero">
+    <h1>🧬 LSTM & DEEP LEARNING: Redes Neuronales para Series Temporales</h1>
+    <p>Long Short-Term Memory — el modelo que "recuerda" el pasado para predecir el futuro</p>
+    <span class="badge">⚡ NIVEL 2 — Módulo Avanzado</span>
+  </div>
+  <div class="analogy-card">
+    <strong>🐘 Piénsalo así:</strong> Una LSTM tiene <strong>memoria</strong> como un elefante. Los modelos ML clásicos (Random Forest) ven cada dato de forma independiente — como tomar una foto. La LSTM entiende la <strong>secuencia temporal</strong> — como ver una película. Si el precio ha bajado 3 días seguidos, la LSTM recuerda eso. Si subió fuerte la semana pasada, la LSTM lo pondera. Esa "memoria selectiva" la hace ideal para series temporales financieras.
+    <br><br>
+    <strong>📚 Fuentes:</strong> Hochreiter, S. & Schmidhuber, J. (1997) — <em>"Long Short-Term Memory"</em>. Neural Computation. / Chollet, F. (2021) — <em>"Deep Learning with Python"</em> 2nd Ed. Manning.
+  </div>
+  <div class="lab">
+    <!-- LSTM Cell Visualizer -->
+    <div class="lstm-viz">
+      <div class="section-title"><i class="fas fa-brain"></i> Visualizador LSTM — Haz clic en cada celda temporal</div>
+      <div class="cells-row" id="cellsRow"></div>
+      <div class="cell-detail" id="cellDetail">👆 Haz clic en una celda temporal para ver qué datos procesa la LSTM en ese paso de tiempo.</div>
+    </div>
+
+    <!-- Network Builder -->
+    <div class="network-builder">
+      <div class="section-title"><i class="fas fa-project-diagram"></i> Diseñador de Arquitectura LSTM</div>
+      <div class="layers-area" id="layersArea"></div>
+      <div class="layer-controls">
+        <button class="lc-btn" onclick="addLayer('lstm')">+ LSTM</button>
+        <button class="lc-btn" onclick="addLayer('dropout')">+ Dropout</button>
+        <button class="lc-btn" onclick="addLayer('dense')">+ Dense</button>
+        <button class="lc-btn" onclick="removeLayer()">− Eliminar</button>
+        <button class="lc-btn" onclick="resetLayers()">↺ Reset</button>
+      </div>
+      <div id="archSummary" style="margin-top:.6rem;font-size:.78rem;color:#aa70dd;font-family:monospace;line-height:1.6;"></div>
+    </div>
+
+    <!-- Train Simulator -->
+    <div class="train-box">
+      <div class="section-title"><i class="fas fa-cogs"></i> Simulador de Entrenamiento LSTM</div>
+      <div class="config-row">
+        <div class="cfg"><label>Lookback (días)</label><div class="range-row"><input type="range" id="lookback" min="10" max="60" value="30"><span id="lookbackV">30</span></div></div>
+        <div class="cfg"><label>Épocas</label><div class="range-row"><input type="range" id="epochs" min="5" max="50" value="20"><span id="epochsV">20</span></div></div>
+        <div class="cfg"><label>Batch Size</label><select id="batchSize"><option>16</option><option selected>32</option><option>64</option><option>128</option></select></div>
+        <div class="cfg"><label>Dropout %</label><div class="range-row"><input type="range" id="dropout" min="0" max="50" value="20" step="5"><span id="dropoutV">20%</span></div></div>
+        <div class="cfg"><label>Activo</label><select id="asset"><option>BTC/USDT</option><option>ETH/USDT</option><option>AAPL</option><option>SPY</option></select></div>
+      </div>
+      <button class="btn-train" id="btnTrain" onclick="simulateTrain()"><i class="fas fa-play"></i> Entrenar LSTM</button>
+      <div class="epoch-log" id="epochLog">Configura el modelo y haz clic en "Entrenar LSTM"...</div>
+      <div class="metrics-row" id="metricsRow">
+        <div class="ml-metric"><div class="mv" style="color:#c864ff" id="mLoss">—</div><div class="ml">Train Loss</div></div>
+        <div class="ml-metric"><div class="mv" style="color:#00ff88" id="mValLoss">—</div><div class="ml">Val Loss</div></div>
+        <div class="ml-metric"><div class="mv" style="color:#ffd700" id="mRMSE">—</div><div class="ml">RMSE</div></div>
+        <div class="ml-metric"><div class="mv" style="color:#00dcff" id="mMAE">—</div><div class="ml">MAE</div></div>
+        <div class="ml-metric"><div class="mv" style="color:#ff9900" id="mDir">—</div><div class="ml">Dir. Accuracy</div></div>
+      </div>
+      <canvas id="lossChart" height="140"></canvas>
+    </div>
+  </div>
+
+  <div id="feedbackMsg" class="feedback">🧬 Explora el visualizador LSTM, diseña una arquitectura de red y simula el entrenamiento. ¡Entrena el modelo para desbloquear la insignia!</div>
+  <div id="insigniaArea" class="insignia hidden">
+    <i class="fas fa-brain"></i>
+    <h3>🏅 ¡INSIGNIA DE DEEP LEARNING TRADER! 🏅</h3>
+    <p>Entrenaste redes LSTM para predecir precios. ¡La IA ahora es tu aliada en el mercado!</p>
+  </div>
+
+  <div class="nav-links">
+    <a href="nivel2-01-apis-exchanges.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+    <a href="nivel2-03-sentiment-nlp.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Bot Trader Adventure · Nivel 2 Módulo 2 · Hochreiter & Schmidhuber (1997) · Chollet (2021) "Deep Learning with Python"</footer>
+</div>
+<script>
+const STORAGE_KEY='tbot_n2lstm';
+let completed=false;
+
+const PRICE_DATA=[44000,44200,43800,44500,45000,44800,46000,45500,46200,47000,46500,47800,48000,47200,47500,48500,49000,48200,49500,50000,49200,50500,51000,50200,51500,52000,51000,52500,53000,52200];
+const CELL_DETAILS=[
+  "Día 1: precio=$44,000 | La LSTM inicializa su estado de memoria (cell state c=0, hidden state h=0). El forget gate decide qué olvidar del pasado — aquí no hay pasado, así que c permanece neutro.",
+  "Día 5: precio=$45,000 | El input gate ve que el precio subió $1,000 en 5 días (+2.3%). El cell state empieza a codificar esta tendencia alcista. El forget gate no borra nada porque el patrón es consistente.",
+  "Día 10: precio=$47,000 | La LSTM ha aprendido el momentum alcista. El cell state acumula la señal positiva. El output gate emite h₁₀ = f(momentum_alcista, volatilidad_media).",
+  "Día 15: precio=$47,500 | El mercado se consolidó (~0% en 5 días). El forget gate empieza a 'olvidar' parte del momentum agresivo. La LSTM detecta posible pérdida de fuerza tendencial.",
+  "Día 20: precio=$50,000 | Nueva ruptura al alza. El input gate amplifica la señal positiva. El cell state combina el momentum pasado + el nuevo impulso. h₂₀ codifica una tendencia fuerte.",
+  "Día 25: precio=$51,500 | La LSTM predice: continuación de tendencia con alta probabilidad. El estado oculto h₂₅ es la 'memoria comprimida' de los últimos 25 días de precio.",
+  "Día 30: precio=$52,200 | Predicción final: la LSTM usa h₃₀ para proyectar el precio del día 31. Combina: tendencia (alcista fuerte), volatilidad (moderada), momentum (positivo). Salida: $53,100 ±$800.",
+];
+
+function renderCells(){
+  document.getElementById('cellsRow').innerHTML=PRICE_DATA.slice(0,7).map((p,i)=>`
+    <div class="lstm-cell" onclick="showCell(${i})">
+      <div class="t-label">t=${i*5+1}</div>
+      <div class="t-val">$${(p/1000).toFixed(0)}k</div>
+      <div class="gates">f·i·o·g</div>
+    </div>`).join('');
+}
+
+function showCell(i){
+  document.querySelectorAll('.lstm-cell').forEach((c,j)=>c.classList.toggle('active',j===i));
+  document.getElementById('cellDetail').textContent=CELL_DETAILS[i];
+}
+
+let layers=[
+  {type:'lstm',units:64,label:'LSTM'},
+  {type:'dropout',rate:0.2,label:'Dropout'},
+  {type:'lstm',units:32,label:'LSTM'},
+  {type:'dense',units:1,label:'Dense'}
+];
+
+function renderLayers(){
+  const area=document.getElementById('layersArea');
+  const items=layers.map((l,i)=>`
+    <div class="layer-node ${i===selLayer?'selected':''}" onclick="selectLayer(${i})">
+      <div class="ln-type">${l.type.toUpperCase()}</div>
+      <div class="ln-size">${l.units||Math.round((l.rate||0)*100)+'%'}</div>
+    </div>${i<layers.length-1?'<div class="layer-arrow">→</div>':''}`).join('');
+  area.innerHTML=items;
+
+  const totalParams=layers.reduce((a,l)=>{
+    if(l.type==='lstm')return a+4*l.units*(l.units+1)+4*l.units;
+    if(l.type==='dense')return a+l.units*64+l.units;
+    return a;
+  },0);
+  document.getElementById('archSummary').innerHTML=`Arquitectura: ${layers.map(l=>l.type==='dropout'?`Dropout(${(l.rate*100).toFixed(0)}%)`:`${l.type.toUpperCase()}(${l.units})`).join(' → ')}\nParámetros estimados: ${totalParams.toLocaleString()}`;
+}
+
+let selLayer=0;
+function selectLayer(i){selLayer=i;renderLayers();}
+function addLayer(type){
+  const units={lstm:64,dense:16}[type]||null;
+  const rate=type==='dropout'?0.2:null;
+  layers.push(type==='dropout'?{type,rate,label:'Dropout'}:{type,units,label:type});
+  renderLayers();
+}
+function removeLayer(){if(layers.length>2)layers.splice(selLayer,1);selLayer=Math.min(selLayer,layers.length-1);renderLayers();}
+function resetLayers(){
+  layers=[{type:'lstm',units:64},{type:'dropout',rate:0.2},{type:'lstm',units:32},{type:'dense',units:1}];
+  selLayer=0;renderLayers();
+}
+
+function simulateTrain(){
+  const ep=+document.getElementById('epochs').value;
+  const drop=+document.getElementById('dropout').value/100;
+  const lb=+document.getElementById('lookback').value;
+  const asset=document.getElementById('asset').value;
+
+  document.getElementById('btnTrain').disabled=true;
+  const log=document.getElementById('epochLog');
+  log.textContent='';
+
+  const trainLosses=[], valLosses=[];
+  let trainLoss=0.045+Math.random()*0.02;
+  let valLoss=0.055+Math.random()*0.03;
+  let ep_done=0;
+
+  function runEpoch(){
+    trainLoss*=(0.80+Math.random()*0.12);
+    valLoss*=(0.82+Math.random()*0.14+(drop>0.2?-0.02:0));
+    trainLosses.push(trainLoss);valLosses.push(valLoss);
+    const msg=`Epoch ${ep_done+1}/${ep} — loss: ${trainLoss.toFixed(5)} — val_loss: ${valLoss.toFixed(5)} — lr: ${(0.001*Math.pow(0.9,ep_done)).toFixed(6)}`;
+    log.textContent+=msg+'\n';log.scrollTop=log.scrollHeight;
+    ep_done++;
+    if(ep_done<ep)setTimeout(runEpoch,50+Math.random()*80);
+    else{
+      const rmse=Math.sqrt(valLoss)*1000;
+      const mae=rmse*0.75;
+      const dir=(55+Math.random()*15+(lb>30?3:0)).toFixed(1);
+      document.getElementById('mLoss').textContent=trainLoss.toFixed(4);
+      document.getElementById('mValLoss').textContent=valLoss.toFixed(4);
+      document.getElementById('mRMSE').textContent='$'+rmse.toFixed(0);
+      document.getElementById('mMAE').textContent='$'+mae.toFixed(0);
+      document.getElementById('mDir').textContent=dir+'%';
+      drawLossChart(trainLosses,valLosses);
+      document.getElementById('btnTrain').disabled=false;
+      document.getElementById('feedbackMsg').innerHTML=`🧬 LSTM entrenada en <strong>${asset}</strong>, lookback=${lb} días, ${ep} épocas. Val Loss: ${valLoss.toFixed(5)}, Dir Accuracy: ${dir}%. ${+dir>65?'✅ Excelente precisión direccional!':+dir>58?'📊 Precisión moderada. Prueba más épocas o lookback.':'⚠️ Bajo desempeño. Ajusta la arquitectura.'}`;
+      if(!completed){completed=true;localStorage.setItem(STORAGE_KEY,'true');document.getElementById('insigniaArea').classList.remove('hidden');}
+    }
+  }
+  runEpoch();
+}
+
+function drawLossChart(train,val){
+  const canvas=document.getElementById('lossChart');
+  const W=canvas.parentElement.clientWidth-30;
+  canvas.width=W;canvas.height=140;
+  const ctx=canvas.getContext('2d');
+  ctx.fillStyle='#0d0018';ctx.fillRect(0,0,W,140);
+  const all=[...train,...val];
+  const mn=0,mx=Math.max(...all)*1.1;
+  const yS=v=>130-((v-mn)/(mx-mn))*120;
+  const xS=(i,n)=>(i/(n-1))*(W-20)+10;
+  function line(data,color){
+    ctx.beginPath();ctx.strokeStyle=color;ctx.lineWidth=2;
+    data.forEach((v,i)=>{i===0?ctx.moveTo(xS(i,data.length),yS(v)):ctx.lineTo(xS(i,data.length),yS(v));});
+    ctx.stroke();
+  }
+  line(train,'#c864ff');line(val,'#00ff88');
+  ctx.font='10px Inter';ctx.fillStyle='#c864ff';ctx.fillText('● Train',10,14);
+  ctx.fillStyle='#00ff88';ctx.fillText('● Val',60,14);
+}
+
+['lookback','epochs','dropout'].forEach(id=>{
+  const el=document.getElementById(id);
+  const vel=document.getElementById(id+'V');
+  el.addEventListener('input',()=>vel.textContent=id==='dropout'?el.value+'%':el.value);
+});
+
+renderCells();renderLayers();
+if(localStorage.getItem(STORAGE_KEY)==='true'){completed=true;document.getElementById('insigniaArea').classList.remove('hidden');}
+</script>
+  <script src="../../assets/js/cookie-consent.js"></script>
+</body>
+</html>
+
+
+

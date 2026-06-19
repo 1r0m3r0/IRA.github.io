@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>ML para Trading | Preprocesamiento</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #111a2e 100%);
+      background-size: 200% 200%; animation: gradientShift 20s ease infinite;
+      font-family: 'Inter', sans-serif; color: #eef5ff; min-height: 100vh;
+      display: flex; align-items: center; justify-content: center; padding: 2rem 1rem;
+    }
+    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+    .curso4-container {
+      max-width: 1300px; width: 100%;
+      background: rgba(15, 25, 45, 0.65); backdrop-filter: blur(12px);
+      border-radius: 3rem; border: 1px solid rgba(255,179,71,0.25);
+      box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden;
+    }
+    .hero-header { background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%); padding: 2rem 2rem 1.5rem; text-align: center; border-bottom: 2px solid #ffb347; }
+    .hero-header h1 { font-size: 2.6rem; font-weight: 800; background: linear-gradient(135deg, #FFF, #ffcc80, #ffb347); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .hero-header p { font-size: 1.1rem; color: #b9e2ff; margin-top: 0.3rem; }
+    .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
+    .chip { background: rgba(255,179,71,0.15); border: 1px solid #ffb347; padding: 0.3rem 1rem; border-radius: 40px; font-size: 0.8rem; font-weight: 600; }
+    .analogy-card { background: #1e2a3acc; margin: 1.5rem 2rem; padding: 1.2rem 1.8rem; border-radius: 2rem; border-left: 8px solid #ffb347; font-size: 1rem; line-height: 1.6; }
+    .main-area { padding: 0.5rem 2rem; }
+    .stage-card { background: #0f192e; border-radius: 1.5rem; padding: 1rem; margin-bottom: 1rem; border: 1px solid #2c3e66; }
+    .stage-card h3 { color: #ffb347; margin-bottom: 0.5rem; }
+    .stage-card.done { border-color: #00ffc8; background: #0f2a1e; }
+    .stage-card.done h3 { color: #00ffc8; }
+    .data-vis { font-family: monospace; background: #0a0f1e; padding: 0.8rem; border-radius: 0.8rem; overflow-x: auto; margin: 0.5rem 0; white-space: pre; font-size: 0.8rem; }
+    .btn-stage { background: #ffb347; border: none; color: #0a0f1e; font-weight: 700; padding: 0.5rem 1.2rem; border-radius: 2rem; cursor: pointer; }
+    .btn-stage:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-stage.done { background: #00ffc8; }
+    .feedback { background: #00000099; margin: 1.5rem 2rem; padding: 1rem; border-radius: 1.5rem; text-align: center; font-weight: 500; border-left: 4px solid #ffb347; }
+    .insignia { text-align: center; background: #0c1b2f; border-radius: 2rem; margin: 0 2rem 1.5rem; padding: 1rem; border: 1px dashed gold; }
+    .insignia i { font-size: 2.5rem; color: gold; }
+    .hidden { display: none; }
+    .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
+    .nav-link { background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem; font-weight: 600; text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; }
+    .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(255,179,71,0.4); }
+    .nav-link.next { background: linear-gradient(95deg, #f0a500, #ff6a00); color: #1e1a0c; }
+    .nav-link.menu { background: #1a2a4a; border: 1px solid #3399ff; }
+    footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
+    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
+  </style>
+  <link rel="stylesheet" href="../../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../../../index.html">&larr; Portfolio</a><a href="../../../../cursos/index.html">Cursos</a></nav>
+
+  <div class="curso4-container">
+    <div class="hero-header">
+      <h1>🧹 Preprocesamiento</h1>
+      <p>Estacionariedad, normalización, outliers, manejo de nulos</p>
+      <div class="badge-area">
+        <span class="chip"><i class="fas fa-broom"></i> Limpieza</span>
+        <span class="chip"><i class="fas fa-chart-bar"></i> 4 etapas</span>
+      </div>
+    </div>
+    <div class="analogy-card"><strong>🧹 Piénsalo así:</strong> Los datos financieros sin procesar son como una cocina después de una tormenta: ingredientes por todas partes, algunos podridos (NaN), otros demasiado picantes (outliers). El preprocesamiento es la limpieza que convierte el caos en una receta viable.</div>
+    <div class="main-area" id="stageContainer"></div>
+    <div id="feedbackMsg" class="feedback">💡 Completa las 4 etapas de preprocesamiento en orden.</div>
+    <div id="insigniaArea" class="insignia hidden">
+      <i class="fas fa-medal"></i>
+      <h3>🏅 LIMPIADOR DE DATOS 🏅</h3>
+      <p>Has dominado el preprocesamiento de datos financieros. ¡Tus modelos trabajarán con datos de calidad!</p>
+    </div>
+    <div class="nav-links">
+      <a href="02-feature-engineering.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+      <a href="04-regresion-lineal-logistica.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <footer><i class="fas fa-crown"></i> ML para Trading · Trading Algorítmico con Python</footer>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'py_trade_4_03';
+    const rawData = [100, 102, NaN, 105, 107, 999, 110, NaN, 111, 115];
+    let cleaned = [...rawData];
+    let stageDone = [false, false, false, false];
+    const stages = [
+      { name: 'Imputación de NaN', desc: 'Reemplazar NaN con la media (sin contar NaN)', action: 'Aplicar media' },
+      { name: 'Winsorización de outliers', desc: 'Limitar valores extremos (percentiles 1-99). 999 es outlier', action: 'Winsorizar' },
+      { name: 'Diferenciación', desc: 'Calcular diferencias para hacer la serie estacionaria', action: 'Diferenciar' },
+      { name: 'Normalización Z-score', desc: 'Estandarizar a media 0 y desviación 1', action: 'Normalizar' }
+    ];
+
+    function showData(arr, label) {
+      return label + ': [' + arr.map(v => v === null || v === undefined || (typeof v === 'number' && isNaN(v)) ? 'NaN' : (typeof v === 'number' ? v.toFixed(2) : v)).join(', ') + ']';
+    }
+
+    function renderStages() {
+      const container = document.getElementById('stageContainer');
+      container.innerHTML = '';
+      stages.forEach((s, idx) => {
+        const div = document.createElement('div');
+        div.className = 'stage-card' + (stageDone[idx] ? ' done' : '');
+        const dataVis = document.createElement('div');
+        dataVis.className = 'data-vis';
+        if (idx === 0) dataVis.textContent = showData(rawData, 'Original') + '\n' + showData(cleaned, 'Limpio');
+        else if (idx === 1) dataVis.textContent = showData(cleaned, 'Sin NaN');
+        else if (idx === 2) dataVis.textContent = showData(cleaned, 'Winsorizado');
+        else dataVis.textContent = showData(cleaned, 'Diferenciado');
+        div.innerHTML = '<h3>' + (idx+1) + '. ' + s.name + '</h3><p>' + s.desc + '</p>';
+        div.appendChild(dataVis);
+        const btn = document.createElement('button');
+        btn.className = 'btn-stage' + (stageDone[idx] ? ' done' : '');
+        btn.textContent = stageDone[idx] ? '✓ Completado' : s.action;
+        btn.disabled = stageDone[idx] || (idx > 0 && !stageDone[idx-1]);
+        btn.addEventListener('click', () => applyStage(idx));
+        div.appendChild(btn);
+        container.appendChild(div);
+      });
+    }
+
+    function applyStage(idx) {
+      if (idx === 0) {
+        const valid = cleaned.filter(v => !isNaN(v));
+        const mean = valid.reduce((a,b)=>a+b,0)/valid.length;
+        cleaned = cleaned.map(v => isNaN(v) ? mean : v);
+      } else if (idx === 1) {
+        const sorted = [...cleaned].sort((a,b)=>a-b);
+        const p1 = sorted[Math.floor(sorted.length*0.01)];
+        const p99 = sorted[Math.floor(sorted.length*0.99)-1];
+        cleaned = cleaned.map(v => Math.min(Math.max(v, p1), p99));
+      } else if (idx === 2) {
+        const diff = [0];
+        for (let i=1; i<cleaned.length; i++) diff.push(cleaned[i] - cleaned[i-1]);
+        cleaned = diff;
+      } else if (idx === 3) {
+        const mean = cleaned.reduce((a,b)=>a+b,0)/cleaned.length;
+        const std = Math.sqrt(cleaned.reduce((a,b)=>a+(b-mean)**2,0)/cleaned.length);
+        cleaned = cleaned.map(v => (v-mean)/std);
+      }
+      stageDone[idx] = true;
+      renderStages();
+      document.getElementById('feedbackMsg').textContent = '✅ Etapa ' + (idx+1) + ' completada.';
+      if (stageDone.every(v=>v)) {
+        localStorage.setItem(STORAGE_KEY, 'true');
+        document.getElementById('insigniaArea').classList.remove('hidden');
+        document.getElementById('feedbackMsg').innerHTML = '🎉 <strong>¡Preprocesamiento completo!</strong>';
+      }
+    }
+
+    renderStages();
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Puentes e Interoperabilidad | Curso 3</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:linear-gradient(135deg,#0a0f1e,#0c1222 100%); font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+    .course-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(0,82,255,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+    .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #0052ff; }
+    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#5588ff,#0052ff); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .hero-header p { font-size:1.1rem; color:#b9d4ff; margin-top:0.3rem; }
+    .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+    .chip { background:rgba(0,82,255,0.15); border:1px solid #0052ff; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #0052ff; font-size:1rem; line-height:1.6; }
+    .main-area { padding:0 2rem 2rem; }
+    .sim-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; border:1px solid #0052ff; margin:1.5rem 0; }
+    .bridge-options { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem; margin:1rem 0; }
+    .bridge-card { background:#0f1a2c; border-radius:1.2rem; padding:1rem; border:1px solid #2c3e66; cursor:pointer; transition:0.2s; text-align:center; }
+    .bridge-card:hover { border-color:#0052ff; transform:translateY(-2px); }
+    .bridge-card.selected { border-color:#0052ff; box-shadow:0 0 12px rgba(0,82,255,0.3); }
+    .bridge-card h4 { font-size:0.9rem; color:#5588ff; }
+    .bridge-card .speed { font-size:0.75rem; color:#8899bb; }
+    .bridge-card .risk { font-size:0.7rem; padding:0.2rem 0.5rem; border-radius:1rem; display:inline-block; margin-top:0.3rem; }
+    .risk-low { background:rgba(0,255,200,0.15); color:#00ffc8; }
+    .risk-med { background:rgba(255,179,71,0.15); color:#ffb347; }
+    .risk-high { background:rgba(255,80,80,0.15); color:#ff5050; }
+    .sim-result { background:#0f1a2c; border-radius:1rem; padding:1rem; margin:0.8rem 0; display:flex; gap:1rem; align-items:center; flex-wrap:wrap; }
+    .btn-action { background:linear-gradient(95deg,#0052ff,#5588ff); border:none; padding:0.7rem 1.5rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:0.95rem; transition:0.2s; color:#fff; }
+    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(0,82,255,0.4); }
+    .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin:1.5rem 0; }
+    .info-card { background:#0f1a2c; border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
+    .info-card h4 { color:#5588ff; margin-bottom:0.3rem; }
+    .info-card p, .info-card li { font-size:0.82rem; line-height:1.5; color:#b9ccee; }
+    .info-card ul { padding-left:1.2rem; }
+    .feedback { background:#00000099; margin:1rem 0; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #0052ff; }
+    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:1rem 0; padding:1rem; border:1px dashed gold; }
+    .insignia i { font-size:2.5rem; color:gold; }
+    .hidden { display:none; }
+    .quiz-embedded { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; border:1px solid #0052ff; margin:1.5rem 0; }
+    .question { background:#0f1a2c; margin:0.8rem 0; padding:0.8rem 1rem; border-radius:1.2rem; }
+    .question p { font-weight:600; margin-bottom:0.4rem; font-size:0.9rem; }
+    .options { display:flex; flex-wrap:wrap; gap:0.8rem; }
+    .opt { background:#1e2a3e; padding:0.3rem 0.9rem; border-radius:2rem; cursor:pointer; transition:0.2s; font-size:0.85rem; }
+    .opt:hover { background:#2c3e66; transform:translateY(-2px); }
+    .opt.selected { background:#0052ff; color:#fff; font-weight:bold; }
+    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; font-size:0.95rem; }
+    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(0,82,255,0.4); }
+    .nav-link.next { background:linear-gradient(95deg,#0052ff,#5588ff); color:#fff; }
+    .nav-link.menu { background:#1a2a4a; border:1px solid #0052ff; }
+    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+    @media (max-width:800px) { .hero-header h1 { font-size:1.8rem; } .bridge-options { grid-template-columns:1fr; } .info-grid { grid-template-columns:1fr; } }
+  </style>
+  <link rel="stylesheet" href="../../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a><a href="../index.html">Programa Blockchain</a></nav>
+<div class="course-container">
+  <div class="hero-header">
+    <h1> PUENTES E INTEROPERABILIDAD</h1>
+    <p>Conectando el ecosistema multi-chain</p>
+    <div class="badge-area">
+      <span class="chip"><i class="fas fa-link"></i> Puentes</span>
+      <span class="chip"><i class="fas fa-passport"></i> Chain Abstraction</span>
+      <span class="chip"><i class="fas fa-shield-alt"></i> CCIP &middot; LayerZero</span>
+    </div>
+  </div>
+  <div class="analogy-card">
+    <strong> Piénsalo así:</strong> Los puentes entre cadenas son como fronteras entre pa&iacute;ses — necesitas un visado (token wrapper) y corres riesgo de aduanas corruptas (hacks). Un puente can&oacute;nico es como un paso fronterizo oficial (seguro pero lento). Un puente de terceros es como un taxi ilegal que cruza la frontera r&aacute;pido pero te puede robar.
+  </div>
+  <div class="main-area">
+    <div class="sim-area">
+      <h3><i class="fas fa-ship"></i> Simulador: Puente de USDC</h3>
+      <p style="font-size:0.85rem;margin-bottom:0.8rem;">Puentea 1,000 USDC de Ethereum a Arbitrum. &iquest;Qu&eacute; tipo de puente usas?</p>
+      <div class="bridge-options">
+        <div class="bridge-card" data-bridge="canonical">
+          <h4>Puente Can&oacute;nico</h4>
+          <div class="speed"><i class="fas fa-clock"></i> 15 min</div>
+          <div class="speed"><i class="fas fa-dollar-sign"></i> $5-15</div>
+          <span class="risk risk-low">Seguro</span>
+        </div>
+        <div class="bridge-card" data-bridge="thirdparty">
+          <h4>Puente Terceros (Stargate)</h4>
+          <div class="speed"><i class="fas fa-clock"></i> 2 min</div>
+          <div class="speed"><i class="fas fa-dollar-sign"></i> $2-8</div>
+          <span class="risk risk-med">Medio</span>
+        </div>
+        <div class="bridge-card" data-bridge="lightning">
+          <h4>Liquidity Network</h4>
+          <div class="speed"><i class="fas fa-clock"></i> 30 seg</div>
+          <div class="speed"><i class="fas fa-dollar-sign"></i> $1-3</div>
+          <span class="risk risk-high">Alto</span>
+        </div>
+      </div>
+      <button class="btn-action" id="bridgeBtn"> Ejecutar Puente</button>
+      <div id="bridgeResult" class="feedback" style="margin-top:0.8rem;">Selecciona un tipo de puente y haz clic en ejecutar.</div>
+    </div>
+    <div class="info-grid">
+      <div class="info-card">
+        <h4>Tipos de Puentes</h4>
+        <p><strong>Can&oacute;nicos:</strong> oficiales de la L2 (Arbitrum Bridge), m&aacute;s seguros pero lentos.<br><strong>De terceros:</strong> LayerZero, CCIP, Stargate — m&aacute;s r&aacute;pidos, agregan liquidez.<br><strong>Liquidity networks:</strong> across, CCTP — m&iacute;nimo riesgo de smart contract pero centralizados.</p>
+      </div>
+      <div class="info-card">
+        <h4>2026: Chain Abstraction</h4>
+        <p>El objetivo es que el usuario no sepa en qu&eacute; chain est&aacute;. CCIP (Chainlink) provee mensajer&iacute;a cross-chain segura. LayerZero es el est&aacute;ndar m&aacute;s usado. CCTP de Circle permite quemar/mintear USDC nativo entre chains sin wrapping.</p>
+      </div>
+    </div>
+    <div class="quiz-embedded">
+      <h3><i class="fas fa-question-circle"></i> Mini-quiz: Puentes</h3>
+      <div id="quizContainer"></div>
+      <button id="submitQuizBtn" class="btn-action"> Validar</button>
+      <div id="feedbackMsg" class="feedback"> Simula un puente con los botones.</div>
+      <div id="insigniaArea" class="insignia hidden">
+        <i class="fas fa-medal"></i>
+        <h3> INSIGNIA INGENIERO DE PUENTES </h3>
+        <p>&iexcl;Entiendes los riesgos y trade-offs de la interoperabilidad!</p>
+      </div>
+    </div>
+  </div>
+  <div class="nav-links">
+    <a href="06-data-availability.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
+    <a href="08-ethereum-2026.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Programa Blockchain &middot; Curso 3: Escalabilidad, L2s y Nueva Arquitectura &middot; M&oacute;dulo 7</footer>
+</div>
+<script>
+  const STORAGE_KEY = 'block_3_07';
+  let selectedBridge = null;
+  let quizCompleted = false;
+  var bridgeData = {
+    canonical: { time: 15, cost: 12, risk: 'bajo', hack: 0.02 },
+    thirdparty: { time: 2, cost: 5, risk: 'medio', hack: 0.15 },
+    lightning: { time: 0.5, cost: 2, risk: 'alto', hack: 0.35 }
+  };
+  document.querySelectorAll('.bridge-card').forEach(function(card) {
+    card.addEventListener('click', function() {
+      document.querySelectorAll('.bridge-card').forEach(function(c) { c.classList.remove('selected'); });
+      this.classList.add('selected');
+      selectedBridge = this.dataset.bridge;
+    });
+  });
+  document.getElementById('bridgeBtn').addEventListener('click', function() {
+    if (!selectedBridge) { document.getElementById('bridgeResult').textContent = ' Selecciona un tipo de puente primero.'; return; }
+    var d = bridgeData[selectedBridge];
+    var hacked = Math.random() < d.hack;
+    var resultDiv = document.getElementById('bridgeResult');
+    if (hacked) {
+      resultDiv.innerHTML = ' &iexcl;Puente hackeado! ' + (d.risk === 'bajo' ? '(raro pero posible)' : '') + ' Perdiste 1,000 USDC. Los puentes ' + selectedBridge + ' tienen riesgo de explotaci&oacute;n.';
+      resultDiv.style.borderLeftColor = '#ff5050';
+    } else {
+      var amt = 1000 - d.cost;
+      resultDiv.innerHTML = ' Puente exitoso! Recibiste ' + amt + ' USDC en Arbitrum en ' + d.time + ' min. Costo: $' + d.cost + '. El riesgo era ' + d.risk + '.';
+      resultDiv.style.borderLeftColor = '#00ffc8';
+    }
+  });
+  const questions = [
+    { text: "&iquest;Qu&eacute; tipo de puente es m&aacute;s seguro?", options: ["Puente de terceros", "Puente can&oacute;nico", "Liquidity network", "Ninguno"], correct: 1 },
+    { text: "&iquest;Qu&eacute; es chain abstraction?", options: ["Eliminar todas las L2", "Ocultar la complejidad de m&uacute;ltiples chains al usuario", "Crear una sola blockchain global", "Un tipo de ataque"], correct: 1 },
+    { text: "&iquest;Qu&eacute; hace CCTP de Circle?", options: ["Crear nuevas criptomonedas", "Permitir transferencias nativas de USDC entre chains sin wrapping", "Minar Bitcoin", "Hacer trading autom&aacute;tico"], correct: 1 }
+  ];
+  let userAnswers = new Array(questions.length).fill(null);
+  const quizContainer = document.getElementById('quizContainer');
+  const submitBtn = document.getElementById('submitQuizBtn');
+  const insigniaDiv = document.getElementById('insigniaArea');
+  const feedbackMsg = document.getElementById('feedbackMsg');
+  function renderQuestions() {
+    quizContainer.innerHTML = '';
+    questions.forEach(function(q, idx) {
+      var qDiv = document.createElement('div');
+      qDiv.classList.add('question');
+      qDiv.innerHTML = '<p>' + q.text + '</p><div class="options" id="qopt' + idx + '"></div>';
+      var optionsDiv = qDiv.querySelector('.options');
+      q.options.forEach(function(opt, optIdx) {
+        var optSpan = document.createElement('div');
+        optSpan.classList.add('opt');
+        optSpan.textContent = opt;
+        optSpan.dataset.qIdx = idx;
+        optSpan.dataset.optIdx = optIdx;
+        optSpan.addEventListener('click', function(e) {
+          if (quizCompleted) return;
+          var parent = optSpan.parentElement;
+          Array.from(parent.children).forEach(function(c) { c.classList.remove('selected'); });
+          optSpan.classList.add('selected');
+          userAnswers[idx] = optIdx;
+        });
+        optionsDiv.appendChild(optSpan);
+      });
+      quizContainer.appendChild(qDiv);
+    });
+  }
+  function handleSubmit() {
+    if (quizCompleted) { feedbackMsg.textContent = ' Ya tienes la insignia!'; return; }
+    var allAnswered = userAnswers.every(function(a) { return a !== null; });
+    if (!allAnswered) { feedbackMsg.textContent = ' Responde todas.'; return; }
+    var correct = 0;
+    for (var i = 0; i < questions.length; i++) { if (userAnswers[i] === questions[i].correct) correct++; }
+    if (correct >= 2) {
+      quizCompleted = true;
+      insigniaDiv.classList.remove('hidden');
+      localStorage.setItem(STORAGE_KEY, 'true');
+      feedbackMsg.textContent = ' &iexcl;Excelente! ' + correct + '/3. Has dominado puentes e interoperabilidad.';
+      document.querySelectorAll('.opt').forEach(function(o) { o.style.pointerEvents = 'none'; });
+      submitBtn.disabled = true;
+    } else { feedbackMsg.textContent = ' Obtuviste ' + correct + '/3. Simula m&aacute;s puentes.'; }
+  }
+  function restoreProgress() {
+    var completed = localStorage.getItem(STORAGE_KEY);
+    if (completed === 'true') {
+      quizCompleted = true;
+      insigniaDiv.classList.remove('hidden');
+      submitBtn.disabled = true;
+      feedbackMsg.textContent = ' M&oacute;dulo completado!';
+      document.querySelectorAll('.opt').forEach(function(o) { o.style.pointerEvents = 'none'; });
+    }
+  }
+  renderQuestions();
+  submitBtn.addEventListener('click', handleSubmit);
+  restoreProgress();
+</script>
+<script src="../../../assets/js/cookie-consent.js"></script></body>
+</html>

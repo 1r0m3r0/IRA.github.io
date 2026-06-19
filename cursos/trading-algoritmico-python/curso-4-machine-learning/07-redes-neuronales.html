@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>ML para Trading | Redes Neuronales</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #111a2e 100%);
+      background-size: 200% 200%; animation: gradientShift 20s ease infinite;
+      font-family: 'Inter', sans-serif; color: #eef5ff; min-height: 100vh;
+      display: flex; align-items: center; justify-content: center; padding: 2rem 1rem;
+    }
+    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+    .curso4-container {
+      max-width: 1300px; width: 100%;
+      background: rgba(15, 25, 45, 0.65); backdrop-filter: blur(12px);
+      border-radius: 3rem; border: 1px solid rgba(255,100,220,0.25);
+      box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden;
+    }
+    .hero-header { background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%); padding: 2rem 2rem 1.5rem; text-align: center; border-bottom: 2px solid #ff64dc; }
+    .hero-header h1 { font-size: 2.6rem; font-weight: 800; background: linear-gradient(135deg, #FFF, #ffb3e6, #ff64dc); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .hero-header p { font-size: 1.1rem; color: #b9e2ff; margin-top: 0.3rem; }
+    .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
+    .chip { background: rgba(255,100,220,0.15); border: 1px solid #ff64dc; padding: 0.3rem 1rem; border-radius: 40px; font-size: 0.8rem; font-weight: 600; }
+    .analogy-card { background: #1e2a3acc; margin: 1.5rem 2rem; padding: 1.2rem 1.8rem; border-radius: 2rem; border-left: 8px solid #ff64dc; font-size: 1rem; line-height: 1.6; }
+    .main-area { padding: 0.5rem 2rem; }
+    .param-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 1rem; margin: 1rem 0; }
+    .param-grid label { display: flex; flex-direction: column; gap: 0.3rem; font-size: 0.9rem; }
+    .param-grid input[type=range] { width: 100%; }
+    .param-grid .val { font-family: monospace; font-weight: 700; }
+    .loss-chart { background: #0a0f1e; border-radius: 1.5rem; padding: 1rem; margin: 1rem 0; }
+    .loss-chart canvas { display: block; margin: 0 auto; width: 100%; max-width: 600px; height: 200px; background: #0a0f1e; border-radius: 1rem; border: 1px solid #2c3e66; }
+    .arch-vis { display: flex; justify-content: center; gap: 0.5rem; align-items: center; margin: 1rem 0; flex-wrap: wrap; }
+    .arch-layer { background: #1a2a4a; border: 2px solid #ff64dc; border-radius: 1rem; padding: 0.5rem 1rem; text-align: center; font-size: 0.8rem; }
+    .arch-layer.input { border-color: #2b9eff; }
+    .arch-layer.output { border-color: #00ffc8; }
+    .arch-arrow { color: #4a6a8a; font-size: 1.2rem; }
+    .feedback { background: #00000099; margin: 1.5rem 2rem; padding: 1rem; border-radius: 1.5rem; text-align: center; font-weight: 500; border-left: 4px solid #ff64dc; }
+    .insignia { text-align: center; background: #0c1b2f; border-radius: 2rem; margin: 0 2rem 1.5rem; padding: 1rem; border: 1px dashed gold; }
+    .insignia i { font-size: 2.5rem; color: gold; }
+    .hidden { display: none; }
+    .btn-action { background: linear-gradient(95deg, #f0a500, #ff6a00); border: none; padding: 0.8rem 1.8rem; font-weight: bold; border-radius: 3rem; cursor: pointer; font-size: 1rem; transition: 0.2s; color: #1e1a0c; }
+    .btn-action:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(240,165,0,0.5); }
+    .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
+    .nav-link { background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem; font-weight: 600; text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; }
+    .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(255,100,220,0.4); }
+    .nav-link.next { background: linear-gradient(95deg, #f0a500, #ff6a00); color: #1e1a0c; }
+    .nav-link.menu { background: #1a2a4a; border: 1px solid #3399ff; }
+    footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
+    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
+  </style>
+  <link rel="stylesheet" href="../../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../../../index.html">&larr; Portfolio</a><a href="../../../../cursos/index.html">Cursos</a></nav>
+
+  <div class="curso4-container">
+    <div class="hero-header">
+      <h1>🧠 Redes Neuronales</h1>
+      <p>MLP con PyTorch para predicción de series financieras</p>
+      <div class="badge-area">
+        <span class="chip"><i class="fas fa-network-wired"></i> MLP</span>
+        <span class="chip"><i class="fas fa-chart-line"></i> PyTorch</span>
+      </div>
+    </div>
+    <div class="analogy-card"><strong>🧠 Piénsalo así:</strong> Una red neuronal es como un equipo de especialistas. Cada neurona es un experto que reconoce un patrón simple. Juntas, capa tras capa, construyen entendimiento complejo. Como un cerebro artificial que aprende de los datos.</div>
+    <div class="main-area">
+      <div id="archDisplay" class="arch-vis"></div>
+      <div class="param-grid">
+        <label>Capas ocultas: <input type="range" id="nLayers" min="1" max="3" value="2"><span id="nLayersVal" class="val">2</span></label>
+        <label>Neuronas/capa: <input type="range" id="neurons" min="4" max="64" value="16" step="4"><span id="neuronsVal" class="val">16</span></label>
+        <label>Learning rate: <input type="range" id="lr" min="1" max="50" value="10"><span id="lrVal" class="val">0.010</span></label>
+        <label>Epochs: <input type="range" id="epochs" min="10" max="200" value="50" step="10"><span id="epochsVal" class="val">50</span></label>
+      </div>
+      <div class="loss-chart">
+        <p style="margin-bottom:0.3rem"><strong>Curva de pérdida</strong></p>
+        <canvas id="lossCanvas" width="600" height="200"></canvas>
+      </div>
+      <div style="text-align:center;margin:0.5rem 0"><button id="trainBtn" class="btn-action"><i class="fas fa-play"></i> Entrenar</button></div>
+    </div>
+    <div id="feedbackMsg" class="feedback">💡 Configura la arquitectura y entrena. Observa cómo bajan las pérdidas.</div>
+    <div id="insigniaArea" class="insignia hidden">
+      <i class="fas fa-medal"></i>
+      <h3>🏅 ARQUITECTO DE REDES 🏅</h3>
+      <p>Has construido y entrenado redes neuronales. ¡Dominas MLP y backpropagation!</p>
+    </div>
+    <div class="nav-links">
+      <a href="06-svm-regimenes.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+      <a href="08-lstm-gru.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <footer><i class="fas fa-crown"></i> ML para Trading · Trading Algorítmico con Python</footer>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'py_trade_4_07';
+    let epochData = [];
+
+    function updateArch() {
+      const nLayers = parseInt(document.getElementById('nLayers').value);
+      const neurons = parseInt(document.getElementById('neurons').value);
+      document.getElementById('nLayersVal').textContent = nLayers;
+      document.getElementById('neuronsVal').textContent = neurons;
+      const arch = document.getElementById('archDisplay');
+      arch.innerHTML = '<div class="arch-layer input">Input<br>4</div><span class="arch-arrow">→</span>';
+      for (let i=0; i<nLayers; i++) {
+        arch.innerHTML += '<div class="arch-layer">Oculta '+(i+1)+'<br>'+neurons+'</div><span class="arch-arrow">→</span>';
+      }
+      arch.innerHTML += '<div class="arch-layer output">Output<br>1</div>';
+    }
+
+    function simulateTraining() {
+      const lr = parseInt(document.getElementById('lr').value)/1000;
+      const epochs = parseInt(document.getElementById('epochs').value);
+      const nLayers = parseInt(document.getElementById('nLayers').value);
+      const neurons = parseInt(document.getElementById('neurons').value);
+      document.getElementById('lrVal').textContent = lr.toFixed(3);
+      document.getElementById('epochsVal').textContent = epochs;
+
+      epochData = [];
+      let trainLoss = 1.2 + Math.random()*0.3;
+      let valLoss = 1.3 + Math.random()*0.3;
+      const capacity = nLayers * neurons / 32;
+      const lrEffect = lr * 50;
+
+      for (let e=0; e<epochs; e++) {
+        trainLoss = Math.max(0.05, trainLoss - lrEffect*0.01*(1-trainLoss/1.5) - 0.002*capacity);
+        const valNoise = (Math.random()-0.5)*0.02;
+        valLoss = Math.max(0.1, trainLoss + 0.1 + valNoise);
+        if (e > epochs*0.7 && capacity > 2) valLoss = Math.max(0.1, valLoss + 0.005*(e-epochs*0.7)); // overfitting late
+        epochData.push({ train: trainLoss, val: valLoss });
+      }
+
+      const c = document.getElementById('lossCanvas');
+      const ctx = c.getContext('2d');
+      ctx.clearRect(0,0,c.width,c.height);
+      const margin = 20, w = c.width-2*margin, h = c.height-2*margin;
+      const maxLoss = 1.5;
+
+      ctx.strokeStyle = '#ff64dc'; ctx.lineWidth = 2; ctx.beginPath();
+      epochData.forEach((d,i) => { const x = margin + i/epochs*w, y = margin + (1-d.train/maxLoss)*h; i===0?ctx.moveTo(x,y):ctx.lineTo(x,y); });
+      ctx.stroke();
+      ctx.strokeStyle = '#2b9eff'; ctx.lineWidth = 2; ctx.beginPath();
+      epochData.forEach((d,i) => { const x = margin + i/epochs*w, y = margin + (1-d.val/maxLoss)*h; i===0?ctx.moveTo(x,y):ctx.lineTo(x,y); });
+      ctx.stroke();
+
+      ctx.fillStyle = '#8899bb'; ctx.font = '12px Inter';
+      ctx.fillText('Train (rosa) · Val (azul)', margin, c.height-5);
+      
+      const finalTrain = epochData[epochs-1].train;
+      const finalVal = epochData[epochs-1].val;
+      let msg = 'Train loss: ' + finalTrain.toFixed(3) + ' · Val loss: ' + finalVal.toFixed(3);
+      if (finalVal > finalTrain * 1.3) msg += ' ⚠️ Overfitting detectado';
+      else if (finalTrain < 0.2 && finalVal < 0.4) msg += ' ✅ ¡Excelente convergencia!';
+      else msg += ' 🔄 Continúa entrenando...';
+
+      document.getElementById('feedbackMsg').textContent = msg;
+      localStorage.setItem(STORAGE_KEY, 'true');
+      document.getElementById('insigniaArea').classList.remove('hidden');
+    }
+
+    document.getElementById('nLayers').addEventListener('input', updateArch);
+    document.getElementById('neurons').addEventListener('input', updateArch);
+    document.getElementById('lr').addEventListener('input', () => { document.getElementById('lrVal').textContent = (parseInt(document.getElementById('lr').value)/1000).toFixed(3); });
+    document.getElementById('epochs').addEventListener('input', () => { document.getElementById('epochsVal').textContent = document.getElementById('epochs').value; });
+    document.getElementById('trainBtn').addEventListener('click', simulateTraining);
+    updateArch();
+  </script>
+</body>
+</html>
+

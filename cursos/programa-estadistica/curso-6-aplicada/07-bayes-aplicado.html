@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Curso 6 |  Estadistica Bayesiana Aplicada</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:linear-gradient(135deg,#0a0f1e,#0c1222 50%,#111a2e); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+    .course-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid #ffd70040; box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+    .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #ffd700; }
+    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#ffed7a,#ffd700); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .hero-header p { font-size:1.1rem; color:#b9e2ff; margin-top:0.5rem; font-weight:500; }
+    .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+    .chip { background:#ffd70020; border:1px solid #ffd700; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; color:#ffd700; }
+    .progress-section { padding:1.2rem 2rem; border-bottom:1px solid #1a2a4a; }
+    .progress-bar-outer { background:#1a2a4a; border-radius:20px; height:16px; overflow:hidden; }
+    .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#ffd700,#ff8c00); border-radius:20px; transition:width 0.5s ease; }
+    .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
+    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ffd700; font-size:1rem; line-height:1.6; }
+    .main-area { padding:1.5rem 2rem; }
+    .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#ffd700; }
+    .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
+    .info-panel { background:rgba(10,20,40,0.7); border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
+    .info-panel h3 { color:#ffed7a; font-size:1rem; margin-bottom:0.5rem; }
+    .info-panel p { font-size:0.85rem; color:#b9ccee; line-height:1.6; }
+    .sim-area { background:rgba(10,20,40,0.7); border-radius:2rem; padding:1.5rem; margin-bottom:1.5rem; border:1px solid #ffd70040; text-align:center; }
+    .sim-area .sim-title { font-size:1.2rem; font-weight:700; color:#ffd700; margin-bottom:1rem; }
+    .quiz-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #ffd700; margin-bottom:1.5rem; }
+    .quiz-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#ffd700; }
+    .question { background:#0f1a2c; margin:0.8rem 0; padding:0.8rem 1rem; border-radius:1.2rem; }
+    .question p { font-weight:600; margin-bottom:0.5rem; font-size:0.95rem; }
+    .options { display:flex; flex-wrap:wrap; gap:0.6rem; }
+    .opt { background:#1e2a3e; padding:0.3rem 0.9rem; border-radius:2rem; cursor:pointer; transition:0.2s; font-size:0.85rem; }
+    .opt:hover { background:#2c3e66; transform:translateY(-2px); }
+    .opt.selected { background:#ffd700; color:#000; font-weight:bold; box-shadow:0 0 8px #ffd700; }
+    .opt.correct { background:#00cc88; color:#000; }
+    .opt.wrong { background:#ff4455; color:#fff; }
+    .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #ffd700; }
+    .btn-action { background:linear-gradient(95deg,#f0a500,#ff6a00); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin-top:1rem; }
+    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(240,165,0,0.5); }
+    .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
+    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin-top:1.5rem; padding:1rem; border:1px dashed #ffd700; }
+    .insignia i { font-size:2.5rem; color:#ffd700; }
+    .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
+    .hidden { display:none; }
+    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px #ffd70060; }
+    .nav-link.next { background:linear-gradient(95deg,#f0a500,#ff6a00); color:#1e1a0c; }
+    .nav-link.menu { background:#1a2a4a; border:1px solid #ffd700; }
+    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .info-grid { grid-template-columns:1fr; } }
+    .sim-btn { background:linear-gradient(135deg,#ffd700,#ff8c00); border:none; color:#1a1a0a; font-weight:700; padding:0.6rem 1.5rem; border-radius:2rem; cursor:pointer; margin:0.5rem; transition:0.2s; }
+    .sim-btn:hover { transform:scale(1.05); box-shadow:0 0 15px #ffd70060; }
+    .sim-result { margin-top:1rem; padding:1rem; background:#0f1a2c; border-radius:1.5rem; min-height:60px; font-size:0.95rem; }
+    .sim-input { background:#1a2a4a; border:1px solid #ffd70060; border-radius:1rem; padding:0.5rem 1rem; color:#eef5ff; font-size:1rem; width:120px; text-align:center; margin:0.5rem; }
+    .sim-input:focus { outline:none; border-color:#ffd700; box-shadow:0 0 10px #ffd70040; }
+    .sim-label { font-size:0.9rem; color:#b9ccee; }
+    .canvas-container { background:#0a0f1e; border-radius:1.5rem; padding:1rem; margin:1rem 0; }
+  </style>
+  <link rel="stylesheet" href="../../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a><a href="../index.html">Programa Estadística</a></nav>
+  <div class="course-container" id="app">    <div class="hero-header">
+      <h1> Estadistica Bayesiana Aplicada</h1>
+      <p>Priors, likelihood, posterior, MCMC, credible intervals, Bayes factor</p>
+      <div class="badge-area">
+        <span class="chip"><i class="fas fa-chart-pie"></i> Bayes</span>
+        <span class="chip"><i class="fas fa-cogs"></i> MCMC</span>
+        <span class="chip"><i class="fas fa-balance-scale"></i> BF</span>
+      </div>
+    </div>
+    <div class="progress-section">
+      <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+      <span class="progress-text" id="progressText">Modulo 7 de 12</span>
+    </div>
+    <div class="analogy-card">
+      <strong> Piensalo asi:</strong> La estadistica Bayesiana es como actualizar tu opinion sobre una pelicula basandote en las criticas. Antes de leer criticas (prior), tienes una idea general. Lees las criticas (likelihood) y ajustas tu opinion (posterior). Si eres fan del director, tu prior es favorable; si odias el genero, es desfavorable. MCMC es como preguntar a muchas personas y promediar sus opiniones para obtener una vision robusta.
+    </div>
+    <div class="main-area">
+      <div class="section-title"><i class="fas fa-chart-pie"></i> Fundamentos Bayesianos</div>
+      <div class="info-grid">
+        <div class="info-panel">
+          <h3>  Prior y Posterior</h3>
+          <p>El prior expresa creencias iniciales P(?). La likelihood P(D|?) mide que tan probables son los datos dado ?. El posterior P(?|D) combinacion: P(?|D) ? P(D|?) P(?).</p>
+        </div>
+        <div class="info-panel">
+          <h3>  MCMC (Markov Chain Monte Carlo)</h3>
+          <p>Algoritmo que genera muestras de la distribucion posterior cuando no tiene forma cerrada. Los mas usados: Metropolis-Hastings y NUTS (Hamiltonian MC).</p>
+        </div>
+        <div class="info-panel">
+          <h3>  Intervalos de Credibilidad</h3>
+          <p>Rango que contiene el 95% de la masa de la distribucion posterior. A diferencia del IC frecuentista, permite decir: "hay 95% de probabilidad de que ? este en este rango".</p>
+        </div>
+        <div class="info-panel">
+          <h3>  Bayes Factor (BF)</h3>
+          <p>Razon de verosimilitudes entre dos modelos. BF10 > 3: evidencia sustancial para H1. BF10 > 10: evidencia fuerte. BF10 < 1/3: evidencia para H0.</p>
+        </div>
+      </div>
+
+      <div class="sim-area">
+        <div class="sim-title"><i class="fas fa-chart-line"></i> Simulador: Actualizacion Bayesiana</div>
+        <p style="margin-bottom:0.8rem;color:#b9ccee;">Observa como el prior se actualiza a posterior al incorporar datos.</p>
+        <div>
+          <span class="sim-label">Prior (media):</span>
+          <input type="number" id="bayesPrior" class="sim-input" value="0.5" min="0.1" max="0.9" step="0.1" style="width:80px;">
+          <span class="sim-label" style="margin-left:1rem;">Exitos observados:</span>
+          <input type="number" id="bayesExitos" class="sim-input" value="8" min="0" max="100" style="width:80px;">
+          <span class="sim-label">Ensayos:</span>
+          <input type="number" id="bayesN" class="sim-input" value="20" min="1" max="200" style="width:80px;">
+        </div>
+        <button class="sim-btn" onclick="runBayesSim()">  Actualizar</button>
+        <div id="bayesResult" class="sim-result">Presiona "Actualizar" para ver la actualizacion Bayesiana.</div>
+      </div>
+
+      <div class="quiz-area">
+        <div class="quiz-title"><i class="fas fa-question-circle"></i> Mini Quiz: Estadistica Bayesiana</div>
+        <div id="quizContainer"></div>
+        <button id="submitQuizBtn" class="btn-action"> Verificar respuestas</button>
+        <div id="insigniaArea" class="insignia hidden">
+          <i class="fas fa-chart-pie"></i>
+          <h3>  Estadista Bayesiano  </h3>
+          <p>Has comprendido los fundamentos de la estadistica Bayesiana: priors, MCMC, intervalos de credibilidad y Bayes factors.</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="feedbackMsg" class="feedback"> Responde las preguntas sobre estadistica Bayesiana aplicada.</div>    <div class="nav-links">
+      <a href="06-meta-analisis.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menu</a>
+      <a href="08-poder-estadistico.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <footer><i class="fas fa-bullhorn"></i> Estadistica Aplicada · Modulo 7 de 12</footer>
+  </div>  <script>
+    function runBayesSim() {
+      const priorMedia = parseFloat(document.getElementById('bayesPrior').value);
+      const exitos = parseInt(document.getElementById('bayesExitos').value);
+      const ensayos = parseInt(document.getElementById('bayesN').value);
+      const aPrior = priorMedia * 10; const bPrior = 10 - aPrior;
+      const aPost = aPrior + exitos; const bPost = bPrior + (ensayos - exitos);
+      const mediaPost = aPost / (aPost + bPost);
+      const sdPost = Math.sqrt(aPost * bPost / ((aPost + bPost)^2 * (aPost + bPost + 1)));
+      const icLow = Math.max(0, mediaPost - 1.96 * sdPost);
+      const icHigh = Math.min(1, mediaPost + 1.96 * sdPost);
+      document.getElementById('bayesResult').innerHTML = '<strong>Prior Beta:</strong> Beta(' + aPrior.toFixed(1) + ', ' + bPrior.toFixed(1) + ') | Media = ' + priorMedia.toFixed(2) + '<br><strong>Posterior Beta:</strong> Beta(' + aPost.toFixed(1) + ', ' + bPost.toFixed(1) + ') | Media = ' + mediaPost.toFixed(3) + '<br><strong>IC 95%:</strong> [' + icLow.toFixed(3) + ', ' + icHigh.toFixed(3) + ']<br><strong>Interpretacion:</strong> Tras observar ' + exitos + '/' + ensayos + ' exitos, la media se actualizo de ' + priorMedia.toFixed(2) + ' a ' + mediaPost.toFixed(3);
+    }
+  </script>  <script>
+    const STORAGE_KEY = 'prog_est_6_07';
+    const PROGRESS_KEY = 'prog_est_6_progress';
+    const questions = [
+  { "text": "En estadistica Bayesiana, que representa el prior?", "options": ["El conocimiento previo sobre el parametro", "La probabilidad de los datos", "La distribucion muestral", "El intervalo de confianza"], "correct": 0 },
+  { "text": "El teorema de Bayes combina prior y likelihood para obtener:", "options": ["La distribucion posterior", "El valor p", "El estimador MV", "El estadistico de prueba"], "correct": 0 },
+  { "text": "Que es MCMC?", "options": ["Metodo para muestrear de distribuciones complejas", "Un tipo de prior", "Una prueba de hipotesis", "Un intervalo de credibilidad"], "correct": 0 },
+  { "text": "Un intervalo de credibilidad al 95% significa:", "options": ["Hay 95% de probabilidad de que el parametro este en el intervalo", "El 95% de los datos caen en el intervalo", "Hay 5% de error tipo I", "El intervalo contiene el 95% de la masa posterior"], "correct": 0 },
+  { "text": "El Bayes Factor BF10 = 5 indica:", "options": ["La evidencia favorece a H1 sobre H0 por factor de 5", "Hay 5% de probabilidad de H0", "El error tipo II es 5%", "El tamano del efecto es 5"], "correct": 0 }
+];
+    let userAnswers = new Array(questions.length).fill(null);
+    let quizCompleted = false;
+
+    function saveProgress() {
+      let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+      if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
+      localStorage.setItem(STORAGE_KEY, 'true');
+    }
+
+    function updateProgress() {
+      let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+      document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
+      document.getElementById('progressText').textContent = 'Modulo '+(p.length || 1)+' de 12';
+    }
+
+    function renderQuestions() {
+      const container = document.getElementById('quizContainer');
+      if (!container) return;
+      container.innerHTML = '';
+      questions.forEach((q, idx) => {
+        const qDiv = document.createElement('div'); qDiv.classList.add('question');
+        qDiv.innerHTML = '<p>'+(idx+1)+'. '+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
+        const optsDiv = qDiv.querySelector('.options');
+        q.options.forEach((opt, optIdx) => {
+          const span = document.createElement('div'); span.classList.add('opt');
+          span.textContent = opt; span.dataset.qIdx = idx; span.dataset.optIdx = optIdx;
+          span.addEventListener('click', function() {
+            if (quizCompleted) return;
+            this.parentElement.querySelectorAll('.opt').forEach(c => c.classList.remove('selected'));
+            this.classList.add('selected'); userAnswers[idx] = optIdx; updateBtnState();
+          });
+          optsDiv.appendChild(span);
+        });
+        container.appendChild(qDiv);
+      });
+    }
+
+    function updateBtnState() {
+      const btn = document.getElementById('submitQuizBtn');
+      if (btn) btn.disabled = userAnswers.some(a => a === null) || quizCompleted;
+    }
+
+    function handleSubmit() {
+      if (quizCompleted) return;
+      if (userAnswers.some(a => a === null)) { document.getElementById('feedbackMsg').textContent = ' Responde todas las preguntas primero.'; return; }
+      let correct = 0;
+      questions.forEach((q, i) => { if (userAnswers[i] === q.correct) correct++; });
+      const total = questions.length;
+      const passed = correct >= Math.ceil(total * 0.6);
+      document.querySelectorAll('.question').forEach((qDiv, idx) => {
+        const opts = qDiv.querySelectorAll('.opt');
+        opts.forEach((o, oi) => {
+          o.classList.remove('selected');
+          if (oi === questions[idx].correct) o.classList.add('correct');
+          else if (oi === userAnswers[idx]) o.classList.add('wrong');
+        });
+      });
+      if (passed) {
+        quizCompleted = true; const btn = document.getElementById('submitQuizBtn'); if (btn) btn.disabled = true;
+        const ia = document.getElementById('insigniaArea'); if (ia) ia.classList.remove('hidden');
+        document.getElementById('feedbackMsg').textContent = ' Excelente! Has completado este modulo.';
+        saveProgress(); updateProgress();
+      } else {
+        document.getElementById('feedbackMsg').textContent = ' ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. Reintenta!';
+      }
+    }
+
+    function restoreProgress() {
+      const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+      if (p.includes(STORAGE_KEY)) {
+        quizCompleted = true; const btn = document.getElementById('submitQuizBtn'); if (btn) btn.disabled = true;
+        const ia = document.getElementById('insigniaArea'); if (ia) ia.classList.remove('hidden');
+        document.getElementById('feedbackMsg').textContent = ' Ya completaste este modulo.';
+        document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const btn = document.getElementById('submitQuizBtn');
+      if (btn) btn.addEventListener('click', handleSubmit);
+      renderQuestions(); updateBtnState(); restoreProgress(); updateProgress();
+    });
+  </script>
+  <script src="../../../assets/js/cookie-consent.js"></script>
+</body>
+</html>
