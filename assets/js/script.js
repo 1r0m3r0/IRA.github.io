@@ -638,3 +638,15 @@ console.log('%cInterested in the code? Check out the GitHub repo!', 'color: #a85
     `;
     document.head.appendChild(cookieStyle);
 })();
+
+// ============================================
+// LANGUAGE SWITCHER INIT
+// ============================================
+(function(){
+  var container = document.getElementById('langSwitcher');
+  if (!container) return;
+  var lang = localStorage.getItem('lang') || 'es';
+  var esActive = lang === 'es' ? ' active' : '';
+  var enActive = lang === 'en' ? ' active' : '';
+  container.innerHTML = '<div class="lang-switcher"><button class="lang-btn' + esActive + '" onclick="I18N.setLanguage(\'es\')" title="Español">ES</button><button class="lang-btn' + enActive + '" onclick="I18N.setLanguage(\'en\')" title="English">EN</button></div>';
+})();
