@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Curso 1 | Módulo 3: Iteradores Personalizados</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../assets/css/theme.css">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:linear-gradient(135deg,#0a0f1e,#0c1222); font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+.course-container { max-width:1100px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(156,100,255,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+.progress-bar { background:#0a0f1e; padding:0.8rem 2rem; display:flex; align-items:center; gap:1rem; border-bottom:1px solid #2c3e66; flex-wrap:wrap; }
+.progress-track { flex:1; height:10px; background:#1a2440; border-radius:10px; overflow:hidden; min-width:100px; }
+.progress-fill { height:100%; background:linear-gradient(90deg,#9c64ff,#c8a8ff); border-radius:10px; transition:width 0.5s; width:0%; }
+.progress-text { font-size:0.8rem; color:#8899bb; }
+.hero { background:linear-gradient(95deg,#0b1120,#1a0e30); padding:2rem; text-align:center; border-bottom:2px solid #9c64ff; }
+.hero h1 { font-size:2.2rem; font-weight:800; background:linear-gradient(135deg,#fff,#c8a8ff,#9c64ff); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.hero p { color:#c8a8ff; }
+.analogy { background:rgba(156,100,255,0.1); margin:1.5rem 2rem; padding:1.2rem 1.5rem; border-radius:1.5rem; border-left:5px solid #9c64ff; display:flex; gap:1rem; align-items:flex-start; }
+.analogy i { font-size:1.8rem; color:#9c64ff; flex-shrink:0; }
+.content { padding:0 2rem 2rem; }
+.iter-builder { background:rgba(0,0,0,0.3); border-radius:2rem; padding:1.5rem; border:1px solid #2c3e66; }
+.iter-type { display:flex; gap:0.8rem; flex-wrap:wrap; margin:1rem 0; }
+.iter-btn { background:#1a2440; border:1px solid #2c3e66; padding:0.6rem 1.2rem; border-radius:2rem; cursor:pointer; transition:0.2s; color:#b9ccee; }
+.iter-btn:hover { border-color:#9c64ff; }
+.iter-btn.selected { background:#9c64ff; color:#fff; }
+.code-block { background:#0a0f1e; border-radius:1.5rem; padding:1rem; margin:0.5rem 0; font-family:monospace; border:1px solid #2c3e66; white-space:pre-wrap; }
+.iter-output { background:#0a0f1e; border-radius:1.5rem; padding:1rem; min-height:60px; border:1px solid #2c3e66; font-family:monospace; margin:0.5rem 0; white-space:pre-wrap; }
+.step-controls { display:flex; gap:0.8rem; align-items:center; flex-wrap:wrap; margin:1rem 0; }
+.btn-step { background:linear-gradient(135deg,#9c64ff,#c8a8ff); border:none; padding:0.6rem 1.5rem; border-radius:2rem; cursor:pointer; font-weight:600; color:#fff; transition:0.2s; }
+.btn-step:hover { transform:scale(1.03); }
+.btn-step:disabled { opacity:0.4; cursor:not-allowed; transform:none; }
+.feedback { background:rgba(0,0,0,0.4); padding:1rem 1.5rem; border-radius:1.5rem; margin:1rem 0; border-left:4px solid #9c64ff; }
+.insignia { text-align:center; padding:1.5rem; background:linear-gradient(135deg,rgba(156,100,255,0.15),rgba(200,168,255,0.05)); border-radius:2rem; margin:1rem 0; border:2px solid #9c64ff; display:none; }
+.insignia.show { display:block; animation:pulse 0.6s; }
+@keyframes pulse { 0%{transform:scale(0.9);opacity:0} 50%{transform:scale(1.05)} 100%{transform:scale(1);opacity:1} }
+.insignia i { font-size:3rem; color:#ffd700; }
+.btn-next-area { text-align:center; padding:1rem 2rem 2rem; }
+.btn-next { background:linear-gradient(135deg,#9c64ff,#00e0ff); border:none; padding:0.9rem 2.5rem; border-radius:3rem; cursor:pointer; font-weight:700; font-size:1.1rem; color:#fff; transition:0.2s; }
+.btn-next:hover { transform:scale(1.05); }
+footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; color:#8899bb; }
+@media (max-width:700px) { .hero h1 { font-size:1.6rem; } .content { padding:0 1rem 1.5rem; } .analogy { margin:1rem; } }
+</style>
+</head>
+<body>
+<nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a><a href="../index.html">Python Medio</a><a href="index.html">Curso 1</a></nav>
+<div class="course-container">
+<div class="progress-bar">
+<span style="color:#9c64ff;font-weight:700;"><i class="fas fa-repeat"></i> M3</span>
+<div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+<span class="progress-text" id="progressText">0%</span>
+</div>
+<div class="hero">
+<h1><i class="fas fa-repeat"></i> Iteradores Personalizados</h1>
+<p>Haz que cualquier objeto funcione con for...in</p>
+</div>
+<div class="analogy">
+<i class="fas fa-book"></i>
+<div><strong>📖 Piénsalo así:</strong> Un iterador es como <strong>un marcapáginas</strong>. El libro (objeto iterable) tiene páginas. El marcapáginas (iterador) recuerda dónde vas. Cada vez que pasas la página (llamas a next()), avanzas. Cuando llegas al final (StopIteration), el libro se acabó. __iter__ crea el marcapáginas, __next__ pasa la página.</div>
+</div>
+<div class="content">
+<div class="iter-builder">
+<h3><i class="fas fa-repeat"></i> Constructor de Iteradores</h3>
+<p style="color:#b9ccee;margin-bottom:0.8rem;">Selecciona un iterador personalizado y recórrelo paso a paso:</p>
+<div class="iter-type">
+<button class="iter-btn selected" data-iter="countdown" onclick="selectIter(this)"><i class="fas fa-arrow-down"></i> Contador Regresivo</button>
+<button class="iter-btn" data-iter="even" onclick="selectIter(this)"><i class="fas fa-2"></i> Números Pares</button>
+<button class="iter-btn" data-iter="alphabet" onclick="selectIter(this)"><i class="fas fa-font"></i> Abecedario</button>
+</div>
+<div class="code-block" id="codeBlock">class ContadorRegresivo:
+    def __init__(self, n):
+        self.n = n
+    def __iter__(self):
+        return self
+    def __next__(self):
+        if self.n <= 0:
+            raise StopIteration
+        self.n -= 1
+        return self.n + 1</div>
+<div class="step-controls">
+<button class="btn-step" id="btnNext" onclick="stepNext()"><i class="fas fa-forward-step"></i> next()</button>
+<button class="btn-step" style="background:#1a2440;border:1px solid #2c3e66;" onclick="resetIter()"><i class="fas fa-undo"></i> Reset</button>
+<span id="stepCount" style="color:#b9ccee;">Paso: 0</span>
+</div>
+<div class="iter-output" id="iterOutput">💡 Presiona "next()" para iterar paso a paso...</div>
+</div>
+<div class="feedback" id="feedback">💬 __iter__() devuelve el iterador. __next__() devuelve el siguiente valor o lanza StopIteration. Así funciona for...in por dentro.</div>
+<div class="insignia" id="insignia">
+<i class="fas fa-medal"></i>
+<h3>🏅 Creador de Iteradores 🏅</h3>
+<p>¡Ya sabes cómo funciona la iteración por dentro! Puedes crear tus propios objetos iterables.</p>
+</div>
+</div>
+<div class="btn-next-area">
+<button class="btn-next" onclick="nextModule()">Siguiente <i class="fas fa-arrow-right"></i></button>
+</div>
+<footer><i class="fas fa-magic"></i> Python Avanzado del Lenguaje · Módulo 3 · Iteradores</footer>
+</div>
+<script>
+const COURSE='pythonmedio';const MODULE='c1m3';const TOTAL=72;
+function updateProgress(){let p=JSON.parse(localStorage.getItem(COURSE+'_progress'))||[];if(!p.includes(MODULE)){p.push(MODULE);localStorage.setItem(COURSE+'_progress',JSON.stringify(p));}const pct=Math.round((p.length/TOTAL)*100);document.getElementById('progressFill').style.width=pct+'%';document.getElementById('progressText').textContent=`Módulo 1.3 de 6.12 (${pct}%)`;}
+updateProgress();
+let currentIter='countdown', iterInstance=null, steps=0, done=false;
+const iterCodes={countdown:'class ContadorRegresivo:\n    def __init__(self, n):\n        self.n = n\n    def __iter__(self):\n        return self\n    def __next__(self):\n        if self.n <= 0:\n            raise StopIteration\n        self.n -= 1\n        return self.n + 1',even:'class NumerosPares:\n    def __init__(self, max):\n        self.current = 0\n        self.max = max\n    def __iter__(self):\n        return self\n    def __next__(self):\n        self.current += 1\n        if self.current > self.max:\n            raise StopIteration\n        return self.current * 2',alphabet:'class Abecedario:\n    def __init__(self):\n        self.idx = 0\n        self.letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"\n    def __iter__(self):\n        return self\n    def __next__(self):\n        if self.idx >= len(self.letras):\n            raise StopIteration\n        letra = self.letras[self.idx]\n        self.idx += 1\n        return letra'};
+function selectIter(btn){document.querySelectorAll('.iter-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');currentIter=btn.dataset.iter;document.getElementById('codeBlock').textContent=iterCodes[currentIter];resetIter();}
+function createIter(){if(currentIter==='countdown'){return{max:5,current:0,vals:[5,4,3,2,1]};}else if(currentIter==='even'){return{max:6,current:0,vals:[2,4,6,8,10,12]};}else{return{max:5,current:0,vals:['A','B','C','D','E']};}}
+function stepNext(){if(done){document.getElementById('iterOutput').textContent+='\n⚠️ StopIteration — el iterador terminó. Crea uno nuevo con Reset.';return;}
+if(!iterInstance){iterInstance=createIter();steps=0;document.getElementById('iterOutput').textContent='🔄 Iterando...\n';}
+if(iterInstance.current<iterInstance.vals.length){const val=iterInstance.vals[iterInstance.current];iterInstance.current++;steps++;document.getElementById('iterOutput').textContent+=`→ next() = ${val}\n`;document.getElementById('stepCount').textContent=`Paso: ${steps}`;}else{done=true;document.getElementById('iterOutput').textContent+='→ ⛔ StopIteration lanzado\n';document.getElementById('iterOutput').textContent+='✅ El iterador ha terminado.';document.getElementById('feedback').innerHTML='✅ <strong>StopIteration</strong> — el iterador se agotó. Así es como Python sabe cuándo dejar de iterar en un for...in.';const ins=document.getElementById('insignia');if(!ins.classList.contains('show')){ins.classList.add('show');const b=JSON.parse(localStorage.getItem(COURSE+'_badges'))||[];if(!b.includes(MODULE)){b.push(MODULE);localStorage.setItem(COURSE+'_badges',JSON.stringify(b));}}}}
+function resetIter(){iterInstance=null;steps=0;done=false;document.getElementById('iterOutput').textContent='💡 Presiona "next()" para iterar paso a paso...';document.getElementById('stepCount').textContent='Paso: 0';document.getElementById('btnNext').disabled=false;document.getElementById('feedback').innerHTML='💬 __iter__() devuelve el iterador. __next__() devuelve el siguiente valor o lanza StopIteration.';}
+function nextModule(){alert('🔄 Transición al Módulo 4: Context Managers. En un entorno real, esto enlazaría a 04-context-managers.html');}
+</script>
+</body>
+</html>

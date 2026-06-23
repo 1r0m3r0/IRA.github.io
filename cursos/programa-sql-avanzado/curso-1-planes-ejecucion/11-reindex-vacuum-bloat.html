@@ -1,0 +1,119 @@
+<!DOCTYPE html><html lang="es"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SQL Avanzado | 11 REINDEX / VACUUM Bloat</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../../../assets/css/theme.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#0a0e0f;color:#e8edee;min-height:100vh;display:flex;justify-content:center;padding:20px}
+.course-container{max-width:860px;width:100%;background:rgba(15,20,42,0.6);backdrop-filter:blur(16px);border-radius:24px;border:1px solid rgba(255,80,80,0.2);padding:30px;margin-top:60px}
+.progress-bar,.progress-fill{height:10px;border-radius:8px}
+.progress-bar{background:rgba(255,255,255,0.06);margin-bottom:18px;overflow:hidden}
+.progress-fill{background:linear-gradient(90deg,#ff5050,#cc4040);width:0%;transition:width .5s ease}
+.progress-text{font-size:.75rem;color:#8899aa;margin-bottom:10px;display:block}
+.hero-header{text-align:center;margin:20px 0}
+.hero-header h1{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:800;background:linear-gradient(135deg,#ff5050,#cc4040);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-header p{color:#8899aa;margin-top:6px;font-size:.95rem}
+.analogy-card{background:rgba(255,80,80,0.08);border-left:4px solid #ff5050;border-radius:12px;padding:16px 20px;margin:20px 0;font-size:.9rem;line-height:1.6}
+.analogy-card strong{color:#ff5050}
+.main-area{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:24px;margin:20px 0}
+.bloat-visual{position:relative;background:rgba(255,255,255,0.02);border-radius:10px;padding:16px;margin:16px 0;min-height:60px}
+.bloat-block{display:inline-block;width:28px;height:28px;border-radius:4px;margin:2px;transition:.3s;text-align:center;line-height:28px;font-size:.55rem}
+.bloat-block.live{background:rgba(0,255,100,0.3);border:1px solid #00ff64;color:#00ff64}
+.bloat-block.dead{background:rgba(255,80,80,0.3);border:1px solid #ff5050;color:#ff5050}
+.bloat-block.free{background:rgba(255,255,255,0.05);border:1px dashed rgba(255,255,255,0.1);color:#667}
+.bloat-actions{display:flex;gap:10px;margin:16px 0;flex-wrap:wrap}
+.bloat-btn{padding:10px 20px;border-radius:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#e8edee;cursor:pointer;font-family:'Inter',sans-serif;font-size:.85rem;transition:.3s;flex:1;text-align:center;min-width:120px}
+.bloat-btn:hover{background:rgba(255,80,80,0.1);border-color:#ff5050}
+.bloat-btn:disabled{opacity:.4;cursor:not-allowed}
+.bloat-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:16px 0}
+.bs{background:rgba(255,255,255,0.04);border-radius:10px;padding:14px;text-align:center}
+.bs .num{font-size:1.3rem;font-weight:700;color:#ff5050}
+.bs .lbl{font-size:.75rem;color:#8899aa}
+.feedback{background:rgba(255,255,255,0.04);border-radius:12px;padding:16px 20px;margin:16px 0;font-size:.88rem;min-height:50px}
+.insignia{background:linear-gradient(135deg,rgba(255,215,0,0.12),rgba(255,165,0,0.08));border:1px solid rgba(255,215,0,0.3);border-radius:16px;padding:20px;text-align:center;margin:16px 0;transition:.5s}
+.insignia.hidden{display:none}
+.insignia h3{color:#ffd700;font-size:1.3rem;margin:8px 0}
+.btn-next{display:block;width:100%;padding:16px;margin:20px 0;background:linear-gradient(135deg,#ff5050,#cc4040);border:none;border-radius:14px;color:#fff;font-size:1.05rem;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:.3s}
+.btn-next:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,80,80,0.3)}
+footer{text-align:center;padding:16px 0 0;color:#667788;font-size:.8rem;border-top:1px solid rgba(255,255,255,0.06);margin-top:20px}
+@media(max-width:600px){.course-container{padding:16px;margin-top:50px}.bloat-stats{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="course-container">
+<nav class="brand-return-nav"><a href="../../../../index.html">&larr; Portfolio</a><a href="../../../../cursos/index.html">Cursos</a></nav>
+<div class="progress-bar"><div class="progress-fill" id="progFill"></div></div>
+<span class="progress-text" id="progText">Módulo 11 de 12</span>
+<div class="hero-header"><h1>🧹 REINDEX / VACUUM y Bloat</h1><p>Combate la inflación de tu base de datos</p></div>
+<div class="analogy-card"><strong>💡 Piénsalo así:</strong> El bloat en PostgreSQL es como tu refrigerador: con el tiempo se acumulan sobras viejas (tuplas muertas) que ocupan espacio. VACUUM es como limpiar el refri una vez por semana. REINDEX es como reorganizar los estantes. autovacuum es como tener un robot que limpia automáticamente. Si no limpias, el refri se llena de cosas que ya no sirven y no encuentras lo que buscas.</div>
+<div class="main-area">
+<p style="color:#bcc;margin-bottom:10px;font-weight:600"><i class="fas fa-broom" style="color:#ff5050"></i> Simulador de Bloat</p>
+<div class="bloat-visual" id="bloatVis"></div>
+<div class="bloat-actions">
+<button class="bloat-btn" id="simUpdates"><i class="fas fa-pencil-alt"></i> Simular Updates (crea bloat)</button>
+<button class="bloat-btn" id="runVacuum"><i class="fas fa-broom"></i> VACUUM</button>
+<button class="bloat-btn" id="runReindex"><i class="fas fa-sync"></i> REINDEX</button>
+</div>
+<div class="bloat-stats">
+<div class="bs"><div class="num" id="liveCount">40</div><div class="lbl">Tuplas vivas</div></div>
+<div class="bs"><div class="num" id="deadCount">0</div><div class="lbl">Tuplas muertas</div></div>
+<div class="bs"><div class="num" id="bloatPct">0%</div><div class="lbl">Bloat</div></div>
+</div>
+</div>
+<div id="feedback" class="feedback">💬 Haz clic en "Simular Updates" para crear bloat, luego usa VACUUM y REINDEX para limpiar.</div>
+<div id="insignia" class="insignia hidden"><i class="fas fa-medal" style="font-size:2.5rem;color:#ffd700"></i><h3>🏅 Cazador de Bloat 🏅</h3><p>¡Eliminas el bloat como un experto DBA!</p></div>
+<button class="btn-next" onclick="alert('🔄 Transición → 12-mini-proyecto-tunea-bd.html')">Siguiente <i class="fas fa-arrow-right"></i></button>
+<footer><i class="fas fa-crown"></i> SQL Avanzado · Curso 1 · Módulo 11</footer>
+</div>
+<script>
+const MODULE=11,COURSE="sqlavanzado_c1",PROG="sqlavanzado_progress",BADGES="sqlavanzado_badges";
+let state={live:40,dead:0};
+function render(){
+let vis=document.getElementById('bloatVis');
+vis.innerHTML='';
+for(let i=0;i<state.live;i++){
+let d=document.createElement('span');d.className='bloat-block live';d.textContent='L';vis.appendChild(d);
+}
+for(let i=0;i<state.dead;i++){
+let d=document.createElement('span');d.className='bloat-block dead';d.textContent='D';vis.appendChild(d);
+}
+let total=state.live+state.dead;
+document.getElementById('liveCount').textContent=state.live;
+document.getElementById('deadCount').textContent=state.dead;
+document.getElementById('bloatPct').textContent=total>0?Math.round(state.dead/total*100)+'%':'0%';
+document.getElementById('feedback').innerHTML='🧹 Estado: '+state.live+' vivas, '+state.dead+' muertas. Bloat: '+(total>0?Math.round(state.dead/total*100):0)+'%. '+
+(state.dead>10?'⚠️ ¡Mucho bloat! Ejecuta VACUUM y REINDEX.':state.dead>0?'👍 Un poco de bloat, VACUUM lo limpia.':'✅ Sin bloat. Base de datos saludable.');
+}
+document.getElementById('simUpdates').addEventListener('click',function(){
+state.dead+=Math.floor(Math.random()*15)+5;
+state.live=Math.max(10,state.live-Math.floor(Math.random()*3));
+render();
+});
+document.getElementById('runVacuum').addEventListener('click',function(){
+if(state.dead>0){
+state.dead=0;
+document.getElementById('feedback').innerHTML='✅ VACUUM completado. Tuplas muertas eliminadas. El espacio se marca como reusable pero no se devuelve al SO.';
+render();
+let bd=JSON.parse(localStorage.getItem(BADGES))||[];
+if(!bd.includes('Cazador de Bloat')){bd.push('Cazador de Bloat');localStorage.setItem(BADGES,JSON.stringify(bd));document.getElementById('insignia').classList.remove('hidden')}
+updateProg();
+}else{document.getElementById('feedback').innerHTML='⚠️ No hay bloat que limpiar. Genera algunos updates primero.'}
+});
+document.getElementById('runReindex').addEventListener('click',function(){
+document.getElementById('feedback').innerHTML='🔄 REINDEX CONCURRENTLY reconstruye el índice sin bloquear escrituras. Ideal después de VACUUM para compactar índices. En PostgreSQL 19, REINDEX usa menos trabajo que antes.';
+});
+function updateProg(){
+let p=JSON.parse(localStorage.getItem(COURSE+"_progress"))||[];
+if(!p.includes(MODULE)){p.push(MODULE);localStorage.setItem(COURSE+"_progress",JSON.stringify(p))}
+let pct=Math.round(p.length/12*100);
+document.getElementById('progFill').style.width=pct+'%';
+document.getElementById('progText').textContent='Módulo 11 de 12 ('+pct+'%)';
+let gp=JSON.parse(localStorage.getItem(PROG))||[];
+if(!gp.includes(MODULE+120)){gp.push(MODULE+120);localStorage.setItem(PROG,JSON.stringify(gp))}
+}
+render();
+</script>
+</body>
+</html>

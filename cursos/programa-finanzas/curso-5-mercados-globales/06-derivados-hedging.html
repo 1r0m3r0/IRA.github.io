@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Gestión de Riesgos con Derivados | Curso 5</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    :root { --accent: #ff5050; --accent-rgb: 255,80,80; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 100%); font-family: 'Inter', sans-serif; color: #eef5ff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; }
+    .modulo-container { max-width: 1100px; width: 100%; background: rgba(15,25,45,0.65); backdrop-filter: blur(12px); border-radius: 3rem; border: 1px solid rgba(var(--accent-rgb),0.25); box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden; }
+    .hero-header { background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%); padding: 1.5rem 2rem; text-align: center; border-bottom: 2px solid var(--accent); }
+    .hero-header h1 { font-size: 2rem; font-weight: 800; background: linear-gradient(135deg, #FFF, #fca5a5, var(--accent)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .hero-header p { font-size: 1rem; color: #fca5a5; margin-top: 0.2rem; }
+    .progress-bar { margin: 0.8rem 2rem; padding: 0.5rem 1rem; background: #00000055; border-radius: 2rem; display: flex; align-items: center; gap: 1rem; border: 1px solid var(--accent); }
+    .progress-fill-bg { flex:1; height:8px; background:#ffffff15; border-radius:8px; overflow:hidden; }
+    .progress-fill { height:100%; width:8%; background:linear-gradient(90deg,var(--accent),#fca5a5); border-radius:8px; transition:width 0.5s ease; }
+    .progress-text { font-size:0.75rem; color:#fca5a5; white-space:nowrap; }
+    .analogy-card { background: #1e2a3acc; margin: 1rem 2rem; padding: 1rem 1.5rem; border-radius: 1.5rem; border-left: 6px solid var(--accent); font-size: 0.95rem; }
+    .analogy-card i { color: var(--accent); }
+    .main-area { padding: 1rem 2rem 1.5rem; }
+    .sim-panel { background: rgba(0,10,25,0.7); border-radius: 1.5rem; padding: 1.2rem; border: 1px solid var(--accent); }
+    .sim-title { font-size: 1.3rem; font-weight: 700; color: var(--accent); margin-bottom: 0.8rem; }
+    .portfolio-card { background:#0f1a2c; border-radius:1rem; padding:0.8rem 1rem; margin-bottom:0.8rem; border:1px solid #2c3e66; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; }
+    .portfolio-card .p-label { font-size:0.75rem; color:#8899bb; }
+    .portfolio-card .p-value { font-size:1.3rem; font-weight:700; }
+    .hedge-form { display:grid; grid-template-columns: 1fr 1fr; gap:0.8rem; margin:0.8rem 0; }
+    .form-group { background:#0f1a2c; padding:0.5rem 0.8rem; border-radius:0.8rem; }
+    .form-group label { font-size:0.75rem; color:#b9e2ff; display:block; }
+    .form-group input, .form-group select { width:100%; padding:0.3rem; border-radius:0.4rem; border:1px solid #2c3e66; background:#1a2a4a; color:#eef5ff; font-family:'Inter',sans-serif; font-size:0.85rem; }
+    .btn-action { background: linear-gradient(95deg, var(--accent), #fca5a5); border: none; padding: 0.7rem 1.5rem; font-weight: 700; border-radius: 2rem; cursor: pointer; font-size: 0.95rem; color: #000; transition: 0.2s; font-family: 'Inter', sans-serif; }
+    .btn-action:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(var(--accent-rgb),0.4); }
+    .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
+    .scenario-btn { background:#1e2a3e; border:1px solid #2c3e66; padding:0.5rem 1rem; border-radius:2rem; cursor:pointer; font-size:0.8rem; font-weight:600; transition:0.2s; color:#eef5ff; }
+    .scenario-btn:hover { border-color:var(--accent); }
+    .scenario-btn.selected { background:var(--accent); color:#000; border-color:var(--accent); }
+    .feedback { background: #00000099; margin: 0.5rem 2rem 1rem; padding: 0.8rem; border-radius: 1rem; text-align: center; font-weight: 500; border-left: 4px solid var(--accent); font-size: 0.9rem; }
+    .insignia { text-align: center; background: #0c1b2f; border-radius: 1.5rem; margin: 0.8rem 2rem; padding: 0.8rem; border: 2px solid gold; }
+    .insignia i { font-size: 2rem; color: gold; }
+    .hedge-results { margin-top:0.8rem; background:#0f1a2c; padding:0.8rem; border-radius:1rem; border:1px solid #2c3e66; }
+    .hidden { display: none; }
+    .nav-links { display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap; padding: 1rem 2rem; }
+    .nav-link { background: #2c3e66; padding: 0.6rem 1.2rem; border-radius: 2rem; font-weight: 600; cursor: pointer; text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; font-size: 0.85rem; }
+    .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(var(--accent-rgb),0.4); }
+    .nav-link.next { background: linear-gradient(95deg, var(--accent), #fca5a5); color: #000; }
+    footer { text-align: center; padding: 1rem; font-size: 0.75rem; border-top: 1px solid #2c3e66; }
+    @media (max-width:800px) { .hero-header h1 { font-size:1.5rem; } .hedge-form { grid-template-columns:1fr; } }
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a><a href="../index.html">Programa</a><a href="index.html">Curso 5</a></nav>
+
+<div class="modulo-container">
+  <div class="hero-header">
+    <h1><i class="fas fa-shield-virus"></i> Gestión de Riesgos con Derivados</h1>
+    <p>Módulo 6 · Hedgea tu portafolio como un institucional</p>
+  </div>
+
+  <div class="progress-bar">
+    <span>📊 Curso 5</span>
+    <div class="progress-fill-bg"><div class="progress-fill" id="progressFill"></div></div>
+    <span class="progress-text" id="progressText">0%</span>
+  </div>
+
+  <div class="analogy-card">
+    <i class="fas fa-umbrella"></i> <strong>El paraguas antes de la tormenta:</strong> Comprar un paraguas cuando ya está lloviendo es caro y poco efectivo. El hedging es comprar el paraguas antes: pagas un pequeño costo (la prima/precio del futuro) para protegerte de la lluvia (caída del mercado) sin importar si al final llueve o no.
+  </div>
+
+  <div class="main-area">
+    <div class="sim-panel">
+      <div class="sim-title"><i class="fas fa-calculator"></i> Simulador de Cobertura con Futuros E-mini S&P</div>
+
+      <div class="portfolio-card">
+        <div><div class="p-label">Portafolio</div><div class="p-value" id="portfolioValue">$1,000,000</div></div>
+        <div><div class="p-label">Benchmark</div><div class="p-value">S&P 500</div></div>
+        <div><div class="p-label">Valor Futuro E-mini</div><div class="p-value">$200,000</div></div>
+      </div>
+
+      <div class="hedge-form">
+        <div class="form-group"><label>Beta del Portafolio</label><input type="number" id="betaInput" value="1.2" step="0.1" min="0.5" max="2.0"></div>
+        <div class="form-group"><label>Nº Contratos (óptimo)</label><input type="number" id="contractsInput" readonly></div>
+      </div>
+
+      <button class="btn-action" id="calcHedgeBtn"><i class="fas fa-calculator"></i> Calcular Hedge</button>
+
+      <div style="margin:0.8rem 0;display:flex;gap:0.5rem;flex-wrap:wrap;">
+        <span style="font-size:0.8rem;color:#8899bb;width:100%;">Selecciona un escenario de mercado:</span>
+        <button class="scenario-btn" data-scenario="up10">📈 Sube 10%</button>
+        <button class="scenario-btn" data-scenario="down20">📉 Baja 20%</button>
+        <button class="scenario-btn" data-scenario="sideways">➡️ Sideways ±2%</button>
+      </div>
+
+      <div id="hedgeResults" class="hedge-results hidden"></div>
+    </div>
+  </div>
+
+  <div id="feedback" class="feedback">
+    💡 Calcula el número óptimo de contratos futuros para hedgear tu portafolio. Luego simula escenarios.
+  </div>
+
+  <div id="insignia" class="insignia hidden">
+    <i class="fas fa-medal"></i>
+    <h3>🏅 ¡HEDGE MASTER! 🏅</h3>
+    <p>Sabes cómo proteger un portafolio usando derivados. ¡Cobertura de nivel institucional!</p>
+  </div>
+
+  <div class="nav-links">
+    <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Menú</a>
+    <button id="nextBtn" class="nav-link next hidden">Siguiente <i class="fas fa-arrow-right"></i></button>
+  </div>
+  <footer>
+    <i class="fas fa-shield-virus"></i> Mercados Globales · Módulo 6 · Derivados y Hedging
+  </footer>
+</div>
+
+<script>
+  const MODULE_ID = 'c5m6';
+  const PROGRESS_KEY = 'finanzas_progress';
+  const BADGE_KEY = 'finanzas_c5m6';
+  const TOTAL_MODULES = 72;
+
+  let hedgeCompleted = false;
+  let currentScenario = null;
+  let optimalContracts = 0;
+
+  function getProgress() { return JSON.parse(localStorage.getItem(PROGRESS_KEY)) || []; }
+  function saveProgress() {
+    let p = getProgress();
+    if (!p.includes(MODULE_ID)) { p.push(MODULE_ID); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
+    let pct = Math.round((p.length / TOTAL_MODULES) * 100);
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressText').textContent = pct + '% (progr. global)';
+  }
+  function getBadge() { return localStorage.getItem(BADGE_KEY) === 'true'; }
+  function setBadge() { localStorage.setItem(BADGE_KEY, 'true'); }
+
+  document.getElementById('calcHedgeBtn').addEventListener('click', function() {
+    var beta = parseFloat(document.getElementById('betaInput').value) || 1.2;
+    var portfolioVal = 1000000;
+    var futureVal = 200000;
+    optimalContracts = Math.round((portfolioVal * beta) / futureVal);
+    document.getElementById('contractsInput').value = optimalContracts;
+    document.getElementById('feedback').textContent = '✅ Hedge calculado: ' + optimalContracts + ' contratos E-mini para portafolio de $1M con beta ' + beta + '. Ahora simula un escenario.';
+  });
+
+  document.querySelectorAll('.scenario-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      if (!optimalContracts) {
+        document.getElementById('feedback').textContent = '⚠️ Primero calcula el número de contratos.';
+        return;
+      }
+      document.querySelectorAll('.scenario-btn').forEach(function(b) { b.classList.remove('selected'); });
+      this.classList.add('selected');
+      currentScenario = this.dataset.scenario;
+      simulateScenario(currentScenario);
+    });
+  });
+
+  function simulateScenario(scenario) {
+    var beta = parseFloat(document.getElementById('betaInput').value) || 1.2;
+    var portfolioVal = 1000000;
+    var futureVal = 200000;
+    var contracts = optimalContracts;
+
+    var marketReturn, marketDesc;
+    if (scenario === 'up10') { marketReturn = 0.10; marketDesc = 'Sube 10%'; }
+    else if (scenario === 'down20') { marketReturn = -0.20; marketDesc = 'Baja 20%'; }
+    else { marketReturn = 0.02; marketDesc = 'Sideways +2%'; }
+
+    var portfolioReturn = marketReturn * beta;
+    var portfolioLoss = portfolioVal * portfolioReturn;
+    var hedgeReturn = -marketReturn * (futureVal * contracts);
+    var netResult = portfolioLoss + hedgeReturn;
+    var hedgeEffectiveness = Math.abs(hedgeReturn / portfolioLoss) * 100;
+
+    var resultsDiv = document.getElementById('hedgeResults');
+    resultsDiv.classList.remove('hidden');
+    resultsDiv.innerHTML = `
+      <h4 style="color:var(--accent);margin-bottom:0.5rem;">📊 Resultados: ${marketDesc}</h4>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem;">
+        <div style="background:#0f1a2c;padding:0.5rem;border-radius:0.5rem;text-align:center;">
+          <div style="font-size:0.7rem;color:#8899bb;">Portafolio</div>
+          <div style="font-weight:700;color:${portfolioLoss >= 0 ? '#00ffc8' : '#ff5050'};">${portfolioLoss >= 0 ? '+' : ''}$${portfolioLoss.toFixed(0)}</div>
+        </div>
+        <div style="background:#0f1a2c;padding:0.5rem;border-radius:0.5rem;text-align:center;">
+          <div style="font-size:0.7rem;color:#8899bb;">Hedge (Futuros)</div>
+          <div style="font-weight:700;color:${hedgeReturn >= 0 ? '#00ffc8' : '#ff5050'};">${hedgeReturn >= 0 ? '+' : ''}$${hedgeReturn.toFixed(0)}</div>
+        </div>
+        <div style="background:#0f1a2c;padding:0.5rem;border-radius:0.5rem;text-align:center;">
+          <div style="font-size:0.7rem;color:#8899bb;">Resultado Neto</div>
+          <div style="font-weight:700;color:${netResult >= 0 ? '#00ffc8' : '#ff5050'};">${netResult >= 0 ? '+' : ''}$${netResult.toFixed(0)}</div>
+        </div>
+      </div>
+      <div style="margin-top:0.5rem;font-size:0.85rem;background:#0f1a2c;padding:0.5rem;border-radius:0.5rem;">
+        📐 Hedge Effectiveness: ${hedgeEffectiveness.toFixed(1)}%
+        ${hedgeEffectiveness > 90 ? '✅ Cobertura casi perfecta.' : hedgeEffectiveness > 70 ? '⚠️ Cobertura parcial aceptable.' : '❌ Cobertura insuficiente. Ajusta beta o contratos.'}
+      </div>
+    `;
+
+    if (!hedgeCompleted) {
+      hedgeCompleted = true;
+      document.getElementById('insignia').classList.remove('hidden');
+      document.getElementById('nextBtn').classList.remove('hidden');
+      setBadge();
+      saveProgress();
+    }
+
+    document.getElementById('feedback').textContent = '✅ Escenario ' + marketDesc + ' simulado. Effectiveness: ' + hedgeEffectiveness.toFixed(1) + '%.';
+  }
+
+  document.getElementById('nextBtn').addEventListener('click', function() {
+    alert('🔄 Transición al Módulo 7: Riesgo de Crédito y Contraparte');
+    window.location.href = '07-riesgo-credito.html';
+  });
+
+  (function restore() {
+    if (getBadge()) {
+      document.getElementById('insignia').classList.remove('hidden');
+      document.getElementById('nextBtn').classList.remove('hidden');
+      document.getElementById('feedback').textContent = '✅ Ya completaste este módulo. ¡Hedge Master!';
+      hedgeCompleted = true;
+    }
+    let p = getProgress();
+    if (p.includes(MODULE_ID)) {
+      let pct = Math.round((p.length / TOTAL_MODULES) * 100);
+      document.getElementById('progressFill').style.width = pct + '%';
+      document.getElementById('progressText').textContent = pct + '% (progr. global)';
+    }
+    // Initial calculation
+    setTimeout(function() { document.getElementById('calcHedgeBtn').click(); }, 100);
+  })();
+</script>
+  <script src="../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

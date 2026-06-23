@@ -1,0 +1,107 @@
+<!DOCTYPE html><html lang="es"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SQL Avanzado | 10 ANALYZE Estadísticas</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../../../assets/css/theme.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#0a0e0f;color:#e8edee;min-height:100vh;display:flex;justify-content:center;padding:20px}
+.course-container{max-width:860px;width:100%;background:rgba(15,20,42,0.6);backdrop-filter:blur(16px);border-radius:24px;border:1px solid rgba(255,80,80,0.2);padding:30px;margin-top:60px}
+.progress-bar,.progress-fill{height:10px;border-radius:8px}
+.progress-bar{background:rgba(255,255,255,0.06);margin-bottom:18px;overflow:hidden}
+.progress-fill{background:linear-gradient(90deg,#ff5050,#cc4040);width:0%;transition:width .5s ease}
+.progress-text{font-size:.75rem;color:#8899aa;margin-bottom:10px;display:block}
+.hero-header{text-align:center;margin:20px 0}
+.hero-header h1{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:800;background:linear-gradient(135deg,#ff5050,#cc4040);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-header p{color:#8899aa;margin-top:6px;font-size:.95rem}
+.analogy-card{background:rgba(255,80,80,0.08);border-left:4px solid #ff5050;border-radius:12px;padding:16px 20px;margin:20px 0;font-size:.9rem;line-height:1.6}
+.analogy-card strong{color:#ff5050}
+.main-area{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:24px;margin:20px 0}
+.histogram{display:flex;align-items:flex-end;gap:6px;margin:20px 0;height:120px;justify-content:center}
+.hist-bar{width:28px;background:linear-gradient(180deg,#ff5050,#cc4040);border-radius:4px 4px 0 0;transition:height .5s;position:relative;min-height:4px}
+.hist-bar span{position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:.6rem;color:#8899aa}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0}
+.stat-card{background:rgba(255,255,255,0.03);border-radius:10px;padding:12px;text-align:center}
+.stat-card h5{color:#ff5050;font-size:.8rem}
+.stat-card .v{font-size:1.2rem;font-weight:700;color:#fff}
+.stat-card .v2{font-size:.85rem;color:#8899aa}
+.stat-card.null_frac .v{color:#9c64ff}
+.stat-card.corr .v{color:#00e0ff}
+.quiz-option{display:block;width:100%;padding:12px 16px;margin:6px 0;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#e8edee;font-size:.85rem;font-family:'Inter',sans-serif;cursor:pointer;transition:.25s;text-align:left}
+.quiz-option:hover{background:rgba(255,80,80,0.1);border-color:#ff5050}
+.quiz-option.correct{background:rgba(0,255,100,0.15);border-color:#00ff64}
+.quiz-option.wrong{background:rgba(255,80,80,0.15);border-color:#ff5050}
+.feedback{background:rgba(255,255,255,0.04);border-radius:12px;padding:16px 20px;margin:16px 0;font-size:.88rem;min-height:50px}
+.insignia{background:linear-gradient(135deg,rgba(255,215,0,0.12),rgba(255,165,0,0.08));border:1px solid rgba(255,215,0,0.3);border-radius:16px;padding:20px;text-align:center;margin:16px 0;transition:.5s}
+.insignia.hidden{display:none}
+.insignia h3{color:#ffd700;font-size:1.3rem;margin:8px 0}
+.btn-next{display:block;width:100%;padding:16px;margin:20px 0;background:linear-gradient(135deg,#ff5050,#cc4040);border:none;border-radius:14px;color:#fff;font-size:1.05rem;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:.3s}
+.btn-next:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,80,80,0.3)}
+footer{text-align:center;padding:16px 0 0;color:#667788;font-size:.8rem;border-top:1px solid rgba(255,255,255,0.06);margin-top:20px}
+@media(max-width:600px){.course-container{padding:16px;margin-top:50px}.stats-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="course-container">
+<nav class="brand-return-nav"><a href="../../../../index.html">&larr; Portfolio</a><a href="../../../../cursos/index.html">Cursos</a></nav>
+<div class="progress-bar"><div class="progress-fill" id="progFill"></div></div>
+<span class="progress-text" id="progText">Módulo 10 de 12</span>
+<div class="hero-header"><h1>📈 ANALYZE y Estadísticas</h1><p>El maná del optimizador: histogramas, correlación y n_distinct</p></div>
+<div class="analogy-card"><strong>💡 Piénsalo así:</strong> ANALYZE es como el censo nacional. El gobierno necesita saber cuánta gente hay, cómo está distribuida por edad, región, ingresos, para tomar decisiones. PostgreSQL necesita saber cuántas filas hay, cómo se distribuyen los valores, para elegir el mejor plan de ejecución. Sin ANALYZE, el optimizador literalmente adivina.</div>
+<div class="main-area">
+<p style="color:#bcc;margin-bottom:10px;font-weight:600"><i class="fas fa-chart-pie" style="color:#ff5050"></i> Visualizador de estadísticas</p>
+<div class="histogram" id="histogram"></div>
+<div class="stats-grid">
+<div class="stat-card"><h5>n_distinct</h5><div class="v">1,245</div><div class="v2">valores únicos estimados</div></div>
+<div class="stat-card"><h5>null_frac</h5><div class="v" style="color:#9c64ff">0.02</div><div class="v2">fracción de nulos (2%)</div></div>
+<div class="stat-card"><h5>correlation</h5><div class="v" style="color:#00e0ff">0.87</div><div class="v2">correlación física-lógica</div></div>
+<div class="stat-card"><h5>most_common_freq</h5><div class="v">0.15</div><div class="v2">frecuencia valor más común</div></div>
+</div>
+<p style="color:#bcc;margin:16px 0 10px;font-weight:600"><i class="fas fa-question-circle" style="color:#ff5050"></i> ¿Qué pasa si no ejecutas ANALYZE después de cargar datos?</p>
+<button class="quiz-option" data-ans="0">PostgreSQL usa estadísticas de la tabla pg_class (approximadas)</button>
+<button class="quiz-option" data-ans="1">La consulta falla con error</button>
+<button class="quiz-option" data-ans="2">PostgreSQL escanea toda la tabla automáticamente</button>
+<button class="quiz-option" data-ans="3">No pasa nada, las estadísticas se actualizan solas al vuelo</button>
+</div>
+<div id="feedback" class="feedback">💬 Responde el quiz para entender la importancia de ANALYZE.</div>
+<div id="insignia" class="insignia hidden"><i class="fas fa-medal" style="font-size:2.5rem;color:#ffd700"></i><h3>🏅 Estadístico SQL 🏅</h3><p>¡Comprendes cómo las estadísticas alimentan al optimizador!</p></div>
+<button class="btn-next" onclick="alert('🔄 Transición → 11-reindex-vacuum-bloat.html')">Siguiente <i class="fas fa-arrow-right"></i></button>
+<footer><i class="fas fa-crown"></i> SQL Avanzado · Curso 1 · Módulo 10</footer>
+</div>
+<script>
+const MODULE=10,COURSE="sqlavanzado_c1",PROG="sqlavanzado_progress",BADGES="sqlavanzado_badges";
+function renderHist(){
+let h=document.getElementById('histogram');
+let vals=[10,25,40,60,80,95,100,95,70,45,30,15];
+h.innerHTML=vals.map((v,i)=>'<div class="hist-bar" style="height:'+v+'px"><span>'+(i*10)+'</span></div>').join('');
+}
+document.querySelectorAll('.quiz-option').forEach(b=>{
+b.addEventListener('click',function(){
+let ans=this.dataset.ans;
+if(ans==='0'){
+document.getElementById('feedback').innerHTML='✅ ¡Correcto! Sin ANALYZE, PostgreSQL usa valores predeterminados de pg_class (reltuples, relpages). El optimizador puede subestimar o sobrestimar drásticamente. Siempre ejecuta ANALYZE (o autovacuum lo hará) después de grandes cambios de datos.';
+document.getElementById('insignia').classList.remove('hidden');
+this.className='quiz-option correct';
+document.querySelectorAll('.quiz-option').forEach(o=>o.style.pointerEvents='none');
+let bd=JSON.parse(localStorage.getItem(BADGES))||[];
+if(!bd.includes('Estadístico SQL')){bd.push('Estadístico SQL');localStorage.setItem(BADGES,JSON.stringify(bd))}
+updateProg();
+}else{
+document.getElementById('feedback').innerHTML='❌ Incorrecto. PostgreSQL nunca falla por falta de estadísticas, pero usa valores aproximados de catálogo. La opción correcta: usa estimaciones de pg_class (que pueden estar desactualizadas).';
+this.className='quiz-option wrong';setTimeout(()=>this.className='quiz-option',600)}
+})
+});
+function updateProg(){
+let p=JSON.parse(localStorage.getItem(COURSE+"_progress"))||[];
+if(!p.includes(MODULE)){p.push(MODULE);localStorage.setItem(COURSE+"_progress",JSON.stringify(p))}
+let pct=Math.round(p.length/12*100);
+document.getElementById('progFill').style.width=pct+'%';
+document.getElementById('progText').textContent='Módulo 10 de 12 ('+pct+'%)';
+let gp=JSON.parse(localStorage.getItem(PROG))||[];
+if(!gp.includes(MODULE+108)){gp.push(MODULE+108);localStorage.setItem(PROG,JSON.stringify(gp))}
+}
+renderHist();
+</script>
+</body>
+</html>

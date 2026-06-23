@@ -1,0 +1,106 @@
+<!DOCTYPE html><html lang="es"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SQL Avanzado | 09 Connection Pooling PgBouncer</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../../../assets/css/theme.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#0a0e0f;color:#e8edee;min-height:100vh;display:flex;justify-content:center;padding:20px}
+.course-container{max-width:860px;width:100%;background:rgba(15,20,42,0.6);backdrop-filter:blur(16px);border-radius:24px;border:1px solid rgba(255,80,80,0.2);padding:30px;margin-top:60px}
+.progress-bar,.progress-fill{height:10px;border-radius:8px}
+.progress-bar{background:rgba(255,255,255,0.06);margin-bottom:18px;overflow:hidden}
+.progress-fill{background:linear-gradient(90deg,#ff5050,#cc4040);width:0%;transition:width .5s ease}
+.progress-text{font-size:.75rem;color:#8899aa;margin-bottom:10px;display:block}
+.hero-header{text-align:center;margin:20px 0}
+.hero-header h1{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:800;background:linear-gradient(135deg,#ff5050,#cc4040);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-header p{color:#8899aa;margin-top:6px;font-size:.95rem}
+.analogy-card{background:rgba(255,80,80,0.08);border-left:4px solid #ff5050;border-radius:12px;padding:16px 20px;margin:20px 0;font-size:.9rem;line-height:1.6}
+.analogy-card strong{color:#ff5050}
+.main-area{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:24px;margin:20px 0}
+.pool-input{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:16px 0}
+.pool-input label{font-size:.85rem;color:#aab}
+.pool-input input{background:#1a1f3a;border:1px solid rgba(255,80,80,0.3);border-radius:8px;padding:8px 12px;color:#e8edee;font-family:'Inter',sans-serif;width:80px;text-align:center;font-size:1rem}
+.pool-input input:focus{border-color:#ff5050;outline:none}
+.pool-display{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0}
+.pool-box{background:rgba(255,255,255,0.03);border-radius:12px;padding:16px;text-align:center}
+.pool-box .num{font-size:2rem;font-weight:700;color:#ff5050}
+.pool-box .lbl{font-size:.75rem;color:#8899aa;margin-top:4px}
+.pool-box .sub{font-size:.75rem;color:#667;margin-top:2px}
+.pool-meter{background:rgba(255,255,255,0.04);border-radius:12px;padding:16px;margin:16px 0}
+.pool-meter .meter-bar{height:24px;background:rgba(255,255,255,0.06);border-radius:12px;overflow:hidden;margin-top:8px}
+.pool-meter .meter-fill{height:100%;background:linear-gradient(90deg,#00ff64,#ff5050);border-radius:12px;transition:width .5s;width:0%}
+.pool-meter .meter-labels{display:flex;justify-content:space-between;font-size:.7rem;color:#667;margin-top:4px}
+.feedback{background:rgba(255,255,255,0.04);border-radius:12px;padding:16px 20px;margin:16px 0;font-size:.88rem;min-height:50px}
+.insignia{background:linear-gradient(135deg,rgba(255,215,0,0.12),rgba(255,165,0,0.08));border:1px solid rgba(255,215,0,0.3);border-radius:16px;padding:20px;text-align:center;margin:16px 0;transition:.5s}
+.insignia.hidden{display:none}
+.insignia h3{color:#ffd700;font-size:1.3rem;margin:8px 0}
+.btn-next{display:block;width:100%;padding:16px;margin:20px 0;background:linear-gradient(135deg,#ff5050,#cc4040);border:none;border-radius:14px;color:#fff;font-size:1.05rem;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:.3s}
+.btn-next:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,80,80,0.3)}
+footer{text-align:center;padding:16px 0 0;color:#667788;font-size:.8rem;border-top:1px solid rgba(255,255,255,0.06);margin-top:20px}
+@media(max-width:600px){.course-container{padding:16px;margin-top:50px}.pool-display{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="course-container">
+<nav class="brand-return-nav"><a href="../../../../index.html">&larr; Portfolio</a><a href="../../../../cursos/index.html">Cursos</a></nav>
+<div class="progress-bar"><div class="progress-fill" id="progFill"></div></div>
+<span class="progress-text" id="progText">Módulo 9 de 12</span>
+<div class="hero-header"><h1>🔌 Connection Pooling con PgBouncer</h1><p>Más conexiones no siempre es mejor. Pooléalas.</p></div>
+<div class="analogy-card"><strong>💡 Piénsalo así:</strong> PgBouncer es como el recepcionista de un gimnasio. En vez de dejar que 500 personas entren al mismo tiempo (colapsando las máquinas), el recepcionista deja pasar solo a 50 y el resto espera en la sala. Cuando alguien termina, pasa el siguiente. Así el gimnasio (PostgreSQL) nunca se satura.</div>
+<div class="main-area">
+<p style="color:#bcc;margin-bottom:10px;font-weight:600"><i class="fas fa-calculator" style="color:#ff5050"></i> Calculadora de Pool</p>
+<div class="pool-input">
+<label><i class="fas fa-users"></i> Conexiones totales:</label>
+<input type="number" id="totalConns" value="500" min="10" max="5000">
+<label><i class="fas fa-microchip"></i> CPUs:</label>
+<input type="number" id="cpuCores" value="8" min="1" max="128">
+<button class="quiz-option" id="calcPool" style="padding:8px 20px;width:auto;text-align:center;background:rgba(255,80,80,0.12);border-color:#ff5050;font-weight:600"><i class="fas fa-sync"></i> Calcular</button>
+</div>
+<div class="pool-display">
+<div class="pool-box"><div class="num" id="poolSize">80</div><div class="lbl">Pool Óptimo (2.5×CPUs)</div><div class="sub">Fórmula: CPU × 2.5</div></div>
+<div class="pool-box"><div class="num" id="queued">420</div><div class="lbl">En espera (colas)</div><div class="sub">Clientes - pool</div></div>
+</div>
+<div class="pool-meter">
+<div style="font-size:.85rem;color:#aab">Uso del pool: <strong id="poolUsage">16%</strong></div>
+<div class="meter-bar"><div class="meter-fill" id="poolFill"></div></div>
+<div class="meter-labels"><span>0</span><span id="poolMaxLabel">80</span></div>
+</div>
+</div>
+<div id="feedback" class="feedback">💬 PgBouncer en modo transaction pooling permite manejar miles de clientes con solo decenas de conexiones a PostgreSQL.</div>
+<div id="insignia" class="insignia hidden"><i class="fas fa-medal" style="font-size:2.5rem;color:#ffd700"></i><h3>🏅 Maestro del Pool 🏅</h3><p>¡Sabes dimensionar PgBouncer como un profesional!</p></div>
+<button class="btn-next" onclick="alert('🔄 Transición → 10-analyze-estadisticas.html')">Siguiente <i class="fas fa-arrow-right"></i></button>
+<footer><i class="fas fa-crown"></i> SQL Avanzado · Curso 1 · Módulo 9</footer>
+</div>
+<script>
+const MODULE=9,COURSE="sqlavanzado_c1",PROG="sqlavanzado_progress",BADGES="sqlavanzado_badges";
+function calcPool(){
+let tc=parseInt(document.getElementById('totalConns').value)||500;
+let cpu=parseInt(document.getElementById('cpuCores').value)||8;
+let pool=Math.max(10,cpu*2.5);
+let queued=Math.max(0,tc-pool);
+let usage=tc>0?Math.min(100,Math.round(pool/tc*100)):0;
+document.getElementById('poolSize').textContent=Math.round(pool);
+document.getElementById('queued').textContent=queued.toLocaleString();
+document.getElementById('poolUsage').textContent=usage+'%';
+document.getElementById('poolFill').style.width=usage+'%';
+document.getElementById('poolMaxLabel').textContent=Math.round(pool);
+document.getElementById('feedback').innerHTML='📊 Con '+tc+' clientes y '+cpu+' CPUs: pool='+Math.round(pool)+' conexiones, '+queued.toLocaleString()+' en cola. ⚠️ Modo transacción (transaction mode): las conexiones se reasignan entre transacciones. ⚠️ Modo sesión: la conexión se mantiene hasta que el cliente se desconecta.';
+let bd=JSON.parse(localStorage.getItem(BADGES))||[];
+if(!bd.includes('Maestro del Pool')){bd.push('Maestro del Pool');localStorage.setItem(BADGES,JSON.stringify(bd));document.getElementById('insignia').classList.remove('hidden')}
+updateProg();
+}
+document.getElementById('calcPool').addEventListener('click',calcPool);
+function updateProg(){
+let p=JSON.parse(localStorage.getItem(COURSE+"_progress"))||[];
+if(!p.includes(MODULE)){p.push(MODULE);localStorage.setItem(COURSE+"_progress",JSON.stringify(p))}
+let pct=Math.round(p.length/12*100);
+document.getElementById('progFill').style.width=pct+'%';
+document.getElementById('progText').textContent='Módulo 9 de 12 ('+pct+'%)';
+let gp=JSON.parse(localStorage.getItem(PROG))||[];
+if(!gp.includes(MODULE+96)){gp.push(MODULE+96);localStorage.setItem(PROG,JSON.stringify(gp))}
+}
+calcPool();
+</script>
+</body>
+</html>

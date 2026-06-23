@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Curso 3 | Módulo 9: Profiling</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../assets/css/theme.css">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:linear-gradient(135deg,#0a0f1e,#0c1222); font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+.course-container { max-width:1100px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,80,80,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+.progress-bar { background:#0a0f1e; padding:0.8rem 2rem; display:flex; align-items:center; gap:1rem; flex-wrap:wrap; }
+.progress-track { flex:1; height:10px; background:#1a2440; border-radius:10px; overflow:hidden; min-width:100px; }
+.progress-fill { height:100%; background:linear-gradient(90deg,#ff5050,#ff8080); border-radius:10px; transition:width 0.5s; width:0%; }
+.progress-text { font-size:0.8rem; color:#8899bb; }
+.hero { background:linear-gradient(95deg,#0b1120,#2a0e0e); padding:2rem; text-align:center; border-bottom:2px solid #ff5050; }
+.hero h1 { font-size:2.2rem; font-weight:800; background:linear-gradient(135deg,#fff,#ff8080,#ff5050); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.hero p { color:#ff8080; }
+.analogy { background:rgba(255,80,80,0.1); margin:1.5rem 2rem; padding:1.2rem 1.5rem; border-radius:1.5rem; border-left:5px solid #ff5050; display:flex; gap:1rem; align-items:flex-start; }
+.analogy i { font-size:1.8rem; color:#ff5050; flex-shrink:0; }
+.content { padding:0 2rem 2rem; }
+.profile-dash { background:rgba(0,0,0,0.3); border-radius:2rem; padding:1.5rem; border:1px solid #2c3e66; }
+.profile-table { width:100%; border-collapse:collapse; margin:0.5rem 0; }
+.profile-table th,.profile-table td { border:1px solid #2c3e66; padding:0.4rem; text-align:center; font-size:0.8rem; }
+.profile-table th { background:#1a2440; color:#ff8080; }
+.profile-table tr.bottleneck td { background:rgba(255,80,80,0.15); }
+.optimize-btn { background:#1a2440; border:2px solid #2c3e66; padding:0.5rem 1rem; border-radius:2rem; cursor:pointer; font-size:0.85rem; margin:0.3rem; transition:0.2s; }
+.optimize-btn:hover { border-color:#ff5050; }
+.feedback { background:rgba(0,0,0,0.4); padding:1rem 1.5rem; border-radius:1.5rem; margin:1rem 0; border-left:4px solid #ff5050; }
+.insignia { text-align:center; padding:1.5rem; background:linear-gradient(135deg,rgba(255,80,80,0.15),rgba(255,128,128,0.05)); border-radius:2rem; margin:1rem 0; border:2px solid #ff5050; display:none; }
+.insignia.show { display:block; animation:pulse 0.6s; }
+@keyframes pulse { 0%{transform:scale(0.9);opacity:0} 50%{transform:scale(1.05)} 100%{transform:scale(1);opacity:1} }
+.insignia i { font-size:3rem; color:#ffd700; }
+.btn-next-area { text-align:center; padding:1rem 2rem 2rem; }
+.btn-next { background:linear-gradient(135deg,#ff5050,#ff8080); border:none; padding:0.9rem 2.5rem; border-radius:3rem; cursor:pointer; font-weight:700; font-size:1.1rem; color:#fff; transition:0.2s; }
+.btn-next:hover { transform:scale(1.05); }
+footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; color:#8899bb; }
+@media (max-width:700px) { .hero h1 { font-size:1.6rem; } .content { padding:0 1rem 1.5rem; } .analogy { margin:1rem; } }
+</style>
+</head>
+<body>
+<nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a><a href="../index.html">Python Medio</a><a href="index.html">Curso 3</a></nav>
+<div class="course-container">
+<div class="progress-bar"><span style="color:#ff5050;font-weight:700;"><i class="fas fa-gauge"></i> M9</span><div class="progress-track"><div class="progress-fill" id="progressFill"></div></div><span class="progress-text" id="progressText">0%</span></div>
+<div class="hero"><h1><i class="fas fa-gauge"></i> Profiling con cProfile</h1><p>Mide tiempos por función, encuentra cuellos de botella</p></div>
+<div class="analogy"><i class="fas fa-stopwatch"></i><div><strong>⏱️ Piénsalo así:</strong> cProfile es como <strong>un cronometrista olímpico para cada atleta de tu código</strong>. No solo mide el tiempo total de la carrera, sino que cronometra a cada corredor (función): "ProcesarDatos tardó 3.2s, se llamó 150 veces, 0.021s por llamada". line_profiler es como <strong>poner sensores en cada zancada</strong>: línea por línea ves dónde pierde tiempo cada atleta. "¡La línea 47 (el bucle anidado) consume el 80% del tiempo!"</div></div>
+<div class="content">
+<div class="profile-dash">
+<h3><i class="fas fa-gauge"></i> Dashboard de Profiling</h3>
+<p style="color:#b9ccee;margin-bottom:0.8rem;">Resultados de cProfile para procesamiento de datos:</p>
+<table class="profile-table" id="profileTable">
+<tr><th>Función</th><th>Llamadas</th><th>Tiempo total</th><th>Por llamada</th><th>%</th></tr>
+<tr><td>procesar_archivo</td><td>1</td><td>4.532s</td><td>4.532s</td><td>100%</td></tr>
+<tr class="bottleneck"><td>ordenar_datos</td><td>1</td><td>2.891s</td><td>2.891s</td><td>63.8%</td></tr>
+<tr><td>leer_csv</td><td>1</td><td>0.834s</td><td>0.834s</td><td>18.4%</td></tr>
+<tr><td>filtrar_registros</td><td>1</td><td>0.421s</td><td>0.421s</td><td>9.3%</td></tr>
+<tr><td>calcular_estadisticas</td><td>5</td><td>0.312s</td><td>0.062s</td><td>6.9%</td></tr>
+</table>
+<button class="optimize-btn" onclick="optimize()"><i class="fas fa-wand-magic-sparkles"></i> Optimizar cuello de botella</button>
+<div class="code-panel" style="background:#0a0f1e;border-radius:1.5rem;padding:1rem;font-family:monospace;border:1px solid #2c3e66;min-height:60px;margin:0.5rem 0;white-space:pre-wrap;" id="optOutput">💡 ordenar_datos() consume el 63.8% del tiempo. ¡Ahí está el cuello de botella!</div>
+</div>
+<div class="feedback" id="feedback">💬 cProfile mide tiempo y llamadas por función. line_profiler mide línea por línea. Nunca optimices sin medir primero.</div>
+<div class="insignia" id="insignia"><i class="fas fa-medal"></i><h3>🏅 Profiler Master 🏅</h3><p>¡Sabes encontrar cuellos de botella! Medir antes de optimizar es la regla de oro del rendimiento.</p></div>
+</div>
+<div class="btn-next-area"><button class="btn-next" onclick="nextModule()">Siguiente <i class="fas fa-arrow-right"></i></button></div>
+<footer><i class="fas fa-vial"></i> Testing, Calidad · Módulo 9 · Profiling</footer></div>
+<script>
+const COURSE='pythonmedio',MODULE='c3m9',TOTAL=72;
+function updateProgress(){let p=JSON.parse(localStorage.getItem(COURSE+'_progress'))||[];if(!p.includes(MODULE)){p.push(MODULE);localStorage.setItem(COURSE+'_progress',JSON.stringify(p));}const pct=Math.round((p.length/TOTAL)*100);document.getElementById('progressFill').style.width=pct+'%';document.getElementById('progressText').textContent=`Módulo 3.9 de 6.12 (${pct}%)`;}
+updateProgress();
+function optimize(){document.getElementById('optOutput').textContent='🔧 Antes: ordenar_datos() usaba sort() con key=lambda\n    2.891s — 63.8% del tiempo\n\n🔧 Después: reemplazamos con sorted() + itemgetter\n    0.892s — ¡69% más rápido!\n\n✅ El cuello de botella se redujo drásticamente.\n💡 Siempre mide antes y después de optimizar.';document.getElementById('feedback').innerHTML='✅ <strong>¡Optimizado!</strong> El cuello de botella (ordenar_datos) se redujo de 2.891s a 0.892s. La regla 80/20: el 20% del código consume el 80% del tiempo.';const ins=document.getElementById('insignia');if(!ins.classList.contains('show')){ins.classList.add('show');const b=JSON.parse(localStorage.getItem(COURSE+'_badges'))||[];if(!b.includes(MODULE)){b.push(MODULE);localStorage.setItem(COURSE+'_badges',JSON.stringify(b));}}}
+function nextModule(){alert('🔄 Transición al Módulo 10: Lint Hero (Ruff, pylint, mypy). En un entorno real, esto enlazaría a 10-lint-hero.html');}
+</script>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html><html lang="es"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SQL Avanzado | C3-06 websearch_to_tsquery</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../../../assets/css/theme.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#0a0e0f;color:#e8edee;min-height:100vh;display:flex;justify-content:center;padding:20px}
+.course-container{max-width:860px;width:100%;background:rgba(15,20,42,0.6);backdrop-filter:blur(16px);border-radius:24px;border:1px solid rgba(0,224,255,0.2);padding:30px;margin-top:60px}
+.progress-bar,.progress-fill{height:10px;border-radius:8px}
+.progress-bar{background:rgba(255,255,255,0.06);margin-bottom:18px;overflow:hidden}
+.progress-fill{background:linear-gradient(90deg,#00e0ff,#00b8d4);width:0%;transition:width .5s ease}
+.progress-text{font-size:.75rem;color:#8899aa;margin-bottom:10px;display:block}
+.hero-header{text-align:center;margin:20px 0}
+.hero-header h1{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:800;background:linear-gradient(135deg,#00e0ff,#00b8d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-header p{color:#8899aa;margin-top:6px;font-size:.95rem}
+.analogy-card{background:rgba(0,224,255,0.08);border-left:4px solid #00e0ff;border-radius:12px;padding:16px 20px;margin:20px 0;font-size:.9rem;line-height:1.6}
+.analogy-card strong{color:#00e0ff}
+.main-area{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:24px;margin:20px 0}
+.input-group{display:flex;gap:10px;margin:16px 0;flex-wrap:wrap}
+.input-group input{flex:1;background:#1a1f3a;border:1px solid rgba(0,224,255,0.3);border-radius:10px;padding:12px 16px;color:#e8edee;font-family:'Inter',sans-serif;font-size:.95rem;min-width:200px}
+.input-group input:focus{border-color:#00e0ff;outline:none}
+.input-group button{padding:12px 24px;border-radius:10px;background:rgba(0,224,255,0.12);border:1px solid #00e0ff;color:#00e0ff;cursor:pointer;font-family:'Inter',sans-serif;font-weight:600;transition:.3s}
+.input-group button:hover{background:rgba(0,224,255,0.2)}
+.conversion{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0}
+.conv-box{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:16px;min-height:60px}
+.conv-box h5{color:#00e0ff;font-size:.85rem;margin-bottom:8px}
+.conv-box .code{font-family:monospace;font-size:.9rem;color:#bcc;word-break:break-all}
+.rules-list{background:rgba(255,255,255,0.02);border-radius:10px;padding:12px 16px;margin:12px 0}
+.rules-list .rule{font-size:.78rem;color:#8899aa;padding:3px 0}
+.rules-list .rule strong{color:#00e0ff}
+.feedback{background:rgba(255,255,255,0.04);border-radius:12px;padding:16px 20px;margin:16px 0;font-size:.88rem;min-height:50px}
+.insignia{background:linear-gradient(135deg,rgba(255,215,0,0.12),rgba(255,165,0,0.08));border:1px solid rgba(255,215,0,0.3);border-radius:16px;padding:20px;text-align:center;margin:16px 0;transition:.5s}
+.insignia.hidden{display:none}
+.insignia h3{color:#ffd700;font-size:1.3rem;margin:8px 0}
+.btn-next{display:block;width:100%;padding:16px;margin:20px 0;background:linear-gradient(135deg,#00e0ff,#00b8d4);border:none;border-radius:14px;color:#fff;font-size:1.05rem;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:.3s}
+.btn-next:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,224,255,0.3)}
+footer{text-align:center;padding:16px 0 0;color:#667788;font-size:.8rem;border-top:1px solid rgba(255,255,255,0.06);margin-top:20px}
+@media(max-width:600px){.course-container{padding:16px;margin-top:50px}.conversion{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="course-container">
+<nav class="brand-return-nav"><a href="../../../../index.html">&larr; Portfolio</a><a href="../../../../cursos/index.html">Cursos</a></nav>
+<div class="progress-bar"><div class="progress-fill" id="progFill"></div></div>
+<span class="progress-text" id="progText">Módulo 6 de 12</span>
+<div class="hero-header"><h1>🌐 websearch_to_tsquery</h1><p>Convierte búsqueda estilo Google a tsquery</p></div>
+<div class="analogy-card"><strong>💡 Piénsalo así:</strong> websearch_to_tsquery es como tener un traductor de "humano a base de datos". Escribes como buscas en Google: "gatos y perros -peces" y la función lo traduce automáticamente al tsquery equivalente: "gatos & perros & !peces". No necesitas aprender los operadores complicados.</div>
+<div class="main-area">
+<div class="input-group">
+<input type="text" id="searchInput" placeholder='"gatos y perros" -peces' value='"gatos y perros" -peces'>
+<button id="convertSearchBtn"><i class="fas fa-sync"></i> Convertir</button>
+</div>
+<div class="conversion">
+<div class="conv-box"><h5>🔍 Búsqueda web</h5><div class="code" id="webDisplay">"gatos y perros" -peces</div></div>
+<div class="conv-box"><h5>⚙️ tsquery generado</h5><div class="code" id="tsqueryDisplay">'gato' & 'perro' & !'pez'</div></div>
+</div>
+<div class="rules-list">
+<div class="rule"><strong>" "</strong> Comillas → frase exacta (&lt;-&gt;)</div>
+<div class="rule"><strong>-</strong> Guión antes → NOT (!)</div>
+<div class="rule"><strong>OR</strong> o | → OR (|)</div>
+<div class="rule">Espacios normales → AND (&amp;)</div>
+</div>
+</div>
+<div id="feedback" class="feedback">💬 websearch_to_tsquery('spanish', '"gatos y perros" -peces') es mucho más amigable para el usuario final.</div>
+<div id="insignia" class="insignia hidden"><i class="fas fa-medal" style="font-size:2.5rem;color:#ffd700"></i><h3>🏅 Web Search Master 🏅</h3><p>¡Sabes cómo convertir búsquedas web a tsquery!</p></div>
+<button class="btn-next" onclick="alert('🔄 Transición → 07-pg-trgm.html')">Siguiente <i class="fas fa-arrow-right"></i></button>
+<footer><i class="fas fa-crown"></i> SQL Avanzado · Curso 3 · Módulo 6</footer>
+</div>
+<script>
+const MODULE=6,COURSE="sqlavanzado_c3",PROG="sqlavanzado_progress",BADGES="sqlavanzado_badges";
+function convertSearch(text){
+let result='';
+let i=0;
+while(i<text.length){
+if(text[i]==='"'&&text.indexOf('"',i+1)>0){
+let phrase=text.slice(i+1,text.indexOf('"',i+1));
+let words=phrase.toLowerCase().split(/\s+/).filter(w=>w.length>0&&!['y','el','la','los','las','un','una','con','por','para','del','en'].includes(w));
+result+='('+words.map(w=>w.replace(/[á]/g,'a').replace(/[é]/g,'e').replace(/[í]/g,'i').replace(/[ó]/g,'o').replace(/[úü]/g,'u')).join(' <-> ')+')';
+i=text.indexOf('"',i+1)+1;
+}else if(text[i]==='-'&&i>0&&text[i-1]===' '){
+result+=' & !';
+i++;
+let end=i;
+while(end<text.length&&text[end]!==' '&&text[end]!=='"')end++;
+let word=text.slice(i,end).toLowerCase();
+result+=word.replace(/[á]/g,'a').replace(/[é]/g,'e').replace(/[í]/g,'i').replace(/[ó]/g,'o').replace(/[úü]/g,'u');
+i=end;
+}else if(text.slice(i,i+2).toUpperCase()==='OR'&&(text[i-1]===' '||i===0)){
+result+=' | ';
+i+=2;
+}else if(text[i]===' '){result+=' & ';i++;while(i<text.length&&text[i]===' ')i++;}
+else{
+let end=i;
+while(end<text.length&&text[end]!==' '&&text[end]!=='"'&&text[end]!=='-')end++;
+let word=text.slice(i,end).toLowerCase();
+if(!['y','el','la','los','las','un','una'].includes(word)){
+result+=word.replace(/[á]/g,'a').replace(/[é]/g,'e').replace(/[í]/g,'i').replace(/[ó]/g,'o').replace(/[úü]/g,'u');
+}
+i=end;
+}
+}
+return result.replace(/ & $/,'').replace(/\s+/g,' ').trim();
+}
+document.getElementById('convertSearchBtn').addEventListener('click',function(){
+let text=document.getElementById('searchInput').value.trim();
+document.getElementById('webDisplay').textContent=text;
+let tsq=convertSearch(text);
+document.getElementById('tsqueryDisplay').textContent="'"+tsq+"'";
+document.getElementById('feedback').innerHTML='✅ websearch_to_tsquery(\'spanish\', \''+text+'\') → <strong>\''+tsq+'\'</strong>. La función simplifica la búsqueda para el usuario final.';
+let bd=JSON.parse(localStorage.getItem(BADGES))||[];if(!bd.includes('Web Search Master')){bd.push('Web Search Master');localStorage.setItem(BADGES,JSON.stringify(bd));document.getElementById('insignia').classList.remove('hidden')}
+updateProg();
+});
+function updateProg(){
+let p=JSON.parse(localStorage.getItem(COURSE+"_progress"))||[];if(!p.includes(MODULE)){p.push(MODULE);localStorage.setItem(COURSE+"_progress",JSON.stringify(p))}
+let pct=Math.round(p.length/12*100);document.getElementById('progFill').style.width=pct+'%';document.getElementById('progText').textContent='Módulo 6 de 12 ('+pct+'%)';
+let gp=JSON.parse(localStorage.getItem(PROG))||[];if(!gp.includes(MODULE+84)){gp.push(MODULE+84);localStorage.setItem(PROG,JSON.stringify(gp))}
+}
+</script>
+</body>
+</html>

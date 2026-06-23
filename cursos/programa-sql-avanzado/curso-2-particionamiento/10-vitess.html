@@ -1,0 +1,88 @@
+<!DOCTYPE html><html lang="es"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SQL Avanzado | C2-10 Vitess</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../../../assets/css/theme.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#0a0e0f;color:#e8edee;min-height:100vh;display:flex;justify-content:center;padding:20px}
+.course-container{max-width:860px;width:100%;background:rgba(15,20,42,0.6);backdrop-filter:blur(16px);border-radius:24px;border:1px solid rgba(156,100,255,0.2);padding:30px;margin-top:60px}
+.progress-bar,.progress-fill{height:10px;border-radius:8px}
+.progress-bar{background:rgba(255,255,255,0.06);margin-bottom:18px;overflow:hidden}
+.progress-fill{background:linear-gradient(90deg,#9c64ff,#7a3ce0);width:0%;transition:width .5s ease}
+.progress-text{font-size:.75rem;color:#8899aa;margin-bottom:10px;display:block}
+.hero-header{text-align:center;margin:20px 0}
+.hero-header h1{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:800;background:linear-gradient(135deg,#9c64ff,#7a3ce0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-header p{color:#8899aa;margin-top:6px;font-size:.95rem}
+.analogy-card{background:rgba(156,100,255,0.08);border-left:4px solid #9c64ff;border-radius:12px;padding:16px 20px;margin:20px 0;font-size:.9rem;line-height:1.6}
+.analogy-card strong{color:#9c64ff}
+.main-area{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:24px;margin:20px 0}
+.quiz-option{display:block;width:100%;padding:14px 18px;margin:8px 0;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:#e8edee;font-size:.9rem;font-family:'Inter',sans-serif;cursor:pointer;transition:all .25s;text-align:left}
+.quiz-option:hover{background:rgba(156,100,255,0.1);border-color:#9c64ff}
+.quiz-option.correct{background:rgba(0,255,100,0.15);border-color:#00ff64}
+.quiz-option.wrong{background:rgba(255,80,80,0.15);border-color:#ff5050}
+.vitess-info{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:16px 0}
+.vi{background:rgba(255,255,255,0.03);border-radius:10px;padding:14px;text-align:center}
+.vi h4{color:#9c64ff;font-size:.85rem;margin-bottom:4px}
+.vi p{color:#8899aa;font-size:.78rem}
+.feedback{background:rgba(255,255,255,0.04);border-radius:12px;padding:16px 20px;margin:16px 0;font-size:.88rem;min-height:50px}
+.insignia{background:linear-gradient(135deg,rgba(255,215,0,0.12),rgba(255,165,0,0.08));border:1px solid rgba(255,215,0,0.3);border-radius:16px;padding:20px;text-align:center;margin:16px 0;transition:.5s}
+.insignia.hidden{display:none}
+.insignia h3{color:#ffd700;font-size:1.3rem;margin:8px 0}
+.btn-next{display:block;width:100%;padding:16px;margin:20px 0;background:linear-gradient(135deg,#9c64ff,#7a3ce0);border:none;border-radius:14px;color:#fff;font-size:1.05rem;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:.3s}
+.btn-next:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(156,100,255,0.3)}
+footer{text-align:center;padding:16px 0 0;color:#667788;font-size:.8rem;border-top:1px solid rgba(255,255,255,0.06);margin-top:20px}
+@media(max-width:600px){.course-container{padding:16px;margin-top:50px}.vitess-info{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="course-container">
+<nav class="brand-return-nav"><a href="../../../../index.html">&larr; Portfolio</a><a href="../../../../cursos/index.html">Cursos</a></nav>
+<div class="progress-bar"><div class="progress-fill" id="progFill"></div></div>
+<span class="progress-text" id="progText">Módulo 10 de 12</span>
+<div class="hero-header"><h1>⚡ Vitess</h1><p>Sharding a escala planetaria (MySQL-compatible)</p></div>
+<div class="analogy-card"><strong>💡 Piénsalo así:</strong> Vitess es como el sistema de enrutamiento de Amazon. No sabes en qué almacén está tu paquete, pero el sistema de enrutamiento lo sabe. Vitess usa un VSchema (esquema virtual) que mapea tablas a shards. Tú consultas como si fuera una sola base de datos, y Vitess enruta la consulta al shard correcto.</div>
+<div class="main-area">
+<p style="color:#bcc;margin-bottom:10px;font-weight:600"><i class="fas fa-database" style="color:#9c64ff"></i> Componentes de Vitess</p>
+<div class="vitess-info">
+<div class="vi"><h4>VTGate</h4><p>Proxy de enrutamiento. Recibe consultas SQL y las dirige al VTablet correcto.</p></div>
+<div class="vi"><h4>VTTablet</h4><p>Proceso por shard. Maneja la conexión a MySQL y las operaciones de replicación.</p></div>
+<div class="vi"><h4>Topology</h4><p>Etcd/Consul. Guarda la configuración del cluster, shards y tablets.</p></div>
+</div>
+<p style="color:#bcc;margin:16px 0 10px;font-weight:600"><i class="fas fa-question-circle" style="color:#9c64ff"></i> ¿Cuál es la principal diferencia entre Vitess y Citus?</p>
+<button class="quiz-option" data-ans="0">Vitess usa MySQL, Citus usa PostgreSQL</button>
+<button class="quiz-option" data-ans="1">Citus es más rápido que Vitess</button>
+<button class="quiz-option" data-ans="2">Vitess no soporta JOINs</button>
+<button class="quiz-option" data-ans="3">Son exactamente iguales</button>
+</div>
+<div id="feedback" class="feedback">💬 Responde el quiz para entender las diferencias entre Vitess y Citus.</div>
+<div id="insignia" class="insignia hidden"><i class="fas fa-medal" style="font-size:2.5rem;color:#ffd700"></i><h3>🏅 Vitess Virtuoso 🏅</h3><p>¡Entiendes el ecosistema de Vitess!</p></div>
+<button class="btn-next" onclick="alert('🔄 Transición → 11-shard-key-design.html')">Siguiente <i class="fas fa-arrow-right"></i></button>
+<footer><i class="fas fa-crown"></i> SQL Avanzado · Curso 2 · Módulo 10</footer>
+</div>
+<script>
+const MODULE=10,COURSE="sqlavanzado_c2",PROG="sqlavanzado_progress",BADGES="sqlavanzado_badges";
+document.querySelectorAll('.quiz-option').forEach(b=>{
+b.addEventListener('click',function(){
+let ans=this.dataset.ans;
+if(ans==='0'){
+document.getElementById('feedback').innerHTML='✅ ¡Correcto! La diferencia fundamental: Vitess funciona con MySQL (y ahora también con PostgreSQL experimentalmente), mientras Citus es una extensión de PostgreSQL. Vitess se usa en YouTube, Slack, Pinterest.';
+document.getElementById('insignia').classList.remove('hidden');
+this.className='quiz-option correct';
+document.querySelectorAll('.quiz-option').forEach(o=>o.style.pointerEvents='none');
+let bd=JSON.parse(localStorage.getItem(BADGES))||[];if(!bd.includes('Vitess Virtuoso')){bd.push('Vitess Virtuoso');localStorage.setItem(BADGES,JSON.stringify(bd))}
+updateProg();
+}else{
+document.getElementById('feedback').innerHTML='❌ Incorrecto. La respuesta correcta es que Vitess usa MySQL mientras Citus es PostgreSQL. Ambos tienen fortalezas diferentes en el mundo del sharding.';
+this.className='quiz-option wrong';setTimeout(()=>this.className='quiz-option',600)}
+})
+});
+function updateProg(){
+let p=JSON.parse(localStorage.getItem(COURSE+"_progress"))||[];if(!p.includes(MODULE)){p.push(MODULE);localStorage.setItem(COURSE+"_progress",JSON.stringify(p))}
+let pct=Math.round(p.length/12*100);document.getElementById('progFill').style.width=pct+'%';document.getElementById('progText').textContent='Módulo 10 de 12 ('+pct+'%)';
+let gp=JSON.parse(localStorage.getItem(PROG))||[];if(!gp.includes(MODULE+120)){gp.push(MODULE+120);localStorage.setItem(PROG,JSON.stringify(gp))}
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Curso 1 | Profiling Async</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:linear-gradient(135deg,#0a0f1e,#0c1222); font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+    .modulo-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,80,80,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+    .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #ff5050; }
+    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#ff9090,#ff5050); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .hero-header p { font-size:1.1rem; color:#ffb0b0; margin-top:0.5rem; }
+    .chip { background:rgba(255,80,80,0.15); border:1px solid #ff5050; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; display:inline-block; margin:0.3rem; }
+    .progress-bar-top { background:#00000044; padding:0.6rem 2rem; text-align:center; font-size:0.85rem; border-bottom:1px solid #2c3e66; }
+    .progress-bar-top span { color:#ff9090; font-weight:600; }
+    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ff5050; font-size:1rem; line-height:1.6; }
+    .main-area { padding:0 2rem 1.5rem; }
+    .simulador { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; border:1px solid #ff5050; }
+    .simulador h3 { margin-bottom:1rem; color:#ff9090; }
+    .dashboard { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:0.8rem; margin:0.8rem 0; }
+    .metric-card { background:#0f1a2c; border:1px solid #2c3e66; border-radius:1rem; padding:0.8rem; text-align:center; }
+    .metric-card .mval { font-size:1.8rem; font-weight:800; }
+    .metric-card .mlabel { font-size:0.78rem; color:#8899bb; }
+    .metric-card.bad .mval { color:#ef4444; }
+    .metric-card.good .mval { color:#22c55e; }
+    .flame-chart { background:#0a0a1a; border-radius:0.8rem; padding:0.8rem; margin:0.5rem 0; }
+    .flame-row { display:flex; gap:2px; margin:2px 0; height:24px; }
+    .flame-block { border-radius:4px; font-size:0.6rem; display:flex; align-items:center; justify-content:center; overflow:hidden; min-width:30px; }
+    .flame-block.hot { background:#ef4444; }
+    .flame-block.warm { background:#ffb347; }
+    .flame-block.cold { background:#2b9eff; }
+    .btn-action { background:linear-gradient(95deg,#ff9090,#ff5050); border:none; padding:0.8rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin:0.3rem; }
+    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(255,80,80,0.5); }
+    .feedback { background:#00000099; margin:1.5rem 2rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #ff5050; }
+    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:1.5rem 2rem; padding:1rem; border:1px dashed gold; }
+    .insignia i { font-size:2.5rem; color:gold; }
+    .hidden { display:none; }
+    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(255,80,80,0.4); }
+    .nav-link.next { background:linear-gradient(95deg,#ff9090,#ff5050); color:#1e1a0c; }
+    .nav-link.menu { background:#1a2a4a; border:1px solid #3399ff; }
+    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a><a href="../index.html">Programa Python Avanzado</a></nav>
+  <div class="modulo-container">
+    <div class="progress-bar-top"><i class="fas fa-tasks"></i> Curso 1: Concurrencia y Paralelismo <span>| M&oacute;dulo 11 de 12</span></div>
+    <div class="hero-header">
+      <h1><i class="fas fa-chart-pie"></i> Profiling Async</h1>
+      <p>Dashboard de profiling as&iacute;ncrono: identifica cuellos de botella</p>
+      <div><span class="chip"><i class="fas fa-fire"></i> Hotspots</span><span class="chip"><i class="fas fa-clock"></i> Latencia</span><span class="chip"><i class="fas fa-bug"></i> aiomonitor</span></div>
+    </div>
+    <div class="analogy-card"><i class="fas fa-stethoscope" style="color:#ff5050;margin-right:0.5rem;"></i> <strong>Piensa en un chequeo m&eacute;dico:</strong> El profiling async es como monitorear los signos vitales de tu c&oacute;digo. Latencia alta es fiebre, errores frecuentes son dolor, uso excesivo de CPU es taquicardia. aiomonitor es como tener un doctor monitoreando en tiempo real. Identificar cuellos de botella es el diagn&oacute;stico.</div>
+    <div class="main-area">
+      <div class="simulador">
+        <h3><i class="fas fa-chart-bar"></i> Dashboard de Profiling As&iacute;ncrono</h3>
+        <p style="font-size:0.85rem;color:#8899bb;margin-bottom:0.8rem;">Analiza las m&eacute;tricas y flame graph para encontrar cuellos de botella.</p>
+        <div class="dashboard">
+          <div class="metric-card bad"><div class="mval" id="mLatency">245ms</div><div class="mlabel">Latencia Promedio</div></div>
+          <div class="metric-card good"><div class="mval" id="mThroughput">142/s</div><div class="mlabel">Throughput</div></div>
+          <div class="metric-card bad"><div class="mval" id="mErrors">3.2%</div><div class="mlabel">Tasa de Error</div></div>
+          <div class="metric-card good"><div class="mval" id="mCPU">68%</div><div class="mlabel">Uso de CPU</div></div>
+        </div>
+        <div class="flame-chart"><strong style="font-size:0.85rem;">Flame Graph (Llamadas async)</strong>
+          <div class="flame-row"><div class="flame-block hot" style="flex:3">fetch_api</div><div class="flame-block warm" style="flex:3">parse_data</div><div class="flame-block cold" style="flex:1">validate</div><div class="flame-block cold" style="flex:2">write_db</div></div>
+          <div class="flame-row"><div class="flame-block warm" style="flex:2">http_get</div><div class="flame-block warm" style="flex:2">json_load</div><div class="flame-block hot" style="flex:2">retry</div><div class="flame-block cold" style="flex:1">log</div></div>
+          <div class="flame-row"><div class="flame-block hot" style="flex:5">dns_resolve</div><div class="flame-block warm" style="flex:3">ssl_handshake</div></div>
+        </div>
+        <div id="profileHint" style="font-size:0.85rem;color:#8899bb;margin:0.5rem 0;">Cuello de botella detectado: fetch_api (DNS + retry). Sugerencia: usa connection pool y DNS caching.</div>
+        <button id="runProfile" class="btn-action"><i class="fas fa-play"></i> Ejecutar Profiling</button>
+      </div>
+    </div>
+    <div id="feedbackMsg" class="feedback">Analiza las m&eacute;tricas para diagnosticar el cuello de botella.</div>
+    <div id="insigniaArea" class="insignia hidden"><i class="fas fa-medal"></i><h3>INSIGNIA: DETECTIVE ASYNC</h3><p>Sabes identificar cuellos de botella en c&oacute;digo as&iacute;ncrono. &iexcl;Sherlock!</p></div>
+    <div class="nav-links">
+      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
+      <a href="12-scraper-asincrono.html" class="nav-link next">Siguiente: Scraper As&iacute;ncrono <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <footer><i class="fas fa-crown"></i> Curso 1: Concurrencia y Paralelismo &middot; Profiling Async</footer>
+  </div>
+  <script>
+    const STORAGE_KEY='c1m11';let profDone=false;
+    document.getElementById('runProfile').addEventListener('click',function(){if(profDone)return;
+    document.getElementById('mLatency').textContent='82ms';document.getElementById('mThroughput').textContent='340/s';document.getElementById('mErrors').textContent='0.4%';document.getElementById('mCPU').textContent='45%';
+    document.querySelectorAll('.metric-card')[0].classList.remove('bad');document.querySelectorAll('.metric-card')[0].classList.add('good');document.querySelectorAll('.metric-card')[2].classList.remove('bad');document.querySelectorAll('.metric-card')[2].classList.add('good');
+    profDone=true;localStorage.setItem(STORAGE_KEY,'true');document.getElementById('insigniaArea').classList.remove('hidden');document.getElementById('feedbackMsg').innerHTML='Has completado el m&oacute;dulo. &iexcl;La insignia es tuya!';});
+    if(localStorage.getItem(STORAGE_KEY)==='true'){document.getElementById('insigniaArea').classList.remove('hidden');document.getElementById('feedbackMsg').innerHTML='M&oacute;dulo completado';}
+  </script>
+</body>
+</html>

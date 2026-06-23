@@ -1,0 +1,90 @@
+<!DOCTYPE html><html lang="es"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SQL Avanzado | C2-01 PARTITION BY RANGE</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../../../assets/css/theme.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#0a0e0f;color:#e8edee;min-height:100vh;display:flex;justify-content:center;padding:20px}
+.course-container{max-width:860px;width:100%;background:rgba(15,20,42,0.6);backdrop-filter:blur(16px);border-radius:24px;border:1px solid rgba(156,100,255,0.2);padding:30px;margin-top:60px}
+.progress-bar{background:rgba(255,255,255,0.06);border-radius:8px;height:10px;margin-bottom:18px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#9c64ff,#7a3ce0);border-radius:8px;transition:width .5s ease;width:0%}
+.progress-text{font-size:.75rem;color:#8899aa;margin-bottom:10px;display:block}
+.hero-header{text-align:center;margin:20px 0}
+.hero-header h1{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:800;background:linear-gradient(135deg,#9c64ff,#7a3ce0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-header p{color:#8899aa;margin-top:6px;font-size:.95rem}
+.analogy-card{background:rgba(156,100,255,0.08);border-left:4px solid #9c64ff;border-radius:12px;padding:16px 20px;margin:20px 0;font-size:.9rem;line-height:1.6}
+.analogy-card strong{color:#9c64ff}
+.main-area{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:24px;margin:20px 0}
+.partition-visual{display:flex;flex-direction:column;gap:6px;margin:16px 0}
+.part-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;transition:.3s}
+.part-row.p-2022{background:rgba(156,100,255,0.1);border:1px solid rgba(156,100,255,0.2)}
+.part-row.p-2023{background:rgba(156,100,255,0.12);border:1px solid rgba(156,100,255,0.25)}
+.part-row.p-2024{background:rgba(156,100,255,0.14);border:1px solid rgba(156,100,255,0.3)}
+.part-row.p-2025{background:rgba(156,100,255,0.08);border:1px dashed rgba(156,100,255,0.2)}
+.part-row .part-name{font-weight:600;color:#9c64ff;min-width:100px}
+.part-row .part-range{color:#8899aa;font-size:.85rem;min-width:120px}
+.part-row .part-size{color:#8899aa;font-size:.8rem}
+.part-row .part-bar{flex:1;height:12px;background:rgba(255,255,255,0.06);border-radius:6px;overflow:hidden}
+.part-row .part-bar .fill{height:100%;background:linear-gradient(90deg,#9c64ff,#7a3ce0);border-radius:6px;transition:width .5s}
+.range-controls{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}
+.range-btn{padding:10px 18px;border-radius:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#e8edee;cursor:pointer;font-family:'Inter',sans-serif;font-size:.85rem;transition:.3s}
+.range-btn:hover{background:rgba(156,100,255,0.15);border-color:#9c64ff}
+.feedback{background:rgba(255,255,255,0.04);border-radius:12px;padding:16px 20px;margin:16px 0;font-size:.88rem;min-height:50px}
+.insignia{background:linear-gradient(135deg,rgba(255,215,0,0.12),rgba(255,165,0,0.08));border:1px solid rgba(255,215,0,0.3);border-radius:16px;padding:20px;text-align:center;margin:16px 0;transition:.5s}
+.insignia.hidden{display:none}
+.insignia h3{color:#ffd700;font-size:1.3rem;margin:8px 0}
+.btn-next{display:block;width:100%;padding:16px;margin:20px 0;background:linear-gradient(135deg,#9c64ff,#7a3ce0);border:none;border-radius:14px;color:#fff;font-size:1.05rem;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:.3s}
+.btn-next:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(156,100,255,0.3)}
+footer{text-align:center;padding:16px 0 0;color:#667788;font-size:.8rem;border-top:1px solid rgba(255,255,255,0.06);margin-top:20px}
+@media(max-width:600px){.course-container{padding:16px;margin-top:50px}}
+</style>
+</head>
+<body>
+<div class="course-container">
+<nav class="brand-return-nav"><a href="../../../../index.html">&larr; Portfolio</a><a href="../../../../cursos/index.html">Cursos</a></nav>
+<div class="progress-bar"><div class="progress-fill" id="progFill"></div></div>
+<span class="progress-text" id="progText">Módulo 1 de 12</span>
+<div class="hero-header"><h1>📅 PARTITION BY RANGE</h1><p>Divide tus datos por rangos: fechas, IDs, precios</p></div>
+<div class="analogy-card"><strong>💡 Piénsalo así:</strong> PARTITION BY RANGE es como organizar un archivo de recibos por año. En vez de tener todos los recibos mezclados en una caja enorme (tabla única), pones los de 2022 en una carpeta, los de 2023 en otra, etc. Cuando necesitas los recibos de 2024, solo abres esa carpeta. No buscas en toda la caja.</div>
+<div class="main-area">
+<p style="color:#bcc;margin-bottom:10px;font-weight:600"><i class="fas fa-arrows-alt-h" style="color:#9c64ff"></i> Constructor de particiones por rango</p>
+<div class="partition-visual" id="partVis"></div>
+<div class="range-controls">
+<button class="range-btn" id="add2025"><i class="fas fa-plus-circle"></i> Agregar partición 2025</button>
+<button class="range-btn" id="add2026"><i class="fas fa-plus-circle"></i> Agregar partición 2026</button>
+<button class="range-btn" id="resetParts"><i class="fas fa-undo"></i> Reset</button>
+</div>
+<p style="color:#8899aa;font-size:.82rem;margin-top:10px">⏺ CREATE TABLE orders (id INT, created_at DATE, total NUMERIC) PARTITION BY RANGE (created_at);</p>
+</div>
+<div id="feedback" class="feedback">💬 Observa cómo los datos se distribuyen en particiones por año. Cada partición es una tabla separada físicamente.</div>
+<div id="insignia" class="insignia hidden"><i class="fas fa-medal" style="font-size:2.5rem;color:#ffd700"></i><h3>🏅 Particionador RANGE 🏅</h3><p>¡Has creado particiones por rango como un verdadero arquitecto de datos!</p></div>
+<button class="btn-next" onclick="alert('🔄 Transición → 02-partition-by-list.html')">Siguiente <i class="fas fa-arrow-right"></i></button>
+<footer><i class="fas fa-crown"></i> SQL Avanzado · Curso 2 · Módulo 1</footer>
+</div>
+<script>
+const MODULE=1,COURSE="sqlavanzado_c2",PROG="sqlavanzado_progress",BADGES="sqlavanzado_badges";
+function renderParts(years){
+let vis=document.getElementById('partVis');
+const sizes={2022:15,2023:28,2024:42};
+const colors={2022:'rgba(156,100,255,0.1)',2023:'rgba(156,100,255,0.12)',2024:'rgba(156,100,255,0.14)',2025:'rgba(156,100,255,0.08)',2026:'rgba(156,100,255,0.06)'};
+vis.innerHTML=years.map(y=>'<div class="part-row" style="background:'+colors[y]+';border:1px solid rgba(156,100,255,0.2);border-radius:10px;padding:10px 14px"><span class="part-name">orders_'+(y)+'</span><span class="part-range">FROM \''+y+'-01-01\' TO \''+(y+1)+'-01-01\'</span><div class="part-bar"><div class="fill" style="width:'+(sizes[y]||5)+'%"></div></div><span class="part-size">'+(sizes[y]||'~')+'% datos</span></div>').join('');
+}
+let years=[2022,2023,2024];
+renderParts(years);
+document.getElementById('add2025').addEventListener('click',function(){
+if(!years.includes(2025)){years.push(2025);renderParts(years);document.getElementById('feedback').innerHTML='✅ Partición 2025 agregada. CREATE TABLE orders_2025 PARTITION OF orders FOR VALUES FROM (\'2025-01-01\') TO (\'2026-01-01\');';let bd=JSON.parse(localStorage.getItem(BADGES))||[];if(!bd.includes('Particionador RANGE')){bd.push('Particionador RANGE');localStorage.setItem(BADGES,JSON.stringify(bd));document.getElementById('insignia').classList.remove('hidden')}updateProg();}else{document.getElementById('feedback').innerHTML='⚠️ La partición 2025 ya existe.'}
+});
+document.getElementById('add2026').addEventListener('click',function(){
+if(!years.includes(2026)){years.push(2026);renderParts(years);document.getElementById('feedback').innerHTML='✅ Partición 2026 agregada. Recuerda planificar con anticipación para evitar ATTACH costoso.';}else{document.getElementById('feedback').innerHTML='⚠️ La partición 2026 ya existe.'}
+});
+document.getElementById('resetParts').addEventListener('click',function(){years=[2022,2023,2024];renderParts(years);document.getElementById('feedback').innerHTML='🔄 Reset: particiones originales 2022-2024.';});
+function updateProg(){
+let p=JSON.parse(localStorage.getItem(COURSE+"_progress"))||[];if(!p.includes(MODULE)){p.push(MODULE);localStorage.setItem(COURSE+"_progress",JSON.stringify(p))}
+let pct=Math.round(p.length/12*100);document.getElementById('progFill').style.width=pct+'%';document.getElementById('progText').textContent='Módulo 1 de 12 ('+pct+'%)';
+let gp=JSON.parse(localStorage.getItem(PROG))||[];if(!gp.includes(MODULE+12)){gp.push(MODULE+12);localStorage.setItem(PROG,JSON.stringify(gp))}
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Finanzas Corporativas | Módulo 1: Estados Financieros</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:linear-gradient(135deg,#0a0f1e,#0c1222,#111a2e); font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; padding:2rem 1rem; display:flex; flex-direction:column; align-items:center; }
+    .course-container { max-width:1100px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(43,158,255,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; padding:2rem; }
+    .progress-bar { margin-bottom:1.5rem; }
+    .progress-track { height:8px; background:rgba(255,255,255,0.08); border-radius:10px; overflow:hidden; }
+    .progress-fill { height:100%; width:0%; background:linear-gradient(90deg,#2b9eff,#00e0ff); border-radius:10px; transition:width 0.6s ease; }
+    .progress-text { font-size:0.8rem; color:#8899bb; margin-top:0.3rem; display:block; }
+    .hero-header { text-align:center; margin-bottom:2rem; }
+    .hero-header h1 { font-size:2.2rem; font-weight:800; background:linear-gradient(135deg,#FFF,#2b9eff); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .hero-header p { color:#2b9eff; margin-top:0.4rem; }
+    .analogy-card { background:rgba(43,158,255,0.1); border-left:4px solid #2b9eff; padding:1.2rem; border-radius:1rem; margin-bottom:1.5rem; font-size:0.95rem; line-height:1.6; }
+    .main-area { margin-bottom:1.5rem; }
+    .feedback { padding:1rem; border-radius:1rem; background:rgba(255,255,255,0.05); border:1px solid #2c3e66; margin-bottom:1.2rem; font-size:0.9rem; }
+    .feedback.success { border-color:#00ffc8; background:rgba(0,255,200,0.1); color:#00ffc8; }
+    .feedback.error { border-color:#ff5050; background:rgba(255,80,80,0.1); color:#ff5050; }
+    .insignia { text-align:center; padding:1.5rem; border-radius:1.5rem; background:linear-gradient(135deg,rgba(255,215,0,0.15),rgba(255,179,71,0.1)); border:2px solid #ffd700; margin-bottom:1.2rem; }
+    .insignia.hidden { display:none; }
+    .insignia h3 { color:#ffd700; font-size:1.3rem; }
+    .btn { display:inline-flex; align-items:center; gap:0.6rem; padding:0.7rem 1.8rem; background:linear-gradient(135deg,#2b9eff,#00e0ff); color:#0a0f1e; font-weight:700; border:none; border-radius:2rem; cursor:pointer; transition:0.25s; font-family:'Inter',sans-serif; box-shadow:0 4px 15px rgba(43,158,255,0.3); }
+    .btn:hover { transform:translateY(-2px) scale(1.03); }
+    .btn:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+    .btn-next { background:linear-gradient(135deg,#ffd700,#ffb347); box-shadow:0 4px 15px rgba(255,215,0,0.3); }
+    .btn-next:hover { box-shadow:0 6px 25px rgba(255,215,0,0.5); }
+    footer { text-align:center; padding:1rem; font-size:0.8rem; border-top:1px solid #2c3e66; margin-top:1.5rem; color:#8899bb; }
+
+    /* Drag & drop */
+    .transactions-pool { display:flex; flex-wrap:wrap; gap:0.6rem; justify-content:center; margin-bottom:1.5rem; min-height:60px; padding:1rem; background:rgba(255,255,255,0.03); border-radius:1rem; border:1px dashed #2c3e66; }
+    .tx-item { padding:0.6rem 1rem; border-radius:2rem; font-size:0.85rem; font-weight:600; cursor:grab; background:rgba(43,158,255,0.15); border:1px solid #2b9eff; transition:0.2s; user-select:none; }
+    .tx-item:hover { transform:scale(1.05); box-shadow:0 0 15px rgba(43,158,255,0.3); }
+    .tx-item.placed { opacity:0.4; cursor:default; pointer-events:none; }
+    .statements-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem; }
+    .stmt-column { background:rgba(10,20,40,0.7); border-radius:1.2rem; padding:1rem; border:1px solid #2c3e66; min-height:200px; }
+    .stmt-column h3 { font-size:0.95rem; margin-bottom:0.8rem; text-align:center; }
+    .stmt-column .dropzone { min-height:150px; display:flex; flex-direction:column; gap:0.4rem; }
+    .stmt-column .drop-item { padding:0.4rem 0.8rem; border-radius:1rem; font-size:0.78rem; background:rgba(43,158,255,0.1); border:1px solid rgba(43,158,255,0.3); }
+    .stmt-balance h3 { color:#2b9eff; }
+    .stmt-income h3 { color:#00ffc8; }
+    .stmt-cashflow h3 { color:#ffb347; }
+    .stmt-column.over { border-color:#ffd700; background:rgba(255,215,0,0.05); }
+    .totals-row { display:flex; justify-content:space-around; margin:1.5rem 0; gap:1rem; flex-wrap:wrap; }
+    .total-box { text-align:center; padding:0.8rem; border-radius:1rem; background:rgba(0,0,0,0.3); min-width:140px; }
+    .total-box .num { font-size:1.3rem; font-weight:800; }
+    .total-box .label { font-size:0.75rem; color:#8899bb; }
+    @media (max-width:800px) { .statements-grid { grid-template-columns:1fr; } .hero-header h1 { font-size:1.6rem; } }
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a><a href="../index.html">Programa</a><a href="index.html">Finanzas Corporativas</a></nav>
+
+  <div class="course-container">
+    <div class="progress-bar">
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <span class="progress-text" id="progressText">Módulo 1 de 12</span>
+    </div>
+
+    <div class="hero-header">
+      <h1><i class="fas fa-balance-scale"></i> Estados Financieros</h1>
+      <p>Balance General · Estado de Resultados · Flujo de Caja</p>
+    </div>
+
+    <div class="analogy-card">
+      <strong>💡 Piénsalo así:</strong> Los estados financieros son como el expediente médico de una empresa. El <strong>Balance</strong> es la radiografía (qué tiene y qué debe hoy), el <strong>P&L</strong> es el análisis de sangre (qué tan saludable fue su desempeño) y el <strong>Cash Flow</strong> es el electrocardiograma (si el dinero está fluyendo bien o hay arritmia financiera).
+    </div>
+
+    <div class="main-area">
+      <p style="margin-bottom:1rem;color:#8899bb;"><i class="fas fa-arrows-alt"></i> Arrastra cada transacción a la columna correcta. ¡Deben cuadrar los totales!</p>
+
+      <div class="transactions-pool" id="txPool"></div>
+
+      <div class="statements-grid">
+        <div class="stmt-column stmt-balance" data-stmt="balance">
+          <h3><i class="fas fa-balance-scale"></i> Balance General</h3>
+          <div class="dropzone" id="dropBalance"></div>
+        </div>
+        <div class="stmt-column stmt-income" data-stmt="income">
+          <h3><i class="fas fa-chart-bar"></i> Estado de Resultados</h3>
+          <div class="dropzone" id="dropIncome"></div>
+        </div>
+        <div class="stmt-column stmt-cashflow" data-stmt="cashflow">
+          <h3><i class="fas fa-exchange-alt"></i> Flujo de Caja</h3>
+          <div class="dropzone" id="dropCashFlow"></div>
+        </div>
+      </div>
+
+      <div class="totals-row">
+        <div class="total-box"><div class="num" id="totalAssets">0</div><div class="label">Total Activos</div></div>
+        <div class="total-box"><div class="num" id="totalLiabEq">0</div><div class="label">Total Pasivo + Capital</div></div>
+        <div class="total-box"><div class="num" id="totalRevenue">0</div><div class="label">Ingresos Netos</div></div>
+        <div class="total-box"><div class="num" id="totalExpenses">0</div><div class="label">Gastos Totales</div></div>
+        <div class="total-box"><div class="num" id="netCashFlow">0</div><div class="label">Flujo Neto de Caja</div></div>
+      </div>
+
+      <div style="text-align:center;margin-top:1rem;">
+        <button class="btn" onclick="checkStatements()"><i class="fas fa-check-double"></i> Verificar Contabilidad</button>
+        <button class="btn" onclick="resetGame()" style="background:rgba(255,255,255,0.1);color:#8899bb;box-shadow:none;margin-left:0.5rem;"><i class="fas fa-redo"></i> Reiniciar</button>
+      </div>
+    </div>
+
+    <div id="feedback" class="feedback">💬 Arrastra cada transacción a su estado financiero correcto. ¡Al final, la contabilidad debe cuadrar!</div>
+
+    <div id="insignia" class="insignia hidden">
+      <i class="fas fa-medal" style="font-size:2rem;color:#ffd700;"></i>
+      <h3>🏅 Contador Master 🏅</h3>
+      <p>¡Has dominado los estados financieros! Sabes exactamente dónde va cada transacción.</p>
+    </div>
+
+    <div style="text-align:center;margin-top:1rem;">
+      <button class="btn btn-next" onclick="goNext()" id="btnNext" disabled><i class="fas fa-arrow-right"></i> Siguiente Módulo</button>
+    </div>
+
+    <footer><i class="fas fa-chart-line"></i> Finanzas Corporativas · Módulo 1: Estados Financieros</footer>
+  </div>
+
+  <script>
+    var transactions = [
+      { id:'t1', text:'Ventas a crédito por $50,000', type:'income', value:50000 },
+      { id:'t2', text:'Compra de maquinaria por $30,000', type:'balance', value:30000 },
+      { id:'t3', text:'Depreciación del período $5,000', type:'income', value:-5000 },
+      { id:'t4', text:'Préstamo bancario recibido $40,000', type:'balance', value:40000 },
+      { id:'t5', text:'Pago a proveedores $15,000', type:'cashflow', value:-15000 },
+      { id:'t6', text:'Costo de ventas $25,000', type:'income', value:-25000 },
+      { id:'t7', text:'Emisión de acciones $20,000', type:'balance', value:20000 },
+      { id:'t8', text:'Cobro a clientes $45,000', type:'cashflow', value:45000 },
+      { id:'t9', text:'Gastos operativos $10,000', type:'income', value:-10000 },
+      { id:'t10', text:'Inventario comprado $12,000', type:'balance', value:12000 },
+      { id:'t11', text:'Pago de impuestos $4,000', type:'cashflow', value:-4000 },
+      { id:'t12', text:'Intereses pagados $3,000', type:'income', value:-3000 }
+    ];
+
+    var placed = {};
+    var dragEl = null;
+
+    function shuffle(arr) { for(var i=arr.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } return arr; }
+
+    function renderPool() {
+      var pool = document.getElementById('txPool');
+      pool.innerHTML = '';
+      var unplaced = transactions.filter(function(t){ return !placed[t.id]; });
+      shuffle(unplaced).forEach(function(t){
+        var el = document.createElement('div');
+        el.className = 'tx-item';
+        el.draggable = true;
+        el.textContent = t.text;
+        el.dataset.id = t.id;
+        el.dataset.type = t.type;
+        el.dataset.value = t.value;
+        el.addEventListener('dragstart', function(e){ dragEl = el; e.dataTransfer.setData('text/plain', t.id); el.style.opacity='0.5'; });
+        el.addEventListener('dragend', function(e){ if(dragEl) dragEl.style.opacity='1'; });
+        pool.appendChild(el);
+      });
+    }
+
+    function setupDropZones() {
+      var zones = ['dropBalance','dropIncome','dropCashFlow'];
+      var zoneMap = { dropBalance:'balance', dropIncome:'income', dropCashFlow:'cashflow' };
+      zones.forEach(function(id){
+        var dz = document.getElementById(id);
+        dz.addEventListener('dragover', function(e){ e.preventDefault(); dz.parentElement.classList.add('over'); });
+        dz.addEventListener('dragleave', function(e){ dz.parentElement.classList.remove('over'); });
+        dz.addEventListener('drop', function(e){
+          e.preventDefault();
+          dz.parentElement.classList.remove('over');
+          var txId = e.dataTransfer.getData('text/plain');
+          if(!txId) return;
+          var tx = transactions.find(function(t){ return t.id === txId; });
+          if(!tx) return;
+          var expected = zoneMap[id];
+          if(tx.type !== expected) {
+            showFeedback('❌ Incorrecto. "'+tx.text+'" no pertenece a este estado financiero. ¡Intenta de nuevo!', 'error');
+            return;
+          }
+          placed[txId] = { zone: id, type: tx.type };
+          renderPool();
+          renderDropZones();
+          updateTotals();
+          showFeedback('✅ Correcto! "'+tx.text+'" está bien clasificado.', 'success');
+        });
+      });
+    }
+
+    function renderDropZones() {
+      var zoneMap = { dropBalance:'balance', dropIncome:'income', dropCashFlow:'cashflow' };
+      Object.keys(zoneMap).forEach(function(zoneId){
+        var dz = document.getElementById(zoneId);
+        dz.innerHTML = '';
+        Object.keys(placed).forEach(function(txId){
+          if(placed[txId].zone === zoneId) {
+            var tx = transactions.find(function(t){ return t.id === txId; });
+            if(tx) {
+              var el = document.createElement('div');
+              el.className = 'drop-item';
+              el.textContent = tx.text;
+              dz.appendChild(el);
+            }
+          }
+        });
+      });
+    }
+
+    function updateTotals() {
+      var assets = 0, liabEq = 0, revenue = 0, expenses = 0, cf = 0;
+      Object.keys(placed).forEach(function(txId){
+        var tx = transactions.find(function(t){ return t.id === txId; });
+        if(!tx) return;
+        if(tx.type === 'balance') { if(tx.value > 0) assets += tx.value; else liabEq += Math.abs(tx.value); }
+        if(tx.type === 'income') { if(tx.value > 0) revenue += tx.value; else expenses += Math.abs(tx.value); }
+        if(tx.type === 'cashflow') cf += tx.value;
+      });
+      document.getElementById('totalAssets').textContent = assets;
+      document.getElementById('totalLiabEq').textContent = liabEq;
+      document.getElementById('totalRevenue').textContent = revenue;
+      document.getElementById('totalExpenses').textContent = expenses;
+      document.getElementById('netCashFlow').textContent = cf;
+    }
+
+    function showFeedback(msg, type) {
+      var fb = document.getElementById('feedback');
+      fb.textContent = msg;
+      fb.className = 'feedback ' + (type||'');
+    }
+
+    function checkStatements() {
+      var total = transactions.length;
+      var placedCount = Object.keys(placed).length;
+      if(placedCount < total) {
+        showFeedback('⚠️ Faltan ' + (total - placedCount) + ' transacciones por clasificar.', 'error');
+        return;
+      }
+      var correct = true;
+      transactions.forEach(function(tx){
+        if(!placed[tx.id] || placed[tx.id].type !== tx.type) correct = false;
+      });
+      if(correct) {
+        var assets = parseInt(document.getElementById('totalAssets').textContent);
+        var liabEq = parseInt(document.getElementById('totalLiabEq').textContent);
+        var revenue = parseInt(document.getElementById('totalRevenue').textContent);
+        var expenses = parseInt(document.getElementById('totalExpenses').textContent);
+        var netCf = parseInt(document.getElementById('netCashFlow').textContent);
+        showFeedback('🎉 ¡Contabilidad perfecta! Activos='+assets+' = Pasivo+Capital='+liabEq+', Utilidad='+(revenue-expenses)+', Flujo Neto='+netCf+'. ¡Eres un Contador Master!', 'success');
+        document.getElementById('insignia').classList.remove('hidden');
+        document.getElementById('btnNext').disabled = false;
+        localStorage.setItem('c3m1_completed', 'true');
+        updateGlobalProgress();
+      } else {
+        showFeedback('❌ Algunas transacciones están mal clasificadas. Revisa y corrige.', 'error');
+      }
+    }
+
+    function resetGame() {
+      placed = {};
+      document.getElementById('insignia').classList.add('hidden');
+      document.getElementById('btnNext').disabled = true;
+      renderPool(); renderDropZones(); updateTotals();
+      showFeedback('💬 Arrastra cada transacción a su estado financiero correcto.', '');
+    }
+
+    function updateGlobalProgress() {
+      var completed = [];
+      for(var i=1;i<=12;i++){ if(localStorage.getItem('c3m'+i+'_completed')==='true') completed.push(i); }
+      var pct = Math.round((completed.length/12)*100);
+      var fill = document.getElementById('progressFill');
+      var txt = document.getElementById('progressText');
+      if(fill) fill.style.width = pct+'%';
+      if(txt) txt.textContent = 'Módulo 1 de 12 ('+pct+'%)';
+    }
+
+    function goNext() {
+      localStorage.setItem('c3_lastVisited', '02-analisis-ratios.html');
+      alert('🔄 Transición al Módulo 2: Análisis Fundamental y Ratios Financieros');
+      window.location.href = '02-analisis-ratios.html';
+    }
+
+    updateGlobalProgress();
+    renderPool();
+    setupDropZones();
+    renderDropZones();
+    updateTotals();
+  </script>
+  <script src="../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

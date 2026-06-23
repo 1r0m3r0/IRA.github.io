@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SQL Avanzado | Curso 1 - Planes de Ejecución</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../../assets/css/theme.css">
+<style>
+:root{--acc:#ff5050;--acc2:#cc4040;--glow:rgba(255,80,80,0.15)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#0a0e0f;color:#e8edee;min-height:100vh}
+.tech-grid{position:fixed;inset:0;background-image:linear-gradient(rgba(255,80,80,0.03)1px,transparent 1px),linear-gradient(90deg,rgba(255,80,80,0.03)1px,transparent 1px);background-size:60px 60px;z-index:0;pointer-events:none}
+.orb{position:fixed;border-radius:50%;filter:blur(120px);z-index:0;pointer-events:none}
+.orb-1{width:600px;height:600px;background:rgba(255,80,80,0.12);top:-200px;right:-200px}
+.orb-2{width:500px;height:500px;background:rgba(156,100,255,0.10);bottom:-150px;left:-150px}
+.container{max-width:1200px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+.header-section{padding-top:140px;text-align:center}
+.header-section h1{font-size:clamp(2rem,5vw,3.2rem);font-weight:800;background:linear-gradient(135deg,var(--acc),var(--acc2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:12px}
+.header-section .subtitle{color:#8899aa;font-size:1.1rem;max-width:700px;margin:0 auto 32px;line-height:1.6}
+.progress-overview{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:24px;margin-bottom:40px;backdrop-filter:blur(12px)}
+.progress-overview .stats{display:flex;justify-content:space-around;flex-wrap:wrap;gap:16px}
+.progress-overview .stat-item{text-align:center}
+.progress-overview .stat-number{font-size:1.8rem;font-weight:700;color:var(--acc)}
+.progress-overview .stat-label{color:#8899aa;font-size:0.85rem;margin-top:4px}
+.progress-bar-container{height:8px;background:rgba(255,255,255,0.08);border-radius:4px;margin-top:16px;overflow:hidden}
+.progress-bar-container .bar{height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));border-radius:4px;width:0%;transition:width .5s ease}
+.badge-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:16px 0}
+.badge-item{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:4px 12px;font-size:0.75rem;color:var(--acc)}
+.modules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:40px}
+.module-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:18px;backdrop-filter:blur(8px);transition:all .3s ease;text-decoration:none;color:inherit;display:block;position:relative}
+.module-card:hover{transform:translateY(-3px);border-color:var(--acc);box-shadow:0 6px 24px var(--glow)}
+.module-card .num{font-size:0.7rem;color:var(--acc);font-weight:600;text-transform:uppercase;letter-spacing:1px}
+.module-card h4{font-size:1rem;font-weight:600;margin:6px 0;color:#fff}
+.module-card p{color:#8899aa;font-size:0.82rem;line-height:1.5}
+.module-card .type-badge{display:inline-block;background:rgba(255,255,255,0.06);padding:2px 8px;border-radius:10px;font-size:0.7rem;color:#aabbcc;margin-top:8px}
+.module-card .check{position:absolute;top:10px;right:12px;color:var(--acc);font-size:1rem;opacity:0;transition:opacity .3s}
+.module-card.completed .check{opacity:1}
+footer{text-align:center;padding:32px 0;color:#667788;font-size:0.85rem;border-top:1px solid rgba(255,255,255,0.06)}
+@media(max-width:768px){.modules-grid{grid-template-columns:1fr}.header-section{padding-top:100px}}
+</style>
+</head>
+<body>
+<div class="tech-grid"></div>
+<div class="orb orb-1"></div><div class="orb orb-2"></div>
+<nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a><a href="../index.html">Programa</a></nav>
+<div class="container">
+<div class="header-section">
+<h1><i class="fas fa-rocket"></i> Planes de Ejecución y Performance Tuning</h1>
+<p class="subtitle">Domina EXPLAIN ANALYZE, optimiza costos, elige la estrategia de join correcta y lleva tu base de datos al máximo rendimiento. 12 módulos interactivos.</p>
+</div>
+<div class="progress-overview">
+<div class="stats">
+<div class="stat-item"><div class="stat-number" id="badgeCount">0</div><div class="stat-label">Insignias</div></div>
+<div class="stat-item"><div class="stat-number" id="moduleCount">0/12</div><div class="stat-label">Módulos</div></div>
+<div class="stat-item"><div class="stat-number" id="pctDisplay">0%</div><div class="stat-label">Completado</div></div>
+</div>
+<div class="progress-bar-container"><div class="bar" id="globalBar"></div></div>
+<div class="badge-row" id="badgeRow"></div>
+</div>
+<div class="modules-grid" id="modulesGrid"></div>
+<footer><i class="fas fa-crown"></i> Programa SQL Avanzado · Curso 1 · Planes de Ejecución · PostgreSQL 19</footer>
+</div>
+<script>
+const MODULES=[
+{num:"01",slug:"01-explain-cada-nodo",title:"EXPLAIN Cada Nodo",desc:"Aprende a leer cada nodo del plan de ejecución: Seq Scan, Index Scan, Sort, Hash, Aggregate y más.",type:"Quiz",icon:"fa-search"},
+{num:"02",slug:"02-costos-startup-total-rows",title:"Costos startup/total/rows",desc:"Descifra los números mágicos: startup cost, total cost y estimated rows. ¿Qué significan realmente?",type:"Simulación",icon:"fa-calculator"},
+{num:"03",slug:"03-nested-hash-merge-join",title:"Nested / Hash / Merge Join",desc:"Comprende cuándo PostgreSQL elige cada estrategia de join y cómo forzarlas con parámetros.",type:"Constructor",icon:"fa-link"},
+{num:"04",slug:"04-seq-vs-index-vs-bitmap",title:"Seq Scan vs Index Scan vs Bitmap",desc:"Compara escaneos secuenciales, por índice y bitmap. ¿Cuál es mejor para cada caso?",type:"Simulación",icon:"fa-chart-bar"},
+{num:"05",slug:"05-geqo",title:"GEQO - Genetic Query Optimizer",desc:"El optimizador genético para joins complejos. ¿Cuándo se activa y cómo afecta los planes?",type:"Simulación",icon:"fa-dna"},
+{num:"06",slug:"06-work-mem-shared-buffers",title:"work_mem / shared_buffers",desc:"Ajusta la memoria de PostgreSQL: ¿cuánta RAM darle a work_mem sin morir en el intento?",type:"Juego",icon:"fa-memory"},
+{num:"07",slug:"07-parallel-query",title:"Parallel Query",desc:"Paraleliza tus consultas: workers, gather, partial paths. ¿Escala linealmente?",type:"Simulación",icon:"fa-cogs"},
+{num:"08",slug:"08-jit-compilation",title:"JIT Compilation",desc:"Compilación Just-In-Time para expresiones complejas. ¿Cuándo ayuda y cuándo estorba?",type:"Quiz",icon:"fa-bolt"},
+{num:"09",slug:"09-connection-pooling-pgbouncer",title:"Connection Pooling con PgBouncer",desc:"Pool de conexiones: transaccional vs sesión, números mágicos y configuración avanzada.",type:"Calculadora",icon:"fa-plug"},
+{num:"10",slug:"10-analyze-estadisticas",title:"ANALYZE y Estadísticas",desc:"Muestreo, histogramas, correlación y n_distinct. Cómo ANALYZE alimenta al optimizador.",type:"Quiz",icon:"fa-chart-pie"},
+{num:"11",slug:"11-reindex-vacuum-bloat",title:"REINDEX / VACUUM y Bloat",desc:"Combate el bloat: VACUUM, autovacuum, REINDEX CONCURRENTLY y pgstattuple.",type:"Simulación",icon:"fa-broom"},
+{num:"12",slug:"12-mini-proyecto-tunea-bd",title:"Mini-Proyecto: Tunea una BD",desc:"Aplica todo lo aprendido: analiza, diagnostica y optimiza una base de datos real simulada.",type:"Escape Room",icon:"fa-trophy"}
+];
+const P="sqlavanzado_c1";
+function render(){
+const grid=document.getElementById("modulesGrid");
+grid.innerHTML=MODULES.map((m,i)=>{
+const done=JSON.parse(localStorage.getItem(P+"_progress"))||[];
+const ok=done.includes(i+1);
+return '<a href="'+m.slug+'.html" class="module-card'+(ok?' completed':'')+'"><div class="check"><i class="fas fa-check-circle"></i></div><div class="num">Módulo '+m.num+'</div><h4><i class="fas '+m.icon+'" style="color:var(--acc);margin-right:6px"></i>'+m.title+'</h4><p>'+m.desc+'</p><span class="type-badge"><i class="fas fa-gamepad"></i> '+m.type+'</span></a>';
+}).join("");
+updateStats();
+}
+function updateStats(){
+const done=JSON.parse(localStorage.getItem(P+"_progress"))||[];
+const pct=Math.round(done.length/12*100);
+document.getElementById("globalBar").style.width=pct+"%";
+document.getElementById("pctDisplay").textContent=pct+"%";
+document.getElementById("moduleCount").textContent=done.length+"/12";
+const badges=JSON.parse(localStorage.getItem("sqlavanzado_badges"))||[];
+document.getElementById("badgeCount").textContent=badges.length;
+const row=document.getElementById("badgeRow");
+row.innerHTML=badges.map(b=>'<span class="badge-item"><i class="fas fa-medal"></i> '+b+'</span>').join("");
+}
+render();setInterval(updateStats,2000);
+</script>
+</body>
+</html>

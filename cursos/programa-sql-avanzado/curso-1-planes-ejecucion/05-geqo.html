@@ -1,0 +1,102 @@
+<!DOCTYPE html><html lang="es"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SQL Avanzado | 05 GEQO</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../../../assets/css/theme.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#0a0e0f;color:#e8edee;min-height:100vh;display:flex;justify-content:center;padding:20px}
+.course-container{max-width:860px;width:100%;background:rgba(15,20,42,0.6);backdrop-filter:blur(16px);border-radius:24px;border:1px solid rgba(255,80,80,0.2);padding:30px;margin-top:60px}
+.progress-bar,.progress-fill{height:10px;border-radius:8px}
+.progress-bar{background:rgba(255,255,255,0.06);margin-bottom:18px;overflow:hidden}
+.progress-fill{background:linear-gradient(90deg,#ff5050,#cc4040);width:0%;transition:width .5s ease}
+.progress-text{font-size:.75rem;color:#8899aa;margin-bottom:10px;display:block}
+.hero-header{text-align:center;margin:20px 0}
+.hero-header h1{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:800;background:linear-gradient(135deg,#ff5050,#cc4040);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-header p{color:#8899aa;margin-top:6px;font-size:.95rem}
+.analogy-card{background:rgba(255,80,80,0.08);border-left:4px solid #ff5050;border-radius:12px;padding:16px 20px;margin:20px 0;font-size:.9rem;line-height:1.6}
+.analogy-card strong{color:#ff5050}
+.main-area{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:24px;margin:20px 0}
+.geqo-control{text-align:center;margin:16px 0}
+.geqo-control select{padding:10px;background:#1a1f3a;color:#e8edee;border:1px solid rgba(255,80,80,0.3);border-radius:10px;font-family:'Inter',sans-serif;font-size:1rem;margin-bottom:16px}
+.geqo-grid{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:16px 0;min-height:60px}
+.geqo-gene{background:rgba(255,80,80,0.15);border:1px solid #ff5050;border-radius:8px;padding:8px 14px;font-size:.85rem;font-weight:600;color:#ff5050;transition:.3s}
+.geqo-gene.best{background:rgba(0,255,100,0.15);border-color:#00ff64;color:#00ff64}
+.geqo-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:16px 0}
+.geqo-stat{background:rgba(255,255,255,0.04);border-radius:10px;padding:14px;text-align:center}
+.geqo-stat .num{font-size:1.4rem;font-weight:700;color:#ff5050}
+.geqo-stat .lbl{font-size:.75rem;color:#8899aa;margin-top:4px}
+.feedback{background:rgba(255,255,255,0.04);border-radius:12px;padding:16px 20px;margin:16px 0;font-size:.88rem;min-height:50px}
+.insignia{background:linear-gradient(135deg,rgba(255,215,0,0.12),rgba(255,165,0,0.08));border:1px solid rgba(255,215,0,0.3);border-radius:16px;padding:20px;text-align:center;margin:16px 0;transition:.5s}
+.insignia.hidden{display:none}
+.insignia h3{color:#ffd700;font-size:1.3rem;margin:8px 0}
+.btn-next{display:block;width:100%;padding:16px;margin:20px 0;background:linear-gradient(135deg,#ff5050,#cc4040);border:none;border-radius:14px;color:#fff;font-size:1.05rem;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:.3s}
+.btn-next:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,80,80,0.3)}
+footer{text-align:center;padding:16px 0 0;color:#667788;font-size:.8rem;border-top:1px solid rgba(255,255,255,0.06);margin-top:20px}
+@media(max-width:600px){.course-container{padding:16px;margin-top:50px}.geqo-stats{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="course-container">
+<nav class="brand-return-nav"><a href="../../../../index.html">&larr; Portfolio</a><a href="../../../../cursos/index.html">Cursos</a></nav>
+<div class="progress-bar"><div class="progress-fill" id="progFill"></div></div>
+<span class="progress-text" id="progText">Módulo 5 de 12</span>
+<div class="hero-header"><h1>🧬 GEQO - Genetic Query Optimizer</h1><p>El algoritmo genético para optimizar joins complejos</p></div>
+<div class="analogy-card"><strong>💡 Piénsalo así:</strong> GEQO es como la evolución de las especies aplicada a bases de datos. Cuando tienes muchas tablas (>12), evaluar todas las combinaciones posibles es como buscar una aguja en un pajar cósmico. En vez de eso, GEQO "cría" generaciones de planes de ejecución, cruzando los mejores y mutándolos, hasta encontrar uno bueno.</div>
+<div class="main-area">
+<p style="color:#bcc;margin-bottom:10px;font-weight:600"><i class="fas fa-dna" style="color:#ff5050"></i> Simulador genético de planes</p>
+<div class="geqo-control"><label><i class="fas fa-layer-group"></i> Número de tablas: </label><select id="numTables"><option>8</option><option selected>12</option><option>16</option><option>20</option><option>30</option></select><button class="scan-btn" id="runGeqo" style="padding:10px 24px;border-radius:10px;background:rgba(255,80,80,0.15);border:1px solid #ff5050;color:#ff5050;cursor:pointer;font-family:'Inter',sans-serif;font-weight:600;margin-left:12px"><i class="fas fa-play"></i> Evolucionar</button></div>
+<div class="geqo-grid" id="geqoGrid"></div>
+<div class="geqo-stats">
+<div class="geqo-stat"><div class="num" id="totalPlans">0</div><div class="lbl">Planes posibles</div></div>
+<div class="geqo-stat"><div class="num" id="evalPlans">0</div><div class="lbl">Evaluados por GEQO</div></div>
+<div class="geqo-stat"><div class="num" id="savings">0x</div><div class="lbl">Ahorro computacional</div></div>
+</div>
+</div>
+<div id="feedback" class="feedback">💬 GEQO se activa cuando hay más de 12 tablas en un JOIN. Selecciona un número y haz clic en "Evolucionar".</div>
+<div id="insignia" class="insignia hidden"><i class="fas fa-medal" style="font-size:2.5rem;color:#ffd700"></i><h3>🏅 Genetista de Joins 🏅</h3><p>¡Entiendes cómo la evolución artificial optimiza consultas complejas!</p></div>
+<button class="btn-next" onclick="alert('🔄 Transición → 06-work-mem-shared-buffers.html')">Siguiente <i class="fas fa-arrow-right"></i></button>
+<footer><i class="fas fa-crown"></i> SQL Avanzado · Curso 1 · Módulo 5</footer>
+</div>
+<script>
+const MODULE=5,COURSE="sqlavanzado_c1",PROG="sqlavanzado_progress",BADGES="sqlavanzado_badges";
+document.getElementById('runGeqo').addEventListener('click',function(){
+let n=parseInt(document.getElementById('numTables').value);
+let total=n===8?5040:n===12?479001600:n===16?20922789888000:n===20?2432902008176640000:265252859812191058636308480000000;
+let geqoEval=Math.min(total,2000+50*n);
+let savings=total/geqoEval;
+document.getElementById('totalPlans').textContent=n>12?n===16?'2.09e13':n===20?'2.43e18':'2.65e32':'479M'.replace('M','').replace('e','');
+if(n===8)document.getElementById('totalPlans').textContent='5,040';
+else if(n===12)document.getElementById('totalPlans').textContent='479M';
+else if(n===16)document.getElementById('totalPlans').textContent='2.09×10¹³';
+else if(n===20)document.getElementById('totalPlans').textContent='2.43×10¹⁸';
+else document.getElementById('totalPlans').textContent='2.65×10³²';
+document.getElementById('evalPlans').textContent=geqoEval.toLocaleString();
+document.getElementById('savings').textContent=savings>1e6?(savings/1e6).toFixed(1)+'M×':savings>1e3?(savings/1e3).toFixed(0)+'K×':Math.round(savings)+'×';
+let grid=document.getElementById('geqoGrid');
+grid.innerHTML='';
+let genes=n>12?12:n;
+for(let i=0;i<genes;i++){
+let g=document.createElement('div');
+g.className='geqo-gene'+(i<4?' best':'');
+g.textContent='T'+(i+1);
+grid.appendChild(g);
+}
+document.getElementById('feedback').innerHTML='🧬 GEQO evaluó ~'+geqoEval.toLocaleString()+' planes de '+(n>12?'~'+total.toExponential(2):total.toLocaleString())+' posibles. Ahorro: '+document.getElementById('savings').textContent+'. Los genes verdes son los mejores planes de la generación.';
+let bd=JSON.parse(localStorage.getItem(BADGES))||[];
+if(!bd.includes('Genetista de Joins')){bd.push('Genetista de Joins');localStorage.setItem(BADGES,JSON.stringify(bd));document.getElementById('insignia').classList.remove('hidden')}
+updateProg();
+});
+function updateProg(){
+let p=JSON.parse(localStorage.getItem(COURSE+"_progress"))||[];
+if(!p.includes(MODULE)){p.push(MODULE);localStorage.setItem(COURSE+"_progress",JSON.stringify(p))}
+let pct=Math.round(p.length/12*100);
+document.getElementById('progFill').style.width=pct+'%';
+document.getElementById('progText').textContent='Módulo 5 de 12 ('+pct+'%)';
+let gp=JSON.parse(localStorage.getItem(PROG))||[];
+if(!gp.includes(MODULE+48)){gp.push(MODULE+48);localStorage.setItem(PROG,JSON.stringify(gp))}
+}
+</script>
+</body>
+</html>

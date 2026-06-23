@@ -1,0 +1,82 @@
+<!DOCTYPE html><html lang="es"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SQL Avanzado | C2-08 postgres_fdw Sharding</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../../../assets/css/theme.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#0a0e0f;color:#e8edee;min-height:100vh;display:flex;justify-content:center;padding:20px}
+.course-container{max-width:860px;width:100%;background:rgba(15,20,42,0.6);backdrop-filter:blur(16px);border-radius:24px;border:1px solid rgba(156,100,255,0.2);padding:30px;margin-top:60px}
+.progress-bar,.progress-fill{height:10px;border-radius:8px}
+.progress-bar{background:rgba(255,255,255,0.06);margin-bottom:18px;overflow:hidden}
+.progress-fill{background:linear-gradient(90deg,#9c64ff,#7a3ce0);width:0%;transition:width .5s ease}
+.progress-text{font-size:.75rem;color:#8899aa;margin-bottom:10px;display:block}
+.hero-header{text-align:center;margin:20px 0}
+.hero-header h1{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:800;background:linear-gradient(135deg,#9c64ff,#7a3ce0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-header p{color:#8899aa;margin-top:6px;font-size:.95rem}
+.analogy-card{background:rgba(156,100,255,0.08);border-left:4px solid #9c64ff;border-radius:12px;padding:16px 20px;margin:20px 0;font-size:.9rem;line-height:1.6}
+.analogy-card strong{color:#9c64ff}
+.main-area{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:24px;margin:20px 0}
+.shard-map{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:16px 0}
+.shard-node{background:rgba(255,255,255,0.03);border:1px solid rgba(156,100,255,0.2);border-radius:14px;padding:16px;text-align:center;transition:.3s}
+.shard-node h4{color:#9c64ff;font-size:.9rem}
+.shard-node p{color:#8899aa;font-size:.75rem;margin-top:4px}
+.shard-node .status{display:inline-block;padding:2px 10px;border-radius:12px;font-size:.7rem;margin-top:8px;background:rgba(0,255,100,0.1);color:#00ff64;border:1px solid #00ff64}
+.shard-node.offline{opacity:.4}
+.shard-node.offline .status{background:rgba(255,80,80,0.1);color:#ff5050;border-color:#ff5050}
+.fdw-controls{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0;justify-content:center}
+.fdw-btn{padding:10px 18px;border-radius:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#e8edee;cursor:pointer;font-family:'Inter',sans-serif;font-size:.85rem;transition:.3s}
+.fdw-btn:hover{background:rgba(156,100,255,0.15);border-color:#9c64ff}
+.fdw-code{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:10px 14px;margin:12px 0;font-family:monospace;font-size:.78rem;color:#bcc;max-height:80px;overflow-y:auto}
+.feedback{background:rgba(255,255,255,0.04);border-radius:12px;padding:16px 20px;margin:16px 0;font-size:.88rem;min-height:50px}
+.insignia{background:linear-gradient(135deg,rgba(255,215,0,0.12),rgba(255,165,0,0.08));border:1px solid rgba(255,215,0,0.3);border-radius:16px;padding:20px;text-align:center;margin:16px 0;transition:.5s}
+.insignia.hidden{display:none}
+.insignia h3{color:#ffd700;font-size:1.3rem;margin:8px 0}
+.btn-next{display:block;width:100%;padding:16px;margin:20px 0;background:linear-gradient(135deg,#9c64ff,#7a3ce0);border:none;border-radius:14px;color:#fff;font-size:1.05rem;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:.3s}
+.btn-next:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(156,100,255,0.3)}
+footer{text-align:center;padding:16px 0 0;color:#667788;font-size:.8rem;border-top:1px solid rgba(255,255,255,0.06);margin-top:20px}
+@media(max-width:600px){.course-container{padding:16px;margin-top:50px}.shard-map{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="course-container">
+<nav class="brand-return-nav"><a href="../../../../index.html">&larr; Portfolio</a><a href="../../../../cursos/index.html">Cursos</a></nav>
+<div class="progress-bar"><div class="progress-fill" id="progFill"></div></div>
+<span class="progress-text" id="progText">Módulo 8 de 12</span>
+<div class="hero-header"><h1>🌐 postgres_fdw Sharding</h1><p>Sharding nativo con Foreign Data Wrappers</p></div>
+<div class="analogy-card"><strong>💡 Piénsalo así:</strong> postgres_fdw es como tener una mensajería entre servidores. Le dices a PostgreSQL "oye, esa tabla que necesitas está en otro servidor, pero quiero consultarla como si estuviera aquí". PostgreSQL crea un "enlace" (foreign server) y mapea usuarios, tablas y esquemas. Es la forma más nativa de sharding en PostgreSQL.</div>
+<div class="main-area">
+<p style="color:#bcc;margin-bottom:10px;font-weight:600"><i class="fas fa-globe" style="color:#9c64ff"></i> Arquitectura FDW Sharding</p>
+<div class="shard-map">
+<div class="shard-node"><h4><i class="fas fa-database"></i> Coordinator</h4><p>localhost:5432</p><div class="status">Online</div></div>
+<div class="shard-node" id="s1"><h4><i class="fas fa-database"></i> Shard 1 - US</h4><p>shard1:5432</p><div class="status">Online</div></div>
+<div class="shard-node" id="s2"><h4><i class="fas fa-database"></i> Shard 2 - EU</h4><p>shard2:5432</p><div class="status">Online</div></div>
+</div>
+<div class="fdw-controls">
+<button class="fdw-btn" id="createFdw"><i class="fas fa-plug"></i> Crear FDW</button>
+<button class="fdw-btn" id="importSchema"><i class="fas fa-file-import"></i> Importar esquema</button>
+<button class="fdw-btn" id="simQuery"><i class="fas fa-play"></i> Simular query pushdown</button>
+</div>
+<div class="fdw-code" id="fdwCode">-- Haz clic para ver SQL</div>
+</div>
+<div id="feedback" class="feedback">💬 postgres_fdw permite pushdown: WHERE, JOINs y agregaciones se ejecutan en el shard remoto.</div>
+<div id="insignia" class="insignia hidden"><i class="fas fa-medal" style="font-size:2.5rem;color:#ffd700"></i><h3>🏅 FDW Architect 🏅</h3><p>¡Sabes conectar servidores PostgreSQL con sharding nativo!</p></div>
+<button class="btn-next" onclick="alert('🔄 Transición → 09-citus.html')">Siguiente <i class="fas fa-arrow-right"></i></button>
+<footer><i class="fas fa-crown"></i> SQL Avanzado · Curso 2 · Módulo 8</footer>
+</div>
+<script>
+const MODULE=8,COURSE="sqlavanzado_c2",PROG="sqlavanzado_progress",BADGES="sqlavanzado_badges";
+const codes=['-- 1. Crear extension\nCREATE EXTENSION postgres_fdw;\n\n-- 2. Crear foreign server\nCREATE SERVER shard_us FOREIGN DATA WRAPPER postgres_fdw OPTIONS (host \'shard1\', port \'5432\', dbname \'orders_us\');','-- 3. Mapeo de usuario\nCREATE USER MAPPING FOR current_user SERVER shard_us OPTIONS (user \'fdw_user\', password \'****\');\n\n-- 4. Importar esquema\nIMPORT FOREIGN SCHEMA public FROM SERVER shard_us INTO public;','-- 5. Query con pushdown\nEXPLAIN (ANALYZE) SELECT * FROM orders_us WHERE region = \'US\' AND created_at > \'2024-01-01\';\n\n-- PostgreSQL envía el WHERE al shard remoto\n-- Solo vuelven los resultados filtrados'];
+let idx=0;
+document.getElementById('createFdw').addEventListener('click',function(){document.getElementById('fdwCode').textContent=codes[0];idx=0;document.getElementById('feedback').innerHTML='🔌 Paso 1: Extension + Server. PostgreSQL se conecta al shard remoto. Usa libpq internamente.';});
+document.getElementById('importSchema').addEventListener('click',function(){document.getElementById('fdwCode').textContent=codes[1];idx=1;document.getElementById('feedback').innerHTML='📥 IMPORT FOREIGN SCHEMA trae la estructura de tablas del servidor remoto. Las tablas aparecen como locales (pero los datos están allá).';});
+document.getElementById('simQuery').addEventListener('click',function(){document.getElementById('fdwCode').textContent=codes[2];idx=2;document.getElementById('feedback').innerHTML='⚡ Query pushdown: el WHERE se ejecuta en el shard remoto. PostgreSQL no trae todas las filas, solo el resultado filtrado. ¡Esto es clave para el rendimiento!';let bd=JSON.parse(localStorage.getItem(BADGES))||[];if(!bd.includes('FDW Architect')){bd.push('FDW Architect');localStorage.setItem(BADGES,JSON.stringify(bd));document.getElementById('insignia').classList.remove('hidden')}updateProg();});
+function updateProg(){
+let p=JSON.parse(localStorage.getItem(COURSE+"_progress"))||[];if(!p.includes(MODULE)){p.push(MODULE);localStorage.setItem(COURSE+"_progress",JSON.stringify(p))}
+let pct=Math.round(p.length/12*100);document.getElementById('progFill').style.width=pct+'%';document.getElementById('progText').textContent='Módulo 8 de 12 ('+pct+'%)';
+let gp=JSON.parse(localStorage.getItem(PROG))||[];if(!gp.includes(MODULE+96)){gp.push(MODULE+96);localStorage.setItem(PROG,JSON.stringify(gp))}
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Curso 6 | CLI Profesionales (Typer, Rich, Click)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:linear-gradient(135deg,#0a0f1e,#0c1222); font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+    .modulo-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(139,92,246,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+    .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #8b5cf6; }
+    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#a78bfa,#8b5cf6); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .hero-header p { font-size:1.1rem; color:#a78bfa; margin-top:0.5rem; }
+    .chip { background:rgba(139,92,246,0.15); border:1px solid #8b5cf6; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; display:inline-block; margin:0.3rem; }
+    .progress-bar-top { background:#00000044; padding:0.6rem 2rem; text-align:center; font-size:0.85rem; border-bottom:1px solid #2c3e66; }
+    .progress-bar-top span { color:#a78bfa; font-weight:600; }
+    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #8b5cf6; font-size:1rem; line-height:1.6; }
+    .main-area { padding:0 2rem 1.5rem; }
+    .simulador { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; border:1px solid #8b5cf6; }
+    .simulador h3 { margin-bottom:1rem; color:#a78bfa; }
+    .btn-action { background:linear-gradient(95deg,#a78bfa,#8b5cf6); border:none; padding:0.8rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin:0.3rem; }
+    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(139,92,246,0.5); }
+    .btn-reset { background:#2c3e66; border:none; padding:0.8rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; color:#eef5ff; margin:0.3rem; }
+    .btn-reset:hover { background:#3a4e7a; }
+    select, input { background:#0f1a2c; border:1px solid #2c3e66; color:#eef5ff; padding:0.4rem 0.8rem; border-radius:0.8rem; font-size:0.85rem; }
+    .terminal { background:#0a1220; border:1px solid #2c3e66; border-radius:1rem; padding:1rem; font-family:'Courier New',monospace; font-size:0.8rem; min-height:100px; max-height:200px; overflow-y:auto; text-align:left; margin:0.5rem 0; }
+    .terminal .prompt { color:#a78bfa; }
+    .terminal .output { color:#eef5ff; }
+    .terminal .error { color:#ef4444; }
+    .terminal .success { color:#22c55e; }
+    .terminal .info { color:#60a5fa; }
+    .result-box { background:#0f1a2c; border:1px solid #2c3e66; border-radius:1rem; padding:1.2rem; margin:0.8rem 0; text-align:center; }
+    .feedback { background:#00000099; margin:1.5rem 2rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #8b5cf6; }
+    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:1.5rem 2rem; padding:1rem; border:1px dashed gold; }
+    .insignia i { font-size:2.5rem; color:gold; }
+    .hidden { display:none; }
+    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; font-size:0.95rem; }
+    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(139,92,246,0.4); }
+    .nav-link.next { background:linear-gradient(95deg,#a78bfa,#8b5cf6); color:#1e1a0c; }
+    .nav-link.menu { background:#1a2a4a; border:1px solid #3399ff; }
+    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a><a href="../index.html">Programa Python Avanzado</a></nav>
+  <div class="modulo-container">
+    <div class="progress-bar-top"><i class="fas fa-tasks"></i> Curso 6: Temas Avanzados <span>| M&oacute;dulo 9 de 12</span></div>
+    <div class="hero-header">
+      <h1><i class="fas fa-terminal"></i> CLI Profesionales (Typer, Rich, Click)</h1>
+      <p>Constructor CLI: Typer args/options/subcomandos. Rich tablas/progress bars.</p>
+    </div>
+    <div class="analogy-card"><i class="fas fa-lightbulb" style="color:#8b5cf6;margin-right:0.5rem;"></i> <strong>Como un asistente de voz para tu terminal:</strong> Crear una CLI con Typer es como ense&ntilde;arle a tu computadora comandos de voz personalizados. "cli.py procesar --input datos.csv --output resultado.json" es como decir "asistente, procesa este archivo y guarda el resultado all&iacute;". Rich es el que hace que la respuesta se vea bonita: tablas, barras de progreso, colores. Click es la versi&oacute;n cl&aacute;sica y robusta.</div>
+    <div class="main-area">
+      <div class="simulador">
+        <h3><i class="fas fa-terminal"></i> Constructor de CLI Interactivo</h3>
+        <p style="font-size:0.85rem;color:#8899bb;margin-bottom:0.8rem;">Configura un comando CLI con Typer y ejecuta el comando simulado en la terminal.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:1rem;">
+          <div><label style="font-size:0.8rem;color:#8899bb;">Comando:</label><br><select id="cliCmd"><option value="procesar" selected>procesar</option><option value="analizar">analizar</option><option value="reporte">reporte</option></select></div>
+          <div><label style="font-size:0.8rem;color:#8899bb;">--input:</label><br><input type="text" id="cliInput" value="datos.csv" style="width:140px;"></div>
+          <div><label style="font-size:0.8rem;color:#8899bb;">--verbose:</label><br><select id="cliVerbose"><option value="false">No</option><option value="true" selected>S&iacute;</option></select></div>
+        </div>
+        <div class="terminal" id="cliTerminal"><span class="prompt">$ </span>python app.py --help</div>
+        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+          <button id="runCliBtn" class="btn-action"><i class="fas fa-play"></i> Ejecutar Comando</button>
+          <button id="showHelpBtn" class="btn-action"><i class="fas fa-question-circle"></i> --help</button>
+          <button id="cliCodeBtn" class="btn-action"><i class="fas fa-code"></i> Ver C&oacute;digo Typer</button>
+        </div>
+        <div id="cliResult" class="result-box"></div>
+      </div>
+    </div>
+    <div id="feedbackMsg" class="feedback">Ejecuta un comando CLI con Typer para ganar tu insignia.</div>
+    <div id="insigniaArea" class="insignia hidden"><i class="fas fa-medal"></i><h3>INSIGNIA: ARQUITECTO CLI</h3><p>&iexcl;Dominas Typer, Rich y Click para CLIs profesionales!</p></div>
+    <div class="nav-links">
+      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
+      <a href="10-async-librerias.html" class="nav-link next">Siguiente: Async Librer&iacute;as <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <footer><i class="fas fa-crown"></i> Curso 6: Temas Avanzados &middot; CLI Profesionales</footer>
+  </div>
+  <script>
+    const STORAGE_KEY='c6m9';
+    function writeTerminal(text){const t=document.getElementById('cliTerminal');t.innerHTML+='<br><span class="output">'+text+'</span>';t.scrollTop=t.scrollHeight;}
+    document.getElementById('runCliBtn').addEventListener('click',function(){const cmd=document.getElementById('cliCmd').value;const input=document.getElementById('cliInput').value||'datos.csv';const verbose=document.getElementById('cliVerbose').value;const t=document.getElementById('cliTerminal');t.innerHTML='<span class="prompt">$ </span>python app.py '+cmd+' --input '+input+(verbose==='true'?' --verbose':'');setTimeout(function(){if(cmd==='procesar')writeTerminal('Procesando '+input+'... <span class="success">OK</span> (42 registros)');else if(cmd==='analizar')writeTerminal('An&aacute;lisis: media=24.5, std=12.3, min=5, max=98');else writeTerminal('Reporte generado: reporte_2025.html');},300);setTimeout(function(){writeTerminal('<span class="success">Comando ejecutado en 0.34s</span>');localStorage.setItem(STORAGE_KEY,'true');document.getElementById('insigniaArea').classList.remove('hidden');document.getElementById('feedbackMsg').innerHTML='&iexcl;CLI ejecutada con &eacute;xito!';},800);});
+    document.getElementById('showHelpBtn').addEventListener('click',function(){const t=document.getElementById('cliTerminal');t.innerHTML='<span class="prompt">$ </span>python app.py --help<br><span class="info">Usage: app.py [OPTIONS] COMMAND [ARGS]...<br>  CLI para procesamiento de datos.<br><br>Commands:<br>  procesar   Procesa archivo de entrada<br>  analizar   Analiza datos estad&iacute;sticos<br>  reporte    Genera reporte HTML</span>';});
+    document.getElementById('cliCodeBtn').addEventListener('click',function(){document.getElementById('cliResult').innerHTML='<pre style="text-align:left;font-size:0.72rem;background:#0a1220;padding:1rem;border-radius:0.8rem;">import typer\nfrom rich.console import Console\nfrom rich.table import Table\n\napp = typer.Typer()\nconsole = Console()\n\n@app.command()\ndef procesar(input: str = typer.Option(..., "--input"),\n             verbose: bool = typer.Option(False, "--verbose")):\n    console.print(f"Procesando {input}...", style="green")</pre>';});
+    if(localStorage.getItem(STORAGE_KEY)==='true'){document.getElementById('insigniaArea').classList.remove('hidden');document.getElementById('feedbackMsg').innerHTML='M&oacute;dulo completado';}
+  </script>
+</body>
+</html>

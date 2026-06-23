@@ -1,0 +1,93 @@
+<!DOCTYPE html><html lang="es"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SQL Avanzado | 03 Nested/Hash/Merge Join</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../../../assets/css/theme.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#0a0e0f;color:#e8edee;min-height:100vh;display:flex;justify-content:center;padding:20px}
+.course-container{max-width:860px;width:100%;background:rgba(15,20,42,0.6);backdrop-filter:blur(16px);border-radius:24px;border:1px solid rgba(255,80,80,0.2);padding:30px;margin-top:60px}
+.progress-bar{background:rgba(255,255,255,0.06);border-radius:8px;height:10px;margin-bottom:18px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#ff5050,#cc4040);border-radius:8px;transition:width .5s ease;width:0%}
+.progress-text{font-size:.75rem;color:#8899aa;margin-bottom:10px;display:block}
+.hero-header{text-align:center;margin:20px 0}
+.hero-header h1{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:800;background:linear-gradient(135deg,#ff5050,#cc4040);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-header p{color:#8899aa;margin-top:6px;font-size:.95rem}
+.analogy-card{background:rgba(255,80,80,0.08);border-left:4px solid #ff5050;border-radius:12px;padding:16px 20px;margin:20px 0;font-size:.9rem;line-height:1.6}
+.analogy-card strong{color:#ff5050}
+.main-area{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:24px;margin:20px 0}
+.join-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:18px;margin:12px 0;cursor:pointer;transition:.3s}
+.join-card:hover{border-color:var(--h);transform:translateX(4px)}
+.join-card h4{color:var(--h);margin-bottom:6px;font-size:1rem}
+.join-card p{color:#8899aa;font-size:.85rem;line-height:1.5}
+.join-card .complexity{display:inline-block;background:rgba(255,255,255,0.05);padding:2px 10px;border-radius:8px;font-size:.75rem;margin-top:8px;font-weight:600}
+.scenario-select{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}
+.scenario-btn{padding:10px 16px;border-radius:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#e8edee;cursor:pointer;font-family:'Inter',sans-serif;font-size:.85rem;transition:.3s}
+.scenario-btn:hover,.scenario-btn.active{background:rgba(255,80,80,0.15);border-color:#ff5050}
+.feedback{background:rgba(255,255,255,0.04);border-radius:12px;padding:16px 20px;margin:16px 0;font-size:.88rem;min-height:50px}
+.insignia{background:linear-gradient(135deg,rgba(255,215,0,0.12),rgba(255,165,0,0.08));border:1px solid rgba(255,215,0,0.3);border-radius:16px;padding:20px;text-align:center;margin:16px 0;transition:.5s}
+.insignia.hidden{display:none}
+.insignia h3{color:#ffd700;font-size:1.3rem;margin:8px 0}
+.btn-next{display:block;width:100%;padding:16px;margin:20px 0;background:linear-gradient(135deg,#ff5050,#cc4040);border:none;border-radius:14px;color:#fff;font-size:1.05rem;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:.3s}
+.btn-next:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,80,80,0.3)}
+footer{text-align:center;padding:16px 0 0;color:#667788;font-size:.8rem;border-top:1px solid rgba(255,255,255,0.06);margin-top:20px}
+@media(max-width:600px){.course-container{padding:16px;margin-top:50px}}
+</style>
+</head>
+<body>
+<div class="course-container">
+<nav class="brand-return-nav"><a href="../../../../index.html">&larr; Portfolio</a><a href="../../../../cursos/index.html">Cursos</a></nav>
+<div class="progress-bar"><div class="progress-fill" id="progFill"></div></div>
+<span class="progress-text" id="progText">Módulo 3 de 12</span>
+<div class="hero-header"><h1>🔗 Nested / Hash / Merge Join</h1><p>Las tres estrategias de join que PostgreSQL puede elegir</p></div>
+<div class="analogy-card"><strong>💡 Piénsalo así:</strong> Los joins son como organizar una cena: Nested Loop es invitar a cada amigo de uno en uno a la mesa (muchas visitas a la nevera). Hash Join es preparar una tabla con todos los ingredientes antes de cocinar. Merge Join es ordenar dos mazos de cartas y mezclarlos ordenadamente.</div>
+<div class="main-area">
+<p style="color:#bcc;margin-bottom:10px;font-weight:600"><i class="fas fa-hand-pointer" style="color:#ff5050"></i> Elige un escenario para ver qué join recomienda el optimizador</p>
+<div class="scenario-select">
+<button class="scenario-btn active" data-scenario="0">🎯 Pedido por ID</button>
+<button class="scenario-btn" data-scenario="1">📋 Órdenes × Clientes</button>
+<button class="scenario-btn" data-scenario="2">📊 Reporte mensual</button>
+</div>
+<div id="joinResult"></div>
+<div id="joinDetails"></div>
+</div>
+<div id="feedback" class="feedback">💬 Haz clic en un escenario para ver qué join elegiría PostgreSQL y por qué.</div>
+<div id="insignia" class="insignia hidden"><i class="fas fa-medal" style="font-size:2.5rem;color:#ffd700"></i><h3>🏅 Estratega de Joins 🏅</h3><p>¡Dominas cuándo usar cada estrategia de join! Como un gran maestro de ajedrez de bases de datos.</p></div>
+<button class="btn-next" onclick="alert('🔄 Transición → 04-seq-vs-index-vs-bitmap.html')">Siguiente <i class="fas fa-arrow-right"></i></button>
+<footer><i class="fas fa-crown"></i> SQL Avanzado · Curso 1 · Módulo 3</footer>
+</div>
+<script>
+const MODULE=3,COURSE="sqlavanzado_c1",PROG="sqlavanzado_progress",BADGES="sqlavanzado_badges";
+const SCENARIOS=[
+{name:"🎯 Pedido por ID",desc:"Buscas un pedido específico (1 fila) en una tabla de 1M filas, con índice por ID.",join:"Nested Loop",reason:"El optimizador elige Nested Loop cuando una tabla es muy pequeña (1 fila) y la otra tiene un índice. Solo hace 1 iteración del loop externo y encuentra la fila por índice.",complexity:"O(N) con índice, O(N×M) sin índice",icon:"fa-redo"},
+{name:"📋 Órdenes × Clientes",desc:"JOIN de 10,000 órdenes con 500 clientes activos. Sin índices relevantes.",join:"Hash Join",reason:"Hash Join construye una tabla hash en memoria con la tabla pequeña (clientes) y luego escanea la grande (órdenes). Ideal cuando una tabla cabe en work_mem.",complexity:"O(N+M)",icon:"fa-table"},
+{name:"📊 Reporte mensual",desc:"JOIN de dos tablas grandes (5M filas c/u), ambas ordenadas por fecha.",join:"Merge Join",reason:"Merge Join aprovecha que ambas tablas ya están ordenadas. Escanea ambas simultáneamente como cremallera. Muy eficiente para rangos grandes de datos pre-ordenados.",complexity:"O(N+M)",icon:"fa-merge"}
+];
+function loadScenario(idx){
+let s=SCENARIOS[idx];
+document.querySelectorAll('.scenario-btn').forEach(b=>b.classList.toggle('active',parseInt(b.dataset.scenario)===idx));
+document.getElementById('joinResult').innerHTML='<div class="join-card" style="--h:#ff5050"><h4><i class="fas fa-check-circle"></i> PostgreSQL elige: '+s.join+'</h4><p>'+s.desc+'</p><p style="margin-top:8px;color:#8899aa">'+s.reason+'</p><span class="complexity" style="color:#ff5050">Complejidad: '+s.complexity+'</span></div>';
+document.getElementById('joinDetails').innerHTML='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:12px">'+
+'<div class="join-card" style="--h:#ff5050;cursor:default;border-color:'+(s.join==='Nested Loop'?'#ff5050':'rgba(255,255,255,0.06)')+'"><h4 style="color:'+(s.join==='Nested Loop'?'#ff5050':'#8899aa')+'"><i class="fas fa-redo"></i> Nested Loop</h4><p style="font-size:.8rem">Bucle anidado: itera sobre la tabla externa y busca en la interna.</p></div>'+
+'<div class="join-card" style="--h:#ff5050;cursor:default;border-color:'+(s.join==='Hash Join'?'#ff5050':'rgba(255,255,255,0.06)')+'"><h4 style="color:'+(s.join==='Hash Join'?'#ff5050':'#8899aa')+'"><i class="fas fa-table"></i> Hash Join</h4><p style="font-size:.8rem">Construye una hash table en memoria con la tabla pequeña.</p></div>'+
+'<div class="join-card" style="--h:#ff5050;cursor:default;border-color:'+(s.join==='Merge Join'?'#ff5050':'rgba(255,255,255,0.06)')+'"><h4 style="color:'+(s.join==='Merge Join'?'#ff5050':'#8899aa')+'"><i class="fas fa-merge"></i> Merge Join</h4><p style="font-size:.8rem">Ambos conjuntos ordenados se fusionan como cremallera.</p></div></div>';
+document.getElementById('feedback').innerHTML='✅ Escenario: '+s.name+' → <strong>'+s.join+'</strong>. '+s.reason.split('.')[0]+'.';
+let bd=JSON.parse(localStorage.getItem(BADGES))||[];
+if(!bd.includes('Estratega de Joins')){bd.push('Estratega de Joins');localStorage.setItem(BADGES,JSON.stringify(bd));document.getElementById('insignia').classList.remove('hidden')}
+updateProg();
+}
+document.querySelectorAll('.scenario-btn').forEach(b=>b.addEventListener('click',function(){loadScenario(parseInt(this.dataset.scenario))}));
+function updateProg(){
+let p=JSON.parse(localStorage.getItem(COURSE+"_progress"))||[];
+if(!p.includes(MODULE)){p.push(MODULE);localStorage.setItem(COURSE+"_progress",JSON.stringify(p))}
+let pct=Math.round(p.length/12*100);
+document.getElementById('progFill').style.width=pct+'%';
+document.getElementById('progText').textContent='Módulo 3 de 12 ('+pct+'%)';
+let gp=JSON.parse(localStorage.getItem(PROG))||[];
+if(!gp.includes(MODULE+24)){gp.push(MODULE+24);localStorage.setItem(PROG,JSON.stringify(gp))}
+}
+loadScenario(0);
+</script>
+</body>
+</html>

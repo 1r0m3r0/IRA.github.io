@@ -1,0 +1,116 @@
+<!DOCTYPE html><html lang="es"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SQL Avanzado | C2-03 PARTITION BY HASH</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../../../assets/css/theme.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#0a0e0f;color:#e8edee;min-height:100vh;display:flex;justify-content:center;padding:20px}
+.course-container{max-width:860px;width:100%;background:rgba(15,20,42,0.6);backdrop-filter:blur(16px);border-radius:24px;border:1px solid rgba(156,100,255,0.2);padding:30px;margin-top:60px}
+.progress-bar,.progress-fill{height:10px;border-radius:8px}
+.progress-bar{background:rgba(255,255,255,0.06);margin-bottom:18px;overflow:hidden}
+.progress-fill{background:linear-gradient(90deg,#9c64ff,#7a3ce0);width:0%;transition:width .5s ease}
+.progress-text{font-size:.75rem;color:#8899aa;margin-bottom:10px;display:block}
+.hero-header{text-align:center;margin:20px 0}
+.hero-header h1{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:800;background:linear-gradient(135deg,#9c64ff,#7a3ce0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-header p{color:#8899aa;margin-top:6px;font-size:.95rem}
+.analogy-card{background:rgba(156,100,255,0.08);border-left:4px solid #9c64ff;border-radius:12px;padding:16px 20px;margin:20px 0;font-size:.9rem;line-height:1.6}
+.analogy-card strong{color:#9c64ff}
+.main-area{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:24px;margin:20px 0}
+.bucket-visual{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0;justify-content:center}
+.bucket{width:80px;height:100px;background:rgba(255,255,255,0.03);border:2px solid rgba(156,100,255,0.2);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:.3s}
+.bucket .bname{color:#9c64ff;font-weight:700;font-size:1.1rem}
+.bucket .bcount{font-size:2rem;font-weight:800;color:#fff}
+.bucket .blabel{font-size:.65rem;color:#8899aa}
+.hash-controls{display:flex;gap:12px;flex-wrap:wrap;margin:16px 0;justify-content:center}
+.hash-btn{padding:12px 24px;border-radius:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#e8edee;cursor:pointer;font-family:'Inter',sans-serif;font-size:.9rem;transition:.3s}
+.hash-btn:hover{background:rgba(156,100,255,0.15);border-color:#9c64ff}
+.hash-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:16px 0}
+.hs{background:rgba(255,255,255,0.04);border-radius:10px;padding:14px;text-align:center}
+.hs .num{font-size:1.2rem;font-weight:700;color:#9c64ff}
+.hs .lbl{font-size:.75rem;color:#8899aa}
+.feedback{background:rgba(255,255,255,0.04);border-radius:12px;padding:16px 20px;margin:16px 0;font-size:.88rem;min-height:50px}
+.insignia{background:linear-gradient(135deg,rgba(255,215,0,0.12),rgba(255,165,0,0.08));border:1px solid rgba(255,215,0,0.3);border-radius:16px;padding:20px;text-align:center;margin:16px 0;transition:.5s}
+.insignia.hidden{display:none}
+.insignia h3{color:#ffd700;font-size:1.3rem;margin:8px 0}
+.btn-next{display:block;width:100%;padding:16px;margin:20px 0;background:linear-gradient(135deg,#9c64ff,#7a3ce0);border:none;border-radius:14px;color:#fff;font-size:1.05rem;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:.3s}
+.btn-next:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(156,100,255,0.3)}
+footer{text-align:center;padding:16px 0 0;color:#667788;font-size:.8rem;border-top:1px solid rgba(255,255,255,0.06);margin-top:20px}
+@media(max-width:600px){.course-container{padding:16px;margin-top:50px}.hash-stats{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="course-container">
+<nav class="brand-return-nav"><a href="../../../../index.html">&larr; Portfolio</a><a href="../../../../cursos/index.html">Cursos</a></nav>
+<div class="progress-bar"><div class="progress-fill" id="progFill"></div></div>
+<span class="progress-text" id="progText">Módulo 3 de 12</span>
+<div class="hero-header"><h1>#️⃣ PARTITION BY HASH</h1><p>Distribuye uniformemente con hashing</p></div>
+<div class="analogy-card"><strong>💡 Piénsalo así:</strong> PARTITION BY HASH es como repartir estudiantes en aulas según los últimos dígitos de su carnet. El hash garantiza que cada aula tenga ~el mismo número de estudiantes, sin importar el orden alfabético o la fecha. Es la opción justa cuando no hay un criterio natural de partición.</div>
+<div class="main-area">
+<p style="color:#bcc;margin-bottom:10px;font-weight:600"><i class="fas fa-hashtag" style="color:#9c64ff"></i> Simulador de distribución hash</p>
+<div style="text-align:center;margin:10px 0">
+<label style="font-size:.85rem;color:#aab">Número de particiones: <select id="numBuckets" style="background:#1a1f3a;color:#e8edee;border:1px solid rgba(156,100,255,0.3);border-radius:6px;padding:4px 8px;font-family:'Inter',sans-serif">
+<option>2</option><option selected>4</option><option>6</option><option>8</option>
+</select></label>
+</div>
+<div class="bucket-visual" id="bucketVis"></div>
+<div class="hash-controls">
+<button class="hash-btn" id="addData"><i class="fas fa-database"></i> Insertar 100 registros</button>
+<button class="hash-btn" id="addBatch"><i class="fas fa-database"></i> Insertar 1000 registros</button>
+<button class="hash-btn" id="resetBuckets"><i class="fas fa-undo"></i> Reset</button>
+</div>
+<div class="hash-stats">
+<div class="hs"><div class="num" id="totalItems">0</div><div class="lbl">Total registros</div></div>
+<div class="hs"><div class="num" id="idealPerBucket">0</div><div class="lbl">Ideal por bucket</div></div>
+<div class="hs"><div class="num" id="maxDeviation">0%</div><div class="lbl">Desviación máxima</div></div>
+</div>
+</div>
+<div id="feedback" class="feedback">💬 Con HASH, los datos se distribuyen uniformemente sin importar su valor. Ideal para evitar hotspots.</div>
+<div id="insignia" class="insignia hidden"><i class="fas fa-medal" style="font-size:2.5rem;color:#ffd700"></i><h3>🏅 Hashing Hero 🏅</h3><p>¡Entiendes cómo el hashing distribuye datos uniformemente!</p></div>
+<button class="btn-next" onclick="alert('🔄 Transición → 04-sub-particionamiento.html')">Siguiente <i class="fas fa-arrow-right"></i></button>
+<footer><i class="fas fa-crown"></i> SQL Avanzado · Curso 2 · Módulo 3</footer>
+</div>
+<script>
+const MODULE=3,COURSE="sqlavanzado_c2",PROG="sqlavanzado_progress",BADGES="sqlavanzado_badges";
+let buckets=[0,0,0,0];
+function renderBuckets(){
+let n=parseInt(document.getElementById('numBuckets').value);
+while(buckets.length<n)buckets.push(0);
+buckets=buckets.slice(0,n);
+let vis=document.getElementById('bucketVis');
+let max=Math.max(...buckets,1);
+vis.innerHTML=buckets.map((c,i)=>'<div class="bucket"><div class="bname">P'+(i+1)+'</div><div class="bcount">'+c+'</div><div class="blabel">'+(n>0?Math.round(c/10)+'%':'')+'</div></div>').join('');
+let total=buckets.reduce((a,b)=>a+b,0);
+let ideal=total/n;
+let maxDev=n>0?Math.max(...buckets.map(b=>Math.abs(b-ideal)))/Math.max(ideal,1)*100:0;
+document.getElementById('totalItems').textContent=total;
+document.getElementById('idealPerBucket').textContent=Math.round(ideal);
+document.getElementById('maxDeviation').textContent=maxDev.toFixed(1)+'%';
+document.getElementById('feedback').innerHTML='📊 Distribución: '+(maxDev<10?'✅ Excelente uniformidad (<10% desviación)':maxDev<20?'👍 Buena distribución':'⚠️ Algo de skew, revisa la función hash')+'. Total: '+total+' registros, ~'+Math.round(ideal)+' por partición.';
+}
+document.getElementById('numBuckets').addEventListener('change',function(){while(buckets.length<parseInt(this.value))buckets.push(0);buckets=buckets.slice(0,parseInt(this.value));renderBuckets();});
+document.getElementById('addData').addEventListener('click',function(){
+let n=parseInt(document.getElementById('numBuckets').value);
+for(let i=0;i<100;i++){let idx=Math.floor(Math.random()*n);buckets[idx]++;}
+renderBuckets();
+let bd=JSON.parse(localStorage.getItem(BADGES))||[];if(!bd.includes('Hashing Hero')){bd.push('Hashing Hero');localStorage.setItem(BADGES,JSON.stringify(bd));document.getElementById('insignia').classList.remove('hidden')}
+updateProg();
+});
+document.getElementById('addBatch').addEventListener('click',function(){
+let n=parseInt(document.getElementById('numBuckets').value);
+for(let i=0;i<1000;i++){let idx=Math.floor(Math.random()*n);buckets[idx]++;}
+renderBuckets();
+});
+document.getElementById('resetBuckets').addEventListener('click',function(){
+let n=parseInt(document.getElementById('numBuckets').value);
+buckets=new Array(n).fill(0);renderBuckets();});
+function updateProg(){
+let p=JSON.parse(localStorage.getItem(COURSE+"_progress"))||[];if(!p.includes(MODULE)){p.push(MODULE);localStorage.setItem(COURSE+"_progress",JSON.stringify(p))}
+let pct=Math.round(p.length/12*100);document.getElementById('progFill').style.width=pct+'%';document.getElementById('progText').textContent='Módulo 3 de 12 ('+pct+'%)';
+let gp=JSON.parse(localStorage.getItem(PROG))||[];if(!gp.includes(MODULE+36)){gp.push(MODULE+36);localStorage.setItem(PROG,JSON.stringify(gp))}
+}
+renderBuckets();
+</script>
+</body>
+</html>

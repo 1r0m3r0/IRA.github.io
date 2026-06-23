@@ -1,0 +1,97 @@
+<!DOCTYPE html><html lang="es"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SQL Avanzado | C3-03 @@ Operador</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../../../assets/css/theme.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#0a0e0f;color:#e8edee;min-height:100vh;display:flex;justify-content:center;padding:20px}
+.course-container{max-width:860px;width:100%;background:rgba(15,20,42,0.6);backdrop-filter:blur(16px);border-radius:24px;border:1px solid rgba(0,224,255,0.2);padding:30px;margin-top:60px}
+.progress-bar,.progress-fill{height:10px;border-radius:8px}
+.progress-bar{background:rgba(255,255,255,0.06);margin-bottom:18px;overflow:hidden}
+.progress-fill{background:linear-gradient(90deg,#00e0ff,#00b8d4);width:0%;transition:width .5s ease}
+.progress-text{font-size:.75rem;color:#8899aa;margin-bottom:10px;display:block}
+.hero-header{text-align:center;margin:20px 0}
+.hero-header h1{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:800;background:linear-gradient(135deg,#00e0ff,#00b8d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-header p{color:#8899aa;margin-top:6px;font-size:.95rem}
+.analogy-card{background:rgba(0,224,255,0.08);border-left:4px solid #00e0ff;border-radius:12px;padding:16px 20px;margin:20px 0;font-size:.9rem;line-height:1.6}
+.analogy-card strong{color:#00e0ff}
+.main-area{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:24px;margin:20px 0}
+.documents{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0}
+.doc-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:14px;cursor:pointer;transition:.3s}
+.doc-card:hover{border-color:#00e0ff}
+.doc-card h5{color:#00e0ff;font-size:.85rem}
+.doc-card p{color:#8899aa;font-size:.78rem;margin-top:4px;line-height:1.4}
+.doc-card .match{color:#00e0ff;font-weight:600}
+.doc-card.matched{border-color:#00ff64;background:rgba(0,255,100,0.04)}
+.quiz-option{display:block;width:100%;padding:14px 18px;margin:8px 0;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:#e8edee;font-size:.9rem;font-family:'Inter',sans-serif;cursor:pointer;transition:all .25s;text-align:left}
+.quiz-option:hover{background:rgba(0,224,255,0.1);border-color:#00e0ff}
+.quiz-option.correct{background:rgba(0,255,100,0.15);border-color:#00ff64}
+.quiz-option.wrong{background:rgba(255,80,80,0.15);border-color:#ff5050}
+.match-result{text-align:center;padding:12px;margin:12px 0;border-radius:10px;font-size:1.1rem;font-weight:600}
+.match-result.true{background:rgba(0,255,100,0.1);color:#00ff64;border:1px solid #00ff64}
+.match-result.false{background:rgba(255,80,80,0.1);color:#ff5050;border:1px solid #ff5050}
+.feedback{background:rgba(255,255,255,0.04);border-radius:12px;padding:16px 20px;margin:16px 0;font-size:.88rem;min-height:50px}
+.insignia{background:linear-gradient(135deg,rgba(255,215,0,0.12),rgba(255,165,0,0.08));border:1px solid rgba(255,215,0,0.3);border-radius:16px;padding:20px;text-align:center;margin:16px 0;transition:.5s}
+.insignia.hidden{display:none}
+.insignia h3{color:#ffd700;font-size:1.3rem;margin:8px 0}
+.btn-next{display:block;width:100%;padding:16px;margin:20px 0;background:linear-gradient(135deg,#00e0ff,#00b8d4);border:none;border-radius:14px;color:#fff;font-size:1.05rem;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:.3s}
+.btn-next:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,224,255,0.3)}
+footer{text-align:center;padding:16px 0 0;color:#667788;font-size:.8rem;border-top:1px solid rgba(255,255,255,0.06);margin-top:20px}
+@media(max-width:600px){.course-container{padding:16px;margin-top:50px}.documents{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="course-container">
+<nav class="brand-return-nav"><a href="../../../../index.html">&larr; Portfolio</a><a href="../../../../cursos/index.html">Cursos</a></nav>
+<div class="progress-bar"><div class="progress-fill" id="progFill"></div></div>
+<span class="progress-text" id="progText">Módulo 3 de 12</span>
+<div class="hero-header"><h1>@@ El Corazón del FTS</h1><p>El operador que conecta tsvector con tsquery</p></div>
+<div class="analogy-card"><strong>💡 Piénsalo así:</strong> @@ es como la cerradura de una puerta. El tsvector es la cerradura (tiene las marcas de los dientes de la llave), la tsquery es la llave (tiene una forma específica), y @@ comprueba si la llave abre la cerradura. SELECT 'gato correr jardín'::tsvector @@ 'gato & jardín'::tsquery → true si la llave encaja.</div>
+<div class="main-area">
+<p style="color:#bcc;margin-bottom:10px;font-weight:600"><i class="fas fa-equals" style="color:#00e0ff"></i> Quiz: ¿Coincide @@?</p>
+<p style="color:#8899aa;font-size:.85rem;margin-bottom:10px">¿El tsvector 'gato perro casa jardín correr' coincide con la tsquery?</p>
+<button class="quiz-option" data-q="gato & casa">🅰 'gato & casa'</button>
+<button class="quiz-option" data-q="gato & pez">🅱 'gato & pez'</button>
+<button class="quiz-option" data-q="gato & !casa">🅲 'gato & !casa'</button>
+<button class="quiz-option" data-q="gato <-> correr">🅳 'gato &lt;-&gt; correr'</button>
+</div>
+<div id="feedback" class="feedback">💬 Haz clic en cada opción para ver si coincide con el tsvector de ejemplo.</div>
+<div id="insignia" class="insignia hidden"><i class="fas fa-medal" style="font-size:2.5rem;color:#ffd700"></i><h3>🏅 Matchmaker @@ 🏅</h3><p>¡Sabes exactamente cómo funciona el operador @@!</p></div>
+<button class="btn-next" onclick="alert('🔄 Transición → 04-indices-gin-fts.html')">Siguiente <i class="fas fa-arrow-right"></i></button>
+<footer><i class="fas fa-crown"></i> SQL Avanzado · Curso 3 · Módulo 3</footer>
+</div>
+<script>
+const MODULE=3,COURSE="sqlavanzado_c3",PROG="sqlavanzado_progress",BADGES="sqlavanzado_badges";
+const TSVECTOR=['gato','perro','casa','jardín','correr'];
+function matchQuery(q){
+let tokens=q.split(/[&\|!<>-]+/).map(t=>t.trim()).filter(t=>t.length>0);
+let hasAnd=q.includes('&');
+let hasNot=q.includes('!');
+let hasPhrase=q.includes('<->');
+if(hasAnd){return tokens.every(t=>TSVECTOR.includes(t));}
+if(hasNot){let pos=tokens.indexOf(tokens.find(t=>q.indexOf('!'+t)>=0));if(pos>0)return TSVECTOR.includes(tokens[0])&&!TSVECTOR.includes(tokens[pos]);return true;}
+if(hasPhrase){let idx=TSVECTOR.indexOf(tokens[0]);return idx>=0&&idx+1<TSVECTOR.length&&TSVECTOR[idx+1]===tokens[1];}
+return tokens.some(t=>TSVECTOR.includes(t));
+}
+document.querySelectorAll('.quiz-option').forEach(b=>{
+b.addEventListener('click',function(){
+let q=this.dataset.q;
+let result=matchQuery(q);
+this.className='quiz-option '+(result?'correct':'wrong');
+let fb=document.getElementById('feedback');
+let qdisplay=q.replace(/</g,'&lt;').replace(/>/g,'&gt;');
+fb.innerHTML=(result?'✅ ¡Coincide! SELECT \'gato perro casa jardín correr\'::tsvector @@ \''+q+'\'::tsquery → <strong>true</strong>':'❌ No coincide. SELECT \'gato perro casa jardín correr\'::tsvector @@ \''+q+'\'::tsquery → <strong>false</strong>')+'. '+
+(q.includes('pez')?'El lexema "pez" no existe en el tsvector.':q.includes('!casa')?'La consulta busca gato AND NOT casa. Casa SÍ está, por eso es false.':q.includes('<->')?'La frase exacta "gato correr" debe aparecer en orden y adyacente.':'');
+if(result){document.getElementById('insignia').classList.remove('hidden');let bd=JSON.parse(localStorage.getItem(BADGES))||[];if(!bd.includes('Matchmaker @@')){bd.push('Matchmaker @@');localStorage.setItem(BADGES,JSON.stringify(bd))}updateProg();}
+});
+});
+function updateProg(){
+let p=JSON.parse(localStorage.getItem(COURSE+"_progress"))||[];if(!p.includes(MODULE)){p.push(MODULE);localStorage.setItem(COURSE+"_progress",JSON.stringify(p))}
+let pct=Math.round(p.length/12*100);document.getElementById('progFill').style.width=pct+'%';document.getElementById('progText').textContent='Módulo 3 de 12 ('+pct+'%)';
+let gp=JSON.parse(localStorage.getItem(PROG))||[];if(!gp.includes(MODULE+48)){gp.push(MODULE+48);localStorage.setItem(PROG,JSON.stringify(gp))}
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html><html lang="es"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SQL Avanzado | C2-12 Mini-Proyecto Multi-Tenant</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../../../assets/css/theme.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#0a0e0f;color:#e8edee;min-height:100vh;display:flex;justify-content:center;padding:20px}
+.course-container{max-width:860px;width:100%;background:rgba(15,20,42,0.6);backdrop-filter:blur(16px);border-radius:24px;border:1px solid rgba(156,100,255,0.2);padding:30px;margin-top:60px}
+.progress-bar,.progress-fill{height:10px;border-radius:8px}
+.progress-bar{background:rgba(255,255,255,0.06);margin-bottom:18px;overflow:hidden}
+.progress-fill{background:linear-gradient(90deg,#9c64ff,#7a3ce0);width:0%;transition:width .5s ease}
+.progress-text{font-size:.75rem;color:#8899aa;margin-bottom:10px;display:block}
+.hero-header{text-align:center;margin:20px 0}
+.hero-header h1{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:800;background:linear-gradient(135deg,#9c64ff,#7a3ce0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-header p{color:#8899aa;margin-top:6px;font-size:.95rem}
+.analogy-card{background:rgba(156,100,255,0.08);border-left:4px solid #9c64ff;border-radius:12px;padding:16px 20px;margin:20px 0;font-size:.9rem;line-height:1.6}
+.analogy-card strong{color:#9c64ff}
+.main-area{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:24px;margin:20px 0}
+.progress-ring{text-align:center;margin:16px 0}
+.progress-ring .big-num{font-size:3rem;font-weight:800;color:#9c64ff}
+.progress-ring .lbl{font-size:.8rem;color:#8899aa}
+.escape-step{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px 20px;margin:12px 0;transition:.3s}
+.escape-step.done{background:rgba(0,255,100,0.06);border-color:#00ff64}
+.escape-step h4{color:#9c64ff;font-size:.95rem;margin-bottom:6px}
+.escape-step p{color:#8899aa;font-size:.85rem;line-height:1.5}
+.escape-step .step-num{display:inline-block;width:28px;height:28px;border-radius:50%;background:rgba(156,100,255,0.2);color:#9c64ff;text-align:center;line-height:28px;font-size:.8rem;font-weight:700;margin-right:8px}
+.escape-step.done .step-num{background:rgba(0,255,100,0.2);color:#00ff64}
+.escape-actions{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+.escape-btn{padding:10px 18px;border-radius:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#e8edee;cursor:pointer;font-family:'Inter',sans-serif;font-size:.82rem;transition:.3s}
+.escape-btn:hover{background:rgba(156,100,255,0.1);border-color:#9c64ff}
+.escape-btn:disabled{opacity:.4;cursor:not-allowed}
+.feedback{background:rgba(255,255,255,0.04);border-radius:12px;padding:16px 20px;margin:16px 0;font-size:.88rem;min-height:50px}
+.insignia{background:linear-gradient(135deg,rgba(255,215,0,0.12),rgba(255,165,0,0.08));border:1px solid rgba(255,215,0,0.3);border-radius:16px;padding:20px;text-align:center;margin:16px 0;transition:.5s}
+.insignia.hidden{display:none}
+.insignia h3{color:#ffd700;font-size:1.3rem;margin:8px 0}
+.btn-next{display:block;width:100%;padding:16px;margin:20px 0;background:linear-gradient(135deg,#9c64ff,#7a3ce0);border:none;border-radius:14px;color:#fff;font-size:1.05rem;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:.3s}
+.btn-next:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(156,100,255,0.3)}
+footer{text-align:center;padding:16px 0 0;color:#667788;font-size:.8rem;border-top:1px solid rgba(255,255,255,0.06);margin-top:20px}
+@media(max-width:600px){.course-container{padding:16px;margin-top:50px}}
+</style>
+</head>
+<body>
+<div class="course-container">
+<nav class="brand-return-nav"><a href="../../../../index.html">&larr; Portfolio</a><a href="../../../../cursos/index.html">Cursos</a></nav>
+<div class="progress-bar"><div class="progress-fill" id="progFill"></div></div>
+<span class="progress-text" id="progText">Módulo 12 de 12</span>
+<div class="hero-header"><h1>🏆 Mini-Proyecto Multi-Tenant</h1><p>Diseña una arquitectura multi-tenant completa</p></div>
+<div class="analogy-card"><strong>💡 Piénsalo así:</strong> Un sistema multi-tenant es como un edificio de oficinas: cada empresa (tenant) tiene su propio espacio, sus datos y sus usuarios, pero comparten la infraestructura del edificio (el cluster de BD). Tu trabajo es diseñar cómo particionar los datos para que cada empresa tenga buen rendimiento sin interferir con las demás.</div>
+<div class="main-area">
+<p style="color:#bcc;margin-bottom:10px;font-weight:600"><i class="fas fa-tasks" style="color:#9c64ff"></i> Escape Room: Arquitectura Multi-Tenant</p>
+<div class="progress-ring"><span class="big-num" id="stepsDone">0</span><span class="lbl">/ 5 pasos completados</span></div>
+<div id="escapeSteps"></div>
+</div>
+<div id="feedback" class="feedback">💬 Completa cada paso para diseñar la arquitectura multi-tenant definitiva.</div>
+<div id="insignia" class="insignia hidden"><i class="fas fa-medal" style="font-size:2.5rem;color:#ffd700"></i><h3>🏅 Arquitecto Multi-Tenant 🏅</h3><p>¡Has completado el Curso 2 de Particionamiento y Sharding! Eres un verdadero Arquitecto de Datos Distribuidos.</p></div>
+<button class="btn-next" onclick="alert('🔄 ¡Felicitaciones! Has completado el Curso 2. Continúa con el Curso 3: Full-Text Search → ../curso-3-fulltext-search/index.html')">Siguiente <i class="fas fa-arrow-right"></i></button>
+<footer><i class="fas fa-crown"></i> SQL Avanzado · Curso 2 · Módulo 12</footer>
+</div>
+<script>
+const MODULE=12,COURSE="sqlavanzado_c2",PROG="sqlavanzado_progress",BADGES="sqlavanzado_badges";
+const STEPS=[
+{title:"Elegir Shard Key",desc:"¿Cuál es la mejor shard key para un SaaS multi-tenant con 500 empresas? tenant_id es la clave correcta por su alta cardinalidad.",action:"🔑 tenant_id"},
+{title:"Particionar por Tenant",desc:"Crea una tabla particionada por HASH(tenant_id) con 8 particiones iniciales.",action:"📊 HASH 8"},
+{title:"Shard con Citus",desc:"Distribuye la tabla con citus_create_distributed_table('orders','tenant_id').",action:"🏛️ Citus"},
+{title:"Reference Tables",desc:"Las tablas pequeñas (countries, plans) deben ser reference tables para joins locales.",action:"📋 Reference"},
+{title:"Monitoreo y Rebalance",desc:"Monitorea el skew y rebalancea si algún tenant crece demasiado.",action:"📈 Monitor"}
+];
+let completed=JSON.parse(localStorage.getItem('c2_escape'))||[];
+function renderEscape(){
+let container=document.getElementById('escapeSteps');
+container.innerHTML=STEPS.map((s,i)=>{
+let done=completed.includes(i);
+return '<div class="escape-step'+(done?' done':'')+'"><h4><span class="step-num">'+(i+1)+'</span>'+s.title+'</h4><p>'+s.desc+'</p>'+
+(!done?'<div class="escape-actions"><button class="escape-btn" data-idx="'+i+'">'+s.action+'</button></div>':'<p style="color:#00ff64;font-size:.8rem"><i class="fas fa-check-circle"></i> Completado</p>')+'</div>';
+}).join('');
+document.querySelectorAll('.escape-btn').forEach(b=>b.addEventListener('click',function(){
+let idx=parseInt(this.dataset.idx);
+if(!completed.includes(idx)){completed.push(idx);localStorage.setItem('c2_escape',JSON.stringify(completed));renderEscape();updateEscapeProg();}
+let bd=JSON.parse(localStorage.getItem(BADGES))||[];
+if(completed.length===5&&!bd.includes('Arquitecto Multi-Tenant')){bd.push('Arquitecto Multi-Tenant');localStorage.setItem(BADGES,JSON.stringify(bd));document.getElementById('insignia').classList.remove('hidden');document.getElementById('feedback').innerHTML='🎉 ¡ARQUITECTO MULTI-TENANT! Has diseñado un sistema completo de particionamiento y sharding.';updateProg();}
+}));
+document.getElementById('stepsDone').textContent=completed.length;
+}
+function updateEscapeProg(){document.getElementById('stepsDone').textContent=completed.length;document.getElementById('feedback').innerHTML='✅ Paso completado. '+(5-completed.length)+' pasos restantes.';}
+function updateProg(){
+let p=JSON.parse(localStorage.getItem(COURSE+"_progress"))||[];if(!p.includes(MODULE)){p.push(MODULE);localStorage.setItem(COURSE+"_progress",JSON.stringify(p))}
+let pct=Math.round(p.length/12*100);document.getElementById('progFill').style.width=pct+'%';document.getElementById('progText').textContent='Módulo 12 de 12 ('+pct+'%) - ¡Curso 2 Completado!';
+let gp=JSON.parse(localStorage.getItem(PROG))||[];if(!gp.includes(MODULE+144)){gp.push(MODULE+144);localStorage.setItem(PROG,JSON.stringify(gp))}
+document.getElementById('feedback').innerHTML='🎉 ¡Has completado el Curso 2! Continúa al Curso 3: Full-Text Search.';
+}
+renderEscape();
+updateProg();
+</script>
+</body>
+</html>

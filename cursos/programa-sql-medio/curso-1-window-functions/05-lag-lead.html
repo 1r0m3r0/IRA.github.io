@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LAG y LEAD | Window Functions</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../../../assets/css/theme.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0e0f;--surface:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.08);--text:#e8edee;--muted:#8899aa;--accent:#ffb347;--accent2:#ff8c00;--glow:hsla(38,90%,55%,0.2)}
+body{font-family:"Inter",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center}
+.tech-grid{position:fixed;inset:0;background-image:linear-gradient(rgba(255,179,71,0.03)1px,transparent 1px),linear-gradient(90deg,rgba(255,179,71,0.03)1px,transparent 1px);background-size:60px 60px;z-index:0;pointer-events:none}
+.container{max-width:820px;width:100%;padding:20px;position:relative;z-index:1;margin-top:80px}
+.brand-return-nav{display:flex;gap:1rem;align-items:center;padding:.5rem 1rem;background:#0f1429;border:1px solid rgba(0,212,255,.2);border-radius:.5rem;position:fixed;top:.75rem;left:.75rem;z-index:9999}
+.brand-return-nav a{color:#00d4ff;text-decoration:none;font-size:.9rem;font-weight:600}
+.brand-return-nav a:hover{color:#00ff41;text-decoration:underline}
+.progress-section{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:24px;backdrop-filter:blur(12px)}
+.progress-section .bar-wrap{height:6px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden;margin-top:8px}
+.progress-section .bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;width:0%;transition:width .5s ease}
+.progress-section .p-text{font-size:.8rem;color:var(--muted)}
+.hero{text-align:center;padding:32px 20px 20px}
+.hero h1{font-size:clamp(1.5rem,4vw,2.4rem);font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+.hero p{color:var(--muted);font-size:1rem}
+.analogy-card{background:rgba(255,179,71,0.08);border:1px solid rgba(255,179,71,0.2);border-radius:12px;padding:18px;margin-bottom:24px;backdrop-filter:blur(8px)}
+.analogy-card strong{color:var(--accent)}
+.main-area{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:20px;backdrop-filter:blur(12px)}
+.main-area h2{font-size:1.1rem;font-weight:600;margin-bottom:16px;color:#fff}
+.main-area p{color:var(--muted);font-size:.9rem;line-height:1.6;margin-bottom:12px}
+.sim-table{overflow-x:auto;margin:16px 0}
+.sim-table table{width:100%;border-collapse:collapse;font-size:.85rem}
+.sim-table th{background:rgba(255,179,71,0.1);color:var(--accent);padding:10px;text-align:left;border-bottom:2px solid rgba(255,179,71,0.2)}
+.sim-table td{padding:10px;border-bottom:1px solid var(--border);color:var(--text)}
+.sim-table .diff{font-weight:600}
+.sim-table .diff.pos{color:#00cc6a}
+.sim-table .diff.neg{color:#ff6b6b}
+.feedback{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;padding:14px;margin:16px 0;font-size:.9rem;min-height:50px;color:var(--muted)}
+.feedback.success{background:rgba(0,204,106,0.1);border-color:#00cc6a;color:#8cffb0}
+.feedback.error{background:rgba(255,80,80,0.1);border-color:#ff5050;color:#ff9999}
+.insignia{text-align:center;padding:24px;background:rgba(255,179,71,0.08);border:1px solid rgba(255,179,71,0.25);border-radius:16px;margin:16px 0;display:none}
+.insignia.show{display:block}
+.insignia i{font-size:2.5rem;color:var(--accent)}.insignia h3{font-size:1.3rem;font-weight:700;margin:8px 0;color:#fff}.insignia p{color:var(--accent);font-weight:500}
+.badge-btn{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:10px;padding:12px 24px;color:#0a0e0f;font-weight:700;cursor:pointer;font-size:.9rem;margin:8px}
+.badge-btn:hover{transform:scale(1.03);opacity:.9}
+.btn-next{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:12px;padding:14px 32px;color:#0a0e0f;font-weight:700;cursor:pointer;font-size:1rem;transition:all .2s;margin:20px auto;display:block}
+.btn-next:disabled{opacity:.4;cursor:not-allowed;transform:none}
+footer{text-align:center;padding:24px 0;color:var(--muted);font-size:.8rem;border-top:1px solid var(--border);width:100%;margin-top:20px}
+@media(max-width:640px){.container{margin-top:70px;padding:12px}}
+</style>
+</head>
+<body><div class="tech-grid"></div>
+<nav class="brand-return-nav"><a href="../../../../index.html">&larr; Portfolio</a><a href="../../../../cursos/index.html">Cursos</a><a href="../../index.html">SQL Medio</a><a href="../index.html">WF</a></nav>
+<div class="container">
+<div class="progress-section"><span class="p-text"><i class="fas fa-tasks"></i> Módulo 5 de 12 · Window Functions</span><div class="bar-wrap"><div class="bar-fill" id="progBar"></div></div></div>
+<div class="hero"><h1>⏪ LAG y LEAD</h1><p>Mira hacia atrás (LAG) o hacia adelante (LEAD) sin cambiar el orden</p></div>
+<div class="analogy-card"><strong>💡 Piénsalo así:</strong> LAG es como mirar por el retrovisor — ves el auto que viene detrás de ti (la fila anterior). LEAD es como mirar el GPS — ves lo que viene adelante (la fila siguiente). Muy útil para calcular diferencias entre meses consecutivos: "este mes vs el mes pasado".</div>
+<div class="main-area">
+<h2>📊 Simulador: Crecimiento Mensual</h2>
+<p>Observa cómo LAG() calcula la diferencia mes a mes:</div>
+<div class="sim-table"><table><thead><tr><th>Mes</th><th>Ventas</th><th>LAG(ventas,1) — Mes Anterior</th><th>Diferencia</th></tr></thead>
+<tbody id="simBody"></tbody></table></div>
+<div style="text-align:center;margin:16px 0">
+<button class="badge-btn" onclick="generateData()"><i class="fas fa-sync"></i> Generar nuevos datos</button>
+<button class="badge-btn" onclick="answerQuiz()"><i class="fas fa-check"></i> ¿Entendido?</button>
+</div>
+<div id="feedback" class="feedback">💬 Haz clic en "Generar" para ver cómo LAG() y LEAD() descubren tendencias</div>
+<div id="insignia" class="insignia"><i class="fas fa-medal"></i><h3>🏅 Time Traveler 🏅</h3><p>¡LAG y LEAD dominados!</p></div>
+<button class="badge-btn" id="claimBadge" style="display:none" onclick="claimInsignia()"><i class="fas fa-award"></i> Reclamar insignia</button>
+</div>
+<button class="btn-next" id="btnNext" disabled onclick="alert('🔄 Transición al Módulo 6: FIRST_VALUE y LAST_VALUE')">Siguiente <i class="fas fa-arrow-right"></i></button>
+<footer><i class="fas fa-window-restore"></i> Window Functions · SQL Medio · Módulo 5</footer>
+</div>
+<script>
+const GM=5,CI=1,LM=12,P='sqlmedio';
+function updateProgress(){let d=JSON.parse(localStorage.getItem(P+'_progress'))||[];let pct=Math.round(d.filter(m=>Math.ceil(m/12)===CI).length/LM*100);document.getElementById('progBar').style.width=pct+'%'}
+function generateData(){
+  let meses=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  let ventas=meses.map(()=>Math.round(Math.random()*80+20)*100);
+  let tbody=document.getElementById('simBody');tbody.innerHTML='';
+  let quizAnswered=false;
+  for(let i=0;i<meses.length;i++){
+    let tr=document.createElement('tr');
+    let lagVal=i>0?ventas[i-1]:'NULL';
+    let diff='—';
+    if(i>0){
+      let d=ventas[i]-ventas[i-1];
+      diff=(d>=0?'+':'')+d;
+    }
+    tr.innerHTML='<td>'+meses[i]+'</td><td>$'+ventas[i].toLocaleString()+'</td><td>'+(lagVal==='NULL'?'<span style="color:#667788">NULL</span>':'$'+lagVal.toLocaleString())+'</td><td class="diff '+(diff!=='—'?(parseInt(diff)>=0?'pos':'neg'):'')+'">'+diff+'</td>';
+    tbody.appendChild(tr);
+  }
+}
+function answerQuiz(){
+  document.getElementById('feedback').innerHTML='✅ <strong>¡Exacto!</strong> LAG(ventas,1) trae el valor del mes anterior. Con LAG(ventas,1) OVER (ORDER BY mes) calculamos: ventas - LAG(ventas) = crecimiento. LEAD hace lo mismo pero hacia adelante.';document.getElementById('feedback').className='feedback success';
+  document.getElementById('claimBadge').style.display='inline-block';
+}
+function claimInsignia(){let d=JSON.parse(localStorage.getItem(P+'_progress'))||[];if(!d.includes(GM)){d.push(GM);localStorage.setItem(P+'_progress',JSON.stringify(d));}let b=JSON.parse(localStorage.getItem(P+'_badges'))||[];let badge='c'+CI+'-m5-lag-lead';if(!b.includes(badge)){b.push(badge);localStorage.setItem(P+'_badges',JSON.stringify(b));}document.getElementById('insignia').classList.add('show');document.getElementById('claimBadge').style.display='none';document.getElementById('btnNext').disabled=false;document.getElementById('feedback').innerHTML='🎉 <strong>LAG/LEAD dominados. ¡A por FIRST/LAST_VALUE!</strong>';document.getElementById('feedback').className='feedback success';updateProgress();}
+generateData();updateProgress();
+</script>
+</body>
+</html>

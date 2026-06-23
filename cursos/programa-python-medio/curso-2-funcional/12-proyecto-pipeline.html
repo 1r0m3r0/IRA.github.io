@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Curso 2 | Proyecto: Pipeline de Datos Funcional</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../assets/css/theme.css">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:linear-gradient(135deg,#0a0f1e,#0c1222); font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+.course-container { max-width:1100px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,215,0,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+.progress-bar { background:#0a0f1e; padding:0.8rem 2rem; display:flex; align-items:center; gap:1rem; border-bottom:1px solid #2c3e66; flex-wrap:wrap; }
+.progress-track { flex:1; height:10px; background:#1a2440; border-radius:10px; overflow:hidden; min-width:100px; }
+.progress-fill { height:100%; background:linear-gradient(90deg,#ffd700,#ffaa00); border-radius:10px; transition:width 0.5s; width:0%; }
+.progress-text { font-size:0.8rem; color:#8899bb; }
+.hero { background:linear-gradient(95deg,#0b1120,#1a1400); padding:2rem; text-align:center; border-bottom:2px solid #ffd700; }
+.hero h1 { font-size:2.2rem; font-weight:800; background:linear-gradient(135deg,#fff,#ffec80,#ffd700); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.hero p { color:#ffec80; }
+.analogy { background:rgba(255,215,0,0.1); margin:1.5rem 2rem; padding:1.2rem 1.5rem; border-radius:1.5rem; border-left:5px solid #ffd700; display:flex; gap:1rem; align-items:flex-start; }
+.analogy i { font-size:1.8rem; color:#ffd700; flex-shrink:0; }
+.content { padding:0 2rem 2rem; }
+.project-area { background:rgba(0,0,0,0.3); border-radius:2rem; padding:1.5rem; border:1px solid #2c3e66; }
+.pipeline-code { background:#0a0f1e; border-radius:1.5rem; padding:1rem; font-family:monospace; border:1px solid #2c3e66; min-height:60px; margin:0.5rem 0; white-space:pre-wrap; }
+.step-indicator { display:flex; justify-content:center; gap:0.5rem; flex-wrap:wrap; margin:1rem 0; }
+.s-dot { width:60px; height:60px; border-radius:50%; border:2px solid #2c3e66; display:flex; align-items:center; justify-content:center; font-size:0.7rem; flex-direction:column; transition:0.3s; cursor:pointer; }
+.s-dot i { font-size:1.2rem; }
+.s-dot.active { border-color:#ffd700; background:rgba(255,215,0,0.2); }
+.s-dot.done { border-color:#00ffc8; background:rgba(0,255,200,0.2); }
+.pipeline-output { background:#0a0f1e; border-radius:1.5rem; padding:1rem; min-height:80px; border:1px solid #2c3e66; font-family:monospace; margin:0.5rem 0; white-space:pre-wrap; }
+.feedback { background:rgba(0,0,0,0.4); padding:1rem 1.5rem; border-radius:1.5rem; margin:1rem 0; border-left:4px solid #ffd700; }
+.insignia { text-align:center; padding:1.5rem; background:linear-gradient(135deg,rgba(255,215,0,0.15),rgba(255,236,128,0.05)); border-radius:2rem; margin:1rem 0; border:2px solid #ffd700; display:none; }
+.insignia.show { display:block; animation:pulse 0.6s; }
+@keyframes pulse { 0%{transform:scale(0.9);opacity:0} 50%{transform:scale(1.05)} 100%{transform:scale(1);opacity:1} }
+.insignia i { font-size:3rem; color:#ffd700; }
+.btn-next-area { text-align:center; padding:1rem 2rem 2rem; }
+.btn-next { background:linear-gradient(135deg,#ffd700,#ffaa00); border:none; padding:0.9rem 2.5rem; border-radius:3rem; cursor:pointer; font-weight:700; font-size:1.1rem; color:#1a1400; transition:0.2s; }
+.btn-next:hover { transform:scale(1.05); }
+footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; color:#8899bb; }
+@media (max-width:700px) { .hero h1 { font-size:1.6rem; } .content { padding:0 1rem 1.5rem; } .analogy { margin:1rem; } .s-dot { width:50px; height:50px; font-size:0.6rem; } }
+</style>
+</head>
+<body>
+<nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a><a href="../index.html">Python Medio</a><a href="index.html">Curso 2</a></nav>
+<div class="course-container">
+<div class="progress-bar"><span style="color:#ffd700;font-weight:700;"><i class="fas fa-crown"></i> M12</span><div class="progress-track"><div class="progress-fill" id="progressFill"></div></div><span class="progress-text" id="progressText">0%</span></div>
+<div class="hero"><h1><i class="fas fa-crown"></i> Pipeline de Procesamiento de Datos</h1><p>Dataset de ventas: read → filter → transform → aggregate → report</p></div>
+<div class="analogy"><i class="fas fa-chart-line"></i><div><strong>📊 Piénsalo así:</strong> Este pipeline es como <strong>una embotelladora de refrescos</strong>. Llegan botellas vacías (read), se inspeccionan y limpian (filter), se llenan con el sabor correcto (transform), se agrupan por lote (aggregate), y se genera el informe de producción (report). Todo el proceso es una cadena de funciones puras, sin efectos secundarios, sin paradas. ¡Así debe fluir el procesamiento de datos!</div></div>
+<div class="content">
+<div class="project-area">
+<h3><i class="fas fa-chart-line"></i> Pipeline de Ventas Funcional</h3>
+<p style="color:#b9ccee;margin-bottom:0.8rem;">Haz clic en cada paso del pipeline para ver su código funcional:</p>
+<div class="step-indicator" id="stepInd">
+<div class="s-dot" data-step="0" onclick="showStep(0)"><i class="fas fa-folder-open"></i><span>Read</span></div>
+<div class="s-dot" data-step="1" onclick="showStep(1)"><i class="fas fa-filter"></i><span>Filter</span></div>
+<div class="s-dot" data-step="2" onclick="showStep(2)"><i class="fas fa-wand-magic-sparkles"></i><span>Transform</span></div>
+<div class="s-dot" data-step="3" onclick="showStep(3)"><i class="fas fa-layer-group"></i><span>Aggregate</span></div>
+<div class="s-dot" data-step="4" onclick="showStep(4)"><i class="fas fa-file-lines"></i><span>Report</span></div>
+</div>
+<div class="pipeline-code" id="stepCode">from toolz import pipe, curry
+
+# DATASET: ventas de 1000 registros
+# read: carga datos desde CSV
+def read_csv(path):
+    with open(path) as f:
+        return [line.strip().split(",")
+                for line in f.readlines()][1:]
+
+ventas = read_csv("ventas_2024.csv")</div>
+<button class="btn-run" style="background:linear-gradient(135deg,#ffd700,#ffaa00);border:none;padding:0.6rem 1.5rem;border-radius:2rem;cursor:pointer;font-weight:600;color:#1a1400;margin:0.5rem 0;" onclick="runFullPipeline()"><i class="fas fa-play"></i> Ejecutar pipeline completo</button>
+<div class="pipeline-output" id="pipelineOutput">💡 Haz clic en cada paso o ejecuta el pipeline completo.</div>
+</div>
+<div class="feedback" id="feedback">💡 Pipeline 100% funcional: funciones puras, composición con pipe, sin efectos secundarios. Cada paso transforma datos.</div>
+<div class="insignia" id="insignia"><i class="fas fa-medal"></i><h3>🏅 Data Pipeline Architect 🏅</h3><p>¡Has construido un pipeline funcional de datos! Así se procesan datos en producción: funciones puras + composición.</p></div>
+</div>
+<div class="btn-next-area"><button class="btn-next" onclick="nextCourse()">Siguiente curso <i class="fas fa-arrow-right"></i></button></div>
+<footer><i class="fas fa-function"></i> Programación Funcional · Proyecto Final · Pipeline</footer></div>
+<script>
+const COURSE='pythonmedio',MODULE='c2m12',TOTAL=72;
+function updateProgress(){let p=JSON.parse(localStorage.getItem(COURSE+'_progress'))||[];if(!p.includes(MODULE)){p.push(MODULE);localStorage.setItem(COURSE+'_progress',JSON.stringify(p));}const pct=Math.round((p.length/TOTAL)*100);document.getElementById('progressFill').style.width=pct+'%';document.getElementById('progressText').textContent=`Módulo 2.12 de 6.12 (${pct}%)`;}
+updateProgress();
+const steps=[{code:`# PASO 1: READ
+# Carga datos de ventas desde CSV
+def read_csv(path):
+    with open(path) as f:
+        lines = f.readlines()
+        return [line.strip().split(",")
+                for line in lines][1:]
+
+# Datos simulados (1000 registros)
+# ["fecha", "producto", "cantidad", "precio", "region"]
+ventas = [
+    ["2024-01-15", "Laptop", "2", "1200", "Norte"],
+    ["2024-01-15", "Mouse", "5", "25", "Sur"],
+    ...
+]`},{code:`# PASO 2: FILTER
+# Función pura: filtra sin modificar original
+def filtrar_por_region(region, ventas):
+    return [v for v in ventas if v[4] == region]
+
+def filtrar_monto_minimo(minimo, ventas):
+    return [v for v in ventas
+            if int(v[2]) * float(v[3]) >= minimo]
+
+# Uso: filtrar_por_region("Norte", ventas)`},{code:`# PASO 3: TRANSFORM
+# Transforma datos crudos a estructura útil
+def transformar(ventas):
+    return [{
+        "fecha": v[0],
+        "producto": v[1],
+        "cantidad": int(v[2]),
+        "precio": float(v[3]),
+        "region": v[4],
+        "total": int(v[2]) * float(v[3])
+    } for v in ventas]
+
+# Función pura: mismo input → mismo output
+# Añade campo calculado "total"`},{code:`# PASO 4: AGGREGATE
+# Agregaciones con reduce/functools
+from functools import reduce
+import operator
+
+def total_ventas(ventas):
+    return reduce(
+        lambda acc, v: acc + v["total"],
+        ventas, 0
+    )
+
+def por_producto(ventas):
+    return reduce(
+        lambda acc, v: {**acc,
+            v["producto"]: acc.get(v["producto"], 0)
+                           + v["total"]},
+        ventas, {}
+    )
+
+def por_region(ventas):
+    return reduce(lambda acc, v: {**acc,
+        v["region"]: acc.get(v["region"], 0)
+                     + v["total"]}, ventas, {})`},{code:`# PASO 5: REPORT
+# Genera reporte formateado (sin print, devuelve string)
+def generar_reporte(totales):
+    (total, por_prod, por_reg) = totales
+    reporte = "=== REPORTE DE VENTAS 2024 ===\\n"
+    reporte += f"Total general: ${total:,.2f}\\n\\n"
+    reporte += "Por producto:\\n"
+    for prod, monto in por_prod.items():
+        reporte += f"  {prod}: ${monto:,.2f}\\n"
+    reporte += "\\nPor región:\\n"
+    for reg, monto in por_reg.items():
+        reporte += f"  {reg}: ${monto:,.2f}\\n"
+    return reporte
+
+# PIPELINE COMPLETO (funciones puras + composición)
+from toolz import pipe
+
+resultado = pipe(
+    "ventas_2024.csv",
+    read_csv,
+    partial(filtrar_por_region, "Norte"),
+    partial(filtrar_monto_minimo, 100),
+    transformar,
+    lambda v: (total_ventas(v),
+               por_producto(v),
+               por_region(v)),
+    generar_reporte
+)
+print(resultado)`}];
+function showStep(idx){document.querySelectorAll('.s-dot').forEach((d,i)=>{d.classList.toggle('active',i===idx);d.classList.toggle('done',i<idx);});document.getElementById('stepCode').textContent=steps[idx].code;
+const ins=document.getElementById('insignia');if(!ins.classList.contains('show')){ins.classList.add('show');const b=JSON.parse(localStorage.getItem(COURSE+'_badges'))||[];if(!b.includes(MODULE)){b.push(MODULE);localStorage.setItem(COURSE+'_badges',JSON.stringify(b));}}}
+function runFullPipeline(){document.getElementById('pipelineOutput').textContent='🚀 Ejecutando pipeline funcional...\n\nread_csv("ventas_2024.csv")\n  → 1000 registros cargados\nfiltrar_por_region("Norte")\n  → 312 registros\nfiltrar_monto_minimo(100)\n  → 189 registros\ntransformar()\n  → 189 objetos con total calculado\naggregate()\n  → total: $847,320.50\n  → por producto: {Laptop: $423k, Mouse: $12k, ...}\n  → por región: {Norte: $847k}\ngenerar_reporte()\n  ✅ Reporte generado. Sin loops, sin side effects.';document.getElementById('feedback').innerHTML='✅ <strong>¡Pipeline completado!</strong> read → filter → transform → aggregate → report. Todo con funciones puras y composición. Sin efectos secundarios.';
+const ins=document.getElementById('insignia');if(!ins.classList.contains('show')){ins.classList.add('show');const b=JSON.parse(localStorage.getItem(COURSE+'_badges'))||[];if(!b.includes(MODULE)){b.push(MODULE);localStorage.setItem(COURSE+'_badges',JSON.stringify(b));}}}
+function nextCourse(){alert('🔄 ¡Curso 2 completado! Transición al Curso 3: Testing, Calidad y Depuración. En un entorno real, esto enlazaría a ../curso-3-testing/index.html');}
+</script>
+</body>
+</html>

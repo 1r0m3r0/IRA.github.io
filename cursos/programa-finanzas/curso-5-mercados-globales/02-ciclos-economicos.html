@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Ciclos Económicos y Rotación Sectorial | Curso 5</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    :root { --accent: #f59e0b; --accent-rgb: 245,158,11; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 100%);
+      font-family: 'Inter', sans-serif; color: #eef5ff; min-height: 100vh;
+      display: flex; align-items: center; justify-content: center; padding: 2rem 1rem;
+    }
+    .modulo-container {
+      max-width: 1100px; width: 100%;
+      background: rgba(15,25,45,0.65); backdrop-filter: blur(12px);
+      border-radius: 3rem; border: 1px solid rgba(var(--accent-rgb),0.25);
+      box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden;
+    }
+    .hero-header { background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%); padding: 1.5rem 2rem; text-align: center; border-bottom: 2px solid var(--accent); }
+    .hero-header h1 { font-size: 2rem; font-weight: 800; background: linear-gradient(135deg, #FFF, #fcd34d, var(--accent)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .hero-header p { font-size: 1rem; color: #fde68a; margin-top: 0.2rem; }
+    .progress-bar { margin: 0.8rem 2rem; padding: 0.5rem 1rem; background: #00000055; border-radius: 2rem; display: flex; align-items: center; gap: 1rem; border: 1px solid var(--accent); }
+    .progress-fill-bg { flex:1; height:8px; background:#ffffff15; border-radius:8px; overflow:hidden; }
+    .progress-fill { height:100%; width:8%; background:linear-gradient(90deg,var(--accent),#fcd34d); border-radius:8px; transition:width 0.5s ease; }
+    .progress-text { font-size:0.75rem; color:#fde68a; white-space:nowrap; }
+    .analogy-card { background: #1e2a3acc; margin: 1rem 2rem; padding: 1rem 1.5rem; border-radius: 1.5rem; border-left: 6px solid var(--accent); font-size: 0.95rem; }
+    .analogy-card i { color: var(--accent); margin-right: 0.5rem; }
+    .main-area { padding: 1rem 2rem 1.5rem; }
+    .sim-panel { background: rgba(0,10,25,0.7); border-radius: 1.5rem; padding: 1.2rem; border: 1px solid var(--accent); }
+    .sim-title { font-size: 1.3rem; font-weight: 700; color: var(--accent); margin-bottom: 0.8rem; }
+    .phase-display { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+    .phase-btn { flex: 1; padding: 0.6rem; border-radius: 0.8rem; border: 1px solid #2c3e66; background: #0f1a2c; color: #8899bb; cursor: pointer; text-align: center; font-size: 0.8rem; font-weight: 600; transition: 0.2s; }
+    .phase-btn:hover { border-color: var(--accent); color: #fff; }
+    .phase-btn.selected { background: var(--accent); color: #000; border-color: var(--accent); }
+    .sector-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.5rem; margin: 0.8rem 0; }
+    .sector-card { background: #0f1a2c; border-radius: 0.8rem; padding: 0.6rem; text-align: center; border: 1px solid #2c3e66; cursor: pointer; transition: 0.2s; }
+    .sector-card:hover { border-color: var(--accent); }
+    .sector-card.selected { border-color: var(--accent); background: rgba(var(--accent-rgb),0.2); }
+    .sector-card .s-name { font-size: 0.75rem; font-weight: 600; }
+    .sector-card .s-return { font-size: 0.7rem; color: #8899bb; }
+    .btn-action { background: linear-gradient(95deg, var(--accent), #fcd34d); border: none; padding: 0.7rem 1.5rem; font-weight: 700; border-radius: 2rem; cursor: pointer; font-size: 0.95rem; color: #000; transition: 0.2s; font-family: 'Inter', sans-serif; }
+    .btn-action:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(var(--accent-rgb),0.4); }
+    .btn-action:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .cycle-results { margin-top: 1rem; }
+    .cycle-row { display: flex; gap: 0.5rem; flex-wrap: wrap; background: #0f1a2c; padding: 0.5rem 0.8rem; border-radius: 0.8rem; margin: 0.3rem 0; border: 1px solid #2c3e66; align-items: center; }
+    .cycle-row .phase-label { font-weight: 700; color: var(--accent); min-width: 100px; font-size: 0.85rem; }
+    .cycle-row .sector-result { font-size: 0.8rem; }
+    .feedback { background: #00000099; margin: 0.5rem 2rem 1rem; padding: 0.8rem; border-radius: 1rem; text-align: center; font-weight: 500; border-left: 4px solid var(--accent); font-size: 0.9rem; }
+    .insignia { text-align: center; background: #0c1b2f; border-radius: 1.5rem; margin: 0.8rem 2rem; padding: 0.8rem; border: 2px solid gold; }
+    .insignia i { font-size: 2rem; color: gold; }
+    .hidden { display: none; }
+    .nav-links { display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap; padding: 1rem 2rem; }
+    .nav-link { background: #2c3e66; padding: 0.6rem 1.2rem; border-radius: 2rem; font-weight: 600; cursor: pointer; text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; font-size: 0.85rem; }
+    .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(var(--accent-rgb),0.4); }
+    .nav-link.next { background: linear-gradient(95deg, var(--accent), #fcd34d); color: #000; }
+    footer { text-align: center; padding: 1rem; font-size: 0.75rem; border-top: 1px solid #2c3e66; }
+    @media (max-width:800px) { .hero-header h1 { font-size:1.5rem; } .phase-display { flex-wrap: wrap; } .phase-btn { min-width: 45%; } }
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a><a href="../index.html">Programa</a><a href="index.html">Curso 5</a></nav>
+
+<div class="modulo-container">
+  <div class="hero-header">
+    <h1><i class="fas fa-chart-line"></i> Ciclos Económicos y Rotación Sectorial</h1>
+    <p>Módulo 2 · Identifica la fase, elige los sectores ganadores</p>
+  </div>
+
+  <div class="progress-bar">
+    <span>📊 Curso 5</span>
+    <div class="progress-fill-bg"><div class="progress-fill" id="progressFill"></div></div>
+    <span class="progress-text" id="progressText">0%</span>
+  </div>
+
+  <div class="analogy-card">
+    <i class="fas fa-seasons"></i> <strong>Las estaciones del año:</strong> Invierno (contracción) → guardas ropa de abrigo. Primavera (expansión) → plantas florecen. Verano (pico) → cosechas abundantes. Otoño (valle) → preparas la tierra. Invertir sin saber la estación económica es como salir a la calle sin mirar el clima.
+  </div>
+
+  <div class="main-area">
+    <div class="sim-panel">
+      <div class="sim-title"><i class="fas fa-arrows-spin"></i> Juego de Rotación Sectorial</div>
+      <p style="font-size:0.85rem;color:#8899bb;margin-bottom:0.5rem;">Identifica la fase del ciclo económico y selecciona los MEJORES sectores para invertir.</p>
+
+      <div class="phase-display" id="phaseButtons">
+        <div class="phase-btn" data-phase="expansion">🌱 Expansión</div>
+        <div class="phase-btn" data-phase="peak">⛰️ Pico</div>
+        <div class="phase-btn" data-phase="contraction">❄️ Contracción</div>
+        <div class="phase-btn" data-phase="trough">🌊 Valle</div>
+      </div>
+
+      <div class="sector-grid" id="sectorGrid">
+        <div class="sector-card" data-sector="tech"><div class="s-name">Tecnología</div><div class="s-return">?</div></div>
+        <div class="sector-card" data-sector="health"><div class="s-name">Salud</div><div class="s-return">?</div></div>
+        <div class="sector-card" data-sector="finance"><div class="s-name">Financiero</div><div class="s-return">?</div></div>
+        <div class="sector-card" data-sector="energy"><div class="s-name">Energía</div><div class="s-return">?</div></div>
+        <div class="sector-card" data-sector="consumer"><div class="s-name">Consumo Básico</div><div class="s-return">?</div></div>
+        <div class="sector-card" data-sector="industrials"><div class="s-name">Industriales</div><div class="s-return">?</div></div>
+        <div class="sector-card" data-sector="realestate"><div class="s-name">Bienes Raíces</div><div class="s-return">?</div></div>
+        <div class="sector-card" data-sector="utilities"><div class="s-name">Servicios Públicos</div><div class="s-return">?</div></div>
+      </div>
+
+      <button class="btn-action" id="runCycleBtn"><i class="fas fa-play"></i> Ejecutar Ciclo</button>
+
+      <div id="cycleResults" class="cycle-results hidden"></div>
+      <div id="historicalNote" style="font-size:0.8rem;color:#8899bb;margin-top:0.5rem;"></div>
+    </div>
+  </div>
+
+  <div id="feedback" class="feedback">
+    💡 Identifica la fase del ciclo. Luego selecciona los sectores que crees que rinden mejor en esa fase.
+  </div>
+
+  <div id="insignia" class="insignia hidden">
+    <i class="fas fa-medal"></i>
+    <h3>🏅 ¡ROTADOR SECTORIAL! 🏅</h3>
+    <p>Sabes en qué fase del ciclo estamos y cómo posicionar tu portafolio. ¡Estrategia de nivel institucional!</p>
+  </div>
+
+  <div class="nav-links">
+    <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Menú</a>
+    <button id="nextBtn" class="nav-link next hidden">Siguiente <i class="fas fa-arrow-right"></i></button>
+  </div>
+  <footer>
+    <i class="fas fa-chart-line"></i> Mercados Globales · Módulo 2 · Ciclos y Rotación Sectorial
+  </footer>
+</div>
+
+<script>
+  const MODULE_ID = 'c5m2';
+  const PROGRESS_KEY = 'finanzas_progress';
+  const BADGE_KEY = 'finanzas_c5m2';
+  const TOTAL_MODULES = 72;
+
+  let selectedPhase = null;
+  let selectedSectors = [];
+  let cycleCompleted = false;
+  let cycleCount = 0;
+
+  // Historical sector performance data by cycle phase (annualized returns)
+  const SECTOR_DATA = {
+    expansion: { tech: 28, health: 14, finance: 22, energy: 18, consumer: 8, industrials: 20, realestate: 12, utilities: 6 },
+    peak: { tech: 15, health: 18, finance: 12, energy: 25, consumer: 14, industrials: 10, realestate: 8, utilities: 16 },
+    contraction: { tech: -15, health: 8, finance: -22, energy: -18, consumer: 5, industrials: -12, realestate: -20, utilities: 10 },
+    trough: { tech: 10, health: 12, finance: 8, energy: 5, consumer: 18, industrials: 6, realestate: 4, utilities: 20 }
+  };
+
+  // Names
+  const SECTOR_NAMES = {
+    tech: 'Tecnología', health: 'Salud', finance: 'Financiero', energy: 'Energía',
+    consumer: 'Consumo Básico', industrials: 'Industriales', realestate: 'Bienes Raíces', utilities: 'Servicios Públicos'
+  };
+
+  function getProgress() {
+    return JSON.parse(localStorage.getItem(PROGRESS_KEY)) || [];
+  }
+
+  function saveProgress() {
+    let p = getProgress();
+    if (!p.includes(MODULE_ID)) { p.push(MODULE_ID); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
+    let pct = Math.round((p.length / TOTAL_MODULES) * 100);
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressText').textContent = pct + '% (progr. global)';
+  }
+
+  function getBadge() { return localStorage.getItem(BADGE_KEY) === 'true'; }
+  function setBadge() { localStorage.setItem(BADGE_KEY, 'true'); }
+
+  document.querySelectorAll('.phase-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.phase-btn').forEach(function(b) { b.classList.remove('selected'); });
+      this.classList.add('selected');
+      selectedPhase = this.dataset.phase;
+      document.getElementById('feedback').textContent = '✅ Has identificado: ' + this.textContent.trim() + '. Ahora selecciona los sectores.';
+    });
+  });
+
+  document.querySelectorAll('.sector-card').forEach(function(card) {
+    card.addEventListener('click', function() {
+      if (cycleCompleted) return;
+      this.classList.toggle('selected');
+      var s = this.dataset.sector;
+      var idx = selectedSectors.indexOf(s);
+      if (idx > -1) { selectedSectors.splice(idx, 1); }
+      else { selectedSectors.push(s); }
+    });
+  });
+
+  document.getElementById('runCycleBtn').addEventListener('click', function() {
+    if (!selectedPhase) {
+      document.getElementById('feedback').textContent = '⚠️ Primero selecciona una fase del ciclo económico.';
+      return;
+    }
+    if (selectedSectors.length === 0) {
+      document.getElementById('feedback').textContent = '⚠️ Selecciona al menos un sector para invertir.';
+      return;
+    }
+
+    cycleCount++;
+    var phaseData = SECTOR_DATA[selectedPhase];
+    var totalReturn = 0;
+    var resultHTML = '<div class="cycle-row"><span class="phase-label">' + document.querySelector('.phase-btn.selected').textContent.trim() + '</span>';
+
+    selectedSectors.forEach(function(s) {
+      var r = phaseData[s] || 0;
+      totalReturn += r;
+      var sign = r >= 0 ? '+' : '';
+      resultHTML += '<span class="sector-result" style="color:' + (r >= 0 ? '#00ffc8' : '#ff5050') + '">' + SECTOR_NAMES[s] + ': ' + sign + r + '%</span>';
+    });
+
+    var avgReturn = totalReturn / selectedSectors.length;
+    var sign2 = avgReturn >= 0 ? '+' : '';
+    resultHTML += '</div><div style="margin-top:0.5rem;font-weight:700;color:' + (avgReturn >= 0 ? '#00ffc8' : '#ff5050') + '">Retorno promedio: ' + sign2 + avgReturn.toFixed(1) + '%</div>';
+
+    // Show what sectors performed best in this phase historically
+    var sorted = Object.entries(phaseData).sort(function(a,b) { return b[1] - a[1]; });
+    var best = sorted.slice(0, 3);
+    resultHTML += '<div style="font-size:0.8rem;color:#fde68a;margin-top:0.3rem;">📊 Históricamente, los mejores sectores en esta fase: ';
+    resultHTML += best.map(function(s) { return SECTOR_NAMES[s[0]] + ' (' + (s[1] >= 0 ? '+' : '') + s[1] + '%)'; }).join(', ');
+    resultHTML += '.</div>';
+
+    document.getElementById('cycleResults').classList.remove('hidden');
+    document.getElementById('cycleResults').innerHTML = resultHTML;
+
+    // Historical note
+    var notes = [
+      "🏛️ En la crisis de 2008, el sector salud fue el único que dio retornos positivos durante la contracción (-27% S&P 500).",
+      "💡 Durante la expansión 2009-2020, Tecnología rindió 20.5% anual vs 13.6% del S&P 500.",
+      "🛢️ En el pico del ciclo petrolero 2010-2014, Energía rindió 18% anual — luego colapsó 45%.",
+      "🏠 Bienes Raíces rinde mejor en expansiones tempranas (2003: +35%) y péé sima en contracciones (2008: -40%).",
+      "⚡ Servicios Públicos es el refugio clásico en contracciones: beta de solo 0.4 y dividendos estables."
+    ];
+    document.getElementById('historicalNote').textContent = notes[Math.floor(Math.random() * notes.length)];
+
+    document.getElementById('feedback').textContent = '✅ Ciclo ' + cycleCount + ' completado. Tus sectores rindieron ' + sign2 + avgReturn.toFixed(1) + '% en esta fase.';
+
+    if (!cycleCompleted) {
+      cycleCompleted = true;
+      document.getElementById('insignia').classList.remove('hidden');
+      document.getElementById('nextBtn').classList.remove('hidden');
+      setBadge();
+      saveProgress();
+      document.getElementById('feedback').textContent = '🏅 ¡CICLO COMPLETADO! ' + document.getElementById('feedback').textContent;
+    }
+  });
+
+  document.getElementById('nextBtn').addEventListener('click', function() {
+    alert('🔄 Transición al Módulo 3: Análisis Técnico — Charts y Patrones');
+    window.location.href = '03-analisis-tecnico.html';
+  });
+
+  (function restore() {
+    if (getBadge()) {
+      document.getElementById('insignia').classList.remove('hidden');
+      document.getElementById('nextBtn').classList.remove('hidden');
+      document.getElementById('feedback').textContent = '✅ Ya completaste este módulo. ¡Eres un estratega sectorial!';
+      document.getElementById('runCycleBtn').disabled = true;
+      cycleCompleted = true;
+    }
+    let p = getProgress();
+    if (p.includes(MODULE_ID)) {
+      let pct = Math.round((p.length / TOTAL_MODULES) * 100);
+      document.getElementById('progressFill').style.width = pct + '%';
+      document.getElementById('progressText').textContent = pct + '% (progr. global)';
+    }
+  })();
+</script>
+  <script src="../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

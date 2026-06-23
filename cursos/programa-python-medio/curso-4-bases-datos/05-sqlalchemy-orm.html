@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Curso 4 | Módulo 5: SQLAlchemy ORM</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../assets/css/theme.css">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:linear-gradient(135deg,#0a0f1e,#0c1222); font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+.course-container { max-width:1100px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(156,100,255,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+.progress-bar { background:#0a0f1e; padding:0.8rem 2rem; display:flex; align-items:center; gap:1rem; flex-wrap:wrap; }
+.progress-track { flex:1; height:10px; background:#1a2440; border-radius:10px; overflow:hidden; min-width:100px; }
+.progress-fill { height:100%; background:linear-gradient(90deg,#9c64ff,#67e8f9); border-radius:10px; transition:width 0.5s; width:0%; }
+.progress-text { font-size:0.8rem; color:#8899bb; border-bottom:1px solid #2c3e66; }
+.hero { background:linear-gradient(95deg,#0b1120,#1f0033); padding:2rem; text-align:center; border-bottom:2px solid #9c64ff; }
+.hero h1 { font-size:2.2rem; font-weight:800; background:linear-gradient(135deg,#fff,#67e8f9,#9c64ff); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.hero p { color:#9c64ff; }
+.analogy { background:rgba(156,100,255,0.1); margin:1.5rem 2rem; padding:1.2rem 1.5rem; border-radius:1.5rem; border-left:5px solid #9c64ff; display:flex; gap:1rem; align-items:flex-start; }
+.analogy i { font-size:1.8rem; color:#9c64ff; flex-shrink:0; }
+.content { padding:0 2rem 2rem; }
+.area { background:rgba(0,0,0,0.3); border-radius:2rem; padding:1.5rem; border:1px solid #2c3e66; }
+.model-card { background:#0a0f1e; border-radius:1rem; padding:1rem; border:1px solid #2c3e66; margin:0.5rem 0; font-family:monospace; font-size:0.85rem; }
+.rel-line { display:flex; align-items:center; gap:0.5rem; margin:0.3rem 0; }
+.rel-line i { color:#9c64ff; width:20px; }
+.grid-models { display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1rem 0; }
+@media (max-width:600px){.grid-models{grid-template-columns:1fr;}}
+.orm-btn { background:#1a2440; border:2px solid #2c3e66; padding:0.5rem 1rem; border-radius:2rem; cursor:pointer; transition:0.2s; color:#eef5ff; margin:0.2rem; }
+.orm-btn:hover { border-color:#9c64ff; }
+.orm-btn.selected { border-color:#00ffc8; background:rgba(0,255,200,0.1); }
+.btn-next-area { text-align:center; padding:1rem 2rem 2rem; }
+.btn-next { background:linear-gradient(135deg,#9c64ff,#67e8f9); border:none; padding:0.9rem 2.5rem; border-radius:3rem; cursor:pointer; font-weight:700; font-size:1.1rem; color:#0a0f1e; transition:0.2s; }
+.btn-next:hover { transform:scale(1.05); }
+.insignia { text-align:center; padding:1.5rem; background:linear-gradient(135deg,rgba(156,100,255,0.15),rgba(103,232,249,0.05)); border-radius:2rem; margin:1rem 0; border:2px solid #9c64ff; display:none; }
+.insignia.show { display:block; animation:pulse 0.6s; }
+@keyframes pulse { 0%{transform:scale(0.9);opacity:0} 50%{transform:scale(1.05)} 100%{transform:scale(1);opacity:1} }
+.insignia i { font-size:3rem; color:#ffd700; }
+.feedback { background:rgba(0,0,0,0.4); padding:1rem 1.5rem; border-radius:1.5rem; margin:1rem 0; border-left:4px solid #9c64ff; }
+footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; color:#8899bb; }
+@media (max-width:700px){.hero h1{font-size:1.6rem;}.content{padding:0 1rem 1.5rem;}.analogy{margin:1rem;}}
+</style>
+</head>
+<body>
+<nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a><a href="../index.html">Python Medio</a><a href="index.html">Curso 4</a></nav>
+<div class="course-container">
+<div class="progress-bar"><span style="color:#9c64ff;font-weight:700;"><i class="fas fa-layer-group"></i> M5</span><div class="progress-track"><div class="progress-fill" id="progressFill"></div></div><span class="progress-text" id="progressText">0%</span></div>
+<div class="hero"><h1><i class="fas fa-layer-group"></i> SQLAlchemy ORM: Modelos y Relaciones</h1><p>Tablas que se convierten en objetos Python</p></div>
+<div class="analogy"><i class="fas fa-robot"></i><div><strong>💡 Piéndalo así:</strong> El ORM es como <strong>un robot que organiza tu cuarto</strong>. En lugar de que tú mismo guardes cada libro en su estante (escribir SQL a mano), le dices al robot: "este es un Libro, pertenece a un Autor", y el robot se encarga de crear las tablas, las relaciones y las consultas. Tú solo trabajas con objetos Python, el robot hace el SQL.</div></div>
+<div class="content">
+<div class="area">
+<p><strong>Identifica la relación correcta</strong> entre estos modelos ORM:</p>
+<div class="grid-models">
+<div class="model-card">
+<h4 style="color:#9c64ff;">class Autor(Base)</h4>
+<pre>__tablename__ = 'autores'
+id = Column(Integer, primary_key=True)
+nombre = Column(String)
+libros = relationship("Libro")</pre>
+</div>
+<div class="model-card">
+<h4 style="color:#9c64ff;">class Libro(Base)</h4>
+<pre>__tablename__ = 'libros'
+id = Column(Integer, primary_key=True)
+titulo = Column(String)
+autor_id = Column(Integer, ForeignKey('autores.id'))
+autor = relationship("Autor")</pre>
+</div>
+</div>
+<p>¿Qué tipo de relación es?</p>
+<div><button class="orm-btn" onclick="checkORM(this,'one-to-one')">1:1 — Un autor, un libro</button>
+<button class="orm-btn" onclick="checkORM(this,'one-to-many')">1:N — Un autor, muchos libros</button>
+<button class="orm-btn" onclick="checkORM(this,'many-to-many')">M:N — Muchos autores, muchos libros</button></div>
+<div id="feedback4" class="feedback">Analiza los modelos y elige la relación correcta.</div>
+</div>
+<div id="insignia" class="insignia"><i class="fas fa-layer-group"></i><h3>🏅 Modelador ORM 🏅</h3><p>Modelas bases de datos como un profesional!</p></div>
+</div>
+<div class="btn-next-area">
+<button class="btn-next" onclick="alert('🔄 Siguiente: Alembic — migraciones de base de datos')">Siguiente <i class="fas fa-arrow-right"></i></button>
+</div>
+<footer><i class="fas fa-database"></i> Bases de Datos y Persistencia · Aprendizaje Activo</footer>
+</div>
+<script>
+const COURSE_KEY='pythonmedio_progress';const BADGE_KEY='pythonmedio_badges';const MODULE_ID='c4m5';const TOTAL=72;
+const feedback=document.getElementById('feedback4');const insignia=document.getElementById('insignia');
+function checkORM(btn,type){
+document.querySelectorAll('.orm-btn').forEach(b=>b.classList.remove('selected'));
+btn.classList.add('selected');
+if(type==='one-to-many'){
+feedback.innerHTML='✅ <strong>¡Correcto!</strong> Un Autor puede tener muchos Libros (relación 1:N). La ForeignKey <code>autor_id</code> en Libros apunta a <code>autores.id</code>.';feedback.style.borderLeftColor='#00ffc8';
+let badges=JSON.parse(localStorage.getItem(BADGE_KEY))||[];
+if(!badges.includes(MODULE_ID)){badges.push(MODULE_ID);localStorage.setItem(BADGE_KEY,JSON.stringify(badges));}
+insignia.classList.add('show');
+}else{
+feedback.innerHTML='❌ No es la respuesta correcta. Mira la ForeignKey <code>autor_id</code> en Libros que apunta a <code>autores.id</code>. ¿Cuántos libros puede tener un autor?';feedback.style.borderLeftColor='#ff5050';
+}
+}
+function updateProgress(){
+let p=JSON.parse(localStorage.getItem(COURSE_KEY))||[];
+if(!p.includes(MODULE_ID)){p.push(MODULE_ID);localStorage.setItem(COURSE_KEY,JSON.stringify(p));}
+const pct=Math.round((p.length/TOTAL)*100);
+document.getElementById('progressFill').style.width=pct+'%';
+document.getElementById('progressText').textContent=pct+'%';
+}
+updateProgress();
+let b=JSON.parse(localStorage.getItem(BADGE_KEY))||[];if(b.includes(MODULE_ID))insignia.classList.add('show');
+</script>
+</body>
+</html>

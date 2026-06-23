@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Curso 5 | Logging Centralizado</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:linear-gradient(135deg,#0a0f1e,#0c1222); font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+    .modulo-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(168,85,247,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+    .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #a855f7; }
+    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#c48aff,#a855f7); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .hero-header p { font-size:1.1rem; color:#c48aff; margin-top:0.5rem; }
+    .chip { background:rgba(168,85,247,0.15); border:1px solid #a855f7; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; display:inline-block; margin:0.3rem; }
+    .progress-bar-top { background:#00000044; padding:0.6rem 2rem; text-align:center; font-size:0.85rem; border-bottom:1px solid #2c3e66; }
+    .progress-bar-top span { color:#c48aff; font-weight:600; }
+    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #a855f7; font-size:1rem; line-height:1.6; }
+    .main-area { padding:0 2rem 1.5rem; }
+    .simulador { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; border:1px solid #a855f7; }
+    .simulador h3 { margin-bottom:1rem; color:#c48aff; }
+    .btn-action { background:linear-gradient(95deg,#c48aff,#a855f7); border:none; padding:0.8rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin:0.3rem; }
+    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(168,85,247,0.5); }
+    .btn-reset { background:#2c3e66; border:none; padding:0.8rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; color:#eef5ff; margin:0.3rem; }
+    .btn-reset:hover { background:#3a4e7a; }
+    .log-viewer { background:#0a1220; border:1px solid #2c3e66; border-radius:1rem; padding:0.8rem; height:200px; overflow-y:auto; font-family:'Courier New',monospace; font-size:0.75rem; margin:0.5rem 0; text-align:left; }
+    .log-entry { padding:0.2rem 0; border-bottom:1px solid #0f1a2c; }
+    .log-entry .time { color:#8899bb; }
+    .log-entry .level-INFO { color:#22c55e; }
+    .log-entry .level-WARN { color:#fbbf24; }
+    .log-entry .level-ERROR { color:#ef4444; }
+    .log-entry .level-DEBUG { color:#60a5fa; }
+    .grid-resp { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:0.5rem; margin:0.5rem 0; }
+    .card-opt { background:#0f1a2c; border:1px solid #2c3e66; border-radius:1rem; padding:0.8rem; text-align:center; }
+    .card-opt .val { font-size:1.4rem; font-weight:800; }
+    .result-box { background:#0f1a2c; border:1px solid #2c3e66; border-radius:1rem; padding:1.2rem; margin:0.8rem 0; text-align:center; }
+    .feedback { background:#00000099; margin:1.5rem 2rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #a855f7; }
+    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:1.5rem 2rem; padding:1rem; border:1px dashed gold; }
+    .insignia i { font-size:2.5rem; color:gold; }
+    .hidden { display:none; }
+    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; font-size:0.95rem; }
+    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(168,85,247,0.4); }
+    .nav-link.next { background:linear-gradient(95deg,#c48aff,#a855f7); color:#1e1a0c; }
+    .nav-link.menu { background:#1a2a4a; border:1px solid #3399ff; }
+    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a><a href="../index.html">Programa Python Avanzado</a></nav>
+  <div class="modulo-container">
+    <div class="progress-bar-top"><i class="fas fa-tasks"></i> Curso 5: DevOps y Cloud <span>| M&oacute;dulo 9 de 12</span></div>
+    <div class="hero-header">
+      <h1><i class="fas fa-clipboard-list"></i> Logging Centralizado</h1>
+      <p>Dashboard de logs: ELK/Loki+Grafana. Structured logging. Visualizaci&oacute;n.</p>
+    </div>
+    <div class="analogy-card"><i class="fas fa-lightbulb" style="color:#a855f7;margin-right:0.5rem;"></i> <strong>Como una caja negra de avi&oacute;n:</strong> Los logs son el registro de todo lo que pasa en tu sistema. Structured logging es como escribir en un formulario en lugar de en prosa: "usuario=123, acci&oacute;n=login" en vez de "el usuario 123 inici&oacute; sesi&oacute;n". ELK (Elasticsearch, Logstash, Kibana) es la caja negra que guarda, procesa y visualiza esos logs. Loki es la versi&oacute;n moderna y ligera de Grafana.</div>
+    <div class="main-area">
+      <div class="simulador">
+        <h3><i class="fas fa-clipboard-list"></i> Visor de Logs Centralizado</h3>
+        <p style="font-size:0.85rem;color:#8899bb;margin-bottom:0.8rem;">Explora logs simulados, aplica filtros y visualiza la distribuci&oacute;n por niveles.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+          <select id="logLevel" style="background:#0a1220;border:1px solid #2c3e66;color:#eef5ff;padding:0.3rem 0.8rem;border-radius:0.8rem;"><option value="ALL">Todos</option><option value="INFO">INFO</option><option value="WARN">WARN</option><option value="ERROR">ERROR</option><option value="DEBUG">DEBUG</option></select>
+          <button id="genLogBtn" class="btn-action"><i class="fas fa-play"></i> Generar Logs</button>
+          <button id="clearLogBtn" class="btn-reset"><i class="fas fa-trash"></i> Limpiar</button>
+          <button id="showStructuredBtn" class="btn-action"><i class="fas fa-code"></i> Structured vs Texto</button>
+        </div>
+        <div class="log-viewer" id="logViewer"></div>
+        <div class="grid-resp">
+          <div class="card-opt"><div class="val" style="color:#22c55e;" id="infoCount">0</div><div>INFO</div></div>
+          <div class="card-opt"><div class="val" style="color:#fbbf24;" id="warnCount">0</div><div>WARN</div></div>
+          <div class="card-opt"><div class="val" style="color:#ef4444;" id="errCount">0</div><div>ERROR</div></div>
+          <div class="card-opt"><div class="val" style="color:#60a5fa;" id="debugCount">0</div><div>DEBUG</div></div>
+        </div>
+        <div id="logResult" class="result-box"></div>
+      </div>
+    </div>
+    <div id="feedbackMsg" class="feedback">Genera logs y visualiza las m&eacute;tricas para ganar tu insignia.</div>
+    <div id="insigniaArea" class="insignia hidden"><i class="fas fa-medal"></i><h3>INSIGNIA: DETECTIVE DE LOGS</h3><p>&iexcl;Dominas logging centralizado y structured logs!</p></div>
+    <div class="nav-links">
+      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
+      <a href="10-seguridad-python.html" class="nav-link next">Siguiente: Seguridad <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <footer><i class="fas fa-crown"></i> Curso 5: DevOps y Cloud &middot; Logging Centralizado</footer>
+  </div>
+  <script>
+    const STORAGE_KEY='c5m9';let logs=[],infoC=0,warnC=0,errC=0,debugC=0;
+    function addLog(level,msg){const time=new Date().toLocaleTimeString();logs.push({time,level,msg});if(level==='INFO')infoC++;else if(level==='WARN')warnC++;else if(level==='ERROR')errC++;else debugC++;updateLogView();updateCounts();}
+    function updateLogView(){const filter=document.getElementById('logLevel').value;const c=document.getElementById('logViewer');let h='';logs.forEach(l=>{if(filter!=='ALL'&&l.level!==filter)return;h+='<div class="log-entry"><span class="time">['+l.time+']</span> <span class="level-'+l.level+'">['+l.level+']</span> '+l.msg+'</div>';});c.innerHTML=h||'<div style="color:#8899bb;">Sin logs que mostrar</div>';c.scrollTop=c.scrollHeight;}
+    function updateCounts(){document.getElementById('infoCount').textContent=infoC;document.getElementById('warnCount').textContent=warnC;document.getElementById('errCount').textContent=errC;document.getElementById('debugCount').textContent=debugC;}
+    document.getElementById('genLogBtn').addEventListener('click',function(){const levels=['INFO','INFO','INFO','WARN','ERROR','DEBUG'];const msgsINFO=['Request GET /api/users 200','Request POST /api/order 201','Health check OK','DB query completed 15ms','Cache hit: session_abc123'];const msgsWARN=['Slow query: 2.5s','Rate limit approaching: 80%','Memory usage > 70%','Deprecated API call'];const msgsERROR=['Connection refused: db:5432','Timeout: external API','Unhandled exception: ValueError','Disk space < 10%'];const msgsDEBUG=['User agent: Mozilla/5.0','Headers: {Accept: application/json}','Stack trace: line 42'];for(let i=0;i<5;i++){const l=levels[Math.floor(Math.random()*levels.length)];let msg;if(l==='INFO')msg=msgsINFO[Math.floor(Math.random()*msgsINFO.length)];else if(l==='WARN')msg=msgsWARN[Math.floor(Math.random()*msgsWARN.length)];else if(l==='ERROR')msg=msgsERROR[Math.floor(Math.random()*msgsERROR.length)];else msg=msgsDEBUG[Math.floor(Math.random()*msgsDEBUG.length)];addLog(l,msg);}if(logs.length>=10){localStorage.setItem(STORAGE_KEY,'true');document.getElementById('insigniaArea').classList.remove('hidden');document.getElementById('feedbackMsg').innerHTML='&iexcl;Logs centralizados y monitoreados!';document.getElementById('logResult').innerHTML='<span style="color:#22c55e;">'+logs.length+' logs generados. ELK stack simulado.</span>';}});
+    document.getElementById('clearLogBtn').addEventListener('click',function(){logs=[];infoC=0;warnC=0;errC=0;debugC=0;updateLogView();updateCounts();document.getElementById('logResult').innerHTML='';});
+    document.getElementById('showStructuredBtn').addEventListener('click',function(){const h='<div style="text-align:left;background:#0a1220;padding:0.8rem;border-radius:1rem;"><strong style="color:#c48aff;">Texto plano:</strong><br>2025-06-20 ERROR User 123 login failed<br><br><strong style="color:#c48aff;">Structured JSON:</strong><br>{"timestamp":"2025-06-20T10:30:00Z","level":"ERROR","user_id":123,"action":"login","status":"failed","duration_ms":1500}<br><br><span style="color:#8899bb;font-size:0.8rem;">Structured logging permite b&uacute;squedas y filtros mucho m&aacute;s potentes.</span></div>';document.getElementById('logResult').innerHTML=h;});
+    document.getElementById('logLevel').addEventListener('change',updateLogView);
+    if(localStorage.getItem(STORAGE_KEY)==='true'){document.getElementById('insigniaArea').classList.remove('hidden');document.getElementById('feedbackMsg').innerHTML='M&oacute;dulo completado';}
+  </script>
+</body>
+</html>

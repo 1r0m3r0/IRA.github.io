@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GIN / GiST / BRIN | Índices</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../../../assets/css/theme.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0e0f;--surface:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.08);--text:#e8edee;--muted:#8899aa;--accent:#2b9eff;--accent2:#6bb8ff;--glow:hsla(210,90%,55%,0.2)}
+body{font-family:"Inter",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center}
+.tech-grid{position:fixed;inset:0;background-image:linear-gradient(rgba(43,158,255,0.03)1px,transparent 1px),linear-gradient(90deg,rgba(43,158,255,0.03)1px,transparent 1px);background-size:60px 60px;z-index:0;pointer-events:none}
+.container{max-width:820px;width:100%;padding:20px;position:relative;z-index:1;margin-top:80px}
+.brand-return-nav{display:flex;gap:1rem;align-items:center;padding:.5rem 1rem;background:#0f1429;border:1px solid rgba(0,212,255,.2);border-radius:.5rem;position:fixed;top:.75rem;left:.75rem;z-index:9999}
+.brand-return-nav a{color:#00d4ff;text-decoration:none;font-size:.9rem;font-weight:600}
+.brand-return-nav a:hover{color:#00ff41;text-decoration:underline}
+.progress-section{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:24px;backdrop-filter:blur(12px)}
+.progress-section .bar-wrap{height:6px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden;margin-top:8px}
+.progress-section .bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;width:0%;transition:width .5s ease}
+.progress-section .p-text{font-size:.8rem;color:var(--muted)}
+.hero{text-align:center;padding:32px 20px 20px}
+.hero h1{font-size:clamp(1.5rem,4vw,2.4rem);font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+.hero p{color:var(--muted);font-size:1rem}
+.analogy-card{background:rgba(43,158,255,0.08);border:1px solid rgba(43,158,255,0.2);border-radius:12px;padding:18px;margin-bottom:24px;backdrop-filter:blur(8px)}
+.analogy-card strong{color:var(--accent)}
+.main-area{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:20px;backdrop-filter:blur(12px);text-align:center}
+.main-area h2{font-size:1.1rem;font-weight:600;margin-bottom:16px;color:#fff;text-align:left}
+.main-area p{color:var(--muted);font-size:.9rem;text-align:left}
+.type-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:20px 0}
+.type-card{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:10px;padding:16px;cursor:pointer;transition:all .2s;text-align:center}
+.type-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.type-card h3{font-size:.95rem;color:var(--accent);margin-bottom:6px}
+.type-card p{font-size:.78rem;color:var(--muted);text-align:center}
+.type-card .badge{display:inline-block;background:rgba(43,158,255,0.15);border-radius:8px;padding:4px 10px;font-size:.7rem;color:var(--accent);margin-top:6px}
+.type-card.correct{border-color:#00cc6a;background:rgba(0,204,106,0.1)}
+.type-card.wrong{border-color:#ff5050;background:rgba(255,80,80,0.1)}
+.use-case{background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:8px;padding:14px;margin:12px 0;font-size:.85rem;color:var(--muted);min-height:50px;text-align:left}
+.feedback{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;padding:14px;margin:16px 0;font-size:.9rem;min-height:50px;color:var(--muted);text-align:left}
+.feedback.success{background:rgba(0,204,106,0.1);border-color:#00cc6a;color:#8cffb0}
+.feedback.error{background:rgba(255,80,80,0.1);border-color:#ff5050;color:#ff9999}
+.insignia{text-align:center;padding:24px;background:rgba(43,158,255,0.08);border:1px solid rgba(43,158,255,0.25);border-radius:16px;margin:16px 0;display:none}
+.insignia.show{display:block}
+.insignia i{font-size:2.5rem;color:var(--accent)}.insignia h3{font-size:1.3rem;font-weight:700;margin:8px 0;color:#fff}.insignia p{color:var(--accent);font-weight:500}
+.badge-btn{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:10px;padding:12px 24px;color:#0a0e0f;font-weight:700;cursor:pointer;font-size:.9rem;margin:8px}
+.badge-btn:hover{transform:scale(1.03);opacity:.9}
+.btn-next{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:12px;padding:14px 32px;color:#0a0e0f;font-weight:700;cursor:pointer;font-size:1rem;transition:all .2s;margin:20px auto;display:block}
+.btn-next:disabled{opacity:.4;cursor:not-allowed;transform:none}
+footer{text-align:center;padding:24px 0;color:var(--muted);font-size:.8rem;border-top:1px solid var(--border);width:100%;margin-top:20px}
+@media(max-width:640px){.type-grid{grid-template-columns:1fr}.container{margin-top:70px;padding:12px}}
+</style>
+</head>
+<body><div class="tech-grid"></div>
+<nav class="brand-return-nav"><a href="../../../../index.html">&larr; Portfolio</a><a href="../../../../cursos/index.html">Cursos</a><a href="../../index.html">SQL Medio</a><a href="../index.html">Índices</a></nav>
+<div class="container">
+<div class="progress-section"><span class="p-text"><i class="fas fa-tasks"></i> Módulo 6 de 12 · Índices</span><div class="bar-wrap"><div class="bar-fill" id="progBar"></div></div></div>
+<div class="hero"><h1>🔬 GIN / GiST / BRIN</h1><p>Índices especializados: texto completo, geometría, datos correlacionados</p></div>
+<div class="analogy-card"><strong>💡 Piénsalo así:</strong> GIN es como un índice de términos en un diccionario inverso: busca palabras dentro de documentos. GiST es como un mapa: busca puntos dentro de áreas. BRIN es como un archivador por década: si sabes que buscas algo de los 90, solo revisas los cajones de esa década. Cada tipo para un trabajo diferente.</div>
+<div class="main-area">
+<h2>🎯 Matching: Índice → Caso de uso</h2>
+<p>¿Qué tipo de índice usarías para cada caso? Haz clic en el tipo:</p>
+<div class="type-grid">
+<div class="type-card" onclick="pickIndexType('gin')"><h3>GIN</h3><p>Texto completo, arrays, JSONB</p><span class="badge">Generalized Inverted Index</span></div>
+<div class="type-card" onclick="pickIndexType('gist')"><h3>GiST</h3><p>Geometría, búsqueda espacial, rangos</p><span class="badge">Generalized Search Tree</span></div>
+<div class="type-card" onclick="pickIndexType('brin')"><h3>BRIN</h3><p>Datos correlacionados, series temporales</p><span class="badge">Block Range Index</span></div>
+</div>
+<div class="use-case" id="useCase">💡 Selec. tipo de índice. Luego elige el caso de uso correcto.</div>
+<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:12px 0">
+<button class="badge-btn" onclick="matchUse('texto')">🔤 Buscar palabras en artículos</button>
+<button class="badge-btn" onclick="matchUse('geo')">📍 Puntos dentro de un radio</button>
+<button class="badge-btn" onclick="matchUse('temp')">📊 Datos de temperatura por año</button>
+</div>
+<div id="feedback" class="feedback">💬 Selecciona un tipo de índice y luego su caso de uso</div>
+<div id="insignia" class="insignia"><i class="fas fa-medal"></i><h3>🏅 Index Specialist 🏅</h3><p>¡GIN, GiST y BRIN dominados!</p></div>
+<button class="badge-btn" id="claimBadge" style="display:none" onclick="claimInsignia()"><i class="fas fa-award"></i> Reclamar insignia</button>
+</div>
+<button class="btn-next" id="btnNext" disabled onclick="alert('🔄 Transición al Módulo 7: Covering Index — INCLUDE')">Siguiente <i class="fas fa-arrow-right"></i></button>
+<footer><i class="fas fa-bolt"></i> Índices · SQL Medio · Módulo 6</footer>
+</div>
+<script>
+const GM=30,CI=3,LM=12,P='sqlmedio';
+function updateProgress(){let d=JSON.parse(localStorage.getItem(P+'_progress'))||[];let pct=Math.round(d.filter(m=>Math.ceil(m/12)===CI).length/LM*100);document.getElementById('progBar').style.width=pct+'%'}
+let selectedType=null;
+function pickIndexType(type){
+  document.querySelectorAll('.type-card').forEach(c=>c.classList.remove('correct','wrong'));
+  selectedType=type;
+  document.querySelector('.type-card[onclick*="'+type+'"]').classList.add('correct');
+  document.getElementById('useCase').innerHTML='✅ Tipo seleccionado: <strong>'+type.toUpperCase()+'</strong>. Ahora elige el caso de uso correcto.';
+}
+function matchUse(use){
+  if(!selectedType){document.getElementById('feedback').innerHTML='❌ Selecciona un tipo de índice primero.';document.getElementById('feedback').className='feedback error';return;}
+  let matches={gin:'texto',gist:'geo',brin:'temp'};
+  if(use===matches[selectedType]){
+    document.getElementById('feedback').innerHTML='✅ <strong>¡Correcto!</strong> '+selectedType.toUpperCase()+' es ideal para '+use+'. GIN busca componentes, GiST busca proximidad, BRIN busca rangos de bloques.';document.getElementById('feedback').className='feedback success';
+    document.getElementById('claimBadge').style.display='inline-block';
+  }else{
+    document.getElementById('feedback').innerHTML='❌ No es el caso de uso ideal para '+selectedType.toUpperCase()+'. Intenta otra combinación.';document.getElementById('feedback').className='feedback error';
+  }
+}
+function claimInsignia(){let d=JSON.parse(localStorage.getItem(P+'_progress'))||[];if(!d.includes(GM)){d.push(GM);localStorage.setItem(P+'_progress',JSON.stringify(d));}let b=JSON.parse(localStorage.getItem(P+'_badges'))||[];let badge='c'+CI+'-m6-gin-gist-brin';if(!b.includes(badge)){b.push(badge);localStorage.setItem(P+'_badges',JSON.stringify(b));}document.getElementById('insignia').classList.add('show');document.getElementById('claimBadge').style.display='none';document.getElementById('btnNext').disabled=false;document.getElementById('feedback').innerHTML='🎉 <strong>GIN/GiST/BRIN dominados. ¡A por covering index!</strong>';document.getElementById('feedback').className='feedback success';updateProgress();}
+updateProgress();
+</script>
+</body>
+</html>

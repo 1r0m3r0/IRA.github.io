@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SUM OVER Acumulado | Window Functions</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../../../assets/css/theme.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0e0f;--surface:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.08);--text:#e8edee;--muted:#8899aa;--accent:#ffb347;--accent2:#ff8c00;--glow:hsla(38,90%,55%,0.2)}
+body{font-family:"Inter",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center}
+.tech-grid{position:fixed;inset:0;background-image:linear-gradient(rgba(255,179,71,0.03)1px,transparent 1px),linear-gradient(90deg,rgba(255,179,71,0.03)1px,transparent 1px);background-size:60px 60px;z-index:0;pointer-events:none}
+.container{max-width:820px;width:100%;padding:20px;position:relative;z-index:1;margin-top:80px}
+.brand-return-nav{display:flex;gap:1rem;align-items:center;padding:.5rem 1rem;background:#0f1429;border:1px solid rgba(0,212,255,.2);border-radius:.5rem;position:fixed;top:.75rem;left:.75rem;z-index:9999}
+.brand-return-nav a{color:#00d4ff;text-decoration:none;font-size:.9rem;font-weight:600}
+.brand-return-nav a:hover{color:#00ff41;text-decoration:underline}
+.progress-section{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:24px;backdrop-filter:blur(12px)}
+.progress-section .bar-wrap{height:6px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden;margin-top:8px}
+.progress-section .bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;width:0%;transition:width .5s ease}
+.progress-section .p-text{font-size:.8rem;color:var(--muted)}
+.hero{text-align:center;padding:32px 20px 20px}
+.hero h1{font-size:clamp(1.5rem,4vw,2.4rem);font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+.hero p{color:var(--muted);font-size:1rem}
+.analogy-card{background:rgba(255,179,71,0.08);border:1px solid rgba(255,179,71,0.2);border-radius:12px;padding:18px;margin-bottom:24px;backdrop-filter:blur(8px)}
+.analogy-card strong{color:var(--accent)}
+.main-area{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:20px;backdrop-filter:blur(12px)}
+.main-area h2{font-size:1.1rem;font-weight:600;margin-bottom:16px;color:#fff}
+.main-area p{color:var(--muted);font-size:.9rem;line-height:1.6;margin-bottom:12px}
+.running-total{overflow-x:auto;margin:16px 0}
+.running-total table{width:100%;border-collapse:collapse;font-size:.85rem}
+.running-total th{background:rgba(255,179,71,0.1);color:var(--accent);padding:10px;text-align:left;border-bottom:2px solid rgba(255,179,71,0.2)}
+.running-total td{padding:10px;border-bottom:1px solid var(--border);color:var(--text)}
+.running-total .rt{color:var(--accent);font-weight:700}
+.running-total .bar-cell{width:200px}
+.running-total .mini-bar{height:16px;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width .5s}
+.control-row{display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap;margin:16px 0}
+.control-row input{width:100px;padding:8px;border:1px solid var(--border);border-radius:6px;background:rgba(0,0,0,0.3);color:#fff;text-align:center}
+.control-row input:focus{border-color:var(--accent);outline:none}
+.feedback{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;padding:14px;margin:16px 0;font-size:.9rem;min-height:50px;color:var(--muted)}
+.feedback.success{background:rgba(0,204,106,0.1);border-color:#00cc6a;color:#8cffb0}
+.feedback.error{background:rgba(255,80,80,0.1);border-color:#ff5050;color:#ff9999}
+.insignia{text-align:center;padding:24px;background:rgba(255,179,71,0.08);border:1px solid rgba(255,179,71,0.25);border-radius:16px;margin:16px 0;display:none}
+.insignia.show{display:block}
+.insignia i{font-size:2.5rem;color:var(--accent)}.insignia h3{font-size:1.3rem;font-weight:700;margin:8px 0;color:#fff}.insignia p{color:var(--accent);font-weight:500}
+.badge-btn{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:10px;padding:12px 24px;color:#0a0e0f;font-weight:700;cursor:pointer;font-size:.9rem;margin:8px}
+.badge-btn:hover{transform:scale(1.03);opacity:.9}
+.btn-next{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:12px;padding:14px 32px;color:#0a0e0f;font-weight:700;cursor:pointer;font-size:1rem;transition:all .2s;margin:20px auto;display:block}
+.btn-next:disabled{opacity:.4;cursor:not-allowed;transform:none}
+footer{text-align:center;padding:24px 0;color:var(--muted);font-size:.8rem;border-top:1px solid var(--border);width:100%;margin-top:20px}
+@media(max-width:640px){.running-total .bar-cell{display:none}.container{margin-top:70px;padding:12px}}
+</style>
+</head>
+<body><div class="tech-grid"></div>
+<nav class="brand-return-nav"><a href="../../../../index.html">&larr; Portfolio</a><a href="../../../../cursos/index.html">Cursos</a><a href="../../index.html">SQL Medio</a><a href="../index.html">WF</a></nav>
+<div class="container">
+<div class="progress-section"><span class="p-text"><i class="fas fa-tasks"></i> Módulo 7 de 12 · Window Functions</span><div class="bar-wrap"><div class="bar-fill" id="progBar"></div></div></div>
+<div class="hero"><h1>📊 SUM OVER — Acumulado</h1><p>Running totals: suma progresiva sin perder detalle de cada fila</p></div>
+<div class="analogy-card"><strong>💡 Piénsalo así:</strong> SUM OVER con ORDER BY es como llenar una alcancía día a día. Cada día pones dinero y ves el total acumulado. El día 5 pones $10 y la alcancía tiene $50 (la suma de los 5 días). No pierdes el registro de cada depósito individual — solo añades el acumulado al lado.</div>
+<div class="main-area">
+<h2>💰 Calculadora de Running Total</h2>
+<p>Agrega montos diarios y ve cómo SUM OVER acumula:</p>
+<div class="control-row">
+<input type="number" id="newAmount" min="1" max="9999" value="100" placeholder="Monto">
+<button class="badge-btn" onclick="addDay()"><i class="fas fa-plus"></i> Agregar Día</button>
+<button class="badge-btn" onclick="resetData()"><i class="fas fa-undo"></i> Reiniciar</button>
+</div>
+<div class="running-total"><table><thead><tr><th>Día</th><th>Monto</th><th>Running Total</th><th class="bar-cell"></th></tr></thead>
+<tbody id="rtBody"></tbody></table></div>
+<div id="feedback" class="feedback">💬 Agrega montos para ver el running total en acción</div>
+<div id="insignia" class="insignia"><i class="fas fa-medal"></i><h3>🏅 Running Total Pro 🏅</h3><p>¡SUM OVER con acumulado dominado!</p></div>
+<button class="badge-btn" id="claimBadge" style="display:none" onclick="claimInsignia()"><i class="fas fa-award"></i> Reclamar insignia</button>
+</div>
+<button class="btn-next" id="btnNext" disabled onclick="alert('🔄 Transición al Módulo 8: AVG OVER y COUNT OVER')">Siguiente <i class="fas fa-arrow-right"></i></button>
+<footer><i class="fas fa-window-restore"></i> Window Functions · SQL Medio · Módulo 7</footer>
+</div>
+<script>
+const GM=7,CI=1,LM=12,P='sqlmedio';
+function updateProgress(){let d=JSON.parse(localStorage.getItem(P+'_progress'))||[];let pct=Math.round(d.filter(m=>Math.ceil(m/12)===CI).length/LM*100);document.getElementById('progBar').style.width=pct+'%'}
+let days=[];
+function addDay(){
+  let amt=parseInt(document.getElementById('newAmount').value)||Math.floor(Math.random()*500+50);
+  days.push(amt);renderTable();
+  if(days.length>=3){document.getElementById('claimBadge').style.display='inline-block';document.getElementById('feedback').innerHTML='✅ <strong>¡Así funciona!</strong> SUM(monto) OVER (ORDER BY dia) calcula el acumulado: fila 1 = monto1, fila 2 = monto1+monto2, fila 3 = suma total hasta ese día.';document.getElementById('feedback').className='feedback success';}
+}
+function resetData(){days=[];document.getElementById('rtBody').innerHTML='';document.getElementById('feedback').innerHTML='💬 Agrega montos para ver el running total';document.getElementById('feedback').className='feedback';}
+function renderTable(){
+  let tbody=document.getElementById('rtBody');tbody.innerHTML='';
+  let sum=0;
+  days.forEach((d,i)=>{
+    sum+=d;
+    let max=Math.max(...days,1);
+    let pct=(sum/(days.reduce((a,b)=>a+b,0)||1))*100;
+    let tr=document.createElement('tr');
+    tr.innerHTML='<td>'+(i+1)+'</td><td>$'+d.toLocaleString()+'</td><td class="rt">$'+sum.toLocaleString()+'</td><td class="bar-cell"><div class="mini-bar" style="width:'+pct+'%"></div></td>';
+    tbody.appendChild(tr);
+  });
+}
+function claimInsignia(){let d=JSON.parse(localStorage.getItem(P+'_progress'))||[];if(!d.includes(GM)){d.push(GM);localStorage.setItem(P+'_progress',JSON.stringify(d));}let b=JSON.parse(localStorage.getItem(P+'_badges'))||[];let badge='c'+CI+'-m7-sum-over';if(!b.includes(badge)){b.push(badge);localStorage.setItem(P+'_badges',JSON.stringify(b));}document.getElementById('insignia').classList.add('show');document.getElementById('claimBadge').style.display='none';document.getElementById('btnNext').disabled=false;document.getElementById('feedback').innerHTML='🎉 <strong>SUM OVER dominado. ¡A por AVG OVER!</strong>';document.getElementById('feedback').className='feedback success';updateProgress();}
+updateProgress();
+</script>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html><html lang="es"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SQL Avanzado | C3-01 tsvector</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../../../assets/css/theme.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#0a0e0f;color:#e8edee;min-height:100vh;display:flex;justify-content:center;padding:20px}
+.course-container{max-width:860px;width:100%;background:rgba(15,20,42,0.6);backdrop-filter:blur(16px);border-radius:24px;border:1px solid rgba(0,224,255,0.2);padding:30px;margin-top:60px}
+.progress-bar{background:rgba(255,255,255,0.06);border-radius:8px;height:10px;margin-bottom:18px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#00e0ff,#00b8d4);border-radius:8px;transition:width .5s ease;width:0%}
+.progress-text{font-size:.75rem;color:#8899aa;margin-bottom:10px;display:block}
+.hero-header{text-align:center;margin:20px 0}
+.hero-header h1{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:800;background:linear-gradient(135deg,#00e0ff,#00b8d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-header p{color:#8899aa;margin-top:6px;font-size:.95rem}
+.analogy-card{background:rgba(0,224,255,0.08);border-left:4px solid #00e0ff;border-radius:12px;padding:16px 20px;margin:20px 0;font-size:.9rem;line-height:1.6}
+.analogy-card strong{color:#00e0ff}
+.main-area{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:24px;margin:20px 0}
+.input-group{display:flex;gap:10px;margin:16px 0;flex-wrap:wrap}
+.input-group input{flex:1;background:#1a1f3a;border:1px solid rgba(0,224,255,0.3);border-radius:10px;padding:12px 16px;color:#e8edee;font-family:'Inter',sans-serif;font-size:.95rem;min-width:200px}
+.input-group input:focus{border-color:#00e0ff;outline:none}
+.input-group button{padding:12px 24px;border-radius:10px;background:rgba(0,224,255,0.12);border:1px solid #00e0ff;color:#00e0ff;cursor:pointer;font-family:'Inter',sans-serif;font-weight:600;transition:.3s}
+.input-group button:hover{background:rgba(0,224,255,0.2)}
+.tsv-display{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:16px;margin:16px 0;min-height:60px;font-family:monospace;font-size:.9rem;color:#bcc;word-break:break-all}
+.lexeme-grid{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0;justify-content:center}
+.lexeme-tag{background:rgba(0,224,255,0.1);border:1px solid #00e0ff;border-radius:16px;padding:6px 14px;font-size:.8rem;color:#00e0ff;font-weight:600}
+.feedback{background:rgba(255,255,255,0.04);border-radius:12px;padding:16px 20px;margin:16px 0;font-size:.88rem;min-height:50px}
+.insignia{background:linear-gradient(135deg,rgba(255,215,0,0.12),rgba(255,165,0,0.08));border:1px solid rgba(255,215,0,0.3);border-radius:16px;padding:20px;text-align:center;margin:16px 0;transition:.5s}
+.insignia.hidden{display:none}
+.insignia h3{color:#ffd700;font-size:1.3rem;margin:8px 0}
+.btn-next{display:block;width:100%;padding:16px;margin:20px 0;background:linear-gradient(135deg,#00e0ff,#00b8d4);border:none;border-radius:14px;color:#fff;font-size:1.05rem;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:.3s}
+.btn-next:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,224,255,0.3)}
+footer{text-align:center;padding:16px 0 0;color:#667788;font-size:.8rem;border-top:1px solid rgba(255,255,255,0.06);margin-top:20px}
+@media(max-width:600px){.course-container{padding:16px;margin-top:50px}}
+</style>
+</head>
+<body>
+<div class="course-container">
+<nav class="brand-return-nav"><a href="../../../../index.html">&larr; Portfolio</a><a href="../../../../cursos/index.html">Cursos</a></nav>
+<div class="progress-bar"><div class="progress-fill" id="progFill"></div></div>
+<span class="progress-text" id="progText">Módulo 1 de 12</span>
+<div class="hero-header"><h1>📦 tsvector</h1><p>Convierte texto en lexemas para búsqueda eficiente</p></div>
+<div class="analogy-card"><strong>💡 Piénsalo así:</strong> tsvector es como el índice alfabético de un libro. En vez de buscar palabra por palabra en todo el texto, el índice te dice "corriendo → página 42" y "correr → página 15". tsvector normaliza las palabras (corriendo, correrán → correr) y las guarda con sus posiciones en el documento. Así la búsqueda es instantánea.</div>
+<div class="main-area">
+<p style="color:#bcc;margin-bottom:10px;font-weight:600"><i class="fas fa-edit" style="color:#00e0ff"></i> Escribe texto y genera su tsvector</p>
+<div class="input-group">
+<input type="text" id="textInput" placeholder="Ej: Los gatos corren rápidamente por el jardín..." value="Los gatos corren rápidamente por el jardín mientras los perros ladran felices">
+<button id="convertBtn"><i class="fas fa-sync"></i> to_tsvector</button>
+</div>
+<div class="tsv-display" id="tsvOutput">Esperando texto...</div>
+<div class="lexeme-grid" id="lexemeGrid"></div>
+</div>
+<div id="feedback" class="feedback">💬 to_tsvector('spanish', texto) tokeniza, elimina stop words y reduce a lexemas con posiciones.</div>
+<div id="insignia" class="insignia hidden"><i class="fas fa-medal" style="font-size:2.5rem;color:#ffd700"></i><h3>🏅 Vectorizer 🏅</h3><p>¡Sabes cómo se construye un tsvector!</p></div>
+<button class="btn-next" onclick="alert('🔄 Transición → 02-tsquery.html')">Siguiente <i class="fas fa-arrow-right"></i></button>
+<footer><i class="fas fa-crown"></i> SQL Avanzado · Curso 3 · Módulo 1</footer>
+</div>
+<script>
+const MODULE=1,COURSE="sqlavanzado_c3",PROG="sqlavanzado_progress",BADGES="sqlavanzado_badges";
+const STOP_WORDS=['los','las','el','la','un','una','por','con','para','del','en','y','o','a','de','que','le','lo','se','su','al','como','más','entre','este','esta'];
+function simpleTokenize(text){
+let words=text.toLowerCase().replace(/[^a-záéíóúüñ\s]/g,'').split(/\s+/).filter(w=>w.length>2&&!STOP_WORDS.includes(w));
+let lexemes=words.map(w=>{
+w=w.replace(/[á]/g,'a').replace(/[é]/g,'e').replace(/[í]/g,'i').replace(/[ó]/g,'o').replace(/[úü]/g,'u').replace(/[ñ]/g,'n');
+if(w.endsWith('ando')||w.endsWith('endo'))w=w.slice(0,-4)+'ar';
+else if(w.endsWith('ando')||w.endsWith('iendo'))w=w.slice(0,-5)+'ir';
+else if(w.endsWith('ados')||w.endsWith('adas'))w=w.slice(0,-4);
+else if(w.endsWith('ado')||w.endsWith('ada'))w=w.slice(0,-3);
+else if(w.endsWith('mente'))w=w.slice(0,-5);
+else if(w.endsWith('s')&&w.length>4)w=w.slice(0,-1);
+return w;
+});
+let seen={},result=[];
+lexemes.forEach((l,i)=>{if(!seen[l]){seen[l]=true;result.push(l+':'+i);}});
+return {lexemes:lexemes,unique:Object.keys(seen),result:result.join(' '),counts:Object.keys(seen).map(l=>{return{lex:l,count:lexemes.filter(x=>x===l).length,positions:lexemes.map((x,idx)=>x===l?idx:-1).filter(x=>x>=0)}})};
+}
+document.getElementById('convertBtn').addEventListener('click',function(){
+let text=document.getElementById('textInput').value.trim();
+if(!text){document.getElementById('feedback').innerHTML='⚠️ Escribe algo de texto primero.';return;}
+let t=simpleTokenize(text);
+document.getElementById('tsvOutput').textContent="'"+t.result+"'";
+let grid=document.getElementById('lexemeGrid');
+grid.innerHTML=t.counts.map(c=>'<span class="lexeme-tag">'+c.lex+' <span style="color:#8899aa;font-size:.7rem">(×'+c.count+')</span></span>').join('');
+document.getElementById('feedback').innerHTML='✅ tsvector generado con '+t.counts.length+' lexemas únicos. Eliminó stop words y normalizó verbos. En PostgreSQL usarías: SELECT to_tsvector(\'spanish\', \''+text+'\');';
+let bd=JSON.parse(localStorage.getItem(BADGES))||[];if(!bd.includes('Vectorizer')){bd.push('Vectorizer');localStorage.setItem(BADGES,JSON.stringify(bd));document.getElementById('insignia').classList.remove('hidden')}
+updateProg();
+});
+function updateProg(){
+let p=JSON.parse(localStorage.getItem(COURSE+"_progress"))||[];if(!p.includes(MODULE)){p.push(MODULE);localStorage.setItem(COURSE+"_progress",JSON.stringify(p))}
+let pct=Math.round(p.length/12*100);document.getElementById('progFill').style.width=pct+'%';document.getElementById('progText').textContent='Módulo 1 de 12 ('+pct+'%)';
+let gp=JSON.parse(localStorage.getItem(PROG))||[];if(!gp.includes(MODULE+24)){gp.push(MODULE+24);localStorage.setItem(PROG,JSON.stringify(gp))}
+}
+</script>
+</body>
+</html>

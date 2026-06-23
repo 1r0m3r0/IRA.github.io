@@ -1,0 +1,90 @@
+<!DOCTYPE html><html lang="es"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SQL Avanzado | C2-04 Sub-Particionamiento</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../../../assets/css/theme.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#0a0e0f;color:#e8edee;min-height:100vh;display:flex;justify-content:center;padding:20px}
+.course-container{max-width:860px;width:100%;background:rgba(15,20,42,0.6);backdrop-filter:blur(16px);border-radius:24px;border:1px solid rgba(156,100,255,0.2);padding:30px;margin-top:60px}
+.progress-bar,.progress-fill{height:10px;border-radius:8px}
+.progress-bar{background:rgba(255,255,255,0.06);margin-bottom:18px;overflow:hidden}
+.progress-fill{background:linear-gradient(90deg,#9c64ff,#7a3ce0);width:0%;transition:width .5s ease}
+.progress-text{font-size:.75rem;color:#8899aa;margin-bottom:10px;display:block}
+.hero-header{text-align:center;margin:20px 0}
+.hero-header h1{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:800;background:linear-gradient(135deg,#9c64ff,#7a3ce0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-header p{color:#8899aa;margin-top:6px;font-size:.95rem}
+.analogy-card{background:rgba(156,100,255,0.08);border-left:4px solid #9c64ff;border-radius:12px;padding:16px 20px;margin:20px 0;font-size:.9rem;line-height:1.6}
+.analogy-card strong{color:#9c64ff}
+.main-area{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:24px;margin:20px 0}
+.tree-visual{display:flex;flex-direction:column;align-items:center;margin:16px 0}
+.tree-root{background:rgba(156,100,255,0.15);border:2px solid #9c64ff;border-radius:14px;padding:12px 24px;font-weight:700;color:#9c64ff;margin-bottom:12px}
+.tree-level{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin:6px 0}
+.tree-node{background:rgba(255,255,255,0.04);border:1px solid rgba(156,100,255,0.25);border-radius:10px;padding:10px 16px;text-align:center;min-width:100px;transition:.3s}
+.tree-node .tn-title{color:#9c64ff;font-weight:600;font-size:.85rem}
+.tree-node .tn-sub{color:#8899aa;font-size:.72rem;margin-top:2px}
+.tree-node.highlight{background:rgba(0,255,100,0.08);border-color:#00ff64}
+.tree-connector{color:#667788;font-size:.7rem;margin:2px 0}
+.sub-controls{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0;justify-content:center}
+.sub-btn{padding:8px 16px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#e8edee;cursor:pointer;font-family:'Inter',sans-serif;font-size:.8rem;transition:.3s}
+.sub-btn:hover{background:rgba(156,100,255,0.15);border-color:#9c64ff}
+.feedback{background:rgba(255,255,255,0.04);border-radius:12px;padding:16px 20px;margin:16px 0;font-size:.88rem;min-height:50px}
+.insignia{background:linear-gradient(135deg,rgba(255,215,0,0.12),rgba(255,165,0,0.08));border:1px solid rgba(255,215,0,0.3);border-radius:16px;padding:20px;text-align:center;margin:16px 0;transition:.5s}
+.insignia.hidden{display:none}
+.insignia h3{color:#ffd700;font-size:1.3rem;margin:8px 0}
+.btn-next{display:block;width:100%;padding:16px;margin:20px 0;background:linear-gradient(135deg,#9c64ff,#7a3ce0);border:none;border-radius:14px;color:#fff;font-size:1.05rem;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:.3s}
+.btn-next:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(156,100,255,0.3)}
+footer{text-align:center;padding:16px 0 0;color:#667788;font-size:.8rem;border-top:1px solid rgba(255,255,255,0.06);margin-top:20px}
+@media(max-width:600px){.course-container{padding:16px;margin-top:50px}}
+</style>
+</head>
+<body>
+<div class="course-container">
+<nav class="brand-return-nav"><a href="../../../../index.html">&larr; Portfolio</a><a href="../../../../cursos/index.html">Cursos</a></nav>
+<div class="progress-bar"><div class="progress-fill" id="progFill"></div></div>
+<span class="progress-text" id="progText">Módulo 4 de 12</span>
+<div class="hero-header"><h1>🌳 Sub-Particionamiento</h1><p>Particiones dentro de particiones</p></div>
+<div class="analogy-card"><strong>💡 Piénsalo así:</strong> Sub-particionar es como tener un archivador de oficina: primero separas por año (RANGE) y dentro de cada año, separas por mes (otro RANGE más fino). O por departamento (LIST). Así no solo sabes en qué año buscar, sino en qué mes exacto. Menos espacio que revisar.</div>
+<div class="main-area">
+<p style="color:#bcc;margin-bottom:10px;font-weight:600"><i class="fas fa-sitemap" style="color:#9c64ff"></i> Constructor de árbol de particiones</p>
+<div class="tree-visual" id="treeVis"></div>
+<div class="sub-controls">
+<button class="sub-btn" id="expandTree"><i class="fas fa-plus"></i> Sub-particionar por LIST (región)</button>
+<button class="sub-btn" id="collapseTree"><i class="fas fa-minus"></i> Colapsar</button>
+</div>
+</div>
+<div id="feedback" class="feedback">💬 El sub-particionamiento combina dos niveles: RANGE (año) + LIST (región). Crea una jerarquía de hasta 32,767 particiones.</div>
+<div id="insignia" class="insignia hidden"><i class="fas fa-medal" style="font-size:2.5rem;color:#ffd700"></i><h3>🏅 Arquitecto de Sub-Particiones 🏅</h3><p>¡Dominas el arte de las particiones anidadas!</p></div>
+<button class="btn-next" onclick="alert('🔄 Transición → 05-partition-pruning.html')">Siguiente <i class="fas fa-arrow-right"></i></button>
+<footer><i class="fas fa-crown"></i> SQL Avanzado · Curso 2 · Módulo 4</footer>
+</div>
+<script>
+const MODULE=4,COURSE="sqlavanzado_c2",PROG="sqlavanzado_progress",BADGES="sqlavanzado_badges";
+let expanded=false;
+function renderTree(){
+let vis=document.getElementById('treeVis');
+if(!expanded){
+vis.innerHTML='<div class="tree-root">📊 orders PARTITION BY RANGE (created_at)</div><div class="tree-level">'+
+[2022,2023,2024,2025].map(y=>'<div class="tree-node"><div class="tn-title">orders_'+y+'</div><div class="tn-sub">FROM '+y+'-01-01</div></div>').join('')+'</div>';
+document.getElementById('feedback').innerHTML='📊 Nivel 1: 4 particiones RANGE por año. Cada partición contiene todos los datos de ese año, sin distinción de región.';
+}else{
+vis.innerHTML='<div class="tree-root">📊 orders PARTITION BY RANGE (created_at)</div><div class="tree-level">'+
+[2022,2023,2024,2025].map(y=>'<div class="tree-node highlight"><div class="tn-title">orders_'+y+'</div><div class="tn-sub">SUB-PARTITION BY LIST (region)</div></div>').join('')+'</div><div class="tree-connector">▼ Cada año sub-particionado por región ▼</div><div class="tree-level">'+
+['orders_2022_america','orders_2022_europa','orders_2022_asia','orders_2023_america','orders_2023_europa','orders_2023_asia','orders_2024_america','orders_2024_europa','orders_2024_asia'].map(n=>'<div class="tree-node"><div class="tn-title" style="font-size:.75rem">'+n+'</div><div class="tn-sub">sub-partición</div></div>').join('')+'</div>';
+document.getElementById('feedback').innerHTML='🌳 Sub-particionamiento: RANGE(año) + LIST(región) = 12 sub-particiones. ⚠️ PostgreSQL 19 permite hasta 32,767 particiones totales. ¡Pero no abuses: cada partición añade overhead de planificación!';
+let bd=JSON.parse(localStorage.getItem(BADGES))||[];if(!bd.includes('Arquitecto de Sub-Particiones')){bd.push('Arquitecto de Sub-Particiones');localStorage.setItem(BADGES,JSON.stringify(bd));document.getElementById('insignia').classList.remove('hidden')}
+updateProg();
+}
+}
+document.getElementById('expandTree').addEventListener('click',function(){expanded=true;renderTree();});
+document.getElementById('collapseTree').addEventListener('click',function(){expanded=false;renderTree();});
+function updateProg(){
+let p=JSON.parse(localStorage.getItem(COURSE+"_progress"))||[];if(!p.includes(MODULE)){p.push(MODULE);localStorage.setItem(COURSE+"_progress",JSON.stringify(p))}
+let pct=Math.round(p.length/12*100);document.getElementById('progFill').style.width=pct+'%';document.getElementById('progText').textContent='Módulo 4 de 12 ('+pct+'%)';
+let gp=JSON.parse(localStorage.getItem(PROG))||[];if(!gp.includes(MODULE+48)){gp.push(MODULE+48);localStorage.setItem(PROG,JSON.stringify(gp))}
+}
+renderTree();
+</script>
+</body>
+</html>

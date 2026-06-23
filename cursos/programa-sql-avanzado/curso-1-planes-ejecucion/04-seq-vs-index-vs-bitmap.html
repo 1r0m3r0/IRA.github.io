@@ -1,0 +1,141 @@
+<!DOCTYPE html><html lang="es"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SQL Avanzado | 04 Seq vs Index vs Bitmap</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../../../assets/css/theme.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#0a0e0f;color:#e8edee;min-height:100vh;display:flex;justify-content:center;padding:20px}
+.course-container{max-width:860px;width:100%;background:rgba(15,20,42,0.6);backdrop-filter:blur(16px);border-radius:24px;border:1px solid rgba(255,80,80,0.2);padding:30px;margin-top:60px}
+.progress-bar{background:rgba(255,255,255,0.06);border-radius:8px;height:10px;margin-bottom:18px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#ff5050,#cc4040);border-radius:8px;transition:width .5s ease;width:0%}
+.progress-text{font-size:.75rem;color:#8899aa;margin-bottom:10px;display:block}
+.hero-header{text-align:center;margin:20px 0}
+.hero-header h1{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:800;background:linear-gradient(135deg,#ff5050,#cc4040);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-header p{color:#8899aa;margin-top:6px;font-size:.95rem}
+.analogy-card{background:rgba(255,80,80,0.08);border-left:4px solid #ff5050;border-radius:12px;padding:16px 20px;margin:20px 0;font-size:.9rem;line-height:1.6}
+.analogy-card strong{color:#ff5050}
+.main-area{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:24px;margin:20px 0}
+.scan-select{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}
+.scan-btn{padding:12px 20px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#e8edee;cursor:pointer;font-family:'Inter',sans-serif;font-size:.9rem;transition:.3s;flex:1;text-align:center;min-width:120px}
+.scan-btn:hover,.scan-btn.active{background:rgba(255,80,80,0.15);border-color:#ff5050}
+.table-visual{position:relative;background:rgba(255,255,255,0.02);border-radius:10px;padding:16px;margin:16px 0;min-height:100px;display:flex;flex-wrap:wrap;gap:4px;justify-content:center}
+.block{width:32px;height:32px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:.5rem;color:#fff;transition:.3s}
+.block.seq{background:rgba(255,80,80,0.4)}
+.block.idx{background:rgba(0,224,255,0.4)}
+.block.bit{background:rgba(156,100,255,0.4)}
+.block.accessed{box-shadow:0 0 12px currentColor}
+.block.highlight{background:#ff5050!important}
+.benchmark{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:16px 0}
+.bench-item{background:rgba(255,255,255,0.04);border-radius:10px;padding:14px;text-align:center}
+.bench-item .time{font-size:1.3rem;font-weight:700;color:var(--c)}
+.bench-item .label{font-size:.75rem;color:#8899aa;margin-top:4px}
+.feedback{background:rgba(255,255,255,0.04);border-radius:12px;padding:16px 20px;margin:16px 0;font-size:.88rem;min-height:50px}
+.insignia{background:linear-gradient(135deg,rgba(255,215,0,0.12),rgba(255,165,0,0.08));border:1px solid rgba(255,215,0,0.3);border-radius:16px;padding:20px;text-align:center;margin:16px 0;transition:.5s}
+.insignia.hidden{display:none}
+.insignia h3{color:#ffd700;font-size:1.3rem;margin:8px 0}
+.btn-next{display:block;width:100%;padding:16px;margin:20px 0;background:linear-gradient(135deg,#ff5050,#cc4040);border:none;border-radius:14px;color:#fff;font-size:1.05rem;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:.3s}
+.btn-next:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,80,80,0.3)}
+footer{text-align:center;padding:16px 0 0;color:#667788;font-size:.8rem;border-top:1px solid rgba(255,255,255,0.06);margin-top:20px}
+@media(max-width:600px){.course-container{padding:16px;margin-top:50px}.benchmark{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="course-container">
+<nav class="brand-return-nav"><a href="../../../../index.html">&larr; Portfolio</a><a href="../../../../cursos/index.html">Cursos</a></nav>
+<div class="progress-bar"><div class="progress-fill" id="progFill"></div></div>
+<span class="progress-text" id="progText">Módulo 4 de 12</span>
+<div class="hero-header"><h1>📡 Seq Scan vs Index Scan vs Bitmap</h1><p>Comparamos los tres escaneos en velocidad y eficiencia</p></div>
+<div class="analogy-card"><strong>💡 Piénsalo así:</strong> Seq Scan es como leer un libro entero para encontrar una palabra. Index Scan es como usar el índice al final del libro para ir directo a la página. Bitmap Scan es como marcar varias páginas con post-its y luego ir a leer solo esas.</div>
+<div class="main-area">
+<p style="color:#bcc;margin-bottom:10px;font-weight:600"><i class="fas fa-chart-bar" style="color:#ff5050"></i> Simulador de escaneos</p>
+<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+<label style="font-size:.85rem;color:#aab">Tamaño tabla: <select id="tableSize" style="background:#1a1f3a;color:#e8edee;border:1px solid rgba(255,255,255,0.1);border-radius:6px;padding:4px 8px;font-family:'Inter',sans-serif">
+<option value="1000">1,000 filas</option><option value="100000" selected>100,000 filas</option><option value="10000000">10M filas</option>
+</select></label>
+<label style="font-size:.85rem;color:#aab">Selectividad: <select id="selectivity" style="background:#1a1f3a;color:#e8edee;border:1px solid rgba(255,255,255,0.1);border-radius:6px;padding:4px 8px;font-family:'Inter',sans-serif">
+<option value="0.001">0.1%</option><option value="0.01">1%</option><option value="0.05">5%</option><option value="0.3" selected>30%</option><option value="0.8">80%</option>
+</select></label>
+</div>
+<div class="scan-select">
+<button class="scan-btn" data-scan="seq"><i class="fas fa-list"></i> Seq Scan</button>
+<button class="scan-btn" data-scan="idx"><i class="fas fa-tree"></i> Index Scan</button>
+<button class="scan-btn" data-scan="bit"><i class="fas fa-th"></i> Bitmap Scan</button>
+</div>
+<div class="table-visual" id="tableVis"></div>
+<div class="benchmark">
+<div class="bench-item" style="--c:#ff5050"><div class="time" id="benchSeq">0 ms</div><div class="label"><i class="fas fa-list"></i> Seq Scan</div></div>
+<div class="bench-item" style="--c:#00e0ff"><div class="time" id="benchIdx">0 ms</div><div class="label"><i class="fas fa-tree"></i> Index Scan</div></div>
+<div class="bench-item" style="--c:#9c64ff"><div class="time" id="benchBit">0 ms</div><div class="label"><i class="fas fa-th"></i> Bitmap Scan</div></div>
+</div>
+</div>
+<div id="feedback" class="feedback">💬 Selecciona un escaneo para ver cómo funciona. Ajusta tamaño y selectividad para comparar rendimiento.</div>
+<div id="insignia" class="insignia hidden"><i class="fas fa-medal" style="font-size:2.5rem;color:#ffd700"></i><h3>🏅 Explorador de Escaneos 🏅</h3><p>¡Dominas las diferencias entre Seq, Index y Bitmap Scan!</p></div>
+<button class="btn-next" onclick="alert('🔄 Transición → 05-geqo.html')">Siguiente <i class="fas fa-arrow-right"></i></button>
+<footer><i class="fas fa-crown"></i> SQL Avanzado · Curso 1 · Módulo 4</footer>
+</div>
+<script>
+const MODULE=4,COURSE="sqlavanzado_c1",PROG="sqlavanzado_progress",BADGES="sqlavanzado_badges";
+function calc(){
+let rows=parseInt(document.getElementById('tableSize').value);
+let sel=parseFloat(document.getElementById('selectivity').value);
+let estRows=Math.round(rows*sel);
+let seqTime=rows*0.01;
+let idxTime=Math.log2(rows)*0.5+estRows*0.005;
+let bitTime=rows*0.003+estRows*0.008;
+document.getElementById('benchSeq').textContent=seqTime.toFixed(1)+' ms';
+document.getElementById('benchIdx').textContent=idxTime.toFixed(1)+' ms';
+document.getElementById('benchBit').textContent=bitTime.toFixed(1)+' ms';
+renderBlocks(rows);
+let fb=document.getElementById('feedback');
+let best=Math.min(seqTime,idxTime,bitTime);
+let bestName=best===seqTime?'Seq Scan':best===idxTime?'Index Scan':'Bitmap Scan';
+fb.innerHTML='📊 Con '+rows.toLocaleString()+' filas y selectividad '+(sel*100)+'%, el más rápido es <strong>'+bestName+'</strong> ('+best.toFixed(1)+' ms). '+
+(bestName==='Seq Scan'?'Excelente para tablas pequeñas o alta selectividad.':bestName==='Index Scan'?'Ideal para búsquedas puntuales con baja selectividad.':'Balance entre índice y lectura secuencial.');
+}
+function renderBlocks(rows){
+let n=Math.min(rows/100,40);
+let vis=document.getElementById('tableVis');
+vis.innerHTML='';
+for(let i=0;i<n;i++){
+let d=document.createElement('div');
+d.className='block seq';
+d.textContent='□';
+vis.appendChild(d);
+}
+}
+document.querySelectorAll('.scan-btn').forEach(b=>{
+b.addEventListener('click',function(){
+document.querySelectorAll('.scan-btn').forEach(bb=>bb.classList.remove('active'));
+this.classList.add('active');
+let scan=this.dataset.scan;
+document.querySelectorAll('.block').forEach((bl,i)=>{
+bl.className='block '+scan;
+if(scan==='idx'&&i%5===0)bl.classList.add('highlight');
+if(scan==='bit'&&(i%3===0||i%7===0))bl.classList.add('highlight');
+});
+let fb=document.getElementById('feedback');
+fb.innerHTML='🔍 Mostrando <strong>'+this.textContent.trim()+'</strong>. '+
+(scan==='seq'?'El escaneo secuencial lee todos los bloques (rojo oscuro). Óptimo para >30% de filas.':scan==='idx'?'El escaneo por índice navega el árbol B+ (azul) y lee solo los bloques necesarios.': 'El escaneo bitmap combina múltiples índices en un bitmap en memoria (púrpura) y lee los bloques exactos.');
+});
+});
+document.getElementById('tableSize').addEventListener('change',calc);
+document.getElementById('selectivity').addEventListener('change',calc);
+function updateProg(){
+let p=JSON.parse(localStorage.getItem(COURSE+"_progress"))||[];
+if(!p.includes(MODULE)){p.push(MODULE);localStorage.setItem(COURSE+"_progress",JSON.stringify(p))}
+let pct=Math.round(p.length/12*100);
+document.getElementById('progFill').style.width=pct+'%';
+document.getElementById('progText').textContent='Módulo 4 de 12 ('+pct+'%)';
+let gp=JSON.parse(localStorage.getItem(PROG))||[];
+if(!gp.includes(MODULE+36)){gp.push(MODULE+36);localStorage.setItem(PROG,JSON.stringify(gp))}
+let bd=JSON.parse(localStorage.getItem(BADGES))||[];
+if(!bd.includes('Explorador de Escaneos')){bd.push('Explorador de Escaneos');localStorage.setItem(BADGES,JSON.stringify(bd));document.getElementById('insignia').classList.remove('hidden')}
+}
+calc();
+document.querySelector('.scan-btn[data-scan=seq]').click();
+updateProg();
+</script>
+</body>
+</html>

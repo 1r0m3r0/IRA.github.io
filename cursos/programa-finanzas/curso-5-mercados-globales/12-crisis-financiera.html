@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Simulación de Crisis Financiera | Curso 5</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    :root { --accent: #ffd700; --accent-rgb: 255,215,0; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 100%); font-family: 'Inter', sans-serif; color: #eef5ff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; }
+    .modulo-container { max-width: 1100px; width: 100%; background: rgba(15,25,45,0.65); backdrop-filter: blur(12px); border-radius: 3rem; border: 1px solid rgba(var(--accent-rgb),0.25); box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden; }
+    .hero-header { background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%); padding: 1.5rem 2rem; text-align: center; border-bottom: 2px solid var(--accent); }
+    .hero-header h1 { font-size: 2rem; font-weight: 800; background: linear-gradient(135deg, #FFF, #ffe066, var(--accent)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .hero-header p { font-size: 1rem; color: #ffe066; margin-top: 0.2rem; }
+    .progress-bar { margin: 0.8rem 2rem; padding: 0.5rem 1rem; background: #00000055; border-radius: 2rem; display: flex; align-items: center; gap: 1rem; border: 1px solid var(--accent); }
+    .progress-fill-bg { flex:1; height:8px; background:#ffffff15; border-radius:8px; overflow:hidden; }
+    .progress-fill { height:100%; width:8%; background:linear-gradient(90deg,var(--accent),#ffe066); border-radius:8px; transition:width 0.5s ease; }
+    .progress-text { font-size:0.75rem; color:#ffe066; white-space:nowrap; }
+    .analogy-card { background: #1e2a3acc; margin: 1rem 2rem; padding: 1rem 1.5rem; border-radius: 1.5rem; border-left: 6px solid var(--accent); font-size: 0.95rem; }
+    .analogy-card i { color: var(--accent); }
+    .main-area { padding: 1rem 2rem 1.5rem; }
+    .sim-panel { background: rgba(0,10,25,0.7); border-radius: 1.5rem; padding: 1.2rem; border: 1px solid var(--accent); }
+    .sim-title { font-size: 1.3rem; font-weight: 700; color: var(--accent); margin-bottom: 0.8rem; }
+    .round-header { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; margin-bottom:0.5rem; }
+    .round-header .r-num { font-size:1.1rem; font-weight:700; color:var(--accent); }
+    .round-header .r-score { font-size:0.9rem; }
+    .crisis-info { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:0.4rem; margin-bottom:0.8rem; }
+    .crisis-metric { background:#0f1a2c; border-radius:0.6rem; padding:0.4rem; text-align:center; border:1px solid #2c3e66; }
+    .crisis-metric .c-label { font-size:0.6rem; color:#8899bb; }
+    .crisis-metric .c-value { font-size:1rem; font-weight:700; }
+    .crisis-desc { font-size:0.9rem; background:#0f1a2c; padding:0.6rem 0.8rem; border-radius:0.8rem; margin:0.5rem 0; border:1px solid #2c3e66; }
+    .decision-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin:0.5rem 0; }
+    .decision-btn { background:#0f1a2c; border:1px solid #2c3e66; border-radius:0.8rem; padding:0.6rem; cursor:pointer; text-align:center; transition:0.2s; }
+    .decision-btn:hover { border-color:var(--accent); transform:translateY(-2px); }
+    .decision-btn.selected { border-color:var(--accent); background:rgba(var(--accent-rgb),0.2); }
+    .decision-btn .d-title { font-weight:700; font-size:0.85rem; }
+    .decision-btn .d-desc { font-size:0.75rem; color:#8899bb; }
+    .btn-action { background: linear-gradient(95deg, var(--accent), #ffe066); border: none; padding: 0.7rem 1.5rem; font-weight: 700; border-radius: 2rem; cursor: pointer; font-size: 0.95rem; color: #000; transition: 0.2s; font-family: 'Inter', sans-serif; }
+    .btn-action:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(var(--accent-rgb),0.4); }
+    .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
+    .round-result { background:#0f1a2c; border-radius:0.8rem; padding:0.8rem; margin-top:0.5rem; border:1px solid gold; }
+    .final-score { text-align:center; margin-top:1rem; }
+    .final-score .fs-number { font-size:3rem; font-weight:800; }
+    .feedback { background: #00000099; margin: 0.5rem 2rem 1rem; padding: 0.8rem; border-radius: 1rem; text-align: center; font-weight: 500; border-left: 4px solid var(--accent); font-size: 0.9rem; }
+    .insignia { text-align: center; background: #0c1b2f; border-radius: 1.5rem; margin: 0.8rem 2rem; padding: 0.8rem; border: 2px solid gold; }
+    .insignia i { font-size: 2rem; color: gold; }
+    .hidden { display: none; }
+    .nav-links { display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap; padding: 1rem 2rem; }
+    .nav-link { background: #2c3e66; padding: 0.6rem 1.2rem; border-radius: 2rem; font-weight: 600; cursor: pointer; text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; font-size: 0.85rem; }
+    .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(var(--accent-rgb),0.4); }
+    .nav-link.next { background: linear-gradient(95deg, var(--accent), #ffe066); color: #000; }
+    footer { text-align: center; padding: 1rem; font-size: 0.75rem; border-top: 1px solid #2c3e66; }
+    @media (max-width:800px) { .hero-header h1 { font-size:1.5rem; } .crisis-info { grid-template-columns:1fr 1fr; } .decision-grid { grid-template-columns:1fr; } }
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a><a href="../index.html">Programa</a><a href="index.html">Curso 5</a></nav>
+
+<div class="modulo-container">
+  <div class="hero-header">
+    <h1><i class="fas fa-bolt"></i> Simulación de Crisis Financiera</h1>
+    <p>Módulo 12 · Eres el Ministro de Finanzas — 5 rondas para salvar la economía</p>
+  </div>
+
+  <div class="progress-bar">
+    <span>📊 Curso 5</span>
+    <div class="progress-fill-bg"><div class="progress-fill" id="progressFill"></div></div>
+    <span class="progress-text" id="progressText">0%</span>
+  </div>
+
+  <div class="analogy-card">
+    <i class="fas fa-fire-extinguisher"></i> <strong>Apagar un incendio con gasolina:</strong> Una crisis financiera es como un incendio en un rascacielos. Si subes tasas de interés (más gasolina), el fuego se aviva. Si das estímulo fiscal (agua), puede apagarse... pero inundas el sótano (deuda). Cada decisión tiene consecuencias inmediatas y futuras.
+  </div>
+
+  <div class="main-area">
+    <div class="sim-panel">
+      <div class="sim-title"><i class="fas fa-landmark"></i> Crisis Simulator — ¡Salva la Economía!</div>
+
+      <div class="round-header">
+        <span class="r-num" id="roundNum">Ronda 1/5</span>
+        <span class="r-score">🏆 Puntuación: <span id="totalScore">0</span></span>
+      </div>
+
+      <div class="crisis-info" id="crisisMetrics">
+        <div class="crisis-metric"><div class="c-label">PIB</div><div class="c-value" id="gdpMetric" style="color:#ff5050;">-2.5%</div></div>
+        <div class="crisis-metric"><div class="c-label">Desempleo</div><div class="c-value" id="unempMetric" style="color:#ff5050;">8.5%</div></div>
+        <div class="crisis-metric"><div class="c-label">Bolsa</div><div class="c-value" id="stockMetric" style="color:#ff5050;">-18%</div></div>
+        <div class="crisis-metric"><div class="c-label">Deuda/PIB</div><div class="c-value" id="debtMetric" style="color:#f59e0b;">85%</div></div>
+      </div>
+
+      <div class="crisis-desc" id="crisisDesc">El país enfrenta una crisis financiera severa. Los bancos están al borde del colapso, el mercado accionario se desploma y el desempleo se dispara. Tu primera decisión como Ministro de Finanzas definirá el rumbo de la recuperación.</div>
+
+      <div class="decision-grid" id="decisionGrid"></div>
+
+      <button class="btn-action" id="applyDecisionBtn"><i class="fas fa-check"></i> Aplicar Decisión</button>
+
+      <div id="roundResult" class="round-result hidden"></div>
+      <div id="finalResult" class="final-score hidden"></div>
+    </div>
+  </div>
+
+  <div id="feedback" class="feedback">
+    💡 5 rondas de decisiones críticas. Cada decisión afecta PIB, desempleo, bolsa y deuda pública. ¡Salva la economía!
+  </div>
+
+  <div id="insignia" class="insignia hidden">
+    <i class="fas fa-medal"></i>
+    <h3>🏅 ¡CRISIS COMMANDER! 🏅</h3>
+    <p>Has navegado una crisis financiera con decisiones difíciles y has salido victorioso. ¡Los países necesitan líderes como tú!</p>
+  </div>
+
+  <div class="nav-links">
+    <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Menú</a>
+    <button id="nextBtn" class="nav-link next hidden">Ver certificado <i class="fas fa-certificate"></i></button>
+  </div>
+  <footer>
+    <i class="fas fa-bolt"></i> Mercados Globales · Módulo 12 · Crisis Financiera
+  </footer>
+</div>
+
+<script>
+  const MODULE_ID = 'c5m12';
+  const PROGRESS_KEY = 'finanzas_progress';
+  const BADGE_KEY = 'finanzas_c5m12';
+  const TOTAL_MODULES = 72;
+
+  var currentRound = 1;
+  var totalScore = 0;
+  var economy = { gdp: -2.5, unemp: 8.5, stock: -18, debt: 85 };
+  var selectedDecision = null;
+  var roundDone = false;
+  var crisisDone = false;
+
+  const ROUNDS = [
+    { num: 1, title: 'Colapso Bancario Inminente', desc: 'Dos bancos sistémicos están al borde de la quiebra. El pánico financiero se propaga. El mercado accionario cayó 18% esta semana. La Reserva Federal pide acción inmediata.', decisions: [
+      { title: 'Bailout', desc: 'Rescatar los bancos con $700MM', effect: { gdp: -0.5, unemp: -0.3, stock: 8, debt: 12 }, score: 20, context: 'Como en TARP 2008 — costoso pero evitó el colapso total.' },
+      { title: 'Bajar Tasas', desc: 'Reducir tasas de interés 1.5%', effect: { gdp: 0.3, unemp: -0.5, stock: 12, debt: 3 }, score: 25, context: 'La Fed bajó tasas a 0% en 2008 y 2020 — efectivo pero limitado.' },
+      { title: 'Dejar Caer', desc: 'No intervenir — dejar que el mercado corrija', effect: { gdp: -3.0, unemp: 2.5, stock: -25, debt: 5 }, score: 5, context: 'Lehman Brothers (2008) — causó congelamiento crediticio global.' },
+      { title: 'Estímulo Fiscal', desc: 'Inyectar $1T en infraestructura y empleo', effect: { gdp: 1.5, unemp: -1.5, stock: 10, debt: 18 }, score: 20, context: 'Similar al American Recovery Act 2009 — lento pero sostenible.' }
+    ]},
+    { num: 2, title: 'Desempleo Masivo', desc: 'El desempleo alcanzó 10.2%. Las empresas cierran. El consumo se desploma. Necesitas proteger a los trabajadores y reactivar la demanda.', decisions: [
+      { title: 'Seguro Cesantía', desc: 'Extender beneficios por 6 meses', effect: { gdp: 0.5, unemp: -1.2, stock: 3, debt: 8 }, score: 25, context: 'Como en COVID 2020 — mantuvo consumo básico.' },
+      { title: 'Recorte Impuestos', desc: 'Reducir ISR corporativo 10%', effect: { gdp: 1.0, unemp: -0.8, stock: 8, debt: 5 }, score: 20, context: 'Supply-side economics — efecto retardado.' },
+      { title: 'QE Masivo', desc: 'Comprar $500MM en bonos corporativos', effect: { gdp: 0.8, unemp: -0.6, stock: 15, debt: 10 }, score: 20, context: 'Fed compró bonos corporativos por primera vez en 2020.' },
+      { title: 'Austeridad', desc: 'Reducir gasto público 15%', effect: { gdp: -2.0, unemp: 1.5, stock: -8, debt: -5 }, score: 5, context: 'Grecia 2010 — la austeridad profundizó la recesión.' }
+    ]},
+    { num: 3, title: 'Estanflación', desc: 'La inflación sube a 7.5% mientras el PIB sigue negativo. Estás entre la espada y la pared: subir tasas (frena inflación pero mata crecimiento) o mantener estímulo (inflación se dispara).', decisions: [
+      { title: 'Subir Tasas', desc: 'Aumentar 0.75% para controlar inflación', effect: { gdp: -0.8, unemp: 0.4, stock: -5, debt: -3 }, score: 20, context: 'Volcker 1980 — subió al 20%, venció inflación pero causó recesión.' },
+      { title: 'Mantener Estímulo', desc: 'Seguir con política expansiva', effect: { gdp: 0.5, unemp: -0.3, stock: 5, debt: 8 }, score: 10, context: 'Riesgo de espiral inflacionaria como en los 70s.' },
+      { title: 'Política Híbrida', desc: 'Subir tasas gradual + estímulo focalizado', effect: { gdp: 0.2, unemp: 0.1, stock: 3, debt: 4 }, score: 30, context: 'Enfoque moderno — combinación monetaria y fiscal.' },
+      { title: 'Control Precios', desc: 'Congelar precios y salarios 90 días', effect: { gdp: -1.0, unemp: 0.8, stock: -10, debt: 2 }, score: 5, context: 'Nixon 1971 — fracasó, causó escasez y distorsiones.' }
+    ]},
+    { num: 4, title: 'Crisis de Deuda Soberana', desc: 'La deuda pública alcanzó 115% del PIB. Los mercados exigen primas de riesgo del 8%. El país podría defaultear. Los inversores huyen.', decisions: [
+      { title: 'Reestructurar', desc: 'Negociar quita del 30% con acreedores', effect: { gdp: -1.0, unemp: 0.5, stock: -5, debt: -25 }, score: 15, context: 'Argentina 2005/2020 — alivio inmediato pero exclusión financiera.' },
+      { title: 'FMI Austeridad', desc: 'Préstamo FMI con ajuste estructural', effect: { gdp: -1.5, unemp: 1.0, stock: -3, debt: -10 }, score: 10, context: 'Grecia 2010 — el FMI impuso austeridad severa.' },
+      { title: 'Monetizar Deuda', desc: 'Banco central compra deuda soberana', effect: { gdp: 0.5, unemp: -0.3, stock: 8, debt: 5 }, score: 25, context: 'Japón — el BOJ posee >50% de deuda japonesa sin inflación.' },
+      { title: 'Crecimiento+Consolidación', desc: 'Reformas estructurales + consolidación gradual', effect: { gdp: 1.5, unemp: -1.0, stock: 12, debt: -5 }, score: 30, context: 'Chile 1990s — reformas + disciplina fiscal = éxito.' }
+    ]},
+    { num: 5, title: 'Recuperación Frágil', desc: 'La economía muestra signos de recuperación pero es frágil. El PIB repunta 1.2% pero el desempleo sigue en 9%. ¿Cómo aseguras una recuperación sostenible?', decisions: [
+      { title: 'Retiro Gradual', desc: 'Reducir estímulo gradualmente (taper)', effect: { gdp: 0.5, unemp: -0.5, stock: 5, debt: -8 }, score: 25, context: 'Taper Tantrum 2013 — manejo cuidadoso de expectativas.' },
+      { title: 'Mantener Estímulo', desc: 'Seguir con política expansiva 1 año más', effect: { gdp: 1.2, unemp: -0.8, stock: 8, debt: 5 }, score: 20, context: 'Riesgo de sobrecalentamiento e inflación.' },
+      { title: 'Reformas Estructurales', desc: 'Liberalización, educación, tecnología', effect: { gdp: 2.0, unemp: -1.5, stock: 15, debt: -5 }, score: 30, context: 'Corea del Sur post-1998 — reformas transformaron la economía.' },
+      { title: 'Populismo Fiscal', desc: 'Grandes recortes de impuestos sin financiamiento', effect: { gdp: 0.3, unemp: -0.3, stock: 3, debt: 15 }, score: 5, context: 'Riesgo de crisis de deuda a largo plazo.' }
+    ]}
+  ];
+
+  function getProgress() { return JSON.parse(localStorage.getItem(PROGRESS_KEY)) || []; }
+  function saveProgress() {
+    let p = getProgress();
+    if (!p.includes(MODULE_ID)) { p.push(MODULE_ID); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
+    let pct = Math.round((p.length / TOTAL_MODULES) * 100);
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressText').textContent = pct + '% (progr. global)';
+  }
+  function getBadge() { return localStorage.getItem(BADGE_KEY) === 'true'; }
+  function setBadge() { localStorage.setItem(BADGE_KEY, 'true'); }
+
+  function loadRound(roundNum) {
+    currentRound = roundNum;
+    roundDone = false;
+    selectedDecision = null;
+    var rData = ROUNDS[roundNum - 1];
+
+    document.getElementById('roundNum').textContent = 'Ronda ' + roundNum + '/5';
+    document.getElementById('crisisDesc').textContent = rData.desc;
+    updateMetrics();
+    document.getElementById('roundResult').classList.add('hidden');
+
+    var grid = document.getElementById('decisionGrid');
+    grid.innerHTML = '';
+    rData.decisions.forEach(function(d, idx) {
+      var btn = document.createElement('div');
+      btn.className = 'decision-btn';
+      btn.innerHTML = '<div class="d-title">' + d.title + '</div><div class="d-desc">' + d.desc + '</div>';
+      btn.dataset.idx = idx;
+      btn.addEventListener('click', function() {
+        if (roundDone) return;
+        grid.querySelectorAll('.decision-btn').forEach(function(b) { b.classList.remove('selected'); });
+        this.classList.add('selected');
+        selectedDecision = idx;
+      });
+      grid.appendChild(btn);
+    });
+    document.getElementById('applyDecisionBtn').disabled = false;
+  }
+
+  function updateMetrics() {
+    document.getElementById('gdpMetric').textContent = (economy.gdp >= 0 ? '+' : '') + economy.gdp.toFixed(1) + '%';
+    document.getElementById('unempMetric').textContent = economy.unemp.toFixed(1) + '%';
+    document.getElementById('stockMetric').textContent = (economy.stock >= 0 ? '+' : '') + economy.stock.toFixed(0) + '%';
+    document.getElementById('debtMetric').textContent = economy.debt.toFixed(0) + '%';
+    document.getElementById('gdpMetric').style.color = economy.gdp >= 1 ? '#00ffc8' : economy.gdp >= -1 ? '#f59e0b' : '#ff5050';
+    document.getElementById('unempMetric').style.color = economy.unemp <= 6 ? '#00ffc8' : economy.unemp <= 9 ? '#f59e0b' : '#ff5050';
+    document.getElementById('stockMetric').style.color = economy.stock >= 0 ? '#00ffc8' : economy.stock >= -10 ? '#f59e0b' : '#ff5050';
+    document.getElementById('debtMetric').style.color = economy.debt <= 70 ? '#00ffc8' : economy.debt <= 100 ? '#f59e0b' : '#ff5050';
+  }
+
+  document.getElementById('applyDecisionBtn').addEventListener('click', function() {
+    if (selectedDecision === null) {
+      document.getElementById('feedback').textContent = '⚠️ Selecciona una decisión antes de aplicarla.';
+      return;
+    }
+    if (roundDone) return;
+
+    var rData = ROUNDS[currentRound - 1];
+    var decision = rData.decisions[selectedDecision];
+    var eff = decision.effect;
+
+    economy.gdp += eff.gdp;
+    economy.unemp += eff.unemp;
+    economy.stock += eff.stock;
+    economy.debt += eff.debt;
+
+    totalScore += decision.score;
+    roundDone = true;
+
+    updateMetrics();
+    document.getElementById('totalScore').textContent = totalScore;
+    document.getElementById('applyDecisionBtn').disabled = true;
+
+    var resultDiv = document.getElementById('roundResult');
+    resultDiv.classList.remove('hidden');
+    resultDiv.innerHTML = `
+      <strong style="color:var(--accent);">Decisión: ${decision.title}</strong>
+      <p style="font-size:0.85rem;margin-top:0.3rem;">${decision.context}</p>
+      <p style="font-size:0.85rem;color:#8899bb;margin-top:0.3rem;">Puntuación: +${decision.score} puntos</p>
+    `;
+    document.getElementById('feedback').textContent = '✅ Ronda ' + currentRound + ' completada. +' + decision.score + ' puntos. Puntuación total: ' + totalScore;
+
+    // Check if there are more rounds
+    if (currentRound < 5) {
+      setTimeout(function() {
+        loadRound(currentRound + 1);
+        resultDiv.classList.add('hidden');
+        document.getElementById('feedback').textContent = '💡 Ronda ' + (currentRound) + ': ' + ROUNDS[currentRound - 1].title + '. ¡Toma la mejor decisión!';
+      }, 2000);
+    } else {
+      // Final
+      crisisDone = true;
+      var finalDiv = document.getElementById('finalResult');
+      finalDiv.classList.remove('hidden');
+      var grade = totalScore >= 120 ? 'S' : totalScore >= 100 ? 'A' : totalScore >= 75 ? 'B' : totalScore >= 50 ? 'C' : 'D';
+      var message = totalScore >= 120 ? '🌟 ¡Leyenda! Manejo magistral de la crisis.' : totalScore >= 100 ? '🏆 ¡Excelente! Decisiones acertadas en momentos críticos.' : totalScore >= 75 ? '👍 Buen trabajo. Algunas decisiones podrían mejorar.' : totalScore >= 50 ? '📚 Aprendiste. La gestión de crisis es un arte complejo.' : '❌ La crisis te superó. ¡Intenta de nuevo!';
+      finalDiv.innerHTML = `
+        <div style="font-size:2rem;margin-bottom:0.5rem;">${totalScore >= 100 ? '🏆' : totalScore >= 75 ? '👍' : '📚'}</div>
+        <div style="font-size:1.5rem;font-weight:800;color:var(--accent);">Score Final: ${totalScore}/150</div>
+        <div style="font-size:2.5rem;font-weight:900;color:${totalScore >= 100 ? '#00ffc8' : totalScore >= 75 ? '#f59e0b' : '#ff5050'};">Grado: ${grade}</div>
+        <p style="margin-top:0.5rem;">${message}</p>
+        <p style="font-size:0.8rem;color:#8899bb;margin-top:0.5rem;">Basado en crisis reales: 2008, COVID-19 y 2023 Banking Crisis</p>
+      `;
+      document.getElementById('insignia').classList.remove('hidden');
+      document.getElementById('nextBtn').classList.remove('hidden');
+      if (!getBadge()) { setBadge(); saveProgress(); }
+      document.getElementById('feedback').textContent = '🏆 ¡CRISIS COMPLETADA! Score: ' + totalScore + '/150 — Grado: ' + grade + '. ¡Eres un Crisis Commander!';
+    }
+  });
+
+  document.getElementById('nextBtn').addEventListener('click', function() {
+    alert('🎉 ¡FELICIDADES! Has completado el Curso 5: Mercados Globales, Trading y Gestión de Riesgos. Has desbloqueado las 12 insignias. ¡Sigue tu aprendizaje con el Curso 6: FinTech e Innovación!');
+    window.location.href = 'index.html';
+  });
+
+  (function restore() {
+    if (getBadge()) {
+      document.getElementById('insignia').classList.remove('hidden');
+      document.getElementById('nextBtn').classList.remove('hidden');
+      document.getElementById('feedback').textContent = '✅ Ya completaste este módulo. ¡Crisis Commander!';
+      document.getElementById('finalResult').classList.remove('hidden');
+      document.getElementById('finalResult').innerHTML = '<p style="font-size:1.5rem;font-weight:700;color:var(--accent);">🏆 Simulación completada anteriormente</p>';
+      crisisDone = true;
+      document.getElementById('applyDecisionBtn').disabled = true;
+    }
+    let p = getProgress();
+    if (p.includes(MODULE_ID)) {
+      let pct = Math.round((p.length / TOTAL_MODULES) * 100);
+      document.getElementById('progressFill').style.width = pct + '%';
+      document.getElementById('progressText').textContent = pct + '% (progr. global)';
+    }
+    loadRound(1);
+  })();
+</script>
+  <script src="../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

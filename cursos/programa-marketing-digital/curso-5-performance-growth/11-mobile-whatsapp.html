@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Curso 5 | Mobile Marketing y WhatsApp API</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:linear-gradient(145deg,#0b1424 0%,#09101c 100%); font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+    .container { max-width:1300px; width:100%; background:rgba(12,22,40,0.75); backdrop-filter:blur(10px); border-radius:3rem; border:1px solid rgba(239,68,68,0.4); box-shadow:0 20px 40px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.05); overflow:hidden; }
+    .hero { background:linear-gradient(95deg,#0a111f,#141e32); padding:1.8rem 2rem; text-align:center; border-bottom:3px solid #ef4444; }
+    .hero h1 { font-size:2rem; font-weight:800; background:linear-gradient(135deg,#ffe6e6,#ef4444); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .hero p { margin-top:0.5rem; font-size:1rem; color:#fca5a5; }
+    .progress-bar { max-width:520px; margin:0.8rem auto 0; }
+    .progress-track { height:8px; background:rgba(255,255,255,0.08); border-radius:10px; overflow:hidden; }
+    .progress-fill { height:100%; width:0%; background:linear-gradient(90deg,#ef4444,#f87171,#fca5a5); border-radius:10px; transition:width 0.6s; }
+    .progress-text { font-size:0.75rem; color:#8899bb; margin-top:0.2rem; display:block; }
+    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ef4444; display:flex; gap:1rem; align-items:center; }
+    .analogy-card i { font-size:2rem; color:#ef4444; }
+    .main-area { padding:0 2rem 1rem; }
+    .quiz-question { font-size:1.2rem; font-weight:600; margin-bottom:1rem; }
+    .options-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:0.7rem; margin-bottom:1rem; }
+    .opt-btn { background:#1e2a3e; padding:0.8rem 1rem; border-radius:1.5rem; cursor:pointer; transition:0.2s; border:2px solid transparent; font-weight:500; }
+    .opt-btn:hover:not(.disabled) { background:#2a3a5a; border-color:#ef444466; }
+    .opt-btn.selected { background:#ef4444; color:#fff; border-color:#dc2626; }
+    .opt-btn.correct { background:#2ecc71; color:#fff; border-color:#27ae60; animation:correctPop 0.5s; }
+    .opt-btn.wrong { background:#e74c3c; color:#fff; border-color:#c0392b; animation:wrongShake 0.5s; }
+    .opt-btn.disabled { cursor:not-allowed; opacity:0.6; }
+    .opt-btn.disabled.correct,.opt-btn.disabled.wrong { opacity:1; }
+    @keyframes correctPop { 0%{transform:scale(1)} 40%{transform:scale(1.06);box-shadow:0 0 25px rgba(46,204,113,0.6)} 100%{transform:scale(1)} }
+    @keyframes wrongShake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 40%{transform:translateX(6px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
+    .feedback { background:#00000099; border-radius:1.5rem; padding:0.8rem; margin:0.5rem 0; text-align:center; font-weight:500; }
+    .feedback.correct-fb { background:rgba(46,204,113,0.15); border:1px solid #2ecc7166; }
+    .feedback.wrong-fb { background:rgba(231,76,60,0.15); border:1px solid #e74c3c66; }
+    .score-display { background:#00000066; border-radius:2rem; padding:0.8rem 1.5rem; margin-bottom:1rem; display:flex; justify-content:space-between; align-items:center; }
+    .insignia { text-align:center; padding:1rem; background:linear-gradient(135deg,rgba(239,68,68,0.15),rgba(220,38,38,0.05)); border-radius:2rem; border:2px solid #ef4444; margin:1rem 0; display:none; }
+    .insignia.show { display:block; animation:fadeIn 0.6s; }
+    @keyframes fadeIn { from{opacity:0;transform:scale(0.8)} to{opacity:1;transform:scale(1)} }
+    .btn-primary { background:linear-gradient(95deg,#ef4444,#dc2626); border:none; padding:0.8rem 2rem; border-radius:3rem; font-weight:bold; font-size:1rem; cursor:pointer; color:#fff; transition:0.2s; font-family:'Inter',sans-serif; }
+    .btn-primary:hover { transform:translateY(-2px); box-shadow:0 4px 15px rgba(239,68,68,0.4); }
+    .btn-secondary { background:#2c3e66; border:none; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; cursor:pointer; color:#eef5ff; font-family:'Inter',sans-serif; transition:0.2s; }
+    .btn-secondary:hover { transform:translateY(-2px); }
+    footer { text-align:center; padding:1rem; font-size:0.75rem; border-top:1px solid #2a3a55; }
+    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+    .nav-link { background:#2c3e66; border:none; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; cursor:pointer; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; font-size:0.95rem; }
+    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(0,224,255,0.4); }
+    .nav-link.next { background:linear-gradient(95deg,#ef4444,#dc2626); color:#fff; }
+    .nav-link.menu { background:#1a2a4a; border:1px solid #ef4444; }
+    @media (max-width:750px) { .hero h1 { font-size:1.6rem; } }
+  </style>
+  <link rel="stylesheet" href="../../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a></nav>
+
+<div class="container">
+  <div class="hero">
+    <h1><i class="fas fa-mobile-alt"></i> Mobile Marketing y WhatsApp Business API</h1>
+    <p>WhatsApp API, push notifications y creatividades mobile-first</p>
+    <div class="progress-bar"><div class="progress-track"><div class="progress-fill" id="progressFill"></div></div><span class="progress-text" id="progressText">Módulo 11 de 12 (0%)</span></div>
+  </div>
+
+  <div class="analogy-card">
+    <i class="fas fa-comment-dots"></i>
+    <div><strong>💬 Como una conversación en un café:</strong> WhatsApp Business API es como tener un camarero personal que recuerda lo que cada cliente pidió la última vez y les avisa cuando hay una oferta que les gusta. El móvil es la mesa del café: siempre está cerca, siempre disponible.</div>
+  </div>
+
+  <div class="main-area">
+    <h3 style="margin-bottom:0.8rem;"><i class="fas fa-question-circle"></i> Quiz de Estrategia Mobile Marketing</h3>
+    <p style="font-size:0.85rem;color:#8899bb;margin-bottom:1rem;">Responde las preguntas y demuestra tu conocimiento en mobile marketing.</p>
+    <div class="score-display">
+      <span>🏆 <span id="scoreValue">0</span>/5</span>
+      <span>📋 <span id="currentQ">1</span>/5</span>
+    </div>
+    <div class="quiz-question" id="questionText"></div>
+    <div class="options-grid" id="optionsContainer"></div>
+    <div id="feedback" class="feedback">💡 Responde cada pregunta para completar el quiz.</div>
+    <div id="insignia" class="insignia">
+      <i class="fas fa-medal" style="font-size:3rem;color:#ef4444;"></i>
+      <h3>🏅 Mobile Marketing Specialist 🏅</h3>
+      <p id="insigniaMsg">Has demostrado dominio en estrategias móviles y WhatsApp API.</p>
+    </div>
+    <div style="text-align:center;margin:1rem 0;">
+      <button id="nextBtn" class="btn-primary" disabled>Siguiente <i class="fas fa-arrow-right"></i></button>
+      <button id="retryBtn" class="btn-secondary" style="display:none;margin-left:0.5rem;"><i class="fas fa-redo-alt"></i> Reintentar</button>
+    </div>
+  </div>
+
+  <div class="nav-links">
+    <a href="./10-ecommerce.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+    <a href="./index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+    <a href="./12-certificado.html" class="nav-link next" id="nextPageBtn">Siguiente: Certificado <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-rocket"></i> Publicidad Digital, Performance & Growth · Curso 5 · Mobile</footer>
+</div>
+
+<script>
+  (function() {
+    var MODULE_KEY = 'mk_dig_5_11';
+    var PROGRESS_KEY = 'mk_dig_5_progress';
+    var TOTAL_MODULES = 12;
+
+    function updateProgress() {
+      var p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+      if (!p.includes(MODULE_KEY)) { p.push(MODULE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
+      var pct = Math.round((p.length / TOTAL_MODULES) * 100);
+      document.getElementById('progressFill').style.width = pct + '%';
+      document.getElementById('progressText').textContent = 'Módulo 11 de ' + TOTAL_MODULES + ' (' + pct + '%)';
+    }
+
+    var questions = [
+      { text:'¿Qué ventaja clave ofrece WhatsApp Business API sobre WhatsApp estándar?', options:['Chats ilimitados','Automatización, plantillas y CRM integration','Llamadas gratis','Stickers personalizados'], correct:1 },
+      { text:'¿Cuál es el formato más efectivo para creatividades mobile-first?', options:['Formato horizontal 16:9','Formato vertical 9:16','Formato cuadrado 1:1','Formato panorámico'], correct:1 },
+      { text:'¿Qué métrica es clave para medir el éxito de push notifications?', options:['CPC','CTR (Click-Through Rate)','Open Rate','ROAS'], correct:2 },
+      { text:'¿Qué es un "rich media" en mobile marketing?', options:['Un anuncio con mucho texto','Un anuncio interactivo con video, audio y elementos táctiles','Un banner estático','Un pop-up'], correct:1 },
+      { text:'¿Cuál es la tasa de apertura promedio de mensajes WhatsApp Business?', options:['10-20%','30-40%','60-80%','90-98%'], correct:3 }
+    ];
+
+    var current = 0, score = 0, answered = false, quizDone = false;
+    var qText = document.getElementById('questionText');
+    var opts = document.getElementById('optionsContainer');
+    var fb = document.getElementById('feedback');
+    var sc = document.getElementById('scoreValue');
+    var cq = document.getElementById('currentQ');
+    var nextBtn = document.getElementById('nextBtn');
+    var retryBtn = document.getElementById('retryBtn');
+    var insignia = document.getElementById('insignia');
+
+    function render() {
+      if (current >= questions.length) { finish(); return; }
+      answered = false;
+      var q = questions[current];
+      qText.textContent = q.text;
+      opts.innerHTML = '';
+      q.options.forEach(function(o, i) {
+        var b = document.createElement('div');
+        b.className = 'opt-btn';
+        b.textContent = o;
+        b.addEventListener('click', function() { handleClick(b, i); });
+        opts.appendChild(b);
+      });
+      nextBtn.disabled = true;
+      cq.textContent = current + 1;
+      fb.innerHTML = '⏳ Pregunta ' + (current + 1) + ' de ' + questions.length;
+      fb.className = 'feedback';
+    }
+
+    function handleClick(btn, idx) {
+      if (answered || quizDone) return;
+      answered = true;
+      var q = questions[current];
+      var correct = idx === q.correct;
+      var btns = opts.querySelectorAll('.opt-btn');
+      btns.forEach(function(b) { b.classList.add('disabled'); });
+      if (correct) {
+        btn.classList.add('correct'); score++;
+        sc.textContent = score;
+        fb.innerHTML = '✅ ¡Correcto! ' + q.options[idx];
+        fb.className = 'feedback correct-fb';
+      } else {
+        btn.classList.add('wrong');
+        btns[q.correct].classList.add('correct');
+        fb.innerHTML = '❌ Incorrecto. Respuesta: ' + q.options[q.correct];
+        fb.className = 'feedback wrong-fb';
+      }
+      nextBtn.disabled = false;
+    }
+
+    function nextQ() { if (quizDone) return; current++; render(); }
+
+    function finish() {
+      quizDone = true;
+      qText.textContent = '🎉 ¡Mobile Quiz completado!';
+      opts.innerHTML = '<div style="text-align:center;padding:1.5rem;font-size:1.2rem;">Obtuviste <strong>' + score + '</strong> de ' + questions.length + ' aciertos.</div>';
+      fb.innerHTML = score === 5 ? '🏆 ¡Perfecto! Eres un Mobile Marketing Expert.' : score >= 3 ? '👍 Buen conocimiento. Revisa los temas donde fallaste.' : '📚 Dedica más tiempo a los conceptos mobile.';
+      fb.className = 'feedback';
+      nextBtn.disabled = true; nextBtn.style.display = 'none';
+      retryBtn.style.display = 'inline-block';
+      insignia.classList.add('show');
+      cq.textContent = questions.length;
+      updateProgress();
+    }
+
+    function resetQ() {
+      current = 0; score = 0; answered = false; quizDone = false;
+      sc.textContent = '0'; nextBtn.disabled = true; nextBtn.style.display = 'inline-block';
+      retryBtn.style.display = 'none'; insignia.classList.remove('show');
+      fb.innerHTML = '🔄 Quiz reiniciado. ¡Nuevo intento!'; fb.className = 'feedback';
+      render();
+    }
+
+    nextBtn.addEventListener('click', nextQ);
+    retryBtn.addEventListener('click', resetQ);
+    render();
+
+    document.getElementById('nextPageBtn').addEventListener('click', function(e) {
+      if (!quizDone) { e.preventDefault(); alert('⚠️ Completa el quiz de mobile marketing antes de continuar.'); }
+    });
+  })();
+</script>
+<script src="../../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

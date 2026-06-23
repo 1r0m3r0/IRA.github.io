@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Curso 2 | Módulo 2: Funciones Puras y Side Effects</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../assets/css/theme.css">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:linear-gradient(135deg,#0a0f1e,#0c1222); font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+.course-container { max-width:1100px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,179,71,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+.progress-bar { background:#0a0f1e; padding:0.8rem 2rem; display:flex; align-items:center; gap:1rem; border-bottom:1px solid #2c3e66; flex-wrap:wrap; }
+.progress-track { flex:1; height:10px; background:#1a2440; border-radius:10px; overflow:hidden; min-width:100px; }
+.progress-fill { height:100%; background:linear-gradient(90deg,#ffb347,#ffd966); border-radius:10px; transition:width 0.5s; width:0%; }
+.progress-text { font-size:0.8rem; color:#8899bb; }
+.hero { background:linear-gradient(95deg,#0b1120,#1a140e); padding:2rem; text-align:center; border-bottom:2px solid #ffb347; }
+.hero h1 { font-size:2.2rem; font-weight:800; background:linear-gradient(135deg,#fff,#ffd966,#ffb347); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.hero p { color:#ffd966; }
+.analogy { background:rgba(255,179,71,0.1); margin:1.5rem 2rem; padding:1.2rem 1.5rem; border-radius:1.5rem; border-left:5px solid #ffb347; display:flex; gap:1rem; align-items:flex-start; }
+.analogy i { font-size:1.8rem; color:#ffb347; flex-shrink:0; }
+.content { padding:0 2rem 2rem; }
+.hunt-game { background:rgba(0,0,0,0.3); border-radius:2rem; padding:1.5rem; border:1px solid #2c3e66; }
+.func-card { background:#1a2440; border:2px solid #2c3e66; border-radius:1.5rem; padding:1rem; margin:0.5rem 0; cursor:pointer; transition:0.2s; display:flex; justify-content:space-between; align-items:center; }
+.func-card:hover { border-color:#ffb347; }
+.func-card .code { font-family:monospace; font-size:0.85rem; }
+.func-card .badge { font-size:0.7rem; padding:0.2rem 0.6rem; border-radius:1rem; }
+.func-card.pura { border-color:#00ffc8; background:rgba(0,255,200,0.1); }
+.func-card.impura { border-color:#ff5050; background:rgba(255,80,80,0.1); }
+.func-card.selected { transform:scale(1.01); }
+.feedback { background:rgba(0,0,0,0.4); padding:1rem 1.5rem; border-radius:1.5rem; margin:1rem 0; border-left:4px solid #ffb347; }
+.insignia { text-align:center; padding:1.5rem; background:linear-gradient(135deg,rgba(255,179,71,0.15),rgba(255,217,102,0.05)); border-radius:2rem; margin:1rem 0; border:2px solid #ffb347; display:none; }
+.insignia.show { display:block; animation:pulse 0.6s; }
+@keyframes pulse { 0%{transform:scale(0.9);opacity:0} 50%{transform:scale(1.05)} 100%{transform:scale(1);opacity:1} }
+.insignia i { font-size:3rem; color:#ffd700; }
+.btn-next-area { text-align:center; padding:1rem 2rem 2rem; }
+.btn-next { background:linear-gradient(135deg,#ffb347,#ffd966); border:none; padding:0.9rem 2.5rem; border-radius:3rem; cursor:pointer; font-weight:700; font-size:1.1rem; color:#1a140e; transition:0.2s; }
+.btn-next:hover { transform:scale(1.05); }
+footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; color:#8899bb; }
+@media (max-width:700px) { .hero h1 { font-size:1.6rem; } .content { padding:0 1rem 1.5rem; } .analogy { margin:1rem; } }
+</style>
+</head>
+<body>
+<nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a><a href="../index.html">Python Medio</a><a href="index.html">Curso 2</a></nav>
+<div class="course-container">
+<div class="progress-bar"><span style="color:#ffb347;font-weight:700;"><i class="fas fa-broom"></i> M2</span><div class="progress-track"><div class="progress-fill" id="progressFill"></div></div><span class="progress-text" id="progressText">0%</span></div>
+<div class="hero"><h1><i class="fas fa-broom"></i> Funciones Puras y Side Effects</h1><p>La pureza es la clave del código predecible</p></div>
+<div class="analogy"><i class="fas fa-egg"></i><div><strong>🥚 Piénsalo así:</strong> Una función pura es como <strong>una máquina de huevos duros</strong>. Metes un huevo (input), obtienes un huevo duro (output). Siempre. No importa si llueve, si es lunes o si la máquina está de mal humor. Nunca afecta al resto de la cocina. Una función impura es como un chef que cocina y deja los platos sucios, usa ingredientes del vecino y contesta el teléfono mientras cocina. ¡Side effects por todos lados!</div></div>
+<div class="content">
+<div class="hunt-game">
+<h3><i class="fas fa-broom"></i> Caza el Side Effect</h3>
+<p style="color:#b9ccee;margin-bottom:0.8rem;">Haz clic en cada función para revelar si es PURA o tiene SIDE EFFECTS:</p>
+<div id="funcList"></div>
+<div id="scoreDisplay" style="text-align:center;margin-top:1rem;font-size:1.1rem;">Aciertos: 0 / 10</div>
+</div>
+<div class="feedback" id="feedback">💬 Función pura: mismo input → mismo output, sin efectos externos. Sin side effects = sin sorpresas.</div>
+<div class="insignia" id="insignia"><i class="fas fa-medal"></i><h3>🏅 Cazador de Side Effects 🏅</h3><p>¡Sabes distinguir funciones puras de impuras! Base del código funcional y testeable.</p></div>
+</div>
+<div class="btn-next-area"><button class="btn-next" onclick="nextModule()">Siguiente <i class="fas fa-arrow-right"></i></button></div>
+<footer><i class="fas fa-function"></i> Programación Funcional · Módulo 2 · Funciones Puras</footer></div>
+<script>
+const COURSE='pythonmedio',MODULE='c2m2',TOTAL=72;
+function updateProgress(){let p=JSON.parse(localStorage.getItem(COURSE+'_progress'))||[];if(!p.includes(MODULE)){p.push(MODULE);localStorage.setItem(COURSE+'_progress',JSON.stringify(p));}const pct=Math.round((p.length/TOTAL)*100);document.getElementById('progressFill').style.width=pct+'%';document.getElementById('progressText').textContent=`Módulo 2.2 de 6.12 (${pct}%)`;}
+updateProgress();
+const funcs=[
+{code:'def suma(a,b):\n    return a+b',pura:true,expl:'✅ Pura: mismo input → mismo output. No afecta nada externo.'},
+{code:'total = 0\ndef add(x):\n    global total\n    total += x',pura:false,expl:'❌ Impura: modifica variable global (total). Side effect!'},
+{code:'def cuadrado(x):\n    return x**2',pura:true,expl:'✅ Pura: solo calcula, no modifica nada externo.'},
+{code:'def saludar(nombre):\n    print(f"Hola {nombre}")',pura:false,expl:'❌ Impura: print() es un side effect (salida a consola).'},
+{code:'import random\ndef azar():\n    return random.random()',pura:false,expl:'❌ Impura: mismo input no da mismo output (aleatoriedad).'},
+{code:'def doblar(lista):\n    return [x*2 for x in lista]',pura:true,expl:'✅ Pura: crea nueva lista, no modifica la original.'},
+{code:'def append(lst, val):\n    lst.append(val)\n    return lst',pura:false,expl:'❌ Impura: modifica la lista original (mutable).'},
+{code:'import time\ndef esperar():\n    time.sleep(1)',pura:false,expl:'❌ Impura: provoca efecto externo (tiempo) y no devuelve nada útil.'},
+{code:'def suma_lista(nums):\n    return sum(nums)',pura:true,expl:'✅ Pura: suma sin efectos secundarios.'},
+{code:'db = {}\ndef guardar(k,v):\n    db[k] = v',pura:false,expl:'❌ Impura: modifica el dict global db (side effect de estado).'}
+];
+let answered=0,correct=0;
+function render(){const div=document.getElementById('funcList');div.innerHTML='';funcs.forEach((f,i)=>{const card=document.createElement('div');card.className='func-card';card.dataset.idx=i;card.innerHTML=`<span class="code">${f.code}</span><span class="badge" id="badge${i}">❓</span>`;card.onclick=()=>reveal(i);div.appendChild(card);});}
+function reveal(idx){const card=document.querySelectorAll('.func-card')[idx];if(card.classList.contains('pura')||card.classList.contains('impura'))return;const f=funcs[idx];card.classList.add(f.pura?'pura':'impura');answered++;if(f.pura)correct++;document.getElementById(`badge${idx}`).textContent=f.pura?'✅ PURA':'❌ IMPURA';document.getElementById('scoreDisplay').textContent=`Aciertos: ${correct} / ${answered}`;
+document.getElementById('feedback').innerHTML=f.expl+(f.pura?'<br>💡 Las funciones puras son predecibles, testeables y paralelizables.': '<br>💡 Los side effects hacen el código impredecible. Aíslalos para tener un núcleo funcional puro.');
+if(answered===funcs.length){const ins=document.getElementById('insignia');if(!ins.classList.contains('show')){ins.classList.add('show');const b=JSON.parse(localStorage.getItem(COURSE+'_badges'))||[];if(!b.includes(MODULE)){b.push(MODULE);localStorage.setItem(COURSE+'_badges',JSON.stringify(b));}}}}
+render();
+function nextModule(){alert('🔄 Transición al Módulo 3: Inmutabilidad. En un entorno real, esto enlazaría a 03-inmutabilidad.html');}
+</script>
+</body>
+</html>

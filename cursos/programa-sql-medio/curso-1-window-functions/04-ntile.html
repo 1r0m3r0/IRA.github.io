@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NTILE | Window Functions</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../../../assets/css/theme.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0e0f;--surface:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.08);--text:#e8edee;--muted:#8899aa;--accent:#ffb347;--accent2:#ff8c00;--glow:hsla(38,90%,55%,0.2)}
+body{font-family:"Inter",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center}
+.tech-grid{position:fixed;inset:0;background-image:linear-gradient(rgba(255,179,71,0.03)1px,transparent 1px),linear-gradient(90deg,rgba(255,179,71,0.03)1px,transparent 1px);background-size:60px 60px;z-index:0;pointer-events:none}
+.container{max-width:820px;width:100%;padding:20px;position:relative;z-index:1;margin-top:80px}
+.brand-return-nav{display:flex;gap:1rem;align-items:center;padding:.5rem 1rem;background:#0f1429;border:1px solid rgba(0,212,255,.2);border-radius:.5rem;position:fixed;top:.75rem;left:.75rem;z-index:9999}
+.brand-return-nav a{color:#00d4ff;text-decoration:none;font-size:.9rem;font-weight:600}
+.brand-return-nav a:hover{color:#00ff41;text-decoration:underline}
+.progress-section{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:24px;backdrop-filter:blur(12px)}
+.progress-section .bar-wrap{height:6px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden;margin-top:8px}
+.progress-section .bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;width:0%;transition:width .5s ease}
+.progress-section .p-text{font-size:.8rem;color:var(--muted)}
+.hero{text-align:center;padding:32px 20px 20px}
+.hero h1{font-size:clamp(1.5rem,4vw,2.4rem);font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+.hero p{color:var(--muted);font-size:1rem}
+.analogy-card{background:rgba(255,179,71,0.08);border:1px solid rgba(255,179,71,0.2);border-radius:12px;padding:18px;margin-bottom:24px;backdrop-filter:blur(8px)}
+.analogy-card strong{color:var(--accent)}
+.main-area{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:20px;backdrop-filter:blur(12px);text-align:center}
+.main-area h2{font-size:1.1rem;font-weight:600;margin-bottom:16px;color:#fff;text-align:left}
+.bucket-container{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:20px 0}
+.bucket{background:rgba(255,255,255,0.04);border:2px dashed var(--border);border-radius:12px;padding:16px;min-width:130px;min-height:120px;transition:all .3s}
+.bucket h3{color:var(--accent);font-size:.9rem;margin-bottom:8px}
+.bucket.drag-over{border-color:var(--accent);background:rgba(255,179,71,0.08)}
+.item-pool{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:16px 0}
+.drag-item{background:rgba(255,179,71,0.1);border:1px solid var(--accent);border-radius:8px;padding:8px 14px;cursor:grab;font-size:.85rem;transition:all .2s;color:#fff}
+.drag-item:hover{transform:scale(1.05)}
+.drag-item.placed{opacity:.4;cursor:default}
+.feedback{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;padding:14px;margin:16px 0;font-size:.9rem;min-height:50px;color:var(--muted);text-align:left}
+.feedback.success{background:rgba(0,204,106,0.1);border-color:#00cc6a;color:#8cffb0}
+.feedback.error{background:rgba(255,80,80,0.1);border-color:#ff5050;color:#ff9999}
+.insignia{text-align:center;padding:24px;background:rgba(255,179,71,0.08);border:1px solid rgba(255,179,71,0.25);border-radius:16px;margin:16px 0;display:none}
+.insignia.show{display:block}
+.insignia i{font-size:2.5rem;color:var(--accent)}.insignia h3{font-size:1.3rem;font-weight:700;margin:8px 0;color:#fff}.insignia p{color:var(--accent);font-weight:500}
+.badge-btn{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:10px;padding:12px 24px;color:#0a0e0f;font-weight:700;cursor:pointer;font-size:.9rem;margin:8px}
+.badge-btn:hover{transform:scale(1.03);opacity:.9}
+.btn-next{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:12px;padding:14px 32px;color:#0a0e0f;font-weight:700;cursor:pointer;font-size:1rem;transition:all .2s;margin:20px auto;display:block}
+.btn-next:disabled{opacity:.4;cursor:not-allowed;transform:none}
+footer{text-align:center;padding:24px 0;color:var(--muted);font-size:.8rem;border-top:1px solid var(--border);width:100%;margin-top:20px}
+@media(max-width:640px){.bucket-container{flex-direction:column;align-items:center}.container{margin-top:70px;padding:12px}}
+</style>
+</head>
+<body><div class="tech-grid"></div>
+<nav class="brand-return-nav"><a href="../../../../index.html">&larr; Portfolio</a><a href="../../../../cursos/index.html">Cursos</a><a href="../../index.html">SQL Medio</a><a href="../index.html">WF</a></nav>
+<div class="container">
+<div class="progress-section"><span class="p-text"><i class="fas fa-tasks"></i> Módulo 4 de 12 · Window Functions</span><div class="bar-wrap"><div class="bar-fill" id="progBar"></div></div></div>
+<div class="hero"><h1>🗂️ NTILE</h1><p>Divide filas en buckets o grupos del mismo tamaño</p></div>
+<div class="analogy-card"><strong>💡 Piénsalo así:</strong> NTILE es como repartir 12 pizzas entre 4 mesas. NTILE(4) pone 3 pizzas en cada mesa. Si hay 11 pizzas y 4 mesas, algunas mesas reciben 3 y otras 2. Es un repartidor que distribuye lo más equitativamente posible.</div>
+<div class="main-area">
+<h2>🧺 Drag & Drop: Asigna clientes a cuartiles</h2>
+<p>Arrastra cada cliente al bucket según NTILE(4) ORDER BY gasto DESC:</p>
+<div class="item-pool" id="itemPool">
+<div class="drag-item" draggable="true" data-val="1000">Ana · $1000</div>
+<div class="drag-item" draggable="true" data-val="800">Luis · $800</div>
+<div class="drag-item" draggable="true" data-val="600">Sofía · $600</div>
+<div class="drag-item" draggable="true" data-val="400">Carlos · $400</div>
+</div>
+<div class="bucket-container">
+<div class="bucket" data-bucket="1"><h3>Bucket 1 (Top 25%)</h3></div>
+<div class="bucket" data-bucket="2"><h3>Bucket 2</h3></div>
+<div class="bucket" data-bucket="3"><h3>Bucket 3</h3></div>
+<div class="bucket" data-bucket="4"><h3>Bucket 4 (Bottom 25%)</h3></div>
+</div>
+<button class="badge-btn" onclick="checkBuckets()"><i class="fas fa-check"></i> Verificar</button>
+<div id="feedback" class="feedback">💬 Arrastra cada nombre al bucket correcto</div>
+<div id="insignia" class="insignia"><i class="fas fa-medal"></i><h3>🏅 NTILE Master 🏅</h3><p>¡Buckets dominados!</p></div>
+<button class="badge-btn" id="claimBadge" style="display:none" onclick="claimInsignia()"><i class="fas fa-award"></i> Reclamar insignia</button>
+</div>
+<button class="btn-next" id="btnNext" disabled onclick="alert('🔄 Transición al Módulo 5: LAG y LEAD')">Siguiente <i class="fas fa-arrow-right"></i></button>
+<footer><i class="fas fa-window-restore"></i> Window Functions · SQL Medio · Módulo 4</footer>
+</div>
+<script>
+const GM=4,CI=1,LM=12,P='sqlmedio';
+function updateProgress(){let d=JSON.parse(localStorage.getItem(P+'_progress'))||[];let pct=Math.round(d.filter(m=>Math.ceil(m/12)===CI).length/LM*100);document.getElementById('progBar').style.width=pct+'%'}
+let placed={};
+document.querySelectorAll('.drag-item').forEach(item=>{
+  item.addEventListener('dragstart',e=>{e.dataTransfer.setData('text/plain',item.textContent.trim());});
+});
+document.querySelectorAll('.bucket').forEach(b=>{
+  b.addEventListener('dragover',e=>{e.preventDefault();b.classList.add('drag-over');});
+  b.addEventListener('dragleave',()=>{b.classList.remove('drag-over');});
+  b.addEventListener('drop',function(e){
+    e.preventDefault();this.classList.remove('drag-over');
+    let name=e.dataTransfer.getData('text/plain');
+    let item=Array.from(document.querySelectorAll('.drag-item')).find(el=>el.textContent.trim()===name);
+    if(item&&!item.classList.contains('placed')){
+      this.innerHTML+=`<div style="background:rgba(255,179,71,0.1);border-radius:6px;padding:6px;margin:4px 0;font-size:.8rem">${name}</div>`;
+      item.classList.add('placed');
+    }
+  });
+});
+function checkBuckets(){
+  let fb=document.getElementById('feedback');
+  let b1=document.querySelector('[data-bucket="1"]').textContent.includes('Ana');
+  let b2=document.querySelector('[data-bucket="2"]').textContent.includes('Luis');
+  let b3=document.querySelector('[data-bucket="3"]').textContent.includes('Sofía');
+  let b4=document.querySelector('[data-bucket="4"]').textContent.includes('Carlos');
+  if(b1&&b2&&b3&&b4){
+    fb.innerHTML='✅ <strong>¡Perfecto!</strong> NTILE(4) con 4 filas = 1 por bucket. Para 10 filas: 3,3,2,2.';fb.className='feedback success';
+    document.getElementById('claimBadge').style.display='inline-block';
+  }else{fb.innerHTML='❌ Recuerda: NTILE(4) ORDER BY gasto DESC — el que más gasta va al bucket 1.';fb.className='feedback error';}
+}
+function claimInsignia(){let d=JSON.parse(localStorage.getItem(P+'_progress'))||[];if(!d.includes(GM)){d.push(GM);localStorage.setItem(P+'_progress',JSON.stringify(d));}let b=JSON.parse(localStorage.getItem(P+'_badges'))||[];let badge='c'+CI+'-m4-ntile';if(!b.includes(badge)){b.push(badge);localStorage.setItem(P+'_badges',JSON.stringify(b));}document.getElementById('insignia').classList.add('show');document.getElementById('claimBadge').style.display='none';document.getElementById('btnNext').disabled=false;document.getElementById('feedback').innerHTML='🎉 <strong>NTILE dominado. ¡A por LAG/LEAD!</strong>';document.getElementById('feedback').className='feedback success';updateProgress();}
+updateProgress();
+</script>
+</body>
+</html>

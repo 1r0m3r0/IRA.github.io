@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Curso 6 | Numba</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:linear-gradient(135deg,#0a0f1e,#0c1222); font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+    .modulo-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(6,182,212,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+    .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #06b6d4; }
+    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#22d3ee,#06b6d4); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .hero-header p { font-size:1.1rem; color:#22d3ee; margin-top:0.5rem; }
+    .chip { background:rgba(6,182,212,0.15); border:1px solid #06b6d4; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; display:inline-block; margin:0.3rem; }
+    .progress-bar-top { background:#00000044; padding:0.6rem 2rem; text-align:center; font-size:0.85rem; border-bottom:1px solid #2c3e66; }
+    .progress-bar-top span { color:#22d3ee; font-weight:600; }
+    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #06b6d4; font-size:1rem; line-height:1.6; }
+    .main-area { padding:0 2rem 1.5rem; }
+    .simulador { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; border:1px solid #06b6d4; }
+    .simulador h3 { margin-bottom:1rem; color:#22d3ee; }
+    .btn-action { background:linear-gradient(95deg,#22d3ee,#06b6d4); border:none; padding:0.8rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin:0.3rem; }
+    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(6,182,212,0.5); }
+    .btn-reset { background:#2c3e66; border:none; padding:0.8rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; color:#eef5ff; margin:0.3rem; }
+    .btn-reset:hover { background:#3a4e7a; }
+    .speed-comparison { display:flex; gap:1rem; justify-content:center; align-items:flex-end; margin:1rem 0; min-height:140px; }
+    .speed-bar { width:100px; text-align:center; }
+    .speed-bar .bar-fill { background:linear-gradient(180deg,#22d3ee,#06b6d4); border-radius:6px 6px 0 0; transition:height 0.5s; margin:auto; }
+    .speed-bar .label { font-size:0.75rem; color:#8899bb; margin-top:0.3rem; }
+    .code-block { background:#0a1220; border:1px solid #2c3e66; border-radius:0.8rem; padding:0.6rem; font-family:'Courier New',monospace; font-size:0.72rem; text-align:left; color:#eef5ff; white-space:pre-wrap; margin:0.3rem 0; }
+    .result-box { background:#0f1a2c; border:1px solid #2c3e66; border-radius:1rem; padding:1.2rem; margin:0.8rem 0; text-align:center; }
+    .feedback { background:#00000099; margin:1.5rem 2rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #06b6d4; }
+    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:1.5rem 2rem; padding:1rem; border:1px dashed gold; }
+    .insignia i { font-size:2.5rem; color:gold; }
+    .hidden { display:none; }
+    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; font-size:0.95rem; }
+    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(6,182,212,0.4); }
+    .nav-link.next { background:linear-gradient(95deg,#22d3ee,#06b6d4); color:#1e1a0c; }
+    .nav-link.menu { background:#1a2a4a; border:1px solid #3399ff; }
+    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a><a href="../index.html">Programa Python Avanzado</a></nav>
+  <div class="modulo-container">
+    <div class="progress-bar-top"><i class="fas fa-tasks"></i> Curso 6: Temas Avanzados <span>| M&oacute;dulo 2 de 12</span></div>
+    <div class="hero-header">
+      <h1><i class="fas fa-bolt"></i> Numba</h1>
+      <p>Dashboard JIT: @jit, @vectorize, @cuda simulado. Speedup visual con/sin Numba.</p>
+    </div>
+    <div class="analogy-card"><i class="fas fa-lightbulb" style="color:#06b6d4;margin-right:0.5rem;"></i> <strong>Como un coche h&iacute;brido:</strong> Numba es el motor el&eacute;ctrico que se activa cuando necesitas acelerar. Pones @jit (Just-In-Time) encima de una funci&oacute;n y Numba la compila en el momento justo, como si el coche cambiara autom&aacute;ticamente de gasolina a el&eacute;ctrico. @vectorize es como activar el turbo para operaciones en arrays. @cuda es como tener 1000 motores peque&ntilde;os trabajando en paralelo.</div>
+    <div class="main-area">
+      <div class="simulador">
+        <h3><i class="fas fa-bolt"></i> Dashboard JIT: Numba en Acci&oacute;n</h3>
+        <p style="font-size:0.85rem;color:#8899bb;margin-bottom:0.8rem;">Compara velocidad de c&oacute;digo Python puro vs Numba @jit y @vectorize.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:1rem;">
+          <div><label style="font-size:0.8rem;color:#8899bb;">Tama&ntilde;o array:</label><br><select id="sizeNumba"><option value="1000">1K</option><option value="1000000" selected>1M</option><option value="10000000">10M</option></select></div>
+          <div><label style="font-size:0.8rem;color:#8899bb;">Operaci&oacute;n:</label><br><select id="opNumba"><option value="sum" selected>Suma</option><option value="sin">Seno</option><option value="loop">Bucle</option></select></div>
+        </div>
+        <div class="speed-comparison" id="numbaBars">
+          <div class="speed-bar"><div class="bar-fill" style="width:60px;height:100px;"></div><div class="label">Python</div></div>
+          <div class="speed-bar"><div class="bar-fill" style="width:60px;height:35px;"></div><div class="label">@jit</div></div>
+          <div class="speed-bar"><div class="bar-fill" style="width:60px;height:15px;"></div><div class="label">@vectorize</div></div>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+          <button id="runNumbaBtn" class="btn-action"><i class="fas fa-play"></i> Ejecutar Benchmark</button>
+          <button id="showCodeNumba" class="btn-action"><i class="fas fa-code"></i> Ver C&oacute;digo</button>
+        </div>
+        <div id="numbaResult" class="result-box"></div>
+      </div>
+    </div>
+    <div id="feedbackMsg" class="feedback">Ejecuta el benchmark Numba para ver la aceleraci&oacute;n y ganar tu insignia.</div>
+    <div id="insigniaArea" class="insignia hidden"><i class="fas fa-medal"></i><h3>INSIGNIA: ACELERADOR JIT</h3><p>&iexcl;Dominas Numba y compilaci&oacute;n Just-In-Time!</p></div>
+    <div class="nav-links">
+      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
+      <a href="03-template-strings.html" class="nav-link next">Siguiente: Template Strings <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <footer><i class="fas fa-crown"></i> Curso 6: Temas Avanzados &middot; Numba</footer>
+  </div>
+  <script>
+    const STORAGE_KEY='c6m2';
+    document.getElementById('runNumbaBtn').addEventListener('click',function(){const size=parseInt(document.getElementById('sizeNumba').value);const pyTime=size/1000*(0.5+Math.random()*1);const jitTime=pyTime*(0.05+Math.random()*0.1);const vecTime=pyTime*(0.02+Math.random()*0.05);const maxH=Math.max(pyTime,0.1);const bars=document.querySelectorAll('#numbaBars .bar-fill');bars[0].style.height=(pyTime/maxH*100)+'px';bars[1].style.height=(jitTime/maxH*100)+'px';bars[2].style.height=(vecTime/maxH*100)+'px';document.querySelectorAll('#numbaBars .label')[0].textContent='Python: '+pyTime.toFixed(2)+'s';document.querySelectorAll('#numbaBars .label')[1].textContent='@jit: '+jitTime.toFixed(3)+'s';document.querySelectorAll('#numbaBars .label')[2].textContent='@vec: '+vecTime.toFixed(3)+'s';const speedup=Math.round(pyTime/jitTime);document.getElementById('numbaResult').innerHTML='<span style="color:#22c55e;">@jit es '+speedup+'x m&aacute;s r&aacute;pido! @vectorize: '+(pyTime/vecTime).toFixed(0)+'x</span>';localStorage.setItem(STORAGE_KEY,'true');document.getElementById('insigniaArea').classList.remove('hidden');document.getElementById('feedbackMsg').innerHTML='&iexcl;Benchmark Numba completado! '+speedup+'x de aceleraci&oacute;n.';});
+    document.getElementById('showCodeNumba').addEventListener('click',function(){document.getElementById('numbaResult').innerHTML='<pre style="text-align:left;font-size:0.72rem;background:#0a1220;padding:1rem;border-radius:0.8rem;">from numba import jit, vectorize\nimport numpy as np\n\n@jit(nopython=True)\ndef sum_jit(arr):\n    total = 0.0\n    for i in range(arr.shape[0]):\n        total += arr[i]\n    return total\n\n@vectorize(["float64(float64)"], target="parallel")\ndef sin_vec(x):\n    return np.sin(x)</pre>';});
+    if(localStorage.getItem(STORAGE_KEY)==='true'){document.getElementById('insigniaArea').classList.remove('hidden');document.getElementById('feedbackMsg').innerHTML='M&oacute;dulo completado';}
+  </script>
+</body>
+</html>

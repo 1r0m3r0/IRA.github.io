@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Curso 2 | Módulo 6: itertools</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../assets/css/theme.css">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:linear-gradient(135deg,#0a0f1e,#0c1222); font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+.course-container { max-width:1100px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(43,158,255,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+.progress-bar { background:#0a0f1e; padding:0.8rem 2rem; display:flex; align-items:center; gap:1rem; border-bottom:1px solid #2c3e66; flex-wrap:wrap; }
+.progress-track { flex:1; height:10px; background:#1a2440; border-radius:10px; overflow:hidden; min-width:100px; }
+.progress-fill { height:100%; background:linear-gradient(90deg,#2b9eff,#6090ff); border-radius:10px; transition:width 0.5s; width:0%; }
+.progress-text { font-size:0.8rem; color:#8899bb; }
+.hero { background:linear-gradient(95deg,#0b1120,#0e182a); padding:2rem; text-align:center; border-bottom:2px solid #2b9eff; }
+.hero h1 { font-size:2.2rem; font-weight:800; background:linear-gradient(135deg,#fff,#6090ff,#2b9eff); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.hero p { color:#6090ff; }
+.analogy { background:rgba(43,158,255,0.1); margin:1.5rem 2rem; padding:1.2rem 1.5rem; border-radius:1.5rem; border-left:5px solid #2b9eff; display:flex; gap:1rem; align-items:flex-start; }
+.analogy i { font-size:1.8rem; color:#2b9eff; flex-shrink:0; }
+.content { padding:0 2rem 2rem; }
+.explorer { background:rgba(0,0,0,0.3); border-radius:2rem; padding:1.5rem; border:1px solid #2c3e66; }
+.iters { display:flex; gap:0.5rem; flex-wrap:wrap; margin:1rem 0; }
+.iter-btn { background:#1a2440; border:1px solid #2c3e66; padding:0.5rem 1rem; border-radius:2rem; cursor:pointer; font-size:0.85rem; color:#b9ccee; transition:0.2s; }
+.iter-btn:hover { border-color:#2b9eff; }
+.iter-btn.active { background:#2b9eff; color:#fff; }
+.iter-output { background:#0a0f1e; border-radius:1.5rem; padding:1rem; min-height:80px; border:1px solid #2c3e66; font-family:monospace; margin:0.5rem 0; white-space:pre-wrap; max-height:200px; overflow-y:auto; }
+.feedback { background:rgba(0,0,0,0.4); padding:1rem 1.5rem; border-radius:1.5rem; margin:1rem 0; border-left:4px solid #2b9eff; }
+.insignia { text-align:center; padding:1.5rem; background:linear-gradient(135deg,rgba(43,158,255,0.15),rgba(96,144,255,0.05)); border-radius:2rem; margin:1rem 0; border:2px solid #2b9eff; display:none; }
+.insignia.show { display:block; animation:pulse 0.6s; }
+@keyframes pulse { 0%{transform:scale(0.9);opacity:0} 50%{transform:scale(1.05)} 100%{transform:scale(1);opacity:1} }
+.insignia i { font-size:3rem; color:#ffd700; }
+.btn-next-area { text-align:center; padding:1rem 2rem 2rem; }
+.btn-next { background:linear-gradient(135deg,#2b9eff,#6090ff); border:none; padding:0.9rem 2.5rem; border-radius:3rem; cursor:pointer; font-weight:700; font-size:1.1rem; color:#fff; transition:0.2s; }
+.btn-next:hover { transform:scale(1.05); }
+footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; color:#8899bb; }
+@media (max-width:700px) { .hero h1 { font-size:1.6rem; } .content { padding:0 1rem 1.5rem; } .analogy { margin:1rem; } }
+</style>
+</head>
+<body>
+<nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a><a href="../index.html">Python Medio</a><a href="index.html">Curso 2</a></nav>
+<div class="course-container">
+<div class="progress-bar"><span style="color:#2b9eff;font-weight:700;"><i class="fas fa-list"></i> M6</span><div class="progress-track"><div class="progress-fill" id="progressFill"></div></div><span class="progress-text" id="progressText">0%</span></div>
+<div class="hero"><h1><i class="fas fa-list"></i> itertools</h1><p>Cadenas infinitas, permutaciones y combinaciones</p></div>
+<div class="analogy"><i class="fas fa-gears"></i><div><strong>⚙️ Piénsalo así:</strong> itertools es como <strong>una caja de engranajes de Lego</strong>. Tienes piezas básicas: count (un engranaje que gira sin parar), cycle (una cinta sin fin que repite), chain (varias cintas conectadas), product (una máquina que prueba todas las combinaciones). Cada pieza hace una cosa simple, pero juntas resuelven problemas complejos de secuencias.</div></div>
+<div class="content">
+<div class="explorer">
+<h3><i class="fas fa-list"></i> Explorador de itertools</h3>
+<p style="color:#b9ccee;margin-bottom:0.8rem;">Selecciona un iterador para ver su salida:</p>
+<div class="iters">
+<button class="iter-btn active" onclick="showIter(this,'count')">count</button>
+<button class="iter-btn" onclick="showIter(this,'cycle')">cycle</button>
+<button class="iter-btn" onclick="showIter(this,'chain')">chain</button>
+<button class="iter-btn" onclick="showIter(this,'product')">product</button>
+<button class="iter-btn" onclick="showIter(this,'permutations')">permutations</button>
+<button class="iter-btn" onclick="showIter(this,'combinations')">combinations</button>
+<button class="iter-btn" onclick="showIter(this,'groupby')">groupby</button>
+</div>
+<div class="iter-output" id="iterOutput">itertools.count(start=0, step=1)
+→ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, ...
+(infinito — nunca termina)</div>
+</div>
+<div class="feedback" id="feedback">💡 itertools ofrece iteradores eficientes en memoria. count es infinito, cycle repite, product combina, permutations ordena.</div>
+<div class="insignia" id="insignia"><i class="fas fa-medal"></i><h3>🏅 Itertools Explorer 🏅</h3><p>¡Has explorado el tesoro de itertools! Estas herramientas hacen que trabajar con secuencias sea elegante y eficiente.</p></div>
+</div>
+<div class="btn-next-area"><button class="btn-next" onclick="nextModule()">Siguiente <i class="fas fa-arrow-right"></i></button></div>
+<footer><i class="fas fa-function"></i> Programación Funcional · Módulo 6 · itertools</footer></div>
+<script>
+const COURSE='pythonmedio',MODULE='c2m6',TOTAL=72;
+function updateProgress(){let p=JSON.parse(localStorage.getItem(COURSE+'_progress'))||[];if(!p.includes(MODULE)){p.push(MODULE);localStorage.setItem(COURSE+'_progress',JSON.stringify(p));}const pct=Math.round((p.length/TOTAL)*100);document.getElementById('progressFill').style.width=pct+'%';document.getElementById('progressText').textContent=`Módulo 2.6 de 6.12 (${pct}%)`;}
+updateProgress();
+const iterData={count:{code:'itertools.count(start=0, step=1)\n→ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, ...',desc:'(infinito — nunca termina)'},cycle:{code:'itertools.cycle("ABC")\n→ A, B, C, A, B, C, A, B, C, A, ...',desc:'(infinito — repite la secuencia)'},chain:{code:'itertools.chain([1,2], [3,4], [5,6])\n→ 1, 2, 3, 4, 5, 6',desc:'(concatena iterables sin crear listas intermedias)'},product:{code:'itertools.product("AB", [1,2])\n→ (A,1), (A,2), (B,1), (B,2)',desc:'(producto cartesiano — todas las combinaciones)'},permutations:{code:'itertools.permutations("ABC", 2)\n→ AB, AC, BA, BC, CA, CB',desc:'(6 permutaciones — importa el orden)'},combinations:{code:'itertools.combinations("ABC", 2)\n→ AB, AC, BC',desc:'(3 combinaciones — no importa el orden)'},groupby:{code:'data = [("A",1), ("A",2), ("B",3)]\nitertools.groupby(data, lambda x: x[0])\n→ A: [1,2], B: [3]',desc:'(agrupa por clave — como GROUP BY en SQL)'}};
+function showIter(btn,name){document.querySelectorAll('.iter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');const d=iterData[name];document.getElementById('iterOutput').textContent=d.code+'\n\n'+d.desc;const ins=document.getElementById('insignia');if(!ins.classList.contains('show')){ins.classList.add('show');const b=JSON.parse(localStorage.getItem(COURSE+'_badges'))||[];if(!b.includes(MODULE)){b.push(MODULE);localStorage.setItem(COURSE+'_badges',JSON.stringify(b));}}}
+function nextModule(){alert('🔄 Transición al Módulo 7: operator Módulo. En un entorno real, esto enlazaría a 07-operator.html');}
+</script>
+</body>
+</html>

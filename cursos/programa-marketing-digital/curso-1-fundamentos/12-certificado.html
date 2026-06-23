@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Curso 1 | Certificado Final</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:linear-gradient(145deg,#0a1a2a,#0a1220); font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+    .modulo-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.85); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(59,130,246,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+    .hero { background:linear-gradient(95deg,#1a2a3a,#0f1f2f); padding:1.5rem 2rem; text-align:center; border-bottom:3px solid #3b82f6; }
+    .hero h1 { font-size:2rem; font-weight:800; background:linear-gradient(135deg,#93bbfc,#3b82f6); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .hero p { margin-top:0.5rem; font-size:1rem; color:#bfdbfe; }
+    .progress-bar-top { background:#00000044; padding:0.6rem 2rem; text-align:center; font-size:0.85rem; border-bottom:1px solid #2c3e66; }
+    .progress-bar-top span { color:#93bbfc; font-weight:600; }
+    .exam-area { padding:2rem; }
+    .question { background:#0f1a2c; margin:1rem 0; padding:1rem; border-radius:1rem; }
+    .question p { font-weight:600; margin-bottom:0.4rem; }
+    .options { display:flex; flex-wrap:wrap; gap:0.6rem; }
+    .opt { background:#1e2a3e; padding:0.3rem 0.8rem; border-radius:2rem; cursor:pointer; transition:0.2s; font-size:0.85rem; }
+    .opt:hover { background:#2c3e66; }
+    .opt.selected { background:#3b82f6; color:#000; font-weight:bold; }
+    .opt.correct { background:#22c55e; color:#000; }
+    .opt.wrong { background:#ef4444; color:#fff; }
+    .btn-action { background:linear-gradient(95deg,#93bbfc,#3b82f6); border:none; padding:0.8rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin-top:1rem; }
+    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(59,130,246,0.5); }
+    .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
+    .btn-reset { background:#2c3e66; border:none; padding:0.7rem 1.5rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:0.95rem; color:#eef5ff; margin-left:0.5rem; }
+    .certificate-card { background:linear-gradient(145deg,#1e2a3a,#0f1a2a); border-radius:2rem; padding:2rem; border:2px solid #3b82f6; box-shadow:0 10px 30px rgba(0,0,0,0.3); margin-bottom:1.5rem; position:relative; overflow:hidden; }
+    .certificate-card::before { content:'\u2606'; font-size:8rem; position:absolute; bottom:-20px; right:-20px; opacity:0.1; pointer-events:none; }
+    .cert-title { font-size:1.6rem; font-weight:800; color:#3b82f6; margin-bottom:0.5rem; }
+    .cert-subtitle { font-size:0.9rem; margin-bottom:1rem; color:#ddd; }
+    .cert-name { font-size:2rem; font-weight:bold; background:linear-gradient(135deg,#fff,#93bbfc); -webkit-background-clip:text; background-clip:text; color:transparent; margin:0.5rem 0; word-break:break-word; }
+    .cert-details { font-size:0.85rem; margin:0.8rem 0; background:#00000055; padding:0.6rem; border-radius:1rem; display:inline-block; }
+    .hash-code { font-family:monospace; font-size:0.75rem; background:#00000099; padding:0.4rem; border-radius:1rem; word-break:break-all; margin:0.5rem auto; max-width:90%; }
+    .module-grid { display:flex; flex-wrap:wrap; gap:0.3rem; justify-content:center; margin:0.8rem 0; }
+    .module-pill { padding:0.2rem 0.5rem; border-radius:1rem; font-size:0.65rem; border:1px solid #444; }
+    .module-pill.done { background:#1a3a1a; border-color:#66ff88; color:#88ffaa; }
+    .module-pill.missing { background:#1a1a1a; border-color:#444; color:#666; }
+    .name-input { background:#0f1a2c; border:1px solid #3b82f6; border-radius:1rem; padding:0.6rem 1rem; color:#eef5ff; font-size:1rem; width:100%; max-width:400px; margin:0.5rem 0; }
+    .confetti-container { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; overflow:hidden; z-index:999; }
+    .confetti-piece { position:absolute; width:10px; height:10px; top:-20px; animation:confettiFall 3s ease-in forwards; }
+    @keyframes confettiFall { 0%{transform:translateY(0) rotate(0deg);opacity:1} 100%{transform:translateY(100vh) rotate(720deg);opacity:0} }
+    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:1rem 0; padding:1rem; border:1px dashed gold; }
+    .insignia i { font-size:2.5rem; color:gold; }
+    .hidden { display:none; }
+    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; font-size:0.95rem; }
+    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(59,130,246,0.4); }
+    .nav-link.menu { background:#1a2a4a; border:1px solid #3b82f6; }
+    footer { text-align:center; padding:1rem; font-size:0.75rem; border-top:1px solid #2c3e66; }
+    @media (max-width:800px) { .hero h1 { font-size:1.5rem; } .cert-name { font-size:1.4rem; } }
+  </style>
+  <link rel="stylesheet" href="../../../assets/css/theme.css">
+  <link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a><a href="../index.html">Programa Marketing Digital</a></nav>
+  <div class="modulo-container" id="app">
+    <div class="progress-bar-top"><i class="fas fa-bullseye"></i> Curso 1: Fundamentos de Marketing Digital <span>| M&oacute;dulo 12 de 12</span></div>
+    <div class="hero">
+      <h1><i class="fas fa-certificate"></i> Certificado Final</h1>
+      <p id="heroSubtitle">Demuestra todo lo que aprendiste en el curso</p>
+    </div>
+
+    <div class="exam-area" id="examArea">
+      <div id="examSection">
+        <h2 style="margin-bottom:0.5rem;"><i class="fas fa-pencil-alt"></i> Examen Final (10 preguntas)</h2>
+        <p style="font-size:0.85rem;color:#8899bb;margin-bottom:1rem;">Necesitas al menos 60% (6/10) para aprobar. &iexcl;Mucha suerte!</p>
+        <div id="quizContainer"></div>
+        <button id="submitExamBtn" class="btn-action">Entregar examen</button>
+        <div id="examResult" style="margin-top:1rem;"></div>
+      </div>
+
+      <div id="certificateSection" class="hidden">
+        <div class="certificate-card" id="certificateCard">
+          <div style="margin-bottom:0.5rem;"><i class="fas fa-check-circle" style="color:#22c55e;"></i> <span style="font-size:0.8rem;">CERTIFICADO VERIFICADO</span></div>
+          <div class="cert-title"><i class="fas fa-medal" style="color:gold;"></i> CERTIFICADO DE FUNDAMENTOS DE MARKETING DIGITAL</div>
+          <div class="cert-subtitle">Otorgado por Programa Marketing Digital Integral</div>
+          <div class="cert-name" id="userCertName">_____</div>
+          <div class="cert-details">
+            <i class="fas fa-calendar-alt"></i> Fecha: <span id="certDate"></span><br>
+            <i class="fas fa-graduation-cap"></i> Curso: Fundamentos de Marketing Digital y Estrategia<br>
+            <i class="fas fa-star"></i> Puntaje: <span id="certScore">—</span>
+          </div>
+          <div class="hash-code"><i class="fas fa-qrcode"></i> Hash &uacute;nico: <span id="certHash">0x0000...0000</span></div>
+          <div><strong style="font-size:0.8rem;">M&oacute;dulos completados:</strong><div class="module-grid" id="moduleGrid"></div></div>
+          <button id="downloadCertBtn" class="btn-action"><i class="fas fa-download"></i> Descargar certificado</button>
+          <p style="font-size:0.65rem;margin-top:0.5rem;">Certificado con hash &uacute;nico registrado.</p>
+        </div>
+      </div>
+
+      <div id="failSection" class="hidden" style="text-align:center;padding:2rem;background:#1a0a0a;border-radius:2rem;border:2px solid #ef4444;">
+        <div style="font-size:4rem;margin-bottom:1rem;">&#x274C;</div>
+        <h2 style="color:#ef4444;">No alcanzaste el puntaje m&iacute;nimo</h2>
+        <p style="margin:0.5rem 0;color:#ffaaaa;">Obtuviste <strong id="failScore">0</strong>/10. Necesitas al menos 6/10 para aprobar.</p>
+        <button id="retryBtn" class="btn-action"><i class="fas fa-redo"></i> Reintentar</button>
+        <button id="restartBtn" class="btn-reset"><i class="fas fa-sync-alt"></i> Reiniciar curso</button>
+      </div>
+    </div>
+
+    <div class="nav-links">
+      <a href="11-martech-stack.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
+    </div>
+    <footer><i class="fas fa-crown"></i> Curso 1: Fundamentos de Marketing Digital &middot; Certificado Final</footer>
+  </div>
+  <script>
+    const STORAGE_KEY = 'mk_dig_1_12';
+    const MODULE_KEYS = ['mk_dig_1_01','mk_dig_1_02','mk_dig_1_03','mk_dig_1_04','mk_dig_1_05','mk_dig_1_06','mk_dig_1_07','mk_dig_1_08','mk_dig_1_09','mk_dig_1_10','mk_dig_1_11','mk_dig_1_12'];
+    const MODULES = [
+      { id: '01-portal.html', label: '1. Portal' },
+      { id: '02-introduccion.html', label: '2. Introducci&oacute;n' },
+      { id: '03-customer-journey.html', label: '3. Customer Journey' },
+      { id: '04-funnel-conversion.html', label: '4. Funnel' },
+      { id: '05-branding-digital.html', label: '5. Branding' },
+      { id: '06-estrategia-contenidos.html', label: '6. Contenidos' },
+      { id: '07-investigacion-mercado.html', label: '7. Investigaci&oacute;n' },
+      { id: '08-plan-marketing.html', label: '8. Plan Marketing' },
+      { id: '09-kpis-roi.html', label: '9. KPIs/ROI' },
+      { id: '10-marco-legal.html', label: '10. Marco Legal' },
+      { id: '11-martech-stack.html', label: '11. MarTech' },
+      { id: '12-certificado.html', label: '12. Certificado' }
+    ];
+    const questions = [
+      { text: "&iquest;Qu&eacute; es un buyer persona?", options: ["Un personaje de anuncio", "Un perfil semi-ficticio del cliente ideal", "Un empleado de marketing", "Un tipo de KPI"], correct: 1 },
+      { text: "&iquest;Qu&eacute; significa TOFU?", options: ["Top of Funnel", "Type of Future User", "Tool of Fun", "Total of Funnel"], correct: 0 },
+      { text: "&iquest;Qu&eacute; mide el ROI?", options: ["Retorno sobre la inversi&oacute;n", "N&uacute;mero de clics", "Cantidad de leads", "Alcance org&aacute;nico"], correct: 0 },
+      { text: "&iquest;Qu&eacute; es el CAC?", options: ["Costo de Adquisici&oacute;n de Cliente", "Clics por Anuncio", "Conversi&oacute;n Acumulada", "Canal de Alta Conversi&oacute;n"], correct: 0 },
+      { text: "&iquest;Qu&eacute; etapa del funnel es ideal para SEO?", options: ["BOFU", "MOFU", "TOFU", "Post-venta"], correct: 2 },
+      { text: "&iquest;Qu&eacute; es un content pillar?", options: ["Un pilar de contenido tem&aacute;tico", "Un tipo de anuncio", "Una red social", "Un formato de video"], correct: 0 },
+      { text: "&iquest;Qu&eacute; ley protege datos personales en Europa?", options: ["GDPR", "CCPA", "LGPD", "COPPA"], correct: 0 },
+      { text: "&iquest;Qu&eacute; significa CRM?", options: ["Customer Relationship Management", "Content Resource Manager", "Campaign Reach Metric", "Click Rate Management"], correct: 0 },
+      { text: "&iquest;Cu&aacute;l es un objetivo SMART?", options: ["Ser l&iacute;deres del mercado", "Aumentar leads 30% en 6 meses", "Mejorar la marca", "Crear contenido"], correct: 1 },
+      { text: "&iquest;Qu&eacute; es el social listening?", options: ["Escuchar m&uacute;sica en redes", "Monitorear menciones de marca en redes sociales", "Publicar en redes", "Crear encuestas"], correct: 1 }
+    ];
+    var userAnswers = new Array(questions.length).fill(null);
+    var examCompleted = false;
+    var lastScore = 0;
+    function renderQuestions() {
+      var container = document.getElementById('quizContainer');
+      container.innerHTML = '';
+      questions.forEach(function(q, idx) {
+        var qDiv = document.createElement('div'); qDiv.classList.add('question');
+        qDiv.innerHTML = '<p>' + (idx+1) + '. ' + q.text + '</p><div class="options" id="lqopt-' + idx + '"></div>';
+        var optDiv = qDiv.querySelector('.options');
+        q.options.forEach(function(opt, oi) {
+          var o = document.createElement('span'); o.classList.add('opt'); o.textContent = opt;
+          o.addEventListener('click', function() {
+            if (examCompleted) return;
+            var parent = this.parentElement;
+            Array.from(parent.children).forEach(function(c) { c.classList.remove('selected'); });
+            this.classList.add('selected'); userAnswers[idx] = oi;
+          });
+          optDiv.appendChild(o);
+        });
+        container.appendChild(qDiv);
+      });
+    }
+    function evaluateExam() {
+      var correct = 0;
+      questions.forEach(function(q, idx) { if (userAnswers[idx] === q.correct) correct++; });
+      return correct;
+    }
+    function submitExam() {
+      if (examCompleted) return;
+      var all = userAnswers.every(function(a) { return a !== null; });
+      if (!all) { alert('Responde todas las preguntas antes de entregar.'); return; }
+      var correct = evaluateExam();
+      lastScore = correct;
+      var passed = correct >= 6;
+      questions.forEach(function(q, idx) {
+        var opts = document.querySelectorAll('#lqopt-' + idx + ' .opt');
+        opts.forEach(function(o, oi) {
+          o.style.pointerEvents = 'none';
+          if (oi === q.correct) o.classList.add('correct');
+          else if (oi === userAnswers[idx] && oi !== q.correct) o.classList.add('wrong');
+        });
+      });
+      document.getElementById('submitExamBtn').disabled = true;
+      if (passed) {
+        examCompleted = true;
+        localStorage.setItem(STORAGE_KEY, 'true');
+        document.getElementById('examSection').classList.add('hidden');
+        document.getElementById('certificateSection').classList.remove('hidden');
+        showCertificate(correct);
+        launchConfetti();
+      } else {
+        document.getElementById('examSection').classList.add('hidden');
+        document.getElementById('failSection').classList.remove('hidden');
+        document.getElementById('failScore').textContent = correct;
+      }
+    }
+    function showCertificate(score) {
+      var name = localStorage.getItem('mk_dig_1_cert_name');
+      if (!name) {
+        name = prompt('Felicidades! Introduce tu nombre para el certificado:', 'Estudiante Marketing Digital');
+        if (!name || name.trim() === '') name = 'Estudiante An&oacute;nimo';
+        localStorage.setItem('mk_dig_1_cert_name', name);
+      }
+      var today = new Date();
+      var dateStr = today.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+      document.getElementById('userCertName').innerText = name;
+      document.getElementById('certDate').innerText = dateStr;
+      document.getElementById('certScore').innerText = score + '/10';
+      var hashStr = name + '|' + dateStr + '|' + score;
+      var hash = 0;
+      for (var i = 0; i < hashStr.length; i++) { hash = ((hash << 5) - hash) + hashStr.charCodeAt(i); hash |= 0; }
+      document.getElementById('certHash').innerText = '0x' + (hash >>> 0).toString(16).padStart(40, '0');
+      var grid = document.getElementById('moduleGrid');
+      grid.innerHTML = '';
+      MODULE_KEYS.forEach(function(key, idx) {
+        var pill = document.createElement('span');
+        pill.className = 'module-pill';
+        var done = localStorage.getItem(key) === 'true' || (idx === 11 && examCompleted);
+        pill.classList.add(done ? 'done' : 'missing');
+        pill.textContent = done ? '\u2705 ' + MODULES[idx].label : '\u2B1C ' + MODULES[idx].label;
+        grid.appendChild(pill);
+      });
+      document.getElementById('downloadCertBtn').addEventListener('click', function() {
+        var content = 'CERTIFICADO DE FUNDAMENTOS DE MARKETING DIGITAL\nNombre: ' + name + '\nFecha: ' + dateStr + '\nCurso: Fundamentos de Marketing Digital y Estrategia\nPuntaje: ' + score + '/10\nHash: ' + document.getElementById('certHash').innerText + '\n';
+        var blob = new Blob([content], {type: 'text/plain'});
+        var link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'certificado_fundamentos_marketing_' + name.replace(/\s/g, '_') + '.txt';
+        link.click();
+        URL.revokeObjectURL(link.href);
+      });
+    }
+    function launchConfetti() {
+      var container = document.createElement('div');
+      container.className = 'confetti-container';
+      document.body.appendChild(container);
+      var colors = ['#3b82f6','#93bbfc','#ff6b6b','#48dbfb','#ff9ff3','#54a0ff','#ffd700'];
+      for (var i = 0; i < 80; i++) {
+        var piece = document.createElement('div'); piece.className = 'confetti-piece';
+        piece.style.left = Math.random()*100+'%';
+        piece.style.background = colors[Math.floor(Math.random()*colors.length)];
+        piece.style.width = (Math.random()*8+4)+'px'; piece.style.height = (Math.random()*8+4)+'px';
+        piece.style.borderRadius = Math.random()>0.5?'50%':'2px';
+        piece.style.animationDuration = (Math.random()*2+2)+'s';
+        piece.style.animationDelay = (Math.random()*2)+'s';
+        container.appendChild(piece);
+      }
+      setTimeout(function() { container.remove(); }, 5000);
+    }
+    document.getElementById('submitExamBtn').addEventListener('click', submitExam);
+    document.getElementById('retryBtn').addEventListener('click', function() {
+      examCompleted = false;
+      userAnswers = new Array(questions.length).fill(null);
+      document.getElementById('failSection').classList.add('hidden');
+      document.getElementById('examSection').classList.remove('hidden');
+      document.getElementById('submitExamBtn').disabled = false;
+      renderQuestions();
+    });
+    document.getElementById('restartBtn').addEventListener('click', function() {
+      if (!confirm('Esto borrar&aacute; todo el progreso del curso. &iquest;Continuar?')) return;
+      MODULE_KEYS.forEach(function(k) { localStorage.removeItem(k); });
+      localStorage.removeItem('mk_dig_1_cert_name');
+      localStorage.removeItem('mk_dig_1_progress');
+      examCompleted = false;
+      userAnswers = new Array(questions.length).fill(null);
+      document.getElementById('failSection').classList.add('hidden');
+      document.getElementById('examSection').classList.remove('hidden');
+      document.getElementById('submitExamBtn').disabled = false;
+      renderQuestions();
+      document.getElementById('examResult').innerHTML = '';
+    });
+    if (localStorage.getItem(STORAGE_KEY) === 'true') {
+      examCompleted = true;
+      document.getElementById('examSection').classList.add('hidden');
+      document.getElementById('certificateSection').classList.remove('hidden');
+      var savedName = localStorage.getItem('mk_dig_1_cert_name') || 'Estudiante';
+      var dateStr = new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+      document.getElementById('userCertName').innerText = savedName;
+      document.getElementById('certDate').innerText = dateStr;
+      document.getElementById('certScore').innerText = 'Aprobado';
+      var hashStr = savedName + '|' + dateStr + '|completado';
+      var hash = 0;
+      for (var i = 0; i < hashStr.length; i++) { hash = ((hash << 5) - hash) + hashStr.charCodeAt(i); hash |= 0; }
+      document.getElementById('certHash').innerText = '0x' + (hash >>> 0).toString(16).padStart(40, '0');
+      var grid = document.getElementById('moduleGrid');
+      grid.innerHTML = '';
+      MODULE_KEYS.forEach(function(key, idx) {
+        var pill = document.createElement('span');
+        pill.className = 'module-pill done';
+        pill.textContent = '\u2705 ' + MODULES[idx].label;
+        grid.appendChild(pill);
+      });
+      document.getElementById('heroSubtitle').textContent = 'Certificado obtenido. &iexcl;Felicidades!';
+      document.getElementById('downloadCertBtn').addEventListener('click', function() {
+        var content = 'CERTIFICADO DE FUNDAMENTOS DE MARKETING DIGITAL\nNombre: ' + savedName + '\nFecha: ' + dateStr + '\nCurso: Fundamentos de Marketing Digital y Estrategia\nEstado: Completado\nHash: ' + document.getElementById('certHash').innerText + '\n';
+        var blob = new Blob([content], {type: 'text/plain'});
+        var link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'certificado_fundamentos_marketing_' + savedName.replace(/\s/g, '_') + '.txt';
+        link.click();
+        URL.revokeObjectURL(link.href);
+      });
+    } else {
+      renderQuestions();
+    }
+  </script>
+  <script src="../../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

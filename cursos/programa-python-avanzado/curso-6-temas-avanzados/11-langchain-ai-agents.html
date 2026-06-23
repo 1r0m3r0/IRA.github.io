@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Curso 6 | LangChain + AI Agents</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:linear-gradient(135deg,#0a0f1e,#0c1222); font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+    .modulo-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(239,68,68,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+    .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #ef4444; }
+    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#f87171,#ef4444); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .hero-header p { font-size:1.1rem; color:#f87171; margin-top:0.5rem; }
+    .chip { background:rgba(239,68,68,0.15); border:1px solid #ef4444; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; display:inline-block; margin:0.3rem; }
+    .progress-bar-top { background:#00000044; padding:0.6rem 2rem; text-align:center; font-size:0.85rem; border-bottom:1px solid #2c3e66; }
+    .progress-bar-top span { color:#f87171; font-weight:600; }
+    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ef4444; font-size:1rem; line-height:1.6; }
+    .main-area { padding:0 2rem 1.5rem; }
+    .simulador { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; border:1px solid #ef4444; }
+    .simulador h3 { margin-bottom:1rem; color:#f87171; }
+    .btn-action { background:linear-gradient(95deg,#f87171,#ef4444); border:none; padding:0.8rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin:0.3rem; }
+    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(239,68,68,0.5); }
+    .btn-reset { background:#2c3e66; border:none; padding:0.8rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; color:#eef5ff; margin:0.3rem; }
+    .btn-reset:hover { background:#3a4e7a; }
+    textarea { width:100%; background:#0a1220; border:1px solid #2c3e66; border-radius:1rem; padding:1rem; color:#eef5ff; font-size:0.85rem; min-height:80px; font-family:'Inter',sans-serif; }
+    .agent-chat { background:#0a1220; border:1px solid #2c3e66; border-radius:1rem; padding:1rem; min-height:150px; max-height:250px; overflow-y:auto; text-align:left; margin:0.5rem 0; font-size:0.85rem; }
+    .agent-chat .user { color:#f87171; }
+    .agent-chat .agent { color:#60a5fa; }
+    .agent-chat .tool { color:#fbbf24; font-style:italic; }
+    .result-box { background:#0f1a2c; border:1px solid #2c3e66; border-radius:1rem; padding:1.2rem; margin:0.8rem 0; text-align:center; }
+    .feedback { background:#00000099; margin:1.5rem 2rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #ef4444; }
+    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:1.5rem 2rem; padding:1rem; border:1px dashed gold; }
+    .insignia i { font-size:2.5rem; color:gold; }
+    .hidden { display:none; }
+    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; font-size:0.95rem; }
+    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(239,68,68,0.4); }
+    .nav-link.next { background:linear-gradient(95deg,#f87171,#ef4444); color:#1e1a0c; }
+    .nav-link.menu { background:#1a2a4a; border:1px solid #3399ff; }
+    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a><a href="../index.html">Programa Python Avanzado</a></nav>
+  <div class="modulo-container">
+    <div class="progress-bar-top"><i class="fas fa-tasks"></i> Curso 6: Temas Avanzados <span>| M&oacute;dulo 11 de 12</span></div>
+    <div class="hero-header">
+      <h1><i class="fas fa-robot"></i> LangChain + AI Agents</h1>
+      <p>Simulador AI agent: prompt &rarr; LLM &rarr; tools &rarr; memory. LangChain Agent.</p>
+    </div>
+    <div class="analogy-card"><i class="fas fa-lightbulb" style="color:#ef4444;margin-right:0.5rem;"></i> <strong>Como un asistente personal con superpoderes:</strong> LangChain es como tener un mayordomo que puede usar herramientas. Le dices "consigue el clima y ag&eacute;ndame una reuni&oacute;n", y &eacute;l: 1) busca el clima (tool: weather API), 2) revisa tu calendario (tool: calendar), 3) agenda la reuni&oacute;n (tool: create event). Todo mientras recuerda la conversaci&oacute;n (memory). Los AI Agents son mayordomos que deciden qu&eacute; herramienta usar y en qu&eacute; orden.</div>
+    <div class="main-area">
+      <div class="simulador">
+        <h3><i class="fas fa-robot"></i> Simulador de AI Agent con LangChain</h3>
+        <p style="font-size:0.85rem;color:#8899bb;margin-bottom:0.8rem;">Escribe un prompt y observa c&oacute;mo el AI Agent usa herramientas para responder.</p>
+        <textarea id="agentPrompt" placeholder="Escribe tu petici&oacute;n al agente..." rows="2">&iquest;Cu&aacute;l es el clima en Madrid y cu&aacute;nto es 25 * 48?</textarea>
+        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+          <button id="runAgentBtn" class="btn-action"><i class="fas fa-play"></i> Ejecutar Agente</button>
+          <button id="showAgentCode" class="btn-action"><i class="fas fa-code"></i> Ver C&oacute;digo LangChain</button>
+          <button id="resetAgentBtn" class="btn-reset"><i class="fas fa-undo"></i> Limpiar Chat</button>
+        </div>
+        <div class="agent-chat" id="agentChat">Bienvenido al simulador de AI Agents. Escribe un prompt y ejecuta el agente.</div>
+        <div id="agentResult" class="result-box"></div>
+      </div>
+    </div>
+    <div id="feedbackMsg" class="feedback">Ejecuta el AI Agent con LangChain para verlo usar herramientas y ganar tu insignia.</div>
+    <div id="insigniaArea" class="insignia hidden"><i class="fas fa-medal"></i><h3>INSIGNIA: INGENIERO DE AGENTS</h3><p>&iexcl;Dominas LangChain y AI Agents!</p></div>
+    <div class="nav-links">
+      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
+      <a href="12-proyecto-final.html" class="nav-link next">Siguiente: Proyecto Final <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <footer><i class="fas fa-crown"></i> Curso 6: Temas Avanzados &middot; LangChain + AI Agents</footer>
+  </div>
+  <script>
+    const STORAGE_KEY='c6m11';let chatHistory=[];
+    function addChat(role,msg){const c=document.getElementById('agentChat');const cls=role==='user'?'user':'agent';c.innerHTML+='<div class="'+cls+'">['+role.toUpperCase()+'] '+msg+'</div>';c.scrollTop=c.scrollHeight;}
+    document.getElementById('runAgentBtn').addEventListener('click',function(){const prompt=document.getElementById('agentPrompt').value||'Hola';addChat('user',prompt);document.getElementById('agentResult').innerHTML='<i class="fas fa-spinner fa-spin"></i> Agente pensando...';setTimeout(function(){addChat('tool','Llamando: get_weather(ciudad="Madrid")');},500);setTimeout(function(){addChat('tool','Resultado: 28&deg;C, soleado');},1000);setTimeout(function(){addChat('tool','Llamando: calculator(25 * 48)');},1200);setTimeout(function(){addChat('tool','Resultado: 1200');},1600);setTimeout(function(){const resp='El clima en Madrid es de 28&deg;C y soleado. El resultado de 25 x 48 es 1200.';addChat('agent',resp);document.getElementById('agentResult').innerHTML='<span style="color:#22c55e;">Agente ejecutado. 2 herramientas usadas.</span>';localStorage.setItem(STORAGE_KEY,'true');document.getElementById('insigniaArea').classList.remove('hidden');document.getElementById('feedbackMsg').innerHTML='&iexcl;AI Agent ejecutado con &eacute;xito!';},2000);});
+    document.getElementById('showAgentCode').addEventListener('click',function(){document.getElementById('agentResult').innerHTML='<pre style="text-align:left;font-size:0.7rem;background:#0a1220;padding:1rem;border-radius:0.8rem;">from langchain.agents import Tool, AgentExecutor\nfrom langchain.tools import tool\n\n@tool\ndef get_weather(city: str):\n    """Get weather for a city"""\n    return "28&deg;C, sunny"\n\n@tool\ndef calculator(expr: str):\n    """Calculate math expression"""\n    return eval(expr)\n\nagent = create_react_agent(llm, [get_weather, calculator])\nagent_executor = AgentExecutor(agent=agent, memory=conversation)</pre>';});
+    document.getElementById('resetAgentBtn').addEventListener('click',function(){document.getElementById('agentChat').innerHTML='Chat reiniciado.';document.getElementById('agentResult').innerHTML='';});
+    if(localStorage.getItem(STORAGE_KEY)==='true'){document.getElementById('insigniaArea').classList.remove('hidden');document.getElementById('feedbackMsg').innerHTML='M&oacute;dulo completado';}
+  </script>
+</body>
+</html>

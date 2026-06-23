@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mini-Proyecto: Navegación Categorías | CTEs</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../../../assets/css/theme.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0e0f;--surface:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.08);--text:#e8edee;--muted:#8899aa;--accent:#00cc6a;--accent2:#00ff88;--glow:hsla(152,80%,40%,0.2)}
+body{font-family:"Inter",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center}
+.tech-grid{position:fixed;inset:0;background-image:linear-gradient(rgba(0,204,106,0.03)1px,transparent 1px),linear-gradient(90deg,rgba(0,204,106,0.03)1px,transparent 1px);background-size:60px 60px;z-index:0;pointer-events:none}
+.container{max-width:820px;width:100%;padding:20px;position:relative;z-index:1;margin-top:80px}
+.brand-return-nav{display:flex;gap:1rem;align-items:center;padding:.5rem 1rem;background:#0f1429;border:1px solid rgba(0,212,255,.2);border-radius:.5rem;position:fixed;top:.75rem;left:.75rem;z-index:9999}
+.brand-return-nav a{color:#00d4ff;text-decoration:none;font-size:.9rem;font-weight:600}
+.brand-return-nav a:hover{color:#00ff41;text-decoration:underline}
+.progress-section{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:24px;backdrop-filter:blur(12px)}
+.progress-section .bar-wrap{height:6px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden;margin-top:8px}
+.progress-section .bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;width:0%;transition:width .5s ease}
+.progress-section .p-text{font-size:.8rem;color:var(--muted)}
+.hero{text-align:center;padding:32px 20px 20px}
+.hero h1{font-size:clamp(1.5rem,4vw,2.4rem);font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+.hero p{color:var(--muted);font-size:1rem}
+.analogy-card{background:rgba(0,204,106,0.08);border:1px solid rgba(0,204,106,0.2);border-radius:12px;padding:18px;margin-bottom:24px;backdrop-filter:blur(8px)}
+.analogy-card strong{color:var(--accent)}
+.main-area{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:20px;backdrop-filter:blur(12px)}
+.main-area h2{font-size:1.1rem;font-weight:600;margin-bottom:16px;color:#fff}
+.main-area p{color:var(--muted);font-size:.9rem;line-height:1.6;margin-bottom:12px}
+.task-list{margin:16px 0}
+.task-item{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;padding:12px;margin:8px 0;display:flex;gap:10px;align-items:flex-start}
+.task-item input[type=checkbox]{margin-top:3px;accent-color:var(--accent)}
+.task-item label{color:var(--text);font-size:.85rem;cursor:pointer}
+.feedback{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;padding:14px;margin:16px 0;font-size:.9rem;min-height:50px;color:var(--muted)}
+.feedback.success{background:rgba(0,204,106,0.1);border-color:var(--accent);color:#8cffb0}
+.feedback.error{background:rgba(255,80,80,0.1);border-color:#ff5050;color:#ff9999}
+.insignia{text-align:center;padding:24px;background:rgba(0,204,106,0.08);border:1px solid rgba(0,204,106,0.25);border-radius:16px;margin:16px 0;display:none}
+.insignia.show{display:block}
+.insignia i{font-size:2.5rem;color:var(--accent)}.insignia h3{font-size:1.3rem;font-weight:700;margin:8px 0;color:#fff}.insignia p{color:var(--accent);font-weight:500}
+.badge-btn{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:10px;padding:12px 24px;color:#0a0e0f;font-weight:700;cursor:pointer;font-size:.9rem;margin:8px}
+.badge-btn:hover{transform:scale(1.03);opacity:.9}
+.btn-next{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:12px;padding:14px 32px;color:#0a0e0f;font-weight:700;cursor:pointer;font-size:1rem;transition:all .2s;margin:20px auto;display:block}
+.btn-next:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.trophy{font-size:3rem;text-align:center;margin:12px 0}
+footer{text-align:center;padding:24px 0;color:var(--muted);font-size:.8rem;border-top:1px solid var(--border);width:100%;margin-top:20px}
+@media(max-width:640px){.container{margin-top:70px;padding:12px}}
+</style>
+</head>
+<body><div class="tech-grid"></div>
+<nav class="brand-return-nav"><a href="../../../../index.html">&larr; Portfolio</a><a href="../../../../cursos/index.html">Cursos</a><a href="../../index.html">SQL Medio</a><a href="../index.html">CTEs</a></nav>
+<div class="container">
+<div class="progress-section"><span class="p-text"><i class="fas fa-tasks"></i> Módulo 12 de 12 · CTEs 🎉</span><div class="bar-wrap"><div class="bar-fill" id="progBar"></div></div></div>
+<div class="hero"><h1>🏆 Mini-Proyecto: Navegación Categorías</h1><p>Integra todo lo aprendido con CTEs en un sistema de categorías real</p></div>
+<div class="analogy-card"><strong>💡 Piénsalo así:</strong> Este es tu proyecto final de CTEs. Vas a construir un sistema de navegación de categorías estilo Amazon: categorías principales, subcategorías, breadcrumbs, conteo de productos por categoría, y búsqueda jerárquica. TODO con WITH RECURSIVE.</div>
+<div class="main-area">
+<h2>📋 Proyecto: Sistema de Navegación Jerárquica</h2>
+<p>Completa las siguientes tareas para ganar tu insignia final:</p>
+<div class="task-list">
+<div class="task-item"><input type="checkbox" id="t1"><label for="t1">1️⃣ <strong>WITH Básico:</strong> Define CTE para categorías raíz (parent IS NULL)</label></div>
+<div class="task-item"><input type="checkbox" id="t2"><label for="t2">2️⃣ <strong>WITH RECURSIVE:</strong> Recorre el árbol de subcategorías con UNION ALL</label></div>
+<div class="task-item"><input type="checkbox" id="t3"><label for="t3">3️⃣ <strong>Path:</strong> Genera el path completo "Electrónica / Computadoras / Laptops"</label></div>
+<div class="task-item"><input type="checkbox" id="t4"><label for="t4">4️⃣ <strong>Profundidad:</strong> Calcula el nivel (depth) de cada categoría</label></div>
+<div class="task-item"><input type="checkbox" id="t5"><label for="t5">5️⃣ <strong>Conteo:</strong> Cuenta productos por categoría con JOIN a tabla productos</label></div>
+<div class="task-item"><input type="checkbox" id="t6"><label for="t6">6️⃣ <strong>Optimización:</strong> Añade MATERIALIZED y verifica con EXPLAIN</label></div>
+</div>
+<button class="badge-btn" onclick="checkCTEProject()"><i class="fas fa-check"></i> Completar proyecto</button>
+<div id="feedback" class="feedback">💬 Marca las tareas completadas y presiona "Completar proyecto"</div>
+<div id="insignia" class="insignia">
+<div class="trophy">🏆</div>
+<i class="fas fa-medal"></i><h3>🏅 CTEs Master 🏅</h3>
+<p>¡Has completado el curso completo de CTEs!</p>
+<p style="font-size:.8rem;color:var(--muted);margin-top:8px">Has dominado: WITH, CTEs múltiples, CTEs modificadoras, WITH RECURSIVE, organigramas, categorías jerárquicas, detección de ciclos, grafos, optimización</p>
+</div>
+<button class="badge-btn" id="claimBadge" style="display:none" onclick="claimInsignia()"><i class="fas fa-award"></i> Reclamar insignia final</button>
+</div>
+<button class="btn-next" id="btnNext" disabled onclick="alert('🎉 ¡Felicidades! Has completado CTEs. Próximo curso: Índices y Optimización.')">Ir al siguiente curso <i class="fas fa-arrow-right"></i></button>
+<footer><i class="fas fa-sitemap"></i> CTEs · SQL Medio · Módulo 12 · 🎉 Completado</footer>
+</div>
+<script>
+const GM=24,CI=2,LM=12,P='sqlmedio';
+function updateProgress(){let d=JSON.parse(localStorage.getItem(P+'_progress'))||[];let pct=Math.round(d.filter(m=>Math.ceil(m/12)===CI).length/LM*100);document.getElementById('progBar').style.width=pct+'%'}
+function checkCTEProject(){
+  let checks=['t1','t2','t3','t4','t5','t6'].every(id=>document.getElementById(id).checked);
+  let fb=document.getElementById('feedback');
+  if(checks){
+    fb.innerHTML='✅ <strong>¡Proyecto completado!</strong> Has aplicado todos los conceptos de CTEs en un sistema de categorías real. ¡Eres un maestro de las CTEs!';fb.className='feedback success';
+    document.getElementById('claimBadge').style.display='inline-block';
+  }else{
+    let pend=6-['t1','t2','t3','t4','t5','t6'].filter(id=>document.getElementById(id).checked).length;
+    fb.innerHTML='❌ Te faltan '+pend+' tarea(s). Revisa cada concepto.';fb.className='feedback error';
+  }
+}
+function claimInsignia(){let d=JSON.parse(localStorage.getItem(P+'_progress'))||[];if(!d.includes(GM)){d.push(GM);localStorage.setItem(P+'_progress',JSON.stringify(d));}let b=JSON.parse(localStorage.getItem(P+'_badges'))||[];['c2-m12-proyecto','c2-completo'].forEach(badge=>{if(!b.includes(badge))b.push(badge);});localStorage.setItem(P+'_badges',JSON.stringify(b));document.getElementById('insignia').classList.add('show');document.getElementById('claimBadge').style.display='none';document.getElementById('btnNext').disabled=false;document.getElementById('feedback').innerHTML='🎉 <strong>¡CTEs COMPLETADO! 🏆</strong>';document.getElementById('feedback').className='feedback success';updateProgress();}
+updateProgress();
+</script>
+</body>
+</html>

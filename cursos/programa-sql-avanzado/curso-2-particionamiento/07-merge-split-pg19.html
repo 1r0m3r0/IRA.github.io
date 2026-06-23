@@ -1,0 +1,99 @@
+<!DOCTYPE html><html lang="es"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SQL Avanzado | C2-07 MERGE / SPLIT (PG 19)</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../../../assets/css/theme.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#0a0e0f;color:#e8edee;min-height:100vh;display:flex;justify-content:center;padding:20px}
+.course-container{max-width:860px;width:100%;background:rgba(15,20,42,0.6);backdrop-filter:blur(16px);border-radius:24px;border:1px solid rgba(156,100,255,0.2);padding:30px;margin-top:60px}
+.progress-bar,.progress-fill{height:10px;border-radius:8px}
+.progress-bar{background:rgba(255,255,255,0.06);margin-bottom:18px;overflow:hidden}
+.progress-fill{background:linear-gradient(90deg,#9c64ff,#7a3ce0);width:0%;transition:width .5s ease}
+.progress-text{font-size:.75rem;color:#8899aa;margin-bottom:10px;display:block}
+.hero-header{text-align:center;margin:20px 0}
+.hero-header h1{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:800;background:linear-gradient(135deg,#9c64ff,#7a3ce0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-header p{color:#8899aa;margin-top:6px;font-size:.95rem}
+.analogy-card{background:rgba(156,100,255,0.08);border-left:4px solid #9c64ff;border-radius:12px;padding:16px 20px;margin:20px 0;font-size:.9rem;line-height:1.6}
+.analogy-card strong{color:#9c64ff}
+.main-area{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:24px;margin:20px 0}
+.split-visual{display:flex;flex-direction:column;align-items:center;gap:10px;margin:16px 0}
+.split-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.split-box{background:rgba(156,100,255,0.12);border:2px solid #9c64ff;border-radius:12px;padding:16px 20px;min-width:120px;text-align:center;transition:.5s;position:relative}
+.split-box .s-title{font-weight:700;color:#9c64ff}
+.split-box .s-range{font-size:.75rem;color:#8899aa;margin-top:4px}
+.split-box .s-action{position:absolute;top:-10px;right:-10px;font-size:1rem}
+.split-arrow{color:#667788;font-size:1.5rem}
+.split-controls{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0;justify-content:center}
+.split-btn{padding:10px 18px;border-radius:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#e8edee;cursor:pointer;font-family:'Inter',sans-serif;font-size:.85rem;transition:.3s}
+.split-btn:hover{background:rgba(156,100,255,0.15);border-color:#9c64ff}
+.split-info{background:rgba(255,255,255,0.02);border-radius:10px;padding:14px;margin:12px 0;font-size:.85rem;color:#8899aa;text-align:center}
+.feedback{background:rgba(255,255,255,0.04);border-radius:12px;padding:16px 20px;margin:16px 0;font-size:.88rem;min-height:50px}
+.insignia{background:linear-gradient(135deg,rgba(255,215,0,0.12),rgba(255,165,0,0.08));border:1px solid rgba(255,215,0,0.3);border-radius:16px;padding:20px;text-align:center;margin:16px 0;transition:.5s}
+.insignia.hidden{display:none}
+.insignia h3{color:#ffd700;font-size:1.3rem;margin:8px 0}
+.btn-next{display:block;width:100%;padding:16px;margin:20px 0;background:linear-gradient(135deg,#9c64ff,#7a3ce0);border:none;border-radius:14px;color:#fff;font-size:1.05rem;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:.3s}
+.btn-next:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(156,100,255,0.3)}
+footer{text-align:center;padding:16px 0 0;color:#667788;font-size:.8rem;border-top:1px solid rgba(255,255,255,0.06);margin-top:20px}
+@media(max-width:600px){.course-container{padding:16px;margin-top:50px}}
+</style>
+</head>
+<body>
+<div class="course-container">
+<nav class="brand-return-nav"><a href="../../../../index.html">&larr; Portfolio</a><a href="../../../../cursos/index.html">Cursos</a></nav>
+<div class="progress-bar"><div class="progress-fill" id="progFill"></div></div>
+<span class="progress-text" id="progText">Módulo 7 de 12</span>
+<div class="hero-header"><h1>🔀 MERGE / SPLIT (PG 19)</h1><p>Fusiona y divide particiones en caliente</p></div>
+<div class="analogy-card"><strong>💡 Piénsalo así:</strong> MERGE y SPLIT son como remodelar los cuartos de tu casa. SPLIT divide un cuarto grande en dos más pequeños (una partición grande se parte en dos rangos). MERGE une dos cuartos pequeños en uno más grande. En PostgreSQL 19, esto se hace SIN apagar la casa (sin downtime).</div>
+<div class="main-area">
+<div class="split-visual" id="splitVis"></div>
+<div class="split-controls">
+<button class="split-btn" id="doSplit"><i class="fas fa-code-branch"></i> SPLIT partición 2023</button>
+<button class="split-btn" id="doMerge"><i class="fas fa-compress-alt"></i> MERGE 2023-Q1 + 2023-Q2</button>
+<button class="split-btn" id="resetSplit"><i class="fas fa-undo"></i> Reset</button>
+</div>
+<div class="split-info" id="splitInfo">🆕 PostgreSQL 19 introduce MERGE/SPLIT PARTITION sin necesidad de DETACH+ATTACH manual.</div>
+</div>
+<div id="feedback" class="feedback">💬 SPLIT divide un rango en subrangos. MERGE une rangos adyacentes. Operaciones en caliente sin bloqueos.</div>
+<div id="insignia" class="insignia hidden"><i class="fas fa-medal" style="font-size:2.5rem;color:#ffd700"></i><h3>🏅 Cirujano de Particiones 🏅</h3><p>¡Dominas MERGE/SPLIT, la nueva feature de PostgreSQL 19!</p></div>
+<button class="btn-next" onclick="alert('🔄 Transición → 08-postgres-fdw-sharding.html')">Siguiente <i class="fas fa-arrow-right"></i></button>
+<footer><i class="fas fa-crown"></i> SQL Avanzado · Curso 2 · Módulo 7</footer>
+</div>
+<script>
+const MODULE=7,COURSE="sqlavanzado_c2",PROG="sqlavanzado_progress",BADGES="sqlavanzado_badges";
+let mode='normal';
+function renderSplit(){
+let vis=document.getElementById('splitVis');
+if(mode==='normal'){
+vis.innerHTML='<div class="split-row"><div class="split-box"><div class="s-title">orders_2022</div><div class="s-range">2022-01-01 a 2023-01-01</div></div>'+
+'<div class="split-box"><div class="s-title">orders_2023</div><div class="s-range">2023-01-01 a 2024-01-01</div></div>'+
+'<div class="split-box"><div class="s-title">orders_2024</div><div class="s-range">2024-01-01 a 2025-01-01</div></div></div>';
+document.getElementById('splitInfo').innerHTML='📊 Particiones originales: 2022, 2023, 2024. Cada una con un año completo de datos.';
+}else if(mode==='split'){
+vis.innerHTML='<div class="split-row"><div class="split-box"><div class="s-title">orders_2022</div><div class="s-range">2022</div></div>'+
+'<div class="split-arrow">⬇</div></div><div class="split-row"><div class="split-box"><div class="s-title">orders_2023_Q1</div><div class="s-range">2023-01 a 2023-06</div></div>'+
+'<div class="split-box"><div class="s-title">orders_2023_Q2</div><div class="s-range">2023-07 a 2024-01</div></div></div>'+
+'<div class="split-arrow">+</div><div class="split-row"><div class="split-box"><div class="s-title">orders_2024</div><div class="s-range">2024</div></div></div>';
+document.getElementById('splitInfo').innerHTML='🔄 SPLIT: ALTER TABLE orders SPLIT PARTITION orders_2023 INTO (PARTITION orders_2023_q1, PARTITION orders_2023_q2); ¡En caliente!';
+}else{
+vis.innerHTML='<div class="split-row"><div class="split-box"><div class="s-title">orders_2022</div><div class="s-range">2022</div></div>'+
+'<div class="split-arrow">+</div></div><div class="split-row"><div class="split-box" style="background:rgba(0,255,100,0.12);border-color:#00ff64"><div class="s-title" style="color:#00ff64">orders_2023_merged</div><div class="s-range">2023 completo</div></div>'+
+'<div class="split-arrow">+</div><div class="split-box"><div class="s-title">orders_2024</div><div class="s-range">2024</div></div></div>';
+document.getElementById('splitInfo').innerHTML='🔄 MERGE: ALTER TABLE orders MERGE PARTITIONS (orders_2023_q1, orders_2023_q2) INTO PARTITION orders_2023;';
+}
+let bd=JSON.parse(localStorage.getItem(BADGES))||[];if(!bd.includes('Cirujano de Particiones')){bd.push('Cirujano de Particiones');localStorage.setItem(BADGES,JSON.stringify(bd));document.getElementById('insignia').classList.remove('hidden')}
+updateProg();
+}
+document.getElementById('doSplit').addEventListener('click',function(){mode='split';renderSplit();document.getElementById('feedback').innerHTML='🔪 SPLIT ejecutado. La partición 2023 se dividió en dos semestres. PostgreSQL 19 reescribe solo los metadatos, no los datos.';});
+document.getElementById('doMerge').addEventListener('click',function(){if(mode==='split'){mode='merge';renderSplit();document.getElementById('feedback').innerHTML='🧩 MERGE ejecutado. Las particiones 2023-Q1 y 2023-Q2 se fusionaron en una sola. Los datos se consolidan transparentemente.';}});
+document.getElementById('resetSplit').addEventListener('click',function(){mode='normal';renderSplit();document.getElementById('feedback').innerHTML='🔄 Reset: particiones originales restauradas.';});
+function updateProg(){
+let p=JSON.parse(localStorage.getItem(COURSE+"_progress"))||[];if(!p.includes(MODULE)){p.push(MODULE);localStorage.setItem(COURSE+"_progress",JSON.stringify(p))}
+let pct=Math.round(p.length/12*100);document.getElementById('progFill').style.width=pct+'%';document.getElementById('progText').textContent='Módulo 7 de 12 ('+pct+'%)';
+let gp=JSON.parse(localStorage.getItem(PROG))||[];if(!gp.includes(MODULE+84)){gp.push(MODULE+84);localStorage.setItem(PROG,JSON.stringify(gp))}
+}
+renderSplit();
+</script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html><html lang="es"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SQL Avanzado | 06 work_mem / shared_buffers</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../../../assets/css/theme.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#0a0e0f;color:#e8edee;min-height:100vh;display:flex;justify-content:center;padding:20px}
+.course-container{max-width:860px;width:100%;background:rgba(15,20,42,0.6);backdrop-filter:blur(16px);border-radius:24px;border:1px solid rgba(255,80,80,0.2);padding:30px;margin-top:60px}
+.progress-bar,.progress-fill{height:10px;border-radius:8px}
+.progress-bar{background:rgba(255,255,255,0.06);margin-bottom:18px;overflow:hidden}
+.progress-fill{background:linear-gradient(90deg,#ff5050,#cc4040);width:0%;transition:width .5s ease}
+.progress-text{font-size:.75rem;color:#8899aa;margin-bottom:10px;display:block}
+.hero-header{text-align:center;margin:20px 0}
+.hero-header h1{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:800;background:linear-gradient(135deg,#ff5050,#cc4040);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-header p{color:#8899aa;margin-top:6px;font-size:.95rem}
+.analogy-card{background:rgba(255,80,80,0.08);border-left:4px solid #ff5050;border-radius:12px;padding:16px 20px;margin:20px 0;font-size:.9rem;line-height:1.6}
+.analogy-card strong{color:#ff5050}
+.main-area{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:24px;margin:20px 0}
+.mem-bars{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:16px 0}
+.mem-item{background:rgba(255,255,255,0.03);border-radius:12px;padding:16px}
+.mem-item h4{color:#ff5050;font-size:.9rem;margin-bottom:8px}
+.mem-bar-bg{height:20px;background:rgba(255,255,255,0.06);border-radius:10px;overflow:hidden;position:relative}
+.mem-bar-fill{height:100%;border-radius:10px;transition:width .5s ease;background:linear-gradient(90deg,#ff5050,#cc4040)}
+.mem-bar-label{font-size:.8rem;color:#8899aa;margin-top:4px;text-align:right}
+.slider-group{margin:16px 0}
+.slider-group label{font-size:.85rem;color:#aab}
+.slider-group input{width:100%;accent-color:#ff5050;margin-top:4px}
+.slider-group .val{color:#ff5050;font-weight:700}
+.ram-display{text-align:center;background:rgba(255,255,255,0.02);border-radius:10px;padding:12px;margin:12px 0}
+.ram-display .num{font-size:2rem;font-weight:800;color:#ff5050}
+.ram-display .lbl{font-size:.8rem;color:#8899aa}
+.feedback{background:rgba(255,255,255,0.04);border-radius:12px;padding:16px 20px;margin:16px 0;font-size:.88rem;min-height:50px}
+.insignia{background:linear-gradient(135deg,rgba(255,215,0,0.12),rgba(255,165,0,0.08));border:1px solid rgba(255,215,0,0.3);border-radius:16px;padding:20px;text-align:center;margin:16px 0;transition:.5s}
+.insignia.hidden{display:none}
+.insignia h3{color:#ffd700;font-size:1.3rem;margin:8px 0}
+.btn-next{display:block;width:100%;padding:16px;margin:20px 0;background:linear-gradient(135deg,#ff5050,#cc4040);border:none;border-radius:14px;color:#fff;font-size:1.05rem;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:.3s}
+.btn-next:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,80,80,0.3)}
+footer{text-align:center;padding:16px 0 0;color:#667788;font-size:.8rem;border-top:1px solid rgba(255,255,255,0.06);margin-top:20px}
+@media(max-width:600px){.course-container{padding:16px;margin-top:50px}.mem-bars{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="course-container">
+<nav class="brand-return-nav"><a href="../../../../index.html">&larr; Portfolio</a><a href="../../../../cursos/index.html">Cursos</a></nav>
+<div class="progress-bar"><div class="progress-fill" id="progFill"></div></div>
+<span class="progress-text" id="progText">Módulo 6 de 12</span>
+<div class="hero-header"><h1>💾 work_mem / shared_buffers</h1><p>Ajusta la memoria de PostgreSQL como un cirujano</p></div>
+<div class="analogy-card"><strong>💡 Piénsalo así:</strong> shared_buffers es como el mostrador de tu cocina: el espacio donde pones los ingredientes para trabajar. work_mem es como la licuadora: más grande permite procesar más cosas a la vez, pero si la llenas demasiado, se desborda (swap). La RAM total es tu cocina completa.</div>
+<div class="main-area">
+<p style="color:#bcc;margin-bottom:10px;font-weight:600"><i class="fas fa-memory" style="color:#ff5050"></i> Tunea la memoria de PostgreSQL</p>
+<div class="slider-group">
+<label>RAM total del servidor: <span class="val" id="ramLabel">8 GB</span></label>
+<input type="range" id="ramSlider" min="1" max="128" value="8">
+</div>
+<div class="mem-bars">
+<div class="mem-item"><h4><i class="fas fa-server"></i> shared_buffers (25% RAM)</h4><div class="mem-bar-bg"><div class="mem-bar-fill" id="sharedBar" style="width:25%"></div></div><div class="mem-bar-label" id="sharedLabel">2.0 GB</div></div>
+<div class="mem-item"><h4><i class="fas fa-blender"></i> work_mem por operación</h4><div class="mem-bar-bg"><div class="mem-bar-fill" id="workBar" style="width:5%"></div></div><div class="mem-bar-label" id="workLabel">4 MB</div></div>
+</div>
+<div class="ram-display">
+<div class="num" id="totalRam">8</div>
+<div class="lbl">GB RAM total</div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0">
+<div style="background:rgba(255,255,255,0.02);border-radius:10px;padding:12px;text-align:center"><div style="font-size:.75rem;color:#8899aa">effective_cache_size</div><div style="color:#ff5050;font-weight:700;font-size:1.1rem" id="cacheLabel">6.0 GB</div></div>
+<div style="background:rgba(255,255,255,0.02);border-radius:10px;padding:12px;text-align:center"><div style="font-size:.75rem;color:#8899aa">maintenance_work_mem</div><div style="color:#ff5050;font-weight:700;font-size:1.1rem" id="maintLabel">640 MB</div></div>
+</div>
+</div>
+<div id="feedback" class="feedback">💬 Ajusta la RAM total y observa cómo se calculan automáticamente los parámetros de memoria óptimos.</div>
+<div id="insignia" class="insignia hidden"><i class="fas fa-medal" style="font-size:2.5rem;color:#ffd700"></i><h3>🏅 Sintonizador de Memoria 🏅</h3><p>¡Sabes exactamente cuánta memoria darle a cada componente de PostgreSQL!</p></div>
+<button class="btn-next" onclick="alert('🔄 Transición → 07-parallel-query.html')">Siguiente <i class="fas fa-arrow-right"></i></button>
+<footer><i class="fas fa-crown"></i> SQL Avanzado · Curso 1 · Módulo 6</footer>
+</div>
+<script>
+const MODULE=6,COURSE="sqlavanzado_c1",PROG="sqlavanzado_progress",BADGES="sqlavanzado_badges";
+function calcMem(){
+let ram=parseInt(document.getElementById('ramSlider').value);
+document.getElementById('ramLabel').textContent=ram+' GB';
+document.getElementById('totalRam').textContent=ram;
+let shared=Math.round(ram*0.25*100)/100;
+let work=Math.min(ram*0.5*4,512);
+let cache=Math.round(ram*0.75*100)/100;
+let maint=Math.round(Math.min(ram*0.08*1000,1024));
+document.getElementById('sharedLabel').textContent=shared+' GB';
+document.getElementById('workLabel').textContent=work+' MB';
+document.getElementById('sharedBar').style.width=(shared/ram*100)+'%';
+document.getElementById('workBar').style.width=Math.min(work/1024/ram*100,50)+'%';
+document.getElementById('cacheLabel').textContent=cache+' GB';
+document.getElementById('maintLabel').textContent=maint+' MB';
+document.getElementById('feedback').innerHTML='📊 Con '+ram+' GB RAM: shared_buffers='+shared+' GB, work_mem='+work+' MB, effective_cache_size='+cache+' GB, maintenance_work_mem='+maint+' MB. ⚠️ No subestimes work_mem: si pones '+work+' MB y tienes 100 conexiones, cada una usa su propio work_mem.';
+let bd=JSON.parse(localStorage.getItem(BADGES))||[];
+if(!bd.includes('Sintonizador de Memoria')){bd.push('Sintonizador de Memoria');localStorage.setItem(BADGES,JSON.stringify(bd));document.getElementById('insignia').classList.remove('hidden')}
+updateProg();
+}
+document.getElementById('ramSlider').addEventListener('input',calcMem);
+function updateProg(){
+let p=JSON.parse(localStorage.getItem(COURSE+"_progress"))||[];
+if(!p.includes(MODULE)){p.push(MODULE);localStorage.setItem(COURSE+"_progress",JSON.stringify(p))}
+let pct=Math.round(p.length/12*100);
+document.getElementById('progFill').style.width=pct+'%';
+document.getElementById('progText').textContent='Módulo 6 de 12 ('+pct+'%)';
+let gp=JSON.parse(localStorage.getItem(PROG))||[];
+if(!gp.includes(MODULE+60)){gp.push(MODULE+60);localStorage.setItem(PROG,JSON.stringify(gp))}
+}
+calcMem();
+</script>
+</body>
+</html>

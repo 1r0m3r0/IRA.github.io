@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Curso 1 | Módulo 5: Closures y Ámbito</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../assets/css/theme.css">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:linear-gradient(135deg,#0a0f1e,#0c1222); font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+.course-container { max-width:1100px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,179,71,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+.progress-bar { background:#0a0f1e; padding:0.8rem 2rem; display:flex; align-items:center; gap:1rem; border-bottom:1px solid #2c3e66; flex-wrap:wrap; }
+.progress-track { flex:1; height:10px; background:#1a2440; border-radius:10px; overflow:hidden; min-width:100px; }
+.progress-fill { height:100%; background:linear-gradient(90deg,#ffb347,#ffd966); border-radius:10px; transition:width 0.5s; width:0%; }
+.progress-text { font-size:0.8rem; color:#8899bb; }
+.hero { background:linear-gradient(95deg,#0b1120,#1a140e); padding:2rem; text-align:center; border-bottom:2px solid #ffb347; }
+.hero h1 { font-size:2.2rem; font-weight:800; background:linear-gradient(135deg,#fff,#ffd966,#ffb347); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.hero p { color:#ffd966; }
+.analogy { background:rgba(255,179,71,0.1); margin:1.5rem 2rem; padding:1.2rem 1.5rem; border-radius:1.5rem; border-left:5px solid #ffb347; display:flex; gap:1rem; align-items:flex-start; }
+.analogy i { font-size:1.8rem; color:#ffb347; flex-shrink:0; }
+.content { padding:0 2rem 2rem; }
+.scope-game { background:rgba(0,0,0,0.3); border-radius:2rem; padding:1.5rem; border:1px solid #2c3e66; }
+.nested-boxes { display:flex; flex-direction:column; align-items:center; gap:0.5rem; margin:1rem 0; position:relative; }
+.scope-box { border:2px solid; border-radius:1.5rem; padding:0.8rem 1.2rem; text-align:center; width:100%; transition:0.3s; cursor:pointer; }
+.scope-box.builtin { border-color:#ff5050; background:rgba(255,80,80,0.1); }
+.scope-box.global { border-color:#2b9eff; background:rgba(43,158,255,0.1); }
+.scope-box.enclosing { border-color:#9c64ff; background:rgba(156,100,255,0.1); }
+.scope-box.local { border-color:#00ffc8; background:rgba(0,255,200,0.1); }
+.scope-box .vars { font-size:0.8rem; color:#b9ccee; margin-top:0.3rem; font-family:monospace; }
+.scope-box.selected { transform:scale(1.02); box-shadow:0 0 15px currentColor; }
+.quiz-options { display:flex; gap:0.8rem; flex-wrap:wrap; margin:1rem 0; }
+.q-opt { background:#1a2440; border:2px solid #2c3e66; padding:0.6rem 1.2rem; border-radius:2rem; cursor:pointer; transition:0.2s; color:#eef5ff; font-size:0.9rem; }
+.q-opt:hover { border-color:#ffb347; }
+.q-opt.correct { border-color:#00ffc8; background:rgba(0,255,200,0.2); }
+.q-opt.wrong { border-color:#ff5050; background:rgba(255,80,80,0.2); }
+.feedback { background:rgba(0,0,0,0.4); padding:1rem 1.5rem; border-radius:1.5rem; margin:1rem 0; border-left:4px solid #ffb347; }
+.insignia { text-align:center; padding:1.5rem; background:linear-gradient(135deg,rgba(255,179,71,0.15),rgba(255,217,102,0.05)); border-radius:2rem; margin:1rem 0; border:2px solid #ffb347; display:none; }
+.insignia.show { display:block; animation:pulse 0.6s; }
+@keyframes pulse { 0%{transform:scale(0.9);opacity:0} 50%{transform:scale(1.05)} 100%{transform:scale(1);opacity:1} }
+.insignia i { font-size:3rem; color:#ffd700; }
+.btn-next-area { text-align:center; padding:1rem 2rem 2rem; }
+.btn-next { background:linear-gradient(135deg,#ffb347,#ffd966); border:none; padding:0.9rem 2.5rem; border-radius:3rem; cursor:pointer; font-weight:700; font-size:1.1rem; color:#1a140e; transition:0.2s; }
+.btn-next:hover { transform:scale(1.05); }
+footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; color:#8899bb; }
+@media (max-width:700px) { .hero h1 { font-size:1.6rem; } .content { padding:0 1rem 1.5rem; } .analogy { margin:1rem; } }
+</style>
+</head>
+<body>
+<nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a><a href="../index.html">Python Medio</a><a href="index.html">Curso 1</a></nav>
+<div class="course-container">
+<div class="progress-bar">
+<span style="color:#ffb347;font-weight:700;"><i class="fas fa-boxes-stacked"></i> M5</span>
+<div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+<span class="progress-text" id="progressText">0%</span>
+</div>
+<div class="hero">
+<h1><i class="fas fa-boxes-stacked"></i> Closures y Ámbito</h1>
+<p>Descubre la regla LEGB y el poder de los closures</p>
+</div>
+<div class="analogy">
+<i class="fas fa-address-card"></i>
+<div><strong>📇 Piénsalo así:</strong> El ámbito de variables es como <strong>las credenciales de acceso</strong> de un edificio. Built-in: acceso a la calle (todos pueden usarlo). Global: acceso al vestíbulo (todo el archivo). Enclosing: acceso a tu oficina (la función externa). Local: acceso a tu escritorio (solo tu función). LEGB es la jerarquía: primero buscas en tu escritorio, luego en la oficina, luego en el vestíbulo, y por último en la calle.</div>
+</div>
+<div class="content">
+<div class="scope-game">
+<h3><i class="fas fa-boxes-stacked"></i> Juego LEGB: ¿Qué variable ves?</h3>
+<p style="color:#b9ccee;margin-bottom:0.8rem;">Cada escenario tiene código con variables en diferentes ámbitos. ¿Cuál se usará?</p>
+<div id="scenarioCode" style="background:#0a0f1e;border-radius:1.5rem;padding:1rem;font-family:monospace;border:1px solid #2c3e66;margin:0.5rem 0;white-space:pre-wrap;">x = "global"
+
+def exterior():
+    x = "enclosing"
+    def interior():
+        x = "local"
+        print(x)  # ← ¿Qué valor?
+    interior()
+
+exterior()</div>
+<div class="quiz-options" id="quizOptions">
+<button class="q-opt" onclick="answer(this,'local')">"local"</button>
+<button class="q-opt" onclick="answer(this,'enclosing')">"enclosing"</button>
+<button class="q-opt" onclick="answer(this,'global')">"global"</button>
+<button class="q-opt" onclick="answer(this,'builtin')">built-in</button>
+</div>
+<div id="scopeVisual" style="margin:1rem 0;">
+<div class="scope-box builtin" id="boxBuiltin"><strong>B</strong> Built-in <span class="vars">print, len, range</span></div>
+<div class="scope-box global" id="boxGlobal"><strong>G</strong> Global <span class="vars" id="globalVars">x = "global"</span></div>
+<div class="scope-box enclosing" id="boxEnclosing"><strong>E</strong> Enclosing <span class="vars" id="enclosingVars">x = "enclosing"</span></div>
+<div class="scope-box local" id="boxLocal"><strong>L</strong> Local <span class="vars" id="localVars">x = "local"</span></div>
+</div>
+<div id="roundInfo" style="text-align:center;font-size:0.85rem;color:#b9ccee;">Ronda 1 de 5</div>
+</div>
+<div class="feedback" id="feedback">💬 La regla LEGB determina el orden de búsqueda: Local → Enclosing → Global → Built-in. ¡Elige la respuesta correcta!</div>
+<div class="insignia" id="insignia">
+<i class="fas fa-medal"></i>
+<h3>🏅 Explorador LEGB 🏅</h3>
+<p>¡Has descifrado cómo Python busca las variables! El ámbito (scope) es fundamental para escribir código predecible.</p>
+</div>
+</div>
+<div class="btn-next-area">
+<button class="btn-next" onclick="nextModule()">Siguiente <i class="fas fa-arrow-right"></i></button>
+</div>
+<footer><i class="fas fa-magic"></i> Python Avanzado del Lenguaje · Módulo 5 · Closures</footer>
+</div>
+<script>
+const COURSE='pythonmedio';const MODULE='c1m5';const TOTAL=72;
+function updateProgress(){let p=JSON.parse(localStorage.getItem(COURSE+'_progress'))||[];if(!p.includes(MODULE)){p.push(MODULE);localStorage.setItem(COURSE+'_progress',JSON.stringify(p));}const pct=Math.round((p.length/TOTAL)*100);document.getElementById('progressFill').style.width=pct+'%';document.getElementById('progressText').textContent=`Módulo 1.5 de 6.12 (${pct}%)`;}
+updateProgress();
+const scenarios=[{code:'x = "global"\n\ndef exterior():\n    x = "enclosing"\n    def interior():\n        x = "local"\n        print(x)  # ← ¿Qué valor?\n    interior()\n\nexterior()',answer:'local',globalV:'x = "global"',enclosingV:'x = "enclosing"',localV:'x = "local"'},{code:'x = "global"\n\ndef exterior():\n    x = "enclosing"\n    def interior():\n        print(x)  # ← ¿Qué valor?\n    interior()\n\nexterior()',answer:'enclosing',globalV:'x = "global"',enclosingV:'x = "enclosing"',localV:'(no hay x local)'},{code:'x = "global"\n\ndef exterior():\n    def interior():\n        print(x)  # ← ¿Qué valor?\n    interior()\n\nexterior()',answer:'global',globalV:'x = "global"',enclosingV:'(no hay x enclosing)',localV:'(no hay x local)'},{code:'def exterior():\n    def interior():\n        print(len([1,2,3]))  # len es...\n    interior()\n\nexterior()',answer:'builtin',globalV:'(no hay x global)',enclosingV:'(no hay x enclosing)',localV:'(no hay x local)'},{code:'x = "global"\n\ndef exterior():\n    x = "enclosing"\n    def interior():\n        nonlocal x\n        x = "modificada"\n        print(x)\n    interior()\n    print(x)\n\nexterior()',answer:'enclosing',globalV:'x = "global"',enclosingV:'x → "modificada" (nonlocal)',localV:'(usa nonlocal x)'}];
+let round=0,correctCount=0;
+function loadScenario(){const s=scenarios[round];document.getElementById('scenarioCode').textContent=s.code;document.getElementById('globalVars').textContent=s.globalV;document.getElementById('enclosingVars').textContent=s.enclosingV;document.getElementById('localVars').textContent=s.localV;document.getElementById('roundInfo').textContent=`Ronda ${round+1} de ${scenarios.length}`;document.querySelectorAll('.q-opt').forEach(b=>{b.classList.remove('correct','wrong');b.disabled=false;});['boxLocal','boxEnclosing','boxGlobal','boxBuiltin'].forEach(id=>document.getElementById(id).classList.remove('selected'));}
+function answer(btn,val){const s=scenarios[round];const isCorrect=val===s.answer;btn.classList.add(isCorrect?'correct':'wrong');document.querySelectorAll('.q-opt').forEach(b=>{if(b!==btn)b.disabled=true;});
+let highlight=s.answer;if(highlight==='local')document.getElementById('boxLocal').classList.add('selected');else if(highlight==='enclosing')document.getElementById('boxEnclosing').classList.add('selected');else if(highlight==='global')document.getElementById('boxGlobal').classList.add('selected');else document.getElementById('boxBuiltin').classList.add('selected');
+if(isCorrect){correctCount++;document.getElementById('feedback').innerHTML=`✅ <strong>¡LEGB correcto!</strong> Python busca en Local → Enclosing → Global → Built-in. "${s.answer}" era la respuesta porque está en el ámbito más interno que la contiene.`;}else{document.getElementById('feedback').innerHTML=`❌ Casi. La respuesta correcta era <strong>"${s.answer}"</strong>. Python sigue la regla LEGB: primero busca en Local, luego Enclosing, luego Global, luego Built-in.`;}
+if(correctCount>=3){const ins=document.getElementById('insignia');if(!ins.classList.contains('show')){ins.classList.add('show');const b=JSON.parse(localStorage.getItem(COURSE+'_badges'))||[];if(!b.includes(MODULE)){b.push(MODULE);localStorage.setItem(COURSE+'_badges',JSON.stringify(b));}}}
+setTimeout(()=>{round=(round+1)%scenarios.length;loadScenario();},2000);}
+loadScenario();
+function nextModule(){alert('🔄 Transición al Módulo 6: Pattern Matching. En un entorno real, esto enlazaría a 06-pattern-matching.html');}
+</script>
+</body>
+</html>

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>M2: Presupuesto Personal | Finanzas Personales</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #0f1a22 100%); font-family: 'Inter', sans-serif; color: #eef5ff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; }
+    .course-container { max-width: 1000px; width: 100%; background: rgba(15,25,45,0.65); backdrop-filter: blur(12px); border-radius: 3rem; border: 1px solid rgba(0,255,200,0.3); box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden; }
+    .hero-header { background: linear-gradient(95deg, #0b1120 0%, #0f1a20 100%); padding: 2rem 2rem 1.5rem; text-align: center; border-bottom: 2px solid #00ffc8; }
+    .hero-header h1 { font-size: 2.2rem; font-weight: 800; background: linear-gradient(135deg, #FFF, #66ffd0, #00ffc8); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .hero-header p { font-size: 1rem; color: #66ffd0; margin-top: 0.4rem; }
+    .progress-bar { margin: 1rem auto; max-width: 500px; }
+    .progress-header { display: flex; justify-content: space-between; font-size: 0.8rem; color: #66ffd0; font-weight: 600; margin-bottom: 0.3rem; }
+    .progress-track { height: 8px; background: rgba(255,255,255,0.08); border-radius: 10px; overflow: hidden; border: 1px solid rgba(0,255,200,0.2); }
+    .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #00ffc8, #00e0ff); border-radius: 10px; transition: width 0.6s ease; }
+    .content { padding: 2rem; }
+    .analogy-card { background: rgba(0,255,200,0.1); border: 1px solid #00ffc8; border-radius: 1.5rem; padding: 1.2rem 1.5rem; margin-bottom: 1.5rem; font-size: 0.95rem; line-height: 1.6; }
+    .analogy-card strong { color: #66ffd0; }
+    .main-area { background: rgba(0,10,25,0.5); border-radius: 1.5rem; padding: 1.5rem; margin-bottom: 1rem; }
+    .main-area h2 { color: #00ffc8; font-size: 1.2rem; margin-bottom: 0.5rem; }
+    .budget-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+    .budget-item { display: flex; flex-direction: column; gap: 0.3rem; }
+    .budget-item label { font-size: 0.85rem; color: #66ffd0; font-weight: 600; display: flex; justify-content: space-between; }
+    .budget-item input[type="range"] { width: 100%; accent-color: #00ffc8; }
+    .budget-item .pct-val { color: #fff; }
+    .total-bar { background: rgba(0,255,200,0.06); border: 1px solid #00ffc833; border-radius: 1rem; padding: 0.8rem 1.2rem; text-align: center; margin: 0.5rem 0; }
+    .total-bar span { font-weight: 700; }
+    .total-bar .ok { color: #00ffc8; }
+    .total-bar .warn { color: #ffb347; }
+    .total-bar .bad { color: #ff5050; }
+    canvas { width: 100%; max-height: 250px; margin-top: 1rem; border-radius: 1rem; background: rgba(0,0,0,0.3); }
+    .feedback { background: rgba(0,255,200,0.08); border: 1px solid #00ffc833; border-radius: 1rem; padding: 1rem 1.2rem; margin: 1rem 0; font-size: 0.9rem; line-height: 1.5; min-height: 3rem; }
+    .insignia { background: linear-gradient(135deg, rgba(0,255,200,0.15), rgba(43,158,255,0.1)); border: 2px solid #00ffc8; border-radius: 2rem; padding: 1.5rem; text-align: center; margin: 1rem 0; }
+    .insignia h3 { font-size: 1.3rem; color: #66ffd0; }
+    .insignia i { font-size: 2.5rem; color: #ffd700; }
+    .btn-next { display: inline-flex; align-items: center; gap: 0.6rem; padding: 0.8rem 2rem; background: linear-gradient(135deg, #00ffc8, #00cc99); color: #0a0f1e; font-weight: 700; font-size: 1rem; border: none; border-radius: 2rem; cursor: pointer; transition: 0.25s; font-family: 'Inter', sans-serif; box-shadow: 0 4px 15px rgba(0,255,200,0.3); }
+    .btn-next:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 6px 25px rgba(0,255,200,0.5); }
+    .hidden { display: none !important; }
+    footer { text-align: center; padding: 1rem; font-size: 0.75rem; border-top: 1px solid #2c3e66; color: #8899bb; }
+    @media (max-width:700px) { .budget-grid { grid-template-columns: 1fr; } .hero-header h1 { font-size: 1.6rem; } }
+  </style>
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+  <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a><a href="../index.html">Programa</a><a href="index.html">Curso 1</a></nav>
+
+  <div class="course-container">
+    <div class="hero-header">
+      <h1><i class="fas fa-chart-pie"></i> Presupuesto Personal y Control de Gastos</h1>
+      <p>Módulo 2 · Regla 50/30/20</p>
+      <div class="progress-bar">
+        <div class="progress-header"><span>📊 Progreso del curso</span><span id="progressText">Módulo 2 de 12 (0%)</span></div>
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="analogy-card">
+        <strong>💡 Piénsalo así:</strong> Tu presupuesto mensual es como una pizza. Si le das demasiada rebanada a una categoría (como "salir a cenar"), otras rebanadas importantes (como "ahorro") se quedan sin espacio. La regla 50/30/20 te dice cómo dividir la pizza: 50% para lo necesario, 30% para lo que te gusta, 20% para tu futuro.
+      </div>
+
+      <div class="main-area">
+        <h2><i class="fas fa-sliders-h"></i> Constructor de Presupuesto</h2>
+        <p style="color:#8899bb;margin-bottom:0.5rem;font-size:0.85rem;">Ajusta los sliders para distribuir tu presupuesto mensual ideal.</p>
+
+        <div class="budget-grid" id="budgetGrid">
+          <div class="budget-item">
+            <label>🏠 Vivienda <span class="pct-val" id="pct0">30%</span></label>
+            <input type="range" class="budget-slider" data-idx="0" min="0" max="60" value="30">
+          </div>
+          <div class="budget-item">
+            <label>🍔 Alimentos <span class="pct-val" id="pct1">15%</span></label>
+            <input type="range" class="budget-slider" data-idx="1" min="0" max="40" value="15">
+          </div>
+          <div class="budget-item">
+            <label>🚗 Transporte <span class="pct-val" id="pct2">10%</span></label>
+            <input type="range" class="budget-slider" data-idx="2" min="0" max="30" value="10">
+          </div>
+          <div class="budget-item">
+            <label>⚡ Servicios <span class="pct-val" id="pct3">10%</span></label>
+            <input type="range" class="budget-slider" data-idx="3" min="0" max="30" value="10">
+          </div>
+          <div class="budget-item">
+            <label>🎮 Ocio <span class="pct-val" id="pct4">10%</span></label>
+            <input type="range" class="budget-slider" data-idx="4" min="0" max="40" value="10">
+          </div>
+          <div class="budget-item">
+            <label>💰 Ahorro e Inversión <span class="pct-val" id="pct5">20%</span></label>
+            <input type="range" class="budget-slider" data-idx="5" min="0" max="50" value="20">
+          </div>
+          <div class="budget-item">
+            <label>🛡️ Seguros <span class="pct-val" id="pct6">5%</span></label>
+            <input type="range" class="budget-slider" data-idx="6" min="0" max="20" value="5">
+          </div>
+          <div class="budget-item">
+            <label>📚 Educación <span class="pct-val" id="pct7">0%</span></label>
+            <input type="range" class="budget-slider" data-idx="7" min="0" max="20" value="0">
+          </div>
+        </div>
+
+        <div class="total-bar" id="totalBar">
+          Total: <span id="totalPct">100%</span> 
+          <span id="totalStatus" class="ok">✅ Perfectamente balanceado</span>
+        </div>
+
+        <canvas id="donutCanvas" height="250"></canvas>
+      </div>
+
+      <div class="feedback" id="feedback">💬 Ajusta los sliders para distribuir tu presupuesto. ¡Recuerda la regla 50/30/20!</div>
+
+      <div id="insignia" class="insignia hidden">
+        <i class="fas fa-medal"></i>
+        <h3>🏅 MAESTRO DEL PRESUPUESTO 🏅</h3>
+        <p>¡Has dominado el arte del presupuesto personal! Tu futuro financiero está bien encaminado.</p>
+      </div>
+
+      <div style="display:flex;justify-content:center;gap:1rem;margin:1rem 0;flex-wrap:wrap;">
+        <button class="btn-next" id="completeBtn"><i class="fas fa-check-circle"></i> Completar Módulo</button>
+        <button class="btn-next hidden" id="nextBtn" onclick="alert('🔄 Transición al Módulo 3: Ahorro e Interés Compuesto — 03-ahorro-interes-compuesto.html')">Siguiente <i class="fas fa-arrow-right"></i></button>
+      </div>
+
+      <footer><i class="fas fa-wallet"></i> Finanzas Personales · Módulo 2 · Presupuesto · Aprendizaje Activo</footer>
+    </div>
+  </div>
+
+  <script>
+    const COMPLETED_KEY = 'finanzas_mod2_completed';
+    var budgetLabels = ['Vivienda','Alimentos','Transporte','Servicios','Ocio','Ahorro','Seguros','Educación'];
+    var budgetColors = ['#2b9eff','#00ffc8','#ffb347','#ff5050','#ff64dc','#ffd700','#00e0ff','#a855f7'];
+    var sliders = document.querySelectorAll('.budget-slider');
+    var totalPct = document.getElementById('totalPct');
+    var totalStatus = document.getElementById('totalStatus');
+    var feedback = document.getElementById('feedback');
+    var canvas = document.getElementById('donutCanvas');
+    var ctx = canvas.getContext('2d');
+    var insignia = document.getElementById('insignia');
+    var completeBtn = document.getElementById('completeBtn');
+    var nextBtn = document.getElementById('nextBtn');
+
+    function resizeCanvas() {
+      canvas.width = canvas.clientWidth * (window.devicePixelRatio || 1);
+      canvas.height = 250 * (window.devicePixelRatio || 1);
+      ctx.scale(window.devicePixelRatio || 1, window.devicePixelRatio || 1);
+      drawDonut();
+    }
+
+    function getValues() {
+      var vals = [];
+      sliders.forEach(function(s) {
+        vals.push(parseInt(s.value) || 0);
+      });
+      return vals;
+    }
+
+    function drawDonut() {
+      var vals = getValues();
+      var total = vals.reduce(function(a,b) { return a + b; }, 0);
+      var w = canvas.width / (window.devicePixelRatio || 1);
+      var h = 230;
+      var cx = w / 2, cy = h / 2;
+      var outerR = Math.min(w, h) * 0.38;
+      var innerR = outerR * 0.55;
+
+      ctx.clearRect(0, 0, w, h);
+      if (total === 0) {
+        ctx.fillStyle = '#2c3e66';
+        ctx.font = '14px Inter';
+        ctx.fillStyle = '#8899bb';
+        ctx.textAlign = 'center';
+        ctx.fillText('Ajusta los sliders para ver tu gráfico', cx, cy);
+        return;
+      }
+
+      var startAngle = -Math.PI / 2;
+      vals.forEach(function(v, i) {
+        if (v === 0) return;
+        var sliceAngle = (v / total) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.moveTo(cx + innerR * Math.cos(startAngle), cy + innerR * Math.sin(startAngle));
+        ctx.arc(cx, cy, outerR, startAngle, startAngle + sliceAngle);
+        ctx.arc(cx, cy, innerR, startAngle + sliceAngle, startAngle, true);
+        ctx.closePath();
+        ctx.fillStyle = budgetColors[i];
+        ctx.fill();
+        ctx.strokeStyle = '#0a0f1e';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        var midAngle = startAngle + sliceAngle / 2;
+        var labelR = outerR + 18;
+        var lx = cx + labelR * Math.cos(midAngle);
+        var ly = cy + labelR * Math.sin(midAngle);
+        var pct = Math.round(v / total * 100);
+        if (pct >= 5) {
+          ctx.fillStyle = '#eef5ff';
+          ctx.font = 'bold 10px Inter';
+          ctx.textAlign = 'center';
+          ctx.fillText(budgetLabels[i] + ' ' + pct + '%', lx, ly);
+        }
+        startAngle += sliceAngle;
+      });
+    }
+
+    function updateBudget() {
+      var vals = getValues();
+      var total = vals.reduce(function(a,b) { return a + b; }, 0);
+
+      vals.forEach(function(v, i) {
+        document.getElementById('pct' + i).textContent = v + '%';
+      });
+
+      totalPct.textContent = total + '%';
+      if (total === 100) {
+        totalStatus.textContent = '✅ Perfectamente balanceado (100%)';
+        totalStatus.className = 'ok';
+      } else if (total < 100) {
+        totalStatus.textContent = '⚠️ Te sobra ' + (100 - total) + '% — ¡destínalo a ahorro!';
+        totalStatus.className = 'warn';
+      } else {
+        totalStatus.textContent = '❌ Te pasaste por ' + (total - 100) + '% — reduce algunas categorías';
+        totalStatus.className = 'bad';
+      }
+
+      var needs = vals[0] + vals[1] + vals[2] + vals[3];
+      var wants = vals[4];
+      var savings = vals[5] + vals[6] + vals[7];
+
+      if (total === 100) {
+        if (Math.abs(needs - 50) <= 5 && Math.abs(wants - 30) <= 5 && Math.abs(savings - 20) <= 5) {
+          feedback.innerHTML = '🌟 ¡REGLA 50/30/20 PERFECTA! ' + needs + '% necesidades, ' + wants + '% deseos, ' + savings + '% ahorro. Este es el estándar de oro de las finanzas personales.';
+        } else if (savings >= 25) {
+          feedback.innerHTML = '🐜 ¡Eres una hormiga! Tu ahorro del ' + savings + '% es impresionante. Estás construyendo un futuro sólido.';
+        } else if (wants >= 35) {
+          feedback.innerHTML = '🎉 Disfrutas la vida (' + wants + '% en ocio). Nada mal, pero intenta no pasar del 30% para mantener el balance.';
+        } else if (needs >= 60) {
+          feedback.innerHTML = '🏠 Muchos gastos fijos (' + needs + '%). Revisa si puedes reducir vivienda o servicios para liberar más para ahorro.';
+        } else {
+          feedback.innerHTML = '✅ Balance del ' + total + '%. Necesidades: ' + needs + '%, Deseos: ' + wants + '%, Ahorro: ' + savings + '%. ¡Sigue ajustando para encontrar tu punto óptimo!';
+        }
+      } else {
+        feedback.innerHTML = '⚖️ Ajusta los sliders para que sumen exactamente 100% y activa el feedback premium.';
+      }
+
+      drawDonut();
+    }
+
+    function markCompleted() {
+      if (localStorage.getItem(COMPLETED_KEY) === 'true') {
+        alert('✅ Ya completaste este módulo anteriormente.');
+        return;
+      }
+      var total = getValues().reduce(function(a,b) { return a + b; }, 0);
+      if (total !== 100) {
+        alert('⚠️ Ajusta los sliders para que sumen exactamente 100% antes de completar el módulo.');
+        return;
+      }
+      localStorage.setItem(COMPLETED_KEY, 'true');
+      updateProgress('c1m2');
+      insignia.classList.remove('hidden');
+      completeBtn.classList.add('hidden');
+      nextBtn.classList.remove('hidden');
+      feedback.innerHTML = '🎉 ¡MÓDULO COMPLETADO! Has ganado la insignia <strong>MAESTRO DEL PRESUPUESTO</strong>. Tu presupuesto balanceado te llevará lejos.';
+    }
+
+    function updateProgress(currentModule) {
+      var progress = JSON.parse(localStorage.getItem('finanzas_progress')) || [];
+      if (!progress.includes(currentModule)) {
+        progress.push(currentModule);
+        localStorage.setItem('finanzas_progress', JSON.stringify(progress));
+      }
+      var pct = Math.round((progress.length / 72) * 100);
+      document.getElementById('progressFill').style.width = pct + '%';
+      document.getElementById('progressText').textContent = 'Módulo 2 de 12 (' + pct + '%)';
+    }
+
+    function restoreProgress() {
+      var completed = localStorage.getItem(COMPLETED_KEY);
+      if (completed === 'true') {
+        insignia.classList.remove('hidden');
+        completeBtn.classList.add('hidden');
+        nextBtn.classList.remove('hidden');
+        feedback.innerHTML = '🏆 ¡Ya eres un Maestro del Presupuesto! Continúa al siguiente módulo.';
+      }
+    }
+
+    sliders.forEach(function(s) { s.addEventListener('input', updateBudget); });
+    completeBtn.addEventListener('click', markCompleted);
+    window.addEventListener('resize', resizeCanvas);
+
+    updateBudget();
+    restoreProgress();
+    setTimeout(resizeCanvas, 100);
+  </script>
+  <script src="../../assets/js/cookie-consent.js"></script>
+</body>
+</html>

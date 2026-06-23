@@ -1,0 +1,93 @@
+<!DOCTYPE html><html lang="es"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SQL Avanzado | 01 EXPLAIN Cada Nodo</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../../../assets/css/theme.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#0a0e0f;color:#e8edee;min-height:100vh;display:flex;justify-content:center;padding:20px}
+.course-container{max-width:860px;width:100%;background:rgba(15,20,42,0.6);backdrop-filter:blur(16px);border-radius:24px;border:1px solid rgba(255,80,80,0.2);padding:30px;margin-top:60px;position:relative}
+.progress-bar{background:rgba(255,255,255,0.06);border-radius:8px;height:10px;margin-bottom:18px;overflow:hidden;position:relative}
+.progress-fill{height:100%;background:linear-gradient(90deg,#ff5050,#cc4040);border-radius:8px;transition:width .5s ease;width:0%}
+.progress-text{font-size:.75rem;color:#8899aa;margin-bottom:10px;display:block}
+.hero-header{text-align:center;margin:20px 0}
+.hero-header h1{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:800;background:linear-gradient(135deg,#ff5050,#cc4040);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-header p{color:#8899aa;margin-top:6px;font-size:.95rem}
+.analogy-card{background:rgba(255,80,80,0.08);border-left:4px solid #ff5050;border-radius:12px;padding:16px 20px;margin:20px 0;font-size:.9rem;line-height:1.6}
+.analogy-card strong{color:#ff5050}
+.main-area{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:24px;margin:20px 0}
+.quiz-option{display:block;width:100%;padding:14px 18px;margin:8px 0;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:#e8edee;font-size:.9rem;font-family:'Inter',sans-serif;cursor:pointer;transition:all .25s;text-align:left}
+.quiz-option:hover{background:rgba(255,80,80,0.1);border-color:#ff5050}
+.quiz-option.correct{background:rgba(0,255,100,0.15);border-color:#00ff64}
+.quiz-option.wrong{background:rgba(255,80,80,0.15);border-color:#ff5050}
+.feedback{background:rgba(255,255,255,0.04);border-radius:12px;padding:16px 20px;margin:16px 0;font-size:.88rem;line-height:1.5;min-height:50px;transition:.3s}
+.insignia{background:linear-gradient(135deg,rgba(255,215,0,0.12),rgba(255,165,0,0.08));border:1px solid rgba(255,215,0,0.3);border-radius:16px;padding:20px;text-align:center;margin:16px 0;transition:.5s}
+.insignia.hidden{display:none}
+.insignia h3{color:#ffd700;font-size:1.3rem;margin:8px 0}
+.insignia p{color:#ccb}
+.btn-next{display:block;width:100%;padding:16px;margin:20px 0;background:linear-gradient(135deg,#ff5050,#cc4040);border:none;border-radius:14px;color:#fff;font-size:1.05rem;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:.3s}
+.btn-next:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,80,80,0.3)}
+footer{text-align:center;padding:16px 0 0;color:#667788;font-size:.8rem;border-top:1px solid rgba(255,255,255,0.06);margin-top:20px}
+@media(max-width:600px){.course-container{padding:16px;margin-top:50px}}
+</style>
+</head>
+<body>
+<div class="course-container">
+<nav class="brand-return-nav"><a href="../../../../index.html">&larr; Portfolio</a><a href="../../../../cursos/index.html">Cursos</a></nav>
+<div class="progress-bar"><div class="progress-fill" id="progFill"></div></div>
+<span class="progress-text" id="progText">Módulo 1 de 12</span>
+<div class="hero-header"><h1>🔍 EXPLAIN Cada Nodo</h1><p>Descifra el plan de ejecución nodo por nodo</p></div>
+<div class="analogy-card"><strong>💡 Piénsalo así:</strong> EXPLAIN ANALYZE es como los frenos de un auto de carreras. No quieres ver los frenos en la recta principal, pero cuando llegas a la curva, quieres saber exactamente cómo funcionan. Cada nodo del plan de ejecución es una pieza del motor de tu consulta: sábelo entender y sabrás dónde está perdiendo potencia.</div>
+<div class="main-area">
+<p style="margin-bottom:14px;color:#bcc;font-weight:600"><i class="fas fa-question-circle" style="color:#ff5050"></i> ¿Qué tipo de nodo usaría PostgreSQL para una tabla pequeña de 100 filas sin índice?</p>
+<div id="quizContainer">
+<button class="quiz-option" data-ans="0">🅰 Index Scan</button>
+<button class="quiz-option" data-ans="1">🅱 Seq Scan</button>
+<button class="quiz-option" data-ans="2">🅲 Bitmap Heap Scan</button>
+<button class="quiz-option" data-ans="3">🅳 Merge Join</button>
+</div>
+<div style="margin-top:16px"><button class="quiz-option" id="revealBtn" style="background:rgba(255,80,80,0.12);border-color:#ff5050;text-align:center;font-weight:600"><i class="fas fa-eye"></i> Mostrar explicación de cada nodo</button></div>
+<div id="nodeExplainer" style="display:none;margin-top:16px">
+<div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:14px;margin:6px 0"><strong style="color:#ff5050">Seq Scan</strong> — Escaneo secuencial: lee toda la tabla bloque por bloque. Eficiente para tablas pequeñas o cuando necesitas >30% de las filas.</div>
+<div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:14px;margin:6px 0"><strong style="color:#ff5050">Index Scan</strong> — Escaneo por índice: salta al árbol B, encuentra las filas. Ideal para búsquedas puntuales.</div>
+<div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:14px;margin:6px 0"><strong style="color:#ff5050">Bitmap Heap Scan</strong> — Combina múltiples índices: construye un bitmap en memoria y luego lee los bloques. Balance entre selectividad y aleatoriedad.</div>
+<div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:14px;margin:6px 0"><strong style="color:#ff5050">Merge Join</strong> — Junta dos conjuntos ordenados. Requiere datos pre-ordenados por ORDER BY o por índices.</div>
+</div>
+</div>
+<div id="feedback" class="feedback">💬 Haz clic en una opción para identificar el nodo correcto.</div>
+<div id="insignia" class="insignia hidden"><i class="fas fa-medal" style="font-size:2.5rem;color:#ffd700"></i><h3>🏅 Nodo Ninja 🏅</h3><p>¡Has identificado correctamente el nodo Seq Scan! Eres un verdadero explorador del plan de ejecución.</p></div>
+<button class="btn-next" onclick="alert('🔄 Transición al siguiente módulo: Costos startup/total/rows → 02-costos-startup-total-rows.html')">Siguiente <i class="fas fa-arrow-right"></i></button>
+<footer><i class="fas fa-crown"></i> SQL Avanzado · Curso 1 · Módulo 1</footer>
+</div>
+<script>
+const MODULE=1,COURSE="sqlavanzado_c1",PROG="sqlavanzado_progress",BADGES="sqlavanzado_badges";
+function updateProg(){
+let p=JSON.parse(localStorage.getItem(COURSE+"_progress"))||[];
+if(!p.includes(MODULE)){p.push(MODULE);localStorage.setItem(COURSE+"_progress",JSON.stringify(p))}
+let pct=Math.round(p.length/12*100);
+document.getElementById('progFill').style.width=pct+'%';
+document.getElementById('progText').textContent='Módulo 1 de 12 ('+pct+'%)';
+let gp=JSON.parse(localStorage.getItem(PROG))||[];
+if(!gp.includes(MODULE)){gp.push(MODULE);localStorage.setItem(PROG,JSON.stringify(gp))}
+}
+document.querySelectorAll('#quizContainer .quiz-option').forEach(b=>{
+b.addEventListener('click',function(){
+let ans=this.dataset.ans,f=document.getElementById('feedback');
+if(ans==='1'){
+document.getElementById('feedback').innerHTML='✅ ¡Correcto! Seq Scan es el nodo adecuado para tablas pequeñas sin índice. Lee toda la tabla secuencialmente, que para 100 filas es más eficiente que cualquier índice. El costo startup es bajo y el total rows=100.';
+document.getElementById('insignia').classList.remove('hidden');
+let bd=JSON.parse(localStorage.getItem(BADGES))||[];
+if(!bd.includes('Nodo Ninja')){bd.push('Nodo Ninja');localStorage.setItem(BADGES,JSON.stringify(bd))}
+this.className='quiz-option correct';document.querySelectorAll('#quizContainer .quiz-option').forEach(o=>o.style.pointerEvents='none');
+updateProg();
+}else{
+document.getElementById('feedback').innerHTML='❌ No exactamente. Para 100 filas sin índice, el optimizador elige Seq Scan porque el costo de leer el índice y luego las filas es mayor que leer toda la tabla. ¡Intenta de nuevo!';
+this.className='quiz-option wrong';setTimeout(()=>this.className='quiz-option',600)}
+})
+});
+document.getElementById('revealBtn').addEventListener('click',function(){let e=document.getElementById('nodeExplainer');e.style.display=e.style.display==='none'?'block':'none';this.innerHTML=e.style.display==='block'?'<i class="fas fa-eye-slash"></i> Ocultar explicación':'<i class="fas fa-eye"></i> Mostrar explicación de cada nodo'});
+updateProg();
+</script>
+</body>
+</html>

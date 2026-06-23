@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>B-Tree | Índices</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../../../assets/css/theme.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0e0f;--surface:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.08);--text:#e8edee;--muted:#8899aa;--accent:#2b9eff;--accent2:#6bb8ff;--glow:hsla(210,90%,55%,0.2)}
+body{font-family:"Inter",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center}
+.tech-grid{position:fixed;inset:0;background-image:linear-gradient(rgba(43,158,255,0.03)1px,transparent 1px),linear-gradient(90deg,rgba(43,158,255,0.03)1px,transparent 1px);background-size:60px 60px;z-index:0;pointer-events:none}
+.container{max-width:820px;width:100%;padding:20px;position:relative;z-index:1;margin-top:80px}
+.brand-return-nav{display:flex;gap:1rem;align-items:center;padding:.5rem 1rem;background:#0f1429;border:1px solid rgba(0,212,255,.2);border-radius:.5rem;position:fixed;top:.75rem;left:.75rem;z-index:9999}
+.brand-return-nav a{color:#00d4ff;text-decoration:none;font-size:.9rem;font-weight:600}
+.brand-return-nav a:hover{color:#00ff41;text-decoration:underline}
+.progress-section{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:24px;backdrop-filter:blur(12px)}
+.progress-section .bar-wrap{height:6px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden;margin-top:8px}
+.progress-section .bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;width:0%;transition:width .5s ease}
+.progress-section .p-text{font-size:.8rem;color:var(--muted)}
+.hero{text-align:center;padding:32px 20px 20px}
+.hero h1{font-size:clamp(1.5rem,4vw,2.4rem);font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+.hero p{color:var(--muted);font-size:1rem}
+.analogy-card{background:rgba(43,158,255,0.08);border:1px solid rgba(43,158,255,0.2);border-radius:12px;padding:18px;margin-bottom:24px;backdrop-filter:blur(8px)}
+.analogy-card strong{color:var(--accent)}
+.main-area{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:20px;backdrop-filter:blur(12px);text-align:center}
+.main-area h2{font-size:1.1rem;font-weight:600;margin-bottom:16px;text-align:left;color:#fff}
+.tree-visual{display:flex;flex-direction:column;align-items:center;gap:16px;margin:20px 0;font-family:"Courier New",monospace}
+.tree-level{display:flex;gap:24px;justify-content:center}
+.tree-node{background:rgba(43,158,255,0.1);border:1px solid var(--accent);border-radius:8px;padding:8px 16px;font-size:.85rem;color:var(--accent);font-weight:600}
+.tree-node.root{border-width:2px;background:rgba(43,158,255,0.15)}
+.tree-node.leaf{background:rgba(255,255,255,0.04);color:var(--text)}
+.tree-node.found{background:rgba(0,204,106,0.2);border-color:#00cc6a;color:#8cffb0;animation:pulse .5s}
+@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.15)}100%{transform:scale(1)}}
+.steps-box{background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:8px;padding:12px;margin:12px 0;text-align:left;font-size:.85rem;color:var(--muted);min-height:40px}
+.search-input{background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:#fff;font-size:.9rem;width:120px;text-align:center}
+.search-input:focus{border-color:var(--accent);outline:none}
+.feedback{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;padding:14px;margin:16px 0;font-size:.9rem;min-height:50px;color:var(--muted);text-align:left}
+.feedback.success{background:rgba(0,204,106,0.1);border-color:#00cc6a;color:#8cffb0}
+.feedback.error{background:rgba(255,80,80,0.1);border-color:#ff5050;color:#ff9999}
+.insignia{text-align:center;padding:24px;background:rgba(43,158,255,0.08);border:1px solid rgba(43,158,255,0.25);border-radius:16px;margin:16px 0;display:none}
+.insignia.show{display:block}
+.insignia i{font-size:2.5rem;color:var(--accent)}.insignia h3{font-size:1.3rem;font-weight:700;margin:8px 0;color:#fff}.insignia p{color:var(--accent);font-weight:500}
+.badge-btn{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:10px;padding:12px 24px;color:#0a0e0f;font-weight:700;cursor:pointer;font-size:.9rem;margin:8px}
+.badge-btn:hover{transform:scale(1.03);opacity:.9}
+.btn-next{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:12px;padding:14px 32px;color:#0a0e0f;font-weight:700;cursor:pointer;font-size:1rem;transition:all .2s;margin:20px auto;display:block}
+.btn-next:disabled{opacity:.4;cursor:not-allowed;transform:none}
+footer{text-align:center;padding:24px 0;color:var(--muted);font-size:.8rem;border-top:1px solid var(--border);width:100%;margin-top:20px}
+@media(max-width:640px){.tree-level{flex-wrap:wrap;gap:8px}.container{margin-top:70px;padding:12px}}
+</style>
+</head>
+<body><div class="tech-grid"></div>
+<nav class="brand-return-nav"><a href="../../../../index.html">&larr; Portfolio</a><a href="../../../../cursos/index.html">Cursos</a><a href="../../index.html">SQL Medio</a><a href="../index.html">Índices</a></nav>
+<div class="container">
+<div class="progress-section"><span class="p-text"><i class="fas fa-tasks"></i> Módulo 2 de 12 · Índices</span><div class="bar-wrap"><div class="bar-fill" id="progBar"></div></div></div>
+<div class="hero"><h1>🌳 B-Tree</h1><p>El corazón de los índices en PostgreSQL — balanceado, rápido, eficiente</p></div>
+<div class="analogy-card"><strong>💡 Piénsalo así:</strong> Un B-Tree es como el sistema de carpetas de un archivador. Tienes cajones (nodos raíz), carpetas (nodos internos) y hojas (nodos hoja). Para encontrar "Martínez", no revisas uno por uno — vas a la M, luego a Ma, luego a Mar — en solo 3 pasos encuentras lo que buscas. Eso es O(log n).</div>
+<div class="main-area">
+<h2>🔍 Visualizador interactivo de B-Tree</h2>
+<p>Ingresa un número del 1 al 15 para buscar en el árbol:</p>
+<div style="margin:16px 0">
+<input class="search-input" type="number" id="searchVal" min="1" max="15" placeholder="Ej: 7">
+<button class="badge-btn" onclick="searchTree()"><i class="fas fa-search"></i> Buscar</button>
+</div>
+<div class="tree-visual">
+<div class="tree-level"><div class="tree-node root" id="nodeRoot">[ 8 ]</div></div>
+<div class="tree-level"><div class="tree-node" id="nodeL1L">[ 3, 5 ]</div><div class="tree-node" id="nodeL1R">[ 11, 13 ]</div></div>
+<div class="tree-level">
+<div class="tree-node leaf" id="leaf1">[1,2]</div><div class="tree-node leaf" id="leaf2">[3,4]</div>
+<div class="tree-node leaf" id="leaf3">[5,6,7]</div><div class="tree-node leaf" id="leaf4">[8,9,10]</div>
+<div class="tree-node leaf" id="leaf5">[11,12]</div><div class="tree-node leaf" id="leaf6">[13,14,15]</div>
+</div>
+</div>
+<div class="steps-box" id="stepsBox">💡 Escribe un número y presiona "Buscar" para ver el recorrido</div>
+<div id="feedback" class="feedback">💬 Experimenta con la búsqueda en el B-Tree</div>
+<div id="insignia" class="insignia"><i class="fas fa-medal"></i><h3>🏅 B-Tree Explorer 🏅</h3><p>¡Estructura B-Tree dominada!</p></div>
+<button class="badge-btn" id="claimBadge" style="display:none" onclick="claimInsignia()"><i class="fas fa-award"></i> Reclamar insignia</button>
+</div>
+<button class="btn-next" id="btnNext" disabled onclick="alert('🔄 Transición al Módulo 3: CREATE / DROP INDEX')">Siguiente <i class="fas fa-arrow-right"></i></button>
+<footer><i class="fas fa-bolt"></i> Índices · SQL Medio · Módulo 2</footer>
+</div>
+<script>
+const GM=26,CI=3,LM=12,P='sqlmedio';
+function updateProgress(){let d=JSON.parse(localStorage.getItem(P+'_progress'))||[];let pct=Math.round(d.filter(m=>Math.ceil(m/12)===CI).length/LM*100);document.getElementById('progBar').style.width=pct+'%'}
+const TREE={root:[8],l1:[[3,5],[11,13]],leaf:[[1,2],[3,4],[5,6,7],[8,9,10],[11,12],[13,14,15]]};
+function resetNodes(){document.querySelectorAll('.tree-node').forEach(n=>{n.classList.remove('found');});}
+function searchTree(){
+  resetNodes();let v=parseInt(document.getElementById('searchVal').value);let fb=document.getElementById('feedback');
+  if(isNaN(v)||v<1||v>15){fb.innerHTML='❌ Ingresa un número entre 1 y 15.';fb.className='feedback error';return;}
+  let steps=[];
+  steps.push('1️⃣ Raíz [8]: ¿'+v+' < 8 o > 8?');
+  document.getElementById('nodeRoot').classList.add('found');
+  if(v===8){
+    steps.push('✅ ¡Encontrado en la raíz!');
+    fb.innerHTML='✅ <strong>¡Bingo!</strong> 8 está en la raíz del B-Tree. Solo 1 paso — O(1) en el mejor caso.';fb.className='feedback success';
+    document.getElementById('claimBadge').style.display='inline-block';
+    document.getElementById('stepsBox').innerHTML=steps.join('<br>');return;
+  }
+  let dir=v<8?'izquierda':'derecha';
+  steps.push('2️⃣ → Subárbol '+dir+': ['+TREE.l1[v<8?0:1].join(', ')+']');
+  let l1Node=document.getElementById(v<8?'nodeL1L':'nodeL1R');
+  l1Node.classList.add('found');
+  let found=false;
+  for(let i=0;i<3;i++){
+    let leafIdx=v<8?(v<=3?0:(v<=5?1:2)):(v<=11?3:(v<=13?4:5));
+    let leafData=TREE.leaf[leafIdx];
+    steps.push('3️⃣ Hoja '+ (leafIdx+1) +': ['+leafData.join(',')+']');
+    let leafEl=document.getElementById('leaf'+(leafIdx+1));
+    leafEl.classList.add('found');
+    if(leafData.includes(v)){
+      steps.push('✅ ¡Encontrado '+v+' en la hoja '+(leafIdx+1)+'!');
+      fb.innerHTML='✅ <strong>Encontrado!</strong> El B-Tree encontró '+v+' en solo 3 pasos (niveles: raíz → interno → hoja). Así funciona O(log n).';fb.className='feedback success';
+      document.getElementById('claimBadge').style.display='inline-block';
+      found=true;break;
+    }
+  }
+  if(!found){fb.innerHTML='❌ No encontrado (esto no debería pasar — todos los números 1-15 existen).';fb.className='feedback error';}
+  document.getElementById('stepsBox').innerHTML=steps.join('<br>');
+}
+function claimInsignia(){let d=JSON.parse(localStorage.getItem(P+'_progress'))||[];if(!d.includes(GM)){d.push(GM);localStorage.setItem(P+'_progress',JSON.stringify(d));}let b=JSON.parse(localStorage.getItem(P+'_badges'))||[];let badge='c'+CI+'-m2-btree';if(!b.includes(badge)){b.push(badge);localStorage.setItem(P+'_badges',JSON.stringify(b));}document.getElementById('insignia').classList.add('show');document.getElementById('claimBadge').style.display='none';document.getElementById('btnNext').disabled=false;document.getElementById('feedback').innerHTML='🎉 <strong>B-Tree dominado. ¡A por CREATE INDEX!</strong>';document.getElementById('feedback').className='feedback success';updateProgress();}
+updateProgress();
+</script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CTEs y Recursividad | SQL Medio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="../../../assets/css/theme.css">
+  <style>
+    :root { --brand-hue: 152; --accent: #00cc6a; --accent-glow: hsla(152,80%,40%,0.15); --accent2: #00ff88; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',sans-serif; background:#0a0e0f; color:#e8edee; min-height:100vh; }
+    .tech-grid { position:fixed; inset:0; background-image:linear-gradient(rgba(0,204,106,0.03)1px,transparent 1px),linear-gradient(90deg,rgba(0,204,106,0.03)1px,transparent 1px); background-size:60px 60px; z-index:0; pointer-events:none; }
+    .gradient-orb { position:fixed; border-radius:50%; filter:blur(120px); z-index:0; pointer-events:none; }
+    .orb-1 { width:600px;height:600px;background:hsla(152,70%,40%,0.12);top:-200px;right:-200px; }
+    .orb-2 { width:500px;height:500px;background:hsla(220,70%,40%,0.10);bottom:-150px;left:-150px; }
+    .container { max-width:1200px;margin:0 auto;padding:0 24px;position:relative;z-index:1; }
+    .header-section { padding-top:140px;text-align:center; }
+    .header-section h1 { font-size:clamp(2rem,5vw,3.2rem);font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:12px; }
+    .header-section .subtitle { color:#8899aa;font-size:1.1rem;max-width:700px;margin:0 auto 32px;line-height:1.6; }
+    .progress-overview { background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:24px;margin-bottom:40px;backdrop-filter:blur(12px); }
+    .progress-overview .stats { display:flex;justify-content:space-around;flex-wrap:wrap;gap:16px; }
+    .progress-overview .stat-item { text-align:center; }
+    .progress-overview .stat-number { font-size:1.8rem;font-weight:700;color:var(--accent); }
+    .progress-overview .stat-label { color:#8899aa;font-size:0.85rem;margin-top:4px; }
+    .progress-bar-container { height:8px;background:rgba(255,255,255,0.08);border-radius:4px;margin-top:16px;overflow:hidden; }
+    .progress-bar-container .bar { height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px;width:0%;transition:width .5s ease; }
+    .modules-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:40px; }
+    .module-card { background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:20px;backdrop-filter:blur(8px);transition:all .3s ease;text-decoration:none;color:inherit;display:block; }
+    .module-card:hover { transform:translateY(-3px);border-color:var(--accent);box-shadow:0 6px 24px var(--accent-glow); }
+    .module-card .num { font-size:0.7rem;color:var(--accent);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px; }
+    .module-card h3 { font-size:1rem;font-weight:600;margin-bottom:4px;color:#fff; }
+    .module-card p { color:#8899aa;font-size:0.85rem;line-height:1.4;margin-bottom:8px; }
+    .module-card .status { font-size:0.75rem;color:#667788; }
+    .module-card .status.done { color:var(--accent); }
+    footer { text-align:center;padding:32px 0;color:#667788;font-size:0.85rem;border-top:1px solid rgba(255,255,255,0.06); }
+    .back-link { display:inline-block;margin-bottom:20px;color:var(--accent);text-decoration:none;font-size:0.9rem;font-weight:600; }
+    .back-link:hover { text-decoration:underline; }
+    @media(max-width:768px){ .modules-grid { grid-template-columns:1fr; } .header-section { padding-top:100px; } }
+  </style>
+</head>
+<body>
+  <div class="tech-grid"></div>
+  <div class="gradient-orb orb-1"></div>
+  <div class="gradient-orb orb-2"></div>
+  <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a><a href="../index.html">SQL Medio</a></nav>
+  <div class="container">
+    <div class="header-section">
+      <a href="../index.html" class="back-link"><i class="fas fa-arrow-left"></i> Volver al programa</a>
+      <h1><i class="fas fa-sitemap"></i> CTEs y Consultas Recursivas</h1>
+      <p class="subtitle">Domina Common Table Expressions: WITH, CTEs múltiples, recursividad, jerarquías, grafos y optimización. 12 módulos interactivos.</p>
+    </div>
+    <div class="progress-overview">
+      <div class="stats">
+        <div class="stat-item"><div class="stat-number" id="modsDone">0/12</div><div class="stat-label">Completados</div></div>
+        <div class="stat-item"><div class="stat-number" id="pctDisplay">0%</div><div class="stat-label">Progreso</div></div>
+        <div class="stat-item"><div class="stat-number" id="badgeCount">0</div><div class="stat-label">Insignias</div></div>
+      </div>
+      <div class="progress-bar-container"><div class="bar" id="globalBar"></div></div>
+    </div>
+    <div class="modules-grid">
+      <a href="01-with-basico.html" class="module-card" data-m="1"><div class="num">Módulo 1</div><h3>WITH Básico</h3><p>Primer CTE, legibilidad, organización de consultas complejas.</p><span class="status">⬜ Pendiente</span></a>
+      <a href="02-multiples-ctes.html" class="module-card" data-m="2"><div class="num">Módulo 2</div><h3>Múltiples CTEs</h3><p>Varios WITH en una consulta, CTEs secuenciales, composición.</p><span class="status">⬜ Pendiente</span></a>
+      <a href="03-ctes-vs-subconsultas.html" class="module-card" data-m="3"><div class="num">Módulo 3</div><h3>CTEs vs Subconsultas vs Vistas</h3><p>Cuándo usar cada uno, rendimiento, mantenibilidad.</p><span class="status">⬜ Pendiente</span></a>
+      <a href="04-ctes-modificadoras.html" class="module-card" data-m="4"><div class="num">Módulo 4</div><h3>CTEs Modificadoras</h3><p>INSERT/UPDATE/DELETE con WITH, RETURNING, CTEs de datos.</p><span class="status">⬜ Pendiente</span></a>
+      <a href="05-recursividad-concepto.html" class="module-card" data-m="5"><div class="num">Módulo 5</div><h3>Recursividad — Concepto</h3><p>Qué es recursividad en SQL, casos de uso, estructura mental.</p><span class="status">⬜ Pendiente</span></a>
+      <a href="06-with-recursive.html" class="module-card" data-m="6"><div class="num">Módulo 6</div><h3>WITH RECURSIVE — Estructura</h3><p>Anchor member, recursive member, UNION ALL, iteración.</p><span class="status">⬜ Pendiente</span></a>
+      <a href="07-organigramas.html" class="module-card" data-m="7"><div class="num">Módulo 7</div><h3>Organigramas</h3><p>Jerarquías empleado-jefe, niveles, árboles organizacionales.</p><span class="status">⬜ Pendiente</span></a>
+      <a href="08-categorias-jerarquicas.html" class="module-card" data-m="8"><div class="num">Módulo 8</div><h3>Categorías Jerárquicas</h3><p>Árboles de categorías, path, profundidad, ordenamiento.</p><span class="status">⬜ Pendiente</span></a>
+      <a href="09-deteccion-ciclos.html" class="module-card" data-m="9"><div class="num">Módulo 9</div><h3>Detección de Ciclos</h3><p>Ciclos en grafos, protección con arrays, prevención de loops.</p><span class="status">⬜ Pendiente</span></a>
+      <a href="10-grafos-ctes.html" class="module-card" data-m="10"><div class="num">Módulo 10</div><h3>Grafos con CTEs</h3><p>BFS/DFS con CTEs, caminos más cortos, redes.</p><span class="status">⬜ Pendiente</span></a>
+      <a href="11-optimizacion-ctes.html" class="module-card" data-m="11"><div class="num">Módulo 11</div><h3>Optimización de CTEs</h3><p>MATERIALIZED vs NOT MATERIALIZED, planificación, índices.</p><span class="status">⬜ Pendiente</span></a>
+      <a href="12-mini-proyecto.html" class="module-card" data-m="12"><div class="num">Módulo 12</div><h3>Mini-Proyecto: Navegación Categorías</h3><p>Proyecto integrador: sistema de categorías con CTEs recursivas.</p><span class="status">⬜ Pendiente</span></a>
+    </div>
+    <footer><i class="fas fa-sitemap"></i> CTEs y Recursividad · SQL Medio · PostgreSQL 19</footer>
+  </div>
+  <script>
+    (function(){
+      const P='sqlmedio',CI=2;
+      function u(){
+        let d=JSON.parse(localStorage.getItem(P+'_progress'))||[],b=JSON.parse(localStorage.getItem(P+'_badges'))||[];
+        let c=d.filter(m=>Math.ceil(m/12)===CI).length;
+        document.getElementById('modsDone').textContent=c+'/12';
+        let p=Math.round(c/12*100);
+        document.getElementById('globalBar').style.width=p+'%';
+        document.getElementById('pctDisplay').textContent=p+'%';
+        document.getElementById('badgeCount').textContent=b.filter(x=>x.startsWith('c'+CI)).length;
+        document.querySelectorAll('.module-card').forEach(e=>{
+          let m=parseInt(e.dataset.m),gm=(CI-1)*12+m,s=d.includes(gm)?'✅ Completado':'⬜ Pendiente';
+          e.querySelector('.status').textContent=s;
+          if(d.includes(gm))e.querySelector('.status').classList.add('done');
+        });
+      }
+      u();setInterval(u,2000);
+    })();
+  </script>
+</body>
+</html>

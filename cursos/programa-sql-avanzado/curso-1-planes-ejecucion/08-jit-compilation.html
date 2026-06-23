@@ -1,0 +1,92 @@
+<!DOCTYPE html><html lang="es"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SQL Avanzado | 08 JIT Compilation</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../../../assets/css/theme.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#0a0e0f;color:#e8edee;min-height:100vh;display:flex;justify-content:center;padding:20px}
+.course-container{max-width:860px;width:100%;background:rgba(15,20,42,0.6);backdrop-filter:blur(16px);border-radius:24px;border:1px solid rgba(255,80,80,0.2);padding:30px;margin-top:60px}
+.progress-bar,.progress-fill{height:10px;border-radius:8px}
+.progress-bar{background:rgba(255,255,255,0.06);margin-bottom:18px;overflow:hidden}
+.progress-fill{background:linear-gradient(90deg,#ff5050,#cc4040);width:0%;transition:width .5s ease}
+.progress-text{font-size:.75rem;color:#8899aa;margin-bottom:10px;display:block}
+.hero-header{text-align:center;margin:20px 0}
+.hero-header h1{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:800;background:linear-gradient(135deg,#ff5050,#cc4040);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-header p{color:#8899aa;margin-top:6px;font-size:.95rem}
+.analogy-card{background:rgba(255,80,80,0.08);border-left:4px solid #ff5050;border-radius:12px;padding:16px 20px;margin:20px 0;font-size:.9rem;line-height:1.6}
+.analogy-card strong{color:#ff5050}
+.main-area{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:24px;margin:20px 0}
+.quiz-option{display:block;width:100%;padding:14px 18px;margin:8px 0;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:#e8edee;font-size:.9rem;font-family:'Inter',sans-serif;cursor:pointer;transition:all .25s;text-align:left}
+.quiz-option:hover{background:rgba(255,80,80,0.1);border-color:#ff5050}
+.quiz-option.correct{background:rgba(0,255,100,0.15);border-color:#00ff64}
+.quiz-option.wrong{background:rgba(255,80,80,0.15);border-color:#ff5050}
+.jit-info{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0}
+.jit-card{background:rgba(255,255,255,0.03);border-radius:10px;padding:14px;text-align:center}
+.jit-card h4{color:#ff5050;font-size:.9rem;margin-bottom:4px}
+.jit-card p{color:#8899aa;font-size:.8rem}
+.feedback{background:rgba(255,255,255,0.04);border-radius:12px;padding:16px 20px;margin:16px 0;font-size:.88rem;min-height:50px}
+.insignia{background:linear-gradient(135deg,rgba(255,215,0,0.12),rgba(255,165,0,0.08));border:1px solid rgba(255,215,0,0.3);border-radius:16px;padding:20px;text-align:center;margin:16px 0;transition:.5s}
+.insignia.hidden{display:none}
+.insignia h3{color:#ffd700;font-size:1.3rem;margin:8px 0}
+.btn-next{display:block;width:100%;padding:16px;margin:20px 0;background:linear-gradient(135deg,#ff5050,#cc4040);border:none;border-radius:14px;color:#fff;font-size:1.05rem;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:.3s}
+.btn-next:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,80,80,0.3)}
+footer{text-align:center;padding:16px 0 0;color:#667788;font-size:.8rem;border-top:1px solid rgba(255,255,255,0.06);margin-top:20px}
+@media(max-width:600px){.course-container{padding:16px;margin-top:50px}.jit-info{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="course-container">
+<nav class="brand-return-nav"><a href="../../../../index.html">&larr; Portfolio</a><a href="../../../../cursos/index.html">Cursos</a></nav>
+<div class="progress-bar"><div class="progress-fill" id="progFill"></div></div>
+<span class="progress-text" id="progText">Módulo 8 de 12</span>
+<div class="hero-header"><h1>🔥 JIT Compilation</h1><p>Compilación Just-In-Time para acelerar expresiones complejas</p></div>
+<div class="analogy-card"><strong>💡 Piénsalo así:</strong> JIT es como tener un traductor humano en vez de leer un libro de frases cada vez que hablas. En vez de interpretar la expresión SQL línea por línea cada vez (como un intérprete), JIT la compila a código máquina una sola vez y luego la ejecuta a velocidad nativa. El truco: si la consulta es muy corta, el tiempo de "traducción" no compensa.</div>
+<div class="main-area">
+<p style="color:#bcc;margin-bottom:10px;font-weight:600"><i class="fas fa-bolt" style="color:#ff5050"></i> ¿Cuándo conviene JIT?</p>
+<div class="jit-info">
+<div class="jit-card"><h4><i class="fas fa-check-circle" style="color:#00ff64"></i> Bueno para JIT</h4><p>Consultas largas, muchas filas, funciones complejas, WHERE con muchas condiciones, SUM/CASE complejos.</p></div>
+<div class="jit-card"><h4><i class="fas fa-times-circle" style="color:#ff5050"></i> Malo para JIT</h4><p>Consultas cortas (<1s), OLTP, joins simples, pocas filas. El overhead de compilación no se recupera.</p></div>
+</div>
+<p style="color:#bcc;margin:16px 0 10px;font-weight:600"><i class="fas fa-question-circle" style="color:#ff5050"></i> Quiz: ¿Cuándo activa PostgreSQL JIT por defecto?</p>
+<button class="quiz-option" data-ans="0">Siempre, en todas las consultas</button>
+<button class="quiz-option" data-ans="1">Solo cuando el plan de ejecución estima >100,000 filas</button>
+<button class="quiz-option" data-ans="2">Nunca, hay que activarlo manualmente</button>
+<button class="quiz-option" data-ans="3">Solo para consultas con funciones agregadas</button>
+</div>
+<div id="feedback" class="feedback">💬 Elige una respuesta para aprender sobre la activación de JIT.</div>
+<div id="insignia" class="insignia hidden"><i class="fas fa-medal" style="font-size:2.5rem;color:#ffd700"></i><h3>🏅 Compilador JIT 🏅</h3><p>¡Sabes cuándo la compilación en caliente acelera tus consultas!</p></div>
+<button class="btn-next" onclick="alert('🔄 Transición → 09-connection-pooling-pgbouncer.html')">Siguiente <i class="fas fa-arrow-right"></i></button>
+<footer><i class="fas fa-crown"></i> SQL Avanzado · Curso 1 · Módulo 8</footer>
+</div>
+<script>
+const MODULE=8,COURSE="sqlavanzado_c1",PROG="sqlavanzado_progress",BADGES="sqlavanzado_badges";
+document.querySelectorAll('.quiz-option').forEach(b=>{
+b.addEventListener('click',function(){
+let ans=this.dataset.ans,f=document.getElementById('feedback');
+if(ans==='1'){
+f.innerHTML='✅ ¡Correcto! PostgreSQL activa JIT cuando el plan estima procesar más de 100,000 filas (parámetro jit_above_cost). También considera la complejidad de las expresiones. JIT traduce expressions/qualifications/tuple deforming a código nativo (LLVM).';
+document.getElementById('insignia').classList.remove('hidden');
+this.className='quiz-option correct';
+document.querySelectorAll('.quiz-option').forEach(o=>o.style.pointerEvents='none');
+let bd=JSON.parse(localStorage.getItem(BADGES))||[];
+if(!bd.includes('Compilador JIT')){bd.push('Compilador JIT');localStorage.setItem(BADGES,JSON.stringify(bd))}
+updateProg();
+}else{
+f.innerHTML='❌ No exactamente. JIT no se activa siempre (demasiado overhead para consultas cortas) ni nunca (es muy útil para consultas pesadas). La respuesta correcta es: cuando se estiman >100,000 filas.';
+this.className='quiz-option wrong';setTimeout(()=>this.className='quiz-option',600)}
+})
+});
+function updateProg(){
+let p=JSON.parse(localStorage.getItem(COURSE+"_progress"))||[];
+if(!p.includes(MODULE)){p.push(MODULE);localStorage.setItem(COURSE+"_progress",JSON.stringify(p))}
+let pct=Math.round(p.length/12*100);
+document.getElementById('progFill').style.width=pct+'%';
+document.getElementById('progText').textContent='Módulo 8 de 12 ('+pct+'%)';
+let gp=JSON.parse(localStorage.getItem(PROG))||[];
+if(!gp.includes(MODULE+84)){gp.push(MODULE+84);localStorage.setItem(PROG,JSON.stringify(gp))}
+}
+</script>
+</body>
+</html>

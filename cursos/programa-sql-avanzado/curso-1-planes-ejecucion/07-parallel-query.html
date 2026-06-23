@@ -1,0 +1,117 @@
+<!DOCTYPE html><html lang="es"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SQL Avanzado | 07 Parallel Query</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../../../assets/css/theme.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#0a0e0f;color:#e8edee;min-height:100vh;display:flex;justify-content:center;padding:20px}
+.course-container{max-width:860px;width:100%;background:rgba(15,20,42,0.6);backdrop-filter:blur(16px);border-radius:24px;border:1px solid rgba(255,80,80,0.2);padding:30px;margin-top:60px}
+.progress-bar,.progress-fill{height:10px;border-radius:8px}
+.progress-bar{background:rgba(255,255,255,0.06);margin-bottom:18px;overflow:hidden}
+.progress-fill{background:linear-gradient(90deg,#ff5050,#cc4040);width:0%;transition:width .5s ease}
+.progress-text{font-size:.75rem;color:#8899aa;margin-bottom:10px;display:block}
+.hero-header{text-align:center;margin:20px 0}
+.hero-header h1{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:800;background:linear-gradient(135deg,#ff5050,#cc4040);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-header p{color:#8899aa;margin-top:6px;font-size:.95rem}
+.analogy-card{background:rgba(255,80,80,0.08);border-left:4px solid #ff5050;border-radius:12px;padding:16px 20px;margin:20px 0;font-size:.9rem;line-height:1.6}
+.analogy-card strong{color:#ff5050}
+.main-area{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:24px;margin:20px 0}
+.workers-select{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0;justify-content:center}
+.worker-btn{padding:12px 20px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#e8edee;cursor:pointer;font-family:'Inter',sans-serif;font-size:.9rem;transition:.3s;min-width:80px;text-align:center}
+.worker-btn:hover,.worker-btn.active{background:rgba(255,80,80,0.15);border-color:#ff5050}
+.worker-visual{display:flex;justify-content:center;gap:12px;margin:20px 0;min-height:80px;flex-wrap:wrap}
+.worker-node{width:70px;height:70px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:.7rem;font-weight:600;transition:.5s;border:2px solid}
+.worker-node.leader{background:rgba(255,80,80,0.2);border-color:#ff5050;color:#ff5050}
+.worker-node.worker{background:rgba(0,224,255,0.15);border-color:#00e0ff;color:#00e0ff}
+.worker-node.gather{background:rgba(156,100,255,0.15);border-color:#9c64ff;color:#9c64ff}
+.parallel-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:16px 0}
+.ps{background:rgba(255,255,255,0.04);border-radius:10px;padding:14px;text-align:center}
+.ps .num{font-size:1.3rem;font-weight:700;color:#ff5050}
+.ps .lbl{font-size:.75rem;color:#8899aa;margin-top:4px}
+.feedback{background:rgba(255,255,255,0.04);border-radius:12px;padding:16px 20px;margin:16px 0;font-size:.88rem;min-height:50px}
+.insignia{background:linear-gradient(135deg,rgba(255,215,0,0.12),rgba(255,165,0,0.08));border:1px solid rgba(255,215,0,0.3);border-radius:16px;padding:20px;text-align:center;margin:16px 0;transition:.5s}
+.insignia.hidden{display:none}
+.insignia h3{color:#ffd700;font-size:1.3rem;margin:8px 0}
+.btn-next{display:block;width:100%;padding:16px;margin:20px 0;background:linear-gradient(135deg,#ff5050,#cc4040);border:none;border-radius:14px;color:#fff;font-size:1.05rem;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:.3s}
+.btn-next:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,80,80,0.3)}
+footer{text-align:center;padding:16px 0 0;color:#667788;font-size:.8rem;border-top:1px solid rgba(255,255,255,0.06);margin-top:20px}
+@media(max-width:600px){.course-container{padding:16px;margin-top:50px}.parallel-stats{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="course-container">
+<nav class="brand-return-nav"><a href="../../../../index.html">&larr; Portfolio</a><a href="../../../../cursos/index.html">Cursos</a></nav>
+<div class="progress-bar"><div class="progress-fill" id="progFill"></div></div>
+<span class="progress-text" id="progText">Módulo 7 de 12</span>
+<div class="hero-header"><h1>⚡ Parallel Query</h1><p>Paraleliza consultas para aprovechar múltiples CPUs</p></div>
+<div class="analogy-card"><strong>💡 Piénsalo así:</strong> Parallel Query es como tener un equipo de cocineros en vez de uno solo. Un cocinero solo puede preparar una pizza a la vez. Con 4 cocineros, puedes preparar 4 pizzas simultáneamente. Pero ojo: no todas las recetas se pueden paralelizar (¿cómo cocinas una sopa entre 4?). PostgreSQL decide qué partes de la consulta se pueden repartir.</div>
+<div class="main-area">
+<p style="color:#bcc;margin-bottom:10px;font-weight:600"><i class="fas fa-cogs" style="color:#ff5050"></i> Configura los workers paralelos</p>
+<div class="workers-select">
+<button class="worker-btn" data-w="1">1 worker</button>
+<button class="worker-btn active" data-w="2">2 workers</button>
+<button class="worker-btn" data-w="4">4 workers</button>
+<button class="worker-btn" data-w="8">8 workers</button>
+<button class="worker-btn" data-w="16">16 workers</button>
+</div>
+<div class="worker-visual" id="workerVis"></div>
+<div class="parallel-stats">
+<div class="ps"><div class="num" id="seqTime">10.0</div><div class="lbl">Seq. Scan (s)</div></div>
+<div class="ps"><div class="num" id="parTime">5.0</div><div class="lbl">Paralelo (s)</div></div>
+<div class="ps"><div class="num" id="speedup">2.0</div><div class="lbl">Speedup ×</div></div>
+</div>
+</div>
+<div id="feedback" class="feedback">💬 A mayor número de workers, más rápido (pero con rendimientos decrecientes por overhead de coordinación).</div>
+<div id="insignia" class="insignia hidden"><i class="fas fa-medal" style="font-size:2.5rem;color:#ffd700"></i><h3>🏅 Paralelizador 🏅</h3><p>¡Dominas la ejecución paralela de consultas en PostgreSQL!</p></div>
+<button class="btn-next" onclick="alert('🔄 Transición → 08-jit-compilation.html')">Siguiente <i class="fas fa-arrow-right"></i></button>
+<footer><i class="fas fa-crown"></i> SQL Avanzado · Curso 1 · Módulo 7</footer>
+</div>
+<script>
+const MODULE=7,COURSE="sqlavanzado_c1",PROG="sqlavanzado_progress",BADGES="sqlavanzado_badges";
+function loadWorkers(n){
+let vis=document.getElementById('workerVis');
+vis.innerHTML='<div class="worker-node leader"><i class="fas fa-microchip"></i><span>Leader</span></div>';
+for(let i=0;i<n;i++){
+let d=document.createElement('div');
+d.className='worker-node worker';
+d.innerHTML='<i class="fas fa-cog"></i><span>W'+(i+1)+'</span>';
+vis.appendChild(d);
+}
+let gather=document.createElement('div');
+gather.className='worker-node gather';
+gather.innerHTML='<i class="fas fa-arrow-down"></i><span>Gather</span>';
+vis.appendChild(gather);
+let seqTime=10;
+let parTime=seqTime*(0.4+0.6/(n+1));
+let speedup=(seqTime/parTime);
+document.getElementById('seqTime').textContent=seqTime.toFixed(1);
+document.getElementById('parTime').textContent=parTime.toFixed(1);
+document.getElementById('speedup').textContent=speedup.toFixed(2);
+let fb=document.getElementById('feedback');
+if(n===1)fb.innerHTML='💡 Con 1 worker, el paralelismo es mínimo. El tiempo baja de '+seqTime+'s a ~'+parTime.toFixed(1)+'s. Speedup: '+speedup.toFixed(2)+'×. No todo se puede paralelizar (Amdahl).';
+else if(n<=4)fb.innerHTML='💡 Con '+n+' workers, el tiempo baja a '+parTime.toFixed(1)+'s. Speedup de '+speedup.toFixed(2)+'×. ¡Buena ganancia! El overhead de coordinación es pequeño.';
+else fb.innerHTML='💡 Con '+n+' workers, tiempo='+parTime.toFixed(1)+'s, speedup='+speedup.toFixed(2)+'×. La ganancia marginal disminuye: la parte secuencial (40%) limita el escalamiento (Ley de Amdahl).';
+let bd=JSON.parse(localStorage.getItem(BADGES))||[];
+if(!bd.includes('Paralelizador')){bd.push('Paralelizador');localStorage.setItem(BADGES,JSON.stringify(bd));document.getElementById('insignia').classList.remove('hidden')}
+updateProg();
+}
+document.querySelectorAll('.worker-btn').forEach(b=>b.addEventListener('click',function(){
+document.querySelectorAll('.worker-btn').forEach(bb=>bb.classList.remove('active'));
+this.classList.add('active');
+loadWorkers(parseInt(this.dataset.w));
+}));
+function updateProg(){
+let p=JSON.parse(localStorage.getItem(COURSE+"_progress"))||[];
+if(!p.includes(MODULE)){p.push(MODULE);localStorage.setItem(COURSE+"_progress",JSON.stringify(p))}
+let pct=Math.round(p.length/12*100);
+document.getElementById('progFill').style.width=pct+'%';
+document.getElementById('progText').textContent='Módulo 7 de 12 ('+pct+'%)';
+let gp=JSON.parse(localStorage.getItem(PROG))||[];
+if(!gp.includes(MODULE+72)){gp.push(MODULE+72);localStorage.setItem(PROG,JSON.stringify(gp))}
+}
+loadWorkers(2);
+</script>
+</body>
+</html>

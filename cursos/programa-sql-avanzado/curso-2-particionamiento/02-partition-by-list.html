@@ -1,0 +1,92 @@
+<!DOCTYPE html><html lang="es"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SQL Avanzado | C2-02 PARTITION BY LIST</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../../../assets/css/theme.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#0a0e0f;color:#e8edee;min-height:100vh;display:flex;justify-content:center;padding:20px}
+.course-container{max-width:860px;width:100%;background:rgba(15,20,42,0.6);backdrop-filter:blur(16px);border-radius:24px;border:1px solid rgba(156,100,255,0.2);padding:30px;margin-top:60px}
+.progress-bar{background:rgba(255,255,255,0.06);border-radius:8px;height:10px;margin-bottom:18px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#9c64ff,#7a3ce0);border-radius:8px;transition:width .5s ease;width:0%}
+.progress-text{font-size:.75rem;color:#8899aa;margin-bottom:10px;display:block}
+.hero-header{text-align:center;margin:20px 0}
+.hero-header h1{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:800;background:linear-gradient(135deg,#9c64ff,#7a3ce0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-header p{color:#8899aa;margin-top:6px;font-size:.95rem}
+.analogy-card{background:rgba(156,100,255,0.08);border-left:4px solid #9c64ff;border-radius:12px;padding:16px 20px;margin:20px 0;font-size:.9rem;line-height:1.6}
+.analogy-card strong{color:#9c64ff}
+.main-area{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:24px;margin:20px 0}
+.list-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}
+.list-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px;text-align:center;cursor:pointer;transition:.3s}
+.list-card:hover{border-color:#9c64ff;transform:translateY(-2px)}
+.list-card.selected{background:rgba(156,100,255,0.12);border-color:#9c64ff}
+.list-card h4{color:#9c64ff;font-size:.95rem}
+.list-card p{color:#8899aa;font-size:.8rem;margin-top:4px}
+.list-card .region-count{font-size:1.2rem;font-weight:700;color:#fff;margin-top:6px}
+.region-pool{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0;justify-content:center}
+.region-tag{padding:6px 14px;border-radius:20px;font-size:.8rem;cursor:pointer;transition:.3s;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1)}
+.region-tag:hover,.region-tag.active{background:rgba(156,100,255,0.15);border-color:#9c64ff}
+.feedback{background:rgba(255,255,255,0.04);border-radius:12px;padding:16px 20px;margin:16px 0;font-size:.88rem;min-height:50px}
+.insignia{background:linear-gradient(135deg,rgba(255,215,0,0.12),rgba(255,165,0,0.08));border:1px solid rgba(255,215,0,0.3);border-radius:16px;padding:20px;text-align:center;margin:16px 0;transition:.5s}
+.insignia.hidden{display:none}
+.insignia h3{color:#ffd700;font-size:1.3rem;margin:8px 0}
+.btn-next{display:block;width:100%;padding:16px;margin:20px 0;background:linear-gradient(135deg,#9c64ff,#7a3ce0);border:none;border-radius:14px;color:#fff;font-size:1.05rem;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:.3s}
+.btn-next:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(156,100,255,0.3)}
+footer{text-align:center;padding:16px 0 0;color:#667788;font-size:.8rem;border-top:1px solid rgba(255,255,255,0.06);margin-top:20px}
+@media(max-width:600px){.course-container{padding:16px;margin-top:50px}.list-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="course-container">
+<nav class="brand-return-nav"><a href="../../../../index.html">&larr; Portfolio</a><a href="../../../../cursos/index.html">Cursos</a></nav>
+<div class="progress-bar"><div class="progress-fill" id="progFill"></div></div>
+<span class="progress-text" id="progText">Módulo 2 de 12</span>
+<div class="hero-header"><h1>📋 PARTITION BY LIST</h1><p>Agrupa por valores discretos: regiones, estados, categorías</p></div>
+<div class="analogy-card"><strong>💡 Piénsalo así:</strong> PARTITION BY LIST es como clasificar tu ropa por tipo: camisas en un cajón, pantalones en otro, calcetines en otro. Cada valor (camisa, pantalón) va a su partición específica. No hay rangos, solo listas de pertenencia. Es perfecto para datos categóricos como regiones, colores o estados.</div>
+<div class="main-area">
+<p style="color:#bcc;margin-bottom:10px;font-weight:600"><i class="fas fa-list" style="color:#9c64ff"></i> Clasificador por Lista</p>
+<p style="color:#8899aa;font-size:.85rem;margin-bottom:12px">Arrastra regiones a su partición correspondiente</p>
+<div class="region-pool" id="regionPool"></div>
+<div class="list-grid" id="listGrid"></div>
+</div>
+<div id="feedback" class="feedback">💬 Haz clic en las regiones para asignarlas a continentes. Cada continente es una partición LIST.</div>
+<div id="insignia" class="insignia hidden"><i class="fas fa-medal" style="font-size:2.5rem;color:#ffd700"></i><h3>🏅 Clasificador LIST 🏅</h3><p>¡Dominas la partición por lista de valores!</p></div>
+<button class="btn-next" onclick="alert('🔄 Transición → 03-partition-by-hash.html')">Siguiente <i class="fas fa-arrow-right"></i></button>
+<footer><i class="fas fa-crown"></i> SQL Avanzado · Curso 2 · Módulo 2</footer>
+</div>
+<script>
+const MODULE=2,COURSE="sqlavanzado_c2",PROG="sqlavanzado_progress",BADGES="sqlavanzado_badges";
+const REGIONS=['Norteamérica','Sudamérica','Europa Occidental','Europa Oriental','Norte de África','Sur de África','Este de Asia','Sudeste Asiático','Oceanía'];
+const PARTITIONS={'América':['Norteamérica','Sudamérica'],'Europa':['Europa Occidental','Europa Oriental'],'África':['Norte de África','Sur de África'],'Asia-Pacífico':['Este de Asia','Sudeste Asiático','Oceanía']};
+let assigned={};
+function render(){
+let pool=document.getElementById('regionPool');
+let unassigned=REGIONS.filter(r=>!Object.values(assigned).flat().includes(r));
+pool.innerHTML=unassigned.map(r=>'<span class="region-tag active" data-r="'+r+'">'+r+'</span>').join('');
+pool.querySelectorAll('.region-tag').forEach(t=>t.addEventListener('click',function(){selectRegion(this.dataset.r);}));
+let grid=document.getElementById('listGrid');
+grid.innerHTML=Object.keys(PARTITIONS).map(k=>{
+let items=assigned[k]||[];
+let total=PARTITIONS[k].length;
+return '<div class="list-card'+(items.length===total?' selected':'')+'" data-p="'+k+'"><h4>'+k+'</h4><div class="region-count">'+items.length+'/'+total+'</div><p>'+(items.length>0?items.join(', '):'Asigna regiones aquí')+'</p></div>';
+}).join('');
+}
+function selectRegion(r){
+let p=Object.keys(PARTITIONS).find(k=>PARTITIONS[k].includes(r));
+if(!p)return;
+if(!assigned[p])assigned[p]=[];
+if(!assigned[p].includes(r)){assigned[p].push(r);document.getElementById('feedback').innerHTML='✅ '+r+' asignada a '+p+'. CREATE TABLE customers_'+p.toLowerCase().replace(/[^a-z]/g,'')+' PARTITION OF customers FOR VALUES IN ('+PARTITIONS[p].map(x=>"'"+x+"'").join(',')+');';}
+let allDone=Object.keys(PARTITIONS).every(k=>(assigned[k]||[]).length===PARTITIONS[k].length);
+if(allDone){document.getElementById('insignia').classList.remove('hidden');let bd=JSON.parse(localStorage.getItem(BADGES))||[];if(!bd.includes('Clasificador LIST')){bd.push('Clasificador LIST');localStorage.setItem(BADGES,JSON.stringify(bd));}updateProg();}
+render();
+}
+render();
+function updateProg(){
+let p=JSON.parse(localStorage.getItem(COURSE+"_progress"))||[];if(!p.includes(MODULE)){p.push(MODULE);localStorage.setItem(COURSE+"_progress",JSON.stringify(p))}
+let pct=Math.round(p.length/12*100);document.getElementById('progFill').style.width=pct+'%';document.getElementById('progText').textContent='Módulo 2 de 12 ('+pct+'%)';
+let gp=JSON.parse(localStorage.getItem(PROG))||[];if(!gp.includes(MODULE+24)){gp.push(MODULE+24);localStorage.setItem(PROG,JSON.stringify(gp))}
+}
+</script>
+</body>
+</html>

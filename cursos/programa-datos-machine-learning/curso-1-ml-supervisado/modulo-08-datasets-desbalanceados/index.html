@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Datasets Desbalanceados - SMOTE, Class Weights y Focal Loss | DataScience Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="../../../../assets/css/theme.css">
+<link rel="stylesheet" href="../../../../assets/css/styles.css">
+<style>
+:root{--ac:#ff8c00;--ac-rgb:255,140,0}
+body{background:#0b0e17;color:#e4e9f0;font-family:Inter,sans-serif;margin:0;padding:0}
+.brand-return-nav{background:rgba(11,14,23,.92);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.06);padding:.6rem 1.2rem;display:flex;align-items:center;gap:.5rem;font-size:.82rem;position:sticky;top:0;z-index:100}
+.brand-return-nav a{color:#8899bb;text-decoration:none;transition:color .2s}
+.brand-return-nav a:hover{color:#ff8c00}
+.brand-return-nav .sep{color:#334}
+.brand-return-nav .current{color:#c8d0e0}
+.container{max-width:780px;margin:0 auto;padding:1.5rem 1rem}
+.module-wrapper{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:1.8rem;backdrop-filter:blur(6px)}
+.module-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem}
+.module-badge{font-size:.75rem;background:rgba(var(--ac-rgb),.15);color:var(--ac);padding:.25rem .7rem;border-radius:20px;font-weight:500}
+.module-course-name{font-size:.7rem;color:#667;text-transform:uppercase;letter-spacing:.06em}
+.module-title{font-size:1.6rem;font-weight:700;margin:.2rem 0 .15rem;background:linear-gradient(135deg,#fff,var(--ac));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.module-subtitle{font-size:.88rem;color:#8899bb;margin:0 0 1.2rem}
+.analogy-card{background:rgba(var(--ac-rgb),.06);border-left:3px solid var(--ac);border-radius:0 10px 10px 0;padding:.8rem 1rem;margin-bottom:1.5rem;font-size:.82rem;color:#b0bcd4}
+.analogy-card i{color:var(--ac);margin-right:.5rem}
+.activity-area{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:12px;padding:1rem;margin-bottom:1rem;min-height:200px}
+.act-slider{-webkit-appearance:none;width:100%;height:5px;border-radius:3px;background:#1e2533;outline:none;margin:.6rem 0}
+.act-slider::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--ac);cursor:pointer;border:2px solid rgba(255,255,255,.1)}
+.sv{display:flex;justify-content:space-between;font-size:.75rem;color:#667;margin:-.3rem 0 .6rem}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:600px){.g2{grid-template-columns:1fr}}
+.tg{display:flex;gap:.35rem;flex-wrap:wrap;margin:.4rem 0}
+.tog{background:#1a2030;border:1px solid #2a3344;color:#8899bb;padding:.35rem .7rem;border-radius:8px;cursor:pointer;font-size:.72rem;font-family:inherit;transition:all .2s}
+.tog.on{background:rgba(var(--ac-rgb),.2);border-color:var(--ac);color:var(--ac)}
+.bn{background:#1a2030;border:1px solid #2a3344;color:#c8d0e0;padding:.6rem 1rem;border-radius:10px;cursor:pointer;font-family:inherit;font-size:.82rem;transition:all .2s}
+.bn:hover{background:#242d3d;border-color:var(--ac)}
+.bp{background:var(--ac);color:#fff;border-color:var(--ac);font-weight:600}
+.bp:hover{opacity:.9;transform:translateY(-1px)}
+.cv{background:#0f1420;border:1px solid #1e2533;border-radius:10px;position:relative;overflow:hidden}
+.cp{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#667;font-size:.8rem}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem;margin-top:.5rem}
+.sb{background:#0f1420;border:1px solid #1e2533;border-radius:8px;padding:.4rem;text-align:center}
+.sb .v{font-size:1rem;font-weight:700;color:#fff}
+.sb .l{font-size:.6rem;color:#667;text-transform:uppercase;letter-spacing:.05em}
+.fb{background:#0f1420;border:1px solid #1e2533;border-radius:10px;padding:.7rem 1rem;font-size:.82rem;color:#667;min-height:1.2rem;margin-bottom:1rem}
+.fb.ok{background:rgba(0,204,106,.08);border-color:rgba(0,204,106,.2);color:#00cc6a}
+.module-actions{display:flex;justify-content:space-between;gap:1rem;margin-top:1.5rem}
+.btn-prev,.btn-next{padding:.7rem 1.4rem;border-radius:10px;border:1px solid rgba(255,255,255,.08);cursor:pointer;font-family:inherit;font-size:.85rem;transition:all .25s;text-decoration:none;display:inline-flex;align-items:center;gap:.5rem}
+.btn-prev{background:rgba(255,255,255,.03);color:#8899bb}
+.btn-prev:hover{background:rgba(255,255,255,.06);color:#c8d0e0}
+.btn-next{background:var(--ac);color:#fff;border-color:var(--ac);font-weight:600}
+.btn-next:hover{opacity:.9;transform:translateY(-1px)}
+.badge-modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:999}
+.badge-content{background:linear-gradient(145deg,#1a2030,#0f1420);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:2rem;text-align:center;max-width:340px;width:90%}
+.badge-content i{font-size:2.5rem;color:var(--ac);margin-bottom:.5rem}
+.badge-content h2{font-size:1.2rem;color:#fff;margin:.3rem 0}
+.badge-name{font-size:1rem;color:var(--ac);font-weight:600;margin:.2rem 0}
+.badge-sub{font-size:.75rem;color:#667}
+.badge-btn{margin-top:1rem;padding:.6rem 1.6rem;background:var(--ac);color:#fff;border:none;border-radius:10px;cursor:pointer;font-family:inherit;font-size:.85rem;font-weight:600}
+.footer p{margin:.3rem 0}
+</style>
+</head>
+<body>
+<nav class="brand-return-nav">
+<a href="../../../../index.html"><i class="fas fa-arrow-left"></i> Portfolio</a>
+<span class="sep">/</span>
+<a href="../../../../cursos/index.html">Cursos</a>
+<span class="sep">/</span>
+<a href="../../index.html">Datasets Desbalanceados</a>
+<span class="sep">/</span>
+<span class="current">SMOTE, Class Weights y Focal Loss</span>
+</nav>
+<div class="container">
+<div class="module-wrapper">
+<div class="module-header">
+<div class="module-badge">⚖️ Módulo 8</div>
+<div class="module-course-name">Curso 1</div>
+</div>
+<h1 class="module-title">Datasets Desbalanceados</h1>
+<p class="module-subtitle">SMOTE, Class Weights y Focal Loss</p>
+<div class="analogy-card"><i class="fas fa-lightbulb"></i><strong>Analogía:</strong> Como un médico detectando enfermedades raras.</div>
+<div class="activity-area"><div class="g2"><div><label>SMOTE ratio</label>
+<input type="range" id="actS" min="1" max="100" value="50" class="act-slider">
+<div class="sv"><span>Min</span><span id="actV">50 %</span><span>Max</span></div>
+<p class="rd">Controla el balanceo de clases sintético.</p>
+<button class="bn bp" style="width:100%;margin-top:.5rem"><i class="fas fa-play"></i> Ejecutar</button>
+</div><div><div class="cv" id="actR" style="height:140px"><div class="cp">Resultado</div></div></div></div></div>
+<div id="fb" class="fb"></div>
+<div class="module-actions">
+<button class="btn-prev" onclick="window.location.href='../modulo-09-calibracion-probabilidades/index.html'"><i class="fas fa-arrow-left"></i> Anterior</button>
+<button class="btn-next" onclick="handleComplete()">Siguiente <i class="fas fa-arrow-right"></i></button>
+</div>
+</div>
+</div>
+<div id="badgeModal" class="badge-modal" style="display:none">
+<div class="badge-content">
+<i class="fas fa-medal"></i>
+<h2>¡Insignia Desbloqueada!</h2>
+<p class="badge-name">Balance Hero</p>
+<p class="badge-sub">Has completado el módulo con éxito</p>
+<button class="badge-btn" onclick="document.getElementById('badgeModal').style.display='none'">Continuar</button>
+</div>
+</div>
+<div class="footer"><p>Ciencia de Datos II — ML &amp; DL © 2025 Israel Romero</p></div>
+<script>
+document.getElementById("actS").oninput=function(){document.getElementById("actV").textContent=this.value+" %"};
+document.querySelector(".bn.bp").onclick=function(){
+const v=parseInt(document.getElementById("actS").value);
+const p=v/100;
+document.getElementById("actR").innerHTML='<div style="height:80px;margin:.5rem;background:linear-gradient(90deg,#ff8c00 '+(p*100)+'%,#1e2533 '+(p*100)+'%);border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:1.2rem">'+v+'</div><div style="padding:.5rem;font-size:.75rem;color:#889;text-align:center">Controla el balanceo de clases sintético.</div>';
+document.getElementById("fb").textContent="\u2705 Valor: "+v+" %";
+document.getElementById("fb").className="fb ok";
+};
+function handleComplete(){
+const bk="datos2_badge_"+1+"_8";
+localStorage.setItem(bk,"true");
+let pk="datos2_c"+1+"_progress";
+let d=0;
+for(let i=1;i<=12;i++){if(localStorage.getItem("datos2_badge_"+1+"_"+i))d++}
+localStorage.setItem(pk,d+"/12");
+let td=0;
+for(let c=1;c<=3;c++){for(let mm=1;mm<=12;mm++){if(localStorage.getItem("datos2_badge_"+c+"_"+mm))td++}}
+localStorage.setItem("datos2_progress",td+"/72");
+document.getElementById('badgeModal').style.display='flex';
+}
+function completeActivity(){
+document.getElementById("fb").textContent="\u2705 \u00a1Actividad completada!";
+document.getElementById("fb").className="fb ok";
+}
+</script>
+</body>
+</html>

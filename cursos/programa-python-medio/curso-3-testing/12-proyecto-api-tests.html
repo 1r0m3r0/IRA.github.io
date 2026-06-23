@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Curso 3 | Proyecto: Tests para API FastAPI</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../assets/css/theme.css">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:linear-gradient(135deg,#0a0f1e,#0c1222); font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+.course-container { max-width:1100px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,215,0,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+.progress-bar { background:#0a0f1e; padding:0.8rem 2rem; display:flex; align-items:center; gap:1rem; flex-wrap:wrap; }
+.progress-track { flex:1; height:10px; background:#1a2440; border-radius:10px; overflow:hidden; min-width:100px; }
+.progress-fill { height:100%; background:linear-gradient(90deg,#ffd700,#ffaa00); border-radius:10px; transition:width 0.5s; width:0%; }
+.progress-text { font-size:0.8rem; color:#8899bb; }
+.hero { background:linear-gradient(95deg,#0b1120,#1a1400); padding:2rem; text-align:center; border-bottom:2px solid #ffd700; }
+.hero h1 { font-size:2.2rem; font-weight:800; background:linear-gradient(135deg,#fff,#ffec80,#ffd700); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.hero p { color:#ffec80; }
+.analogy { background:rgba(255,215,0,0.1); margin:1.5rem 2rem; padding:1.2rem 1.5rem; border-radius:1.5rem; border-left:5px solid #ffd700; display:flex; gap:1rem; align-items:flex-start; }
+.analogy i { font-size:1.8rem; color:#ffd700; flex-shrink:0; }
+.content { padding:0 2rem 2rem; }
+.project-area { background:rgba(0,0,0,0.3); border-radius:2rem; padding:1.5rem; border:1px solid #2c3e66; }
+.test-tabs { display:flex; gap:0.5rem; flex-wrap:wrap; margin:0.5rem 0; }
+.t-tab { background:#1a2440; border:2px solid #2c3e66; padding:0.5rem 1rem; border-radius:2rem; cursor:pointer; font-size:0.85rem; transition:0.2s; }
+.t-tab:hover { border-color:#ffd700; }
+.t-tab.active { background:rgba(255,215,0,0.2); border-color:#ffd700; }
+.code-block { background:#0a0f1e; border-radius:1.5rem; padding:1rem; font-family:monospace; border:1px solid #2c3e66; white-space:pre-wrap; min-height:80px; margin:0.5rem 0; }
+.result-block { background:#0a0f1e; border-radius:1.5rem; padding:1rem; min-height:60px; border:1px solid #2c3e66; font-family:monospace; margin:0.5rem 0; white-space:pre-wrap; }
+.feedback { background:rgba(0,0,0,0.4); padding:1rem 1.5rem; border-radius:1.5rem; margin:1rem 0; border-left:4px solid #ffd700; }
+.insignia { text-align:center; padding:1.5rem; background:linear-gradient(135deg,rgba(255,215,0,0.15),rgba(255,236,128,0.05)); border-radius:2rem; margin:1rem 0; border:2px solid #ffd700; display:none; }
+.insignia.show { display:block; animation:pulse 0.6s; }
+@keyframes pulse { 0%{transform:scale(0.9);opacity:0} 50%{transform:scale(1.05)} 100%{transform:scale(1);opacity:1} }
+.insignia i { font-size:3rem; color:#ffd700; }
+.btn-next-area { text-align:center; padding:1rem 2rem 2rem; }
+.btn-next { background:linear-gradient(135deg,#ffd700,#ffaa00); border:none; padding:0.9rem 2.5rem; border-radius:3rem; cursor:pointer; font-weight:700; font-size:1.1rem; color:#1a1400; transition:0.2s; }
+.btn-next:hover { transform:scale(1.05); }
+footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; color:#8899bb; }
+@media (max-width:700px) { .hero h1 { font-size:1.6rem; } .content { padding:0 1rem 1.5rem; } .analogy { margin:1rem; } }
+</style>
+</head>
+<body>
+<nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a><a href="../index.html">Python Medio</a><a href="index.html">Curso 3</a></nav>
+<div class="course-container">
+<div class="progress-bar"><span style="color:#ffd700;font-weight:700;"><i class="fas fa-crown"></i> M12</span><div class="progress-track"><div class="progress-fill" id="progressFill"></div></div><span class="progress-text" id="progressText">0%</span></div>
+<div class="hero"><h1><i class="fas fa-crown"></i> Suite de Tests para API FastAPI</h1><p>CRUD, auth, errores, DB — pytest + httpx. Coverage &gt; 90%</p></div>
+<div class="analogy"><i class="fas fa-test-tube"></i><div><strong>🧪 Piénsalo así:</strong> Testear una API es como <strong>hacer la inspección final de un coche antes de venderlo</strong>. Pruebas que encienda (GET /health), que acelere (POST /users), que frene (DELETE /users/1), que no deje entrar a cualquiera (auth), que los frenos fallen si hay error (errores), que el motor funcione bajo estrés (DB). El cliente (usuario) recibe un coche (API) que sabes que funciona porque lo probaste todo.</div></div>
+<div class="content">
+<div class="project-area">
+<h3><i class="fas fa-crown"></i> Suite de Tests: API de Tareas</h3>
+<p style="color:#b9ccee;margin-bottom:0.8rem;">Tests completos para API CRUD de tareas con pytest + httpx:</p>
+<div class="test-tabs">
+<button class="t-tab active" onclick="showTest(this,'crud')">CRUD</button>
+<button class="t-tab" onclick="showTest(this,'auth')">Auth</button>
+<button class="t-tab" onclick="showTest(this,'errors')">Errores</button>
+<button class="t-tab" onclick="showTest(this,'db')">DB</button>
+</div>
+<div class="code-block" id="testCode"># tests/test_tareas.py
+from httpx import AsyncClient, ASGITransport
+import pytest
+from app import app
+
+@pytest.fixture
+def client():
+    return AsyncClient(
+        transport=ASGITransport(app=app),
+        base_url="http://test"
+    )
+
+@pytest.mark.asyncio
+async def test_crear_tarea(client):
+    response = await client.post(
+        "/tareas",
+        json={"titulo": "Test", "completada": False}
+    )
+    assert response.status_code == 201
+    data = response.json()
+    assert data["titulo"] == "Test"
+    assert "id" in data</div>
+<button class="btn-run" style="background:linear-gradient(135deg,#ffd700,#ffaa00);border:none;padding:0.6rem 1.5rem;border-radius:2rem;cursor:pointer;font-weight:600;color:#1a1400;margin:0.5rem 0;" onclick="runTestSuite()"><i class="fas fa-play"></i> Ejecutar suite completa</button>
+<div class="result-block" id="testOutput">💡 Selecciona una categoría de tests para ver el código.</div>
+</div>
+<div class="feedback" id="feedback">💬 pytest + httpx.AsyncClient para tests async. ASGITransport evita servidor real. Override dependencies para aislar.</div>
+<div class="insignia" id="insignia"><i class="fas fa-medal"></i><h3>🏅 Testing Champion 🏅</h3><p>¡Has completado el Curso 3! Suite completa de tests para API FastAPI con pytest + httpx. Coverage &gt; 90%.</p></div>
+</div>
+<div class="btn-next-area"><button class="btn-next" onclick="nextCourse()">Siguiente curso <i class="fas fa-arrow-right"></i></button></div>
+<footer><i class="fas fa-vial"></i> Testing, Calidad · Proyecto Final · API Tests</footer></div>
+<script>
+const COURSE='pythonmedio',MODULE='c3m12',TOTAL=72;
+function updateProgress(){let p=JSON.parse(localStorage.getItem(COURSE+'_progress'))||[];if(!p.includes(MODULE)){p.push(MODULE);localStorage.setItem(COURSE+'_progress',JSON.stringify(p));}const pct=Math.round((p.length/TOTAL)*100);document.getElementById('progressFill').style.width=pct+'%';document.getElementById('progressText').textContent=`Módulo 3.12 de 6.12 (${pct}%)`;}
+updateProgress();
+const testCodes={crud:{code:`# tests/test_crud.py
+@pytest.mark.asyncio
+async def test_listar_tareas(client):
+    resp = await client.get("/tareas")
+    assert resp.status_code == 200
+    assert isinstance(resp.json(), list)
+
+async def test_obtener_tarea(client):
+    resp = await client.get("/tareas/1")
+    assert resp.status_code == 200
+    assert resp.json()["id"] == 1
+
+async def test_actualizar_tarea(client):
+    resp = await client.put("/tareas/1",
+        json={"titulo": "Actualizado"})
+    assert resp.status_code == 200
+    assert resp.json()["titulo"] == "Actualizado"
+
+async def test_eliminar_tarea(client):
+    resp = await client.delete("/tareas/1")
+    assert resp.status_code == 204`},auth:{code:`# tests/test_auth.py
+async def test_registro_usuario(client):
+    resp = await client.post("/auth/register",
+        json={"email": "a@b.com", "pass": "123456"})
+    assert resp.status_code == 201
+
+async def test_login_ok(client):
+    resp = await client.post("/auth/login",
+        json={"email": "a@b.com", "pass": "123456"})
+    assert resp.status_code == 200
+    assert "access_token" in resp.json()
+
+async def test_sin_token(client):
+    resp = await client.get("/tareas")
+    assert resp.status_code == 401
+
+async def test_token_invalido(client):
+    headers = {"Authorization": "Bearer invalido"}
+    resp = await client.get("/tareas/me",
+        headers=headers)
+    assert resp.status_code == 401`},errors:{code:`# tests/test_errores.py
+async def test_404(client):
+    resp = await client.get("/tareas/99999")
+    assert resp.status_code == 404
+
+async def test_validacion_datos(client):
+    resp = await client.post("/tareas",
+        json={"titulo": ""})  # vacío!
+    assert resp.status_code == 422
+    errors = resp.json()["detail"]
+    assert any(e["loc"][-1] == "titulo"
+               for e in errors)
+
+async def test_concurrencia(client):
+    tasks = [client.post("/tareas",
+        json={"titulo": f"Tarea {i}"})
+             for i in range(10)]
+    responses = await asyncio.gather(*tasks)
+    assert all(r.status_code == 201
+               for r in responses)`},db:{code:`# tests/test_db.py
+@pytest.fixture
+def test_db():
+    """BD en memoria para tests aislados"""
+    engine = create_engine("sqlite:///:memory:")
+    Base.metadata.create_all(engine)
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    yield session
+    session.close()
+
+# Override de dependencia de FastAPI
+app.dependency_overrides[get_db] = test_db
+
+async def test_db_rollback(client, test_db):
+    """Si falla una operación, la BD debe
+    mantener consistencia"""
+    try:
+        await client.post("/tareas",
+            json={"titulo": "Test"})
+        await client.post("/tareas",
+            json={"titulo": ""})  # falla
+    except:
+        pass
+    result = test_db.query(Tarea).all()
+    assert len(result) == 0  # rollback!`}};
+function showTest(btn,name){document.querySelectorAll('.t-tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.getElementById('testCode').textContent=testCodes[name].code;}
+function runTestSuite(){document.getElementById('testOutput').textContent='$ pytest tests/ -v --cov=app --cov-report=term\n\n========================== test session ==========================\ntests/test_crud.py::test_crear_tarea ✅ PASS\ntests/test_crud.py::test_listar_tareas ✅ PASS\ntests/test_crud.py::test_obtener_tarea ✅ PASS\ntests/test_crud.py::test_actualizar_tarea ✅ PASS\ntests/test_crud.py::test_eliminar_tarea ✅ PASS\ntests/test_auth.py::test_registro_usuario ✅ PASS\ntests/test_auth.py::test_login_ok ✅ PASS\ntests/test_auth.py::test_sin_token ✅ PASS\ntests/test_auth.py::test_token_invalido ✅ PASS\ntests/test_errores.py::test_404 ✅ PASS\ntests/test_errores.py::test_validacion ✅ PASS\ntests/test_errores.py::test_concurrencia ✅ PASS\ntests/test_db.py::test_db_rollback ✅ PASS\n\n========================== 13 passed in 2.34s ==========================\n\nCoverage: 94% | Stmts: 156 | Miss: 9 | Cover: 94.2%';document.getElementById('feedback').innerHTML='✅ <strong>¡Suite completa!</strong> 13 tests, 94% de cobertura. CRUD + Auth + Errores + DB. pytest + httpx + AsyncClient.';
+const ins=document.getElementById('insignia');if(!ins.classList.contains('show')){ins.classList.add('show');const b=JSON.parse(localStorage.getItem(COURSE+'_badges'))||[];if(!b.includes(MODULE)){b.push(MODULE);localStorage.setItem(COURSE+'_badges',JSON.stringify(b));}}}
+function nextCourse(){alert('🔄 ¡Curso 3 completado! Transición al Curso 4: Bases de Datos y Persistencia. En un entorno real, esto enlazaría a ../curso-4-bases-datos/index.html');}
+</script>
+</body>
+</html>

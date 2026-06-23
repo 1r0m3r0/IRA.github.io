@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Curso 4 | Módulo 10: Repository Pattern</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="../../assets/css/theme.css">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:linear-gradient(135deg,#0a0f1e,#0c1222); font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+.course-container { max-width:1100px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,100,220,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+.progress-bar { background:#0a0f1e; padding:0.8rem 2rem; display:flex; align-items:center; gap:1rem; flex-wrap:wrap; }
+.progress-track { flex:1; height:10px; background:#1a2440; border-radius:10px; overflow:hidden; min-width:100px; }
+.progress-fill { height:100%; background:linear-gradient(90deg,#ff64dc,#ffb347); border-radius:10px; transition:width 0.5s; width:0%; }
+.progress-text { font-size:0.8rem; color:#8899bb; border-bottom:1px solid #2c3e66; }
+.hero { background:linear-gradient(95deg,#0b1120,#33001f); padding:2rem; text-align:center; border-bottom:2px solid #ff64dc; }
+.hero h1 { font-size:2.2rem; font-weight:800; background:linear-gradient(135deg,#fff,#ffb347,#ff64dc); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.hero p { color:#ff64dc; }
+.analogy { background:rgba(255,100,220,0.1); margin:1.5rem 2rem; padding:1.2rem 1.5rem; border-radius:1.5rem; border-left:5px solid #ff64dc; display:flex; gap:1rem; align-items:flex-start; }
+.analogy i { font-size:1.8rem; color:#ff64dc; flex-shrink:0; }
+.content { padding:0 2rem 2rem; }
+.area { background:rgba(0,0,0,0.3); border-radius:2rem; padding:1.5rem; border:1px solid #2c3e66; }
+.code-block { background:#0a0f1e; border-radius:1rem; padding:1rem; border:1px solid #2c3e66; font-family:monospace; margin:0.5rem 0; font-size:0.85rem; }
+.repo-btn { background:#1a2440; border:2px solid #2c3e66; padding:0.5rem 1rem; border-radius:2rem; cursor:pointer; transition:0.2s; color:#eef5ff; margin:0.2rem; }
+.repo-btn:hover { border-color:#ff64dc; }
+.repo-btn.selected { border-color:#00ffc8; background:rgba(0,255,200,0.1); }
+.match-line { display:flex; align-items:center; gap:0.5rem; margin:0.3rem 0; flex-wrap:wrap; }
+.btn-next-area { text-align:center; padding:1rem 2rem 2rem; }
+.btn-next { background:linear-gradient(135deg,#ff64dc,#ffb347); border:none; padding:0.9rem 2.5rem; border-radius:3rem; cursor:pointer; font-weight:700; font-size:1.1rem; color:#0a0f1e; transition:0.2s; }
+.btn-next:hover { transform:scale(1.05); }
+.insignia { text-align:center; padding:1.5rem; background:linear-gradient(135deg,rgba(255,100,220,0.15),rgba(255,179,71,0.05)); border-radius:2rem; margin:1rem 0; border:2px solid #ff64dc; display:none; }
+.insignia.show { display:block; animation:pulse 0.6s; }
+@keyframes pulse { 0%{transform:scale(0.9);opacity:0} 50%{transform:scale(1.05)} 100%{transform:scale(1);opacity:1} }
+.insignia i { font-size:3rem; color:#ffd700; }
+.feedback { background:rgba(0,0,0,0.4); padding:1rem 1.5rem; border-radius:1.5rem; margin:1rem 0; border-left:4px solid #ff64dc; }
+footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; color:#8899bb; }
+@media (max-width:700px){.hero h1{font-size:1.6rem;}.content{padding:0 1rem 1.5rem;}.analogy{margin:1rem;}}
+</style>
+</head>
+<body>
+<nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a><a href="../index.html">Python Medio</a><a href="index.html">Curso 4</a></nav>
+<div class="course-container">
+<div class="progress-bar"><span style="color:#ff64dc;font-weight:700;"><i class="fas fa-layer-group"></i> M10</span><div class="progress-track"><div class="progress-fill" id="progressFill"></div></div><span class="progress-text" id="progressText">0%</span></div>
+<div class="hero"><h1><i class="fas fa-layer-group"></i> Repository Pattern: Separando la Persistencia</h1><p>Tu código no debería saber si usas SQLite o MongoDB</p></div>
+<div class="analogy"><i class="fas fa-warehouse"></i><div><strong>💡 Piéndalo así:</strong> El patrón repositorio es como <strong>el mostrador de atención de una biblioteca</strong>. Tú no entras al depósito a buscar libros (la base de datos). Le pides al bibliotecario: "dame el libro X" o "guarda este libro". Da igual si los libros están en estantes, cajas o una sala digital — el mostrador (repositorio) es siempre la misma interfaz.</div></div>
+<div class="content">
+<div class="area">
+<p><strong>Empareja cada método del repositorio con su descripción:</strong></p>
+<div id="matchContainer">
+<div class="match-line"><button class="repo-btn" data-pair="get" onclick="pair(this)">get_by_id(id)</button><span>→</span><span id="target_get" class="repo-btn" onclick="targetPair('get')">Elimina una entidad</span></div>
+<div class="match-line"><button class="repo-btn" data-pair="save" onclick="pair(this)">save(entity)</button><span>→</span><span id="target_save" class="repo-btn" onclick="targetPair('save')">Obtiene una entidad por ID</span></div>
+<div class="match-line"><button class="repo-btn" data-pair="delete" onclick="pair(this)">delete(entity)</button><span>→</span><span id="target_delete" class="repo-btn" onclick="targetPair('delete')">Devuelve todas las entidades</span></div>
+<div class="match-line"><button class="repo-btn" data-pair="list" onclick="pair(this)">list_all()</button><span>→</span><span id="target_list" class="repo-btn" onclick="targetPair('list')">Guarda o actualiza</span></div>
+</div>
+<button class="btn-next" onclick="checkPairs()" style="background:#ff64dc;color:#0a0f1e;padding:0.6rem 1.5rem;border-radius:2rem;border:none;cursor:pointer;font-weight:600;margin-top:1rem;">Verificar</button>
+<div id="feedback4" class="feedback" style="margin-top:1rem;">Haz clic en un método y luego en su descripción para emparejarlos.</div>
+</div>
+<div id="insignia" class="insignia"><i class="fas fa-layer-group"></i><h3>🏅 Arquitecto de Datos 🏅</h3><p>Diseñas la capa de persistencia como un profesional!</p></div>
+</div>
+<div class="btn-next-area">
+<button class="btn-next" onclick="alert('🔄 Siguiente: Cloud DB — bases de datos en la nube')">Siguiente <i class="fas fa-arrow-right"></i></button>
+</div>
+<footer><i class="fas fa-database"></i> Bases de Datos y Persistencia · Aprendizaje Activo</footer>
+</div>
+<script>
+const COURSE_KEY='pythonmedio_progress';const BADGE_KEY='pythonmedio_badges';const MODULE_ID='c4m10';const TOTAL=72;
+const feedback=document.getElementById('feedback4');const insignia=document.getElementById('insignia');
+const PAIRS={'get':'save','save':'get','delete':'list','list':'delete'};
+let selectedSource=null;
+
+function pair(el){
+document.querySelectorAll('[data-pair]').forEach(b=>b.style.borderColor='#2c3e66');
+selectedSource=el.dataset.pair;
+el.style.borderColor='#ff64dc';
+}
+
+function targetPair(id){
+if(!selectedSource){feedback.innerHTML='Primero haz clic en un método de la izquierda.';feedback.style.borderLeftColor='#ffb347';return;}
+const targetMap={'get':'save','save':'get','delete':'list','list':'delete'};
+if(targetMap[selectedSource]===id){
+document.getElementById('target_'+id).style.borderColor='#00ffc8';
+document.getElementById('target_'+id).textContent=id==='save'?'Obtiene una entidad por ID':id==='get'?'Guarda o actualiza':id==='list'?'Elimina una entidad':'Devuelve todas las entidades';
+document.querySelector([data-pair=""]).style.borderColor='#00ffc8';
+feedback.innerHTML='✅ Pareja correcta! Sigue con los demás.';feedback.style.borderLeftColor='#00ffc8';
+}else{
+feedback.innerHTML='❌ Esa no es la pareja correcta. Intenta de nuevo.';feedback.style.borderLeftColor='#ff5050';
+}
+selectedSource=null;
+checkAllDone();
+}
+
+function checkAllDone(){
+const all=document.querySelectorAll('#matchContainer .repo-btn');
+const green=Array.from(all).filter(b=>b.style.borderColor==='rgb(0, 255, 200)'||b.style.borderColor==='#00ffc8');
+if(green.length===8){
+showInsignia();
+feedback.innerHTML='🎉 <strong>¡Perfecto!</strong> get_by_id → obtiene, save → guarda, delete → elimina, list_all → lista. El patrón repositorio abstrae la BD.';feedback.style.borderLeftColor='#00ffc8';
+}
+}
+
+function showInsignia(){
+let badges=JSON.parse(localStorage.getItem(BADGE_KEY))||[];
+if(!badges.includes(MODULE_ID)){badges.push(MODULE_ID);localStorage.setItem(BADGE_KEY,JSON.stringify(badges));}
+insignia.classList.add('show');
+}
+
+function updateProgress(){
+let p=JSON.parse(localStorage.getItem(COURSE_KEY))||[];
+if(!p.includes(MODULE_ID)){p.push(MODULE_ID);localStorage.setItem(COURSE_KEY,JSON.stringify(p));}
+const pct=Math.round((p.length/TOTAL)*100);
+document.getElementById('progressFill').style.width=pct+'%';
+document.getElementById('progressText').textContent=pct+'%';
+}
+updateProgress();
+let b=JSON.parse(localStorage.getItem(BADGE_KEY))||[];if(b.includes(MODULE_ID))insignia.classList.add('show');
+</script>
+</body>
+</html>
