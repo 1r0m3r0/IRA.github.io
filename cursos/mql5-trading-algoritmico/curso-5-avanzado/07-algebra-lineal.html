@@ -142,7 +142,7 @@ function calcCorrelation() {
   let interp = r > 0.7 ? '🟢 Correlación fuerte positiva' : r > 0.3 ? '🟡 Correlación moderada' : r > -0.3 ? '⚪ Sin correlación' : r > -0.7 ? '🟠 Correlación moderada negativa' : '🔴 Correlación fuerte negativa';
   document.getElementById('corrInterpret').textContent = interp + ' (' + r.toFixed(2) + ')';
   document.getElementById('codeBox').innerHTML = `<span style="color:#667799;">// Correlación de Pearson en MQL5</span>\n<span style="color:#66ccff;">double</span> CorrPearson(<span style="color:#66ccff;">vector</span>& x, <span style="color:#66ccff;">vector</span>& y) {\n   <span style="color:#66ccff;">double</span> mx = x.Mean(), my = y.Mean();\n   <span style="color:#66ccff;">double</span> num = (x - mx).Dot(y - my);\n   <span style="color:#66ccff;">double</span> den = MathSqrt((x - mx).Dot(x - mx) * (y - my).Dot(y - my));\n   <span style="color:#66ccff;">return</span> den > 0 ? num / den : 0;\n}`;
-  document.getElementById('feedbackMsg').textContent = '📊 Correlación ' + a1 + ' vs ' + a2 + ': ' + r.toFixed(4);
+  document.getElementById('feedbackMsg').textContent = I18N.t('fb_0') + a1 + ' vs ' + a2 + ': ' + r.toFixed(4);
   const p = getProgress();
   if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem('mql5_5_progress', JSON.stringify(p)); document.getElementById('insigniaArea').classList.remove('hidden'); }
 }
@@ -196,9 +196,22 @@ function applyL1Filter() {
   ctx.fillStyle = '#8899cc'; ctx.font = '10px Inter'; ctx.fillText('λ = ' + lambda.toFixed(1) + ' (rosa: original · magenta: filtrado)', 10, 12);
   document.getElementById('codeBox').innerHTML = `<span style="color:#667799;">// L1 Trend Filter en MQL5</span>\n<span style="color:#66ccff;">void</span> L1Filter(<span style="color:#66ccff;">vector</span> &price, <span style="color:#66ccff;">double</span> lambda) {\n   <span style="color:#66ccff;">vector</span> trend = price;\n   <span style="color:#66ccff;">for</span>(<span style="color:#66ccff;">int</span> i=1; i<price.Size(); i++) {\n      <span style="color:#66ccff;">double</span> diff = price[i] - trend[i-1];\n      <span style="color:#66ccff;">if</span>(MathAbs(diff) > lambda)\n         trend[i] = trend[i-1] + MathSign(diff) * (MathAbs(diff) - lambda*0.3);\n      <span style="color:#66ccff;">else</span>\n         trend[i] = trend[i-1] + diff * 0.3;\n   }\n}`;
 }
-(function() { const p = getProgress(); if (p.includes(STORAGE_KEY)) { document.getElementById('insigniaArea').classList.remove('hidden'); document.getElementById('feedbackMsg').textContent = '🏅 Ya completaste este módulo.'; } })();
+(function() { const p = getProgress(); if (p.includes(STORAGE_KEY)) { document.getElementById('insigniaArea').classList.remove('hidden'); document.getElementById('feedbackMsg').textContent = I18N.t('fb_1'); } })();
 calcRegression(); applyL1Filter();
 </script>
 <script src="../../../assets/js/cookie-consent.js"></script>
+<script>
+window.I18N_DATA={
+  "fb_0": {
+    "es": "📊 Correlación ",
+    "en": "📊 Correlación "
+  },
+  "fb_1": {
+    "es": "🏅 Ya completaste este módulo.",
+    "en": "🏅 Ya completaste este module."
+  }
+};
+</script>
+<script src="../../../assets/js/i18n.js"></script>
 </body>
 </html>

@@ -96,9 +96,18 @@ const timerDisplay=document.getElementById('timerDisplay');
 function renderQuiz(){let h='';QUESTIONS.forEach((q,i)=>{h+='<div class="quiz-question"><h3>'+(i+1)+'. '+q.q+'</h3>';q.opts.forEach((o,j)=>{const sel=answers[i]===j?' selected':'';h+='<div class="quiz-option'+sel+'" data-q="'+i+'" data-o="'+j+'">'+o+'</div>'});h+='</div>'});quizArea.innerHTML=h;document.querySelectorAll('.quiz-option').forEach(el=>{el.addEventListener('click',function(){if(quizDone)return;const q=parseInt(this.dataset.q);const o=parseInt(this.dataset.o);answers[q]=o;renderQuiz()})})}
 function submitQuiz(){if(quizDone)return;clearInterval(timerId);quizDone=true;let correct=0;QUESTIONS.forEach((q,i)=>{if(answers[i]===q.ans)correct++});const total=QUESTIONS.length;const pct=correct/total*100;const passed=pct>=60;if(passed){localStorage.setItem(KEY,'true')}
 document.querySelectorAll('.quiz-option').forEach(el=>{const q=parseInt(el.dataset.q);const o=parseInt(el.dataset.o);el.classList.remove('selected');if(o===QUESTIONS[q].ans)el.classList.add('correct');else if(o===answers[q])el.classList.add('wrong')});const rb=document.getElementById('resultArea');rb.classList.remove('hidden');rb.innerHTML='<div class="quiz-result"><h2>'+(passed?'🎉 ¡Aprobado!':'😅 No alcanzaste')+'</h2><p>'+correct+'/'+total+' correctas ('+Math.round(pct)+'%)</p>'+(passed?'<br><button class="btn-action" onclick="document.getElementById(\'insigniaArea\').classList.remove(\'hidden\')">🎖️ Recibir insignia</button>':'<p>¡Inténtalo de nuevo! Recarga la página para reintentar.</p>')+'</div>';feedback.textContent=passed?'✅ ¡Felicidades! Has desbloqueado la insignia EXPLORADOR PYTHON.':'❌ No alcanzaste el 60%. Recarga y vuelve a intentarlo.'}
-function startTimer(){timerId=setInterval(()=>{timeLeft--;const m=Math.floor(timeLeft/60);const s=timeLeft%60;timerDisplay.textContent='⏱️ '+m+':'+(s<10?'0':'')+s;if(timeLeft<=30)timerDisplay.classList.add('warning');if(timeLeft<=0){clearInterval(timerId);submitQuiz()}},1000)}
+function startTimer(){timerId=setInterval(()=>{timeLeft--;const m=Math.floor(timeLeft/60);const s=timeLeft%60;timerDisplay.textContent=I18N.t('fb_0')+m+':'+(s<10?'0':'')+s;if(timeLeft<=30)timerDisplay.classList.add('warning');if(timeLeft<=0){clearInterval(timerId);submitQuiz()}},1000)}
 renderQuiz();startTimer();
 })();
 </script>
+<script>
+window.I18N_DATA={
+  "fb_0": {
+    "es": "⏱️ ",
+    "en": "⏱️ "
+  }
+};
+</script>
+<script src="../../../assets/js/i18n.js"></script>
 </body>
 </html>

@@ -111,11 +111,27 @@
     ];
     let answers = new Array(questions.length).fill(null); let completed = false;
     function render(){const c=document.getElementById('quizContainer');c.innerHTML='';questions.forEach((q,i)=>{const d=document.createElement('div');d.className='question';d.innerHTML='<p>'+(i+1)+'. '+q.text+'</p><div class="options" id="opts-'+i+'"></div>';const o=d.querySelector('.options');q.options.forEach((opt,j)=>{const s=document.createElement('div');s.className='opt';s.textContent=opt;s.dataset.idx=j;s.addEventListener('click',function(){if(completed)return;this.parentElement.querySelectorAll('.opt').forEach(c=>c.classList.remove('selected'));this.classList.add('selected');answers[i]=j;document.getElementById('submitBtn').disabled=answers.some(a=>a===null);});o.appendChild(s);});c.appendChild(d);});}
-    function handleSubmit(){if(completed)return;completed=true;document.querySelectorAll('.question').forEach((d,i)=>{const opts=d.querySelectorAll('.opt');opts.forEach((o,j)=>{o.classList.remove('selected');if(j===questions[i].correct)o.classList.add('correct');else if(j===answers[i])o.classList.add('wrong');});});const correct=answers.filter((a,i)=>a===questions[i].correct).length;document.getElementById('insigniaArea').classList.remove('hidden');document.getElementById('submitBtn').disabled=true;document.getElementById('feedbackMsg').textContent='🎉 '+correct+'/'+questions.length+' correctas. ¡Has configurado tu mente para Python!';saveProgress();}
+    function handleSubmit(){if(completed)return;completed=true;document.querySelectorAll('.question').forEach((d,i)=>{const opts=d.querySelectorAll('.opt');opts.forEach((o,j)=>{o.classList.remove('selected');if(j===questions[i].correct)o.classList.add('correct');else if(j===answers[i])o.classList.add('wrong');});});const correct=answers.filter((a,i)=>a===questions[i].correct).length;document.getElementById('insigniaArea').classList.remove('hidden');document.getElementById('submitBtn').disabled=true;document.getElementById('feedbackMsg').textContent=I18N.t('fb_0')+correct+'/'+questions.length+' correctas. ¡Has configurado tu mente para Python!';saveProgress();}
     function saveProgress(){let p=JSON.parse(localStorage.getItem(COURSE_KEY)||'[]');if(!p.includes(MODULE_KEY))p.push(MODULE_KEY);localStorage.setItem(COURSE_KEY,JSON.stringify(p));let pp=JSON.parse(localStorage.getItem(PROGRAM_KEY)||'[]');if(!pp.includes(MODULE_KEY))pp.push(MODULE_KEY);localStorage.setItem(PROGRAM_KEY,JSON.stringify(pp));updateProgress();}
-    function updateProgress(){const p=JSON.parse(localStorage.getItem(COURSE_KEY)||'[]');document.getElementById('progressFill').style.width=Math.min(100,Math.round((p.length/12)*100))+'%';document.getElementById('progressText').textContent='Módulo 1 de 12 ('+p.length+' completados)';}
-    function restore(){const p=JSON.parse(localStorage.getItem(COURSE_KEY)||'[]');if(p.includes(MODULE_KEY)){completed=true;document.getElementById('submitBtn').disabled=true;document.getElementById('insigniaArea').classList.remove('hidden');document.getElementById('feedbackMsg').textContent='🏆 Ya completaste este módulo.';document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');answers=questions.map((q,i)=>q.correct);}}
+    function updateProgress(){const p=JSON.parse(localStorage.getItem(COURSE_KEY)||'[]');document.getElementById('progressFill').style.width=Math.min(100,Math.round((p.length/12)*100))+'%';document.getElementById('progressText').textContent=I18N.t('fb_1')+p.length+' completados)';}
+    function restore(){const p=JSON.parse(localStorage.getItem(COURSE_KEY)||'[]');if(p.includes(MODULE_KEY)){completed=true;document.getElementById('submitBtn').disabled=true;document.getElementById('insigniaArea').classList.remove('hidden');document.getElementById('feedbackMsg').textContent=I18N.t('fb_2');document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');answers=questions.map((q,i)=>q.correct);}}
     document.getElementById('submitBtn').addEventListener('click',handleSubmit);render();restore();updateProgress();
   </script>
+<script>
+window.I18N_DATA={
+  "fb_0": {
+    "es": "🎉 ",
+    "en": "🎉 "
+  },
+  "fb_1": {
+    "es": "Módulo 1 de 12 (",
+    "en": "Module 1 de 12 ("
+  },
+  "fb_2": {
+    "es": "🏆 Ya completaste este módulo.",
+    "en": "🏆 Ya completaste este module."
+  }
+};
+</script>
 <script src="../../../assets/js/i18n.js"></script>  </body>
 </html>

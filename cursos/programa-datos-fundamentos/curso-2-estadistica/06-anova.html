@@ -15,8 +15,24 @@ const M='datos1_c2_06',CK='datos1_c2_progress',PK='datos1_progress';
 const qs=[{text:"¿Qué compara ANOVA?",opts:["Medianas entre grupos","Varianzas entre grupos vs dentro de grupos","Desviaciones estándar","Proporciones"],a:1},{text:"¿Cuántos grupos puedes comparar con ANOVA de una vía?",opts:["Solo 2","3 o más","1","Ilimitados"],a:1},{text:"¿Qué prueba se usa DESPUÉS de un ANOVA significativo?",opts:["T-test","Tukey HSD","Chi-cuadrado","Correlación"],a:1},{text:"¿Qué supuesto NO es necesario para ANOVA?",opts:["Normalidad","Homogeneidad de varianzas","Independencia","Linealidad"],a:3},{text:"Un ANOVA two-way tiene:",opts:["Un factor","Dos factores","Dos grupos","Dos variables dependientes"],a:1}];
 let ans=new Array(qs.length).fill(null),completed=false;
 function render(){const c=document.getElementById('quizContainer');c.innerHTML='';qs.forEach((q,i)=>{const d=document.createElement('div');d.className='question';d.innerHTML='<p>'+(i+1)+'. '+q.text+'</p><div class="options" id="o-'+i+'"></div>';const o=d.querySelector('.options');q.opts.forEach((opt,j)=>{const s=document.createElement('div');s.className='opt';s.textContent=opt;s.dataset.idx=j;s.addEventListener('click',function(){if(completed)return;this.parentElement.querySelectorAll('.opt').forEach(c=>c.classList.remove('selected'));this.classList.add('selected');ans[i]=j;document.getElementById('submitBtn').disabled=ans.some(a=>a===null);});o.appendChild(s);});c.appendChild(d);});}
-function handleSubmit(){if(completed)return;completed=true;document.querySelectorAll('.question').forEach((d,i)=>{const opts=d.querySelectorAll('.opt');opts.forEach((o,j)=>{o.classList.remove('selected');if(j===qs[i].a)o.classList.add('correct');else if(j===ans[i])o.classList.add('wrong');});});const c=ans.filter((a,i)=>a===qs[i].a).length;document.getElementById('insigniaArea').classList.remove('hidden');document.getElementById('submitBtn').disabled=true;document.getElementById('feedbackMsg').textContent='🎉 '+c+'/'+qs.length+' correctas. ¡ANOVA dominado!';saveProgress();}
+function handleSubmit(){if(completed)return;completed=true;document.querySelectorAll('.question').forEach((d,i)=>{const opts=d.querySelectorAll('.opt');opts.forEach((o,j)=>{o.classList.remove('selected');if(j===qs[i].a)o.classList.add('correct');else if(j===ans[i])o.classList.add('wrong');});});const c=ans.filter((a,i)=>a===qs[i].a).length;document.getElementById('insigniaArea').classList.remove('hidden');document.getElementById('submitBtn').disabled=true;document.getElementById('feedbackMsg').textContent=I18N.t('fb_0')+c+'/'+qs.length+' correctas. ¡ANOVA dominado!';saveProgress();}
 function saveProgress(){let p=JSON.parse(localStorage.getItem(CK)||'[]');if(!p.includes(M))p.push(M);localStorage.setItem(CK,JSON.stringify(p));let pp=JSON.parse(localStorage.getItem(PK)||'[]');if(!pp.includes(M))pp.push(M);localStorage.setItem(PK,JSON.stringify(pp));updateProgress();}
-function updateProgress(){const p=JSON.parse(localStorage.getItem(CK)||'[]');document.getElementById('progressFill').style.width=Math.min(100,Math.round((p.length/12)*100))+'%';document.getElementById('progressText').textContent='Módulo 6 de 12 ('+p.length+' completados)';}
-function restore(){const p=JSON.parse(localStorage.getItem(CK)||'[]');if(p.includes(M)){completed=true;document.getElementById('submitBtn').disabled=true;document.getElementById('insigniaArea').classList.remove('hidden');document.getElementById('feedbackMsg').textContent='🏆 Ya completaste este módulo.';document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');ans=qs.map(q=>q.a);}}
-document.getElementById('submitBtn').addEventListener('click',handleSubmit);render();restore();updateProgress();</script><script src="../../../assets/js/i18n.js"></script>  </body></html>
+function updateProgress(){const p=JSON.parse(localStorage.getItem(CK)||'[]');document.getElementById('progressFill').style.width=Math.min(100,Math.round((p.length/12)*100))+'%';document.getElementById('progressText').textContent=I18N.t('fb_1')+p.length+' completados)';}
+function restore(){const p=JSON.parse(localStorage.getItem(CK)||'[]');if(p.includes(M)){completed=true;document.getElementById('submitBtn').disabled=true;document.getElementById('insigniaArea').classList.remove('hidden');document.getElementById('feedbackMsg').textContent=I18N.t('fb_2');document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none');ans=qs.map(q=>q.a);}}
+document.getElementById('submitBtn').addEventListener('click',handleSubmit);render();restore();updateProgress();</script><script>
+window.I18N_DATA={
+  "fb_0": {
+    "es": "🎉 ",
+    "en": "🎉 "
+  },
+  "fb_1": {
+    "es": "Módulo 6 de 12 (",
+    "en": "Module 6 de 12 ("
+  },
+  "fb_2": {
+    "es": "🏆 Ya completaste este módulo.",
+    "en": "🏆 Ya completaste este module."
+  }
+};
+</script>
+<script src="../../../assets/js/i18n.js"></script>  </body></html>

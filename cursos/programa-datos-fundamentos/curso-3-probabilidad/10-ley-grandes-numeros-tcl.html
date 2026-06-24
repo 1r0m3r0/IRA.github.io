@@ -26,9 +26,29 @@
 <script>
 const M='datos1_c3_10',CK='datos1_c3_progress',PK='datos1_progress';
 let rolls=[],completed=false,histBins=Array(6).fill(0);
-function rollDice(n){if(completed)return;for(let i=0;i<n;i++){const r=Math.floor(Math.random()*6)+1;rolls.push(r);histBins[r-1]++;}const sum=rolls.reduce((a,b)=>a+b,0),mean=sum/rolls.length;document.getElementById('statsDisplay').innerHTML='<strong>Media muestral:</strong> '+mean.toFixed(4)+' | <strong>Error:</strong> '+(mean-3.5).toFixed(4)+' | <strong>n:</strong> '+rolls.length;const hist=document.getElementById('tclHist');hist.innerHTML='';const hMax=Math.max(...histBins,1);for(let i=0;i<6;i++){const bar=document.createElement('div');bar.style.background='#2b9eff';bar.style.width='16%';bar.style.height=(histBins[i]/hMax*100)+'px';bar.style.minHeight='4px';bar.style.borderRadius='4px 4px 0 0';bar.title='Valor '+(i+1)+': '+histBins[i];hist.appendChild(bar);}document.getElementById('tclMsg').textContent='Distribución empírica de '+(rolls.length)+' lanzamientos. μ='+mean.toFixed(3)+' vs 3.5. ¿Ves cómo se acerca?';(rolls.length>=30&&!completed)?(completed=true,document.getElementById('insigniaArea').classList.remove('hidden'),document.getElementById('feedbackMsg').textContent='🎉 '+rolls.length+' lanzamientos. La media muestral converge a 3.5 (LGN). Si repitieras este experimento muchas veces, las medias seguirían una Normal (TCL).',saveProgress()):0;}
+function rollDice(n){if(completed)return;for(let i=0;i<n;i++){const r=Math.floor(Math.random()*6)+1;rolls.push(r);histBins[r-1]++;}const sum=rolls.reduce((a,b)=>a+b,0),mean=sum/rolls.length;document.getElementById('statsDisplay').innerHTML='<strong>Media muestral:</strong> '+mean.toFixed(4)+' | <strong>Error:</strong> '+(mean-3.5).toFixed(4)+' | <strong>n:</strong> '+rolls.length;const hist=document.getElementById('tclHist');hist.innerHTML='';const hMax=Math.max(...histBins,1);for(let i=0;i<6;i++){const bar=document.createElement('div');bar.style.background='#2b9eff';bar.style.width='16%';bar.style.height=(histBins[i]/hMax*100)+'px';bar.style.minHeight='4px';bar.style.borderRadius='4px 4px 0 0';bar.title='Valor '+(i+1)+': '+histBins[i];hist.appendChild(bar);}document.getElementById('tclMsg').textContent=I18N.t('fb_0')+(rolls.length)+' lanzamientos. μ='+mean.toFixed(3)+' vs 3.5. ¿Ves cómo se acerca?';(rolls.length>=30&&!completed)?(completed=true,document.getElementById('insigniaArea').classList.remove('hidden'),document.getElementById('feedbackMsg').textContent=I18N.t('fb_1')+rolls.length+' lanzamientos. La media muestral converge a 3.5 (LGN). Si repitieras este experimento muchas veces, las medias seguirían una Normal (TCL).',saveProgress()):0;}
 function resetTCL(){rolls=[];histBins=Array(6).fill(0);document.getElementById('statsDisplay').innerHTML='<strong>Media muestral:</strong> — | <strong>Error:</strong> —';document.getElementById('tclHist').innerHTML='';document.getElementById('tclMsg').textContent='Lanza para comenzar...';}
 function saveProgress(){let p=JSON.parse(localStorage.getItem(CK)||'[]');if(!p.includes(M))p.push(M);localStorage.setItem(CK,JSON.stringify(p));let pp=JSON.parse(localStorage.getItem(PK)||'[]');if(!pp.includes(M))pp.push(M);localStorage.setItem(PK,JSON.stringify(pp));updateProgress();}
-function updateProgress(){const p=JSON.parse(localStorage.getItem(CK)||'[]');document.getElementById('progressFill').style.width=Math.min(100,Math.round((p.length/12)*100))+'%';document.getElementById('progressText').textContent='Módulo 10 de 12 ('+p.length+' completados)';}
-function restore(){const p=JSON.parse(localStorage.getItem(CK)||'[]');if(p.includes(M)){completed=true;document.getElementById('insigniaArea').classList.remove('hidden');document.getElementById('feedbackMsg').textContent='🏆 Ya completaste este módulo.';document.querySelectorAll('.btn-action').forEach(b=>b.style.pointerEvents='none');}}
-restore();updateProgress();</script><script src="../../../assets/js/i18n.js"></script>  </body></html>
+function updateProgress(){const p=JSON.parse(localStorage.getItem(CK)||'[]');document.getElementById('progressFill').style.width=Math.min(100,Math.round((p.length/12)*100))+'%';document.getElementById('progressText').textContent=I18N.t('fb_2')+p.length+' completados)';}
+function restore(){const p=JSON.parse(localStorage.getItem(CK)||'[]');if(p.includes(M)){completed=true;document.getElementById('insigniaArea').classList.remove('hidden');document.getElementById('feedbackMsg').textContent=I18N.t('fb_3');document.querySelectorAll('.btn-action').forEach(b=>b.style.pointerEvents='none');}}
+restore();updateProgress();</script><script>
+window.I18N_DATA={
+  "fb_0": {
+    "es": "Distribución empírica de ",
+    "en": "Distribución empírica de "
+  },
+  "fb_1": {
+    "es": "🎉 ",
+    "en": "🎉 "
+  },
+  "fb_2": {
+    "es": "Módulo 10 de 12 (",
+    "en": "Module 10 de 12 ("
+  },
+  "fb_3": {
+    "es": "🏆 Ya completaste este módulo.",
+    "en": "🏆 Ya completaste este module."
+  }
+};
+</script>
+<script src="../../../assets/js/i18n.js"></script>  </body></html>
