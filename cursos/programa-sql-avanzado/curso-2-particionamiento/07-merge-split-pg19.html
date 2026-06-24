@@ -69,31 +69,41 @@ if(mode==='normal'){
 vis.innerHTML='<div class="split-row"><div class="split-box"><div class="s-title">orders_2022</div><div class="s-range">2022-01-01 a 2023-01-01</div></div>'+
 '<div class="split-box"><div class="s-title">orders_2023</div><div class="s-range">2023-01-01 a 2024-01-01</div></div>'+
 '<div class="split-box"><div class="s-title">orders_2024</div><div class="s-range">2024-01-01 a 2025-01-01</div></div></div>';
-document.getElementById('splitInfo').innerHTML='📊 Particiones originales: 2022, 2023, 2024. Cada una con un año completo de datos.';
+document.getElementById('splitInfo').innerHTML=I18N.t('fb_0');
 }else if(mode==='split'){
 vis.innerHTML='<div class="split-row"><div class="split-box"><div class="s-title">orders_2022</div><div class="s-range">2022</div></div>'+
 '<div class="split-arrow">⬇</div></div><div class="split-row"><div class="split-box"><div class="s-title">orders_2023_Q1</div><div class="s-range">2023-01 a 2023-06</div></div>'+
 '<div class="split-box"><div class="s-title">orders_2023_Q2</div><div class="s-range">2023-07 a 2024-01</div></div></div>'+
 '<div class="split-arrow">+</div><div class="split-row"><div class="split-box"><div class="s-title">orders_2024</div><div class="s-range">2024</div></div></div>';
-document.getElementById('splitInfo').innerHTML='🔄 SPLIT: ALTER TABLE orders SPLIT PARTITION orders_2023 INTO (PARTITION orders_2023_q1, PARTITION orders_2023_q2); ¡En caliente!';
+document.getElementById('splitInfo').innerHTML=I18N.t('fb_1');
 }else{
 vis.innerHTML='<div class="split-row"><div class="split-box"><div class="s-title">orders_2022</div><div class="s-range">2022</div></div>'+
 '<div class="split-arrow">+</div></div><div class="split-row"><div class="split-box" style="background:rgba(0,255,100,0.12);border-color:#00ff64"><div class="s-title" style="color:#00ff64">orders_2023_merged</div><div class="s-range">2023 completo</div></div>'+
 '<div class="split-arrow">+</div><div class="split-box"><div class="s-title">orders_2024</div><div class="s-range">2024</div></div></div>';
-document.getElementById('splitInfo').innerHTML='🔄 MERGE: ALTER TABLE orders MERGE PARTITIONS (orders_2023_q1, orders_2023_q2) INTO PARTITION orders_2023;';
+document.getElementById('splitInfo').innerHTML=I18N.t('fb_2');
 }
 let bd=JSON.parse(localStorage.getItem(BADGES))||[];if(!bd.includes('Cirujano de Particiones')){bd.push('Cirujano de Particiones');localStorage.setItem(BADGES,JSON.stringify(bd));document.getElementById('insignia').classList.remove('hidden')}
 updateProg();
 }
-document.getElementById('doSplit').addEventListener('click',function(){mode='split';renderSplit();document.getElementById('feedback').innerHTML='🔪 SPLIT ejecutado. La partición 2023 se dividió en dos semestres. PostgreSQL 19 reescribe solo los metadatos, no los datos.';});
+document.getElementById('doSplit').addEventListener('click',function(){mode='split';renderSplit();document.getElementById('feedback').innerHTML=I18N.t('fb_3');});
 document.getElementById('doMerge').addEventListener('click',function(){if(mode==='split'){mode='merge';renderSplit();document.getElementById('feedback').innerHTML='🧩 MERGE ejecutado. Las particiones 2023-Q1 y 2023-Q2 se fusionaron en una sola. Los datos se consolidan transparentemente.';}});
-document.getElementById('resetSplit').addEventListener('click',function(){mode='normal';renderSplit();document.getElementById('feedback').innerHTML='🔄 Reset: particiones originales restauradas.';});
+document.getElementById('resetSplit').addEventListener('click',function(){mode='normal';renderSplit();document.getElementById('feedback').innerHTML=I18N.t('fb_4');});
 function updateProg(){
 let p=JSON.parse(localStorage.getItem(COURSE+"_progress"))||[];if(!p.includes(MODULE)){p.push(MODULE);localStorage.setItem(COURSE+"_progress",JSON.stringify(p))}
 let pct=Math.round(p.length/12*100);document.getElementById('progFill').style.width=pct+'%';document.getElementById('progText').textContent='Módulo 7 de 12 ('+pct+'%)';
 let gp=JSON.parse(localStorage.getItem(PROG))||[];if(!gp.includes(MODULE+84)){gp.push(MODULE+84);localStorage.setItem(PROG,JSON.stringify(gp))}
 }
 renderSplit();
+</script>
+
+<script>
+window.I18N_DATA={
+  'fb_0': { es: '📊 Particiones originales: 2022, 2023, 2024. Cada una con un año completo de datos.', en: '📊 Particiones originales: 2022, 2023, 2024. Cada una con un año completo de datos.' },
+  'fb_1': { es: '🔄 SPLIT: ALTER TABLE orders SPLIT PARTITION orders_2023 INTO (PARTITION orders_2023_q1, PARTITION orders_2023_q2); ¡En caliente!', en: '🔄 SPLIT: ALTER TABLE orders SPLIT PARTITION orders_2023 INTO (PARTITION orders_2023_q1, PARTITION orders_2023_q2); ¡En caliente!' },
+  'fb_2': { es: '🔄 MERGE: ALTER TABLE orders MERGE PARTITIONS (orders_2023_q1, orders_2023_q2) INTO PARTITION orders_2023;', en: '🔄 MERGE: ALTER TABLE orders MERGE PARTITIONS (orders_2023_q1, orders_2023_q2) INTO PARTITION orders_2023;' },
+  'fb_3': { es: '🔪 SPLIT ejecutado. La partición 2023 se dividió en dos semestres. PostgreSQL 19 reescribe solo los metadatos, no los datos.', en: '🔪 SPLIT ejecutado. La partición 2023 se dividió en dos semestres. PostgreSQL 19 reescribe solo los metadatos, no los datos.' },
+  'fb_4': { es: '🔄 Reset: particiones originales restauradas.', en: '🔄 Reset: particiones originales restauradas.' }
+};
 </script>
 <script src="../../../assets/js/i18n.js"></script>  </body>
 </html>

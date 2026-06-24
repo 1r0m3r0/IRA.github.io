@@ -230,10 +230,10 @@ function sendOrder(){
   if(success){
     positions.push({symbol, type, vol, price:price.toFixed(5), sl, tp, magic, pnl:(Math.random()*40-20).toFixed(2)});
     orderHistory.push({time:new Date().toLocaleTimeString(), symbol, type, vol, price:price.toFixed(5), result:'✅ EJECUTADA'});
-    document.getElementById('feedbackMsg').innerHTML = '✅ Orden ejecutada: '+symbol+' '+type+' '+vol.toFixed(2)+' lots @ '+price.toFixed(5);
+    document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_0')+symbol+' '+type+' '+vol.toFixed(2)+' lots @ '+price.toFixed(5);
   } else {
     orderHistory.push({time:new Date().toLocaleTimeString(), symbol, type, vol, price:price.toFixed(5), result:'❌ RECHAZADA'});
-    document.getElementById('feedbackMsg').innerHTML = '❌ Orden rechazada (código '+retcode+'). Fondos insuficientes o error de mercado.';
+    document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_1')+retcode+'). Fondos insuficientes o error de mercado.';
   }
   updatePositions();
   updateLog();
@@ -255,14 +255,14 @@ function closePosition(idx){
   positions.splice(idx,1);
   updatePositions();
   updateLog();
-  document.getElementById('feedbackMsg').innerHTML = '🔒 Posición cerrada manualmente.';
+  document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_2');
   checkCompletion();
 }
 
 function updateLog(){
   const log = document.getElementById('tradeLog');
   if(orderHistory.length===0){
-    log.innerHTML = '<div class="log-entry" style="color:#666;text-align:center">Aún no has enviado órdenes</div>';
+    log.innerHTML = I18N.t('fb_3');
     return;
   }
   log.innerHTML = orderHistory.slice().reverse().map(o=>
@@ -273,7 +273,7 @@ function updateLog(){
 function checkCompletion(){
   if(!completed && totalOrders>=3){
     document.getElementById('insigniaArea').classList.remove('hidden');
-    document.getElementById('feedbackMsg').innerHTML = '🎉 ¡Has ejecutado '+totalOrders+' órdenes! Dominas la API de trading. ¡Insignia desbloqueada!';
+    document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_4')+totalOrders+' órdenes! Dominas la API de trading. ¡Insignia desbloqueada!';
     saveProgress();
     completed = true;
   }
@@ -290,5 +290,15 @@ document.getElementById('clearBtn').addEventListener('click',()=>{
 window.addEventListener('load',()=>{initProgress();updatePrice();setInterval(updatePrice,2500);});
 </script>
 <script src="../../../assets/js/cookie-consent.js"></script>
+
+<script>
+window.I18N_DATA={
+  'fb_0': { es: '✅ Orden ejecutada: ', en: '✅ Orden ejecutada: ' },
+  'fb_1': { es: '❌ Orden rechazada (código ', en: '❌ Orden rechazada (código ' },
+  'fb_2': { es: '🔒 Posición cerrada manualmente.', en: '🔒 Posición cerrada manualmente.' },
+  'fb_3': { es: '<div class="log-entry" style="color:#666;text-align:center">Aún no has enviado órdenes</div>', en: '<div class="log-entry" style="color:#666;text-align:center">Aún no has enviado órdenes</div>' },
+  'fb_4': { es: '🎉 ¡Has ejecutado ', en: '🎉 ¡Has ejecutado ' }
+};
+</script>
 </body>
 </html>

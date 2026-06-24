@@ -121,7 +121,7 @@
       ];
       function updateProgress(m){let p=JSON.parse(localStorage.getItem(PROGRESS_KEY)||'[]');if(!p.includes(m)){p.push(m);localStorage.setItem(PROGRESS_KEY,JSON.stringify(p))}document.getElementById('progressFill').style.width=Math.round((p.length/TOTAL)*100)+'%';document.getElementById('progressText').textContent='Módulo '+m+' de '+TOTAL}
       function renderTools(){const grid=document.getElementById('toolGrid');let html='';tools.forEach(t=>{if(cat!=='all'&&t.cat!==cat)return;const sel=selected.has(t.id)?'selected':'';html+='<div class="tool-card '+sel+'" data-id="'+t.id+'"><div class="icon">'+t.icon+'</div><div class="info"><div class="name">'+t.name+'</div><div class="desc">'+t.desc+'</div></div><div class="price">'+(t.price===0?'Gratis':'$'+t.price+'/mes')+'</div></div>'});grid.innerHTML=html;document.querySelectorAll('.tool-card').forEach(el=>{el.addEventListener('click',function(){const id=parseInt(this.dataset.id);if(selected.has(id)){selected.delete(id);this.classList.remove('selected')}else{selected.add(id);this.classList.add('selected')}updateSummary()})});updateSummary()}
-      function updateSummary(){const s=document.getElementById('summaryArea');if(selected.size===0){s.innerHTML='<h3>📋 Resumen de tu Stack</h3><p style="color:#8899bb;">Selecciona herramientas para calcular el ROI</p>';return}let total=0,names=[];selected.forEach(id=>{const t=tools.find(t=>t.id===id);total+=t.price;names.push(t.name)});const anual=total*12;const roi=((anual*3.5-anual)/anual*100).toFixed(0);s.innerHTML='<h3>📋 Resumen de tu Stack ('+selected.size+' herramientas)</h3>'+names.map(n=>'<div class="row"><span>'+n+'</span></div>').join('')+'<div class="row" style="font-weight:600;"><span>💰 Costo mensual</span><span>$'+total+'</span></div><div class="row"><span>📅 Costo anual</span><span>$'+anual+'</span></div><div class="total">📈 ROI estimado: '+roi+'%</div>';document.getElementById('feedback').textContent='🛠️ '+selected.size+' herramientas seleccionadas. Costo: $'+total+'/mes.'}
+      function updateSummary(){const s=document.getElementById('summaryArea');if(selected.size===0){s.innerHTML=I18N.t('fb_0');return}let total=0,names=[];selected.forEach(id=>{const t=tools.find(t=>t.id===id);total+=t.price;names.push(t.name)});const anual=total*12;const roi=((anual*3.5-anual)/anual*100).toFixed(0);s.innerHTML=I18N.t('fb_1')+selected.size+' herramientas)</h3>'+names.map(n=>'<div class="row"><span>'+n+'</span></div>').join('')+'<div class="row" style="font-weight:600;"><span>💰 Costo mensual</span><span>$'+total+'</span></div><div class="row"><span>📅 Costo anual</span><span>$'+anual+'</span></div><div class="total">📈 ROI estimado: '+roi+'%</div>';document.getElementById('feedback').textContent='🛠️ '+selected.size+' herramientas seleccionadas. Costo: $'+total+'/mes.'}
       document.querySelectorAll('.cat-btn').forEach(b=>{b.addEventListener('click',()=>{document.querySelectorAll('.cat-btn').forEach(bb=>bb.classList.remove('active'));b.classList.add('active');cat=b.dataset.c;renderTools()})});
       document.getElementById('calcBtn').addEventListener('click',()=>{if(completed)return;if(selected.size<3){document.getElementById('feedback').textContent='⚠️ Selecciona al menos 3 herramientas para calcular el ROI del stack.';return}completed=true;document.getElementById('insignia').classList.remove('hidden');document.getElementById('feedback').textContent='✅ Stack MarTech evaluado con '+selected.size+' herramientas. ROI proyectado: 250%+. ¡Integración inteligente!';updateProgress(10);localStorage.setItem(KEY,'selected')});
       document.getElementById('resetStackBtn').addEventListener('click',()=>{selected.clear();renderTools();document.getElementById('feedback').textContent='💬 Stack reiniciado. Selecciona nuevas herramientas.'});
@@ -130,5 +130,12 @@
     })();
   </script>
   <script src="../../../assets/js/cookie-consent.js"></script>
+
+<script>
+window.I18N_DATA={
+  'fb_0': { es: '<h3>📋 Resumen de tu Stack</h3><p style="color:#8899bb;">Selecciona herramientas para calcular el ROI</p>', en: '<h3>📋 Resumen de tu Stack</h3><p style="color:#8899bb;">Selecciona herramientas para calcular el ROI</p>' },
+  'fb_1': { es: '<h3>📋 Resumen de tu Stack (', en: '<h3>📋 Resumen de tu Stack (' }
+};
+</script>
 <script src="../../../assets/js/i18n.js"></script>  </body>
 </html>

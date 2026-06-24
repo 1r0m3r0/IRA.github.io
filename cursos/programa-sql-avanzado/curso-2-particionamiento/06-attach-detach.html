@@ -64,16 +64,16 @@ let parts=[{y:2022,attached:true},{y:2023,attached:true},{y:2024,attached:true},
 function renderStack(){
 let vis=document.getElementById('stackVis');
 vis.innerHTML=parts.map((p,i)=>'<div class="stack-item'+(p.attached?'':' detached')+'">orders_'+(i<p.length-1?p.y:'???')+(p.attached?' ✅ ATTACHED':' 🔓 DETACHED')+'</div>'+(i<parts.length-1?'<div class="stack-connect"></div>':'')).join('');
-document.getElementById('feedback').innerHTML='🚂 Tren de particiones: '+parts.filter(p=>p.attached).length+' vagones conectados, '+parts.filter(p=>!p.attached).length+' desconectados.';
+document.getElementById('feedback').innerHTML=I18N.t('fb_0')+parts.filter(p=>p.attached).length+' vagones conectados, '+parts.filter(p=>!p.attached).length+' desconectados.';
 let bd=JSON.parse(localStorage.getItem(BADGES))||[];if(!bd.includes('Ingeniero de Trenes')){bd.push('Ingeniero de Trenes');localStorage.setItem(BADGES,JSON.stringify(bd));document.getElementById('insignia').classList.remove('hidden')}
 updateProg();
 }
 document.getElementById('attach2026').addEventListener('click',function(){
-if(!parts.find(p=>p.y===2026)){parts.push({y:2026,attached:true});document.getElementById('feedback').innerHTML='✅ ATTACH CONCURRENTLY: nueva partición 2026 agregada sin downtime. ALTER TABLE orders ATTACH PARTITION orders_2026 FOR VALUES FROM (\'2026-01-01\') TO (\'2027-01-01\');';renderStack();}
+if(!parts.find(p=>p.y===2026)){parts.push({y:2026,attached:true});document.getElementById('feedback').innerHTML=I18N.t('fb_1');renderStack();}
 });
 document.getElementById('detach2022').addEventListener('click',function(){
 let p=parts.find(x=>x.y===2022);
-if(p&&p.attached){p.attached=false;document.getElementById('feedback').innerHTML='🔓 DETACH CONCURRENTLY: partición 2022 desconectada. ALTER TABLE orders DETACH PARTITION orders_2022; Los datos siguen accesibles como tabla independiente.';renderStack();}
+if(p&&p.attached){p.attached=false;document.getElementById('feedback').innerHTML=I18N.t('fb_2');renderStack();}
 });
 document.getElementById('resetStack').addEventListener('click',function(){parts=[{y:2022,attached:true},{y:2023,attached:true},{y:2024,attached:true},{y:2025,attached:true}];renderStack();});
 function updateProg(){
@@ -82,6 +82,14 @@ let pct=Math.round(p.length/12*100);document.getElementById('progFill').style.wi
 let gp=JSON.parse(localStorage.getItem(PROG))||[];if(!gp.includes(MODULE+72)){gp.push(MODULE+72);localStorage.setItem(PROG,JSON.stringify(gp))}
 }
 renderStack();
+</script>
+
+<script>
+window.I18N_DATA={
+  'fb_0': { es: '🚂 Tren de particiones: ', en: '🚂 Tren de particiones: ' },
+  'fb_1': { es: '✅ ATTACH CONCURRENTLY: nueva partición 2026 agregada sin downtime. ALTER TABLE orders ATTACH PARTITION orders_2026 FOR VALUES FROM (\\\'2026-01-01\\\') TO (\\\'2027-01-01\\\');', en: '✅ ATTACH CONCURRENTLY: nueva partición 2026 agregada sin downtime. ALTER TABLE orders ATTACH PARTITION orders_2026 FOR VALUES FROM (\\\'2026-01-01\\\') TO (\\\'2027-01-01\\\');' },
+  'fb_2': { es: '🔓 DETACH CONCURRENTLY: partición 2022 desconectada. ALTER TABLE orders DETACH PARTITION orders_2022; Los datos siguen accesibles como tabla independiente.', en: '🔓 DETACH CONCURRENTLY: partición 2022 desconectada. ALTER TABLE orders DETACH PARTITION orders_2022; Los datos siguen accesibles como tabla independiente.' }
+};
 </script>
 <script src="../../../assets/js/i18n.js"></script>  </body>
 </html>

@@ -270,16 +270,16 @@ function checkActivations(){
 }
 
 function placeOrder(type, price, vol, sl, tp){
-  if(!price || price<=0){document.getElementById('feedbackMsg').innerHTML='⚠️ Ingresa un precio válido.';return;}
+  if(!price || price<=0){document.getElementById('feedbackMsg').innerHTML=I18N.t('fb_0');return;}
   const minP=1.07, maxP=1.13;
-  if(price<minP||price>maxP){document.getElementById('feedbackMsg').innerHTML='⚠️ El precio debe estar entre '+minP+' y '+maxP;return;}
+  if(price<minP||price>maxP){document.getElementById('feedbackMsg').innerHTML=I18N.t('fb_1')+minP+' y '+maxP;return;}
   const order = {type, price, vol, sl, tp, time:new Date().toLocaleTimeString()};
   pendingOrders.push(order);
   addAction('📌 Colocada: '+TYPE_LABELS[type]+' @ '+price.toFixed(5)+' Vol: '+vol, '#ffd700');
   updatePendUI();
   drawPriceLevels();
   updateCodePreview(type, price, vol, sl, tp);
-  document.getElementById('feedbackMsg').innerHTML = '📌 Orden '+TYPE_LABELS[type]+' colocada @ '+price.toFixed(5);
+  document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_2')+TYPE_LABELS[type]+' colocada @ '+price.toFixed(5);
 }
 
 function addAction(msg, color='#8899cc'){
@@ -289,7 +289,7 @@ function addAction(msg, color='#8899cc'){
 function updatePendUI(){
   const tbody = document.getElementById('pendBody');
   if(pendingOrders.length===0){
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#666;padding:.8rem">Sin órdenes pendientes</td></tr>';
+    tbody.innerHTML = I18N.t('fb_3');
   } else {
     tbody.innerHTML = pendingOrders.map((o,i)=>
       '<tr><td>'+(i+1)+'</td><td style="color:'+TYPE_COLORS[o.type]+'">'+TYPE_LABELS[o.type]+'</td><td>'+o.price.toFixed(5)+'</td><td>'+o.vol.toFixed(2)+'</td><td style="color:#ffd700">⏳ Pendiente</td><td><button class="btn-danger" onclick="cancelOrder('+i+')" style="padding:.2rem .5rem;font-size:.65rem">✕</button></td></tr>'
@@ -306,7 +306,7 @@ function cancelOrder(idx){
   pendingOrders.splice(idx,1);
   updatePendUI();
   drawPriceLevels();
-  document.getElementById('feedbackMsg').innerHTML = '🗑️ Orden cancelada: '+TYPE_LABELS[o.type];
+  document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_4')+TYPE_LABELS[o.type];
 }
 
 function cancelAll(){
@@ -314,7 +314,7 @@ function cancelAll(){
   pendingOrders = [];
   updatePendUI();
   drawPriceLevels();
-  document.getElementById('feedbackMsg').innerHTML = '🗑️ '+n+' órdenes canceladas.';
+  document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_5')+n+' órdenes canceladas.';
 }
 
 function updateCodePreview(type, price, vol, sl, tp){
@@ -365,7 +365,7 @@ function randomOrder(){
 function checkCompletion(){
   if(!completed && (pendingOrders.length>0 || executedCount>=2)){
     document.getElementById('insigniaArea').classList.remove('hidden');
-    document.getElementById('feedbackMsg').innerHTML = '🎉 ¡Has colocado órdenes pendientes como un profesional! ¡Insignia desbloqueada!';
+    document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_6');
     saveProgress();
     completed = true;
   }
@@ -386,5 +386,17 @@ window.addEventListener('load',()=>{
 });
 </script>
 <script src="../../../assets/js/cookie-consent.js"></script>
+
+<script>
+window.I18N_DATA={
+  'fb_0': { es: '⚠️ Ingresa un precio válido.', en: '⚠️ Ingresa un precio válido.' },
+  'fb_1': { es: '⚠️ El precio debe estar entre ', en: '⚠️ El precio debe estar entre ' },
+  'fb_2': { es: '📌 Orden ', en: '📌 Orden ' },
+  'fb_3': { es: '<tr><td colspan="6" style="text-align:center;color:#666;padding:.8rem">Sin órdenes pendientes</td></tr>', en: '<tr><td colspan="6" style="text-align:center;color:#666;padding:.8rem">Sin órdenes pendientes</td></tr>' },
+  'fb_4': { es: '🗑️ Orden cancelada: ', en: '🗑️ Orden cancelada: ' },
+  'fb_5': { es: '🗑️ ', en: '🗑️ ' },
+  'fb_6': { es: '🎉 ¡Has colocado órdenes pendientes como un profesional! ¡Insignia desbloqueada!', en: '🎉 ¡Has colocado órdenes pendientes como un profesional! Badge unlocked!' }
+};
+</script>
 </body>
 </html>

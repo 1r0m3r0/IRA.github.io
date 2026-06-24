@@ -105,7 +105,7 @@ let opsDone={rolling:false,filter:false,resample:false};
 function renderDF(){let h='<table class="styled"><tr><th>Fecha</th><th>Open</th><th>High</th><th>Low</th><th>Close</th><th>Volumen</th></tr>';ohlcData.forEach((r,i)=>{h+='<tr><td>'+fechas[i]+'</td><td>'+r.open+'</td><td>'+r.high+'</td><td>'+r.low+'</td><td>'+r.close+'</td><td>'+r.vol+'</td></tr>'});h+='</table>';document.getElementById('dfDisplay').innerHTML=h}
 window.aplicarRolling=function(){const closes=ohlcData.map(r=>r.close);const sma=[];for(let i=0;i<closes.length;i++){if(i<2){sma.push('—')}else{sma.push(((closes[i-2]+closes[i-1]+closes[i])/3).toFixed(2))}}
 let h='<span class="success">✔ rolling(3).mean() aplicado:</span>\n\n<table class="styled"><tr><th>Fecha</th><th>Close</th><th>SMA-3</th></tr>';fechas.forEach((f,i)=>{h+='<tr><td>'+f+'</td><td>'+closes[i]+'</td><td>'+sma[i]+'</td></tr>'});h+='</table>';document.getElementById('dfResult').innerHTML=h;opsDone.rolling=true;verificar()}
-window.filtrarPrecio=function(){const filtered=ohlcData.filter(r=>r.close>100);if(filtered.length===0){document.getElementById('dfResult').innerHTML='<span class="error">❌ No hay filas con Close > 100</span>';return}
+window.filtrarPrecio=function(){const filtered=ohlcData.filter(r=>r.close>100);if(filtered.length===0){document.getElementById('dfResult').innerHTML=I18N.t('fb_0');return}
 let h='<span class="success">✔ Filtro aplicado: Close > 100</span>\n\n<table class="styled"><tr><th>Fecha</th><th>Open</th><th>Close</th><th>Volumen</th></tr>';ohlcData.forEach((r,i)=>{if(r.close>100){h+='<tr><td>'+fechas[i]+'</td><td>'+r.open+'</td><td>'+r.close+'</td><td>'+r.vol+'</td></tr>'}});h+='</table><p>Filas que cumplen: '+filtered.length+' de '+ohlcData.length+'</p>';document.getElementById('dfResult').innerHTML=h;opsDone.filter=true;verificar()}
 window.aplicarResample=function(){const weekData=[];let wOpen=0,wHigh=0,wLow=Infinity,wClose=0,wVol=0,wCount=0;fechas.forEach((f,i)=>{const d=new Date(f);const day=d.getDay();if(day===1||i===0){if(wCount>0){weekData.push({open:wOpen,high:wHigh,low:wLow,close:wClose,vol:wVol,count:wCount})};wOpen=ohlcData[i].open;wHigh=ohlcData[i].high;wLow=ohlcData[i].low;wClose=ohlcData[i].close;wVol=ohlcData[i].vol;wCount=1}else{wHigh=Math.max(wHigh,ohlcData[i].high);wLow=Math.min(wLow,ohlcData[i].low);wClose=ohlcData[i].close;wVol+=ohlcData[i].vol;wCount++}});if(wCount>0)weekData.push({open:wOpen,high:wHigh,low:wLow,close:wClose,vol:wVol,count:wCount});
 let h='<span class="success">✔ Resample semanal aplicado:</span>\n\n<table class="styled"><tr><th>Semana</th><th>Open</th><th>High</th><th>Low</th><th>Close</th><th>Vol</th></tr>';weekData.forEach((w,i)=>{h+='<tr><td>Semana '+(i+1)+'</td><td>'+w.open+'</td><td>'+w.high+'</td><td>'+w.low+'</td><td>'+w.close+'</td><td>'+w.vol+'</td></tr>'});h+='</table><p>De '+fechas.length+' velas diarias a '+weekData.length+' velas semanales</p>';document.getElementById('dfResult').innerHTML=h;opsDone.resample=true;verificar()}
@@ -113,6 +113,12 @@ function verificar(){const fb=document.getElementById('feedbackMsg');const vals=
 window.completar=function(){if(Object.values(opsDone).every(Boolean)){localStorage.setItem(KEY,'true');document.getElementById('insigniaArea').classList.remove('hidden');document.getElementById('feedbackMsg').textContent='✅ ¡Módulo completado! Domador de DataFrames, has ganado tu insignia.'}else{document.getElementById('feedbackMsg').textContent='❌ Aplica las 3 operaciones primero.'}}
 renderDF();
 })();
+</script>
+
+<script>
+window.I18N_DATA={
+  'fb_0': { es: '<span class="error">❌ No hay filas con Close > 100</span>', en: '<span class="error">❌ No hay filas con Close > 100</span>' }
+};
 </script>
 </body>
 </html>

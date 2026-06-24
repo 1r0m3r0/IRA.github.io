@@ -338,10 +338,10 @@ function sendOrder(){
     const pos = {symbol, type, vol, price:price.toFixed(5), sl, tp, magic, pnl: (Math.random()*40-20).toFixed(2), ticket: order };
     positions.push(pos);
     orderHistory.push({time:new Date().toLocaleTimeString(), symbol, type, vol, price:price.toFixed(5), result:'✅ EJECUTADA'});
-    document.getElementById('feedbackMsg').innerHTML = '✅ Orden ejecutada correctamente. Deal #'+deal+' | Order #'+order;
+    document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_0')+deal+' | Order #'+order;
   } else {
     orderHistory.push({time:new Date().toLocaleTimeString(), symbol, type, vol, price:price.toFixed(5), result:'❌ '+RETURN_CODES[retcode].split('—')[0].trim()});
-    document.getElementById('feedbackMsg').innerHTML = '❌ Orden rechazada: '+RETURN_CODES[retcode];
+    document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_1')+RETURN_CODES[retcode];
   }
   updatePositions();
   updateLog();
@@ -375,14 +375,14 @@ function closePosition(idx){
   positions.splice(idx,1);
   updatePositions();
   updateLog();
-  document.getElementById('feedbackMsg').innerHTML = '🔒 Posición cerrada manualmente.';
+  document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_2');
   checkCompletion();
 }
 
 function updateLog(){
   const log = document.getElementById('tradeLog');
   if(orderHistory.length===0){
-    log.innerHTML = '<div class="log-entry" style="color:#666;text-align:center">Aún no has enviado órdenes</div>';
+    log.innerHTML = I18N.t('fb_3');
     return;
   }
   log.innerHTML = orderHistory.slice().reverse().map(o=>
@@ -396,7 +396,7 @@ function updateLog(){
 function checkCompletion(){
   if(!completed && quizScore>=5 && tradeCount>=3){
     document.getElementById('insigniaArea').classList.remove('hidden');
-    document.getElementById('feedbackMsg').innerHTML = '🎉 ¡LO LOGRASTE, TRADER! Has completado el quiz y ejecutado órdenes como un profesional. ¡Insignia desbloqueada!';
+    document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_4');
     saveProgress();
     completed = true;
   }
@@ -438,11 +438,11 @@ function loadQuiz(){
       if(i===q.correct){
         btn.classList.add('correct');
         quizScore++;
-        document.getElementById('feedbackMsg').innerHTML = '✅ ¡Correcto! '+opt+' era la respuesta adecuada para ese escenario.';
+        document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_5')+opt+' era la respuesta adecuada para ese escenario.';
       } else {
         btn.classList.add('wrong');
         btns[q.correct].classList.add('correct');
-        document.getElementById('feedbackMsg').innerHTML = '❌ La respuesta correcta era <strong>'+q.options[q.correct]+'</strong>. '+opt+' no aplica aquí.';
+        document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_6')+q.options[q.correct]+'</strong>. '+opt+' no aplica aquí.';
       }
       document.getElementById('quizScore').textContent = quizScore;
       document.getElementById('nextQuizBtn').disabled = false;
@@ -459,6 +459,18 @@ window.addEventListener('load',()=>{
   initProgress();
   loadQuiz();
 });
+</script>
+
+<script>
+window.I18N_DATA={
+  'fb_0': { es: '✅ Orden ejecutada correctamente. Deal #', en: '✅ Orden ejecutada correctamente. Deal #' },
+  'fb_1': { es: '❌ Orden rechazada: ', en: '❌ Orden rechazada: ' },
+  'fb_2': { es: '🔒 Posición cerrada manualmente.', en: '🔒 Posición cerrada manualmente.' },
+  'fb_3': { es: '<div class="log-entry" style="color:#666;text-align:center">Aún no has enviado órdenes</div>', en: '<div class="log-entry" style="color:#666;text-align:center">Aún no has enviado órdenes</div>' },
+  'fb_4': { es: '🎉 ¡LO LOGRASTE, TRADER! Has completado el quiz y ejecutado órdenes como un profesional. ¡Insignia desbloqueada!', en: '🎉 ¡LO LOGRASTE, TRADER! You completed el quiz y ejecutado órdenes como un profesional. Badge unlocked!' },
+  'fb_5': { es: '✅ ¡Correcto! ', en: '✅ Correct! ' },
+  'fb_6': { es: '❌ La respuesta correcta era <strong>', en: '❌ La respuesta correcta era <strong>' }
+};
 </script>
 </body>
 </html>

@@ -137,31 +137,43 @@
     function parseDist(text){const lines=text.trim().split('\n');const vals=[];for(const l of lines){const p=l.split(',').map(s=>parseFloat(s.trim()));if(p.length>=2&&!isNaN(p[0])&&!isNaN(p[1]))vals.push({x:p[0],p:p[1]});}return vals;}
     function computeMoments(){
       const dist=parseDist(document.getElementById('distInput').value);
-      if(dist.length===0){document.getElementById('feedbackMsg').innerHTML='⚠️ Ingresa datos válidos';return;}
+      if(dist.length===0){document.getElementById('feedbackMsg').innerHTML=I18N.t('fb_0');return;}
       const totalP=dist.reduce((s,d)=>s+d.p,0);
-      if(Math.abs(totalP-1)>0.01){document.getElementById('feedbackMsg').innerHTML='⚠️ Las probabilidades suman '+totalP.toFixed(3)+'. Deben sumar ~1.';return;}
+      if(Math.abs(totalP-1)>0.01){document.getElementById('feedbackMsg').innerHTML=I18N.t('fb_1')+totalP.toFixed(3)+'. Deben sumar ~1.';return;}
       const eX=dist.reduce((s,d)=>s+d.x*d.p,0);const eX2=dist.reduce((s,d)=>s+d.x*d.x*d.p,0);
       const varian=eX2-eX*eX;const std=Math.sqrt(Math.max(0,varian));
       document.getElementById('eResult').textContent=eX.toFixed(4);document.getElementById('varResult').textContent=varian.toFixed(4);
       document.getElementById('stdResult').textContent=std.toFixed(4);document.getElementById('ex2Result').textContent=eX2.toFixed(4);
-      document.getElementById('feedbackMsg').innerHTML='✅ E[X] = '+eX.toFixed(4)+', Var[X] = '+varian.toFixed(4)+'. ¡La varianza mide la dispersión!';
+      document.getElementById('feedbackMsg').innerHTML=I18N.t('fb_2')+eX.toFixed(4)+', Var[X] = '+varian.toFixed(4)+'. ¡La varianza mide la dispersión!';
       calcDone=true;checkInsignia();
     }
     function computeTransform(){
       const dist=parseDist(document.getElementById('distInput').value);
       if(dist.length===0)return;const t=document.getElementById('transformInput').value.trim();
       try{const fn=new Function('x','return '+t+';');let egX=0;for(const d of dist){const gx=fn(d.x);if(isNaN(gx)||!isFinite(gx))throw Error();egX+=gx*d.p;}
-        document.getElementById('egResult').textContent=egX.toFixed(4);document.getElementById('feedbackMsg').innerHTML='✅ E[g(X)] = '+egX.toFixed(4)+'. ¡Ley del Estadístico Inconsciente!';
+        document.getElementById('egResult').textContent=egX.toFixed(4);document.getElementById('feedbackMsg').innerHTML=I18N.t('fb_3')+egX.toFixed(4)+'. ¡Ley del Estadístico Inconsciente!';
         calcDone=true;checkInsignia();
-      }catch(e){document.getElementById('feedbackMsg').innerHTML='⚠️ Función inválida. Usa sintaxis JS (ej: x^2, 2*x+1, Math.exp(x))';}
+      }catch(e){document.getElementById('feedbackMsg').innerHTML=I18N.t('fb_4');}
     }
-    function checkInsignia(){if(calcDone&&!localStorage.getItem(STORAGE_KEY)){document.getElementById('insigniaArea').classList.remove('hidden');localStorage.setItem(STORAGE_KEY,'true');document.getElementById('feedbackMsg').innerHTML='🎉 ¡LO LOGRASTE! Has calculado esperanza y varianza.';}}
+    function checkInsignia(){if(calcDone&&!localStorage.getItem(STORAGE_KEY)){document.getElementById('insigniaArea').classList.remove('hidden');localStorage.setItem(STORAGE_KEY,'true');document.getElementById('feedbackMsg').innerHTML=I18N.t('fb_5');}}
     document.getElementById('calcMomentsBtn').addEventListener('click',computeMoments);
     document.getElementById('calcTransformBtn').addEventListener('click',computeTransform);
     document.querySelectorAll('.calc-tab').forEach(tab=>tab.addEventListener('click',()=>{document.querySelectorAll('.calc-tab').forEach(t=>t.classList.remove('active'));tab.classList.add('active');const d=tab.dataset.calc==='discrete';document.getElementById('discreteCalc').style.display=d?'block':'none';document.getElementById('transformCalc').style.display=d?'none':'block';}));
-    if(localStorage.getItem(STORAGE_KEY)==='true'){document.getElementById('insigniaArea').classList.remove('hidden');document.getElementById('feedbackMsg').innerHTML='🎉 ¡Ya dominas la esperanza y varianza!';}
+    if(localStorage.getItem(STORAGE_KEY)==='true'){document.getElementById('insigniaArea').classList.remove('hidden');document.getElementById('feedbackMsg').innerHTML=I18N.t('fb_6');}
     computeMoments();
   </script>
   <script src="../../assets/js/cookie-consent.js"></script>
+
+<script>
+window.I18N_DATA={
+  'fb_0': { es: '⚠️ Ingresa datos válidos', en: '⚠️ Ingresa datos válidos' },
+  'fb_1': { es: '⚠️ Las probabilidades suman ', en: '⚠️ Las probabilidades suman ' },
+  'fb_2': { es: '✅ E[X] = ', en: '✅ E[X] = ' },
+  'fb_3': { es: '✅ E[g(X)] = ', en: '✅ E[g(X)] = ' },
+  'fb_4': { es: '⚠️ Función inválida. Usa sintaxis JS (ej: x^2, 2*x+1, Math.exp(x))', en: '⚠️ Función inválida. Usa sintaxis JS (ej: x^2, 2*x+1, Math.exp(x))' },
+  'fb_5': { es: '🎉 ¡LO LOGRASTE! Has calculado esperanza y varianza.', en: '🎉 YOU DID IT! Has calculado esperanza y varianza.' },
+  'fb_6': { es: '🎉 ¡Ya dominas la esperanza y varianza!', en: '🎉 ¡Ya dominas la esperanza y varianza!' }
+};
+</script>
 </body>
 </html>

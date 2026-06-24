@@ -210,13 +210,13 @@ function addPosition(){
   positions.push(pos);
   addAction('📌 Abierta: '+sym+' '+type+' '+vol.toFixed(2)+' @ '+entryPrice.toFixed(5), '#00ffc8');
   updateUI();
-  document.getElementById('feedbackMsg').innerHTML = '📌 Posición abierta: '+sym+' '+type+' '+vol.toFixed(2);
+  document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_0')+sym+' '+type+' '+vol.toFixed(2);
   updateButtons();
 }
 
 function simulateTick(){
   if(positions.length===0){
-    document.getElementById('feedbackMsg').innerHTML = '⚠️ No hay posiciones para simular. Abre una primero.';
+    document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_1');
     return;
   }
   positions.forEach(p => {
@@ -264,7 +264,7 @@ function closePos(idx){
   updateButtons();
   drawPnlChart();
   checkCompletion();
-  document.getElementById('feedbackMsg').innerHTML = '🔒 Posición cerrada.';
+  document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_2');
 }
 
 function closeAll(){
@@ -276,12 +276,12 @@ function closeAll(){
   updateButtons();
   drawPnlChart();
   checkCompletion();
-  document.getElementById('feedbackMsg').innerHTML = '🔴 Todas las posiciones cerradas.';
+  document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_3');
 }
 
 function closeNegative(){
   const neg = positions.filter(p => p.pnl < 0);
-  if(neg.length===0){document.getElementById('feedbackMsg').innerHTML = '✅ No hay posiciones negativas.'; return;}
+  if(neg.length===0){document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_4'); return;}
   neg.forEach(n => {
     addAction('🔴 Cerrada negativa: '+n.sym+' '+n.type+' '+(n.pnl>=0?'+':'')+n.pnl.toFixed(2), '#ff1744');
     positions.splice(positions.indexOf(n),1);
@@ -290,12 +290,12 @@ function closeNegative(){
   updateButtons();
   drawPnlChart();
   checkCompletion();
-  document.getElementById('feedbackMsg').innerHTML = '🔴 '+neg.length+' posición(es) negativa(s) cerrada(s).';
+  document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_5')+neg.length+' posición(es) negativa(s) cerrada(s).';
 }
 
 function applyTrailing(){
   const active = positions.filter(p => !p.trailingActive);
-  if(active.length===0){document.getElementById('feedbackMsg').innerHTML='⚠️ Todas las posiciones ya tienen trailing.';return;}
+  if(active.length===0){document.getElementById('feedbackMsg').innerHTML=I18N.t('fb_6');return;}
   active.forEach(p => {
     p.trailingActive = true;
     p.trailDist = 0.0020;
@@ -304,7 +304,7 @@ function applyTrailing(){
   });
   addAction('🔺 Trailing Stop activado en '+active.length+' posición(es) — distancia 20pts', '#ffd700');
   updateUI();
-  document.getElementById('feedbackMsg').innerHTML = '🔺 Trailing stop activado en '+active.length+' posiciones.';
+  document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_7')+active.length+' posiciones.';
   checkCompletion();
 }
 
@@ -313,14 +313,14 @@ function applyBreakeven(){
     const gain = p.type==='BUY'?(p.current-p.entry):(p.entry-p.current);
     return gain > 0.0005;
   });
-  if(eligible.length===0){document.getElementById('feedbackMsg').innerHTML='⚠️ Ninguna posición tiene suficiente ganancia para breakeven.';return;}
+  if(eligible.length===0){document.getElementById('feedbackMsg').innerHTML=I18N.t('fb_8');return;}
   eligible.forEach(p => {
     const be = p.type==='BUY'?p.entry+0.0005:p.entry-0.0005;
     p.sl = be;
   });
   addAction('⚖️ Breakeven +5pts aplicado a '+eligible.length+' posición(es)', '#66ccff');
   updateUI();
-  document.getElementById('feedbackMsg').innerHTML = '⚖️ Breakeven aplicado a '+eligible.length+' posiciones. SL movido a entrada +5pts.';
+  document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_9')+eligible.length+' posiciones. SL movido a entrada +5pts.';
   checkCompletion();
 }
 
@@ -357,7 +357,7 @@ function drawPnlChart(){
 function checkCompletion(){
   if(!completed && actions>=5){
     document.getElementById('insigniaArea').classList.remove('hidden');
-    document.getElementById('feedbackMsg').innerHTML = '🎉 ¡Has realizado '+actions+' acciones de gestión! Eres un Risk Manager. ¡Insignia desbloqueada!';
+    document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_10')+actions+' acciones de gestión! Eres un Risk Manager. ¡Insignia desbloqueada!';
     saveProgress();
     completed = true;
   }
@@ -373,5 +373,21 @@ document.getElementById('closeNegBtn').addEventListener('click', closeNegative);
 window.addEventListener('load',()=>{initProgress();updateButtons();});
 </script>
 <script src="../../../assets/js/cookie-consent.js"></script>
+
+<script>
+window.I18N_DATA={
+  'fb_0': { es: '📌 Posición abierta: ', en: '📌 Posición abierta: ' },
+  'fb_1': { es: '⚠️ No hay posiciones para simular. Abre una primero.', en: '⚠️ No hay posiciones para simular. Abre una primero.' },
+  'fb_2': { es: '🔒 Posición cerrada.', en: '🔒 Posición cerrada.' },
+  'fb_3': { es: '🔴 Todas las posiciones cerradas.', en: '🔴 Todas las posiciones cerradas.' },
+  'fb_4': { es: '✅ No hay posiciones negativas.', en: '✅ No hay posiciones negativas.' },
+  'fb_5': { es: '🔴 ', en: '🔴 ' },
+  'fb_6': { es: '⚠️ Todas las posiciones ya tienen trailing.', en: '⚠️ Todas las posiciones ya tienen trailing.' },
+  'fb_7': { es: '🔺 Trailing stop activado en ', en: '🔺 Trailing stop activado en ' },
+  'fb_8': { es: '⚠️ Ninguna posición tiene suficiente ganancia para breakeven.', en: '⚠️ Ninguna posición tiene suficiente ganancia para breakeven.' },
+  'fb_9': { es: '⚖️ Breakeven aplicado a ', en: '⚖️ Breakeven aplicado a ' },
+  'fb_10': { es: '🎉 ¡Has realizado ', en: '🎉 ¡Has realizado ' }
+};
+</script>
 </body>
 </html>

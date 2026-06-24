@@ -69,14 +69,22 @@ footer{text-align:center;padding:16px 0 0;color:#667788;font-size:.8rem;border-t
 const MODULE=8,COURSE="sqlavanzado_c2",PROG="sqlavanzado_progress",BADGES="sqlavanzado_badges";
 const codes=['-- 1. Crear extension\nCREATE EXTENSION postgres_fdw;\n\n-- 2. Crear foreign server\nCREATE SERVER shard_us FOREIGN DATA WRAPPER postgres_fdw OPTIONS (host \'shard1\', port \'5432\', dbname \'orders_us\');','-- 3. Mapeo de usuario\nCREATE USER MAPPING FOR current_user SERVER shard_us OPTIONS (user \'fdw_user\', password \'****\');\n\n-- 4. Importar esquema\nIMPORT FOREIGN SCHEMA public FROM SERVER shard_us INTO public;','-- 5. Query con pushdown\nEXPLAIN (ANALYZE) SELECT * FROM orders_us WHERE region = \'US\' AND created_at > \'2024-01-01\';\n\n-- PostgreSQL envía el WHERE al shard remoto\n-- Solo vuelven los resultados filtrados'];
 let idx=0;
-document.getElementById('createFdw').addEventListener('click',function(){document.getElementById('fdwCode').textContent=codes[0];idx=0;document.getElementById('feedback').innerHTML='🔌 Paso 1: Extension + Server. PostgreSQL se conecta al shard remoto. Usa libpq internamente.';});
-document.getElementById('importSchema').addEventListener('click',function(){document.getElementById('fdwCode').textContent=codes[1];idx=1;document.getElementById('feedback').innerHTML='📥 IMPORT FOREIGN SCHEMA trae la estructura de tablas del servidor remoto. Las tablas aparecen como locales (pero los datos están allá).';});
-document.getElementById('simQuery').addEventListener('click',function(){document.getElementById('fdwCode').textContent=codes[2];idx=2;document.getElementById('feedback').innerHTML='⚡ Query pushdown: el WHERE se ejecuta en el shard remoto. PostgreSQL no trae todas las filas, solo el resultado filtrado. ¡Esto es clave para el rendimiento!';let bd=JSON.parse(localStorage.getItem(BADGES))||[];if(!bd.includes('FDW Architect')){bd.push('FDW Architect');localStorage.setItem(BADGES,JSON.stringify(bd));document.getElementById('insignia').classList.remove('hidden')}updateProg();});
+document.getElementById('createFdw').addEventListener('click',function(){document.getElementById('fdwCode').textContent=codes[0];idx=0;document.getElementById('feedback').innerHTML=I18N.t('fb_0');});
+document.getElementById('importSchema').addEventListener('click',function(){document.getElementById('fdwCode').textContent=codes[1];idx=1;document.getElementById('feedback').innerHTML=I18N.t('fb_1');});
+document.getElementById('simQuery').addEventListener('click',function(){document.getElementById('fdwCode').textContent=codes[2];idx=2;document.getElementById('feedback').innerHTML=I18N.t('fb_2');let bd=JSON.parse(localStorage.getItem(BADGES))||[];if(!bd.includes('FDW Architect')){bd.push('FDW Architect');localStorage.setItem(BADGES,JSON.stringify(bd));document.getElementById('insignia').classList.remove('hidden')}updateProg();});
 function updateProg(){
 let p=JSON.parse(localStorage.getItem(COURSE+"_progress"))||[];if(!p.includes(MODULE)){p.push(MODULE);localStorage.setItem(COURSE+"_progress",JSON.stringify(p))}
 let pct=Math.round(p.length/12*100);document.getElementById('progFill').style.width=pct+'%';document.getElementById('progText').textContent='Módulo 8 de 12 ('+pct+'%)';
 let gp=JSON.parse(localStorage.getItem(PROG))||[];if(!gp.includes(MODULE+96)){gp.push(MODULE+96);localStorage.setItem(PROG,JSON.stringify(gp))}
 }
+</script>
+
+<script>
+window.I18N_DATA={
+  'fb_0': { es: '🔌 Paso 1: Extension + Server. PostgreSQL se conecta al shard remoto. Usa libpq internamente.', en: '🔌 Paso 1: Extension + Server. PostgreSQL se conecta al shard remoto. Usa libpq internamente.' },
+  'fb_1': { es: '📥 IMPORT FOREIGN SCHEMA trae la estructura de tablas del servidor remoto. Las tablas aparecen como locales (pero los datos están allá).', en: '📥 IMPORT FOREIGN SCHEMA trae la estructura de tablas del servidor remoto. Las tablas aparecen como locales (pero los datos están allá).' },
+  'fb_2': { es: '⚡ Query pushdown: el WHERE se ejecuta en el shard remoto. PostgreSQL no trae todas las filas, solo el resultado filtrado. ¡Esto es clave para el rendimiento!', en: '⚡ Query pushdown: el WHERE se ejecuta en el shard remoto. PostgreSQL no trae todas las filas, solo el resultado filtrado. ¡Esto es clave para el rendimiento!' }
+};
 </script>
 <script src="../../../assets/js/i18n.js"></script>  </body>
 </html>

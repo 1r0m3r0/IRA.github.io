@@ -144,9 +144,9 @@
       document.getElementById('progFill').style.width = pct+'%';
       if(done >= TOTAL) {
         document.getElementById('genBtn').disabled = false;
-        document.getElementById('feedbackMsg').innerHTML = '✅ Todos los módulos completados. Ingresa tu nombre y firma para generar el certificado.';
+        document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_0');
       } else {
-        document.getElementById('feedbackMsg').innerHTML = '💡 Completados '+done+'/'+TOTAL+' módulos. Faltan '+(TOTAL-done)+' para obtener el certificado.';
+        document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_1')+done+'/'+TOTAL+' módulos. Faltan '+(TOTAL-done)+' para obtener el certificado.';
       }
     }
 
@@ -181,14 +181,14 @@
 
     function generateCert() {
       const name = document.getElementById('gradName').value.trim();
-      if(!name) { document.getElementById('feedbackMsg').innerHTML = '❌ Ingresa tu nombre primero.'; return; }
+      if(!name) { document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_2'); return; }
       const done = countDone();
-      if(done < TOTAL) { document.getElementById('feedbackMsg').innerHTML = '❌ Completa todos los módulos primero.'; return; }
+      if(done < TOTAL) { document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_3'); return; }
       // Check signature - has something drawn?
       const imageData = ctx.getImageData(0,0,canvas.width,canvas.height).data;
       let hasSig = false;
       for(let i=0;i<imageData.length;i+=4) { if(imageData[i+3] > 0) { hasSig=true; break; } }
-      if(!hasSig) { document.getElementById('feedbackMsg').innerHTML = '❌ Por favor firma en el recuadro.'; return; }
+      if(!hasSig) { document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_4'); return; }
 
       localStorage.setItem('py_trade_2_12', 'true');
       document.getElementById('insigniaArea')?.classList.remove('hidden');
@@ -196,7 +196,7 @@
       localStorage.setItem('py_trade_2_cert', JSON.stringify(certData));
       document.getElementById('genBtn').disabled = true;
       document.getElementById('printBtn').classList.remove('hidden');
-      document.getElementById('feedbackMsg').innerHTML = '✅ Certificado generado para <strong>'+name+'</strong> el '+certData.date+'. ¡Felicidades, graduado!';
+      document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_5')+name+'</strong> el '+certData.date+'. ¡Felicidades, graduado!';
       renderModules();
     }
 
@@ -207,5 +207,16 @@
     // Add insignia area if not present
     renderModules();
   </script>
+
+<script>
+window.I18N_DATA={
+  'fb_0': { es: '✅ Todos los módulos completados. Ingresa tu nombre y firma para generar el certificado.', en: '✅ Todos los módulos completados. Ingresa tu nombre y firma para generar el certificado.' },
+  'fb_1': { es: '💡 Completados ', en: '💡 Completados ' },
+  'fb_2': { es: '❌ Ingresa tu nombre primero.', en: '❌ Ingresa tu nombre primero.' },
+  'fb_3': { es: '❌ Completa todos los módulos primero.', en: '❌ Completa todos los módulos primero.' },
+  'fb_4': { es: '❌ Por favor firma en el recuadro.', en: '❌ Por favor firma en el recuadro.' },
+  'fb_5': { es: '✅ Certificado generado para <strong>', en: '✅ Certificado generado para <strong>' }
+};
+</script>
 </body>
 </html>

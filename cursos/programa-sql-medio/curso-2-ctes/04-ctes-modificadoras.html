@@ -73,20 +73,29 @@ function updateProgress(){let d=JSON.parse(localStorage.getItem(P+'_progress'))|
 const ORDERED=['WITH','empleados_actualizados AS (','UPDATE empleados SET salario = salario * 1.1','WHERE departamento_id = 3','RETURNING id, nombre, salario)','SELECT * FROM empleados_actualizados;'];
 function shuffle(a){for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 let shuffled=shuffle([...ORDERED]);
-document.getElementById('shuffled').innerHTML='<div style="font-size:.8rem;margin-bottom:8px">📋 Fragmentos (copia en orden en el área de abajo):</div>'+shuffled.map((s,i)=>'<div style="background:rgba(0,204,106,0.06);border:1px solid rgba(0,204,106,0.15);border-radius:4px;padding:6px 10px;margin:4px;display:inline-block;font-size:.82rem;cursor:pointer" onclick="copyFragment('+i+')">'+(i+1)+'. '+s+'</div>').join('');
+document.getElementById('shuffled').innerHTML=I18N.t('fb_0')+shuffled.map((s,i)=>'<div style="background:rgba(0,204,106,0.06);border:1px solid rgba(0,204,106,0.15);border-radius:4px;padding:6px 10px;margin:4px;display:inline-block;font-size:.82rem;cursor:pointer" onclick="copyFragment('+i+')">'+(i+1)+'. '+s+'</div>').join('');
 function copyFragment(i){const ta=document.getElementById('userCode');ta.value+=shuffled[i]+'\n';ta.focus();}
 function checkOrder(){
   let code=document.getElementById('userCode').value.trim().replace(/\n/g,' ').replace(/\s+/g,' ');
   let expected=ORDERED.join(' ').replace(/\s+/g,' ');
   if(code===expected||code.includes('WITH')&&code.includes('UPDATE')&&code.includes('RETURNING')&&code.includes('SELECT * FROM')){
-    document.getElementById('feedback').innerHTML='✅ <strong>¡CTE modificadora perfecta!</strong> WITH + UPDATE con RETURNING + SELECT final. RETURNING devuelve los datos modificados como si fueran una tabla.';document.getElementById('feedback').className='feedback success';
+    document.getElementById('feedback').innerHTML=I18N.t('fb_1');document.getElementById('feedback').className='feedback success';
     document.getElementById('claimBadge').style.display='inline-block';
   }else{
-    document.getElementById('feedback').innerHTML='❌ Revisa el orden. Debe ser: WITH → nombre AS ( → UPDATE → WHERE → RETURNING → ) → SELECT';document.getElementById('feedback').className='feedback error';
+    document.getElementById('feedback').innerHTML=I18N.t('fb_2');document.getElementById('feedback').className='feedback error';
   }
 }
-function claimInsignia(){let d=JSON.parse(localStorage.getItem(P+'_progress'))||[];if(!d.includes(GM)){d.push(GM);localStorage.setItem(P+'_progress',JSON.stringify(d));}let b=JSON.parse(localStorage.getItem(P+'_badges'))||[];let badge='c'+CI+'-m4-ctes-mod';if(!b.includes(badge)){b.push(badge);localStorage.setItem(P+'_badges',JSON.stringify(b));}document.getElementById('insignia').classList.add('show');document.getElementById('claimBadge').style.display='none';document.getElementById('btnNext').disabled=false;document.getElementById('feedback').innerHTML='🎉 <strong>CTEs modificadoras dominadas. ¡A por recursividad!</strong>';document.getElementById('feedback').className='feedback success';updateProgress();}
+function claimInsignia(){let d=JSON.parse(localStorage.getItem(P+'_progress'))||[];if(!d.includes(GM)){d.push(GM);localStorage.setItem(P+'_progress',JSON.stringify(d));}let b=JSON.parse(localStorage.getItem(P+'_badges'))||[];let badge='c'+CI+'-m4-ctes-mod';if(!b.includes(badge)){b.push(badge);localStorage.setItem(P+'_badges',JSON.stringify(b));}document.getElementById('insignia').classList.add('show');document.getElementById('claimBadge').style.display='none';document.getElementById('btnNext').disabled=false;document.getElementById('feedback').innerHTML=I18N.t('fb_3');document.getElementById('feedback').className='feedback success';updateProgress();}
 updateProgress();
+</script>
+
+<script>
+window.I18N_DATA={
+  'fb_0': { es: '<div style="font-size:.8rem;margin-bottom:8px">📋 Fragmentos (copia en orden en el área de abajo):</div>', en: '<div style="font-size:.8rem;margin-bottom:8px">📋 Fragmentos (copia en orden en el área de abajo):</div>' },
+  'fb_1': { es: '✅ <strong>¡CTE modificadora perfecta!</strong> WITH + UPDATE con RETURNING + SELECT final. RETURNING devuelve los datos modificados como si fueran una tabla.', en: '✅ <strong>¡CTE modificadora perfecta!</strong> WITH + UPDATE con RETURNING + SELECT final. RETURNING devuelve los datos modificados como si fueran una tabla.' },
+  'fb_2': { es: '❌ Revisa el orden. Debe ser: WITH → nombre AS ( → UPDATE → WHERE → RETURNING → ) → SELECT', en: '❌ Review el orden. Debe ser: WITH → nombre AS ( → UPDATE → WHERE → RETURNING → ) → SELECT' },
+  'fb_3': { es: '🎉 <strong>CTEs modificadoras dominadas. ¡A por recursividad!</strong>', en: '🎉 <strong>CTEs modificadoras dominadas. ¡A por recursividad!</strong>' }
+};
 </script>
 <script src="../../../assets/js/i18n.js"></script>  </body>
 </html>
