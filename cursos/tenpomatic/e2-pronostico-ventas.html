@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TENPOMATIC | Pronóstico Avanzado de Ventas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #111a2e 100%);
+      font-family: 'Inter', sans-serif;
+      color: #eef5ff;
+      min-height: 100vh;
+      padding: 5rem 1rem 2rem;
+    }
+    .course-container {
+      max-width: 900px; margin: 0 auto;
+      background: rgba(15,25,45,0.65);
+      backdrop-filter: blur(12px);
+      border-radius: 2rem;
+      border: 1px solid rgba(255,102,192,0.25);
+      box-shadow: 0 25px 45px rgba(0,0,0,0.5);
+      overflow: hidden;
+    }
+    .hero-header {
+      background: linear-gradient(135deg,#1a0a14,#2a0a1e);
+      padding: 2.5rem 2rem;
+      text-align: center;
+      border-bottom: 1px solid rgba(255,102,192,0.15);
+    }
+    .hero-header h1 {
+      font-size: 2.2rem;
+      background: linear-gradient(135deg,#ff66c0,#ff3399);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      font-weight: 800;
+    }
+    .hero-header p { color: rgba(255,255,255,0.7); margin-top: 0.75rem; line-height: 1.6; }
+    .progress-bar {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.75rem 2rem;
+      background: rgba(0,0,0,0.2);
+    }
+    .progress-fill {
+      height: 8px;
+      background: linear-gradient(90deg,#ff66c0,#ff3399);
+      border-radius: 10px;
+      transition: width 0.5s ease;
+      flex-shrink: 0;
+    }
+    .progress-outer {
+      flex:1; height: 8px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 10px; overflow: hidden;
+    }
+    .progress-text { font-size: 0.8rem; color: rgba(255,255,255,0.6); white-space: nowrap; }
+    .analogy-card {
+      margin: 1.5rem 2rem;
+      padding: 1.25rem;
+      background: rgba(255,102,192,0.06);
+      border-left: 4px solid #ff66c0;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      color: rgba(255,255,255,0.85);
+    }
+    .analogy-card strong { color: #ff66c0; }
+    .main-area { padding: 0 2rem 1.5rem; }
+    .main-area h2 { font-size: 1.3rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+    .main-area h2 i { color: #ff66c0; }
+    .feedback {
+      margin: 0 2rem 1.5rem; padding: 1rem; border-radius: 12px;
+      background: rgba(255,102,192,0.08); border: 1px solid rgba(255,102,192,0.2); font-size: 0.9rem;
+    }
+    .insignia {
+      margin: 0 2rem 1.5rem; padding: 1.5rem; text-align: center;
+      background: linear-gradient(135deg, rgba(255,102,192,0.1), rgba(255,51,153,0.05));
+      border: 1px solid rgba(255,102,192,0.3); border-radius: 16px; animation: fadeInUp 0.5s ease;
+    }
+    .insignia i { font-size: 2.5rem; color: #ffd700; }
+    .insignia h3 { color: #ff66c0; margin: 0.5rem 0; }
+    .insignia p { color: rgba(255,255,255,0.7); font-size: 0.9rem; }
+    .hidden { display: none !important; }
+    .nav-simulation {
+      display: flex; justify-content: flex-end; padding: 1rem 2rem; background: rgba(0,0,0,0.15);
+    }
+    .btn-next {
+      background: linear-gradient(135deg,#ff66c0,#ff3399); color: #fff; border: none; padding: 0.75rem 1.5rem;
+      border-radius: 10px; font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: all 0.3s;
+      display: flex; align-items: center; gap: 0.5rem; text-decoration: none;
+    }
+    .btn-next:hover { transform: scale(1.03); box-shadow: 0 0 20px rgba(255,102,192,0.3); }
+    footer { text-align: center; padding: 1rem 2rem; font-size: 0.8rem; color: rgba(255,255,255,0.4); border-top: 1px solid rgba(255,255,255,0.05); }
+    footer i { color: #ff66c0; }
+    .chart-wrap { margin: 0.75rem 0; background: rgba(0,0,0,0.2); border-radius: 12px; padding: 0.5rem; }
+    .chart-wrap canvas { width: 100%; height: auto; display: block; border-radius: 8px; }
+    .data-table { width: 100%; border-collapse: collapse; margin: 0.75rem 0; font-size: 0.85rem; }
+    .data-table th { background: rgba(255,102,192,0.1); color: #ff66c0; padding: 0.5rem; text-align: center; font-weight: 600; border-bottom: 1px solid rgba(255,102,192,0.2); }
+    .data-table td { padding: 0.4rem 0.5rem; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .data-table tr:nth-child(even) { background: rgba(255,255,255,0.02); }
+    .result-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin: 0.75rem 0;
+    }
+    .result-card {
+      background: rgba(255,102,192,0.04); border: 1px solid rgba(255,102,192,0.1); border-radius: 10px; padding: 0.7rem; text-align: center;
+    }
+    .result-card .r-value { font-size: 1.2rem; font-weight: 800; color: #ff66c0; }
+    .result-card .r-label { font-size: 0.7rem; color: rgba(255,255,255,0.5); margin-top: 0.2rem; }
+    .projection-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.4rem; margin: 0.5rem 0;
+    }
+    .proj-card {
+      background: rgba(255,102,192,0.04); border: 1px solid rgba(255,102,192,0.1); border-radius: 10px; padding: 0.6rem; text-align: center;
+    }
+    .proj-card .p-label { font-size: 0.7rem; color: rgba(255,255,255,0.5); }
+    .proj-card .p-value { font-size: 1rem; font-weight: 700; color: #00e0ff; }
+    .btn-calc {
+      background: rgba(255,102,192,0.15); color: #ff66c0; border: 1px solid rgba(255,102,192,0.3);
+      padding: 0.6rem 1.5rem; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.3s;
+      margin-top: 0.5rem; font-size: 0.9rem;
+    }
+    .btn-calc:hover { background: rgba(255,102,192,0.25); }
+    .data-box {
+      background: rgba(255,102,192,0.04); border: 1px solid rgba(255,102,192,0.12); border-radius: 12px;
+      padding: 0.85rem; margin: 0.5rem 0; font-size: 0.85rem; line-height: 1.6;
+    }
+    .data-box strong { color: #ff66c0; }
+    @keyframes fadeInUp { from { opacity:0;transform:translateY(15px); } to { opacity:1;transform:translateY(0); } }
+    @media (max-width: 768px) {
+      .hero-header h1 { font-size: 1.5rem; }
+      .analogy-card { margin: 1rem; }
+      .main-area { padding: 0 1rem 1rem; }
+      .feedback { margin: 0 1rem 1rem; }
+      .progress-bar { padding: 0.5rem 1rem; flex-wrap: wrap; }
+      .nav-simulation { padding: 0.75rem 1rem; }
+      .result-grid { grid-template-columns: 1fr; }
+      .projection-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <nav class="brand-return-nav">
+    <a href="../../index.html">&larr; Portfolio</a>
+    <a href="../../cursos/index.html">Cursos</a>
+    <a href="index.html">TENPOMATIC</a>
+  </nav>
+  <div class="course-container">
+    <div class="progress-bar">
+      <div class="progress-outer"><div class="progress-fill" style="width:0%"></div></div>
+      <span class="progress-text">M&oacute;dulo Experto 2 de 10 (0%)</span>
+    </div>
+    <div class="hero-header">
+      <h1><i class="fas fa-chart-scatter"></i> Pron&oacute;stico Avanzado de Ventas</h1>
+      <p>Regresi&oacute;n lineal con datos hist&oacute;ricos T1-T8 para proyectar el futuro de TENPOMATIC.</p>
+    </div>
+    <div class="analogy-card">
+      <strong><i class="fas fa-lightbulb"></i> Pi&eacute;nsalo as&iacute;:</strong> La regresi&oacute;n lineal es como mirar por el retrovisor de un auto para adivinar el camino que viene. Si las ventas han subido en l&iacute;nea recta los &uacute;ltimos 8 trimestres, lo m&aacute;s probable es que sigan subiendo igual. La pendiente te dice qu&eacute; tan r&aacute;pido acelera tu negocio.
+    </div>
+    <div class="main-area">
+      <h2><i class="fas fa-table"></i> Datos Hist&oacute;ricos de Ventas T1-T8</h2>
+      <table class="data-table">
+        <thead><tr><th>Trimestre</th><th>T1</th><th>T2</th><th>T3</th><th>T4</th><th>T5</th><th>T6</th><th>T7</th><th>T8</th></tr></thead>
+        <tbody><tr><td style="font-weight:600;">Ventas</td><td>12,700</td><td>12,400</td><td>13,200</td><td>14,600</td><td>15,300</td><td>15,900</td><td>16,400</td><td>18,100</td></tr></tbody>
+      </table>
+      <div>
+        <button class="btn-calc" onclick="calcularRegresion()"><i class="fas fa-chart-line"></i> Calcular Regresi&oacute;n</button>
+      </div>
+      <div class="result-grid" id="regResults" style="margin-top:0.5rem;">
+        <div class="result-card"><div class="r-value" id="rPendiente">--</div><div class="r-label">Pendiente (m)</div></div>
+        <div class="result-card"><div class="r-value" id="rIntercepto">--</div><div class="r-label">Intercepto (b)</div></div>
+        <div class="result-card"><div class="r-value" id="rRSquared">--</div><div class="r-label">R&sup2;</div></div>
+        <div class="result-card"><div class="r-value" id="rEcuacion">--</div><div class="r-label">Ecuaci&oacute;n</div></div>
+      </div>
+      <h2 style="margin-top:0.5rem;"><i class="fas fa-rocket"></i> Proyecciones</h2>
+      <div class="projection-grid" id="projGrid">
+        <div class="proj-card"><div class="p-label">T9</div><div class="p-value" id="projT9">--</div></div>
+        <div class="proj-card"><div class="p-label">T10</div><div class="p-value" id="projT10">--</div></div>
+        <div class="proj-card"><div class="p-label">T11</div><div class="p-value" id="projT11">--</div></div>
+        <div class="proj-card"><div class="p-label">T12</div><div class="p-value" id="projT12">--</div></div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="regChart" height="320"></canvas>
+      </div>
+      <div class="data-box">
+        <strong><i class="fas fa-database"></i> Datos reales T1-T8:</strong> Ventas totales por trimestre: 12,700 | 12,400 | 13,200 | 14,600 | 15,300 | 15,900 | 16,400 | 18,100. Tendencia claramente positiva.
+      </div>
+    </div>
+    <div id="feedback" class="feedback"><i class="fas fa-info-circle"></i> Presiona "Calcular Regresi&oacute;n" para ver la l&iacute;nea de tendencia y proyecciones.</div>
+    <div id="insignia" class="insignia hidden">
+      <i class="fas fa-medal"></i>
+      <h3>Maestro del Pron&oacute;stico</h3>
+      <p>Dominas la regresi&oacute;n lineal y puedes predecir el futuro de TENPOMATIC con datos reales. &iexcl;El directorio te necesita!</p>
+    </div>
+    <div class="nav-simulation">
+      <a href="e3-optimizacion-produccion.html" class="btn-next">Siguiente <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <footer><i class="fas fa-chart-line"></i> TENPOMATIC &middot; Gerencia General Integral &middot; Modo Experto</footer>
+  </div>
+  <script>
+    const CURRENT_MODULE = 27;
+    const TOTAL_MODULES = 35;
+    const COURSE_PROGRESS_KEY = 'tenpomatic_progress';
+
+    function updateProgress(moduleNum) {
+      let progress = JSON.parse(localStorage.getItem(COURSE_PROGRESS_KEY)) || [];
+      if (!progress.includes(moduleNum.toString())) {
+        progress.push(moduleNum.toString());
+        localStorage.setItem(COURSE_PROGRESS_KEY, JSON.stringify(progress));
+      }
+      const pct = Math.round((progress.length / TOTAL_MODULES) * 100);
+      document.querySelector('.progress-fill').style.width = pct + '%';
+      document.querySelector('.progress-text').textContent = 'M\u00f3dulo ' + moduleNum + ' de ' + TOTAL_MODULES + ' (' + pct + '%)';
+    }
+
+    const ventas = [12700, 12400, 13200, 14600, 15300, 15900, 16400, 18100];
+    const trimestres = [1, 2, 3, 4, 5, 6, 7, 8];
+
+    function calcularRegresion() {
+      const n = ventas.length;
+      let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0, sumY2 = 0;
+      for (let i = 0; i < n; i++) {
+        sumX += trimestres[i];
+        sumY += ventas[i];
+        sumXY += trimestres[i] * ventas[i];
+        sumX2 += trimestres[i] * trimestres[i];
+        sumY2 += ventas[i] * ventas[i];
+      }
+      const m = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+      const b = (sumY - m * sumX) / n;
+
+      const yMean = sumY / n;
+      let ssRes = 0, ssTot = 0;
+      for (let i = 0; i < n; i++) {
+        const yPred = m * trimestres[i] + b;
+        ssRes += (ventas[i] - yPred) ** 2;
+        ssTot += (ventas[i] - yMean) ** 2;
+      }
+      const r2 = ssTot > 0 ? 1 - ssRes / ssTot : 0;
+
+      function fmt(n) { return n.toLocaleString('en-US', {minimumFractionDigits:1,maximumFractionDigits:1}); }
+      document.getElementById('rPendiente').textContent = fmt(m);
+      document.getElementById('rIntercepto').textContent = fmt(b);
+      document.getElementById('rRSquared').textContent = r2.toFixed(4);
+      document.getElementById('rEcuacion').textContent = 'y = ' + fmt(m) + 'x + ' + fmt(b);
+
+      const proj = [];
+      for (let t = 9; t <= 12; t++) {
+        const p = m * t + b;
+        proj.push(p);
+      }
+      for (let i = 0; i < 4; i++) {
+        document.getElementById('projT' + (9 + i)).textContent = Math.round(proj[i]).toLocaleString();
+      }
+
+      const ultimo = ventas[n-1];
+      const ultimoProy = proj[proj.length - 1];
+      const crecimiento = ((ultimoProy - ventas[0]) / ventas[0] * 100).toFixed(1);
+      document.getElementById('feedback').innerHTML =
+        '<i class="fas fa-check-circle" style="color:#00ffc8;"></i> Regresi\u00f3n calculada. Pendiente: <strong>' + fmt(m) + '</strong> unidades/trimestre. R\u00b2 = <strong>' + r2.toFixed(4) + '</strong>. Proyecci\u00f3n T12: <strong>' + Math.round(proj[3]).toLocaleString() + '</strong> unidades. Crecimiento estimado: <strong>' + crecimiento + '%</strong>.';
+
+      dibujarGrafico(m, b, proj);
+
+      if (!localStorage.getItem('tenpomatic_insignia_M27')) {
+        localStorage.setItem('tenpomatic_insignia_M27', 'true');
+      }
+      document.getElementById('insignia').classList.remove('hidden');
+    }
+
+    function dibujarGrafico(m, b, proj) {
+      const canvas = document.getElementById('regChart');
+      const ctx = canvas.getContext('2d');
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = 320 * dpr;
+      ctx.scale(dpr, dpr);
+      const W = rect.width, H = 320;
+      const pad = { top: 30, bottom: 40, left: 55, right: 25 };
+      const chartW = W - pad.left - pad.right;
+      const chartH = H - pad.top - pad.bottom;
+
+      ctx.clearRect(0, 0, W, H);
+
+      const todos = ventas.concat(proj);
+      const minY = Math.min(0, Math.min(...todos) * 0.9);
+      const maxY = Math.max(...todos) * 1.1;
+      const maxT = 12.5;
+
+      function xPos(t) { return pad.left + (t / maxT) * chartW; }
+      function yPos(v) { return pad.top + chartH - ((v - minY) / (maxY - minY)) * chartH; }
+
+      for (let i = 0; i <= 5; i++) {
+        const y = pad.top + (i / 5) * chartH;
+        ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W - pad.right, y); ctx.stroke();
+        const val = maxY - (i / 5) * (maxY - minY);
+        ctx.fillStyle = 'rgba(255,255,255,0.3)';
+        ctx.font = '9px Inter';
+        ctx.textAlign = 'right';
+        ctx.fillText(Math.round(val).toLocaleString(), pad.left - 6, y + 3);
+      }
+
+      for (let t = 1; t <= 12; t++) {
+        const px = xPos(t);
+        ctx.fillStyle = 'rgba(255,255,255,0.3)';
+        ctx.font = '9px Inter';
+        ctx.textAlign = 'center';
+        const label = 'T' + t;
+        ctx.fillText(label, px, H - pad.bottom + 16);
+        ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(px, pad.top); ctx.lineTo(px, pad.top + chartH); ctx.stroke();
+      }
+
+      ctx.fillStyle = 'rgba(255,255,255,0.35)';
+      ctx.font = '9px Inter';
+      ctx.textAlign = 'center';
+      ctx.fillText('Trimestre', W/2, H - 4);
+      ctx.save();
+      ctx.translate(12, H/2);
+      ctx.rotate(-Math.PI/2);
+      ctx.fillText('Unidades', 0, 0);
+      ctx.restore();
+
+      for (let i = 0; i < ventas.length; i++) {
+        const x = xPos(trimestres[i]), y = yPos(ventas[i]);
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, Math.PI * 2);
+        ctx.fillStyle = '#ff66c0';
+        ctx.fill();
+      }
+
+      ctx.beginPath();
+      ctx.strokeStyle = '#ff66c0';
+      ctx.lineWidth = 2;
+      const startX = xPos(0.5), endX = xPos(12.5);
+      ctx.moveTo(startX, yPos(m * 0.5 + b));
+      ctx.lineTo(endX, yPos(m * 12.5 + b));
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.strokeStyle = '#00e0ff';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([5, 4]);
+      ctx.moveTo(xPos(8.5), yPos(m * 8.5 + b));
+      ctx.lineTo(xPos(12.5), yPos(m * 12.5 + b));
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      for (let i = 0; i < proj.length; i++) {
+        const t = 9 + i;
+        const x = xPos(t), y = yPos(proj[i]);
+        ctx.beginPath();
+        ctx.arc(x, y, 5, 0, Math.PI * 2);
+        ctx.fillStyle = '#00e0ff';
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(0,224,255,0.4)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+
+      ctx.fillStyle = 'rgba(255,102,192,0.8)';
+      ctx.font = '9px Inter';
+      ctx.textAlign = 'left';
+      ctx.fillRect(W - 155, pad.top + 4, 10, 10);
+      ctx.fillText('Hist\u00f3rico', W - 141, pad.top + 12);
+
+      ctx.fillStyle = '#ff66c0';
+      ctx.fillRect(W - 155, pad.top + 20, 10, 10);
+      ctx.fillText('Tendencia', W - 141, pad.top + 28);
+
+      ctx.fillStyle = '#00e0ff';
+      ctx.fillRect(W - 155, pad.top + 36, 10, 10);
+      ctx.fillText('Proyecci\u00f3n', W - 141, pad.top + 44);
+    }
+
+    window.addEventListener('load', function() {
+      calcularRegresion();
+      updateProgress(CURRENT_MODULE);
+    });
+  </script>
+</body>
+</html>

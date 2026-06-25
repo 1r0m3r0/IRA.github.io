@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TENPOMATIC | Estrategias de Precios Dinámicos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:linear-gradient(135deg,#0a0f1e,#0c1222,#111a2e); font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; padding:5rem 1rem 2rem; }
+    .course-container { max-width:900px; margin:0 auto; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:2rem; border:1px solid rgba(255,102,192,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+    .hero-header { background:linear-gradient(135deg,#1a0a14,#2a0a1e); padding:2.5rem 2rem; text-align:center; border-bottom:1px solid rgba(255,102,192,0.15); }
+    .hero-header h1 { font-size:2.2rem; background:linear-gradient(135deg,#ff66c0,#ff3399); -webkit-background-clip:text; background-clip:text; color:transparent; font-weight:800; }
+    .hero-header p { color:rgba(255,255,255,0.7); margin-top:.75rem; line-height:1.6; }
+    .progress-bar { display:flex; align-items:center; gap:.75rem; padding:.75rem 2rem; background:rgba(0,0,0,0.2); }
+    .progress-fill { height:8px; background:linear-gradient(90deg,#ff66c0,#ff3399); border-radius:10px; transition:width .5s ease; flex-shrink:0; }
+    .progress-outer { flex:1; height:8px; background:rgba(255,255,255,0.08); border-radius:10px; overflow:hidden; }
+    .progress-text { font-size:.8rem; color:rgba(255,255,255,0.6); white-space:nowrap; }
+    .analogy-card { margin:1.5rem 2rem; padding:1.25rem; background:rgba(255,102,192,0.06); border-left:4px solid #ff66c0; border-radius:12px; font-size:.95rem; line-height:1.5; color:rgba(255,255,255,0.85); }
+    .analogy-card strong { color:#ff66c0; }
+    .main-area { padding:0 2rem 1.5rem; }
+    .main-area h2 { font-size:1.3rem; margin-bottom:1rem; display:flex; align-items:center; gap:.5rem; }
+    .main-area h2 i { color:#ff66c0; }
+    .feedback { margin:0 2rem 1.5rem; padding:1rem; border-radius:12px; background:rgba(255,102,192,0.08); border:1px solid rgba(255,102,192,0.2); font-size:.9rem; }
+    .insignia { margin:0 2rem 1.5rem; padding:1.5rem; text-align:center; background:linear-gradient(135deg,rgba(255,102,192,0.1),rgba(255,51,153,0.05)); border:1px solid rgba(255,102,192,0.3); border-radius:16px; animation:fadeInUp .5s ease; }
+    .insignia i { font-size:2.5rem; color:#ffd700; }
+    .insignia h3 { color:#ff66c0; margin:.5rem 0; }
+    .insignia p { color:rgba(255,255,255,0.7); font-size:.9rem; }
+    .hidden { display:none!important; }
+    .nav-simulation { display:flex; justify-content:flex-end; padding:1rem 2rem; background:rgba(0,0,0,0.15); }
+    .btn-next { background:linear-gradient(135deg,#ff66c0,#ff3399); color:#fff; border:none; padding:.75rem 1.5rem; border-radius:10px; font-weight:700; font-size:.95rem; cursor:pointer; transition:all .3s; display:flex; align-items:center; gap:.5rem; text-decoration:none; }
+    .btn-next:hover { transform:scale(1.03); box-shadow:0 0 20px rgba(255,102,192,0.3); }
+    footer { text-align:center; padding:1rem 2rem; font-size:.8rem; color:rgba(255,255,255,0.4); border-top:1px solid rgba(255,255,255,0.05); }
+    footer i { color:#ff66c0; }
+    .slider-group { background:rgba(255,255,255,0.03); border:1px solid rgba(255,102,192,0.08); border-radius:12px; padding:1rem; margin-bottom:.75rem; }
+    .slider-group label { display:flex; justify-content:space-between; font-size:.85rem; margin-bottom:.4rem; }
+    .slider-group label span { color:#ff66c0; font-weight:700; }
+    .slider-group input[type="range"] { width:100%; -webkit-appearance:none; appearance:none; height:6px; background:rgba(255,102,192,0.15); border-radius:10px; outline:none; }
+    .slider-group input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none; width:22px; height:22px; border-radius:50%; background:#ff66c0; cursor:pointer; box-shadow:0 0 12px rgba(255,102,192,0.4); }
+    .btn-calc { background:rgba(255,102,192,0.15); color:#ff66c0; border:1px solid rgba(255,102,192,0.3); padding:.6rem 1.5rem; border-radius:10px; font-weight:600; cursor:pointer; transition:all .3s; margin-top:.5rem; font-size:.9rem; }
+    .btn-calc:hover { background:rgba(255,102,192,0.25); }
+    .result-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:.5rem; margin:.75rem 0; }
+    .result-card { background:rgba(255,102,192,0.04); border:1px solid rgba(255,102,192,0.1); border-radius:10px; padding:.7rem; text-align:center; }
+    .result-card .r-value { font-size:1.3rem; font-weight:800; color:#ff66c0; }
+    .result-card .r-label { font-size:.7rem; color:rgba(255,255,255,0.5); margin-top:.2rem; }
+    .chart-wrap { margin:.75rem 0; background:rgba(0,0,0,0.2); border-radius:12px; padding:.5rem; }
+    .chart-wrap canvas { width:100%; height:auto; display:block; border-radius:8px; }
+    .data-box { background:rgba(255,102,192,0.04); border:1px solid rgba(255,102,192,0.12); border-radius:12px; padding:.85rem; margin:.5rem 0; font-size:.85rem; line-height:1.6; }
+    .data-box strong { color:#ff66c0; }
+    .reco-box { margin:.5rem 0; padding:1rem; border-radius:12px; background:rgba(0,224,255,0.06); border:1px solid rgba(0,224,255,0.2); font-size:.85rem; }
+    .reco-box strong { color:#00e0ff; }
+    .current-price-badge { display:inline-block; padding:3px 12px; background:rgba(255,102,192,0.1); border-radius:6px; color:#ff66c0; font-size:.75rem; font-weight:600; }
+    @keyframes fadeInUp { from{opacity:0;transform:translateY(15px)} to{opacity:1;transform:translateY(0)} }
+    @media (max-width:768px) {
+      .hero-header h1 { font-size:1.5rem; }
+      .analogy-card { margin:1rem; }
+      .main-area { padding:0 1rem 1rem; }
+      .feedback { margin:0 1rem 1rem; }
+      .progress-bar { padding:.5rem 1rem; flex-wrap:wrap; }
+      .nav-simulation { padding:.75rem 1rem; }
+      .result-grid { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="brand-return-nav">
+    <a href="../../index.html">&larr; Portfolio</a>
+    <a href="../../cursos/index.html">Cursos</a>
+    <a href="index.html">TENPOMATIC</a>
+  </nav>
+  <div class="course-container">
+    <div class="progress-bar">
+      <div class="progress-outer"><div class="progress-fill" style="width:0%"></div></div>
+      <span class="progress-text">M&oacute;dulo Experto 4 de 10 (0%)</span>
+    </div>
+    <div class="hero-header">
+      <h1><i class="fas fa-dollar-sign"></i> Estrategias de Precios Din&aacute;micos</h1>
+      <p>Simula la elasticidad precio-demanda y encuentra el precio que maximiza tu margen.</p>
+    </div>
+    <div class="analogy-card">
+      <strong><i class="fas fa-lightbulb"></i> Pi&eacute;nsalo as&iacute;:</strong> La elasticidad precio-demanda es como un el&aacute;stico: si estiras mucho el precio (lo subes), la demanda se rompe y cae. Si lo aflojas (lo bajas), la demanda se estira y crece. El truco est&aacute; en encontrar el punto exacto donde el ingreso total es m&aacute;ximo. Como en un subasta, ni el precio m&aacute;s alto ni el m&aacute;s bajo dan la mayor ganancia.
+    </div>
+    <div class="main-area">
+      <h2><i class="fas fa-sliders-h"></i> Simulador de Elasticidad</h2>
+      <p style="color:rgba(255,255,255,0.6);margin-bottom:.75rem;font-size:.9rem;">
+        Mueve el slider para cambiar el precio. La elasticidad estimada es <strong>-1.2</strong>.
+        Precio actual: <span class="current-price-badge">$40</span>
+      </p>
+      <div class="slider-group">
+        <label>Precio de venta <span id="precioLabel">$40.00</span></label>
+        <input type="range" id="precioSlider" min="34" max="47" value="40" step="0.5" oninput="simularPrecio()">
+        <div style="display:flex;justify-content:space-between;font-size:.7rem;color:rgba(255,255,255,0.3);margin-top:.2rem;">
+          <span>$34 (m&iacute;n)</span>
+          <span>$47 (m&aacute;x)</span>
+        </div>
+      </div>
+      <div class="result-grid" id="priceResults">
+        <div class="result-card"><div class="r-value" id="rDemanda">18,633</div><div class="r-label">Demanda estimada (unid.)</div></div>
+        <div class="result-card"><div class="r-value" id="rIngresos">$745,320</div><div class="r-label">Ingresos totales</div></div>
+        <div class="result-card"><div class="r-value" id="rCMN">$241,446</div><div class="r-label">Contribuci&oacute;n Marginal Neta</div></div>
+        <div class="result-card"><div class="r-value" id="rMercado">33.5%</div><div class="r-label">Participaci&oacute;n mercado</div></div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="demandChart" height="320"></canvas>
+      </div>
+      <div id="recomendacion" class="reco-box">
+        <strong><i class="fas fa-lightbulb"></i> Recomendaci&oacute;n:</strong> El precio actual de $40 genera un margen de contribuci&oacute;n neta de $241,446. Explora otros precios para maximizar tu CMN.
+      </div>
+      <div>
+        <button class="btn-calc" onclick="encontrarOptimo()"><i class="fas fa-bullseye"></i> Encontrar Precio &Oacute;ptimo</button>
+        <button class="btn-calc" onclick="simularPrecio();finalizar();" style="background:rgba(0,224,255,0.1);color:#00e0ff;border-color:rgba(0,224,255,0.2);"><i class="fas fa-check-circle"></i> Confirmar y Finalizar</button>
+      </div>
+      <div class="data-box">
+        <strong><i class="fas fa-database"></i> Datos de referencia T8:</strong> Precio $40 | Demanda 15,554 unid. | Ingresos $622,160 | CMN = (40-27.04)&times;15,554 = $201,527 | Elasticidad estimada -1.2 (valor t&iacute;pico mercado similar)
+      </div>
+    </div>
+    <div id="feedback" class="feedback"><i class="fas fa-info-circle"></i> Ajusta el precio con el slider para ver c&oacute;mo cambia la demanda, ingresos y CMN.</div>
+    <div id="insignia" class="insignia hidden">
+      <i class="fas fa-medal"></i>
+      <h3>Estratega de Precios</h3>
+      <p>Dominas la elasticidad precio-demanda. &iexcl;Tu pricing strategy maximiza el valor para TENPOMATIC!</p>
+    </div>
+    <div class="nav-simulation">
+      <a href="e5-gestion-inventarios.html" class="btn-next">Siguiente <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <footer><i class="fas fa-chart-line"></i> TENPOMATIC &middot; Gerencia General Integral &middot; Modo Experto</footer>
+  </div>
+  <script>
+    const CURRENT_MODULE = 29;
+    const TOTAL_MODULES = 35;
+    const COURSE_PROGRESS_KEY = 'tenpomatic_progress';
+
+    function updateProgress(moduleNum) {
+      let progress = JSON.parse(localStorage.getItem(COURSE_PROGRESS_KEY)) || [];
+      if (!progress.includes(moduleNum.toString())) {
+        progress.push(moduleNum.toString());
+        localStorage.setItem(COURSE_PROGRESS_KEY, JSON.stringify(progress));
+      }
+      const pct = Math.round((progress.length / TOTAL_MODULES) * 100);
+      document.querySelector('.progress-fill').style.width = pct + '%';
+      document.querySelector('.progress-text').textContent = 'M\u00f3dulo ' + moduleNum + ' de ' + TOTAL_MODULES + ' (' + pct + '%)';
+    }
+
+    const CVU = 27.04;
+    const ELASTICIDAD = -1.2;
+    const PRECIO_BASE = 40;
+    const DEMANDA_BASE = 15554;
+    const MERCADO_TOTAL_EST = 55000;
+
+    function calcDemanda(precio) {
+      const ratio = precio / PRECIO_BASE;
+      const cambio = Math.pow(ratio, ELASTICIDAD);
+      return Math.round(DEMANDA_BASE * cambio);
+    }
+
+    function simularPrecio() {
+      const precio = parseFloat(document.getElementById('precioSlider').value);
+      document.getElementById('precioLabel').textContent = '$' + precio.toFixed(2);
+
+      const demanda = calcDemanda(precio);
+      const ingresos = precio * demanda;
+      const cmn = (precio - CVU) * demanda;
+      const partMercado = (demanda / MERCADO_TOTAL_EST) * 100;
+
+      document.getElementById('rDemanda').textContent = demanda.toLocaleString();
+      document.getElementById('rIngresos').textContent = '$' + Math.round(ingresos).toLocaleString();
+      document.getElementById('rCMN').textContent = '$' + Math.round(cmn).toLocaleString();
+      document.getElementById('rMercado').textContent = partMercado.toFixed(1) + '%';
+
+      const mejorPrecio = encontrarOptimo(true);
+
+      document.getElementById('recomendacion').innerHTML =
+        '<strong><i class="fas fa-lightbulb"></i> Recomendaci\u00f3n:</strong> A $' + precio.toFixed(2) +
+        ' la demanda estimada es <strong>' + demanda.toLocaleString() + '</strong> unidades. ' +
+        'Ingresos: <strong>$' + Math.round(ingresos).toLocaleString() + '</strong> | ' +
+        'CMN: <strong>$' + Math.round(cmn).toLocaleString() + '</strong>. ' +
+        'El precio que maximiza CMN es <strong>$' + mejorPrecio.toFixed(2) + '</strong>.';
+
+      dibujarGrafico();
+
+      document.getElementById('feedback').innerHTML =
+        '<i class="fas fa-info-circle"></i> Precio: $' + precio.toFixed(2) +
+        ' | Demanda: ' + demanda.toLocaleString() + ' unid. | Elasticidad: ' + ELASTICIDAD;
+    }
+
+    function encontrarOptimo(silent) {
+      let mejorPrecio = 34;
+      let mejorCMN = 0;
+      for (let p = 34; p <= 47; p += 0.5) {
+        const d = calcDemanda(p);
+        const cmn = (p - CVU) * d;
+        if (cmn > mejorCMN) {
+          mejorCMN = cmn;
+          mejorPrecio = p;
+        }
+      }
+      if (!silent) {
+        document.getElementById('precioSlider').value = mejorPrecio;
+        simularPrecio();
+        document.getElementById('feedback').innerHTML =
+          '<i class="fas fa-check-circle" style="color:#00ffc8;"></i> Precio \u00f3ptimo encontrado: <strong>$' + mejorPrecio.toFixed(2) +
+          '</strong>. CMN m\u00e1xima: <strong>$' + Math.round(mejorCMN).toLocaleString() + '</strong>.';
+      }
+      return mejorPrecio;
+    }
+
+    function finalizar() {
+      if (!localStorage.getItem('tenpomatic_insignia_M29')) {
+        localStorage.setItem('tenpomatic_insignia_M29', 'true');
+      }
+      document.getElementById('insignia').classList.remove('hidden');
+    }
+
+    function dibujarGrafico() {
+      const canvas = document.getElementById('demandChart');
+      const ctx = canvas.getContext('2d');
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = 320 * dpr;
+      ctx.scale(dpr, dpr);
+      const W = rect.width, H = 320;
+      const pad = { top: 25, bottom: 40, left: 60, right: 130 };
+      const chartW = W - pad.left - pad.right;
+      const chartH = H - pad.top - pad.bottom;
+
+      ctx.clearRect(0, 0, W, H);
+
+      let minP = 33, maxP = 48;
+      let maxDem = calcDemanda(34) * 1.05;
+      let minDem = calcDemanda(47) * 0.95;
+
+      function xPos(p) { return pad.left + ((p - minP) / (maxP - minP)) * chartW; }
+      function yPos(d) { return pad.top + chartH - ((d - minDem) / (maxDem - minDem)) * chartH; }
+
+      ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= 5; i++) {
+        const y = pad.top + (i / 5) * chartH;
+        ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W - pad.right, y); ctx.stroke();
+        ctx.fillStyle = 'rgba(255,255,255,0.3)';
+        ctx.font = '9px Inter';
+        ctx.textAlign = 'right';
+        ctx.fillText(Math.round(maxDem - (i / 5) * (maxDem - minDem)).toLocaleString(), pad.left - 6, y + 3);
+      }
+
+      for (let p = 34; p <= 47; p += 1) {
+        const px = xPos(p);
+        ctx.fillStyle = 'rgba(255,255,255,0.3)';
+        ctx.font = '9px Inter';
+        ctx.textAlign = 'center';
+        ctx.fillText('$' + p, px, H - pad.bottom + 16);
+        ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(px, pad.top); ctx.lineTo(px, pad.top + chartH); ctx.stroke();
+      }
+
+      ctx.fillStyle = 'rgba(255,255,255,0.35)';
+      ctx.font = '9px Inter';
+      ctx.textAlign = 'center';
+      ctx.fillText('Precio', W/2, H - 4);
+      ctx.save();
+      ctx.translate(12, H/2);
+      ctx.rotate(-Math.PI/2);
+      ctx.fillText('Demanda', 0, 0);
+      ctx.restore();
+
+      ctx.beginPath();
+      ctx.strokeStyle = '#ff66c0';
+      ctx.lineWidth = 2.5;
+      let first = true;
+      for (let p = 34; p <= 47; p += 0.25) {
+        const d = calcDemanda(p);
+        const x = xPos(p), y = yPos(d);
+        first ? (ctx.moveTo(x, y), first = false) : ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.strokeStyle = 'rgba(0,224,255,0.6)';
+      ctx.lineWidth = 2;
+      first = true;
+      for (let p = 34; p <= 47; p += 0.25) {
+        const d = calcDemanda(p);
+        const ing = p * d;
+        const x = xPos(p);
+        const ingMin = 34 * calcDemanda(34);
+        const ingMax = 47 * calcDemanda(47);
+        const allIng = [];
+        for (let pp = 34; pp <= 47; pp += 0.25) allIng.push(pp * calcDemanda(pp));
+        const minIng = Math.min(...allIng);
+        const maxIng = Math.max(...allIng);
+        const yIng = pad.top + chartH - ((ing - minIng) / (maxIng - minIng)) * chartH;
+        first ? (ctx.moveTo(x, yIng), first = false) : ctx.lineTo(x, yIng);
+      }
+      ctx.stroke();
+
+      const precioActual = parseFloat(document.getElementById('precioSlider').value);
+      const da = calcDemanda(precioActual);
+      ctx.beginPath();
+      ctx.arc(xPos(precioActual), yPos(da), 6, 0, Math.PI * 2);
+      ctx.fillStyle = '#ffd700';
+      ctx.fill();
+      ctx.strokeStyle = '#ffd700';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.setLineDash([3, 3]);
+      ctx.moveTo(xPos(precioActual), pad.top);
+      ctx.lineTo(xPos(precioActual), yPos(da));
+      ctx.lineTo(pad.left, yPos(da));
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#ffd700';
+      ctx.font = 'bold 9px Inter';
+      ctx.textAlign = 'center';
+      ctx.fillText('$' + precioActual.toFixed(2), xPos(precioActual), pad.top - 6);
+
+      ctx.fillStyle = 'rgba(255,102,192,0.8)';
+      ctx.font = '9px Inter';
+      ctx.textAlign = 'left';
+      ctx.fillRect(W - 122, pad.top + 4, 10, 10);
+      ctx.fillText('Demanda', W - 108, pad.top + 12);
+
+      ctx.fillStyle = 'rgba(0,224,255,0.7)';
+      ctx.fillRect(W - 122, pad.top + 20, 10, 10);
+      ctx.fillText('Ingresos', W - 108, pad.top + 28);
+    }
+
+    window.addEventListener('load', function() {
+      simularPrecio();
+      updateProgress(CURRENT_MODULE);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TENPOMATIC | Cierre y Evaluación</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #111a2e 100%);
+      font-family: 'Inter', sans-serif;
+      color: #eef5ff;
+      min-height: 100vh;
+      padding: 5rem 1rem 2rem;
+    }
+    .course-container {
+      max-width: 900px; margin: 0 auto;
+      background: rgba(15,25,45,0.65);
+      backdrop-filter: blur(12px);
+      border-radius: 2rem;
+      border: 1px solid rgba(255,215,0,0.25);
+      box-shadow: 0 25px 45px rgba(0,0,0,0.5);
+      overflow: hidden;
+    }
+    .hero-header {
+      background: linear-gradient(135deg,#1a1400,#2a1f00);
+      padding: 2.5rem 2rem;
+      text-align: center;
+      border-bottom: 1px solid rgba(255,215,0,0.15);
+    }
+    .hero-header h1 {
+      font-size: 2.2rem;
+      background: linear-gradient(135deg,#ffd700,#ff8c00);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      font-weight: 900;
+    }
+    .hero-header p { color: rgba(255,255,255,0.7); margin-top: 0.75rem; line-height: 1.6; }
+    .progress-bar {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.75rem 2rem;
+      background: rgba(0,0,0,0.2);
+    }
+    .progress-fill {
+      height: 8px;
+      background: linear-gradient(90deg,#ffd700,#ff8c00);
+      border-radius: 10px;
+      transition: width 0.5s ease;
+      flex-shrink: 0;
+    }
+    .progress-outer {
+      flex:1; height: 8px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 10px; overflow: hidden;
+    }
+    .progress-text { font-size: 0.8rem; color: rgba(255,255,255,0.6); white-space: nowrap; }
+    .analogy-card {
+      margin: 1.5rem 2rem;
+      padding: 1.25rem;
+      background: rgba(255,215,0,0.06);
+      border-left: 4px solid #ffd700;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      color: rgba(255,255,255,0.85);
+    }
+    .analogy-card strong { color: #ffd700; }
+    .main-area { padding: 0 2rem 1.5rem; }
+    .main-area h2 {
+      font-size: 1.3rem; margin-bottom: 1rem;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .main-area h2 i { color: #ffd700; }
+    .feedback {
+      margin: 0 2rem 1.5rem;
+      padding: 1rem;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      min-height: 3rem;
+      line-height: 1.6;
+      font-size: 0.9rem;
+    }
+    .feedback.success { border-color: #00ffc8; background: rgba(0,255,200,0.08); }
+    .feedback.fail { border-color: #ff5050; background: rgba(255,80,80,0.08); }
+    .insignia {
+      margin: 0 2rem 1.5rem;
+      padding: 1.5rem;
+      text-align: center;
+      background: linear-gradient(135deg,rgba(255,215,0,0.1),rgba(255,215,0,0.02));
+      border: 2px solid #ffd700;
+      border-radius: 16px;
+      animation: glowPulse 1.5s ease infinite alternate;
+    }
+    .insignia i { font-size: 3rem; color: #ffd700; }
+    .insignia h3 { color: #ffd700; margin: 0.5rem 0; }
+    .insignia p { color: rgba(255,255,255,0.7); font-size: 0.85rem; }
+    .hidden { display: none !important; }
+    @keyframes glowPulse {
+      0% { box-shadow: 0 0 10px rgba(255,215,0,0.3); }
+      100% { box-shadow: 0 0 30px rgba(255,215,0,0.6); }
+    }
+    .btn-next {
+      display: block; width: fit-content; margin: 0 auto 1.5rem;
+      background: linear-gradient(135deg,#ffd700,#e6a800);
+      border: none; color: #0a0f1e; font-family: 'Inter', sans-serif;
+      font-weight: 800; font-size: 1rem;
+      padding: 0.85rem 2.5rem;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 20px rgba(255,215,0,0.3);
+    }
+    .btn-next:hover { transform: translateY(-3px); box-shadow: 0 0 30px rgba(255,215,0,0.5); }
+    .nav-simulation { padding: 0 2rem 1rem; text-align: center; }
+    footer {
+      text-align: center; padding: 1.5rem 2rem;
+      border-top: 1px solid rgba(255,255,255,0.04);
+      color: rgba(255,255,255,0.2);
+      font-size: 0.8rem;
+    }
+    footer i { color: #ffd700; margin-right: 6px; }
+    .btn-action {
+      background: rgba(255,215,0,0.15);
+      border: 1px solid rgba(255,215,0,0.3);
+      color: #ffd700; padding: 0.6rem 1.5rem;
+      border-radius: 10px; cursor: pointer;
+      font-family: 'Inter', sans-serif; font-weight: 600;
+      transition: 0.2s; font-size: 0.85rem;
+    }
+    .btn-action:hover { background: rgba(255,215,0,0.25); }
+    .btn-action.primary { background: #ffd700; color: #0a0f1e; font-weight: 700; }
+    .btn-action.primary:hover { background: #e6c200; }
+    .quiz-question {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+    }
+    .quiz-question p {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    .quiz-option {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      margin: 0.25rem 0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.2s;
+      font-size: 0.85rem;
+    }
+    .quiz-option:hover { background: rgba(255,215,0,0.04); }
+    .quiz-option input[type="radio"] {
+      -webkit-appearance: none;
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.2);
+      border-radius: 50%;
+      flex-shrink: 0;
+      transition: 0.2s;
+    }
+    .quiz-option input[type="radio"]:checked {
+      border-color: #ffd700;
+      background: #ffd700;
+      box-shadow: inset 0 0 0 3px #0a0f1e;
+    }
+    .quiz-option.correct {
+      background: rgba(0,255,200,0.08);
+      border: 1px solid rgba(0,255,200,0.2);
+    }
+    .quiz-option.incorrect {
+      background: rgba(255,80,80,0.08);
+      border: 1px solid rgba(255,80,80,0.2);
+    }
+    .timer-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      background: rgba(0,0,0,0.2);
+      border-radius: 10px;
+      margin-bottom: 1rem;
+    }
+    .timer-bar .timer {
+      font-size: 1.5rem;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+    }
+    .timer-bar .timer.warning { color: #ff8c00; }
+    .timer-bar .timer.danger { color: #ff5050; animation: blink 0.5s infinite; }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+    .cert-section {
+      text-align: center;
+      padding: 1.5rem;
+      background: rgba(255,215,0,0.04);
+      border: 1px solid rgba(255,215,0,0.15);
+      border-radius: 16px;
+      margin: 1rem 0;
+    }
+    .cert-section input {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 0.6rem 1rem;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      width: 250px;
+      text-align: center;
+      margin-bottom: 0.75rem;
+    }
+    .result-circle {
+      width: 100px; height: 100px;
+      border-radius: 50%;
+      border: 4px solid #ffd700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem;
+      font-size: 2rem;
+      font-weight: 900;
+      color: #ffd700;
+    }
+    .result-circle.pass { border-color: #00ffc8; color: #00ffc8; }
+    .result-circle.fail { border-color: #ff5050; color: #ff5050; }
+    @media(max-width:640px) {
+      .hero-header h1 { font-size: 1.4rem; }
+      .progress-bar { flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="brand-return-nav">
+    <a href="../../index.html">&larr; Portfolio</a>
+    <a href="../../cursos/index.html">Cursos</a>
+    <a href="index.html">TENPOMATIC</a>
+  </nav>
+  <div class="course-container">
+    <div class="progress-bar">
+      <div class="progress-outer"><div class="progress-fill" style="width:0%"></div></div>
+      <span class="progress-text">Módulo 25 de 35</span>
+    </div>
+    <div class="hero-header">
+      <h1><i class="fas fa-certificate"></i> Cierre y Evaluación</h1>
+      <p>Quiz final de 20 preguntas — Mínimo 70% para obtener tu certificado TENPOMATIC</p>
+    </div>
+    <div class="analogy-card">
+      <strong>💡 Piénsalo así:</strong> Este examen final es como el último nivel de tu videojuego favorito: has recorrido todo el mapa, has derrotado mini-jefes y has recolectado recursos. Ahora es momento de demostrar que eres digno del título de GERENTE TENPOMATIC. ¡Tienes 20 minutos!
+    </div>
+    <div class="main-area">
+      <h2><i class="fas fa-clock"></i> Quiz Final — 20 Preguntas</h2>
+      <div class="timer-bar">
+        <i class="fas fa-hourglass-half" style="color:#ffd700;"></i>
+        <div class="timer" id="timerDisplay">20:00</div>
+        <div style="flex:1;height:6px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden;">
+          <div id="timerBar" style="height:100%;width:100%;background:linear-gradient(90deg,#ffd700,#ff8c00);border-radius:3px;transition:width 1s linear;"></div>
+        </div>
+        <span id="qCounter" style="font-size:0.8rem;color:rgba(255,255,255,0.4);">0/20</span>
+      </div>
+      <div id="quizArea"></div>
+      <div style="text-align:center;margin:1rem 0;">
+        <button class="btn-action primary" id="btnSubmitQuiz" onclick="evaluarQuiz()"><i class="fas fa-check-circle"></i> Entregar Quiz</button>
+      </div>
+      <div id="resultArea" class="hidden">
+        <div class="result-circle" id="resultCircle">
+          <span id="resultScore">0%</span>
+        </div>
+        <div id="resultMessage" style="text-align:center;font-size:1rem;margin-bottom:1rem;"></div>
+        <div id="certSection" class="cert-section hidden">
+          <h3 style="color:#ffd700;margin-bottom:0.5rem;"><i class="fas fa-crown"></i> ¡Felicidades!</h3>
+          <p style="color:rgba(255,255,255,0.6);margin-bottom:1rem;">Ingresa tu nombre para generar tu certificado</p>
+          <input type="text" id="certName" placeholder="Tu nombre completo" maxlength="60">
+          <div style="display:flex;gap:0.5rem;justify-content:center;flex-wrap:wrap;">
+            <button class="btn-action primary" onclick="generarCertificado()"><i class="fas fa-certificate"></i> Generar Certificado PDF</button>
+          </div>
+        </div>
+        <div id="failSection" class="hidden" style="text-align:center;">
+          <p style="color:rgba(255,255,255,0.6);margin-bottom:1rem;">Puedes intentarlo de nuevo cuando estés listo.</p>
+          <button class="btn-action" onclick="location.reload()"><i class="fas fa-redo"></i> Reintentar Quiz</button>
+        </div>
+      </div>
+    </div>
+    <div id="feedback" class="feedback">
+      💬 Responde las 20 preguntas del quiz final. Tienes 20 minutos. ¡Buena suerte!
+    </div>
+    <div id="insignia" class="insignia hidden">
+      <i class="fas fa-medal"></i>
+      <h3>🏅 TENPOMATIC Certified 🏅</h3>
+      <p>Has completado el curso de Gerencia General Integral. ¡Eres un Gerente TENPOMATIC certificado!</p>
+    </div>
+    <div class="nav-simulation">
+      <button class="btn-next" onclick="alert('🎓 ¡Felicidades! Has completado el curso principal. Ahora puedes explorar el MODO EXPERTO con 10 módulos avanzados.'); window.location.href='index.html'">
+        Ir al Menú Principal <i class="fas fa-arrow-right"></i>
+      </button>
+    </div>
+    <footer>
+      <i class="fas fa-certificate"></i> TENPOMATIC · Cierre y Evaluación · LABSAG
+    </footer>
+  </div>
+  <script>
+    const COURSE_PROGRESS_KEY = 'tenpomatic_progress';
+    const CURRENT_MODULE = 25;
+    const TOTAL_MODULES = 35;
+
+    const quizData = [
+      { q: '¿Cuál es el rango de precio de venta en TENPOMATIC?', opts: ['$30-$40', '$34-$47', '$40-$50', '$25-$35'], ans: 1 },
+      { q: '¿Cuántas áreas geográficas tiene el mercado?', opts: ['2', '3', '4', '5'], ans: 1 },
+      { q: '¿Cuántos obreros tiene una cuadrilla?', opts: ['2', '3', '4', '5'], ans: 1 },
+      { q: '¿Cuál es el costo por página de publicidad nacional?', opts: ['$900', '$1,500', '$3,000', '$4,600'], ans: 2 },
+      { q: '¿Cuál es el costo por página de publicidad local?', opts: ['$900', '$1,500', '$3,000', '$4,600'], ans: 0 },
+      { q: '¿Cuál es el costo de contratar un vendedor?', opts: ['$2,000', '$3,000', '$4,600', '$6,000'], ans: 2 },
+      { q: '¿Cuánto cuesta cada mejora de producto?', opts: ['$5,000', '$7,500', '$10,000', '$12,500'], ans: 2 },
+      { q: '¿Cuál es la tasa de impuestos en TENPOMATIC?', opts: ['25%', '30%', '40%', '50%'], ans: 3 },
+      { q: '¿En cuántos trimestres se cobra una venta (proporción)?', opts: ['1', '2', '3', '4'], ans: 2 },
+      { q: '¿Qué porcentaje del efectivo se cobra en el primer trimestre?', opts: ['5%', '10%', '15%', '20%'], ans: 1 },
+      { q: '¿Cuál era el precio de la acción en T8?', opts: ['$8.67', '$9.76', '$10.85', '$11.58'], ans: 1 },
+      { q: '¿Cuántos kits compraste en el ejercicio del Módulo 5?', opts: ['10,000', '15,000', '18,000', 'Depende del presupuesto'], ans: 3 },
+      { q: '¿Cuál es el costo de construir una nueva planta?', opts: ['$100,000', '$150,000', '$200,000', '$250,000'], ans: 2 },
+      { q: '¿Cuál es el máximo de mejoras de producto por trimestre?', opts: ['1', '2', '3', '4'], ans: 2 },
+      { q: '¿Cuánto cuesta transferir cada unidad entre áreas?', opts: ['$2', '$3', '$4', '$5'], ans: 2 },
+      { q: '¿Cuál es la rotación esperada de obreros?', opts: ['1/10', '1/15', '1/20', '1/25'], ans: 2 },
+      { q: '¿Cuál es la productividad base por cuadrilla en Área 1?', opts: ['800', '900', '1,000', '1,100'], ans: 2 },
+      { q: '¿Cuántos vendedores puedes contratar como máximo en un trimestre?', opts: ['5', '7', '9', '12'], ans: 2 },
+      { q: '¿Cuál es el costo de capacitar un vendedor (trimestres de training)?', opts: ['1', '2', '3', '0'], ans: 1 },
+      { q: '¿Cuál era el total de activos de TENPOMATIC en T8?', opts: ['$1,702,880', '$2,280,272', '$577,396', '$622,160'], ans: 1 },
+    ];
+
+    let timerInterval = null;
+    let timeLeft = 1200; // 20 min * 60 sec
+    let quizSubmitted = false;
+
+    function updateProgress(m) {
+      let p = JSON.parse(localStorage.getItem(COURSE_PROGRESS_KEY)) || [];
+      if (!p.includes(m.toString())) { p.push(m.toString()); localStorage.setItem(COURSE_PROGRESS_KEY, JSON.stringify(p)); }
+      const pct = Math.round((p.length / TOTAL_MODULES) * 100);
+      document.querySelector('.progress-fill').style.width = pct + '%';
+      document.querySelector('.progress-text').textContent = 'Módulo ' + m + ' de ' + TOTAL_MODULES + ' (' + pct + '%)';
+    }
+
+    function renderQuiz() {
+      const area = document.getElementById('quizArea');
+      area.innerHTML = '';
+      quizData.forEach((item, i) => {
+        const div = document.createElement('div');
+        div.className = 'quiz-question';
+        div.innerHTML = '<p>' + (i + 1) + '. ' + item.q + '</p>';
+        item.opts.forEach((opt, j) => {
+          const label = document.createElement('label');
+          label.className = 'quiz-option';
+          label.innerHTML = '<input type="radio" name="q' + i + '" value="' + j + '"> ' + opt;
+          label.querySelector('input').addEventListener('change', actualizarContador);
+          div.appendChild(label);
+        });
+        area.appendChild(div);
+      });
+      actualizarContador();
+    }
+
+    function actualizarContador() {
+      if (quizSubmitted) return;
+      let answered = 0;
+      quizData.forEach((_, i) => {
+        if (document.querySelector('input[name="q' + i + '"]:checked')) answered++;
+      });
+      document.getElementById('qCounter').textContent = answered + '/20';
+    }
+
+    function startTimer() {
+      timerInterval = setInterval(function() {
+        timeLeft--;
+        const min = Math.floor(timeLeft / 60);
+        const sec = timeLeft % 60;
+        const display = document.getElementById('timerDisplay');
+        display.textContent = String(min).padStart(2, '0') + ':' + String(sec).padStart(2, '0');
+        const pct = (timeLeft / 1200) * 100;
+        document.getElementById('timerBar').style.width = pct + '%';
+        if (timeLeft <= 120) { display.classList.add('danger'); display.classList.remove('warning'); }
+        else if (timeLeft <= 300) { display.classList.add('warning'); display.classList.remove('danger'); }
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          evaluarQuiz();
+        }
+      }, 1000);
+    }
+
+    function evaluarQuiz() {
+      if (quizSubmitted) return;
+      clearInterval(timerInterval);
+      quizSubmitted = true;
+      let correct = 0;
+      quizData.forEach((item, i) => {
+        const selected = document.querySelector('input[name="q' + i + '"]:checked');
+        const options = document.querySelectorAll('#quizArea .quiz-question:nth-child(' + (i + 1) + ') .quiz-option');
+        options.forEach((opt, j) => {
+          opt.classList.remove('correct', 'incorrect');
+          if (j === item.ans) opt.classList.add('correct');
+        });
+        if (selected && parseInt(selected.value) === item.ans) correct++;
+        else if (selected) options[parseInt(selected.value)].classList.add('incorrect');
+      });
+      const pct = Math.round((correct / quizData.length) * 100);
+      document.getElementById('resultArea').classList.remove('hidden');
+      document.getElementById('resultScore').textContent = pct + '%';
+      const circle = document.getElementById('resultCircle');
+      const msg = document.getElementById('resultMessage');
+      document.getElementById('btnSubmitQuiz').disabled = true;
+      document.querySelectorAll('.quiz-option input').forEach(inp => inp.disabled = true);
+
+      if (pct >= 70) {
+        circle.className = 'result-circle pass';
+        msg.innerHTML = '✅ <strong>¡APROBADO!</strong> Has obtenido ' + correct + ' de ' + quizData.length + ' (' + pct + '%). Eres un Gerente TENPOMATIC certificado.';
+        msg.style.color = '#00ffc8';
+        document.getElementById('certSection').classList.remove('hidden');
+        document.getElementById('insignia').classList.remove('hidden');
+        if (!localStorage.getItem('tenpomatic_insignia_M25')) {
+          localStorage.setItem('tenpomatic_insignia_M25', 'true');
+        }
+        // Also set global certified flag
+        localStorage.setItem('tenpomatic_certified', 'true');
+        updateProgress(CURRENT_MODULE);
+        document.getElementById('feedback').innerHTML = '<i class="fas fa-check-circle" style="color:#00ffc8;"></i> 🎉 ¡FELICIDADES! Has aprobado el quiz final. Genera tu certificado.';
+        document.getElementById('feedback').className = 'feedback success';
+      } else {
+        circle.className = 'result-circle fail';
+        msg.innerHTML = '❌ <strong>NO APROBADO</strong> — Obtuviste ' + correct + ' de ' + quizData.length + ' (' + pct + '%). Necesitas al menos 70% (14/20).';
+        msg.style.color = '#ff5050';
+        document.getElementById('failSection').classList.remove('hidden');
+        document.getElementById('feedback').innerHTML = '<i class="fas fa-times-circle" style="color:#ff5050;"></i> No alcanzaste el 70%. Revisa los módulos y vuelve a intentarlo.';
+        document.getElementById('feedback').className = 'feedback fail';
+      }
+    }
+
+    function generarCertificado() {
+      const name = document.getElementById('certName').value.trim();
+      if (!name) {
+        document.getElementById('feedback').innerHTML = '<i class="fas fa-exclamation-circle" style="color:#ff8c00;"></i> Ingresa tu nombre para generar el certificado.';
+        return;
+      }
+      if (typeof window.jspdf === 'undefined') {
+        document.getElementById('feedback').innerHTML = '<i class="fas fa-exclamation-circle" style="color:#ff8c00;"></i> Cargando jsPDF, intenta de nuevo...';
+        return;
+      }
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+      const W = 297, H = 210;
+
+      // Dark background
+      doc.setFillColor(10, 15, 30);
+      doc.rect(0, 0, W, H, 'F');
+
+      // Border
+      doc.setDrawColor(255, 215, 0);
+      doc.setLineWidth(2);
+      doc.rect(8, 8, W - 16, H - 16);
+      doc.setLineWidth(0.5);
+      doc.rect(12, 12, W - 24, H - 24);
+
+      // Top decoration
+      doc.setFillColor(255, 215, 0);
+      doc.rect(60, 20, W - 120, 1);
+      doc.rect(60, H - 25, W - 120, 1);
+
+      // Title
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(32);
+      doc.setTextColor(255, 215, 0);
+      doc.text('CERTIFICADO', W / 2, 55, { align: 'center' });
+
+      doc.setFontSize(14);
+      doc.setTextColor(200, 200, 200);
+      doc.text('de Finalización', W / 2, 65, { align: 'center' });
+
+      // Decorative line
+      doc.setDrawColor(255, 215, 0);
+      doc.line(W / 2 - 60, 72, W / 2 + 60, 72);
+
+      // Body
+      doc.setFontSize(12);
+      doc.setTextColor(180, 180, 180);
+      doc.text('Otorgado a:', W / 2, 90, { align: 'center' });
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(28);
+      doc.setTextColor(255, 255, 255);
+      doc.text(name, W / 2, 108, { align: 'center' });
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(12);
+      doc.setTextColor(180, 180, 180);
+      doc.text('Por haber completado el curso de', W / 2, 125, { align: 'center' });
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(18);
+      doc.setTextColor(255, 215, 0);
+      doc.text('TENPOMATIC - Gerencia General Integral', W / 2, 138, { align: 'center' });
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(11);
+      doc.setTextColor(150, 150, 150);
+      doc.text('Simulador de Negocios LABSAG', W / 2, 150, { align: 'center' });
+      doc.text('25 Módulos Completados · Evaluación Final Aprobada', W / 2, 160, { align: 'center' });
+
+      doc.setFont('helvetica', 'italic');
+      doc.setFontSize(9);
+      doc.setTextColor(120, 120, 120);
+      const today = new Date();
+      doc.text('Fecha: ' + today.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' }), W / 2, H - 35, { align: 'center' });
+      doc.text('ID: TENPOMATIC-' + today.getFullYear() + '-' + String(today.getTime()).slice(-6), W / 2, H - 28, { align: 'center' });
+
+      // Seal
+      doc.setDrawColor(255, 215, 0);
+      doc.setFillColor(10, 15, 30);
+      doc.circle(W - 45, 55, 15, 'DF');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8);
+      doc.setTextColor(255, 215, 0);
+      doc.text('TENPO', W - 45, 53, { align: 'center' });
+      doc.text('MATIC', W - 45, 60, { align: 'center' });
+
+      doc.save('Certificado_TENPOMATIC_' + name.replace(/\s+/g, '_') + '.pdf');
+      document.getElementById('feedback').innerHTML = '<i class="fas fa-file-pdf" style="color:#ffd700;"></i> ✅ Certificado PDF descargado. ¡Felicidades ' + name + '!';
+    }
+
+    window.addEventListener('load', function() {
+      updateProgress(CURRENT_MODULE);
+      renderQuiz();
+      startTimer();
+    });
+  </script>
+</body>
+</html>

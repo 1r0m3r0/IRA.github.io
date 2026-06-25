@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MARKESTRATED | Conversión Escalas ↔ Mapa</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="../../assets/css/theme.css">
+  <style>
+    :root {
+      --accent-r: 43; --accent-g: 158; --accent-b: 255;
+      --accent: rgb(var(--accent-r), var(--accent-g), var(--accent-b));
+      --accent-dim: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.15);
+      --accent-glow: rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.3);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #111a2e 100%);
+      background-size:200% 200%; animation:gradientShift 20s ease infinite;
+      font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; padding:2rem 1rem;
+    }
+    @keyframes gradientShift { 0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%} }
+    .course-container {
+      max-width:1100px; margin:0 auto; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px);
+      border-radius:2.5rem; border:1px solid var(--accent-dim);
+      box-shadow:0 25px 45px rgba(0,0,0,0.5),0 0 0 1px var(--accent-dim) inset; overflow:hidden;
+    }
+    .progress-bar { padding:1rem 2rem; background:rgba(0,0,0,0.2); display:flex; align-items:center; gap:1rem; border-bottom:1px solid rgba(255,255,255,0.05); }
+    .progress-fill { height:8px; background:linear-gradient(90deg,var(--accent),#fff); border-radius:10px; transition:width 0.5s ease; flex:1; }
+    .progress-text { font-size:0.8rem; color:rgba(255,255,255,0.5); white-space:nowrap; }
+    .hero-header { background:linear-gradient(135deg,#0a1628,#1a2a4a); padding:2.5rem 2rem; text-align:center; border-bottom:1px solid var(--accent-dim); }
+    .hero-header h1 { font-size:2.4rem; background:linear-gradient(135deg,var(--accent),#b3d9ff); -webkit-background-clip:text; background-clip:text; color:transparent; margin-bottom:0.75rem; font-weight:800; }
+    .hero-header p { font-size:1rem; color:rgba(255,255,255,0.7); }
+    .analogy-card { margin:1.5rem 2rem; padding:1.25rem 1.5rem; background:var(--accent-dim); border-left:4px solid var(--accent); border-radius:12px; font-size:0.95rem; line-height:1.6; color:rgba(255,255,255,0.9); }
+    .analogy-card strong { color:var(--accent); }
+    .main-area { padding:1.5rem 2rem; }
+    .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; display:flex; align-items:center; gap:0.5rem; }
+    .section-title i { color:var(--accent); }
+
+    .formula-box {
+      padding:1.5rem; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1);
+      border-radius:16px; text-align:center; margin-bottom:1.5rem;
+    }
+    .formula-box .formula {
+      font-size:1.6rem; font-weight:800; color:var(--accent); margin:0.5rem 0;
+      font-family:'Courier New',monospace;
+    }
+    .formula-box .desc { font-size:0.85rem; color:rgba(255,255,255,0.5); }
+
+    .converter-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:1.5rem; }
+    .converter-panel { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:1.25rem; }
+    .converter-panel h3 { font-size:1rem; margin-bottom:1rem; display:flex; align-items:center; gap:0.5rem; }
+    .converter-panel h3 i { color:var(--accent); }
+    .converter-panel .input-row { display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap; }
+    .converter-panel input { background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.12); border-radius:8px; padding:0.6rem 0.8rem; color:#fff; font-size:1rem; width:120px; outline:none; }
+    .converter-panel input:focus { border-color:var(--accent); }
+    .converter-panel .result { font-size:1.5rem; font-weight:800; color:var(--accent); margin-top:0.5rem; }
+    .converter-panel .step { font-size:0.75rem; color:rgba(255,255,255,0.4); margin-top:0.3rem; }
+    .arrow-icon { display:flex; align-items:center; justify-content:center; font-size:2rem; color:rgba(255,255,255,0.2); }
+
+    .exercise-card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:20px; padding:1.5rem; margin-top:1.5rem; }
+    .exercise-card h3 { font-size:1.1rem; margin-bottom:1rem; display:flex; align-items:center; gap:0.5rem; }
+    .exercise-card h3 i { color:var(--accent); }
+    .exercise-item { padding:1rem; background:rgba(0,0,0,0.15); border-radius:12px; margin-bottom:1rem; }
+    .exercise-item .q { font-size:0.9rem; margin-bottom:0.5rem; }
+    .exercise-item input { background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.12); border-radius:8px; padding:0.4rem 0.6rem; color:#fff; font-size:0.85rem; width:100px; outline:none; margin-right:0.5rem; }
+    .exercise-item input:focus { border-color:var(--accent); }
+    .exercise-item .btn-sm { padding:0.4rem 0.8rem; border:none; border-radius:6px; background:var(--accent); color:#0a0f1e; font-weight:600; font-size:0.8rem; cursor:pointer; }
+    .exercise-item .btn-sm:hover { opacity:0.85; }
+    .exercise-item .ex-result { display:inline-block; margin-left:0.5rem; font-weight:700; font-size:0.9rem; }
+    .exercise-item .ex-steps { font-size:0.8rem; color:rgba(255,255,255,0.5); margin-top:0.3rem; }
+
+    .btn { padding:0.7rem 1.5rem; border:none; border-radius:10px; font-size:0.95rem; font-weight:600; cursor:pointer; transition:all 0.3s; display:inline-flex; align-items:center; gap:0.5rem; }
+    .btn-primary { background:linear-gradient(135deg,var(--accent),#1a6bb5); color:#0a0f1e; }
+    .btn-primary:hover { transform:scale(1.03); box-shadow:0 0 25px var(--accent-glow); }
+    .feedback { margin:1rem 2rem 1.5rem; padding:1rem 1.25rem; border-radius:12px; background:rgba(255,255,255,0.05); border-left:4px solid var(--accent); font-size:0.9rem; line-height:1.5; }
+    .feedback.success { background:rgba(0,255,200,0.1); border-color:#00ffc8; }
+    .feedback.error { background:rgba(255,80,80,0.1); border-color:#ff5050; }
+    .insignia { text-align:center; padding:2rem; margin:1rem 2rem; background:linear-gradient(135deg,rgba(43,158,255,0.1),rgba(43,158,255,0.05)); border:2px solid var(--accent); border-radius:20px; animation:insigniaPop 0.6s ease; }
+    .insignia i { font-size:3rem; color:var(--accent); }
+    .insignia h3 { font-size:1.3rem; margin:0.5rem 0; color:var(--accent); }
+    .insignia p { color:rgba(255,255,255,0.7); }
+    @keyframes insigniaPop { 0%{transform:scale(0);opacity:0} 60%{transform:scale(1.1)} 100%{transform:scale(1);opacity:1} }
+    .hidden { display:none !important; }
+    .nav-simulation { display:flex; justify-content:flex-end; padding:1rem 2rem 2rem; }
+    .btn-next { padding:0.8rem 2rem; border:none; border-radius:12px; background:linear-gradient(135deg,var(--accent),#1a6bb5); color:#0a0f1e; font-size:1rem; font-weight:700; cursor:pointer; transition:all 0.3s; display:inline-flex; align-items:center; gap:0.5rem; }
+    .btn-next:hover { transform:scale(1.03); box-shadow:0 0 30px var(--accent-glow); }
+    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid rgba(255,255,255,0.05); color:rgba(255,255,255,0.4); }
+    @media(max-width:768px) { .hero-header h1 { font-size:1.6rem; } .converter-grid { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <nav class="brand-return-nav">
+    <a href="../../index.html">&larr; Portfolio</a>
+    <a href="../../cursos/index.html">Cursos</a>
+    <a href="index.html">MARKESTRATED</a>
+  </nav>
+
+  <div class="course-container">
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill" style="width:0%"></div>
+      <span class="progress-text" id="progressText">Módulo 16 de 24 (0%)</span>
+    </div>
+
+    <div class="hero-header">
+      <h1><i class="fas fa-exchange-alt"></i> Conversión Escalas Semánticas ↔ Mapa Perceptual</h1>
+      <p>Domina la fórmula que conecta las escalas 1-7 con el mapa perceptual y viceversa.</p>
+    </div>
+
+    <div class="analogy-card">
+      <strong>💡 Piénsalo así:</strong> Convertir escalas semánticas a mapa perceptual es como convertir Celsius a Fahrenheit: usas una fórmula, pero el significado (la temperatura) es el mismo.
+    </div>
+
+    <div class="main-area">
+      <div class="section-title"><i class="fas fa-calculator"></i> La Fórmula de Conversión (Anexo 3)</div>
+      <div class="formula-box">
+        <p class="desc">Cada unidad en la escala semántica (1-7) equivale a 20/3 ≈ 6.67 unidades en el mapa perceptual (-20 a +20).</p>
+        <div class="formula">y = (x − 4) × (20 / 3)</div>
+        <p class="desc">Donde <strong>x</strong> = valor en escala semántica (1-7), <strong>y</strong> = coordenada en mapa perceptual</p>
+        <p class="desc" style="margin-top:0.3rem;">Conversión inversa: <strong>x = (y × 3 / 20) + 4</strong></p>
+      </div>
+
+      <div class="section-title"><i class="fas fa-sync-alt"></i> Convertidor Dual</div>
+      <div class="converter-grid">
+        <div class="converter-panel">
+          <h3><i class="fas fa-arrow-right"></i> Escala → Mapa</h3>
+          <div class="input-row">
+            <label style="font-size:0.8rem;color:rgba(255,255,255,0.5);">Valor en escala (1-7):</label>
+            <input type="number" id="semanticInput" min="1" max="7" step="0.01" value="4" oninput="convertSemanticToMap()">
+          </div>
+          <div class="result" id="mapResult">0.00</div>
+          <div class="step" id="semanticStep">x = 4.00 → y = (4.00 − 4) × 6.667 = 0.00</div>
+        </div>
+        <div class="arrow-icon"><i class="fas fa-arrows-alt-h"></i></div>
+        <div class="converter-panel">
+          <h3><i class="fas fa-arrow-left"></i> Mapa → Escala</h3>
+          <div class="input-row">
+            <label style="font-size:0.8rem;color:rgba(255,255,255,0.5);">Coordenada (-20 a 20):</label>
+            <input type="number" id="mapInput" min="-20" max="20" step="0.1" value="0" oninput="convertMapToSemantic()">
+          </div>
+          <div class="result" id="semanticResult">4.00</div>
+          <div class="step" id="mapStep">y = 0.00 → x = (0.00 × 3 / 20) + 4 = 4.00</div>
+        </div>
+      </div>
+
+      <div class="exercise-card">
+        <h3><i class="fas fa-pencil-alt"></i> Ejercicios Prácticos</h3>
+        <p style="color:rgba(255,255,255,0.6);font-size:0.85rem;margin-bottom:1rem;">Resuelve usando la fórmula de conversión.</p>
+
+        <div class="exercise-item">
+          <div class="q">📝 <strong>Ejercicio 1:</strong> El Segmento 3 (Profesionales) puntúa idealmente 6.04 en Valor (escala 1-7). ¿Cuál es su coordenada en el mapa perceptual?</div>
+          <input type="number" id="ex1" step="0.01" placeholder="Coordenada">
+          <button class="btn-sm" onclick="checkExercise(1)">Verificar</button>
+          <span class="ex-result" id="ex1Result"></span>
+          <div class="ex-steps" id="ex1Steps"></div>
+        </div>
+
+        <div class="exercise-item">
+          <div class="q">📝 <strong>Ejercicio 2:</strong> El Segmento 4 (Altos Ingresos) puntúa idealmente 5.35 en Valor. ¿Cuál es su coordenada en Y (Potencia = 4.03)? Primero convierte Valor.</div>
+          <input type="number" id="ex2" step="0.01" placeholder="Coordenada Valor">
+          <button class="btn-sm" onclick="checkExercise(2)">Verificar</button>
+          <span class="ex-result" id="ex2Result"></span>
+          <div class="ex-steps" id="ex2Steps"></div>
+        </div>
+
+        <div class="exercise-item">
+          <div class="q">📝 <strong>Ejercicio 3:</strong> Una marca está en coordenada X = -10.4 en el mapa (SAKA). ¿Qué valor en escala semántica representa?</div>
+          <input type="number" id="ex3" step="0.01" placeholder="Valor escala">
+          <button class="btn-sm" onclick="checkExercise(3)">Verificar</button>
+          <span class="ex-result" id="ex3Result"></span>
+          <div class="ex-steps" id="ex3Steps"></div>
+        </div>
+
+        <div class="exercise-item">
+          <div class="q">📝 <strong>Ejercicio 4:</strong> El Segmento 2 tiene ideal de Diseño = 5.68. ¿Cuál es su coordenada en el mapa? (Usa la misma fórmula para cualquier atributo)</div>
+          <input type="number" id="ex4" step="0.01" placeholder="Coordenada">
+          <button class="btn-sm" onclick="checkExercise(4)">Verificar</button>
+          <span class="ex-result" id="ex4Result"></span>
+          <div class="ex-steps" id="ex4Steps"></div>
+        </div>
+
+        <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:0.5rem;">
+          <button class="btn btn-primary" onclick="checkAllExercises()"><i class="fas fa-check-double"></i> Verificar Todo</button>
+          <button class="btn btn-secondary" onclick="resetExercises()" style="background:rgba(255,255,255,0.08);color:#eef5ff;border:1px solid rgba(255,255,255,0.15);"><i class="fas fa-undo"></i> Reiniciar</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="feedback" class="feedback">
+      <i class="fas fa-info-circle"></i> Usa el convertidor dual y resuelve los 4 ejercicios prácticos. Recuerda: y = (x - 4) × (20/3).
+    </div>
+
+    <div id="insignia" class="insignia hidden">
+      <i class="fas fa-medal"></i>
+      <h3>🏅 Traductor de Escalas 🏅</h3>
+      <p>¡Has dominado la conversión entre escalas semánticas y mapa perceptual! Ahora puedes traducir cualquier valor de un sistema a otro.</p>
+    </div>
+
+    <div class="nav-simulation">
+      <button class="btn-next" onclick="alert('🔄 Transición al siguiente módulo: Estudio 6 y 11 — Pronóstico de Mercado')">
+        Siguiente <i class="fas fa-arrow-right"></i>
+      </button>
+    </div>
+
+    <footer>
+      <i class="fas fa-chart-line"></i> MARKESTRATED · Marketing Estratégico en Simulación
+    </footer>
+  </div>
+
+  <script>
+    const CURRENT_MODULE = 16;
+    const COURSE_PROGRESS_KEY = 'markestrated_progress';
+    const TOTAL_MODULES = 34;
+    const MODULE_FILE = '16-conversion-escalas-mapa.html';
+    const K = 20/3;
+
+    const exerciseAnswers = {
+      1: { answer: 13.60, tol: 0.05 },
+      2: { answer: 9.00, tol: 0.05 },
+      3: { answer: 2.44, tol: 0.05 },
+      4: { answer: 11.20, tol: 0.05 }
+    };
+
+    function updateProgress() {
+      let progress = JSON.parse(localStorage.getItem(COURSE_PROGRESS_KEY)) || [];
+      if (!progress.includes(MODULE_FILE)) {
+        progress.push(MODULE_FILE);
+        localStorage.setItem(COURSE_PROGRESS_KEY, JSON.stringify(progress));
+      }
+      const pct = Math.round((progress.length / TOTAL_MODULES) * 100);
+      document.getElementById('progressFill').style.width = pct + '%';
+      document.getElementById('progressText').textContent = 'Módulo 16 de 24 (' + pct + '%)';
+    }
+
+    function convertSemanticToMap() {
+      const x = parseFloat(document.getElementById('semanticInput').value) || 4;
+      const y = (x - 4) * K;
+      document.getElementById('mapResult').textContent = y.toFixed(2);
+      document.getElementById('semanticStep').textContent = 
+        'x = ' + x.toFixed(2) + ' → y = (' + x.toFixed(2) + ' − 4) × ' + K.toFixed(3) + ' = ' + y.toFixed(2);
+    }
+
+    function convertMapToSemantic() {
+      const y = parseFloat(document.getElementById('mapInput').value) || 0;
+      const x = (y * 3 / 20) + 4;
+      document.getElementById('semanticResult').textContent = x.toFixed(2);
+      document.getElementById('mapStep').textContent =
+        'y = ' + y.toFixed(2) + ' → x = (' + y.toFixed(2) + ' × 3 / 20) + 4 = ' + x.toFixed(2);
+    }
+
+    function checkExercise(num) {
+      const input = document.getElementById('ex' + num);
+      const result = document.getElementById('ex' + num + 'Result');
+      const steps = document.getElementById('ex' + num + 'Steps');
+      const val = parseFloat(input.value);
+      const ans = exerciseAnswers[num];
+
+      if (isNaN(val)) {
+        result.textContent = '❌ Ingresa un número';
+        result.style.color = '#ff5050';
+        return;
+      }
+
+      if (Math.abs(val - ans.answer) <= ans.tol) {
+        result.textContent = '✅ ¡Correcto!';
+        result.style.color = '#00ffc8';
+      } else {
+        result.textContent = '❌ Incorrecto. Respuesta: ' + ans.answer.toFixed(2);
+        result.style.color = '#ff5050';
+      }
+
+      // Show steps
+      const stepsText = {
+        1: 'Fórmula: y = (6.04 - 4) × 20/3 = 2.04 × 6.667 = 13.60',
+        2: 'Fórmula para Valor: y = (5.35 - 4) × 20/3 = 1.35 × 6.667 = 9.00',
+        3: 'Fórmula inversa: x = (-10.4 × 3/20) + 4 = (-1.56) + 4 = 2.44',
+        4: 'Fórmula: y = (5.68 - 4) × 20/3 = 1.68 × 6.667 = 11.20'
+      };
+      steps.textContent = stepsText[num];
+    }
+
+    function checkAllExercises() {
+      let correct = 0;
+      const total = 4;
+      for (let i = 1; i <= total; i++) {
+        checkExercise(i);
+        const result = document.getElementById('ex' + i + 'Result');
+        if (result.textContent.includes('Correcto')) correct++;
+      }
+
+      const feedback = document.getElementById('feedback');
+      if (correct === total) {
+        feedback.innerHTML = '<i class="fas fa-check-circle"></i> ¡Excelente! Los 4 ejercicios correctos. Dominas la conversión de escalas a mapa perceptual.';
+        feedback.className = 'feedback success';
+        document.getElementById('insignia').classList.remove('hidden');
+      } else {
+        feedback.innerHTML = '<i class="fas fa-info-circle"></i> ' + correct + '/' + total + ' correctos. Revisa los pasos mostrados e intenta de nuevo.';
+        feedback.className = 'feedback';
+      }
+    }
+
+    function resetExercises() {
+      for (let i = 1; i <= 4; i++) {
+        document.getElementById('ex' + i).value = '';
+        document.getElementById('ex' + i + 'Result').textContent = '';
+        document.getElementById('ex' + i + 'Steps').textContent = '';
+      }
+      document.getElementById('feedback').innerHTML = '<i class="fas fa-info-circle"></i> Ejercicios reiniciados. Resuelve usando la fórmula y = (x - 4) × 20/3.';
+      document.getElementById('feedback').className = 'feedback';
+    }
+
+    convertSemanticToMap();
+    convertMapToSemantic();
+    updateProgress();
+  </script>
+</body>
+</html>
