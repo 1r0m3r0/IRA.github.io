@@ -1,304 +1,303 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Lending y Borrowing: Aave | Curso 2</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 100%); font-family: 'Inter', sans-serif; color: #eef5ff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; }
-    .course-container { max-width: 1300px; width: 100%; background: rgba(15,25,45,0.65); backdrop-filter: blur(12px); border-radius: 3rem; border: 1px solid rgba(98,126,234,0.25); box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden; }
-    .hero-header { background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%); padding: 2rem 2rem 1.5rem; text-align: center; border-bottom: 2px solid #627eea; }
-    .hero-header h1 { font-size: 2.6rem; font-weight: 800; background: linear-gradient(135deg, #FFF, #8099f0, #627eea); -webkit-background-clip: text; background-clip: text; color: transparent; }
-    .hero-header p { font-size: 1.1rem; color: #b9e2ff; margin-top: 0.5rem; }
-    .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1.2rem; flex-wrap: wrap; }
-    .chip { background: rgba(98,126,234,0.15); border: 1px solid #627eea; padding: 0.4rem 1rem; border-radius: 40px; font-size: 0.8rem; font-weight: 600; }
-    .analogy-card { background: #1e2a3acc; margin: 1.5rem 2rem; padding: 1.2rem 1.8rem; border-radius: 2rem; border-left: 8px solid #627eea; font-size: 1rem; line-height: 1.6; }
-    .main-area { padding: 1rem 2rem 2rem; }
-    .sim-box { background: rgba(0,10,25,0.7); border-radius: 2rem; padding: 1.5rem; border: 1px solid #627eea; text-align: center; margin-bottom: 1.5rem; }
-    .sim-box h3 { margin-bottom: 1rem; color: #8099f0; }
-    .balance-display { font-size: 2rem; font-weight: 800; color: #627eea; margin: 0.5rem 0; }
-    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap: 0.8rem; margin: 1rem 0; }
-    .stat-card { background: #0f1a2c; border-radius: 1rem; padding: 1rem; border: 1px solid #2c3e66; }
-    .stat-card .label { font-size: 0.75rem; color: #8899bb; }
-    .stat-card .value { font-size: 1.2rem; font-weight: 700; color: #627eea; }
-    .stat-card.warning .value { color: #ff6a00; }
-    .stat-card.danger .value { color: #ff5050; }
-    .btn-action { background: linear-gradient(95deg, #627eea, #8099f0); border: none; padding: 0.8rem 1.8rem; font-weight: bold; border-radius: 3rem; margin: 0.5rem; cursor: pointer; font-size: 1rem; transition: 0.2s; color: #fff; }
-    .btn-action:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(98,126,234,0.5); }
-    .btn-action:disabled { opacity: 0.5; cursor: not-allowed; }
-    .btn-action.danger { background: linear-gradient(95deg, #ff5050, #cc3333); }
-    .trade-controls { max-width: 400px; margin: 1rem auto; }
-    .trade-controls input { width: 100%; padding: 0.6rem 1rem; border-radius: 1rem; border: 1px solid #2c3e66; background: #0f1a2c; color: #eef5ff; font-family: 'Inter', sans-serif; font-size: 1rem; margin: 0.3rem 0; }
-    .progress-bar { height: 10px; background: rgba(255,255,255,0.08); border-radius: 10px; overflow: hidden; margin: 0.5rem 0; }
-    .progress-fill { height: 100%; width: 100%; background: linear-gradient(90deg, #22c55e, #ff6a00, #ff5050); border-radius: 10px; transition: width 0.5s; }
-    .feedback { background: #00000099; margin: 1rem 0; padding: 1rem; border-radius: 1.5rem; text-align: center; font-weight: 500; border-left: 4px solid #627eea; }
-    .quiz-block { background: rgba(0,10,25,0.5); border-radius: 2rem; padding: 1.5rem; margin-top: 1.5rem; border: 1px solid #627eea; }
-    .quiz-block h3 { color: #8099f0; margin-bottom: 1rem; }
-    .quiz-q { margin: 1rem 0; padding: 1rem; background: #0f1a2c; border-radius: 1rem; }
-    .quiz-q p { font-weight: 600; margin-bottom: 0.5rem; }
-    .quiz-q .opt { display: inline-block; background: #1e2a3e; padding: 0.4rem 1rem; border-radius: 2rem; margin: 0.2rem; cursor: pointer; transition: 0.2s; font-size: 0.9rem; }
-    .quiz-q .opt:hover { background: #2c3e66; }
-    .quiz-q .opt.selected { background: #627eea; color: #fff; }
-    .insignia { text-align: center; background: #0c1b2f; border-radius: 2rem; margin: 1rem 0; padding: 1rem; border: 1px dashed gold; }
-    .insignia i { font-size: 2.5rem; color: gold; }
-    .hidden { display: none; }
-    .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
-    .nav-link { background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem; font-weight: 600; text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; }
-    .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(98,126,234,0.4); }
-    .nav-link.next { background: linear-gradient(95deg, #627eea, #8099f0); color: #fff; }
-    .nav-link.menu { background: #1a2a4a; border: 1px solid #627eea; }
-    footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
-    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
-  </style>
-  <link rel="stylesheet" href="../../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Lending y Borrowing: Aave | Curso 2</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 100%); font-family: 'Inter', sans-serif; color: #eef5ff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; }
+  .course-container { max-width: 1300px; width: 100%; background: rgba(15,25,45,0.65); backdrop-filter: blur(12px); border-radius: 3rem; border: 1px solid rgba(98,126,234,0.25); box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden; }
+  .hero-header { background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%); padding: 2rem 2rem 1.5rem; text-align: center; border-bottom: 2px solid #627eea; }
+  .hero-header h1 { font-size: 2.6rem; font-weight: 800; background: linear-gradient(135deg, #FFF, #8099f0, #627eea); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero-header p { font-size: 1.1rem; color: #b9e2ff; margin-top: 0.5rem; }
+  .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1.2rem; flex-wrap: wrap; }
+  .chip { background: rgba(98,126,234,0.15); border: 1px solid #627eea; padding: 0.4rem 1rem; border-radius: 40px; font-size: 0.8rem; font-weight: 600; }
+  .analogy-card { background: #1e2a3acc; margin: 1.5rem 2rem; padding: 1.2rem 1.8rem; border-radius: 2rem; border-left: 8px solid #627eea; font-size: 1rem; line-height: 1.6; }
+  .main-area { padding: 1rem 2rem 2rem; }
+  .sim-box { background: rgba(0,10,25,0.7); border-radius: 2rem; padding: 1.5rem; border: 1px solid #627eea; text-align: center; margin-bottom: 1.5rem; }
+  .sim-box h3 { margin-bottom: 1rem; color: #8099f0; }
+  .balance-display { font-size: 2rem; font-weight: 800; color: #627eea; margin: 0.5rem 0; }
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap: 0.8rem; margin: 1rem 0; }
+  .stat-card { background: #0f1a2c; border-radius: 1rem; padding: 1rem; border: 1px solid #2c3e66; }
+  .stat-card .label { font-size: 0.75rem; color: #8899bb; }
+  .stat-card .value { font-size: 1.2rem; font-weight: 700; color: #627eea; }
+  .stat-card.warning .value { color: #ff6a00; }
+  .stat-card.danger .value { color: #ff5050; }
+  .btn-action { background: linear-gradient(95deg, #627eea, #8099f0); border: none; padding: 0.8rem 1.8rem; font-weight: bold; border-radius: 3rem; margin: 0.5rem; cursor: pointer; font-size: 1rem; transition: 0.2s; color: #fff; }
+  .btn-action:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(98,126,234,0.5); }
+  .btn-action:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-action.danger { background: linear-gradient(95deg, #ff5050, #cc3333); }
+  .trade-controls { max-width: 400px; margin: 1rem auto; }
+  .trade-controls input { width: 100%; padding: 0.6rem 1rem; border-radius: 1rem; border: 1px solid #2c3e66; background: #0f1a2c; color: #eef5ff; font-family: 'Inter', sans-serif; font-size: 1rem; margin: 0.3rem 0; }
+  .progress-bar { height: 10px; background: rgba(255,255,255,0.08); border-radius: 10px; overflow: hidden; margin: 0.5rem 0; }
+  .progress-fill { height: 100%; width: 100%; background: linear-gradient(90deg, #22c55e, #ff6a00, #ff5050); border-radius: 10px; transition: width 0.5s; }
+  .feedback { background: #00000099; margin: 1rem 0; padding: 1rem; border-radius: 1.5rem; text-align: center; font-weight: 500; border-left: 4px solid #627eea; }
+  .quiz-block { background: rgba(0,10,25,0.5); border-radius: 2rem; padding: 1.5rem; margin-top: 1.5rem; border: 1px solid #627eea; }
+  .quiz-block h3 { color: #8099f0; margin-bottom: 1rem; }
+  .quiz-q { margin: 1rem 0; padding: 1rem; background: #0f1a2c; border-radius: 1rem; }
+  .quiz-q p { font-weight: 600; margin-bottom: 0.5rem; }
+  .quiz-q .opt { display: inline-block; background: #1e2a3e; padding: 0.4rem 1rem; border-radius: 2rem; margin: 0.2rem; cursor: pointer; transition: 0.2s; font-size: 0.9rem; }
+  .quiz-q .opt:hover { background: #2c3e66; }
+  .quiz-q .opt.selected { background: #627eea; color: #fff; }
+  .insignia { text-align: center; background: #0c1b2f; border-radius: 2rem; margin: 1rem 0; padding: 1rem; border: 1px dashed gold; }
+  .insignia i { font-size: 2.5rem; color: gold; }
+  .hidden { display: none; }
+  .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
+  .nav-link { background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem; font-weight: 600; text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; }
+  .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(98,126,234,0.4); }
+  .nav-link.next { background: linear-gradient(95deg, #627eea, #8099f0); color: #fff; }
+  .nav-link.menu { background: #1a2a4a; border: 1px solid #627eea; }
+  footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
+ </style>
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
 </head>
 <body>
-  <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Blockchain</a></nav>
+ <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Blockchain</a></nav>
 
 <div class="course-container">
-  <div class="hero-header">
-    <h1> LENDING Y BORROWING: AAVE</h1>
-    <p>Pr&eacute;stamos descentralizados con colateralizaci&oacute;n autom&aacute;tica</p>
-    <div class="badge-area">
-      <span class="chip"><i class="fas fa-piggy-bank"></i> Supply APY</span>
-      <span class="chip"><i class="fas fa-shield-alt"></i> Health Factor</span>
-      <span class="chip"><i class="fas fa-exclamation-triangle"></i> Liquidaci&oacute;n</span>
-    </div>
+ <div class="hero-header">
+  <h1> LENDING Y BORROWING: AAVE</h1>
+  <p>Pr&eacute;stamos descentralizados con colateralizaci&oacute;n autom&aacute;tica</p>
+  <div class="badge-area">
+   <span class="chip"><i class="fas fa-piggy-bank"></i> Supply APY</span>
+   <span class="chip"><i class="fas fa-shield-alt"></i> Health Factor</span>
+   <span class="chip"><i class="fas fa-exclamation-triangle"></i> Liquidaci&oacute;n</span>
+  </div>
+ </div>
+
+ <div class="analogy-card">
+  <strong> Piénsalo as&iacute;:</strong> Aave es un banco comunitario donde depositas para ganar inter&eacute;s y puedes pedir prestado dejando una garant&iacute;a. Si tu garant&iacute;a pierde valor, el banco vende tus activos para protegerse.
+ </div>
+
+ <div class="main-area">
+  <div class="sim-box">
+   <h3><i class="fas fa-university"></i> Simulador de Supply &amp; Borrow</h3>
+   <p>Deposita ETH como colateral, gana inter&eacute;s, y pide prestado USDC contra tu garant&iacute;a.</p>
+
+   <div class="balance-display" id="walletDisplay">10.00 ETH | 5,000 USDC</div>
+
+   <div class="stats-grid">
+    <div class="stat-card"><div class="label">ETH depositado</div><div class="value" id="depositedEth">0.00</div></div>
+    <div class="stat-card"><div class="label">USDC prestado</div><div class="value" id="borrowedUsdc">0.00</div></div>
+    <div class="stat-card" id="hfCard"><div class="label">Health Factor</div><div class="value" id="healthFactor">--</div></div>
+    <div class="stat-card"><div class="label">Supply APY</div><div class="value">3.2%</div></div>
+    <div class="stat-card"><div class="label">Borrow APY (USDC)</div><div class="value">5.8%</div></div>
+    <div class="stat-card"><div class="label">LTV m&aacute;x</div><div class="value">82.5%</div></div>
+   </div>
+
+   <div class="progress-bar">
+    <div class="progress-fill" id="hfBar" style="width:100%"></div>
+   </div>
+   <p style="font-size:0.8rem;color:#8899bb;">Health Factor > 2: seguro | 1.1-2: riesgo | < 1.1: liquidaci&oacute;n inminente</p>
+
+   <div class="trade-controls">
+    <button class="btn-action" id="depositBtn"> Depositar 5 ETH</button>
+    <button class="btn-action" id="withdrawBtn" disabled> Retirar ETH</button>
+   </div>
+   <div class="trade-controls">
+    <button class="btn-action" id="borrowBtn"> Pedir prestado 2000 USDC</button>
+    <button class="btn-action danger" id="repayBtn" disabled> Repagar USDC</button>
+   </div>
+   <div class="trade-controls">
+    <button class="btn-action" id="crashBtn" style="background:linear-gradient(95deg,#ff5050,#cc3333);"> Simular ca&iacute;da de ETH (-30%)</button>
+   </div>
+
+   <div id="lendingFeedback" class="feedback">Estado inicial: 10 ETH en wallet, sin posiciones activas.</div>
   </div>
 
-  <div class="analogy-card">
-    <strong> Piénsalo as&iacute;:</strong> Aave es un banco comunitario donde depositas para ganar inter&eacute;s y puedes pedir prestado dejando una garant&iacute;a. Si tu garant&iacute;a pierde valor, el banco vende tus activos para protegerse.
+  <div class="quiz-block">
+   <h3> Cuestionario Express</h3>
+   <div id="quizQs"></div>
+   <button class="btn-action" id="submitQuiz"> Validar respuestas</button>
+   <div id="quizFeedback" class="feedback" style="margin-top:1rem;"></div>
   </div>
 
-  <div class="main-area">
-    <div class="sim-box">
-      <h3><i class="fas fa-university"></i> Simulador de Supply &amp; Borrow</h3>
-      <p>Deposita ETH como colateral, gana inter&eacute;s, y pide prestado USDC contra tu garant&iacute;a.</p>
-
-      <div class="balance-display" id="walletDisplay">10.00 ETH | 5,000 USDC</div>
-
-      <div class="stats-grid">
-        <div class="stat-card"><div class="label">ETH depositado</div><div class="value" id="depositedEth">0.00</div></div>
-        <div class="stat-card"><div class="label">USDC prestado</div><div class="value" id="borrowedUsdc">0.00</div></div>
-        <div class="stat-card" id="hfCard"><div class="label">Health Factor</div><div class="value" id="healthFactor">--</div></div>
-        <div class="stat-card"><div class="label">Supply APY</div><div class="value">3.2%</div></div>
-        <div class="stat-card"><div class="label">Borrow APY (USDC)</div><div class="value">5.8%</div></div>
-        <div class="stat-card"><div class="label">LTV m&aacute;x</div><div class="value">82.5%</div></div>
-      </div>
-
-      <div class="progress-bar">
-        <div class="progress-fill" id="hfBar" style="width:100%"></div>
-      </div>
-      <p style="font-size:0.8rem;color:#8899bb;">Health Factor > 2: seguro | 1.1-2: riesgo | < 1.1: liquidaci&oacute;n inminente</p>
-
-      <div class="trade-controls">
-        <button class="btn-action" id="depositBtn"> Depositar 5 ETH</button>
-        <button class="btn-action" id="withdrawBtn" disabled> Retirar ETH</button>
-      </div>
-      <div class="trade-controls">
-        <button class="btn-action" id="borrowBtn"> Pedir prestado 2000 USDC</button>
-        <button class="btn-action danger" id="repayBtn" disabled> Repagar USDC</button>
-      </div>
-      <div class="trade-controls">
-        <button class="btn-action" id="crashBtn" style="background:linear-gradient(95deg,#ff5050,#cc3333);"> Simular ca&iacute;da de ETH (-30%)</button>
-      </div>
-
-      <div id="lendingFeedback" class="feedback">Estado inicial: 10 ETH en wallet, sin posiciones activas.</div>
-    </div>
-
-    <div class="quiz-block">
-      <h3> Cuestionario Express</h3>
-      <div id="quizQs"></div>
-      <button class="btn-action" id="submitQuiz"> Validar respuestas</button>
-      <div id="quizFeedback" class="feedback" style="margin-top:1rem;"></div>
-    </div>
-
-    <div id="insigniaArea" class="insignia hidden">
-      <i class="fas fa-medal"></i>
-      <h3> INSIGNIA DE USUARIO AAVE </h3>
-      <p>&iexcl;Entiendes c&oacute;mo funcionan los pr&eacute;stamos descentralizados y el health factor!</p>
-    </div>
+  <div id="insigniaArea" class="insignia hidden">
+   <i class="fas fa-medal"></i>
+   <h3> INSIGNIA DE USUARIO AAVE </h3>
+   <p>&iexcl;Entiendes c&oacute;mo funcionan los pr&eacute;stamos descentralizados y el health factor!</p>
   </div>
+ </div>
 
-  <div class="nav-links">
-    <a href="05-amm-uniswap.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
-    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
-    <a href="07-liquid-staking.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
-  </div>
-  <footer>
-    <i class="fas fa-crown"></i> Programa Blockchain &middot; Curso 2 &middot; M&oacute;dulo 6
-  </footer>
+ <div class="nav-links">
+  <a href="05-amm-uniswap.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
+  <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
+  <a href="07-liquid-staking.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+ </div>
+ <footer>
+  <i class="fas fa-crown"></i> Programa Blockchain &middot; Curso 2 &middot; M&oacute;dulo 6
+ </footer>
 </div>
 
 <script>
-  const STORAGE_KEY = 'block_2_06';
-  let ethPrice = 3000;
-  let wallet = { eth: 10, usdc: 5000 };
-  let position = { depositedEth: 0, borrowedUsdc: 0 };
-  let quizAnswers = [null, null, null];
-  let quizCompleted = false;
+ const STORAGE_KEY = 'block_2_06';
+ let ethPrice = 3000;
+ let wallet = { eth: 10, usdc: 5000 };
+ let position = { depositedEth: 0, borrowedUsdc: 0 };
+ let quizAnswers = [null, null, null];
+ let quizCompleted = false;
 
-  function getHF() {
-    if (position.borrowedUsdc <= 0) return 999;
-    var collateralValue = position.depositedEth * ethPrice;
-    var maxLtv = 0.825;
-    var maxBorrow = collateralValue * maxLtv;
-    if (position.borrowedUsdc >= maxBorrow) return 0.99;
-    return (maxBorrow / position.borrowedUsdc);
+ function getHF() {
+  if (position.borrowedUsdc <= 0) return 999;
+  var collateralValue = position.depositedEth * ethPrice;
+  var maxLtv = 0.825;
+  var maxBorrow = collateralValue * maxLtv;
+  if (position.borrowedUsdc >= maxBorrow) return 0.99;
+  return (maxBorrow / position.borrowedUsdc);
+ }
+
+ function updateAll() {
+  var hf = getHF();
+  document.getElementById('depositedEth').textContent = position.depositedEth.toFixed(2);
+  document.getElementById('borrowedUsdc').textContent = position.borrowedUsdc.toFixed(2);
+  document.getElementById('walletDisplay').textContent = wallet.eth.toFixed(2) + ' ETH | ' + wallet.usdc.toFixed(2) + ' USDC';
+
+  var hfDisplay = hf >= 999 ? '--' : hf.toFixed(2);
+  document.getElementById('healthFactor').textContent = hfDisplay;
+
+  var hfCard = document.getElementById('hfCard');
+  hfCard.className = 'stat-card';
+  if (hf < 1.1 && hf < 999) hfCard.classList.add('danger');
+  else if (hf < 2) hfCard.classList.add('warning');
+
+  var barPct = hf >= 999 ? 100 : Math.min(hf / 4 * 100, 100);
+  document.getElementById('hfBar').style.width = barPct + '%';
+
+  document.getElementById('depositBtn').disabled = wallet.eth < 1;
+  document.getElementById('borrowBtn').disabled = position.depositedEth <= 0;
+  document.getElementById('withdrawBtn').disabled = position.depositedEth <= 0;
+  document.getElementById('repayBtn').disabled = position.borrowedUsdc <= 0;
+ }
+
+ function deposit() {
+  if (wallet.eth < 5) { document.getElementById('lendingFeedback').innerHTML = ' No tienes suficiente ETH.'; return; }
+  wallet.eth -= 5;
+  position.depositedEth += 5;
+  updateAll();
+  document.getElementById('lendingFeedback').innerHTML = ' Has depositado 5 ETH como colateral. aETH emitido. Ganas 3.2% APY.';
+ }
+
+ function withdraw() {
+  if (position.depositedEth < 5) { document.getElementById('lendingFeedback').innerHTML = ' No tienes suficiente ETH depositado.'; return; }
+  var hfAfter = getHF();
+  if (hfAfter < 1.1 && position.borrowedUsdc > 0) {
+   document.getElementById('lendingFeedback').innerHTML = ' No puedes retirar: el health factor quedar&iacute;a por debajo de 1.1.';
+   return;
   }
+  position.depositedEth -= 5;
+  wallet.eth += 5;
+  updateAll();
+  document.getElementById('lendingFeedback').innerHTML = ' Has retirado 5 ETH.';
+ }
 
-  function updateAll() {
-    var hf = getHF();
-    document.getElementById('depositedEth').textContent = position.depositedEth.toFixed(2);
-    document.getElementById('borrowedUsdc').textContent = position.borrowedUsdc.toFixed(2);
-    document.getElementById('walletDisplay').textContent = wallet.eth.toFixed(2) + ' ETH | ' + wallet.usdc.toFixed(2) + ' USDC';
+ function borrow() {
+  if (position.depositedEth <= 0) { document.getElementById('lendingFeedback').innerHTML = ' Deposita ETH primero.'; return; }
+  var hfAfter = getHF();
+  if (hfAfter < 1.1) { document.getElementById('lendingFeedback').innerHTML = ' Health factor demasiado bajo. No puedes pedir m&aacute;s prestado.'; return; }
+  position.borrowedUsdc += 2000;
+  wallet.usdc += 2000;
+  updateAll();
+  document.getElementById('lendingFeedback').innerHTML = ' Has pedido prestado 2,000 USDC. Health factor: ' + getHF().toFixed(2) + '.';
+ }
 
-    var hfDisplay = hf >= 999 ? '--' : hf.toFixed(2);
-    document.getElementById('healthFactor').textContent = hfDisplay;
+ function repay() {
+  if (position.borrowedUsdc <= 0) return;
+  var amount = Math.min(2000, position.borrowedUsdc);
+  if (wallet.usdc < amount) { document.getElementById('lendingFeedback').innerHTML = ' No tienes suficiente USDC para repagar.'; return; }
+  wallet.usdc -= amount;
+  position.borrowedUsdc -= amount;
+  updateAll();
+  document.getElementById('lendingFeedback').innerHTML = ' Has repagado ' + amount + ' USDC.';
+ }
 
-    var hfCard = document.getElementById('hfCard');
-    hfCard.className = 'stat-card';
-    if (hf < 1.1 && hf < 999) hfCard.classList.add('danger');
-    else if (hf < 2) hfCard.classList.add('warning');
-
-    var barPct = hf >= 999 ? 100 : Math.min(hf / 4 * 100, 100);
-    document.getElementById('hfBar').style.width = barPct + '%';
-
-    document.getElementById('depositBtn').disabled = wallet.eth < 1;
-    document.getElementById('borrowBtn').disabled = position.depositedEth <= 0;
-    document.getElementById('withdrawBtn').disabled = position.depositedEth <= 0;
-    document.getElementById('repayBtn').disabled = position.borrowedUsdc <= 0;
+ function crash() {
+  ethPrice *= 0.7;
+  var hf = getHF();
+  document.getElementById('lendingFeedback').innerHTML = ' ETH cay&oacute; un 30%. Nuevo precio: $' + ethPrice.toFixed(0) + '. Health factor: ' + (hf >= 999 ? '--' : hf.toFixed(2));
+  if (hf < 1.1 && hf < 999) {
+   document.getElementById('lendingFeedback').innerHTML += ' &iexcl;LIQUIDACI&Oacute;N INMINENTE! Si el health factor baja de 1, tu colateral ser&aacute; liquidado.';
   }
+  updateAll();
+ }
 
-  function deposit() {
-    if (wallet.eth < 5) { document.getElementById('lendingFeedback').innerHTML = ' No tienes suficiente ETH.'; return; }
-    wallet.eth -= 5;
-    position.depositedEth += 5;
-    updateAll();
-    document.getElementById('lendingFeedback').innerHTML = ' Has depositado 5 ETH como colateral. aETH emitido. Ganas 3.2% APY.';
+ function init() {
+  document.getElementById('depositBtn').addEventListener('click', deposit);
+  document.getElementById('withdrawBtn').addEventListener('click', withdraw);
+  document.getElementById('borrowBtn').addEventListener('click', borrow);
+  document.getElementById('repayBtn').addEventListener('click', repay);
+  document.getElementById('crashBtn').addEventListener('click', crash);
+  updateAll();
+
+  renderQuiz();
+  document.getElementById('submitQuiz').addEventListener('click', checkQuiz);
+
+  var saved = localStorage.getItem(STORAGE_KEY);
+  if (saved === 'true') {
+   quizCompleted = true;
+   document.getElementById('insigniaArea').classList.remove('hidden');
   }
+ }
 
-  function withdraw() {
-    if (position.depositedEth < 5) { document.getElementById('lendingFeedback').innerHTML = ' No tienes suficiente ETH depositado.'; return; }
-    var hfAfter = getHF();
-    if (hfAfter < 1.1 && position.borrowedUsdc > 0) {
-      document.getElementById('lendingFeedback').innerHTML = ' No puedes retirar: el health factor quedar&iacute;a por debajo de 1.1.';
-      return;
-    }
-    position.depositedEth -= 5;
-    wallet.eth += 5;
-    updateAll();
-    document.getElementById('lendingFeedback').innerHTML = ' Has retirado 5 ETH.';
-  }
+ var quizData = [
+  { q: "&iquest;Qu&eacute; es el health factor en Aave?", opts: ["La tasa de inter&eacute;s", "La relaci&oacute;n entre colateral y deuda", "El precio del token", "El n&uacute;mero de usuarios"], correct: 1 },
+  { q: "&iquest;Qu&eacute; sucede si tu health factor baja de 1?", opts: ["Tu deuda se perdona", "Tu colateral es liquidado", "Recibes m&aacute;s tokens", "Tu cuenta se congela"], correct: 1 },
+  { q: "&iquest;Qu&eacute; son los aTokens en Aave?", opts: ["Tokens de gobernanza", "Tokens que representan tu dep&oacute;sito y acumulan inter&eacute;s", "Tokens de descuento", "NFTs de Aave"], correct: 1 }
+ ];
 
-  function borrow() {
-    if (position.depositedEth <= 0) { document.getElementById('lendingFeedback').innerHTML = ' Deposita ETH primero.'; return; }
-    var hfAfter = getHF();
-    if (hfAfter < 1.1) { document.getElementById('lendingFeedback').innerHTML = ' Health factor demasiado bajo. No puedes pedir m&aacute;s prestado.'; return; }
-    position.borrowedUsdc += 2000;
-    wallet.usdc += 2000;
-    updateAll();
-    document.getElementById('lendingFeedback').innerHTML = ' Has pedido prestado 2,000 USDC. Health factor: ' + getHF().toFixed(2) + '.';
-  }
-
-  function repay() {
-    if (position.borrowedUsdc <= 0) return;
-    var amount = Math.min(2000, position.borrowedUsdc);
-    if (wallet.usdc < amount) { document.getElementById('lendingFeedback').innerHTML = ' No tienes suficiente USDC para repagar.'; return; }
-    wallet.usdc -= amount;
-    position.borrowedUsdc -= amount;
-    updateAll();
-    document.getElementById('lendingFeedback').innerHTML = ' Has repagado ' + amount + ' USDC.';
-  }
-
-  function crash() {
-    ethPrice *= 0.7;
-    var hf = getHF();
-    document.getElementById('lendingFeedback').innerHTML = ' ETH cay&oacute; un 30%. Nuevo precio: $' + ethPrice.toFixed(0) + '. Health factor: ' + (hf >= 999 ? '--' : hf.toFixed(2));
-    if (hf < 1.1 && hf < 999) {
-      document.getElementById('lendingFeedback').innerHTML += '  &iexcl;LIQUIDACI&Oacute;N INMINENTE! Si el health factor baja de 1, tu colateral ser&aacute; liquidado.';
-    }
-    updateAll();
-  }
-
-  function init() {
-    document.getElementById('depositBtn').addEventListener('click', deposit);
-    document.getElementById('withdrawBtn').addEventListener('click', withdraw);
-    document.getElementById('borrowBtn').addEventListener('click', borrow);
-    document.getElementById('repayBtn').addEventListener('click', repay);
-    document.getElementById('crashBtn').addEventListener('click', crash);
-    updateAll();
-
-    renderQuiz();
-    document.getElementById('submitQuiz').addEventListener('click', checkQuiz);
-
-    var saved = localStorage.getItem(STORAGE_KEY);
-    if (saved === 'true') {
-      quizCompleted = true;
-      document.getElementById('insigniaArea').classList.remove('hidden');
-    }
-  }
-
-  var quizData = [
-    { q: "&iquest;Qu&eacute; es el health factor en Aave?", opts: ["La tasa de inter&eacute;s", "La relaci&oacute;n entre colateral y deuda", "El precio del token", "El n&uacute;mero de usuarios"], correct: 1 },
-    { q: "&iquest;Qu&eacute; sucede si tu health factor baja de 1?", opts: ["Tu deuda se perdona", "Tu colateral es liquidado", "Recibes m&aacute;s tokens", "Tu cuenta se congela"], correct: 1 },
-    { q: "&iquest;Qu&eacute; son los aTokens en Aave?", opts: ["Tokens de gobernanza", "Tokens que representan tu dep&oacute;sito y acumulan inter&eacute;s", "Tokens de descuento", "NFTs de Aave"], correct: 1 }
-  ];
-
-  function renderQuiz() {
-    var container = document.getElementById('quizQs');
-    container.innerHTML = '';
-    quizData.forEach(function(q, idx) {
-      var div = document.createElement('div');
-      div.className = 'quiz-q';
-      div.innerHTML = '<p>' + q.q + '</p><div class="opts" id="qopts-' + idx + '"></div>';
-      var optsDiv = div.querySelector('.opts');
-      q.opts.forEach(function(opt, oi) {
-        var span = document.createElement('span');
-        span.className = 'opt';
-        span.textContent = opt;
-        span.dataset.qi = idx;
-        span.dataset.oi = oi;
-        span.addEventListener('click', function() {
-          if (quizCompleted) return;
-          var parent = span.parentElement;
-          Array.from(parent.children).forEach(function(c) { c.classList.remove('selected'); });
-          span.classList.add('selected');
-          quizAnswers[idx] = oi;
-        });
-        optsDiv.appendChild(span);
-      });
-      container.appendChild(div);
+ function renderQuiz() {
+  var container = document.getElementById('quizQs');
+  container.innerHTML = '';
+  quizData.forEach(function(q, idx) {
+   var div = document.createElement('div');
+   div.className = 'quiz-q';
+   div.innerHTML = '<p>' + q.q + '</p><div class="opts" id="qopts-' + idx + '"></div>';
+   var optsDiv = div.querySelector('.opts');
+   q.opts.forEach(function(opt, oi) {
+    var span = document.createElement('span');
+    span.className = 'opt';
+    span.textContent = opt;
+    span.dataset.qi = idx;
+    span.dataset.oi = oi;
+    span.addEventListener('click', function() {
+     if (quizCompleted) return;
+     var parent = span.parentElement;
+     Array.from(parent.children).forEach(function(c) { c.classList.remove('selected'); });
+     span.classList.add('selected');
+     quizAnswers[idx] = oi;
     });
-  }
+    optsDiv.appendChild(span);
+   });
+   container.appendChild(div);
+  });
+ }
 
-  function checkQuiz() {
-    if (quizCompleted) { document.getElementById('quizFeedback').innerHTML = I18N.t('fb_0'); return; }
-    var allAnswered = quizAnswers.every(function(a) { return a !== null; });
-    if (!allAnswered) { document.getElementById('quizFeedback').innerHTML = ' Responde todas las preguntas primero.'; return; }
-    var correct = 0;
-    for (var i = 0; i < quizData.length; i++) { if (quizAnswers[i] === quizData[i].correct) correct++; }
-    if (correct >= 2) {
-      quizCompleted = true;
-      document.getElementById('quizFeedback').innerHTML = I18N.t('fb_1') + correct + '/' + quizData.length + '. &iexcl;Dominas el lending DeFi!';
-      document.getElementById('insigniaArea').classList.remove('hidden');
-      localStorage.setItem(STORAGE_KEY, 'true');
-    } else {
-      document.getElementById('quizFeedback').innerHTML = ' Obtuviste ' + correct + '/' + quizData.length + '. Repasa los conceptos e int&eacute;ntalo de nuevo.';
-    }
+ function checkQuiz() {
+  if (quizCompleted) { document.getElementById('quizFeedback').innerHTML = I18N.t('fb_0'); return; }
+  var allAnswered = quizAnswers.every(function(a) { return a !== null; });
+  if (!allAnswered) { document.getElementById('quizFeedback').innerHTML = ' Responde todas las preguntas primero.'; return; }
+  var correct = 0;
+  for (var i = 0; i < quizData.length; i++) { if (quizAnswers[i] === quizData[i].correct) correct++; }
+  if (correct >= 2) {
+   quizCompleted = true;
+   document.getElementById('quizFeedback').innerHTML = I18N.t('fb_1') + correct + '/' + quizData.length + '. &iexcl;Dominas el lending DeFi!';
+   document.getElementById('insigniaArea').classList.remove('hidden');
+   localStorage.setItem(STORAGE_KEY, 'true');
+  } else {
+   document.getElementById('quizFeedback').innerHTML = ' Obtuviste ' + correct + '/' + quizData.length + '. Repasa los conceptos e int&eacute;ntalo de nuevo.';
   }
+ }
 
-  init();
+ init();
 </script>
-<script src="../../../assets/js/cookie-consent.js"></script>
 <script>
 window.I18N_DATA={
-  'fb_0': { es: ' Ya completaste este cuestionario.', en: ' Ya completaste este cuestionario.' },
-  'fb_1': { es: ' &iexcl;Correcto! ', en: ' &iexcl;Correcto! ' }
+ 'fb_0': { es: ' Ya completaste este cuestionario.', en: ' Ya completaste este cuestionario.' },
+ 'fb_1': { es: ' &iexcl;Correcto! ', en: ' &iexcl;Correcto! ' }
 };
 </script>
-<script src="../../../assets/js/i18n.js"></script>  </body>
+<script src="../../../assets/js/i18n.js"></script> </body>
 </html>

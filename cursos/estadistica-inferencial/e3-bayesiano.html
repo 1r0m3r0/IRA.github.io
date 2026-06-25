@@ -1,272 +1,272 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Estadística Inferencial | Métodos Bayesianos</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Press+Start+2P&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%);background-size:200% 200%;animation:gradientShift 20s ease infinite;font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
-    @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-    .container{max-width:1300px;width:100%;background:rgba(15,25,45,0.65);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(255,102,192,0.25);box-shadow:0 25px 45px rgba(0,0,0,0.5);overflow:hidden}
-    .hero-header{background:linear-gradient(95deg,#0b1120 0%,#111a2e 100%);padding:2rem 2rem 1.5rem;text-align:center;border-bottom:2px solid #ff66c0}
-    .hero-header h1{font-size:2.6rem;font-weight:800;background:linear-gradient(135deg,#FFF,#ff99dd,#ff66c0);-webkit-background-clip:text;background-clip:text;color:transparent}
-    .hero-header p{font-size:1.1rem;color:#ffb3e6;margin-top:0.5rem;font-weight:500}
-    .badge-area{display:flex;justify-content:center;gap:1rem;margin-top:1.2rem;flex-wrap:wrap}
-    .chip{background:rgba(255,102,192,0.15);border:1px solid #ff66c0;padding:0.4rem 1rem;border-radius:40px;font-size:0.8rem;font-weight:600}
-    .analogy-card{background:#1e2a3acc;margin:1.5rem 2rem;padding:1.2rem 1.8rem;border-radius:2rem;border-left:8px solid #ff66c0;font-size:1rem;line-height:1.6}
-    .main-area{padding:0 2rem 1rem;display:flex;flex-direction:column;gap:1.5rem}
-    .bayes-panel{background:#0f1a2be0;border-radius:2rem;padding:1.5rem;border:1px solid rgba(255,102,192,0.2)}
-    .bayes-panel h3{font-size:1.2rem;margin-bottom:0.8rem;color:#ff99dd}
-    .slider-group{margin-bottom:1.2rem}
-    .slider-group label{display:flex;justify-content:space-between;font-size:0.9rem;color:#b9c8e6;margin-bottom:0.3rem}
-    .slider-group input[type=range]{width:100%;-webkit-appearance:none;height:6px;background:#2c3e66;border-radius:3px;outline:none}
-    .slider-group input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;background:#ff66c0;border-radius:50%;cursor:pointer;box-shadow:0 0 8px rgba(255,102,192,0.4)}
-    .curve-viz{display:flex;flex-direction:column;gap:1rem;margin:1rem 0}
-    .curve-row{display:flex;align-items:center;gap:1rem}
-    .curve-label{min-width:80px;font-size:0.8rem;color:#b9c8e6;font-weight:600}
-    .curve-bar-container{flex:1;height:30px;background:#1a2a4a;border-radius:1rem;overflow:hidden;position:relative;display:flex}
-    .curve-bar{height:100%;border-radius:1rem;transition:width 0.3s;min-width:2px}
-    .curve-bar.prior{background:linear-gradient(90deg,#667799,#8899bb)}
-    .curve-bar.likelihood{background:linear-gradient(90deg,#ff66c0,#ff99dd)}
-    .curve-bar.posterior{background:linear-gradient(90deg,#ffd700,#ffaa00)}
-    .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem;margin-top:1rem}
-    .info-item{background:#1a2a4a;padding:0.8rem;border-radius:1rem;text-align:center}
-    .info-item .val{font-size:1.3rem;font-weight:800;color:#ff99dd}
-    .info-item .lbl{font-size:0.75rem;color:#b9c8e6;margin-top:0.2rem}
-    .btn-action{background:linear-gradient(95deg,#ff66c0,#ff3388);border:none;padding:0.8rem 1.8rem;font-weight:700;border-radius:3rem;cursor:pointer;font-size:1rem;transition:0.2s;color:#1e1a0c;font-family:'Inter',sans-serif;display:inline-flex;align-items:center;gap:0.5rem}
-    .btn-action:hover{transform:translateY(-2px);box-shadow:0 0 15px rgba(255,102,192,0.5)}
-    .btn-action:disabled{opacity:0.4;cursor:not-allowed;transform:none}
-    .feedback{background:#00000099;margin:0 2rem 1.5rem;padding:1rem;border-radius:1.5rem;text-align:center;font-weight:500;border-left:4px solid #ff66c0}
-    .insignia{text-align:center;background:#0c1b2f;border-radius:2rem;margin:0 2rem 1.5rem;padding:1rem;border:1px dashed gold}
-    .insignia i{font-size:2.5rem;color:gold}
-    .hidden{display:none}
-    .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.5rem 2rem}
-    .nav-link{background:#2c3e66;padding:0.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:0.5rem;transition:0.2s}
-    .nav-link:hover{transform:translateY(-2px);box-shadow:0 0 10px rgba(255,102,192,0.4)}
-    .nav-link.next{background:linear-gradient(95deg,#ff66c0,#ff3388);color:#1e1a0c}
-    .nav-link.menu{background:#1a2a4a;border:1px solid #ff66c0}
-    footer{text-align:center;padding:1.2rem;font-size:0.8rem;border-top:1px solid #2c3e66}
-    @media(max-width:800px){.hero-header h1{font-size:1.9rem}}
-  </style>
-  <link rel="stylesheet" href="../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>EstadÃ­stica Inferencial | MÃ©todos Bayesianos</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Press+Start+2P&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%);background-size:200% 200%;animation:gradientShift 20s ease infinite;font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
+  @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+  .container{max-width:1300px;width:100%;background:rgba(15,25,45,0.65);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(255,102,192,0.25);box-shadow:0 25px 45px rgba(0,0,0,0.5);overflow:hidden}
+  .hero-header{background:linear-gradient(95deg,#0b1120 0%,#111a2e 100%);padding:2rem 2rem 1.5rem;text-align:center;border-bottom:2px solid #ff66c0}
+  .hero-header h1{font-size:2.6rem;font-weight:800;background:linear-gradient(135deg,#FFF,#ff99dd,#ff66c0);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero-header p{font-size:1.1rem;color:#ffb3e6;margin-top:0.5rem;font-weight:500}
+  .badge-area{display:flex;justify-content:center;gap:1rem;margin-top:1.2rem;flex-wrap:wrap}
+  .chip{background:rgba(255,102,192,0.15);border:1px solid #ff66c0;padding:0.4rem 1rem;border-radius:40px;font-size:0.8rem;font-weight:600}
+  .analogy-card{background:#1e2a3acc;margin:1.5rem 2rem;padding:1.2rem 1.8rem;border-radius:2rem;border-left:8px solid #ff66c0;font-size:1rem;line-height:1.6}
+  .main-area{padding:0 2rem 1rem;display:flex;flex-direction:column;gap:1.5rem}
+  .bayes-panel{background:#0f1a2be0;border-radius:2rem;padding:1.5rem;border:1px solid rgba(255,102,192,0.2)}
+  .bayes-panel h3{font-size:1.2rem;margin-bottom:0.8rem;color:#ff99dd}
+  .slider-group{margin-bottom:1.2rem}
+  .slider-group label{display:flex;justify-content:space-between;font-size:0.9rem;color:#b9c8e6;margin-bottom:0.3rem}
+  .slider-group input[type=range]{width:100%;-webkit-appearance:none;height:6px;background:#2c3e66;border-radius:3px;outline:none}
+  .slider-group input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;background:#ff66c0;border-radius:50%;cursor:pointer;box-shadow:0 0 8px rgba(255,102,192,0.4)}
+  .curve-viz{display:flex;flex-direction:column;gap:1rem;margin:1rem 0}
+  .curve-row{display:flex;align-items:center;gap:1rem}
+  .curve-label{min-width:80px;font-size:0.8rem;color:#b9c8e6;font-weight:600}
+  .curve-bar-container{flex:1;height:30px;background:#1a2a4a;border-radius:1rem;overflow:hidden;position:relative;display:flex}
+  .curve-bar{height:100%;border-radius:1rem;transition:width 0.3s;min-width:2px}
+  .curve-bar.prior{background:linear-gradient(90deg,#667799,#8899bb)}
+  .curve-bar.likelihood{background:linear-gradient(90deg,#ff66c0,#ff99dd)}
+  .curve-bar.posterior{background:linear-gradient(90deg,#ffd700,#ffaa00)}
+  .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem;margin-top:1rem}
+  .info-item{background:#1a2a4a;padding:0.8rem;border-radius:1rem;text-align:center}
+  .info-item .val{font-size:1.3rem;font-weight:800;color:#ff99dd}
+  .info-item .lbl{font-size:0.75rem;color:#b9c8e6;margin-top:0.2rem}
+  .btn-action{background:linear-gradient(95deg,#ff66c0,#ff3388);border:none;padding:0.8rem 1.8rem;font-weight:700;border-radius:3rem;cursor:pointer;font-size:1rem;transition:0.2s;color:#1e1a0c;font-family:'Inter',sans-serif;display:inline-flex;align-items:center;gap:0.5rem}
+  .btn-action:hover{transform:translateY(-2px);box-shadow:0 0 15px rgba(255,102,192,0.5)}
+  .btn-action:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+  .feedback{background:#00000099;margin:0 2rem 1.5rem;padding:1rem;border-radius:1.5rem;text-align:center;font-weight:500;border-left:4px solid #ff66c0}
+  .insignia{text-align:center;background:#0c1b2f;border-radius:2rem;margin:0 2rem 1.5rem;padding:1rem;border:1px dashed gold}
+  .insignia i{font-size:2.5rem;color:gold}
+  .hidden{display:none}
+  .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.5rem 2rem}
+  .nav-link{background:#2c3e66;padding:0.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:0.5rem;transition:0.2s}
+  .nav-link:hover{transform:translateY(-2px);box-shadow:0 0 10px rgba(255,102,192,0.4)}
+  .nav-link.next{background:linear-gradient(95deg,#ff66c0,#ff3388);color:#1e1a0c}
+  .nav-link.menu{background:#1a2a4a;border:1px solid #ff66c0}
+  footer{text-align:center;padding:1.2rem;font-size:0.8rem;border-top:1px solid #2c3e66}
+  @media(max-width:800px){.hero-header h1{font-size:1.9rem}}
+ </style>
+ <link rel="stylesheet" href="../../assets/css/theme.css">
 </head>
 <body>
-  <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
-  <div class="container">
-    <div class="hero-header">
-      <h1>🧠 Métodos Bayesianos 🧠</h1>
-      <p>Actualiza tus creencias con cada nuevo dato</p>
-      <div class="badge-area">
-        <span class="chip"><i class="fas fa-brain"></i> Prior → Posterior</span>
-        <span class="chip"><i class="fas fa-sync-alt"></i> Conjugadas</span>
-        <span class="chip"><i class="fas fa-chart-pie"></i> Beta-Binomial</span>
-      </div>
-    </div>
-    <div class="analogy-card">
-      <strong>🧠 Piénsalo así:</strong> La estadística bayesiana es como actualizar tu opinión al recibir nueva información. Si crees que tu amigo llega tarde el 30% de las veces (prior) y lo ves llegar temprano 5 veces seguidas (likelihood), tu nueva creencia (posterior) será más optimista.
-    </div>
-    <div class="main-area">
-      <div class="bayes-panel">
-        <h3><i class="fas fa-sliders-h"></i> Beta-Binomial: moneda bayesiana</h3>
-        <p style="font-size:0.85rem;color:#b9c8e6;margin-bottom:1rem">Ajusta tu creencia previa (prior) y lanza la moneda para ver cómo se actualiza el posterior.</p>
-        <div class="slider-group">
-          <label><span>🙂 Confianza previa (α prior)</span><span id="alphaLabel">2</span></label>
-          <input type="range" id="alphaSlider" min="1" max="20" value="2" step="1">
-        </div>
-        <div class="slider-group">
-          <label><span>🙃 Escepticismo previo (β prior)</span><span id="betaLabel">2</span></label>
-          <input type="range" id="betaSlider" min="1" max="20" value="2" step="1">
-        </div>
-        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1rem;justify-content:center">
-          <button class="btn-action" id="flipHeadBtn"><i class="fas fa-circle"></i> Cara</button>
-          <button class="btn-action" id="flipTailBtn"><i class="fas fa-record-vinyl"></i> Cruz</button>
-          <button class="btn-action" id="flip10Btn"><i class="fas fa-dice"></i> Lanzar 10</button>
-          <button class="btn-action" id="resetBayesBtn"><i class="fas fa-redo"></i> Reiniciar</button>
-        </div>
-        <div class="curve-viz">
-          <div class="curve-row">
-            <span class="curve-label">📊 Prior</span>
-            <div class="curve-bar-container"><div class="curve-bar prior" id="priorBar" style="width:50%"></div></div>
-          </div>
-          <div class="curve-row">
-            <span class="curve-label">📈 Likelihood</span>
-            <div class="curve-bar-container"><div class="curve-bar likelihood" id="likeBar" style="width:50%"></div></div>
-          </div>
-          <div class="curve-row">
-            <span class="curve-label">🎯 Posterior</span>
-            <div class="curve-bar-container"><div class="curve-bar posterior" id="postBar" style="width:50%"></div></div>
-          </div>
-        </div>
-        <div class="info-grid">
-          <div class="info-item"><div class="val" id="headsDisplay">0</div><div class="lbl">Caras</div></div>
-          <div class="info-item"><div class="val" id="tailsDisplay">0</div><div class="lbl">Cruces</div></div>
-          <div class="info-item"><div class="val" id="postMeanDisplay">0.500</div><div class="lbl">Media posterior</div></div>
-          <div class="info-item"><div class="val" id="credInterval">—</div><div class="lbl">IC 95% credible</div></div>
-          <div class="info-item"><div class="val" id="bfDisplay">—</div><div class="lbl">Bayes Factor (vs 0.5)</div></div>
-        </div>
-      </div>
-    </div>
-    <div id="feedbackMsg" class="feedback">
-      💡 Ajusta el prior con los sliders y lanza la moneda para ver cómo los datos actualizan tu creencia.
-    </div>
-    <div id="insigniaArea" class="insignia hidden">
-      <i class="fas fa-medal"></i>
-      <h3>🏅 Actualizador Bayesiano 🏅</h3>
-      <p>¡Has dominado la actualización bayesiana! Prior + Likelihood = Posterior. Todo es creencia actualizada.</p>
-    </div>
-    <div class="nav-links">
-      <a href="e2-no-parametricas.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
-      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
-      <a href="e4-potencia.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
-    </div>
-    <footer><i class="fas fa-crown"></i> Estadística Inferencial Interactiva · Modo Experto</footer>
+ <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+ <div class="container">
+  <div class="hero-header">
+   <h1>ðŸ§  MÃ©todos Bayesianos ðŸ§ </h1>
+   <p>Actualiza tus creencias con cada nuevo dato</p>
+   <div class="badge-area">
+    <span class="chip"><i class="fas fa-brain"></i> Prior â†’ Posterior</span>
+    <span class="chip"><i class="fas fa-sync-alt"></i> Conjugadas</span>
+    <span class="chip"><i class="fas fa-chart-pie"></i> Beta-Binomial</span>
+   </div>
   </div>
-  <script>
-    (function(){
-      const STORAGE_KEY='est_inf_e3';
-      let alphaPrior=2,betaPrior=2;
-      let heads=0,tails=0;
-      let completed=false;
+  <div class="analogy-card">
+   <strong>ðŸ§  PiÃ©nsalo asÃ­:</strong> La estadÃ­stica bayesiana es como actualizar tu opiniÃ³n al recibir nueva informaciÃ³n. Si crees que tu amigo llega tarde el 30% de las veces (prior) y lo ves llegar temprano 5 veces seguidas (likelihood), tu nueva creencia (posterior) serÃ¡ mÃ¡s optimista.
+  </div>
+  <div class="main-area">
+   <div class="bayes-panel">
+    <h3><i class="fas fa-sliders-h"></i> Beta-Binomial: moneda bayesiana</h3>
+    <p style="font-size:0.85rem;color:#b9c8e6;margin-bottom:1rem">Ajusta tu creencia previa (prior) y lanza la moneda para ver cÃ³mo se actualiza el posterior.</p>
+    <div class="slider-group">
+     <label><span>ðŸ™‚ Confianza previa (Î± prior)</span><span id="alphaLabel">2</span></label>
+     <input type="range" id="alphaSlider" min="1" max="20" value="2" step="1">
+    </div>
+    <div class="slider-group">
+     <label><span>ðŸ™ƒ Escepticismo previo (Î² prior)</span><span id="betaLabel">2</span></label>
+     <input type="range" id="betaSlider" min="1" max="20" value="2" step="1">
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1rem;justify-content:center">
+     <button class="btn-action" id="flipHeadBtn"><i class="fas fa-circle"></i> Cara</button>
+     <button class="btn-action" id="flipTailBtn"><i class="fas fa-record-vinyl"></i> Cruz</button>
+     <button class="btn-action" id="flip10Btn"><i class="fas fa-dice"></i> Lanzar 10</button>
+     <button class="btn-action" id="resetBayesBtn"><i class="fas fa-redo"></i> Reiniciar</button>
+    </div>
+    <div class="curve-viz">
+     <div class="curve-row">
+      <span class="curve-label">ðŸ“Š Prior</span>
+      <div class="curve-bar-container"><div class="curve-bar prior" id="priorBar" style="width:50%"></div></div>
+     </div>
+     <div class="curve-row">
+      <span class="curve-label">ðŸ“ˆ Likelihood</span>
+      <div class="curve-bar-container"><div class="curve-bar likelihood" id="likeBar" style="width:50%"></div></div>
+     </div>
+     <div class="curve-row">
+      <span class="curve-label">ðŸŽ¯ Posterior</span>
+      <div class="curve-bar-container"><div class="curve-bar posterior" id="postBar" style="width:50%"></div></div>
+     </div>
+    </div>
+    <div class="info-grid">
+     <div class="info-item"><div class="val" id="headsDisplay">0</div><div class="lbl">Caras</div></div>
+     <div class="info-item"><div class="val" id="tailsDisplay">0</div><div class="lbl">Cruces</div></div>
+     <div class="info-item"><div class="val" id="postMeanDisplay">0.500</div><div class="lbl">Media posterior</div></div>
+     <div class="info-item"><div class="val" id="credInterval">â€”</div><div class="lbl">IC 95% credible</div></div>
+     <div class="info-item"><div class="val" id="bfDisplay">â€”</div><div class="lbl">Bayes Factor (vs 0.5)</div></div>
+    </div>
+   </div>
+  </div>
+  <div id="feedbackMsg" class="feedback">
+   ðŸ’¡ Ajusta el prior con los sliders y lanza la moneda para ver cÃ³mo los datos actualizan tu creencia.
+  </div>
+  <div id="insigniaArea" class="insignia hidden">
+   <i class="fas fa-medal"></i>
+   <h3>ðŸ… Actualizador Bayesiano ðŸ…</h3>
+   <p>Â¡Has dominado la actualizaciÃ³n bayesiana! Prior + Likelihood = Posterior. Todo es creencia actualizada.</p>
+  </div>
+  <div class="nav-links">
+   <a href="e2-no-parametricas.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+   <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> MenÃº</a>
+   <a href="e4-potencia.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> EstadÃ­stica Inferencial Interactiva Â· Modo Experto</footer>
+ </div>
+ <script>
+  (function(){
+   const STORAGE_KEY='est_inf_e3';
+   let alphaPrior=2,betaPrior=2;
+   let heads=0,tails=0;
+   let completed=false;
 
-      const alphaSlider=document.getElementById('alphaSlider');
-      const betaSlider=document.getElementById('betaSlider');
-      const alphaLabel=document.getElementById('alphaLabel');
-      const betaLabel=document.getElementById('betaLabel');
-      const priorBar=document.getElementById('priorBar');
-      const likeBar=document.getElementById('likeBar');
-      const postBar=document.getElementById('postBar');
-      const headsDisplay=document.getElementById('headsDisplay');
-      const tailsDisplay=document.getElementById('tailsDisplay');
-      const postMeanDisplay=document.getElementById('postMeanDisplay');
-      const credInterval=document.getElementById('credInterval');
-      const bfDisplay=document.getElementById('bfDisplay');
-      const feedbackEl=document.getElementById('feedbackMsg');
-      const insigniaEl=document.getElementById('insigniaArea');
+   const alphaSlider=document.getElementById('alphaSlider');
+   const betaSlider=document.getElementById('betaSlider');
+   const alphaLabel=document.getElementById('alphaLabel');
+   const betaLabel=document.getElementById('betaLabel');
+   const priorBar=document.getElementById('priorBar');
+   const likeBar=document.getElementById('likeBar');
+   const postBar=document.getElementById('postBar');
+   const headsDisplay=document.getElementById('headsDisplay');
+   const tailsDisplay=document.getElementById('tailsDisplay');
+   const postMeanDisplay=document.getElementById('postMeanDisplay');
+   const credInterval=document.getElementById('credInterval');
+   const bfDisplay=document.getElementById('bfDisplay');
+   const feedbackEl=document.getElementById('feedbackMsg');
+   const insigniaEl=document.getElementById('insigniaArea');
 
-      function betaQuantile(p,alpha,beta){
-        let a=alpha,b=beta;
-        let x=a/(a+b);
-        for(let i=0;i<50;i++){
-          const B=function(aa,bb,xx){let s=0,c=1;for(let k=0;k<200;k++){s+=c/(aa+k);c*=xx*(bb+k)/(k+1)*(aa+bb+k)/(aa+k);if(c<1e-12)break;}return s*Math.pow(xx,aa)*Math.pow(1-xx,bb)/aa;};
-          const fx=B(a,b,x)-p;
-          if(Math.abs(fx)<1e-8)break;
-          const df=Math.pow(x,a-1)*Math.pow(1-x,b-1);
-          if(Math.abs(df)<1e-15)break;
-          x-=fx/df;
-          x=Math.max(1e-10,Math.min(1-1e-10,x));
-        }
-        return x;
-      }
+   function betaQuantile(p,alpha,beta){
+    let a=alpha,b=beta;
+    let x=a/(a+b);
+    for(let i=0;i<50;i++){
+     const B=function(aa,bb,xx){let s=0,c=1;for(let k=0;k<200;k++){s+=c/(aa+k);c*=xx*(bb+k)/(k+1)*(aa+bb+k)/(aa+k);if(c<1e-12)break;}return s*Math.pow(xx,aa)*Math.pow(1-xx,bb)/aa;};
+     const fx=B(a,b,x)-p;
+     if(Math.abs(fx)<1e-8)break;
+     const df=Math.pow(x,a-1)*Math.pow(1-x,b-1);
+     if(Math.abs(df)<1e-15)break;
+     x-=fx/df;
+     x=Math.max(1e-10,Math.min(1-1e-10,x));
+    }
+    return x;
+   }
 
-      function updateAll(){
-        const a=alphaPrior+heads;
-        const b=betaPrior+tails;
-        const postMean=a/(a+b);
-        const postMode=Math.max(0,(a-1)/(a+b-2));
-        const postVar=a*b/((a+b)*(a+b)*(a+b+1));
-        const postSD=Math.sqrt(postVar);
+   function updateAll(){
+    const a=alphaPrior+heads;
+    const b=betaPrior+tails;
+    const postMean=a/(a+b);
+    const postMode=Math.max(0,(a-1)/(a+b-2));
+    const postVar=a*b/((a+b)*(a+b)*(a+b+1));
+    const postSD=Math.sqrt(postVar);
 
-        const priorStrength=alphaPrior+betaPrior;
-        const priorMean=alphaPrior/priorStrength;
-        priorBar.style.width=(priorMean*100)+'%';
-        priorBar.title='Prior Beta('+alphaPrior+','+betaPrior+') media='+priorMean.toFixed(3);
+    const priorStrength=alphaPrior+betaPrior;
+    const priorMean=alphaPrior/priorStrength;
+    priorBar.style.width=(priorMean*100)+'%';
+    priorBar.title='Prior Beta('+alphaPrior+','+betaPrior+') media='+priorMean.toFixed(3);
 
-        const nTotal=heads+tails;
-        const likeProp=nTotal>0?heads/nTotal:0.5;
-        likeBar.style.width=(likeProp*100)+'%';
-        likeBar.title='Likelihood: '+heads+'/'+nTotal+'='+likeProp.toFixed(3);
+    const nTotal=heads+tails;
+    const likeProp=nTotal>0?heads/nTotal:0.5;
+    likeBar.style.width=(likeProp*100)+'%';
+    likeBar.title='Likelihood: '+heads+'/'+nTotal+'='+likeProp.toFixed(3);
 
-        postBar.style.width=(postMean*100)+'%';
-        postBar.title='Posterior Beta('+a+','+b+') media='+postMean.toFixed(3);
+    postBar.style.width=(postMean*100)+'%';
+    postBar.title='Posterior Beta('+a+','+b+') media='+postMean.toFixed(3);
 
-        headsDisplay.textContent=heads;
-        tailsDisplay.textContent=tails;
-        postMeanDisplay.textContent=postMean.toFixed(4);
+    headsDisplay.textContent=heads;
+    tailsDisplay.textContent=tails;
+    postMeanDisplay.textContent=postMean.toFixed(4);
 
-        if(a>1&&b>1){
-          const lo=betaQuantile(0.025,a,b);
-          const hi=betaQuantile(0.975,a,b);
-          credInterval.textContent='['+lo.toFixed(4)+', '+hi.toFixed(4)+']';
+    if(a>1&&b>1){
+     const lo=betaQuantile(0.025,a,b);
+     const hi=betaQuantile(0.975,a,b);
+     credInterval.textContent='['+lo.toFixed(4)+', '+hi.toFixed(4)+']';
 
-          const logBF=heads*Math.log(postMean/0.5)+tails*Math.log((1-postMean)/0.5);
-          const BF=Math.exp(logBF);
-          bfDisplay.textContent=BF>100?'>100':BF<0.01?'<0.01':BF.toFixed(2);
-        }else{
-          credInterval.textContent='Necesitas más datos';
-          bfDisplay.textContent='—';
-        }
+     const logBF=heads*Math.log(postMean/0.5)+tails*Math.log((1-postMean)/0.5);
+     const BF=Math.exp(logBF);
+     bfDisplay.textContent=BF>100?'>100':BF<0.01?'<0.01':BF.toFixed(2);
+    }else{
+     credInterval.textContent='Necesitas mÃ¡s datos';
+     bfDisplay.textContent='â€”';
+    }
 
-        if(heads+tails>=10&&!completed){
-          completed=true;
-          localStorage.setItem(STORAGE_KEY,'completed');
-          insigniaEl.classList.remove('hidden');
-          feedbackEl.innerHTML=I18N.t('fb_0');
-        }
-      }
+    if(heads+tails>=10&&!completed){
+     completed=true;
+     localStorage.setItem(STORAGE_KEY,'completed');
+     insigniaEl.classList.remove('hidden');
+     feedbackEl.innerHTML=I18N.t('fb_0');
+    }
+   }
 
-      function handleFlip(result){
-        if(result==='H')heads++;
-        else tails++;
-        updateAll();
-        feedbackEl.innerHTML=I18N.t('fb_1')+(result==='H'?'Cara':'Cruz')+'</strong>. Observa cómo el posterior se actualiza.';
-      }
+   function handleFlip(result){
+    if(result==='H')heads++;
+    else tails++;
+    updateAll();
+    feedbackEl.innerHTML=I18N.t('fb_1')+(result==='H'?'Cara':'Cruz')+'</strong>. Observa cÃ³mo el posterior se actualiza.';
+   }
 
-      function flip10(){
-        for(let i=0;i<10;i++){Math.random()<0.5?heads++:tails++;}
-        updateAll();
-        feedbackEl.innerHTML=I18N.t('fb_2');
-      }
+   function flip10(){
+    for(let i=0;i<10;i++){Math.random()<0.5?heads++:tails++;}
+    updateAll();
+    feedbackEl.innerHTML=I18N.t('fb_2');
+   }
 
-      function resetBayes(){
-        heads=0;tails=0;completed=false;
-        localStorage.removeItem(STORAGE_KEY);
-        insigniaEl.classList.add('hidden');
-        alphaPrior=parseInt(alphaSlider.value);
-        betaPrior=parseInt(betaSlider.value);
-        updateAll();
-        feedbackEl.innerHTML=I18N.t('fb_3');
-      }
+   function resetBayes(){
+    heads=0;tails=0;completed=false;
+    localStorage.removeItem(STORAGE_KEY);
+    insigniaEl.classList.add('hidden');
+    alphaPrior=parseInt(alphaSlider.value);
+    betaPrior=parseInt(betaSlider.value);
+    updateAll();
+    feedbackEl.innerHTML=I18N.t('fb_3');
+   }
 
-      alphaSlider.addEventListener('input',function(){
-        alphaLabel.textContent=this.value;
-        alphaPrior=parseInt(this.value);
-        if(heads===0&&tails===0)updateAll();
-      });
-      betaSlider.addEventListener('input',function(){
-        betaLabel.textContent=this.value;
-        betaPrior=parseInt(this.value);
-        if(heads===0&&tails===0)updateAll();
-      });
+   alphaSlider.addEventListener('input',function(){
+    alphaLabel.textContent=this.value;
+    alphaPrior=parseInt(this.value);
+    if(heads===0&&tails===0)updateAll();
+   });
+   betaSlider.addEventListener('input',function(){
+    betaLabel.textContent=this.value;
+    betaPrior=parseInt(this.value);
+    if(heads===0&&tails===0)updateAll();
+   });
 
-      document.getElementById('flipHeadBtn').addEventListener('click',()=>handleFlip('H'));
-      document.getElementById('flipTailBtn').addEventListener('click',()=>handleFlip('T'));
-      document.getElementById('flip10Btn').addEventListener('click',flip10);
-      document.getElementById('resetBayesBtn').addEventListener('click',resetBayes);
+   document.getElementById('flipHeadBtn').addEventListener('click',()=>handleFlip('H'));
+   document.getElementById('flipTailBtn').addEventListener('click',()=>handleFlip('T'));
+   document.getElementById('flip10Btn').addEventListener('click',flip10);
+   document.getElementById('resetBayesBtn').addEventListener('click',resetBayes);
 
-      if(localStorage.getItem(STORAGE_KEY)==='completed'){
-        completed=true;
-        heads=7;tails=3;
-        updateAll();
-        insigniaEl.classList.remove('hidden');
-        feedbackEl.innerHTML=I18N.t('fb_4');
-      }else{
-        updateAll();
-      }
-    })();
-  </script>
+   if(localStorage.getItem(STORAGE_KEY)==='completed'){
+    completed=true;
+    heads=7;tails=3;
+    updateAll();
+    insigniaEl.classList.remove('hidden');
+    feedbackEl.innerHTML=I18N.t('fb_4');
+   }else{
+    updateAll();
+   }
+  })();
+ </script>
 
 <script>
 window.I18N_DATA={
-  'fb_0': { es: '🎉 ¡Increíble! Has visto cómo el prior se actualiza con los datos. El posterior siempre es un balance entre tu creencia inicial y la evidencia.', en: '🎉 ¡Increíble! Has visto cómo el prior se actualiza con los datos. El posterior siempre es un balance entre tu creencia inicial y la evidencia.' },
-  'fb_1': { es: '✅ Lanzaste <strong>', en: '✅ Lanzaste <strong>' },
-  'fb_2': { es: '🎲 10 lanzamientos completados. El posterior ahora refleja más datos.', en: '🎲 10 lanzamientos completados. El posterior ahora refleja más datos.' },
-  'fb_3': { es: '💡 Todo reiniciado. Ajusta los sliders del prior y lanza la moneda.', en: '💡 Todo reiniciado. Ajusta los sliders del prior y lanza la moneda.' },
-  'fb_4': { es: '🎉 ¡Bienvenido de vuelta! Ya completaste este módulo.', en: '🎉 ¡Bienvenido de vuelta! Ya completaste este módulo.' }
+ 'fb_0': { es: 'ðŸŽ‰ Â¡IncreÃ­ble! Has visto cÃ³mo el prior se actualiza con los datos. El posterior siempre es un balance entre tu creencia inicial y la evidencia.', en: 'ðŸŽ‰ Â¡IncreÃ­ble! Has visto cÃ³mo el prior se actualiza con los datos. El posterior siempre es un balance entre tu creencia inicial y la evidencia.' },
+ 'fb_1': { es: 'âœ… Lanzaste <strong>', en: 'âœ… Lanzaste <strong>' },
+ 'fb_2': { es: 'ðŸŽ² 10 lanzamientos completados. El posterior ahora refleja mÃ¡s datos.', en: 'ðŸŽ² 10 lanzamientos completados. El posterior ahora refleja mÃ¡s datos.' },
+ 'fb_3': { es: 'ðŸ’¡ Todo reiniciado. Ajusta los sliders del prior y lanza la moneda.', en: 'ðŸ’¡ Todo reiniciado. Ajusta los sliders del prior y lanza la moneda.' },
+ 'fb_4': { es: 'ðŸŽ‰ Â¡Bienvenido de vuelta! Ya completaste este mÃ³dulo.', en: 'ðŸŽ‰ Â¡Bienvenido de vuelta! Ya completaste este mÃ³dulo.' }
 };
 </script>
-</body>
+ </body>
 </html>

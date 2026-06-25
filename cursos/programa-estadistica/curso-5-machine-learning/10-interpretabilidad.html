@@ -1,214 +1,213 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>ML Estadístico | 🔍 Interpretabilidad (SHAP, LIME)</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { background:linear-gradient(135deg,#0a0f1e,#0c1222 50%,#111a2e); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
-    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-    .course-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,80,80,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
-    .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #ff5050; }
-    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#ff8080,#ff5050); -webkit-background-clip:text; background-clip:text; color:transparent; }
-    .hero-header p { font-size:1.1rem; color:#ffb0b0; margin-top:0.5rem; font-weight:500; }
-    .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
-    .chip { background:rgba(255,80,80,0.15); border:1px solid #ff5050; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
-    .progress-section { padding:1.2rem 2rem; border-bottom:1px solid #1a2a4a; }
-    .progress-bar-outer { background:#1a2a4a; border-radius:20px; height:16px; overflow:hidden; }
-    .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#ff5050,#cc2020); border-radius:20px; transition:width 0.5s ease; }
-    .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
-    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ff5050; font-size:1rem; line-height:1.6; }
-    .main-area { padding:1.5rem 2rem; }
-    .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#ff5050; }
-    .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
-    .info-panel { background:rgba(10,20,40,0.7); border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
-    .info-panel h3 { color:#ff8080; font-size:1rem; margin-bottom:0.5rem; }
-    .info-panel p { font-size:0.85rem; color:#b9ccee; line-height:1.6; }
-    .sim-area { background:rgba(0,10,25,0.5); border-radius:2rem; padding:1.5rem; margin-bottom:1.5rem; border:1px solid #2c3e66; }
-    .sim-area h3 { color:#ff5050; margin-bottom:1rem; }
-    .quiz-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #ff5050; margin-bottom:1.5rem; }
-    .quiz-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#ff5050; }
-    .question { background:#0f1a2c; margin:0.8rem 0; padding:0.8rem 1rem; border-radius:1.2rem; }
-    .question p { font-weight:600; margin-bottom:0.5rem; font-size:0.95rem; }
-    .options { display:flex; flex-wrap:wrap; gap:0.6rem; }
-    .opt { background:#1e2a3e; padding:0.3rem 0.9rem; border-radius:2rem; cursor:pointer; transition:0.2s; font-size:0.85rem; }
-    .opt:hover { background:#2c3e66; transform:translateY(-2px); }
-    .opt.selected { background:#ff5050; color:#fff; font-weight:bold; box-shadow:0 0 8px #ff5050; }
-    .opt.correct { background:#00cc88; color:#000; }
-    .opt.wrong { background:#ff4455; color:#fff; }
-    .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #ff5050; }
-    .btn-action { background:linear-gradient(95deg,#ff5050,#cc2020); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#fff; margin-top:1rem; }
-    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(255,80,80,0.5); }
-    .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
-    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin-top:1.5rem; padding:1rem; border:1px dashed gold; }
-    .insignia i { font-size:2.5rem; color:gold; }
-    .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
-    .hidden { display:none; }
-    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
-    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
-    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(255,80,80,0.4); }
-    .nav-link.next { background:linear-gradient(95deg,#ff5050,#cc2020); color:#fff; }
-    .nav-link.menu { background:#1a2a4a; border:1px solid #ff5050; }
-    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
-    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .info-grid { grid-template-columns:1fr; } }
-  </style>
-  <link rel="stylesheet" href="../../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>ML Estadístico | 🔍 Interpretabilidad (SHAP, LIME)</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:linear-gradient(135deg,#0a0f1e,#0c1222 50%,#111a2e); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+  @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .course-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,80,80,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+  .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #ff5050; }
+  .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#ff8080,#ff5050); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero-header p { font-size:1.1rem; color:#ffb0b0; margin-top:0.5rem; font-weight:500; }
+  .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+  .chip { background:rgba(255,80,80,0.15); border:1px solid #ff5050; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+  .progress-section { padding:1.2rem 2rem; border-bottom:1px solid #1a2a4a; }
+  .progress-bar-outer { background:#1a2a4a; border-radius:20px; height:16px; overflow:hidden; }
+  .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#ff5050,#cc2020); border-radius:20px; transition:width 0.5s ease; }
+  .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
+  .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ff5050; font-size:1rem; line-height:1.6; }
+  .main-area { padding:1.5rem 2rem; }
+  .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#ff5050; }
+  .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
+  .info-panel { background:rgba(10,20,40,0.7); border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
+  .info-panel h3 { color:#ff8080; font-size:1rem; margin-bottom:0.5rem; }
+  .info-panel p { font-size:0.85rem; color:#b9ccee; line-height:1.6; }
+  .sim-area { background:rgba(0,10,25,0.5); border-radius:2rem; padding:1.5rem; margin-bottom:1.5rem; border:1px solid #2c3e66; }
+  .sim-area h3 { color:#ff5050; margin-bottom:1rem; }
+  .quiz-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #ff5050; margin-bottom:1.5rem; }
+  .quiz-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#ff5050; }
+  .question { background:#0f1a2c; margin:0.8rem 0; padding:0.8rem 1rem; border-radius:1.2rem; }
+  .question p { font-weight:600; margin-bottom:0.5rem; font-size:0.95rem; }
+  .options { display:flex; flex-wrap:wrap; gap:0.6rem; }
+  .opt { background:#1e2a3e; padding:0.3rem 0.9rem; border-radius:2rem; cursor:pointer; transition:0.2s; font-size:0.85rem; }
+  .opt:hover { background:#2c3e66; transform:translateY(-2px); }
+  .opt.selected { background:#ff5050; color:#fff; font-weight:bold; box-shadow:0 0 8px #ff5050; }
+  .opt.correct { background:#00cc88; color:#000; }
+  .opt.wrong { background:#ff4455; color:#fff; }
+  .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #ff5050; }
+  .btn-action { background:linear-gradient(95deg,#ff5050,#cc2020); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#fff; margin-top:1rem; }
+  .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(255,80,80,0.5); }
+  .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
+  .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin-top:1.5rem; padding:1rem; border:1px dashed gold; }
+  .insignia i { font-size:2.5rem; color:gold; }
+  .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
+  .hidden { display:none; }
+  .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+  .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+  .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(255,80,80,0.4); }
+  .nav-link.next { background:linear-gradient(95deg,#ff5050,#cc2020); color:#fff; }
+  .nav-link.menu { background:#1a2a4a; border:1px solid #ff5050; }
+  footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .info-grid { grid-template-columns:1fr; } }
+ </style>
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
 </head>
 <body>
-  <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Estadística</a></nav>
-  <div class="course-container" id="app">
-    <div class="hero-header">
-      <h1>🔍 Interpretabilidad (SHAP, LIME)</h1>
-      <p>Entiende por qué tu modelo hace cada predicción</p>
-      <div class="badge-area">
-        <span class="chip"><i class="fas fa-shield-alt"></i> SHAP</span>
-        <span class="chip"><i class="fas fa-search"></i> LIME</span>
-        <span class="chip"><i class="fas fa-chart-bar"></i> PDP</span>
-      </div>
-    </div>
-    <div class="progress-section">
-      <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
-      <span class="progress-text" id="progressText">Módulo 10 de 12</span>
-    </div>
-    <div class="analogy-card">
-      <strong>💡 Piénsalo así:</strong> SHAP y LIME son como un juez que explica su veredicto. No solo dice "culpable", sino que detalla: "la huella digital aportó +60%, la coartada -30%, el móvil +20%, la oportunidad +10%". Así sabemos qué influyó en cada decisión.
-    </div>
-    <div class="main-area">
-      <div class="section-title"><i class="fas fa-shield-alt"></i> Técnicas de Interpretabilidad</div>
-      <div class="info-grid">
-        <div class="info-panel"><h3>🎯 SHAP (SHapley Additive exPlanations)</h3><p>Basado en teoría de juegos. Calcula la contribución marginal de cada feature promediando sobre todas las posibles coaliciones. Produce valores SHAP consistentes y con base matemática sólida. La librería shap es la más usada.</p></div>
-        <div class="info-panel"><h3>🔎 LIME</h3><p>Local Interpretable Model-agnostic Explanations. Aproxima el modelo global con un modelo simple (lineal) alrededor de una predicción específica. Es más rápido que SHAP pero menos estable. Bueno para explicaciones rápidas.</p></div>
-        <div class="info-panel"><h3>📈 PDP (Partial Dependence Plot)</h3><p>Muestra cómo cambia la predicción promedio al variar un feature mientras los demás se mantienen constantes. Ideal para entender relaciones marginales. Complemento: ICE plots muestran predicciones individuales.</p></div>
-        <div class="info-panel"><h3>🔄 Importancia Permutacional</h3><p>Mide cuánto empeora el modelo al permutar aleatoriamente los valores de un feature. Si la permutación afecta mucho, el feature es importante. Es model-agnostic y rápida de calcular con sklearn.inspection.</p></div>
-      </div>
-      <div class="sim-area">
-        <h3><i class="fas fa-cogs"></i> Simulador: SHAP para una Predicción</h3>
-        <p style="color:#b9ccee;margin-bottom:0.8rem;">Predicción: riesgo crediticio ALTO. SHAP descompone la decisión.</p>
-        <div style="text-align:center;">
-          <button class="btn-action" onclick="runSHAP()" style="font-size:0.9rem;">📊 Calcular SHAP</button>
-        </div>
-        <div id="shapResult" style="margin-top:1rem;text-align:center;font-size:0.9rem;color:#b9ccee;">Haz clic para ver valores SHAP.</div>
-      </div>
-      <div class="quiz-area">
-        <div class="quiz-title"><i class="fas fa-question-circle"></i> Mini Quiz: Interpretabilidad</div>
-        <div id="quizContainer"></div>
-        <button id="submitQuizBtn" class="btn-action">✅ Verificar respuestas</button>
-        <div id="insigniaArea" class="insignia hidden">
-          <i class="fas fa-medal"></i>
-          <h3>🏅 Intérprete de Modelos 🏅</h3>
-          <p>Sabes cómo explicar las decisiones de modelos complejos.</p>
-        </div>
-      </div>
-    </div>
-    <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre SHAP y LIME.</div>
-    <div class="nav-links">
-      <a href="09-datos-desbalanceados.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
-      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
-      <a href="11-pipelines-automl.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
-    </div>
-    <footer><i class="fas fa-brain"></i> Curso 5: Machine Learning Estadístico · 12 módulos interactivos</footer>
+ <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Estadística</a></nav>
+ <div class="course-container" id="app">
+  <div class="hero-header">
+   <h1>🔍 Interpretabilidad (SHAP, LIME)</h1>
+   <p>Entiende por qué tu modelo hace cada predicción</p>
+   <div class="badge-area">
+    <span class="chip"><i class="fas fa-shield-alt"></i> SHAP</span>
+    <span class="chip"><i class="fas fa-search"></i> LIME</span>
+    <span class="chip"><i class="fas fa-chart-bar"></i> PDP</span>
+   </div>
   </div>
-  <script>
-    const STORAGE_KEY = 'prog_est_5_10';
-    const PROGRESS_KEY = 'prog_est_5_progress';
-    const questions = [
-      { text: "¿En qué se basa SHAP?", options: ["Teoría de juegos","Árboles de decisión","Redes bayesianas","Cadenas de Markov"], correct: 0 },
-      { text: "¿Qué hace LIME?", options: ["Explica globalmente","Aproxima modelo localmente","Calcula importancia global","Reduce dimensiones"], correct: 1 },
-      { text: "¿Qué tipo de gráfico muestra el efecto marginal de un feature?", options: ["SHAP summary","PDP","LIME plot","Confusion matrix"], correct: 1 },
-      { text: "¿La importancia permutacional es...?", options: ["Model-specific","Model-agnostic","Solo para árboles","Solo para redes"], correct: 1 },
-      { text: "¿Qué ventaja tiene SHAP sobre LIME?", options: ["Más rápido","Más estable y consistente","No requiere datos","Visualmente mejor"], correct: 1 },
-      { text: "¿Qué librería implementa valores SHAP?", options: ["lime","shap","interpret","eli5"], correct: 1 }
-    ];
-    let userAnswers = new Array(questions.length).fill(null);
-    let quizCompleted = false;
-    function runSHAP() {
-      const features = [
-        { name: 'Ingresos', val: 15000, shap: '+0.45', color: '#ff5050' },
-        { name: 'Deuda/Ingreso', val: '68%', shap: '+0.32', color: '#ff5050' },
-        { name: 'Historial', val: 'Bueno', shap: '-0.18', color: '#00cc88' },
-        { name: 'Edad', val: 28, shap: '+0.12', color: '#ff5050' },
-        { name: 'Garantía', val: 'No', shap: '+0.08', color: '#ff5050' }
-      ];
-      let html = '<div style="display:flex;flex-direction:column;gap:0.4rem;">';
-      features.forEach(f => {
-        html += '<div style="display:flex;justify-content:space-between;background:#1a2a4a;padding:0.3rem 0.8rem;border-radius:0.8rem;font-size:0.85rem;">'+
-          '<span>'+f.name+': '+f.val+'</span>'+
-          '<span style="color:'+f.color+';font-weight:700;">SHAP: '+f.shap+'</span></div>';
-      });
-      html += '<p style="margin-top:0.5rem;color:#ff5050;font-weight:700;">Predicción base: -0.10 | Suma SHAP: +0.79 → Riesgo ALTO</p></div>';
-      document.getElementById('shapResult').innerHTML = html;
-    }
-    function saveProgress() {
-      let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
-      if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
-      localStorage.setItem(STORAGE_KEY, 'true');
-    }
-    function updateProgress() {
-      let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
-      document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
-      document.getElementById('progressText').textContent = 'M\u00f3dulo '+(p.length || 1)+' de 12';
-    }
-    function renderQuestions() {
-      const container = document.getElementById('quizContainer');
-      container.innerHTML = '';
-      questions.forEach((q, idx) => {
-        const qDiv = document.createElement('div'); qDiv.classList.add('question');
-        qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
-        const optsDiv = qDiv.querySelector('.options');
-        q.options.forEach((opt, optIdx) => {
-          const span = document.createElement('div'); span.classList.add('opt');
-          span.textContent = opt; span.dataset.qIdx = idx; span.dataset.optIdx = optIdx;
-          span.addEventListener('click', function() {
-            if (quizCompleted) return;
-            this.parentElement.querySelectorAll('.opt').forEach(c => c.classList.remove('selected'));
-            this.classList.add('selected'); userAnswers[idx] = optIdx; updateBtnState();
-          });
-          optsDiv.appendChild(span);
-        });
-        container.appendChild(qDiv);
-      });
-    }
-    function updateBtnState() {
-      document.getElementById('submitQuizBtn').disabled = userAnswers.some(a => a === null) || quizCompleted;
-    }
-    function handleSubmit() {
+  <div class="progress-section">
+   <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+   <span class="progress-text" id="progressText">Módulo 10 de 12</span>
+  </div>
+  <div class="analogy-card">
+   <strong>💡 Piénsalo así:</strong> SHAP y LIME son como un juez que explica su veredicto. No solo dice "culpable", sino que detalla: "la huella digital aportó +60%, la coartada -30%, el móvil +20%, la oportunidad +10%". Así sabemos qué influyó en cada decisión.
+  </div>
+  <div class="main-area">
+   <div class="section-title"><i class="fas fa-shield-alt"></i> Técnicas de Interpretabilidad</div>
+   <div class="info-grid">
+    <div class="info-panel"><h3>🎯 SHAP (SHapley Additive exPlanations)</h3><p>Basado en teoría de juegos. Calcula la contribución marginal de cada feature promediando sobre todas las posibles coaliciones. Produce valores SHAP consistentes y con base matemática sólida. La librería shap es la más usada.</p></div>
+    <div class="info-panel"><h3>🔎 LIME</h3><p>Local Interpretable Model-agnostic Explanations. Aproxima el modelo global con un modelo simple (lineal) alrededor de una predicción específica. Es más rápido que SHAP pero menos estable. Bueno para explicaciones rápidas.</p></div>
+    <div class="info-panel"><h3>📈 PDP (Partial Dependence Plot)</h3><p>Muestra cómo cambia la predicción promedio al variar un feature mientras los demás se mantienen constantes. Ideal para entender relaciones marginales. Complemento: ICE plots muestran predicciones individuales.</p></div>
+    <div class="info-panel"><h3>🔄 Importancia Permutacional</h3><p>Mide cuánto empeora el modelo al permutar aleatoriamente los valores de un feature. Si la permutación afecta mucho, el feature es importante. Es model-agnostic y rápida de calcular con sklearn.inspection.</p></div>
+   </div>
+   <div class="sim-area">
+    <h3><i class="fas fa-cogs"></i> Simulador: SHAP para una Predicción</h3>
+    <p style="color:#b9ccee;margin-bottom:0.8rem;">Predicción: riesgo crediticio ALTO. SHAP descompone la decisión.</p>
+    <div style="text-align:center;">
+     <button class="btn-action" onclick="runSHAP()" style="font-size:0.9rem;">📊 Calcular SHAP</button>
+    </div>
+    <div id="shapResult" style="margin-top:1rem;text-align:center;font-size:0.9rem;color:#b9ccee;">Haz clic para ver valores SHAP.</div>
+   </div>
+   <div class="quiz-area">
+    <div class="quiz-title"><i class="fas fa-question-circle"></i> Mini Quiz: Interpretabilidad</div>
+    <div id="quizContainer"></div>
+    <button id="submitQuizBtn" class="btn-action">✅ Verificar respuestas</button>
+    <div id="insigniaArea" class="insignia hidden">
+     <i class="fas fa-medal"></i>
+     <h3>🏅 Intérprete de Modelos 🏅</h3>
+     <p>Sabes cómo explicar las decisiones de modelos complejos.</p>
+    </div>
+   </div>
+  </div>
+  <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre SHAP y LIME.</div>
+  <div class="nav-links">
+   <a href="09-datos-desbalanceados.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
+   <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+   <a href="11-pipelines-automl.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-brain"></i> Curso 5: Machine Learning Estadístico · 12 módulos interactivos</footer>
+ </div>
+ <script>
+  const STORAGE_KEY = 'prog_est_5_10';
+  const PROGRESS_KEY = 'prog_est_5_progress';
+  const questions = [
+   { text: "¿En qué se basa SHAP?", options: ["Teoría de juegos","Árboles de decisión","Redes bayesianas","Cadenas de Markov"], correct: 0 },
+   { text: "¿Qué hace LIME?", options: ["Explica globalmente","Aproxima modelo localmente","Calcula importancia global","Reduce dimensiones"], correct: 1 },
+   { text: "¿Qué tipo de gráfico muestra el efecto marginal de un feature?", options: ["SHAP summary","PDP","LIME plot","Confusion matrix"], correct: 1 },
+   { text: "¿La importancia permutacional es...?", options: ["Model-specific","Model-agnostic","Solo para árboles","Solo para redes"], correct: 1 },
+   { text: "¿Qué ventaja tiene SHAP sobre LIME?", options: ["Más rápido","Más estable y consistente","No requiere datos","Visualmente mejor"], correct: 1 },
+   { text: "¿Qué librería implementa valores SHAP?", options: ["lime","shap","interpret","eli5"], correct: 1 }
+  ];
+  let userAnswers = new Array(questions.length).fill(null);
+  let quizCompleted = false;
+  function runSHAP() {
+   const features = [
+    { name: 'Ingresos', val: 15000, shap: '+0.45', color: '#ff5050' },
+    { name: 'Deuda/Ingreso', val: '68%', shap: '+0.32', color: '#ff5050' },
+    { name: 'Historial', val: 'Bueno', shap: '-0.18', color: '#00cc88' },
+    { name: 'Edad', val: 28, shap: '+0.12', color: '#ff5050' },
+    { name: 'Garantía', val: 'No', shap: '+0.08', color: '#ff5050' }
+   ];
+   let html = '<div style="display:flex;flex-direction:column;gap:0.4rem;">';
+   features.forEach(f => {
+    html += '<div style="display:flex;justify-content:space-between;background:#1a2a4a;padding:0.3rem 0.8rem;border-radius:0.8rem;font-size:0.85rem;">'+
+     '<span>'+f.name+': '+f.val+'</span>'+
+     '<span style="color:'+f.color+';font-weight:700;">SHAP: '+f.shap+'</span></div>';
+   });
+   html += '<p style="margin-top:0.5rem;color:#ff5050;font-weight:700;">Predicción base: -0.10 | Suma SHAP: +0.79 → Riesgo ALTO</p></div>';
+   document.getElementById('shapResult').innerHTML = html;
+  }
+  function saveProgress() {
+   let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
+   localStorage.setItem(STORAGE_KEY, 'true');
+  }
+  function updateProgress() {
+   let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
+   document.getElementById('progressText').textContent = 'M\u00f3dulo '+(p.length || 1)+' de 12';
+  }
+  function renderQuestions() {
+   const container = document.getElementById('quizContainer');
+   container.innerHTML = '';
+   questions.forEach((q, idx) => {
+    const qDiv = document.createElement('div'); qDiv.classList.add('question');
+    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
+    const optsDiv = qDiv.querySelector('.options');
+    q.options.forEach((opt, optIdx) => {
+     const span = document.createElement('div'); span.classList.add('opt');
+     span.textContent = opt; span.dataset.qIdx = idx; span.dataset.optIdx = optIdx;
+     span.addEventListener('click', function() {
       if (quizCompleted) return;
-      if (userAnswers.some(a => a === null)) { document.getElementById('feedbackMsg').textContent = '\u26a0\ufe0f Responde todas las preguntas primero.'; return; }
-      let correct = 0;
-      questions.forEach((q, i) => { if (userAnswers[i] === q.correct) correct++; });
-      const total = questions.length; const passed = correct >= Math.ceil(total * 0.6);
-      document.querySelectorAll('.question').forEach((qDiv, idx) => {
-        const opts = qDiv.querySelectorAll('.opt');
-        opts.forEach((o, oi) => {
-          o.classList.remove('selected');
-          if (oi === questions[idx].correct) o.classList.add('correct');
-          else if (oi === userAnswers[idx]) o.classList.add('wrong');
-        });
-      });
-      if (passed) {
-        quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
-        document.getElementById('insigniaArea').classList.remove('hidden');
-        document.getElementById('feedbackMsg').textContent = '\ud83c\udf89 \u00a1Excelente! Dominas interpretabilidad.';
-        saveProgress(); updateProgress();
-      } else {
-        document.getElementById('feedbackMsg').textContent = '\u274c '+correct+'/'+total+' correctas. Necesitas al menos '+Math.ceil(total*0.6)+'. \u00a1Reintenta!';
-      }
-    }
-    function restoreProgress() {
-      const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
-      if (p.includes(STORAGE_KEY)) {
-        quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
-        document.getElementById('insigniaArea').classList.remove('hidden');
-        document.getElementById('feedbackMsg').textContent = '\ud83c\udfc6 Ya completaste este m\u00f3dulo.';
-        document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
-      }
-    }
-    document.getElementById('submitQuizBtn').addEventListener('click', handleSubmit);
-    renderQuestions(); updateBtnState(); restoreProgress(); updateProgress();
-  </script>
-  <script src="../../../assets/js/cookie-consent.js"></script>
-<script src="../../../assets/js/i18n.js"></script>  </body>
+      this.parentElement.querySelectorAll('.opt').forEach(c => c.classList.remove('selected'));
+      this.classList.add('selected'); userAnswers[idx] = optIdx; updateBtnState();
+     });
+     optsDiv.appendChild(span);
+    });
+    container.appendChild(qDiv);
+   });
+  }
+  function updateBtnState() {
+   document.getElementById('submitQuizBtn').disabled = userAnswers.some(a => a === null) || quizCompleted;
+  }
+  function handleSubmit() {
+   if (quizCompleted) return;
+   if (userAnswers.some(a => a === null)) { document.getElementById('feedbackMsg').textContent = '\u26a0\ufe0f Responde todas las preguntas primero.'; return; }
+   let correct = 0;
+   questions.forEach((q, i) => { if (userAnswers[i] === q.correct) correct++; });
+   const total = questions.length; const passed = correct >= Math.ceil(total * 0.6);
+   document.querySelectorAll('.question').forEach((qDiv, idx) => {
+    const opts = qDiv.querySelectorAll('.opt');
+    opts.forEach((o, oi) => {
+     o.classList.remove('selected');
+     if (oi === questions[idx].correct) o.classList.add('correct');
+     else if (oi === userAnswers[idx]) o.classList.add('wrong');
+    });
+   });
+   if (passed) {
+    quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').textContent = '\ud83c\udf89 \u00a1Excelente! Dominas interpretabilidad.';
+    saveProgress(); updateProgress();
+   } else {
+    document.getElementById('feedbackMsg').textContent = '\u274c '+correct+'/'+total+' correctas. Necesitas al menos '+Math.ceil(total*0.6)+'. \u00a1Reintenta!';
+   }
+  }
+  function restoreProgress() {
+   const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   if (p.includes(STORAGE_KEY)) {
+    quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').textContent = '\ud83c\udfc6 Ya completaste este m\u00f3dulo.';
+    document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
+   }
+  }
+  document.getElementById('submitQuizBtn').addEventListener('click', handleSubmit);
+  renderQuestions(); updateBtnState(); restoreProgress(); updateProgress();
+ </script>
+ <script src="../../../assets/js/i18n.js"></script> </body>
 </html>

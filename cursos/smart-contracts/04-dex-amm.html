@@ -1,993 +1,992 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DEX y AMM · Smart Contracts DeFi</title>
-  <meta property="og:title" content="DEX y AMM · Smart Contracts DeFi">
-  <meta property="og:description" content="Construye un Exchange Descentralizado con Automated Market Maker. Implementación de pools de liquidez y swaps en Solidity.">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="Israel Romero Portfolio">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="DEX y AMM · Smart Contracts DeFi">
-  <meta name="twitter:description" content="Construye un Exchange Descentralizado con Automated Market Maker. Implementación de pools de liquidez y swaps en Solidity.">
-  <link rel="stylesheet" href="../../assets/css/theme.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Press+Start+2P&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <style>
-    :root {
-      --accent: #9c64ff;
-      --accent-dim: rgba(156, 100, 255, 0.15);
-      --accent-glow: rgba(156, 100, 255, 0.3);
-      --bg: #0b0d1a;
-      --surface: rgba(16, 20, 40, 0.85);
-      --surface-hover: rgba(20, 28, 58, 0.92);
-      --text: #e0e6f0;
-      --text-dim: #8892b0;
-      --radius: 16px;
-      --shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
-      --border: 1px solid rgba(156, 100, 255, 0.18);
-      --font-mono: 'Press Start 2P', monospace;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.7;
-      min-height: 100vh;
-    }
-    a { color: var(--accent); text-decoration: none; transition: .3s; }
-    a:hover { filter: brightness(1.3); }
-    .container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>DEX y AMM · Smart Contracts DeFi</title>
+ <meta property="og:title" content="DEX y AMM · Smart Contracts DeFi">
+ <meta property="og:description" content="Construye un Exchange Descentralizado con Automated Market Maker. Implementación de pools de liquidez y swaps en Solidity.">
+ <meta property="og:type" content="website">
+ <meta property="og:site_name" content="Israel Romero Portfolio">
+ <meta name="twitter:card" content="summary_large_image">
+ <meta name="twitter:title" content="DEX y AMM · Smart Contracts DeFi">
+ <meta name="twitter:description" content="Construye un Exchange Descentralizado con Automated Market Maker. Implementación de pools de liquidez y swaps en Solidity.">
+ <link rel="stylesheet" href="../../assets/css/theme.css">
+ <link rel="preconnect" href="https://fonts.googleapis.com">
+ <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Press+Start+2P&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+ <style>
+  :root {
+   --accent: #9c64ff;
+   --accent-dim: rgba(156, 100, 255, 0.15);
+   --accent-glow: rgba(156, 100, 255, 0.3);
+   --bg: #0b0d1a;
+   --surface: rgba(16, 20, 40, 0.85);
+   --surface-hover: rgba(20, 28, 58, 0.92);
+   --text: #e0e6f0;
+   --text-dim: #8892b0;
+   --radius: 16px;
+   --shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+   --border: 1px solid rgba(156, 100, 255, 0.18);
+   --font-mono: 'Press Start 2P', monospace;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+   font-family: 'Inter', sans-serif;
+   background: var(--bg);
+   color: var(--text);
+   line-height: 1.7;
+   min-height: 100vh;
+  }
+  a { color: var(--accent); text-decoration: none; transition: .3s; }
+  a:hover { filter: brightness(1.3); }
+  .container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
 
-    .hero {
-      text-align: center;
-      padding: 60px 24px 40px;
-      position: relative;
-    }
-    .hero::after {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 50%;
-      transform: translateX(-50%);
-      width: 120px; height: 2px;
-      background: linear-gradient(90deg, transparent, var(--accent), transparent);
-    }
-    .hero-icon { font-size: 3rem; margin-bottom: 12px; display: block; }
-    .hero h1 {
-      font-family: var(--font-mono);
-      font-size: 1.6rem;
-      color: var(--accent);
-      text-shadow: 0 0 30px var(--accent-glow);
-      letter-spacing: 2px;
-      margin-bottom: 8px;
-    }
-    .hero p { color: var(--text-dim); font-size: 1.05rem; max-width: 600px; margin: 0 auto; }
+  .hero {
+   text-align: center;
+   padding: 60px 24px 40px;
+   position: relative;
+  }
+  .hero::after {
+   content: '';
+   position: absolute;
+   bottom: 0; left: 50%;
+   transform: translateX(-50%);
+   width: 120px; height: 2px;
+   background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  }
+  .hero-icon { font-size: 3rem; margin-bottom: 12px; display: block; }
+  .hero h1 {
+   font-family: var(--font-mono);
+   font-size: 1.6rem;
+   color: var(--accent);
+   text-shadow: 0 0 30px var(--accent-glow);
+   letter-spacing: 2px;
+   margin-bottom: 8px;
+  }
+  .hero p { color: var(--text-dim); font-size: 1.05rem; max-width: 600px; margin: 0 auto; }
 
-    .card {
-      background: var(--surface);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: var(--border);
-      border-radius: var(--radius);
-      padding: 28px;
-      margin-bottom: 28px;
-      box-shadow: var(--shadow);
-      transition: .3s;
-    }
-    .card:hover { border-color: rgba(156, 100, 255, 0.35); }
-    .card-title {
-      font-family: var(--font-mono);
-      font-size: .85rem;
-      color: var(--accent);
-      margin-bottom: 16px;
-      letter-spacing: 1px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .card-title i { font-size: 1.1rem; }
+  .card {
+   background: var(--surface);
+   backdrop-filter: blur(12px);
+   -webkit-backdrop-filter: blur(12px);
+   border: var(--border);
+   border-radius: var(--radius);
+   padding: 28px;
+   margin-bottom: 28px;
+   box-shadow: var(--shadow);
+   transition: .3s;
+  }
+  .card:hover { border-color: rgba(156, 100, 255, 0.35); }
+  .card-title {
+   font-family: var(--font-mono);
+   font-size: .85rem;
+   color: var(--accent);
+   margin-bottom: 16px;
+   letter-spacing: 1px;
+   display: flex;
+   align-items: center;
+   gap: 10px;
+  }
+  .card-title i { font-size: 1.1rem; }
 
-    .analogy-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-top: 12px;
-    }
-    .analogy-item {
-      background: var(--accent-dim);
-      border-radius: 10px;
-      padding: 16px;
-      text-align: center;
-      font-size: .9rem;
-    }
-    .analogy-item i {
-      font-size: 1.5rem;
-      color: var(--accent);
-      display: block;
-      margin-bottom: 6px;
-    }
-    .analogy-item span { color: var(--accent); font-weight: 600; }
+  .analogy-grid {
+   display: grid;
+   grid-template-columns: 1fr 1fr;
+   gap: 16px;
+   margin-top: 12px;
+  }
+  .analogy-item {
+   background: var(--accent-dim);
+   border-radius: 10px;
+   padding: 16px;
+   text-align: center;
+   font-size: .9rem;
+  }
+  .analogy-item i {
+   font-size: 1.5rem;
+   color: var(--accent);
+   display: block;
+   margin-bottom: 6px;
+  }
+  .analogy-item span { color: var(--accent); font-weight: 600; }
 
-    .pool-bars {
-      display: flex;
-      gap: 20px;
-      margin: 16px 0 20px;
-    }
-    .pool-bar-wrap {
-      flex: 1;
-      background: rgba(0,0,0,0.3);
-      border-radius: 10px;
-      padding: 16px;
-      text-align: center;
-    }
-    .pool-bar-label {
-      font-size: .8rem;
-      color: var(--text-dim);
-      margin-bottom: 4px;
-    }
-    .pool-bar-value {
-      font-family: var(--font-mono);
-      font-size: 1.2rem;
-      color: var(--text);
-      margin-bottom: 8px;
-    }
-    .pool-bar-track {
-      height: 12px;
-      background: rgba(255,255,255,0.06);
-      border-radius: 6px;
-      overflow: hidden;
-    }
-    .pool-bar-fill {
-      height: 100%;
-      border-radius: 6px;
-      transition: width .5s ease;
-    }
-    .pool-bar-fill.a { background: linear-gradient(90deg, #4a9eff, #6ab0ff); }
-    .pool-bar-fill.b { background: linear-gradient(90deg, var(--accent), #b884ff); }
-    .pool-formula {
-      text-align: center;
-      font-family: var(--font-mono);
-      font-size: .85rem;
-      color: var(--accent);
-      background: var(--accent-dim);
-      border-radius: 8px;
-      padding: 10px;
-      margin-top: 8px;
-    }
-    .pool-price {
-      text-align: center;
-      font-size: .9rem;
-      color: var(--text-dim);
-      margin-top: 8px;
-    }
-    .pool-price span { color: var(--text); font-family: var(--font-mono); font-size: .8rem; }
+  .pool-bars {
+   display: flex;
+   gap: 20px;
+   margin: 16px 0 20px;
+  }
+  .pool-bar-wrap {
+   flex: 1;
+   background: rgba(0,0,0,0.3);
+   border-radius: 10px;
+   padding: 16px;
+   text-align: center;
+  }
+  .pool-bar-label {
+   font-size: .8rem;
+   color: var(--text-dim);
+   margin-bottom: 4px;
+  }
+  .pool-bar-value {
+   font-family: var(--font-mono);
+   font-size: 1.2rem;
+   color: var(--text);
+   margin-bottom: 8px;
+  }
+  .pool-bar-track {
+   height: 12px;
+   background: rgba(255,255,255,0.06);
+   border-radius: 6px;
+   overflow: hidden;
+  }
+  .pool-bar-fill {
+   height: 100%;
+   border-radius: 6px;
+   transition: width .5s ease;
+  }
+  .pool-bar-fill.a { background: linear-gradient(90deg, #4a9eff, #6ab0ff); }
+  .pool-bar-fill.b { background: linear-gradient(90deg, var(--accent), #b884ff); }
+  .pool-formula {
+   text-align: center;
+   font-family: var(--font-mono);
+   font-size: .85rem;
+   color: var(--accent);
+   background: var(--accent-dim);
+   border-radius: 8px;
+   padding: 10px;
+   margin-top: 8px;
+  }
+  .pool-price {
+   text-align: center;
+   font-size: .9rem;
+   color: var(--text-dim);
+   margin-top: 8px;
+  }
+  .pool-price span { color: var(--text); font-family: var(--font-mono); font-size: .8rem; }
 
-    .tabs {
-      display: flex;
-      gap: 0;
-      margin-bottom: 0;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-    }
-    .tab-btn {
-      flex: 1;
-      background: transparent;
-      border: none;
-      border-bottom: 2px solid transparent;
-      padding: 14px;
-      color: var(--text-dim);
-      font-family: var(--font-mono);
-      font-size: .7rem;
-      cursor: pointer;
-      transition: .3s;
-      letter-spacing: 1px;
-    }
-    .tab-btn:hover { color: var(--text); }
-    .tab-btn.active {
-      color: var(--accent);
-      border-bottom-color: var(--accent);
-    }
-    .tab-content { display: none; padding-top: 20px; }
-    .tab-content.active { display: block; }
+  .tabs {
+   display: flex;
+   gap: 0;
+   margin-bottom: 0;
+   border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .tab-btn {
+   flex: 1;
+   background: transparent;
+   border: none;
+   border-bottom: 2px solid transparent;
+   padding: 14px;
+   color: var(--text-dim);
+   font-family: var(--font-mono);
+   font-size: .7rem;
+   cursor: pointer;
+   transition: .3s;
+   letter-spacing: 1px;
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active {
+   color: var(--accent);
+   border-bottom-color: var(--accent);
+  }
+  .tab-content { display: none; padding-top: 20px; }
+  .tab-content.active { display: block; }
 
-    .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
-    .form-group label {
-      font-size: .8rem;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--text-dim);
-    }
-    .form-group input {
-      background: rgba(0,0,0,0.35);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 8px;
-      padding: 10px 14px;
-      color: var(--text);
-      font-size: .95rem;
-      font-family: 'Inter', sans-serif;
-      transition: .3s;
-      outline: none;
-    }
-    .form-group input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 16px var(--accent-glow);
-    }
-    .form-group input::placeholder { color: var(--text-dim); opacity: .5; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+  .form-group label {
+   font-size: .8rem;
+   text-transform: uppercase;
+   letter-spacing: 1px;
+   color: var(--text-dim);
+  }
+  .form-group input {
+   background: rgba(0,0,0,0.35);
+   border: 1px solid rgba(255,255,255,0.08);
+   border-radius: 8px;
+   padding: 10px 14px;
+   color: var(--text);
+   font-size: .95rem;
+   font-family: 'Inter', sans-serif;
+   transition: .3s;
+   outline: none;
+  }
+  .form-group input:focus {
+   border-color: var(--accent);
+   box-shadow: 0 0 16px var(--accent-glow);
+  }
+  .form-group input::placeholder { color: var(--text-dim); opacity: .5; }
 
-    .btn-action {
-      width: 100%;
-      background: linear-gradient(135deg, #7a3dd0, var(--accent));
-      border: none;
-      border-radius: 10px;
-      padding: 14px;
-      color: #fff;
-      font-family: var(--font-mono);
-      font-size: .8rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: .3s;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      margin-top: 4px;
-    }
-    .btn-action:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 30px var(--accent-glow);
-    }
-    .btn-action:disabled {
-      opacity: .4;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
-    .btn-action.secondary {
-      background: transparent;
-      border: 1px solid var(--accent);
-      color: var(--accent);
-    }
-    .btn-action.secondary:hover { background: var(--accent-dim); }
+  .btn-action {
+   width: 100%;
+   background: linear-gradient(135deg, #7a3dd0, var(--accent));
+   border: none;
+   border-radius: 10px;
+   padding: 14px;
+   color: #fff;
+   font-family: var(--font-mono);
+   font-size: .8rem;
+   font-weight: 700;
+   cursor: pointer;
+   transition: .3s;
+   letter-spacing: 1px;
+   text-transform: uppercase;
+   margin-top: 4px;
+  }
+  .btn-action:hover {
+   transform: translateY(-2px);
+   box-shadow: 0 8px 30px var(--accent-glow);
+  }
+  .btn-action:disabled {
+   opacity: .4;
+   cursor: not-allowed;
+   transform: none;
+   box-shadow: none;
+  }
+  .btn-action.secondary {
+   background: transparent;
+   border: 1px solid var(--accent);
+   color: var(--accent);
+  }
+  .btn-action.secondary:hover { background: var(--accent-dim); }
 
-    .swap-info {
-      background: rgba(0,0,0,0.2);
-      border-radius: 10px;
-      padding: 14px;
-      margin-top: 12px;
-    }
-    .swap-info-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: .85rem;
-      padding: 4px 0;
-    }
-    .swap-info-row .label { color: var(--text-dim); }
-    .swap-info-row .value { color: var(--text); font-family: var(--font-mono); font-size: .75rem; }
-    .swap-info-row .value.impact-low { color: #00ff88; }
-    .swap-info-row .value.impact-med { color: #ffc800; }
-    .swap-info-row .value.impact-high { color: #ff5050; }
+  .swap-info {
+   background: rgba(0,0,0,0.2);
+   border-radius: 10px;
+   padding: 14px;
+   margin-top: 12px;
+  }
+  .swap-info-row {
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   font-size: .85rem;
+   padding: 4px 0;
+  }
+  .swap-info-row .label { color: var(--text-dim); }
+  .swap-info-row .value { color: var(--text); font-family: var(--font-mono); font-size: .75rem; }
+  .swap-info-row .value.impact-low { color: #00ff88; }
+  .swap-info-row .value.impact-med { color: #ffc800; }
+  .swap-info-row .value.impact-high { color: #ff5050; }
 
-    .chart-wrap {
-      width: 100%;
-      max-width: 100%;
-      margin: 12px 0 0;
-    }
-    .chart-wrap canvas {
-      width: 100%;
-      height: auto;
-      border-radius: 10px;
-      background: rgba(0,0,0,0.3);
-    }
+  .chart-wrap {
+   width: 100%;
+   max-width: 100%;
+   margin: 12px 0 0;
+  }
+  .chart-wrap canvas {
+   width: 100%;
+   height: auto;
+   border-radius: 10px;
+   background: rgba(0,0,0,0.3);
+  }
 
-    .metrics-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 14px;
-      margin-top: 4px;
-    }
-    .metric-item {
-      background: rgba(0,0,0,0.2);
-      border-radius: 10px;
-      padding: 14px;
-      text-align: center;
-    }
-    .metric-item .metric-label {
-      font-size: .7rem;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--text-dim);
-      margin-bottom: 4px;
-    }
-    .metric-item .metric-value {
-      font-family: var(--font-mono);
-      font-size: .95rem;
-      color: var(--accent);
-    }
-    .metric-item .metric-value small {
-      font-size: .6rem;
-      color: var(--text-dim);
-      font-family: 'Inter', sans-serif;
-    }
+  .metrics-grid {
+   display: grid;
+   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+   gap: 14px;
+   margin-top: 4px;
+  }
+  .metric-item {
+   background: rgba(0,0,0,0.2);
+   border-radius: 10px;
+   padding: 14px;
+   text-align: center;
+  }
+  .metric-item .metric-label {
+   font-size: .7rem;
+   text-transform: uppercase;
+   letter-spacing: 1px;
+   color: var(--text-dim);
+   margin-bottom: 4px;
+  }
+  .metric-item .metric-value {
+   font-family: var(--font-mono);
+   font-size: .95rem;
+   color: var(--accent);
+  }
+  .metric-item .metric-value small {
+   font-size: .6rem;
+   color: var(--text-dim);
+   font-family: 'Inter', sans-serif;
+  }
 
-    .concepts-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 14px;
-    }
-    .concept-item {
-      background: var(--accent-dim);
-      border-radius: 10px;
-      padding: 16px;
-      text-align: center;
-      transition: .3s;
-    }
-    .concept-item:hover { transform: translateY(-3px); }
-    .concept-item i { font-size: 1.6rem; color: var(--accent); display: block; margin-bottom: 8px; }
-    .concept-item h4 { font-size: .85rem; margin-bottom: 4px; }
-    .concept-item p { font-size: .75rem; color: var(--text-dim); line-height: 1.5; }
+  .concepts-grid {
+   display: grid;
+   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+   gap: 14px;
+  }
+  .concept-item {
+   background: var(--accent-dim);
+   border-radius: 10px;
+   padding: 16px;
+   text-align: center;
+   transition: .3s;
+  }
+  .concept-item:hover { transform: translateY(-3px); }
+  .concept-item i { font-size: 1.6rem; color: var(--accent); display: block; margin-bottom: 8px; }
+  .concept-item h4 { font-size: .85rem; margin-bottom: 4px; }
+  .concept-item p { font-size: .75rem; color: var(--text-dim); line-height: 1.5; }
 
-    .badge-earned {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: linear-gradient(135deg, #1a1a2a, #0d0d1f);
-      border: 1px solid var(--accent);
-      border-radius: 20px;
-      padding: 8px 18px;
-      font-family: var(--font-mono);
-      font-size: .65rem;
-      color: var(--accent);
-      animation: badgePulse 2s ease-in-out infinite;
-    }
-    @keyframes badgePulse { 0%, 100% { box-shadow: 0 0 8px var(--accent-glow); } 50% { box-shadow: 0 0 24px var(--accent-glow); } }
-    .badge-hidden { display: none !important; }
+  .badge-earned {
+   display: inline-flex;
+   align-items: center;
+   gap: 8px;
+   background: linear-gradient(135deg, #1a1a2a, #0d0d1f);
+   border: 1px solid var(--accent);
+   border-radius: 20px;
+   padding: 8px 18px;
+   font-family: var(--font-mono);
+   font-size: .65rem;
+   color: var(--accent);
+   animation: badgePulse 2s ease-in-out infinite;
+  }
+  @keyframes badgePulse { 0%, 100% { box-shadow: 0 0 8px var(--accent-glow); } 50% { box-shadow: 0 0 24px var(--accent-glow); } }
+  .badge-hidden { display: none !important; }
 
-    .badge-progress {
-      font-size: .8rem;
-      color: var(--text-dim);
-      margin-top: 8px;
-    }
-    .badge-progress span { color: var(--accent); font-weight: 600; }
+  .badge-progress {
+   font-size: .8rem;
+   color: var(--text-dim);
+   margin-top: 8px;
+  }
+  .badge-progress span { color: var(--accent); font-weight: 600; }
 
-    .btn-reset {
-      background: transparent;
-      border: 1px solid rgba(255,80,80,0.3);
-      border-radius: 6px;
-      padding: 6px 14px;
-      color: #ff5050;
-      font-size: .7rem;
-      cursor: pointer;
-      transition: .3s;
-      font-family: 'Inter', sans-serif;
-    }
-    .btn-reset:hover {
-      background: rgba(255,80,80,0.1);
-      border-color: #ff5050;
-    }
+  .btn-reset {
+   background: transparent;
+   border: 1px solid rgba(255,80,80,0.3);
+   border-radius: 6px;
+   padding: 6px 14px;
+   color: #ff5050;
+   font-size: .7rem;
+   cursor: pointer;
+   transition: .3s;
+   font-family: 'Inter', sans-serif;
+  }
+  .btn-reset:hover {
+   background: rgba(255,80,80,0.1);
+   border-color: #ff5050;
+  }
 
-    .module-nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      margin: 40px 0;
-      flex-wrap: wrap;
-    }
-    .module-nav a {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 12px 20px;
-      border-radius: 10px;
-      font-size: .9rem;
-      font-weight: 500;
-      transition: .3s;
-      background: var(--surface);
-      border: var(--border);
-    }
-    .module-nav a:hover {
-      border-color: var(--accent);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 20px var(--accent-glow);
-    }
-    .module-nav .nav-center {
-      font-family: var(--font-mono);
-      font-size: .7rem;
-      color: var(--text-dim);
-    }
+  .module-nav {
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   gap: 12px;
+   margin: 40px 0;
+   flex-wrap: wrap;
+  }
+  .module-nav a {
+   display: inline-flex;
+   align-items: center;
+   gap: 8px;
+   padding: 12px 20px;
+   border-radius: 10px;
+   font-size: .9rem;
+   font-weight: 500;
+   transition: .3s;
+   background: var(--surface);
+   border: var(--border);
+  }
+  .module-nav a:hover {
+   border-color: var(--accent);
+   transform: translateY(-2px);
+   box-shadow: 0 4px 20px var(--accent-glow);
+  }
+  .module-nav .nav-center {
+   font-family: var(--font-mono);
+   font-size: .7rem;
+   color: var(--text-dim);
+  }
 
-    .notification {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--surface);
-      border: 1px solid var(--accent);
-      border-radius: 12px;
-      padding: 14px 24px;
-      backdrop-filter: blur(16px);
-      font-size: .9rem;
-      color: var(--text);
-      z-index: 999;
-      opacity: 0;
-      transition: opacity .4s, transform .4s;
-      pointer-events: none;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
-      max-width: 90vw;
-      text-align: center;
-    }
-    .notification.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(-8px);
-    }
+  .notification {
+   position: fixed;
+   bottom: 24px;
+   left: 50%;
+   transform: translateX(-50%);
+   background: var(--surface);
+   border: 1px solid var(--accent);
+   border-radius: 12px;
+   padding: 14px 24px;
+   backdrop-filter: blur(16px);
+   font-size: .9rem;
+   color: var(--text);
+   z-index: 999;
+   opacity: 0;
+   transition: opacity .4s, transform .4s;
+   pointer-events: none;
+   box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+   max-width: 90vw;
+   text-align: center;
+  }
+  .notification.show {
+   opacity: 1;
+   transform: translateX(-50%) translateY(-8px);
+  }
 
-    .footer {
-      text-align: center;
-      padding: 40px 24px;
-      border-top: 1px solid rgba(255,255,255,0.05);
-      color: var(--text-dim);
-      font-size: .8rem;
-      margin-top: 40px;
-    }
+  .footer {
+   text-align: center;
+   padding: 40px 24px;
+   border-top: 1px solid rgba(255,255,255,0.05);
+   color: var(--text-dim);
+   font-size: .8rem;
+   margin-top: 40px;
+  }
 
-    @media (max-width: 600px) {
-      .hero h1 { font-size: 1.1rem; }
-      .analogy-grid { grid-template-columns: 1fr; }
-      .pool-bars { flex-direction: column; gap: 12px; }
-      .metrics-grid { grid-template-columns: 1fr 1fr; }
-      .concepts-grid { grid-template-columns: 1fr 1fr; }
-      .module-nav { flex-direction: column; }
-    }
-  </style>
+  @media (max-width: 600px) {
+   .hero h1 { font-size: 1.1rem; }
+   .analogy-grid { grid-template-columns: 1fr; }
+   .pool-bars { flex-direction: column; gap: 12px; }
+   .metrics-grid { grid-template-columns: 1fr 1fr; }
+   .concepts-grid { grid-template-columns: 1fr 1fr; }
+   .module-nav { flex-direction: column; }
+  }
+ </style>
 </head>
 <body>
-  <nav class="brand-return-nav">
-    <a href="../../index.html#cursos"><i class="fas fa-arrow-left"></i> Portfolio</a>
-    <a href="index.html"><i class="fas fa-layer-group"></i> Cursos</a>
-    <span class="brand-badge">Smart Contracts DeFi</span>
-  </nav>
+ <nav class="brand-return-nav">
+  <a href="../../index.html#cursos"><i class="fas fa-arrow-left"></i> Portfolio</a>
+  <a href="index.html"><i class="fas fa-layer-group"></i> Cursos</a>
+  <span class="brand-badge">Smart Contracts DeFi</span>
+ </nav>
 
-  <section class="hero">
-    <span class="hero-icon">🔄</span>
-    <h1>DEX Y AMM</h1>
-    <p>El corazón de DeFi. Los Automated Market Makers reemplazan los libros de órdenes con matemáticas puras.</p>
-  </section>
+ <section class="hero">
+  <span class="hero-icon">🔄</span>
+  <h1>DEX Y AMM</h1>
+  <p>El corazón de DeFi. Los Automated Market Makers reemplazan los libros de órdenes con matemáticas puras.</p>
+ </section>
 
-  <div class="container">
+ <div class="container">
 
-    <!-- Analogía -->
-    <div class="card">
-      <div class="card-title"><i class="fas fa-lightbulb"></i> ANALOGÍA · La Casa de Cambio del Aeropuerto</div>
-      <p style="margin-bottom:14px; color:var(--text-dim); font-size:.9rem;">
-        Un AMM funciona como la casa de cambio en el aeropuerto: siempre tiene dólares y euros disponibles,
-        y usa una fórmula fija para determinar el tipo de cambio. Si mucha gente compra dólares, el precio sube.
-        No necesitas a otro trader enfrente — la propia "piscina" de liquidez es tu contraparte.
-      </p>
-      <div class="analogy-grid">
-        <div class="analogy-item"><i class="fas fa-water"></i> <span>Pool de Liquidez</span><br>Como la caja registradora con ambas monedas</div>
-        <div class="analogy-item"><i class="fas fa-calculator"></i> <span>x · y = k</span><br>La fórmula que mantiene el equilibrio</div>
-        <div class="analogy-item"><i class="fas fa-chart-line"></i> <span>Slippage</span><br>Cambios grandes mueven el precio</div>
-        <div class="analogy-item"><i class="fas fa-hand-holding-usd"></i> <span>LP Tokens</span><br>Recibes un comprobante de tu aporte</div>
-      </div>
-    </div>
-
-    <!-- Pool Status -->
-    <div class="card">
-      <div class="card-title"><i class="fas fa-chart-bar"></i> POOL STATUS</div>
-      <div class="pool-bars">
-        <div class="pool-bar-wrap">
-          <div class="pool-bar-label"><i class="fas fa-circle" style="color:#4a9eff;font-size:.6rem;"></i> TOKEN A</div>
-          <div class="pool-bar-value" id="poolAval">1,000.00</div>
-          <div class="pool-bar-track"><div class="pool-bar-fill a" id="poolAbar" style="width:50%;"></div></div>
-        </div>
-        <div class="pool-bar-wrap">
-          <div class="pool-bar-label"><i class="fas fa-circle" style="color:var(--accent);font-size:.6rem;"></i> TOKEN B</div>
-          <div class="pool-bar-value" id="poolBval">1,000.00</div>
-          <div class="pool-bar-track"><div class="pool-bar-fill b" id="poolBbar" style="width:50%;"></div></div>
-        </div>
-      </div>
-      <div class="pool-formula" id="poolFormula">x · y = k → 1,000.00 × 1,000.00 = 1,000,000.00</div>
-      <div class="pool-price">Precio marginal: <span id="poolPrice">1.0000</span> TOKEN_A por TOKEN_B</div>
-    </div>
-
-    <!-- Simulator -->
-    <div class="card">
-      <div class="card-title"><i class="fas fa-flask"></i> SIMULADOR AMM</div>
-      <div class="tabs" id="simTabs">
-        <button class="tab-btn active" data-tab="liq"><i class="fas fa-plus-circle"></i> ADD LIQUIDITY</button>
-        <button class="tab-btn" data-tab="swap"><i class="fas fa-exchange-alt"></i> SWAP</button>
-      </div>
-
-      <!-- Add Liquidity -->
-      <div class="tab-content active" id="tabLiq">
-        <p style="color:var(--text-dim);font-size:.85rem;margin-bottom:14px;">
-          Aporta ambos tokens en la proporción actual del pool (1:1) y recibe LP tokens.
-        </p>
-        <div class="form-group">
-          <label>TOKEN A a aportar</label>
-          <input type="number" id="liqA" placeholder="Ej: 50" min="0.01" step="0.01">
-        </div>
-        <div class="form-group">
-          <label>TOKEN B a aportar <span style="color:var(--accent);font-weight:400;">(calculado)</span></label>
-          <input type="text" id="liqB" readonly style="color:var(--accent);">
-        </div>
-        <div class="form-group">
-          <label>LP tokens a recibir</label>
-          <input type="text" id="liqLP" readonly style="color:var(--accent);">
-        </div>
-        <button class="btn-action" id="addLiqBtn"><i class="fas fa-water"></i> Añadir Liquidez</button>
-      </div>
-
-      <!-- Swap -->
-      <div class="tab-content" id="tabSwap">
-        <p style="color:var(--text-dim);font-size:.85rem;margin-bottom:14px;">
-          Intercambia TOKEN_A por TOKEN_B. El pool cobra una comisión del 0.3%.
-        </p>
-        <div class="form-group">
-          <label>Pagas (TOKEN A)</label>
-          <input type="number" id="swapIn" placeholder="Ej: 50" min="0.01" step="0.01">
-        </div>
-        <div class="swap-info" id="swapInfo">
-          <div class="swap-info-row"><span class="label">Recibes (TOKEN B)</span><span class="value" id="swapOut">0.00</span></div>
-          <div class="swap-info-row"><span class="label">Comisión 0.3%</span><span class="value" id="swapFee">0.00</span></div>
-          <div class="swap-info-row"><span class="label">Price Impact</span><span class="value impact-low" id="swapImpact">0.00%</span></div>
-        </div>
-        <button class="btn-action" id="swapBtn"><i class="fas fa-exchange-alt"></i> Intercambiar</button>
-      </div>
-    </div>
-
-    <!-- Slippage Curve -->
-    <div class="card">
-      <div class="card-title"><i class="fas fa-chart-line"></i> CURVA DE DESLIZAMIENTO (SLIPPAGE)</div>
-      <p style="color:var(--text-dim);font-size:.85rem;margin-bottom:12px;">
-        El gráfico muestra cómo el precio efectivo empeora con swaps más grandes. La línea vertical marca tu operación actual.
-      </p>
-      <div class="chart-wrap">
-        <canvas id="slippageChart" width="700" height="300"></canvas>
-      </div>
-    </div>
-
-    <!-- Metrics -->
-    <div class="card">
-      <div class="card-title"><i class="fas fa-chart-pie"></i> MÉTRICAS DEL POOL</div>
-      <div class="metrics-grid">
-        <div class="metric-item"><div class="metric-label">Precio</div><div class="metric-value" id="metricPrice">1.00 <small>B/A</small></div></div>
-        <div class="metric-item"><div class="metric-label">Liquidez Total</div><div class="metric-value" id="metricLiq">$2,000 <small>USD</small></div></div>
-        <div class="metric-item"><div class="metric-label">LP Tokens</div><div class="metric-value" id="metricLP">0.00</div></div>
-        <div class="metric-item"><div class="metric-label">Com. Acumulada</div><div class="metric-value" id="metricFee">0.00 <small>A</small></div></div>
-      </div>
-    </div>
-
-    <!-- Badge -->
-    <div class="card" style="text-align:center;">
-      <div style="display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;">
-        <div>
-          <span id="badgeTrader" class="badge-hidden badge-earned"><i class="fas fa-certificate"></i> TRADER</span>
-        </div>
-        <button class="btn-reset" id="resetBtn"><i class="fas fa-trash-alt"></i> Reset Pool</button>
-      </div>
-      <div class="badge-progress" id="badgeProgress">Swaps realizados: <span id="swapCount">0</span> / 3</div>
-    </div>
-
-    <!-- Conceptos -->
-    <div class="card">
-      <div class="card-title"><i class="fas fa-book"></i> CONCEPTOS CLAVE</div>
-      <div class="concepts-grid">
-        <div class="concept-item">
-          <i class="fas fa-equals"></i>
-          <h4>Constant Product</h4>
-          <p>x · y = k. El producto de las reservas siempre se mantiene constante. Es la fórmula mágica de Uniswap.</p>
-        </div>
-        <div class="concept-item">
-          <i class="fas fa-tachometer-alt"></i>
-          <h4>Slippage</h4>
-          <p>La diferencia entre el precio esperado y el ejecutado. Swaps grandes en pools pequeños = más slippage.</p>
-        </div>
-        <div class="concept-item">
-          <i class="fas fa-ticket-alt"></i>
-          <h4>LP Tokens</h4>
-          <p>Representan tu parte proporcional del pool. Los quemas para retirar tu liquidez + comisiones acumuladas.</p>
-        </div>
-        <div class="concept-item">
-          <i class="fas fa-exclamation-triangle"></i>
-          <h4>Pérdida Impermanente</h4>
-          <p>Riesgo de proveer liquidez: si el precio cambia drásticamente, tu pool vale menos que hodlear.</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Navegación -->
-    <div class="module-nav">
-      <a href="03-tokens-erc20.html"><i class="fas fa-chevron-left"></i> Anterior</a>
-      <span class="nav-center">Módulo 4 de 9</span>
-      <a href="05-lending.html">Siguiente <i class="fas fa-chevron-right"></i></a>
-    </div>
-
-    <div style="text-align:center;margin-bottom:20px;">
-      <a href="index.html" style="color:var(--text-dim);font-size:.85rem;"><i class="fas fa-th-large"></i> Volver al índice del curso</a>
-    </div>
+  <!-- Analogía -->
+  <div class="card">
+   <div class="card-title"><i class="fas fa-lightbulb"></i> ANALOGÍA · La Casa de Cambio del Aeropuerto</div>
+   <p style="margin-bottom:14px; color:var(--text-dim); font-size:.9rem;">
+    Un AMM funciona como la casa de cambio en el aeropuerto: siempre tiene dólares y euros disponibles,
+    y usa una fórmula fija para determinar el tipo de cambio. Si mucha gente compra dólares, el precio sube.
+    No necesitas a otro trader enfrente — la propia "piscina" de liquidez es tu contraparte.
+   </p>
+   <div class="analogy-grid">
+    <div class="analogy-item"><i class="fas fa-water"></i> <span>Pool de Liquidez</span><br>Como la caja registradora con ambas monedas</div>
+    <div class="analogy-item"><i class="fas fa-calculator"></i> <span>x · y = k</span><br>La fórmula que mantiene el equilibrio</div>
+    <div class="analogy-item"><i class="fas fa-chart-line"></i> <span>Slippage</span><br>Cambios grandes mueven el precio</div>
+    <div class="analogy-item"><i class="fas fa-hand-holding-usd"></i> <span>LP Tokens</span><br>Recibes un comprobante de tu aporte</div>
+   </div>
   </div>
 
-  <footer class="footer">
-    <p>Smart Contracts DeFi · Módulo 4 — DEX y AMM</p>
-    <p style="margin-top:4px;">&copy; 2026 Israel Romero · Hecho con <span style="color:var(--accent);">❤</span> y código descentralizado</p>
-  </footer>
+  <!-- Pool Status -->
+  <div class="card">
+   <div class="card-title"><i class="fas fa-chart-bar"></i> POOL STATUS</div>
+   <div class="pool-bars">
+    <div class="pool-bar-wrap">
+     <div class="pool-bar-label"><i class="fas fa-circle" style="color:#4a9eff;font-size:.6rem;"></i> TOKEN A</div>
+     <div class="pool-bar-value" id="poolAval">1,000.00</div>
+     <div class="pool-bar-track"><div class="pool-bar-fill a" id="poolAbar" style="width:50%;"></div></div>
+    </div>
+    <div class="pool-bar-wrap">
+     <div class="pool-bar-label"><i class="fas fa-circle" style="color:var(--accent);font-size:.6rem;"></i> TOKEN B</div>
+     <div class="pool-bar-value" id="poolBval">1,000.00</div>
+     <div class="pool-bar-track"><div class="pool-bar-fill b" id="poolBbar" style="width:50%;"></div></div>
+    </div>
+   </div>
+   <div class="pool-formula" id="poolFormula">x · y = k → 1,000.00 × 1,000.00 = 1,000,000.00</div>
+   <div class="pool-price">Precio marginal: <span id="poolPrice">1.0000</span> TOKEN_A por TOKEN_B</div>
+  </div>
 
-  <div class="notification" id="notification"></div>
+  <!-- Simulator -->
+  <div class="card">
+   <div class="card-title"><i class="fas fa-flask"></i> SIMULADOR AMM</div>
+   <div class="tabs" id="simTabs">
+    <button class="tab-btn active" data-tab="liq"><i class="fas fa-plus-circle"></i> ADD LIQUIDITY</button>
+    <button class="tab-btn" data-tab="swap"><i class="fas fa-exchange-alt"></i> SWAP</button>
+   </div>
 
-  <script src="../../assets/js/cookie-consent.js"></script>
-  <script>
-    (function() {
-      const STORAGE_KEY = 'sc_dex4';
+   <!-- Add Liquidity -->
+   <div class="tab-content active" id="tabLiq">
+    <p style="color:var(--text-dim);font-size:.85rem;margin-bottom:14px;">
+     Aporta ambos tokens en la proporción actual del pool (1:1) y recibe LP tokens.
+    </p>
+    <div class="form-group">
+     <label>TOKEN A a aportar</label>
+     <input type="number" id="liqA" placeholder="Ej: 50" min="0.01" step="0.01">
+    </div>
+    <div class="form-group">
+     <label>TOKEN B a aportar <span style="color:var(--accent);font-weight:400;">(calculado)</span></label>
+     <input type="text" id="liqB" readonly style="color:var(--accent);">
+    </div>
+    <div class="form-group">
+     <label>LP tokens a recibir</label>
+     <input type="text" id="liqLP" readonly style="color:var(--accent);">
+    </div>
+    <button class="btn-action" id="addLiqBtn"><i class="fas fa-water"></i> Añadir Liquidez</button>
+   </div>
 
-      const INITIAL_A = 1000;
-      const INITIAL_B = 1000;
-      const FEE = 0.003;
+   <!-- Swap -->
+   <div class="tab-content" id="tabSwap">
+    <p style="color:var(--text-dim);font-size:.85rem;margin-bottom:14px;">
+     Intercambia TOKEN_A por TOKEN_B. El pool cobra una comisión del 0.3%.
+    </p>
+    <div class="form-group">
+     <label>Pagas (TOKEN A)</label>
+     <input type="number" id="swapIn" placeholder="Ej: 50" min="0.01" step="0.01">
+    </div>
+    <div class="swap-info" id="swapInfo">
+     <div class="swap-info-row"><span class="label">Recibes (TOKEN B)</span><span class="value" id="swapOut">0.00</span></div>
+     <div class="swap-info-row"><span class="label">Comisión 0.3%</span><span class="value" id="swapFee">0.00</span></div>
+     <div class="swap-info-row"><span class="label">Price Impact</span><span class="value impact-low" id="swapImpact">0.00%</span></div>
+    </div>
+    <button class="btn-action" id="swapBtn"><i class="fas fa-exchange-alt"></i> Intercambiar</button>
+   </div>
+  </div>
 
-      const state = loadState();
+  <!-- Slippage Curve -->
+  <div class="card">
+   <div class="card-title"><i class="fas fa-chart-line"></i> CURVA DE DESLIZAMIENTO (SLIPPAGE)</div>
+   <p style="color:var(--text-dim);font-size:.85rem;margin-bottom:12px;">
+    El gráfico muestra cómo el precio efectivo empeora con swaps más grandes. La línea vertical marca tu operación actual.
+   </p>
+   <div class="chart-wrap">
+    <canvas id="slippageChart" width="700" height="300"></canvas>
+   </div>
+  </div>
 
-      function getDefaultState() {
-        return {
-          reserveA: INITIAL_A,
-          reserveB: INITIAL_B,
-          lpTotal: 0,
-          swapCount: 0,
-          totalFeeA: 0,
-          badgeEarned: false
-        };
-      }
+  <!-- Metrics -->
+  <div class="card">
+   <div class="card-title"><i class="fas fa-chart-pie"></i> MÉTRICAS DEL POOL</div>
+   <div class="metrics-grid">
+    <div class="metric-item"><div class="metric-label">Precio</div><div class="metric-value" id="metricPrice">1.00 <small>B/A</small></div></div>
+    <div class="metric-item"><div class="metric-label">Liquidez Total</div><div class="metric-value" id="metricLiq">$2,000 <small>USD</small></div></div>
+    <div class="metric-item"><div class="metric-label">LP Tokens</div><div class="metric-value" id="metricLP">0.00</div></div>
+    <div class="metric-item"><div class="metric-label">Com. Acumulada</div><div class="metric-value" id="metricFee">0.00 <small>A</small></div></div>
+   </div>
+  </div>
 
-      function loadState() {
-        try {
-          const saved = localStorage.getItem(STORAGE_KEY);
-          if (saved) {
-            const parsed = JSON.parse(saved);
-            if (parsed && typeof parsed === 'object' && parsed.reserveA !== undefined) return parsed;
-          }
-        } catch (_) {}
-        return getDefaultState();
-      }
+  <!-- Badge -->
+  <div class="card" style="text-align:center;">
+   <div style="display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;">
+    <div>
+     <span id="badgeTrader" class="badge-hidden badge-earned"><i class="fas fa-certificate"></i> TRADER</span>
+    </div>
+    <button class="btn-reset" id="resetBtn"><i class="fas fa-trash-alt"></i> Reset Pool</button>
+   </div>
+   <div class="badge-progress" id="badgeProgress">Swaps realizados: <span id="swapCount">0</span> / 3</div>
+  </div>
 
-      function saveState() {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      }
+  <!-- Conceptos -->
+  <div class="card">
+   <div class="card-title"><i class="fas fa-book"></i> CONCEPTOS CLAVE</div>
+   <div class="concepts-grid">
+    <div class="concept-item">
+     <i class="fas fa-equals"></i>
+     <h4>Constant Product</h4>
+     <p>x · y = k. El producto de las reservas siempre se mantiene constante. Es la fórmula mágica de Uniswap.</p>
+    </div>
+    <div class="concept-item">
+     <i class="fas fa-tachometer-alt"></i>
+     <h4>Slippage</h4>
+     <p>La diferencia entre el precio esperado y el ejecutado. Swaps grandes en pools pequeños = más slippage.</p>
+    </div>
+    <div class="concept-item">
+     <i class="fas fa-ticket-alt"></i>
+     <h4>LP Tokens</h4>
+     <p>Representan tu parte proporcional del pool. Los quemas para retirar tu liquidez + comisiones acumuladas.</p>
+    </div>
+    <div class="concept-item">
+     <i class="fas fa-exclamation-triangle"></i>
+     <h4>Pérdida Impermanente</h4>
+     <p>Riesgo de proveer liquidez: si el precio cambia drásticamente, tu pool vale menos que hodlear.</p>
+    </div>
+   </div>
+  </div>
 
-      function getK() { return state.reserveA * state.reserveB; }
+  <!-- Navegación -->
+  <div class="module-nav">
+   <a href="03-tokens-erc20.html"><i class="fas fa-chevron-left"></i> Anterior</a>
+   <span class="nav-center">Módulo 4 de 9</span>
+   <a href="05-lending.html">Siguiente <i class="fas fa-chevron-right"></i></a>
+  </div>
 
-      function getPrice() { return state.reserveB / state.reserveA; }
+  <div style="text-align:center;margin-bottom:20px;">
+   <a href="index.html" style="color:var(--text-dim);font-size:.85rem;"><i class="fas fa-th-large"></i> Volver al índice del curso</a>
+  </div>
+ </div>
 
-      function formatNum(n) {
-        return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-      }
+ <footer class="footer">
+  <p>Smart Contracts DeFi · Módulo 4 — DEX y AMM</p>
+  <p style="margin-top:4px;">&copy; 2026 Israel Romero · Hecho con <span style="color:var(--accent);">❤</span> y código descentralizado</p>
+ </footer>
 
-      function formatK(n) {
-        if (n >= 1e9) return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-      }
+ <div class="notification" id="notification"></div>
 
-      function notify(msg) {
-        const el = document.getElementById('notification');
-        el.textContent = msg;
-        el.classList.add('show');
-        clearTimeout(el._timer);
-        el._timer = setTimeout(() => el.classList.remove('show'), 3000);
-      }
+ <script>
+  (function() {
+   const STORAGE_KEY = 'sc_dex4';
 
-      function renderPool() {
-        const total = state.reserveA + state.reserveB;
-        const pctA = total > 0 ? (state.reserveA / total * 100) : 50;
-        const pctB = total > 0 ? (state.reserveB / total * 100) : 50;
+   const INITIAL_A = 1000;
+   const INITIAL_B = 1000;
+   const FEE = 0.003;
 
-        document.getElementById('poolAval').textContent = formatNum(state.reserveA);
-        document.getElementById('poolBval').textContent = formatNum(state.reserveB);
-        document.getElementById('poolAbar').style.width = pctA + '%';
-        document.getElementById('poolBbar').style.width = pctB + '%';
+   const state = loadState();
 
-        const k = getK();
-        document.getElementById('poolFormula').textContent =
-          'x · y = k → ' + formatNum(state.reserveA) + ' × ' + formatNum(state.reserveB) + ' = ' + formatK(k);
+   function getDefaultState() {
+    return {
+     reserveA: INITIAL_A,
+     reserveB: INITIAL_B,
+     lpTotal: 0,
+     swapCount: 0,
+     totalFeeA: 0,
+     badgeEarned: false
+    };
+   }
 
-        const price = getPrice();
-        document.getElementById('poolPrice').textContent = price.toFixed(4);
-      }
+   function loadState() {
+    try {
+     const saved = localStorage.getItem(STORAGE_KEY);
+     if (saved) {
+      const parsed = JSON.parse(saved);
+      if (parsed && typeof parsed === 'object' && parsed.reserveA !== undefined) return parsed;
+     }
+    } catch (_) {}
+    return getDefaultState();
+   }
 
-      function renderMetrics() {
-        const price = getPrice();
-        document.getElementById('metricPrice').innerHTML = formatNum(price) + ' <small>B/A</small>';
-        const totalLiq = state.reserveA + state.reserveB;
-        document.getElementById('metricLiq').innerHTML = '$' + formatNum(totalLiq) + ' <small>USD</small>';
-        document.getElementById('metricLP').textContent = formatNum(state.lpTotal);
-        document.getElementById('metricFee').innerHTML = formatNum(state.totalFeeA) + ' <small>A</small>';
-      }
+   function saveState() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+   }
 
-      function renderBadge() {
-        document.getElementById('swapCount').textContent = state.swapCount;
-        if (state.swapCount >= 3 && !state.badgeEarned) {
-          state.badgeEarned = true;
-          saveState();
-          notify('🏅 ¡Logro desbloqueado! Eres un TRADER.');
-        }
-        if (state.badgeEarned) {
-          document.getElementById('badgeTrader').classList.remove('badge-hidden');
-        } else {
-          document.getElementById('badgeTrader').classList.add('badge-hidden');
-        }
-      }
+   function getK() { return state.reserveA * state.reserveB; }
 
-      function drawChart(highlightIn, highlightOut) {
-        const canvas = document.getElementById('slippageChart');
-        const rect = canvas.parentElement.getBoundingClientRect();
-        const dpr = window.devicePixelRatio || 1;
-        const w = Math.min(700, rect.width - 2);
-        const h = 300;
-        canvas.width = w * dpr;
-        canvas.height = h * dpr;
-        canvas.style.width = w + 'px';
-        canvas.style.height = h + 'px';
-        const ctx = canvas.getContext('2d');
-        ctx.scale(dpr, dpr);
+   function getPrice() { return state.reserveB / state.reserveA; }
 
-        const pad = { top: 20, right: 20, bottom: 40, left: 50 };
-        const plotW = w - pad.left - pad.right;
-        const plotH = h - pad.top - pad.bottom;
+   function formatNum(n) {
+    return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+   }
 
-        const price = getPrice();
-        const maxIn = Math.min(state.reserveA * 0.5, 500);
-        const steps = 50;
-        const points = [];
-        let maxEffPrice = price * 1.05;
-        let minEffPrice = price;
+   function formatK(n) {
+    if (n >= 1e9) return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+   }
 
-        for (let i = 0; i <= steps; i++) {
-          const x = (i / steps) * maxIn;
-          const feeAmt = x * FEE;
-          const afterFee = x - feeAmt;
-          const out = x === 0 ? 0 : (state.reserveB * afterFee) / (state.reserveA + afterFee);
-          const effPrice = x === 0 ? price : out / x;
-          points.push({ x, effPrice });
-          if (effPrice > maxEffPrice) maxEffPrice = effPrice;
-          if (effPrice < minEffPrice) minEffPrice = effPrice;
-        }
+   function notify(msg) {
+    const el = document.getElementById('notification');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(el._timer);
+    el._timer = setTimeout(() => el.classList.remove('show'), 3000);
+   }
 
-        const yPad = (maxEffPrice - minEffPrice) * 0.15;
-        const yMin = Math.max(0, minEffPrice - yPad);
-        const yMax = maxEffPrice + yPad;
+   function renderPool() {
+    const total = state.reserveA + state.reserveB;
+    const pctA = total > 0 ? (state.reserveA / total * 100) : 50;
+    const pctB = total > 0 ? (state.reserveB / total * 100) : 50;
 
-        function xToPixel(x) { return pad.left + (x / maxIn) * plotW; }
-        function yToPixel(y) { return pad.top + plotH - ((y - yMin) / (yMax - yMin)) * plotH; }
+    document.getElementById('poolAval').textContent = formatNum(state.reserveA);
+    document.getElementById('poolBval').textContent = formatNum(state.reserveB);
+    document.getElementById('poolAbar').style.width = pctA + '%';
+    document.getElementById('poolBbar').style.width = pctB + '%';
 
-        ctx.clearRect(0, 0, w, h);
+    const k = getK();
+    document.getElementById('poolFormula').textContent =
+     'x · y = k → ' + formatNum(state.reserveA) + ' × ' + formatNum(state.reserveB) + ' = ' + formatK(k);
 
-        // Grid
-        ctx.strokeStyle = 'rgba(255,255,255,0.06)';
-        ctx.lineWidth = 1;
-        for (let i = 0; i <= 4; i++) {
-          const y = yMin + (i / 4) * (yMax - yMin);
-          ctx.beginPath();
-          ctx.moveTo(pad.left, yToPixel(y));
-          ctx.lineTo(w - pad.right, yToPixel(y));
-          ctx.stroke();
-          ctx.fillStyle = '#8892b0';
-          ctx.font = '10px Inter, sans-serif';
-          ctx.textAlign = 'right';
-          ctx.fillText(y.toFixed(3), pad.left - 6, yToPixel(y) + 3);
-        }
-        for (let i = 0; i <= 5; i++) {
-          const x = (i / 5) * maxIn;
-          ctx.beginPath();
-          ctx.moveTo(xToPixel(x), pad.top);
-          ctx.lineTo(xToPixel(x), h - pad.bottom);
-          ctx.stroke();
-          ctx.fillStyle = '#8892b0';
-          ctx.font = '10px Inter, sans-serif';
-          ctx.textAlign = 'center';
-          ctx.fillText(x.toFixed(0), xToPixel(x), h - pad.bottom + 16);
-        }
+    const price = getPrice();
+    document.getElementById('poolPrice').textContent = price.toFixed(4);
+   }
 
-        // Labels
-        ctx.fillStyle = '#8892b0';
-        ctx.font = '11px Inter, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText('Swap Size (TOKEN_A)', pad.left + plotW / 2, h - 4);
-        ctx.save();
-        ctx.translate(14, pad.top + plotH / 2);
-        ctx.rotate(-Math.PI / 2);
-        ctx.fillText('Precio Efectivo (B/A)', 0, 0);
-        ctx.restore();
+   function renderMetrics() {
+    const price = getPrice();
+    document.getElementById('metricPrice').innerHTML = formatNum(price) + ' <small>B/A</small>';
+    const totalLiq = state.reserveA + state.reserveB;
+    document.getElementById('metricLiq').innerHTML = '$' + formatNum(totalLiq) + ' <small>USD</small>';
+    document.getElementById('metricLP').textContent = formatNum(state.lpTotal);
+    document.getElementById('metricFee').innerHTML = formatNum(state.totalFeeA) + ' <small>A</small>';
+   }
 
-        // Curve fill
-        ctx.beginPath();
-        ctx.moveTo(xToPixel(points[0].x), yToPixel(points[0].effPrice));
-        for (let i = 1; i < points.length; i++) {
-          ctx.lineTo(xToPixel(points[i].x), yToPixel(points[i].effPrice));
-        }
-        ctx.lineTo(xToPixel(points[points.length - 1].x), yToPixel(yMin));
-        ctx.lineTo(xToPixel(points[0].x), yToPixel(yMin));
-        ctx.closePath();
-        const grad = ctx.createLinearGradient(0, pad.top, 0, h - pad.bottom);
-        grad.addColorStop(0, 'rgba(156, 100, 255, 0.2)');
-        grad.addColorStop(1, 'rgba(156, 100, 255, 0.02)');
-        ctx.fillStyle = grad;
-        ctx.fill();
+   function renderBadge() {
+    document.getElementById('swapCount').textContent = state.swapCount;
+    if (state.swapCount >= 3 && !state.badgeEarned) {
+     state.badgeEarned = true;
+     saveState();
+     notify('🏅 ¡Logro desbloqueado! Eres un TRADER.');
+    }
+    if (state.badgeEarned) {
+     document.getElementById('badgeTrader').classList.remove('badge-hidden');
+    } else {
+     document.getElementById('badgeTrader').classList.add('badge-hidden');
+    }
+   }
 
-        // Curve line
-        ctx.beginPath();
-        ctx.moveTo(xToPixel(points[0].x), yToPixel(points[0].effPrice));
-        for (let i = 1; i < points.length; i++) {
-          ctx.lineTo(xToPixel(points[i].x), yToPixel(points[i].effPrice));
-        }
-        ctx.strokeStyle = '#9c64ff';
-        ctx.lineWidth = 2.5;
-        ctx.stroke();
+   function drawChart(highlightIn, highlightOut) {
+    const canvas = document.getElementById('slippageChart');
+    const rect = canvas.parentElement.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    const w = Math.min(700, rect.width - 2);
+    const h = 300;
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
 
-        // Highlight current swap
-        if (highlightIn > 0 && highlightOut > 0) {
-          const effP = highlightOut / highlightIn;
-          const px = xToPixel(Math.min(highlightIn, maxIn));
-          const py = yToPixel(Math.min(Math.max(effP, yMin), yMax));
+    const pad = { top: 20, right: 20, bottom: 40, left: 50 };
+    const plotW = w - pad.left - pad.right;
+    const plotH = h - pad.top - pad.bottom;
 
-          ctx.beginPath();
-          ctx.arc(px, py, 6, 0, Math.PI * 2);
-          ctx.fillStyle = '#ffc800';
-          ctx.fill();
-          ctx.strokeStyle = '#fff';
-          ctx.lineWidth = 2;
-          ctx.stroke();
+    const price = getPrice();
+    const maxIn = Math.min(state.reserveA * 0.5, 500);
+    const steps = 50;
+    const points = [];
+    let maxEffPrice = price * 1.05;
+    let minEffPrice = price;
 
-          // Vertical line
-          ctx.setLineDash([4, 4]);
-          ctx.beginPath();
-          ctx.moveTo(px, pad.top);
-          ctx.lineTo(px, h - pad.bottom);
-          ctx.strokeStyle = 'rgba(255, 200, 0, 0.4)';
-          ctx.lineWidth = 1;
-          ctx.stroke();
-          ctx.setLineDash([]);
+    for (let i = 0; i <= steps; i++) {
+     const x = (i / steps) * maxIn;
+     const feeAmt = x * FEE;
+     const afterFee = x - feeAmt;
+     const out = x === 0 ? 0 : (state.reserveB * afterFee) / (state.reserveA + afterFee);
+     const effPrice = x === 0 ? price : out / x;
+     points.push({ x, effPrice });
+     if (effPrice > maxEffPrice) maxEffPrice = effPrice;
+     if (effPrice < minEffPrice) minEffPrice = effPrice;
+    }
 
-          ctx.fillStyle = '#ffc800';
-          ctx.font = '10px Inter, sans-serif';
-          ctx.textAlign = 'left';
-          ctx.fillText('◀ swap actual', px + 8, py + 3);
-        }
+    const yPad = (maxEffPrice - minEffPrice) * 0.15;
+    const yMin = Math.max(0, minEffPrice - yPad);
+    const yMax = maxEffPrice + yPad;
 
-        // Ideal price line (no slippage)
-        ctx.setLineDash([3, 4]);
-        ctx.beginPath();
-        ctx.moveTo(pad.left, yToPixel(price));
-        ctx.lineTo(w - pad.right, yToPixel(price));
-        ctx.strokeStyle = 'rgba(0, 255, 200, 0.25)';
-        ctx.lineWidth = 1;
-        ctx.stroke();
-        ctx.setLineDash([]);
-        ctx.fillStyle = 'rgba(0, 255, 200, 0.5)';
-        ctx.font = '9px Inter, sans-serif';
-        ctx.textAlign = 'left';
-        ctx.fillText('precio ideal (sin slippage)', w - pad.right - 140, yToPixel(price) - 4);
-      }
+    function xToPixel(x) { return pad.left + (x / maxIn) * plotW; }
+    function yToPixel(y) { return pad.top + plotH - ((y - yMin) / (yMax - yMin)) * plotH; }
 
-      function renderAll(highlightIn, highlightOut) {
-        renderPool();
-        renderMetrics();
-        renderBadge();
-        drawChart(highlightIn || 0, highlightOut || 0);
-        saveState();
-      }
+    ctx.clearRect(0, 0, w, h);
 
-      function addLiquidity() {
-        const inputA = parseFloat(document.getElementById('liqA').value);
-        if (isNaN(inputA) || inputA <= 0) { notify('Ingresa una cantidad válida de TOKEN_A.'); return; }
-        const ratio = state.reserveB / state.reserveA;
-        const amountB = inputA * ratio;
-        if (amountB <= 0) { notify('El pool necesita liquidez primero.'); return; }
+    // Grid
+    ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 4; i++) {
+     const y = yMin + (i / 4) * (yMax - yMin);
+     ctx.beginPath();
+     ctx.moveTo(pad.left, yToPixel(y));
+     ctx.lineTo(w - pad.right, yToPixel(y));
+     ctx.stroke();
+     ctx.fillStyle = '#8892b0';
+     ctx.font = '10px Inter, sans-serif';
+     ctx.textAlign = 'right';
+     ctx.fillText(y.toFixed(3), pad.left - 6, yToPixel(y) + 3);
+    }
+    for (let i = 0; i <= 5; i++) {
+     const x = (i / 5) * maxIn;
+     ctx.beginPath();
+     ctx.moveTo(xToPixel(x), pad.top);
+     ctx.lineTo(xToPixel(x), h - pad.bottom);
+     ctx.stroke();
+     ctx.fillStyle = '#8892b0';
+     ctx.font = '10px Inter, sans-serif';
+     ctx.textAlign = 'center';
+     ctx.fillText(x.toFixed(0), xToPixel(x), h - pad.bottom + 16);
+    }
 
-        const lpMinted = Math.sqrt(inputA * amountB);
+    // Labels
+    ctx.fillStyle = '#8892b0';
+    ctx.font = '11px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Swap Size (TOKEN_A)', pad.left + plotW / 2, h - 4);
+    ctx.save();
+    ctx.translate(14, pad.top + plotH / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText('Precio Efectivo (B/A)', 0, 0);
+    ctx.restore();
 
-        state.reserveA += inputA;
-        state.reserveB += amountB;
-        state.lpTotal += lpMinted;
+    // Curve fill
+    ctx.beginPath();
+    ctx.moveTo(xToPixel(points[0].x), yToPixel(points[0].effPrice));
+    for (let i = 1; i < points.length; i++) {
+     ctx.lineTo(xToPixel(points[i].x), yToPixel(points[i].effPrice));
+    }
+    ctx.lineTo(xToPixel(points[points.length - 1].x), yToPixel(yMin));
+    ctx.lineTo(xToPixel(points[0].x), yToPixel(yMin));
+    ctx.closePath();
+    const grad = ctx.createLinearGradient(0, pad.top, 0, h - pad.bottom);
+    grad.addColorStop(0, 'rgba(156, 100, 255, 0.2)');
+    grad.addColorStop(1, 'rgba(156, 100, 255, 0.02)');
+    ctx.fillStyle = grad;
+    ctx.fill();
 
-        document.getElementById('liqA').value = '';
-        document.getElementById('liqB').value = '';
-        document.getElementById('liqLP').value = '';
+    // Curve line
+    ctx.beginPath();
+    ctx.moveTo(xToPixel(points[0].x), yToPixel(points[0].effPrice));
+    for (let i = 1; i < points.length; i++) {
+     ctx.lineTo(xToPixel(points[i].x), yToPixel(points[i].effPrice));
+    }
+    ctx.strokeStyle = '#9c64ff';
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
 
-        notify('✅ Añadiste ' + formatNum(inputA) + ' A + ' + formatNum(amountB) + ' B · Recibiste ' + formatNum(lpMinted) + ' LP');
-        renderAll();
-      }
+    // Highlight current swap
+    if (highlightIn > 0 && highlightOut > 0) {
+     const effP = highlightOut / highlightIn;
+     const px = xToPixel(Math.min(highlightIn, maxIn));
+     const py = yToPixel(Math.min(Math.max(effP, yMin), yMax));
 
-      function swap() {
-        const inputA = parseFloat(document.getElementById('swapIn').value);
-        if (isNaN(inputA) || inputA <= 0) { notify('Ingresa una cantidad válida de TOKEN_A.'); return; }
-        if (inputA >= state.reserveA) { notify('Cantidad muy grande. El pool no tiene suficiente liquidez.'); return; }
+     ctx.beginPath();
+     ctx.arc(px, py, 6, 0, Math.PI * 2);
+     ctx.fillStyle = '#ffc800';
+     ctx.fill();
+     ctx.strokeStyle = '#fff';
+     ctx.lineWidth = 2;
+     ctx.stroke();
 
-        const fee = inputA * FEE;
-        const afterFee = inputA - fee;
-        const output = (state.reserveB * afterFee) / (state.reserveA + afterFee);
-        const priceImpact = (1 - (state.reserveB * 0.997 / (state.reserveA + inputA * 0.997)) / (state.reserveB / state.reserveA)) * 100;
+     // Vertical line
+     ctx.setLineDash([4, 4]);
+     ctx.beginPath();
+     ctx.moveTo(px, pad.top);
+     ctx.lineTo(px, h - pad.bottom);
+     ctx.strokeStyle = 'rgba(255, 200, 0, 0.4)';
+     ctx.lineWidth = 1;
+     ctx.stroke();
+     ctx.setLineDash([]);
 
-        state.reserveA += inputA;
-        state.reserveB -= output;
-        state.totalFeeA += fee;
-        state.swapCount++;
+     ctx.fillStyle = '#ffc800';
+     ctx.font = '10px Inter, sans-serif';
+     ctx.textAlign = 'left';
+     ctx.fillText('◀ swap actual', px + 8, py + 3);
+    }
 
-        document.getElementById('swapIn').value = '';
+    // Ideal price line (no slippage)
+    ctx.setLineDash([3, 4]);
+    ctx.beginPath();
+    ctx.moveTo(pad.left, yToPixel(price));
+    ctx.lineTo(w - pad.right, yToPixel(price));
+    ctx.strokeStyle = 'rgba(0, 255, 200, 0.25)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = 'rgba(0, 255, 200, 0.5)';
+    ctx.font = '9px Inter, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('precio ideal (sin slippage)', w - pad.right - 140, yToPixel(price) - 4);
+   }
 
-        notify('🔄 Swap ejecutado: ' + formatNum(output) + ' TOKEN_B recibido');
-        renderAll(inputA, output);
-      }
+   function renderAll(highlightIn, highlightOut) {
+    renderPool();
+    renderMetrics();
+    renderBadge();
+    drawChart(highlightIn || 0, highlightOut || 0);
+    saveState();
+   }
 
-      // Tab switching
-      document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-          document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-          document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-          this.classList.add('active');
-          document.getElementById('tab' + this.dataset.tab.charAt(0).toUpperCase() + this.dataset.tab.slice(1)).classList.add('active');
-        });
-      });
+   function addLiquidity() {
+    const inputA = parseFloat(document.getElementById('liqA').value);
+    if (isNaN(inputA) || inputA <= 0) { notify('Ingresa una cantidad válida de TOKEN_A.'); return; }
+    const ratio = state.reserveB / state.reserveA;
+    const amountB = inputA * ratio;
+    if (amountB <= 0) { notify('El pool necesita liquidez primero.'); return; }
 
-      // Auto-calculate B for liquidity
-      document.getElementById('liqA').addEventListener('input', function() {
-        const val = parseFloat(this.value);
-        if (!isNaN(val) && val > 0 && state.reserveA > 0) {
-          const ratio = state.reserveB / state.reserveA;
-          const amountB = val * ratio;
-          document.getElementById('liqB').value = formatNum(amountB);
-          const lp = Math.sqrt(val * amountB);
-          document.getElementById('liqLP').value = formatNum(lp);
-        } else {
-          document.getElementById('liqB').value = '';
-          document.getElementById('liqLP').value = '';
-        }
-      });
+    const lpMinted = Math.sqrt(inputA * amountB);
 
-      // Auto-calculate swap output
-      document.getElementById('swapIn').addEventListener('input', function() {
-        const val = parseFloat(this.value);
-        if (!isNaN(val) && val > 0 && val < state.reserveA) {
-          const fee = val * FEE;
-          const afterFee = val - fee;
-          const output = (state.reserveB * afterFee) / (state.reserveA + afterFee);
-          const priceImpact = (1 - (state.reserveB * 0.997 / (state.reserveA + val * 0.997)) / (state.reserveB / state.reserveA)) * 100;
+    state.reserveA += inputA;
+    state.reserveB += amountB;
+    state.lpTotal += lpMinted;
 
-          document.getElementById('swapOut').textContent = formatNum(output);
-          document.getElementById('swapFee').textContent = formatNum(fee);
+    document.getElementById('liqA').value = '';
+    document.getElementById('liqB').value = '';
+    document.getElementById('liqLP').value = '';
 
-          const impactEl = document.getElementById('swapImpact');
-          impactEl.textContent = priceImpact.toFixed(2) + '%';
-          impactEl.className = 'value';
-          if (priceImpact < 1) impactEl.classList.add('impact-low');
-          else if (priceImpact < 5) impactEl.classList.add('impact-med');
-          else impactEl.classList.add('impact-high');
-        } else {
-          document.getElementById('swapOut').textContent = '0.00';
-          document.getElementById('swapFee').textContent = '0.00';
-          document.getElementById('swapImpact').textContent = '0.00%';
-          document.getElementById('swapImpact').className = 'value impact-low';
-        }
-      });
+    notify('✅ Añadiste ' + formatNum(inputA) + ' A + ' + formatNum(amountB) + ' B · Recibiste ' + formatNum(lpMinted) + ' LP');
+    renderAll();
+   }
 
-      document.getElementById('addLiqBtn').addEventListener('click', addLiquidity);
-      document.getElementById('swapBtn').addEventListener('click', swap);
+   function swap() {
+    const inputA = parseFloat(document.getElementById('swapIn').value);
+    if (isNaN(inputA) || inputA <= 0) { notify('Ingresa una cantidad válida de TOKEN_A.'); return; }
+    if (inputA >= state.reserveA) { notify('Cantidad muy grande. El pool no tiene suficiente liquidez.'); return; }
 
-      document.getElementById('resetBtn').addEventListener('click', function() {
-        if (!confirm('¿Resetear el pool? Perderás todo tu progreso.')) return;
-        Object.assign(state, getDefaultState());
-        document.getElementById('swapIn').value = '';
-        document.getElementById('liqA').value = '';
-        document.getElementById('liqB').value = '';
-        document.getElementById('liqLP').value = '';
-        document.getElementById('swapOut').textContent = '0.00';
-        document.getElementById('swapFee').textContent = '0.00';
-        document.getElementById('swapImpact').textContent = '0.00%';
-        document.getElementById('swapImpact').className = 'value impact-low';
-        renderAll();
-        notify('🔄 Pool restaurado a valores iniciales.');
-      });
+    const fee = inputA * FEE;
+    const afterFee = inputA - fee;
+    const output = (state.reserveB * afterFee) / (state.reserveA + afterFee);
+    const priceImpact = (1 - (state.reserveB * 0.997 / (state.reserveA + inputA * 0.997)) / (state.reserveB / state.reserveA)) * 100;
 
-      renderAll();
-    })();
-  </script>
+    state.reserveA += inputA;
+    state.reserveB -= output;
+    state.totalFeeA += fee;
+    state.swapCount++;
+
+    document.getElementById('swapIn').value = '';
+
+    notify('🔄 Swap ejecutado: ' + formatNum(output) + ' TOKEN_B recibido');
+    renderAll(inputA, output);
+   }
+
+   // Tab switching
+   document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+     this.classList.add('active');
+     document.getElementById('tab' + this.dataset.tab.charAt(0).toUpperCase() + this.dataset.tab.slice(1)).classList.add('active');
+    });
+   });
+
+   // Auto-calculate B for liquidity
+   document.getElementById('liqA').addEventListener('input', function() {
+    const val = parseFloat(this.value);
+    if (!isNaN(val) && val > 0 && state.reserveA > 0) {
+     const ratio = state.reserveB / state.reserveA;
+     const amountB = val * ratio;
+     document.getElementById('liqB').value = formatNum(amountB);
+     const lp = Math.sqrt(val * amountB);
+     document.getElementById('liqLP').value = formatNum(lp);
+    } else {
+     document.getElementById('liqB').value = '';
+     document.getElementById('liqLP').value = '';
+    }
+   });
+
+   // Auto-calculate swap output
+   document.getElementById('swapIn').addEventListener('input', function() {
+    const val = parseFloat(this.value);
+    if (!isNaN(val) && val > 0 && val < state.reserveA) {
+     const fee = val * FEE;
+     const afterFee = val - fee;
+     const output = (state.reserveB * afterFee) / (state.reserveA + afterFee);
+     const priceImpact = (1 - (state.reserveB * 0.997 / (state.reserveA + val * 0.997)) / (state.reserveB / state.reserveA)) * 100;
+
+     document.getElementById('swapOut').textContent = formatNum(output);
+     document.getElementById('swapFee').textContent = formatNum(fee);
+
+     const impactEl = document.getElementById('swapImpact');
+     impactEl.textContent = priceImpact.toFixed(2) + '%';
+     impactEl.className = 'value';
+     if (priceImpact < 1) impactEl.classList.add('impact-low');
+     else if (priceImpact < 5) impactEl.classList.add('impact-med');
+     else impactEl.classList.add('impact-high');
+    } else {
+     document.getElementById('swapOut').textContent = '0.00';
+     document.getElementById('swapFee').textContent = '0.00';
+     document.getElementById('swapImpact').textContent = '0.00%';
+     document.getElementById('swapImpact').className = 'value impact-low';
+    }
+   });
+
+   document.getElementById('addLiqBtn').addEventListener('click', addLiquidity);
+   document.getElementById('swapBtn').addEventListener('click', swap);
+
+   document.getElementById('resetBtn').addEventListener('click', function() {
+    if (!confirm('¿Resetear el pool? Perderás todo tu progreso.')) return;
+    Object.assign(state, getDefaultState());
+    document.getElementById('swapIn').value = '';
+    document.getElementById('liqA').value = '';
+    document.getElementById('liqB').value = '';
+    document.getElementById('liqLP').value = '';
+    document.getElementById('swapOut').textContent = '0.00';
+    document.getElementById('swapFee').textContent = '0.00';
+    document.getElementById('swapImpact').textContent = '0.00%';
+    document.getElementById('swapImpact').className = 'value impact-low';
+    renderAll();
+    notify('🔄 Pool restaurado a valores iniciales.');
+   });
+
+   renderAll();
+  })();
+ </script>
 </body>
 </html>

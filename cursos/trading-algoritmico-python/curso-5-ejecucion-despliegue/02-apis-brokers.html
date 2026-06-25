@@ -1,192 +1,192 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Ejecución y Despliegue | APIs de Brokers</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #111a2e 100%);
-      background-size: 200% 200%; animation: gradientShift 20s ease infinite;
-      font-family: 'Inter', sans-serif; color: #eef5ff; min-height: 100vh;
-      display: flex; align-items: center; justify-content: center; padding: 2rem 1rem;
-    }
-    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-    .curso5-container {
-      max-width: 1300px; width: 100%;
-      background: rgba(15, 25, 45, 0.65); backdrop-filter: blur(12px);
-      border-radius: 3rem; border: 1px solid rgba(255,179,71,0.25);
-      box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden;
-    }
-    .hero-header { background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%); padding: 2rem 2rem 1.5rem; text-align: center; border-bottom: 2px solid #ffb347; }
-    .hero-header h1 { font-size: 2.6rem; font-weight: 800; background: linear-gradient(135deg, #FFF, #ffcc77, #ffb347); -webkit-background-clip: text; background-clip: text; color: transparent; }
-    .hero-header p { font-size: 1.1rem; color: #ffe4b9; margin-top: 0.3rem; }
-    .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
-    .chip { background: rgba(255,179,71,0.15); border: 1px solid #ffb347; padding: 0.3rem 1rem; border-radius: 40px; font-size: 0.8rem; font-weight: 600; }
-    .analogy-card { background: #1e2a3acc; margin: 1.5rem 2rem; padding: 1.2rem 1.8rem; border-radius: 2rem; border-left: 8px solid #ffb347; font-size: 1rem; line-height: 1.6; }
-    .main-area { padding: 0.5rem 2rem; }
-    .broker-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 1rem; margin: 1rem 0; }
-    .broker-btn { background: #1a2a4a; border: 1px solid #2c3e66; border-radius: 1.5rem; padding: 1rem; text-align: center; cursor: pointer; transition: 0.2s; }
-    .broker-btn:hover { border-color: #ffb347; transform: translateY(-3px); }
-    .broker-btn.active { border-color: #ffb347; background: #2a3e55; box-shadow: 0 0 15px rgba(255,179,71,0.2); }
-    .broker-btn h3 { font-size: 1.1rem; }
-    .broker-btn p { font-size: 0.8rem; color: #ccc; }
-    .scene-box { background: #141e33cc; border-radius: 2rem; padding: 1.2rem; margin: 1rem 0; }
-    .scene-box h3 { margin-bottom: 0.5rem; color: #ffb347; }
-    .scene-btn { background: #2c3e66; border: none; color: #eef5ff; padding: 0.5rem 1.2rem; border-radius: 2rem; margin: 0.3rem; cursor: pointer; transition: 0.2s; }
-    .scene-btn:hover { background: #3e5a88; }
-    .scene-btn.active { background: #ffb347; color: #1e1a0c; }
-    .json-box { background: #0a1220; border-radius: 1rem; padding: 1rem; font-family: monospace; font-size: 0.8rem; white-space: pre-wrap; margin-top: 0.5rem; border-left: 3px solid #ffb347; color: #aaddff; }
-    .feedback { background: #00000099; margin: 1.5rem 2rem; padding: 1rem; border-radius: 1.5rem; text-align: center; font-weight: 500; border-left: 4px solid #ffb347; }
-    .insignia { text-align: center; background: #0c1b2f; border-radius: 2rem; margin: 0 2rem 1.5rem; padding: 1rem; border: 1px dashed gold; }
-    .insignia i { font-size: 2.5rem; color: gold; }
-    .hidden { display: none; }
-    .btn-action { background: linear-gradient(95deg, #f0a500, #ff6a00); border: none; padding: 0.8rem 1.8rem; font-weight: bold; border-radius: 3rem; cursor: pointer; font-size: 1rem; transition: 0.2s; color: #1e1a0c; }
-    .btn-action:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(240,165,0,0.5); }
-    .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
-    .nav-link { background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem; font-weight: 600; text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; }
-    .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(255,179,71,0.4); }
-    .nav-link.next { background: linear-gradient(95deg, #f0a500, #ff6a00); color: #1e1a0c; }
-    .nav-link.menu { background: #1a2a4a; border: 1px solid #3399ff; }
-    footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
-    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
-  </style>
-  <link rel="stylesheet" href="../../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>EjecuciÃ³n y Despliegue | APIs de Brokers</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+   background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #111a2e 100%);
+   background-size: 200% 200%; animation: gradientShift 20s ease infinite;
+   font-family: 'Inter', sans-serif; color: #eef5ff; min-height: 100vh;
+   display: flex; align-items: center; justify-content: center; padding: 2rem 1rem;
+  }
+  @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .curso5-container {
+   max-width: 1300px; width: 100%;
+   background: rgba(15, 25, 45, 0.65); backdrop-filter: blur(12px);
+   border-radius: 3rem; border: 1px solid rgba(255,179,71,0.25);
+   box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden;
+  }
+  .hero-header { background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%); padding: 2rem 2rem 1.5rem; text-align: center; border-bottom: 2px solid #ffb347; }
+  .hero-header h1 { font-size: 2.6rem; font-weight: 800; background: linear-gradient(135deg, #FFF, #ffcc77, #ffb347); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero-header p { font-size: 1.1rem; color: #ffe4b9; margin-top: 0.3rem; }
+  .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
+  .chip { background: rgba(255,179,71,0.15); border: 1px solid #ffb347; padding: 0.3rem 1rem; border-radius: 40px; font-size: 0.8rem; font-weight: 600; }
+  .analogy-card { background: #1e2a3acc; margin: 1.5rem 2rem; padding: 1.2rem 1.8rem; border-radius: 2rem; border-left: 8px solid #ffb347; font-size: 1rem; line-height: 1.6; }
+  .main-area { padding: 0.5rem 2rem; }
+  .broker-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 1rem; margin: 1rem 0; }
+  .broker-btn { background: #1a2a4a; border: 1px solid #2c3e66; border-radius: 1.5rem; padding: 1rem; text-align: center; cursor: pointer; transition: 0.2s; }
+  .broker-btn:hover { border-color: #ffb347; transform: translateY(-3px); }
+  .broker-btn.active { border-color: #ffb347; background: #2a3e55; box-shadow: 0 0 15px rgba(255,179,71,0.2); }
+  .broker-btn h3 { font-size: 1.1rem; }
+  .broker-btn p { font-size: 0.8rem; color: #ccc; }
+  .scene-box { background: #141e33cc; border-radius: 2rem; padding: 1.2rem; margin: 1rem 0; }
+  .scene-box h3 { margin-bottom: 0.5rem; color: #ffb347; }
+  .scene-btn { background: #2c3e66; border: none; color: #eef5ff; padding: 0.5rem 1.2rem; border-radius: 2rem; margin: 0.3rem; cursor: pointer; transition: 0.2s; }
+  .scene-btn:hover { background: #3e5a88; }
+  .scene-btn.active { background: #ffb347; color: #1e1a0c; }
+  .json-box { background: #0a1220; border-radius: 1rem; padding: 1rem; font-family: monospace; font-size: 0.8rem; white-space: pre-wrap; margin-top: 0.5rem; border-left: 3px solid #ffb347; color: #aaddff; }
+  .feedback { background: #00000099; margin: 1.5rem 2rem; padding: 1rem; border-radius: 1.5rem; text-align: center; font-weight: 500; border-left: 4px solid #ffb347; }
+  .insignia { text-align: center; background: #0c1b2f; border-radius: 2rem; margin: 0 2rem 1.5rem; padding: 1rem; border: 1px dashed gold; }
+  .insignia i { font-size: 2.5rem; color: gold; }
+  .hidden { display: none; }
+  .btn-action { background: linear-gradient(95deg, #f0a500, #ff6a00); border: none; padding: 0.8rem 1.8rem; font-weight: bold; border-radius: 3rem; cursor: pointer; font-size: 1rem; transition: 0.2s; color: #1e1a0c; }
+  .btn-action:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(240,165,0,0.5); }
+  .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
+  .nav-link { background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem; font-weight: 600; text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; }
+  .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(255,179,71,0.4); }
+  .nav-link.next { background: linear-gradient(95deg, #f0a500, #ff6a00); color: #1e1a0c; }
+  .nav-link.menu { background: #1a2a4a; border: 1px solid #3399ff; }
+  footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
+ </style>
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
 </head>
 <body>
-  <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a></nav>
-  <div class="curso5-container">
-    <div class="hero-header">
-      <h1>🔌 APIs de Brokers</h1>
-      <p>Alpaca, Interactive Brokers, Binance, Bybit</p>
-      <div class="badge-area">
-        <span class="chip"><i class="fas fa-plug"></i> REST</span>
-        <span class="chip"><i class="fas fa-key"></i> Autenticación</span>
-        <span class="chip"><i class="fas fa-tachometer-alt"></i> Rate Limits</span>
-      </div>
-    </div>
-    <div class="analogy-card"><strong>🔌 Piénsalo así:</strong> Cada broker expone una API como un idioma diferente. Alpaca es como el inglés —limpio, moderno, RESTful. IB es como el alemán —muy potente pero con语法 compleja. Binance y Bybit son como el mandarín —mucho volumen, muchos endpoints, pero increíblemente eficientes. Aprender a hablar con cada uno te da acceso a diferentes mercados.</div>
-    <div class="main-area">
-      <p style="margin:0.5rem 0 0.8rem;"><strong>Elige un broker para explorar su API:</strong></p>
-      <div class="broker-grid">
-        <div class="broker-btn" data-broker="alpaca" onclick="selectBroker('alpaca')">
-          <h3>🦙 Alpaca</h3>
-          <p>RESTful, OAuth, 200 req/min</p>
-        </div>
-        <div class="broker-btn" data-broker="ib" onclick="selectBroker('ib')">
-          <h3>🏦 IB</h3>
-          <p>Client Portal API, TWS, 50 req/s</p>
-        </div>
-        <div class="broker-btn" data-broker="binance" onclick="selectBroker('binance')">
-          <h3>🟡 Binance</h3>
-          <p>REST + WSS, HMAC, 1200 req/min</p>
-        </div>
-        <div class="broker-btn" data-broker="bybit" onclick="selectBroker('bybit')">
-          <h3>🔵 Bybit</h3>
-          <p>REST + WSS, API-Key, 600 req/min</p>
-        </div>
-      </div>
-      <div class="scene-box">
-        <h3 id="brokerTitle">Alpaca — Documentación</h3>
-        <p style="font-size:0.85rem; color:#b9ccee; margin-bottom:0.6rem;" id="brokerDesc">API moderna con soporte OAuth. Ideal para empezar.</p>
-        <div style="display:flex;flex-wrap:wrap;gap:0.4rem;">
-          <button class="scene-btn active" data-scene="0" onclick="selectScene(0)">📈 Obtener Precio</button>
-          <button class="scene-btn" data-scene="1" onclick="selectScene(1)">📤 Enviar Orden</button>
-          <button class="scene-btn" data-scene="2" onclick="selectScene(2)">📊 Consultar Portafolio</button>
-        </div>
-        <div class="json-box" id="jsonDisplay">{
-  "endpoint": "GET /v2/stocks/{symbol}/quotes/latest",
-  "headers": { "Authorization": "Bearer <api_key>" },
-  "response": {
-    "symbol": "AAPL",
-    "ask_price": 198.45,
-    "bid_price": 198.40,
-    "ask_size": 1200,
-    "bid_size": 800,
-    "timestamp": "2026-06-18T14:30:00Z"
-  }
-}</div>
-      </div>
-    </div>
-    <div id="feedbackMsg" class="feedback">💡 Explora los 3 escenarios para cada broker. Al finalizar, haz clic en "Completar Módulo".</div>
-    <div id="insigniaArea" class="insignia hidden">
-      <i class="fas fa-medal"></i>
-      <h3>🏅 INTEGRADOR DE APIs 🏅</h3>
-      <p>Conoces las APIs de los principales brokers. ¡Puedes conectar tu bot a cualquier exchange!</p>
-    </div>
-    <div style="text-align:center;margin:1rem 0;">
-      <button class="btn-action" onclick="completeModule()"><i class="fas fa-check"></i> Completar Módulo</button>
-    </div>
-    <div class="nav-links">
-      <a href="01-portal.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
-      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
-      <a href="03-ordenes-ejecucion.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
-    </div>
-    <footer><i class="fas fa-crown"></i> Ejecución y Despliegue · Trading Algorítmico con Python</footer>
+ <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a></nav>
+ <div class="curso5-container">
+  <div class="hero-header">
+   <h1>ðŸ”Œ APIs de Brokers</h1>
+   <p>Alpaca, Interactive Brokers, Binance, Bybit</p>
+   <div class="badge-area">
+    <span class="chip"><i class="fas fa-plug"></i> REST</span>
+    <span class="chip"><i class="fas fa-key"></i> AutenticaciÃ³n</span>
+    <span class="chip"><i class="fas fa-tachometer-alt"></i> Rate Limits</span>
+   </div>
   </div>
-  <script>
-    const STORAGE_KEY = '02';
-    const brokers = {
-      alpaca: { name: '🦙 Alpaca', desc: 'API moderna con soporte OAuth. 200 requests/minuto. Sandbox disponible.', scenes: [
-        '{\n  "endpoint": "GET /v2/stocks/{symbol}/quotes/latest",\n  "auth": "OAuth2 Bearer Token",\n  "response": {\n    "symbol": "AAPL",\n    "ask_price": 198.45,\n    "bid_price": 198.40,\n    "ask_size": 1200,\n    "bid_size": 800,\n    "timestamp": "2026-06-18T14:30:00Z"\n  }\n}',
-        '{\n  "endpoint": "POST /v2/orders",\n  "auth": "OAuth2 Bearer Token",\n  "body": {\n    "symbol": "AAPL",\n    "qty": 100,\n    "side": "buy",\n    "type": "market",\n    "time_in_force": "day"\n  },\n  "response": {\n    "id": "61e8f9a0-...",\n    "status": "accepted",\n    "filled_qty": 100,\n    "filled_avg_price": 198.42\n  }\n}',
-        '{\n  "endpoint": "GET /v2/account/portfolio/history",\n  "auth": "OAuth2 Bearer Token",\n  "response": {\n    "total_value": 125430.80,\n    "cash": 32450.00,\n    "equity": 125430.80,\n    "profit_loss": 1230.50,\n    "pl_percent": 0.99\n  }\n}'
-      ]},
-      ib: { name: '🏦 Interactive Brokers', desc: 'Client Portal API o TWS API. Potente pero compleja. Ideal para institucionales.', scenes: [
-        '{\n  "endpoint": "GET /v1/api/iserver/marketdata/snapshot?conid=265598",\n  "auth": "Gateway Session",\n  "response": {\n    "conid": 265598,\n    "symbol": "AAPL",\n    "last": 198.45,\n    "change": 1.20,\n    "volume": 15234500,\n    "bid": 198.40,\n    "ask": 198.47\n  }\n}',
-        '{\n  "endpoint": "POST /v1/api/iserver/account/{id}/orders",\n  "auth": "Gateway Session",\n  "body": {\n    "orders": [{\n      "conid": 265598,\n      "orderType": "MKT",\n      "side": "BUY",\n      "quantity": 100,\n      "tif": "DAY"\n    }]\n  },\n  "response": {\n    "order_id": "12345abc",\n    "order_status": "PreSubmitted",\n    "local_order_id": "67890"\n  }\n}',
-        '{\n  "endpoint": "GET /v1/api/portfolio/{id}/summary",\n  "auth": "Gateway Session",\n  "response": {\n    "accountvalue": { "stock": 125430.80, "cash": 32450.00 },\n    "total": { "value": "125430.80", "currency": "USD" },\n    "nlv": 125430.80,\n    "unrealizedPnL": 1230.50\n  }\n}'
-      ]},
-      binance: { name: '🟡 Binance', desc: 'API más usada del mundo cripto. HMAC + REST. 1200 req/min. Excelente documentación.', scenes: [
-        '{\n  "endpoint": "GET /api/v3/ticker/bookTicker?symbol=BTCUSDT",\n  "auth": "None (pública)",\n  "response": {\n    "symbol": "BTCUSDT",\n    "bidPrice": "67450.00",\n    "bidQty": "0.850000",\n    "askPrice": "67451.50",\n    "askQty": "1.200000"\n  }\n}',
-        '{\n  "endpoint": "POST /api/v3/order",\n  "auth": "HMAC SHA256 + API Key",\n  "body": {\n    "symbol": "BTCUSDT",\n    "side": "BUY",\n    "type": "MARKET",\n    "quantity": 0.01\n  },\n  "response": {\n    "orderId": 123456789,\n    "status": "FILLED",\n    "executedQty": "0.01000000",\n    "cummulativeQuoteQty": "674.51"\n  }\n}',
-        '{\n  "endpoint": "GET /api/v3/account",\n  "auth": "HMAC SHA256 + API Key",\n  "response": {\n    "balances": [\n      { "asset": "BTC", "free": "0.50000000", "locked": "0.01000000" },\n      { "asset": "USDT", "free": "45200.00", "locked": "1000.00" }\n    ],\n    "canTrade": true\n  }\n}'
-      ]},
-      bybit: { name: '🔵 Bybit', desc: 'API para derivados cripto. REST + WebSocket. 600 req/min. Ideal para futuros.', scenes: [
-        '{\n  "endpoint": "GET /v5/market/tickers?category=spot&symbol=BTCUSDT",\n  "auth": "None (pública)",\n  "response": {\n    "result": {\n      "list": [{\n        "symbol": "BTCUSDT",\n        "bid1Price": "67450.00",\n        "ask1Price": "67451.50",\n        "lastPrice": "67450.50",\n        "volume24h": "18523.45"\n      }]\n    }\n  }\n}',
-        '{\n  "endpoint": "POST /v5/order/create",\n  "auth": "API Key + Timestamp + Sign",\n  "body": {\n    "category": "spot",\n    "symbol": "BTCUSDT",\n    "side": "Buy",\n    "orderType": "Market",\n    "qty": "0.01"\n  },\n  "response": {\n    "result": {\n      "orderId": "abcd1234-...",\n      "orderStatus": "Filled",\n      "cumExecQty": "0.01",\n      "cumExecValue": "674.51"\n    }\n  }\n}',
-        '{\n  "endpoint": "GET /v5/account/wallet-balance?accountType=UNIFIED",\n  "auth": "API Key + Timestamp + Sign",\n  "response": {\n    "result": {\n      "list": [{\n        "totalEquity": "150000.00",\n        "coin": [\n          { "coin": "BTC", "walletBalance": "1.5000" },\n          { "coin": "USDT", "walletBalance": "50000.00" }\n        ]\n      }]\n    }\n  }\n}'
-      ]}
-    };
-    let currentBroker = 'alpaca', currentScene = 0;
-    function selectBroker(b) {
-      currentBroker = b;
-      document.querySelectorAll('.broker-btn').forEach(el => el.classList.remove('active'));
-      document.querySelector('.broker-btn[data-broker="'+b+'"]').classList.add('active');
-      document.getElementById('brokerTitle').textContent = brokers[b].name + ' — Documentación';
-      document.getElementById('brokerDesc').textContent = brokers[b].desc;
-      currentScene = 0;
-      updateScenes();
-      showScene(0);
-    }
-    function selectScene(i) { currentScene = i; showScene(i); }
-    function showScene(i) {
-      document.querySelectorAll('.scene-btn').forEach((el,idx) => el.classList.toggle('active',idx===i));
-      document.getElementById('jsonDisplay').textContent = brokers[currentBroker].scenes[i];
-    }
-    function updateScenes() { showScene(currentScene); }
-    function completeModule() {
-      const insignia = document.getElementById('insigniaArea');
-      insignia.classList.remove('hidden');
-      localStorage.setItem(STORAGE_KEY, 'true');
-      document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_0');
-    }
-    selectBroker('alpaca');
-    if (localStorage.getItem(STORAGE_KEY) === 'true') {
-      document.getElementById('insigniaArea').classList.remove('hidden');
-      document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_1');
-    }
-  </script>
+  <div class="analogy-card"><strong>ðŸ”Œ PiÃ©nsalo asÃ­:</strong> Cada broker expone una API como un idioma diferente. Alpaca es como el inglÃ©s â€”limpio, moderno, RESTful. IB es como el alemÃ¡n â€”muy potente pero conè¯­æ³• compleja. Binance y Bybit son como el mandarÃ­n â€”mucho volumen, muchos endpoints, pero increÃ­blemente eficientes. Aprender a hablar con cada uno te da acceso a diferentes mercados.</div>
+  <div class="main-area">
+   <p style="margin:0.5rem 0 0.8rem;"><strong>Elige un broker para explorar su API:</strong></p>
+   <div class="broker-grid">
+    <div class="broker-btn" data-broker="alpaca" onclick="selectBroker('alpaca')">
+     <h3>ðŸ¦™ Alpaca</h3>
+     <p>RESTful, OAuth, 200 req/min</p>
+    </div>
+    <div class="broker-btn" data-broker="ib" onclick="selectBroker('ib')">
+     <h3>ðŸ¦ IB</h3>
+     <p>Client Portal API, TWS, 50 req/s</p>
+    </div>
+    <div class="broker-btn" data-broker="binance" onclick="selectBroker('binance')">
+     <h3>ðŸŸ¡ Binance</h3>
+     <p>REST + WSS, HMAC, 1200 req/min</p>
+    </div>
+    <div class="broker-btn" data-broker="bybit" onclick="selectBroker('bybit')">
+     <h3>ðŸ”µ Bybit</h3>
+     <p>REST + WSS, API-Key, 600 req/min</p>
+    </div>
+   </div>
+   <div class="scene-box">
+    <h3 id="brokerTitle">Alpaca â€” DocumentaciÃ³n</h3>
+    <p style="font-size:0.85rem; color:#b9ccee; margin-bottom:0.6rem;" id="brokerDesc">API moderna con soporte OAuth. Ideal para empezar.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:0.4rem;">
+     <button class="scene-btn active" data-scene="0" onclick="selectScene(0)">ðŸ“ˆ Obtener Precio</button>
+     <button class="scene-btn" data-scene="1" onclick="selectScene(1)">ðŸ“¤ Enviar Orden</button>
+     <button class="scene-btn" data-scene="2" onclick="selectScene(2)">ðŸ“Š Consultar Portafolio</button>
+    </div>
+    <div class="json-box" id="jsonDisplay">{
+ "endpoint": "GET /v2/stocks/{symbol}/quotes/latest",
+ "headers": { "Authorization": "Bearer <api_key>" },
+ "response": {
+  "symbol": "AAPL",
+  "ask_price": 198.45,
+  "bid_price": 198.40,
+  "ask_size": 1200,
+  "bid_size": 800,
+  "timestamp": "2026-06-18T14:30:00Z"
+ }
+}</div>
+   </div>
+  </div>
+  <div id="feedbackMsg" class="feedback">ðŸ’¡ Explora los 3 escenarios para cada broker. Al finalizar, haz clic en "Completar MÃ³dulo".</div>
+  <div id="insigniaArea" class="insignia hidden">
+   <i class="fas fa-medal"></i>
+   <h3>ðŸ… INTEGRADOR DE APIs ðŸ…</h3>
+   <p>Conoces las APIs de los principales brokers. Â¡Puedes conectar tu bot a cualquier exchange!</p>
+  </div>
+  <div style="text-align:center;margin:1rem 0;">
+   <button class="btn-action" onclick="completeModule()"><i class="fas fa-check"></i> Completar MÃ³dulo</button>
+  </div>
+  <div class="nav-links">
+   <a href="01-portal.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+   <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> MenÃº</a>
+   <a href="03-ordenes-ejecucion.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> EjecuciÃ³n y Despliegue Â· Trading AlgorÃ­tmico con Python</footer>
+ </div>
+ <script>
+  const STORAGE_KEY = '02';
+  const brokers = {
+   alpaca: { name: 'ðŸ¦™ Alpaca', desc: 'API moderna con soporte OAuth. 200 requests/minuto. Sandbox disponible.', scenes: [
+    '{\n "endpoint": "GET /v2/stocks/{symbol}/quotes/latest",\n "auth": "OAuth2 Bearer Token",\n "response": {\n  "symbol": "AAPL",\n  "ask_price": 198.45,\n  "bid_price": 198.40,\n  "ask_size": 1200,\n  "bid_size": 800,\n  "timestamp": "2026-06-18T14:30:00Z"\n }\n}',
+    '{\n "endpoint": "POST /v2/orders",\n "auth": "OAuth2 Bearer Token",\n "body": {\n  "symbol": "AAPL",\n  "qty": 100,\n  "side": "buy",\n  "type": "market",\n  "time_in_force": "day"\n },\n "response": {\n  "id": "61e8f9a0-...",\n  "status": "accepted",\n  "filled_qty": 100,\n  "filled_avg_price": 198.42\n }\n}',
+    '{\n "endpoint": "GET /v2/account/portfolio/history",\n "auth": "OAuth2 Bearer Token",\n "response": {\n  "total_value": 125430.80,\n  "cash": 32450.00,\n  "equity": 125430.80,\n  "profit_loss": 1230.50,\n  "pl_percent": 0.99\n }\n}'
+   ]},
+   ib: { name: 'ðŸ¦ Interactive Brokers', desc: 'Client Portal API o TWS API. Potente pero compleja. Ideal para institucionales.', scenes: [
+    '{\n "endpoint": "GET /v1/api/iserver/marketdata/snapshot?conid=265598",\n "auth": "Gateway Session",\n "response": {\n  "conid": 265598,\n  "symbol": "AAPL",\n  "last": 198.45,\n  "change": 1.20,\n  "volume": 15234500,\n  "bid": 198.40,\n  "ask": 198.47\n }\n}',
+    '{\n "endpoint": "POST /v1/api/iserver/account/{id}/orders",\n "auth": "Gateway Session",\n "body": {\n  "orders": [{\n   "conid": 265598,\n   "orderType": "MKT",\n   "side": "BUY",\n   "quantity": 100,\n   "tif": "DAY"\n  }]\n },\n "response": {\n  "order_id": "12345abc",\n  "order_status": "PreSubmitted",\n  "local_order_id": "67890"\n }\n}',
+    '{\n "endpoint": "GET /v1/api/portfolio/{id}/summary",\n "auth": "Gateway Session",\n "response": {\n  "accountvalue": { "stock": 125430.80, "cash": 32450.00 },\n  "total": { "value": "125430.80", "currency": "USD" },\n  "nlv": 125430.80,\n  "unrealizedPnL": 1230.50\n }\n}'
+   ]},
+   binance: { name: 'ðŸŸ¡ Binance', desc: 'API mÃ¡s usada del mundo cripto. HMAC + REST. 1200 req/min. Excelente documentaciÃ³n.', scenes: [
+    '{\n "endpoint": "GET /api/v3/ticker/bookTicker?symbol=BTCUSDT",\n "auth": "None (pÃºblica)",\n "response": {\n  "symbol": "BTCUSDT",\n  "bidPrice": "67450.00",\n  "bidQty": "0.850000",\n  "askPrice": "67451.50",\n  "askQty": "1.200000"\n }\n}',
+    '{\n "endpoint": "POST /api/v3/order",\n "auth": "HMAC SHA256 + API Key",\n "body": {\n  "symbol": "BTCUSDT",\n  "side": "BUY",\n  "type": "MARKET",\n  "quantity": 0.01\n },\n "response": {\n  "orderId": 123456789,\n  "status": "FILLED",\n  "executedQty": "0.01000000",\n  "cummulativeQuoteQty": "674.51"\n }\n}',
+    '{\n "endpoint": "GET /api/v3/account",\n "auth": "HMAC SHA256 + API Key",\n "response": {\n  "balances": [\n   { "asset": "BTC", "free": "0.50000000", "locked": "0.01000000" },\n   { "asset": "USDT", "free": "45200.00", "locked": "1000.00" }\n  ],\n  "canTrade": true\n }\n}'
+   ]},
+   bybit: { name: 'ðŸ”µ Bybit', desc: 'API para derivados cripto. REST + WebSocket. 600 req/min. Ideal para futuros.', scenes: [
+    '{\n "endpoint": "GET /v5/market/tickers?category=spot&symbol=BTCUSDT",\n "auth": "None (pÃºblica)",\n "response": {\n  "result": {\n   "list": [{\n    "symbol": "BTCUSDT",\n    "bid1Price": "67450.00",\n    "ask1Price": "67451.50",\n    "lastPrice": "67450.50",\n    "volume24h": "18523.45"\n   }]\n  }\n }\n}',
+    '{\n "endpoint": "POST /v5/order/create",\n "auth": "API Key + Timestamp + Sign",\n "body": {\n  "category": "spot",\n  "symbol": "BTCUSDT",\n  "side": "Buy",\n  "orderType": "Market",\n  "qty": "0.01"\n },\n "response": {\n  "result": {\n   "orderId": "abcd1234-...",\n   "orderStatus": "Filled",\n   "cumExecQty": "0.01",\n   "cumExecValue": "674.51"\n  }\n }\n}',
+    '{\n "endpoint": "GET /v5/account/wallet-balance?accountType=UNIFIED",\n "auth": "API Key + Timestamp + Sign",\n "response": {\n  "result": {\n   "list": [{\n    "totalEquity": "150000.00",\n    "coin": [\n     { "coin": "BTC", "walletBalance": "1.5000" },\n     { "coin": "USDT", "walletBalance": "50000.00" }\n    ]\n   }]\n  }\n }\n}'
+   ]}
+  };
+  let currentBroker = 'alpaca', currentScene = 0;
+  function selectBroker(b) {
+   currentBroker = b;
+   document.querySelectorAll('.broker-btn').forEach(el => el.classList.remove('active'));
+   document.querySelector('.broker-btn[data-broker="'+b+'"]').classList.add('active');
+   document.getElementById('brokerTitle').textContent = brokers[b].name + ' â€” DocumentaciÃ³n';
+   document.getElementById('brokerDesc').textContent = brokers[b].desc;
+   currentScene = 0;
+   updateScenes();
+   showScene(0);
+  }
+  function selectScene(i) { currentScene = i; showScene(i); }
+  function showScene(i) {
+   document.querySelectorAll('.scene-btn').forEach((el,idx) => el.classList.toggle('active',idx===i));
+   document.getElementById('jsonDisplay').textContent = brokers[currentBroker].scenes[i];
+  }
+  function updateScenes() { showScene(currentScene); }
+  function completeModule() {
+   const insignia = document.getElementById('insigniaArea');
+   insignia.classList.remove('hidden');
+   localStorage.setItem(STORAGE_KEY, 'true');
+   document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_0');
+  }
+  selectBroker('alpaca');
+  if (localStorage.getItem(STORAGE_KEY) === 'true') {
+   document.getElementById('insigniaArea').classList.remove('hidden');
+   document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_1');
+  }
+ </script>
 
 <script>
 window.I18N_DATA={
-  'fb_0': { es: '✅ Módulo completado. ¡Has explorado las APIs de los 4 brokers!', en: '✅ Módulo completado. ¡Has explorado las APIs de los 4 brokers!' },
-  'fb_1': { es: '✅ Ya completaste este módulo. ¡Bien hecho!', en: '✅ Ya completaste este módulo. ¡Bien hecho!' }
+ 'fb_0': { es: 'âœ… MÃ³dulo completado. Â¡Has explorado las APIs de los 4 brokers!', en: 'âœ… MÃ³dulo completado. Â¡Has explorado las APIs de los 4 brokers!' },
+ 'fb_1': { es: 'âœ… Ya completaste este mÃ³dulo. Â¡Bien hecho!', en: 'âœ… Ya completaste este mÃ³dulo. Â¡Bien hecho!' }
 };
 </script>
-</body>
+ </body>
 </html>
 

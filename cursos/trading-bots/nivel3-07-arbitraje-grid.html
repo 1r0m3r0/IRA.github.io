@@ -1,234 +1,234 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bot Trader | Arbitraje y Grid Trading</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700;14..32,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-    body{background:linear-gradient(145deg,#001800,#002800);font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:2rem 1rem}
-    .container{max-width:1300px;width:100%;background:rgba(0,20,0,.88);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(0,220,88,.22);box-shadow:0 25px 55px rgba(0,0,0,.65);overflow:hidden}
-    .hero{background:linear-gradient(95deg,#001000,#001e00);padding:1.8rem 2rem;text-align:center;border-bottom:2px solid #00dc58}
-    .hero h1{font-size:1.9rem;font-weight:800;background:linear-gradient(135deg,#ccffdd,#66ee99,#00dc58);-webkit-background-clip:text;background-clip:text;color:transparent}
-    .hero p{margin-top:.5rem;font-size:.95rem;color:#339955}
-    .chips{display:flex;justify-content:center;gap:.6rem;flex-wrap:wrap;margin-top:.7rem}
-    .chip{background:rgba(0,220,88,.1);border:1px solid rgba(0,220,88,.3);color:#339955;font-size:.72rem;padding:.25rem .8rem;border-radius:2rem}
-    .week-badge{display:inline-block;background:rgba(0,220,88,.15);border:1px solid #00dc58;color:#00dc58;font-size:.75rem;font-weight:700;padding:.3rem 1rem;border-radius:2rem;margin-top:.5rem}
-    .analogy{background:#001400cc;margin:1.4rem 2rem;padding:1.1rem 1.7rem;border-radius:2rem;border-left:7px solid #00dc58;font-size:.9rem;line-height:1.65}
-    .analogy strong{color:#66ee99}
-    .tabs{display:flex;gap:.5rem;padding:0 1.8rem .5rem;flex-wrap:wrap}
-    .tab{background:#002000;border:1px solid rgba(0,220,88,.2);color:#339955;padding:.5rem 1.4rem;border-radius:2rem;cursor:pointer;font-size:.82rem;font-weight:600;transition:.15s}
-    .tab.active{background:#003800;border-color:#00dc58;color:#00dc58}
-    .tab-content{display:none;padding:0 1.8rem 1.5rem}
-    .tab-content.active{display:block}
-    .panel{background:#001400dd;border-radius:1.8rem;padding:1.2rem 1.3rem;border:1px solid rgba(0,220,88,.15);margin-bottom:1rem}
-    .panel h3{font-size:.88rem;font-weight:700;color:#66ee99;margin-bottom:.7rem}
-    .two-col{display:flex;gap:1rem;flex-wrap:wrap}
-    .two-col > *{flex:1;min-width:260px}
-    label{font-size:.72rem;color:#226633;text-transform:uppercase;letter-spacing:.06rem;display:block;margin-bottom:.3rem;margin-top:.5rem}
-    select,input[type=number],input[type=text]{background:#001000;border:1px solid rgba(0,220,88,.2);color:#eef5ff;padding:.45rem .7rem;border-radius:.75rem;font-size:.82rem;font-family:'Inter',sans-serif;width:100%}
-    .slider-row{display:flex;align-items:center;gap:.4rem;margin:.25rem 0}
-    .slider-row label{min-width:110px;margin:0}
-    .slider-row input[type=range]{flex:1;accent-color:#00dc58}
-    .slider-row span{font-size:.75rem;color:#66ee99;font-family:'JetBrains Mono',monospace;min-width:52px;text-align:right}
-    .btn{background:linear-gradient(95deg,#00dc58,#00aa44);border:none;padding:.7rem 1.4rem;font-weight:700;border-radius:2rem;cursor:pointer;color:#001000;font-size:.88rem;transition:.2s;display:inline-flex;align-items:center;gap:.5rem}
-    .btn:hover{transform:translateY(-2px);box-shadow:0 0 18px rgba(0,220,88,.4)}
-    pre{background:#000a00;border-radius:1rem;padding:1rem;font-family:'JetBrains Mono',monospace;font-size:.73rem;line-height:1.7;overflow-x:auto;color:#ccffdd;border:1px solid rgba(0,220,88,.12)}
-    .kw{color:#00dc58}.fn{color:#66ee99}.cm{color:#226633}.str{color:#80eeaa}.num{color:#ffd070}
-    /* Arbitrage scanner */
-    .ex-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem}
-    .ex-card{background:#001800;border-radius:1.2rem;padding:.8rem;border:1px solid rgba(0,220,88,.15);text-align:center}
-    .ex-name{font-size:.8rem;font-weight:700;color:#66ee99;margin-bottom:.4rem}
-    .ex-price{font-size:1.3rem;font-weight:800;font-family:'JetBrains Mono',monospace;color:#eef5ff}
-    .ex-spread{font-size:.7rem;margin-top:.2rem}
-    .arb-result{background:#001800;border-radius:1.2rem;padding:.9rem 1.1rem;margin-top:.7rem;border:1px solid rgba(0,220,88,.2)}
-    .arb-row{display:flex;justify-content:space-between;align-items:center;padding:.25rem 0;border-bottom:1px solid rgba(0,220,88,.08);font-size:.78rem}
-    .arb-row:last-child{border:none}
-    .arb-key{color:#339955}
-    .arb-val{font-family:'JetBrains Mono',monospace;font-weight:700}
-    /* Grid trading */
-    .grid-vis{position:relative;height:280px;background:#000a00;border-radius:1rem;overflow:hidden;margin-bottom:.7rem}
-    canvas{border-radius:1rem;display:block}
-    .stat-row{display:flex;gap:.5rem;flex-wrap:wrap}
-    .stat-mini{flex:1;min-width:88px;background:#001800;border-radius:1rem;padding:.55rem;text-align:center;border:1px solid rgba(0,220,88,.12)}
-    .stat-mini .sv{font-size:1rem;font-weight:800;font-family:monospace;color:#00dc58}
-    .stat-mini .sl{font-size:.6rem;color:#226633;margin-top:.1rem}
-    .feedback{background:#00000088;margin:0 1.8rem 1rem;padding:.85rem 1.2rem;border-radius:1.5rem;text-align:center;border-left:4px solid #00dc58;font-size:.88rem;line-height:1.55}
-    .insignia{text-align:center;background:#001400;border-radius:2rem;margin:0 1.8rem 1.5rem;padding:1rem;border:1px dashed gold}
-    .insignia i{font-size:2.4rem;color:gold}
-    .hidden{display:none}
-    .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.4rem 2rem}
-    .nav-link{background:#001800;padding:.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:.5rem;font-size:.88rem;transition:.2s}
-    .nav-link:hover{transform:translateY(-2px)}
-    .nav-link.next{background:linear-gradient(95deg,#f0a500,#ff6a00);color:#1e1a0c}
-    footer{text-align:center;padding:1rem;font-size:.72rem;border-top:1px solid #001400;color:#226633}
-    @media(max-width:860px){.ex-grid{grid-template-columns:1fr 1fr}.hero h1{font-size:1.4rem}}
-  </style>
-  <link rel="stylesheet" href="../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Bot Trader | Arbitraje y Grid Trading</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700;14..32,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+  body{background:linear-gradient(145deg,#001800,#002800);font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:2rem 1rem}
+  .container{max-width:1300px;width:100%;background:rgba(0,20,0,.88);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(0,220,88,.22);box-shadow:0 25px 55px rgba(0,0,0,.65);overflow:hidden}
+  .hero{background:linear-gradient(95deg,#001000,#001e00);padding:1.8rem 2rem;text-align:center;border-bottom:2px solid #00dc58}
+  .hero h1{font-size:1.9rem;font-weight:800;background:linear-gradient(135deg,#ccffdd,#66ee99,#00dc58);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p{margin-top:.5rem;font-size:.95rem;color:#339955}
+  .chips{display:flex;justify-content:center;gap:.6rem;flex-wrap:wrap;margin-top:.7rem}
+  .chip{background:rgba(0,220,88,.1);border:1px solid rgba(0,220,88,.3);color:#339955;font-size:.72rem;padding:.25rem .8rem;border-radius:2rem}
+  .week-badge{display:inline-block;background:rgba(0,220,88,.15);border:1px solid #00dc58;color:#00dc58;font-size:.75rem;font-weight:700;padding:.3rem 1rem;border-radius:2rem;margin-top:.5rem}
+  .analogy{background:#001400cc;margin:1.4rem 2rem;padding:1.1rem 1.7rem;border-radius:2rem;border-left:7px solid #00dc58;font-size:.9rem;line-height:1.65}
+  .analogy strong{color:#66ee99}
+  .tabs{display:flex;gap:.5rem;padding:0 1.8rem .5rem;flex-wrap:wrap}
+  .tab{background:#002000;border:1px solid rgba(0,220,88,.2);color:#339955;padding:.5rem 1.4rem;border-radius:2rem;cursor:pointer;font-size:.82rem;font-weight:600;transition:.15s}
+  .tab.active{background:#003800;border-color:#00dc58;color:#00dc58}
+  .tab-content{display:none;padding:0 1.8rem 1.5rem}
+  .tab-content.active{display:block}
+  .panel{background:#001400dd;border-radius:1.8rem;padding:1.2rem 1.3rem;border:1px solid rgba(0,220,88,.15);margin-bottom:1rem}
+  .panel h3{font-size:.88rem;font-weight:700;color:#66ee99;margin-bottom:.7rem}
+  .two-col{display:flex;gap:1rem;flex-wrap:wrap}
+  .two-col > *{flex:1;min-width:260px}
+  label{font-size:.72rem;color:#226633;text-transform:uppercase;letter-spacing:.06rem;display:block;margin-bottom:.3rem;margin-top:.5rem}
+  select,input[type=number],input[type=text]{background:#001000;border:1px solid rgba(0,220,88,.2);color:#eef5ff;padding:.45rem .7rem;border-radius:.75rem;font-size:.82rem;font-family:'Inter',sans-serif;width:100%}
+  .slider-row{display:flex;align-items:center;gap:.4rem;margin:.25rem 0}
+  .slider-row label{min-width:110px;margin:0}
+  .slider-row input[type=range]{flex:1;accent-color:#00dc58}
+  .slider-row span{font-size:.75rem;color:#66ee99;font-family:'JetBrains Mono',monospace;min-width:52px;text-align:right}
+  .btn{background:linear-gradient(95deg,#00dc58,#00aa44);border:none;padding:.7rem 1.4rem;font-weight:700;border-radius:2rem;cursor:pointer;color:#001000;font-size:.88rem;transition:.2s;display:inline-flex;align-items:center;gap:.5rem}
+  .btn:hover{transform:translateY(-2px);box-shadow:0 0 18px rgba(0,220,88,.4)}
+  pre{background:#000a00;border-radius:1rem;padding:1rem;font-family:'JetBrains Mono',monospace;font-size:.73rem;line-height:1.7;overflow-x:auto;color:#ccffdd;border:1px solid rgba(0,220,88,.12)}
+  .kw{color:#00dc58}.fn{color:#66ee99}.cm{color:#226633}.str{color:#80eeaa}.num{color:#ffd070}
+  /* Arbitrage scanner */
+  .ex-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem}
+  .ex-card{background:#001800;border-radius:1.2rem;padding:.8rem;border:1px solid rgba(0,220,88,.15);text-align:center}
+  .ex-name{font-size:.8rem;font-weight:700;color:#66ee99;margin-bottom:.4rem}
+  .ex-price{font-size:1.3rem;font-weight:800;font-family:'JetBrains Mono',monospace;color:#eef5ff}
+  .ex-spread{font-size:.7rem;margin-top:.2rem}
+  .arb-result{background:#001800;border-radius:1.2rem;padding:.9rem 1.1rem;margin-top:.7rem;border:1px solid rgba(0,220,88,.2)}
+  .arb-row{display:flex;justify-content:space-between;align-items:center;padding:.25rem 0;border-bottom:1px solid rgba(0,220,88,.08);font-size:.78rem}
+  .arb-row:last-child{border:none}
+  .arb-key{color:#339955}
+  .arb-val{font-family:'JetBrains Mono',monospace;font-weight:700}
+  /* Grid trading */
+  .grid-vis{position:relative;height:280px;background:#000a00;border-radius:1rem;overflow:hidden;margin-bottom:.7rem}
+  canvas{border-radius:1rem;display:block}
+  .stat-row{display:flex;gap:.5rem;flex-wrap:wrap}
+  .stat-mini{flex:1;min-width:88px;background:#001800;border-radius:1rem;padding:.55rem;text-align:center;border:1px solid rgba(0,220,88,.12)}
+  .stat-mini .sv{font-size:1rem;font-weight:800;font-family:monospace;color:#00dc58}
+  .stat-mini .sl{font-size:.6rem;color:#226633;margin-top:.1rem}
+  .feedback{background:#00000088;margin:0 1.8rem 1rem;padding:.85rem 1.2rem;border-radius:1.5rem;text-align:center;border-left:4px solid #00dc58;font-size:.88rem;line-height:1.55}
+  .insignia{text-align:center;background:#001400;border-radius:2rem;margin:0 1.8rem 1.5rem;padding:1rem;border:1px dashed gold}
+  .insignia i{font-size:2.4rem;color:gold}
+  .hidden{display:none}
+  .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.4rem 2rem}
+  .nav-link{background:#001800;padding:.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:.5rem;font-size:.88rem;transition:.2s}
+  .nav-link:hover{transform:translateY(-2px)}
+  .nav-link.next{background:linear-gradient(95deg,#f0a500,#ff6a00);color:#1e1a0c}
+  footer{text-align:center;padding:1rem;font-size:.72rem;border-top:1px solid #001400;color:#226633}
+  @media(max-width:860px){.ex-grid{grid-template-columns:1fr 1fr}.hero h1{font-size:1.4rem}}
+ </style>
+ <link rel="stylesheet" href="../../assets/css/theme.css">
 </head>
 <body>
 <nav class="brand-return-nav">
-  <a href="../../index.html">&larr; Portfolio</a>
-  <a href="../../cursos/index.html">Cursos</a>
+ <a href="../../index.html">&larr; Portfolio</a>
+ <a href="../../cursos/index.html">Cursos</a>
 </nav>
 <div class="container">
-  <div class="hero">
-    <h1>⚡ ARBITRAJE & GRID TRADING: Dinero en el Spread</h1>
-    <p>Dos estrategias que no necesitan predecir la dirección — solo aprovechar la ineficiencia del mercado</p>
-    <div class="week-badge"><i class="fas fa-calendar-week"></i> Semanas 7-8: Estrategias Algorítmicas</div>
-    <div class="chips">
-      <span class="chip">Arbitraje triangular</span>
-      <span class="chip">Cross-exchange arb</span>
-      <span class="chip">Grid bot config</span>
-      <span class="chip">ROI vs Buy&Hold</span>
-    </div>
+ <div class="hero">
+  <h1>âš¡ ARBITRAJE & GRID TRADING: Dinero en el Spread</h1>
+  <p>Dos estrategias que no necesitan predecir la direcciÃ³n â€” solo aprovechar la ineficiencia del mercado</p>
+  <div class="week-badge"><i class="fas fa-calendar-week"></i> Semanas 7-8: Estrategias AlgorÃ­tmicas</div>
+  <div class="chips">
+   <span class="chip">Arbitraje triangular</span>
+   <span class="chip">Cross-exchange arb</span>
+   <span class="chip">Grid bot config</span>
+   <span class="chip">ROI vs Buy&Hold</span>
   </div>
+ </div>
 
-  <div class="analogy">
-    <strong>💱 Piénsalo así:</strong> El <strong>arbitraje</strong> es como comprar arroz más barato en el mercado municipal y revenderlo al supermercado — mismo producto, diferente precio en dos lugares. El <strong>Grid Trading</strong> es como ser el mercado mismo: pones órdenes de compra cada $100 más abajo y órdenes de venta cada $100 más arriba. Cuando el precio sube y baja dentro del rango, cobras el spread en cada movimiento. Ambas estrategias generan retornos sin necesitar saber si el mercado sube o baja.
-    <div style="margin-top:.5rem;font-size:.78rem;color:#226633"><strong>📚 Fuentes:</strong> Kissell, R. (2013) — <em>"The Science of Algorithmic Trading and Portfolio Management"</em>. Elsevier. / Chan, E. (2017) — <em>"Machine Trading"</em>. Wiley.</div>
-  </div>
+ <div class="analogy">
+  <strong>ðŸ’± PiÃ©nsalo asÃ­:</strong> El <strong>arbitraje</strong> es como comprar arroz mÃ¡s barato en el mercado municipal y revenderlo al supermercado â€” mismo producto, diferente precio en dos lugares. El <strong>Grid Trading</strong> es como ser el mercado mismo: pones Ã³rdenes de compra cada $100 mÃ¡s abajo y Ã³rdenes de venta cada $100 mÃ¡s arriba. Cuando el precio sube y baja dentro del rango, cobras el spread en cada movimiento. Ambas estrategias generan retornos sin necesitar saber si el mercado sube o baja.
+  <div style="margin-top:.5rem;font-size:.78rem;color:#226633"><strong>ðŸ“š Fuentes:</strong> Kissell, R. (2013) â€” <em>"The Science of Algorithmic Trading and Portfolio Management"</em>. Elsevier. / Chan, E. (2017) â€” <em>"Machine Trading"</em>. Wiley.</div>
+ </div>
 
-  <div class="tabs">
-    <div class="tab active" onclick="switchTab('arb',this)">⚡ Arbitraje</div>
-    <div class="tab" onclick="switchTab('grid',this)">📊 Grid Trading</div>
-  </div>
+ <div class="tabs">
+  <div class="tab active" onclick="switchTab('arb',this)">âš¡ Arbitraje</div>
+  <div class="tab" onclick="switchTab('grid',this)">ðŸ“Š Grid Trading</div>
+ </div>
 
-  <!-- ARBITRAJE TAB -->
-  <div class="tab-content active" id="tab-arb">
-    <div class="two-col">
-      <div class="panel">
-        <h3><i class="fas fa-exchange-alt"></i> Scanner de Arbitraje</h3>
-        <label>Par de trading</label>
-        <select id="arbPair" onchange="scanArb()">
-          <option value="btc">BTC/USDT</option>
-          <option value="eth">ETH/USDT</option>
-          <option value="bnb">BNB/USDT</option>
-          <option value="sol">SOL/USDT</option>
-        </select>
-        <label>Capital disponible ($)</label>
-        <input type="number" id="arbCapital" value="10000" onchange="scanArb()">
-        <label>Fee por exchange (%)</label>
-        <div class="slider-row"><label style="min-width:0">Fee</label><input type="range" id="arbFee" min="0.05" max="0.2" value="0.1" step="0.01" oninput="document.getElementById('arbFeeV').textContent=this.value+'%';scanArb()"><span id="arbFeeV">0.1%</span></div>
-        <button class="btn" onclick="scanArb()"><i class="fas fa-search"></i> Escanear Spread</button>
-      </div>
+ <!-- ARBITRAJE TAB -->
+ <div class="tab-content active" id="tab-arb">
+  <div class="two-col">
+   <div class="panel">
+    <h3><i class="fas fa-exchange-alt"></i> Scanner de Arbitraje</h3>
+    <label>Par de trading</label>
+    <select id="arbPair" onchange="scanArb()">
+     <option value="btc">BTC/USDT</option>
+     <option value="eth">ETH/USDT</option>
+     <option value="bnb">BNB/USDT</option>
+     <option value="sol">SOL/USDT</option>
+    </select>
+    <label>Capital disponible ($)</label>
+    <input type="number" id="arbCapital" value="10000" onchange="scanArb()">
+    <label>Fee por exchange (%)</label>
+    <div class="slider-row"><label style="min-width:0">Fee</label><input type="range" id="arbFee" min="0.05" max="0.2" value="0.1" step="0.01" oninput="document.getElementById('arbFeeV').textContent=this.value+'%';scanArb()"><span id="arbFeeV">0.1%</span></div>
+    <button class="btn" onclick="scanArb()"><i class="fas fa-search"></i> Escanear Spread</button>
+   </div>
 
-      <div>
-        <div class="panel">
-          <h3><i class="fas fa-store"></i> Precios por Exchange</h3>
-          <div class="ex-grid" id="exGrid"></div>
-        </div>
-        <div class="panel">
-          <h3><i class="fas fa-calculator"></i> Cálculo de Ganancia</h3>
-          <div class="arb-result" id="arbResult"><div style="color:#339955;text-align:center;font-size:.82rem">Escanea para ver oportunidades</div></div>
-        </div>
-      </div>
+   <div>
+    <div class="panel">
+     <h3><i class="fas fa-store"></i> Precios por Exchange</h3>
+     <div class="ex-grid" id="exGrid"></div>
     </div>
     <div class="panel">
-      <h3><i class="fas fa-code"></i> Python — Arbitraje con CCXT</h3>
-      <pre><span class="kw">import</span> ccxt.async_support <span class="kw">as</span> ccxt
+     <h3><i class="fas fa-calculator"></i> CÃ¡lculo de Ganancia</h3>
+     <div class="arb-result" id="arbResult"><div style="color:#339955;text-align:center;font-size:.82rem">Escanea para ver oportunidades</div></div>
+    </div>
+   </div>
+  </div>
+  <div class="panel">
+   <h3><i class="fas fa-code"></i> Python â€” Arbitraje con CCXT</h3>
+   <pre><span class="kw">import</span> ccxt.async_support <span class="kw">as</span> ccxt
 <span class="kw">import</span> asyncio
 
 <span class="kw">async def</span> <span class="fn">scan_arbitrage</span>(symbol=<span class="str">'BTC/USDT'</span>):
-    exchanges = {
-        <span class="str">'binance'</span>: ccxt.<span class="fn">binance</span>({<span class="str">'enableRateLimit'</span>: <span class="kw">True</span>}),
-        <span class="str">'kraken'</span> : ccxt.<span class="fn">kraken</span>({<span class="str">'enableRateLimit'</span>: <span class="kw">True</span>}),
-        <span class="str">'coinbase'</span>: ccxt.<span class="fn">coinbase</span>({<span class="str">'enableRateLimit'</span>: <span class="kw">True</span>}),
-    }
-    <span class="cm"># Fetch all orderbooks concurrently</span>
-    tickers = <span class="kw">await</span> asyncio.<span class="fn">gather</span>(*[
-        ex.<span class="fn">fetch_ticker</span>(symbol) <span class="kw">for</span> ex <span class="kw">in</span> exchanges.<span class="fn">values</span>()
-    ])
-    prices = {name: t[<span class="str">'last'</span>] <span class="kw">for</span> name,t <span class="kw">in</span> <span class="fn">zip</span>(exchanges, tickers)}
+  exchanges = {
+    <span class="str">'binance'</span>: ccxt.<span class="fn">binance</span>({<span class="str">'enableRateLimit'</span>: <span class="kw">True</span>}),
+    <span class="str">'kraken'</span> : ccxt.<span class="fn">kraken</span>({<span class="str">'enableRateLimit'</span>: <span class="kw">True</span>}),
+    <span class="str">'coinbase'</span>: ccxt.<span class="fn">coinbase</span>({<span class="str">'enableRateLimit'</span>: <span class="kw">True</span>}),
+  }
+  <span class="cm"># Fetch all orderbooks concurrently</span>
+  tickers = <span class="kw">await</span> asyncio.<span class="fn">gather</span>(*[
+    ex.<span class="fn">fetch_ticker</span>(symbol) <span class="kw">for</span> ex <span class="kw">in</span> exchanges.<span class="fn">values</span>()
+  ])
+  prices = {name: t[<span class="str">'last'</span>] <span class="kw">for</span> name,t <span class="kw">in</span> <span class="fn">zip</span>(exchanges, tickers)}
 
-    best_buy  = <span class="fn">min</span>(prices, key=prices.<span class="fn">get</span>)
-    best_sell = <span class="fn">max</span>(prices, key=prices.<span class="fn">get</span>)
-    spread_pct = (prices[best_sell] - prices[best_buy]) / prices[best_buy] * <span class="num">100</span>
+  best_buy = <span class="fn">min</span>(prices, key=prices.<span class="fn">get</span>)
+  best_sell = <span class="fn">max</span>(prices, key=prices.<span class="fn">get</span>)
+  spread_pct = (prices[best_sell] - prices[best_buy]) / prices[best_buy] * <span class="num">100</span>
 
-    total_fee = <span class="num">0.1</span> * <span class="num">2</span>  <span class="cm"># buy + sell fee</span>
-    net_profit_pct = spread_pct - total_fee
+  total_fee = <span class="num">0.1</span> * <span class="num">2</span> <span class="cm"># buy + sell fee</span>
+  net_profit_pct = spread_pct - total_fee
 
-    <span class="kw">if</span> net_profit_pct > <span class="num">0.05</span>:  <span class="cm"># mínimo viable</span>
-        <span class="fn">execute_arbitrage</span>(best_buy, best_sell, symbol, capital)
+  <span class="kw">if</span> net_profit_pct > <span class="num">0.05</span>: <span class="cm"># mÃ­nimo viable</span>
+    <span class="fn">execute_arbitrage</span>(best_buy, best_sell, symbol, capital)
 
-    <span class="kw">return</span> {<span class="str">'spread'</span>: spread_pct, <span class="str">'net'</span>: net_profit_pct}</pre>
-    </div>
+  <span class="kw">return</span> {<span class="str">'spread'</span>: spread_pct, <span class="str">'net'</span>: net_profit_pct}</pre>
   </div>
+ </div>
 
-  <!-- GRID TAB -->
-  <div class="tab-content" id="tab-grid">
-    <div class="two-col">
-      <div class="panel">
-        <h3><i class="fas fa-th"></i> Configuración del Grid</h3>
-        <div class="slider-row"><label>Precio central ($)</label><input type="range" id="gridCenter" min="1000" max="50000" value="40000" step="500" oninput="document.getElementById('gridCenterV').textContent='$'+this.value;drawGrid()"><span id="gridCenterV">$40000</span></div>
-        <div class="slider-row"><label>Rango (%)</label><input type="range" id="gridRange" min="5" max="30" value="10" oninput="document.getElementById('gridRangeV').textContent=this.value+'%';drawGrid()"><span id="gridRangeV">10%</span></div>
-        <div class="slider-row"><label>N° de niveles</label><input type="range" id="gridLevels" min="5" max="20" value="10" oninput="document.getElementById('gridLevelsV').textContent=this.value;drawGrid()"><span id="gridLevelsV">10</span></div>
-        <div class="slider-row"><label>Capital total ($)</label><input type="range" id="gridCapital" min="1000" max="50000" value="10000" step="500" oninput="document.getElementById('gridCapitalV').textContent='$'+this.value;drawGrid()"><span id="gridCapitalV">$10000</span></div>
-        <div class="slider-row"><label>Fee (%)</label><input type="range" id="gridFee" min="0.05" max="0.2" value="0.1" step="0.01" oninput="document.getElementById('gridFeeV').textContent=this.value+'%';drawGrid()"><span id="gridFeeV">0.1%</span></div>
-      </div>
+ <!-- GRID TAB -->
+ <div class="tab-content" id="tab-grid">
+  <div class="two-col">
+   <div class="panel">
+    <h3><i class="fas fa-th"></i> ConfiguraciÃ³n del Grid</h3>
+    <div class="slider-row"><label>Precio central ($)</label><input type="range" id="gridCenter" min="1000" max="50000" value="40000" step="500" oninput="document.getElementById('gridCenterV').textContent='$'+this.value;drawGrid()"><span id="gridCenterV">$40000</span></div>
+    <div class="slider-row"><label>Rango (%)</label><input type="range" id="gridRange" min="5" max="30" value="10" oninput="document.getElementById('gridRangeV').textContent=this.value+'%';drawGrid()"><span id="gridRangeV">10%</span></div>
+    <div class="slider-row"><label>NÂ° de niveles</label><input type="range" id="gridLevels" min="5" max="20" value="10" oninput="document.getElementById('gridLevelsV').textContent=this.value;drawGrid()"><span id="gridLevelsV">10</span></div>
+    <div class="slider-row"><label>Capital total ($)</label><input type="range" id="gridCapital" min="1000" max="50000" value="10000" step="500" oninput="document.getElementById('gridCapitalV').textContent='$'+this.value;drawGrid()"><span id="gridCapitalV">$10000</span></div>
+    <div class="slider-row"><label>Fee (%)</label><input type="range" id="gridFee" min="0.05" max="0.2" value="0.1" step="0.01" oninput="document.getElementById('gridFeeV').textContent=this.value+'%';drawGrid()"><span id="gridFeeV">0.1%</span></div>
+   </div>
 
-      <div>
-        <div class="panel">
-          <h3><i class="fas fa-chart-area"></i> Estadísticas del Grid</h3>
-          <div class="stat-row" id="gridStats">
-            <div class="stat-mini"><div class="sv" id="gSpacing">—</div><div class="sl">Espaciado nivel</div></div>
-            <div class="stat-mini"><div class="sv" id="gPerLevel">—</div><div class="sl">$ por nivel</div></div>
-            <div class="stat-mini"><div class="sv" id="gProfitPerTrade">—</div><div class="sl">Ganancia/trade</div></div>
-            <div class="stat-mini"><div class="sv" id="gDailyTrades">—</div><div class="sl">Trades/día (est.)</div></div>
-            <div class="stat-mini"><div class="sv" id="gDailyROI">—</div><div class="sl">ROI diario (est.)</div></div>
-            <div class="stat-mini"><div class="sv" id="gMonthlyROI">—</div><div class="sl">ROI mensual (est.)</div></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
+   <div>
     <div class="panel">
-      <h3><i class="fas fa-chart-line"></i> Visualización del Grid</h3>
-      <canvas id="gridCanvas"></canvas>
+     <h3><i class="fas fa-chart-area"></i> EstadÃ­sticas del Grid</h3>
+     <div class="stat-row" id="gridStats">
+      <div class="stat-mini"><div class="sv" id="gSpacing">â€”</div><div class="sl">Espaciado nivel</div></div>
+      <div class="stat-mini"><div class="sv" id="gPerLevel">â€”</div><div class="sl">$ por nivel</div></div>
+      <div class="stat-mini"><div class="sv" id="gProfitPerTrade">â€”</div><div class="sl">Ganancia/trade</div></div>
+      <div class="stat-mini"><div class="sv" id="gDailyTrades">â€”</div><div class="sl">Trades/dÃ­a (est.)</div></div>
+      <div class="stat-mini"><div class="sv" id="gDailyROI">â€”</div><div class="sl">ROI diario (est.)</div></div>
+      <div class="stat-mini"><div class="sv" id="gMonthlyROI">â€”</div><div class="sl">ROI mensual (est.)</div></div>
+     </div>
     </div>
-
-    <div class="panel">
-      <h3><i class="fas fa-code"></i> Python — Grid Bot</h3>
-      <pre><span class="kw">class</span> <span class="fn">GridBot</span>:
-    <span class="kw">def</span> <span class="fn">__init__</span>(self, symbol, center, range_pct, levels, capital, fee=<span class="num">0.001</span>):
-        self.symbol  = symbol
-        self.capital = capital
-        self.fee     = fee
-        step = center * range_pct / levels
-        self.buy_levels  = [center - step * i <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, levels+<span class="num">1</span>)]
-        self.sell_levels = [center + step * i <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, levels+<span class="num">1</span>)]
-        self.capital_per_level = capital / levels
-
-    <span class="kw">def</span> <span class="fn">on_tick</span>(self, price):
-        <span class="kw">for</span> lvl <span class="kw">in</span> self.buy_levels:
-            <span class="kw">if</span> price <= lvl <span class="kw">and</span> lvl <span class="kw">not in</span> self.open_buys:
-                qty = self.capital_per_level / (lvl * (<span class="num">1</span> + self.fee))
-                self.<span class="fn">place_order</span>(<span class="str">'BUY'</span>, qty, lvl)
-        <span class="kw">for</span> lvl <span class="kw">in</span> self.sell_levels:
-            <span class="kw">if</span> price >= lvl <span class="kw">and</span> lvl <span class="kw">not in</span> self.open_sells:
-                self.<span class="fn">place_order</span>(<span class="str">'SELL'</span>, self.holdings.get(lvl, <span class="num">0</span>), lvl)</pre>
-    </div>
+   </div>
   </div>
 
-  <div class="feedback" id="feedbackMsg">
-    ⚡ Explora el <strong>Arbitraje</strong> para ver spreads entre exchanges en tiempo real, o el <strong>Grid Trading</strong> para configurar un bot que opera rangos laterales.
+  <div class="panel">
+   <h3><i class="fas fa-chart-line"></i> VisualizaciÃ³n del Grid</h3>
+   <canvas id="gridCanvas"></canvas>
   </div>
 
-  <div class="insignia hidden" id="insigniaArea">
-    <i class="fas fa-bolt"></i>
-    <h3 style="margin:.4rem 0;color:#ffd700">🏅 ¡INSIGNIA MARKET MAKER!</h3>
-    <p style="font-size:.85rem;color:#66ee99">Dominaste arbitraje y grid trading. ¡No necesitas predecir el mercado para ganar!</p>
-  </div>
+  <div class="panel">
+   <h3><i class="fas fa-code"></i> Python â€” Grid Bot</h3>
+   <pre><span class="kw">class</span> <span class="fn">GridBot</span>:
+  <span class="kw">def</span> <span class="fn">__init__</span>(self, symbol, center, range_pct, levels, capital, fee=<span class="num">0.001</span>):
+    self.symbol = symbol
+    self.capital = capital
+    self.fee   = fee
+    step = center * range_pct / levels
+    self.buy_levels = [center - step * i <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, levels+<span class="num">1</span>)]
+    self.sell_levels = [center + step * i <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, levels+<span class="num">1</span>)]
+    self.capital_per_level = capital / levels
 
-  <div class="nav-links">
-    <a href="nivel3-06-volume-obv.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
-    <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Menú</a>
-    <a href="nivel3-08-dca-backtrader.html" class="nav-link next">DCA & Backtrader <i class="fas fa-arrow-right"></i></a>
+  <span class="kw">def</span> <span class="fn">on_tick</span>(self, price):
+    <span class="kw">for</span> lvl <span class="kw">in</span> self.buy_levels:
+      <span class="kw">if</span> price <= lvl <span class="kw">and</span> lvl <span class="kw">not in</span> self.open_buys:
+        qty = self.capital_per_level / (lvl * (<span class="num">1</span> + self.fee))
+        self.<span class="fn">place_order</span>(<span class="str">'BUY'</span>, qty, lvl)
+    <span class="kw">for</span> lvl <span class="kw">in</span> self.sell_levels:
+      <span class="kw">if</span> price >= lvl <span class="kw">and</span> lvl <span class="kw">not in</span> self.open_sells:
+        self.<span class="fn">place_order</span>(<span class="str">'SELL'</span>, self.holdings.get(lvl, <span class="num">0</span>), lvl)</pre>
   </div>
-  <footer><i class="fas fa-crown"></i> Bot Trader Adventure · Semana 7-8 · Kissell (2013) · Chan (2017) "Machine Trading"</footer>
+ </div>
+
+ <div class="feedback" id="feedbackMsg">
+  âš¡ Explora el <strong>Arbitraje</strong> para ver spreads entre exchanges en tiempo real, o el <strong>Grid Trading</strong> para configurar un bot que opera rangos laterales.
+ </div>
+
+ <div class="insignia hidden" id="insigniaArea">
+  <i class="fas fa-bolt"></i>
+  <h3 style="margin:.4rem 0;color:#ffd700">ðŸ… Â¡INSIGNIA MARKET MAKER!</h3>
+  <p style="font-size:.85rem;color:#66ee99">Dominaste arbitraje y grid trading. Â¡No necesitas predecir el mercado para ganar!</p>
+ </div>
+
+ <div class="nav-links">
+  <a href="nivel3-06-volume-obv.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
+  <a href="index.html" class="nav-link"><i class="fas fa-home"></i> MenÃº</a>
+  <a href="nivel3-08-dca-backtrader.html" class="nav-link next">DCA & Backtrader <i class="fas fa-arrow-right"></i></a>
+ </div>
+ <footer><i class="fas fa-crown"></i> Bot Trader Adventure Â· Semana 7-8 Â· Kissell (2013) Â· Chan (2017) "Machine Trading"</footer>
 </div>
 
 <script>
@@ -236,134 +236,134 @@ const STORAGE_KEY = 'tbot_arb';
 let tabsVisited = new Set(['arb']);
 
 function switchTab(tab, el) {
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('tab-'+tab).classList.add('active');
-  tabsVisited.add(tab);
-  if (tab==='grid') drawGrid();
-  checkCompletion();
+ document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+ document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+ el.classList.add('active');
+ document.getElementById('tab-'+tab).classList.add('active');
+ tabsVisited.add(tab);
+ if (tab==='grid') drawGrid();
+ checkCompletion();
 }
 
 const BASE_PRICES = {btc:42000,eth:2500,bnb:310,sol:95};
 const EX_NAMES = ['Binance','Kraken','Coinbase'];
 
 function scanArb() {
-  const pair = document.getElementById('arbPair').value;
-  const base = BASE_PRICES[pair];
-  const fee = +document.getElementById('arbFee').value;
-  const capital = +document.getElementById('arbCapital').value;
+ const pair = document.getElementById('arbPair').value;
+ const base = BASE_PRICES[pair];
+ const fee = +document.getElementById('arbFee').value;
+ const capital = +document.getElementById('arbCapital').value;
 
-  const prices = EX_NAMES.map((_,i) => base * (1 + (Math.random()-.5)*.003));
-  document.getElementById('exGrid').innerHTML = EX_NAMES.map((name,i) => `
-    <div class="ex-card">
-      <div class="ex-name">${name}</div>
-      <div class="ex-price">$${prices[i].toFixed(2)}</div>
-    </div>`).join('');
+ const prices = EX_NAMES.map((_,i) => base * (1 + (Math.random()-.5)*.003));
+ document.getElementById('exGrid').innerHTML = EX_NAMES.map((name,i) => `
+  <div class="ex-card">
+   <div class="ex-name">${name}</div>
+   <div class="ex-price">$${prices[i].toFixed(2)}</div>
+  </div>`).join('');
 
-  const minPrice = Math.min(...prices), maxPrice = Math.max(...prices);
-  const minEx = EX_NAMES[prices.indexOf(minPrice)], maxEx = EX_NAMES[prices.indexOf(maxPrice)];
-  const spread = (maxPrice-minPrice)/minPrice*100;
-  const totalFee = fee*2;
-  const netSpread = spread - totalFee;
-  const qty = capital/minPrice;
-  const grossProfit = qty*(maxPrice-minPrice);
-  const feesCost = capital*totalFee/100;
-  const netProfit = grossProfit - feesCost;
+ const minPrice = Math.min(...prices), maxPrice = Math.max(...prices);
+ const minEx = EX_NAMES[prices.indexOf(minPrice)], maxEx = EX_NAMES[prices.indexOf(maxPrice)];
+ const spread = (maxPrice-minPrice)/minPrice*100;
+ const totalFee = fee*2;
+ const netSpread = spread - totalFee;
+ const qty = capital/minPrice;
+ const grossProfit = qty*(maxPrice-minPrice);
+ const feesCost = capital*totalFee/100;
+ const netProfit = grossProfit - feesCost;
 
-  const profitable = netSpread > 0.02;
-  document.getElementById('arbResult').innerHTML = `
-    <div class="arb-row"><span class="arb-key">Comprar en</span><span class="arb-val" style="color:#00dc58">${minEx} @ $${minPrice.toFixed(2)}</span></div>
-    <div class="arb-row"><span class="arb-key">Vender en</span><span class="arb-val" style="color:#ffd070">${maxEx} @ $${maxPrice.toFixed(2)}</span></div>
-    <div class="arb-row"><span class="arb-key">Spread bruto</span><span class="arb-val">${spread.toFixed(3)}%</span></div>
-    <div class="arb-row"><span class="arb-key">Fees totales</span><span class="arb-val" style="color:#ff9966">-${totalFee.toFixed(2)}%</span></div>
-    <div class="arb-row"><span class="arb-key">Spread neto</span><span class="arb-val" style="${netSpread>0?'color:#00dc58':'color:#ff5566'}">${netSpread>0?'+':''}${netSpread.toFixed(3)}%</span></div>
-    <div class="arb-row"><span class="arb-key">Cantidad BTC</span><span class="arb-val">${qty.toFixed(4)}</span></div>
-    <div class="arb-row"><span class="arb-key">Ganancia bruta</span><span class="arb-val">$${grossProfit.toFixed(2)}</span></div>
-    <div class="arb-row"><span class="arb-key">Costo fees</span><span class="arb-val" style="color:#ff9966">-$${feesCost.toFixed(2)}</span></div>
-    <div class="arb-row"><span class="arb-key">Ganancia neta</span><span class="arb-val" style="${netProfit>0?'color:#00dc58':'color:#ff5566';}">${netProfit>0?'+':''}<strong>$${netProfit.toFixed(2)}</strong></span></div>
-    <div style="margin-top:.5rem;text-align:center;font-size:.78rem;font-weight:700;color:${profitable?'#00dc58':'#ff9966'}">${profitable?'✅ OPORTUNIDAD VIABLE':'⚠️ Spread insuficiente tras fees'}</div>`;
+ const profitable = netSpread > 0.02;
+ document.getElementById('arbResult').innerHTML = `
+  <div class="arb-row"><span class="arb-key">Comprar en</span><span class="arb-val" style="color:#00dc58">${minEx} @ $${minPrice.toFixed(2)}</span></div>
+  <div class="arb-row"><span class="arb-key">Vender en</span><span class="arb-val" style="color:#ffd070">${maxEx} @ $${maxPrice.toFixed(2)}</span></div>
+  <div class="arb-row"><span class="arb-key">Spread bruto</span><span class="arb-val">${spread.toFixed(3)}%</span></div>
+  <div class="arb-row"><span class="arb-key">Fees totales</span><span class="arb-val" style="color:#ff9966">-${totalFee.toFixed(2)}%</span></div>
+  <div class="arb-row"><span class="arb-key">Spread neto</span><span class="arb-val" style="${netSpread>0?'color:#00dc58':'color:#ff5566'}">${netSpread>0?'+':''}${netSpread.toFixed(3)}%</span></div>
+  <div class="arb-row"><span class="arb-key">Cantidad BTC</span><span class="arb-val">${qty.toFixed(4)}</span></div>
+  <div class="arb-row"><span class="arb-key">Ganancia bruta</span><span class="arb-val">$${grossProfit.toFixed(2)}</span></div>
+  <div class="arb-row"><span class="arb-key">Costo fees</span><span class="arb-val" style="color:#ff9966">-$${feesCost.toFixed(2)}</span></div>
+  <div class="arb-row"><span class="arb-key">Ganancia neta</span><span class="arb-val" style="${netProfit>0?'color:#00dc58':'color:#ff5566';}">${netProfit>0?'+':''}<strong>$${netProfit.toFixed(2)}</strong></span></div>
+  <div style="margin-top:.5rem;text-align:center;font-size:.78rem;font-weight:700;color:${profitable?'#00dc58':'#ff9966'}">${profitable?'âœ… OPORTUNIDAD VIABLE':'âš ï¸ Spread insuficiente tras fees'}</div>`;
 
-  document.getElementById('feedbackMsg').innerHTML = `⚡ Spread neto: <strong>${netSpread.toFixed(3)}%</strong>. ${profitable?`✅ Ganancia neta: <strong>$${netProfit.toFixed(2)}</strong> con $${capital.toLocaleString()} de capital.`:'⚠️ Los fees consumen el spread. Las oportunidades reales son raras y duran <2 segundos.'} En crypto, el arbitraje requiere ejecución en <strong>millisegundos</strong> y APIs WebSocket.`;
-  checkCompletion();
+ document.getElementById('feedbackMsg').innerHTML = `âš¡ Spread neto: <strong>${netSpread.toFixed(3)}%</strong>. ${profitable?`âœ… Ganancia neta: <strong>$${netProfit.toFixed(2)}</strong> con $${capital.toLocaleString()} de capital.`:'âš ï¸ Los fees consumen el spread. Las oportunidades reales son raras y duran <2 segundos.'} En crypto, el arbitraje requiere ejecuciÃ³n en <strong>millisegundos</strong> y APIs WebSocket.`;
+ checkCompletion();
 }
 
 function drawGrid() {
-  const center  = +document.getElementById('gridCenter').value;
-  const rangePct = +document.getElementById('gridRange').value/100;
-  const levels  = +document.getElementById('gridLevels').value;
-  const capital = +document.getElementById('gridCapital').value;
-  const fee     = +document.getElementById('gridFee').value/100;
+ const center = +document.getElementById('gridCenter').value;
+ const rangePct = +document.getElementById('gridRange').value/100;
+ const levels = +document.getElementById('gridLevels').value;
+ const capital = +document.getElementById('gridCapital').value;
+ const fee   = +document.getElementById('gridFee').value/100;
 
-  const upper = center*(1+rangePct), lower = center*(1-rangePct);
-  const spacing = (upper-lower)/levels;
-  const perLevel = capital/levels;
-  const profitPerTrade = spacing*perLevel/center*(1-fee*2)*100;
-  const dailyTrades = Math.round(3 + Math.random()*5); // estimate
-  const dailyROI = (profitPerTrade/100 * dailyTrades / capital * 100);
-  const monthlyROI = dailyROI * 30;
+ const upper = center*(1+rangePct), lower = center*(1-rangePct);
+ const spacing = (upper-lower)/levels;
+ const perLevel = capital/levels;
+ const profitPerTrade = spacing*perLevel/center*(1-fee*2)*100;
+ const dailyTrades = Math.round(3 + Math.random()*5); // estimate
+ const dailyROI = (profitPerTrade/100 * dailyTrades / capital * 100);
+ const monthlyROI = dailyROI * 30;
 
-  document.getElementById('gSpacing').textContent = '$'+spacing.toFixed(0);
-  document.getElementById('gPerLevel').textContent = '$'+perLevel.toFixed(0);
-  document.getElementById('gProfitPerTrade').textContent = '$'+(spacing*perLevel/center*(1-fee*2)).toFixed(2);
-  document.getElementById('gDailyTrades').textContent = dailyTrades;
-  document.getElementById('gDailyROI').textContent = dailyROI.toFixed(2)+'%';
-  document.getElementById('gMonthlyROI').textContent = monthlyROI.toFixed(1)+'%';
+ document.getElementById('gSpacing').textContent = '$'+spacing.toFixed(0);
+ document.getElementById('gPerLevel').textContent = '$'+perLevel.toFixed(0);
+ document.getElementById('gProfitPerTrade').textContent = '$'+(spacing*perLevel/center*(1-fee*2)).toFixed(2);
+ document.getElementById('gDailyTrades').textContent = dailyTrades;
+ document.getElementById('gDailyROI').textContent = dailyROI.toFixed(2)+'%';
+ document.getElementById('gMonthlyROI').textContent = monthlyROI.toFixed(1)+'%';
 
-  const canvas = document.getElementById('gridCanvas');
-  const W = canvas.parentElement.clientWidth-30;
-  canvas.width=W; canvas.height=250;
-  const ctx=canvas.getContext('2d');
-  ctx.fillStyle='#000a00';ctx.fillRect(0,0,W,250);
+ const canvas = document.getElementById('gridCanvas');
+ const W = canvas.parentElement.clientWidth-30;
+ canvas.width=W; canvas.height=250;
+ const ctx=canvas.getContext('2d');
+ ctx.fillStyle='#000a00';ctx.fillRect(0,0,W,250);
 
-  const priceRange=upper-lower;
-  const yS = v => 230 - ((v-lower)/priceRange)*210;
+ const priceRange=upper-lower;
+ const yS = v => 230 - ((v-lower)/priceRange)*210;
 
-  // Grid lines
-  for (let i=0;i<=levels;i++) {
-    const price = lower + i*spacing;
-    const y = yS(price);
-    ctx.strokeStyle = price===center?'#ffd70055':price>center?'#ff556633':'#00dc5833';
-    ctx.lineWidth=1;ctx.setLineDash([4,3]);
-    ctx.beginPath();ctx.moveTo(40,y);ctx.lineTo(W-10,y);ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.fillStyle = price>center?'#ff9966':price===center?'#ffd700':'#00dc58';
-    ctx.font='9px JetBrains Mono';ctx.textAlign='right';
-    ctx.fillText('$'+price.toFixed(0),38,y+3);
-    // sell label
-    if(price>center) {ctx.fillStyle='#ff996688';ctx.textAlign='left';ctx.fillText('SELL',42,y-2);}
-    else if(price<center) {ctx.fillStyle='#00dc5888';ctx.textAlign='left';ctx.fillText('BUY',42,y+10);}
-  }
+ // Grid lines
+ for (let i=0;i<=levels;i++) {
+  const price = lower + i*spacing;
+  const y = yS(price);
+  ctx.strokeStyle = price===center?'#ffd70055':price>center?'#ff556633':'#00dc5833';
+  ctx.lineWidth=1;ctx.setLineDash([4,3]);
+  ctx.beginPath();ctx.moveTo(40,y);ctx.lineTo(W-10,y);ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = price>center?'#ff9966':price===center?'#ffd700':'#00dc58';
+  ctx.font='9px JetBrains Mono';ctx.textAlign='right';
+  ctx.fillText('$'+price.toFixed(0),38,y+3);
+  // sell label
+  if(price>center) {ctx.fillStyle='#ff996688';ctx.textAlign='left';ctx.fillText('SELL',42,y-2);}
+  else if(price<center) {ctx.fillStyle='#00dc5888';ctx.textAlign='left';ctx.fillText('BUY',42,y+10);}
+ }
 
-  // Simulated price path
-  let curPrice = center;
-  ctx.beginPath();ctx.strokeStyle='#ffffff';ctx.lineWidth=1.5;
-  const steps = 80;
-  for(let i=0;i<=steps;i++){
-    curPrice += (Math.random()-.5)*spacing*.8;
-    curPrice = Math.max(lower+spacing*.5, Math.min(upper-spacing*.5, curPrice));
-    const x = 45+(W-55)*i/steps;
-    if(i===0) ctx.moveTo(x,yS(curPrice)); else ctx.lineTo(x,yS(curPrice));
-  }
-  ctx.stroke();
+ // Simulated price path
+ let curPrice = center;
+ ctx.beginPath();ctx.strokeStyle='#ffffff';ctx.lineWidth=1.5;
+ const steps = 80;
+ for(let i=0;i<=steps;i++){
+  curPrice += (Math.random()-.5)*spacing*.8;
+  curPrice = Math.max(lower+spacing*.5, Math.min(upper-spacing*.5, curPrice));
+  const x = 45+(W-55)*i/steps;
+  if(i===0) ctx.moveTo(x,yS(curPrice)); else ctx.lineTo(x,yS(curPrice));
+ }
+ ctx.stroke();
 
-  // Center line
-  ctx.strokeStyle='#ffd70088';ctx.lineWidth=1.5;ctx.setLineDash([]);
-  ctx.beginPath();ctx.moveTo(40,yS(center));ctx.lineTo(W-10,yS(center));ctx.stroke();
-  ctx.fillStyle='#ffd700';ctx.font='10px Inter';ctx.textAlign='center';
-  ctx.fillText(`Centro $${center.toLocaleString()}`,W/2,yS(center)-5);
+ // Center line
+ ctx.strokeStyle='#ffd70088';ctx.lineWidth=1.5;ctx.setLineDash([]);
+ ctx.beginPath();ctx.moveTo(40,yS(center));ctx.lineTo(W-10,yS(center));ctx.stroke();
+ ctx.fillStyle='#ffd700';ctx.font='10px Inter';ctx.textAlign='center';
+ ctx.fillText(`Centro $${center.toLocaleString()}`,W/2,yS(center)-5);
 }
 
 function checkCompletion() {
-  if (tabsVisited.size >= 2 && !localStorage.getItem(STORAGE_KEY)) {
-    localStorage.setItem(STORAGE_KEY,'true');
-    document.getElementById('insigniaArea').classList.remove('hidden');
-    document.getElementById('feedbackMsg').innerHTML += '<br><strong style="color:#00dc58">🎓 ¡Insignia Market Maker desbloqueada!</strong>';
-  }
+ if (tabsVisited.size >= 2 && !localStorage.getItem(STORAGE_KEY)) {
+  localStorage.setItem(STORAGE_KEY,'true');
+  document.getElementById('insigniaArea').classList.remove('hidden');
+  document.getElementById('feedbackMsg').innerHTML += '<br><strong style="color:#00dc58">ðŸŽ“ Â¡Insignia Market Maker desbloqueada!</strong>';
+ }
 }
 
 scanArb();
 if (localStorage.getItem(STORAGE_KEY)) document.getElementById('insigniaArea').classList.remove('hidden');
 </script>
-</body>
+ </body>
 </html>

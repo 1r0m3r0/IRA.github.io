@@ -1,145 +1,145 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Bot Trader | Gestión de Riesgo</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box;}
-    body{background:linear-gradient(145deg,#1a0010 0%,#300022 100%);font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem;}
-    .container{max-width:1250px;width:100%;background:rgba(20,0,15,.85);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(255,60,120,.25);box-shadow:0 25px 45px rgba(0,0,0,.6);overflow:hidden;}
-    .hero{background:linear-gradient(95deg,#140010,#280022);padding:1.8rem 2rem;text-align:center;border-bottom:2px solid #ff3c78;}
-    .hero h1{font-size:2rem;font-weight:800;background:linear-gradient(135deg,#ffd0e6,#ff99c0,#ff3c78);-webkit-background-clip:text;background-clip:text;color:transparent;}
-    .hero p{margin-top:.5rem;font-size:1rem;color:#e080a0;}
-    .analogy-card{background:#1a0014cc;margin:1.5rem 2rem;padding:1.2rem 1.8rem;border-radius:2rem;border-left:8px solid #ff3c78;font-size:.95rem;line-height:1.6;}
-    .analogy-card strong{color:#ff80aa;}
-    .tools-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:1.5rem;padding:0 2rem 1.5rem;}
-    .tool-card{background:#1a0014dd;border-radius:2rem;padding:1.4rem;border:1px solid #ff3c7844;}
-    .tool-card h2{font-size:1.05rem;font-weight:700;color:#ff80aa;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;}
-    .field-row{margin-bottom:.8rem;}
-    .field-label{font-size:.75rem;color:#cc4488;text-transform:uppercase;letter-spacing:.05rem;margin-bottom:.3rem;}
-    .slider-row{display:flex;align-items:center;gap:.5rem;}
-    .slider-row input[type=range]{flex:1;accent-color:#ff3c78;}
-    .slider-row span{font-size:.8rem;color:#ff80aa;font-family:monospace;min-width:55px;text-align:right;}
-    input[type=number]{background:#280022;border:1px solid #ff3c7844;color:#eef5ff;padding:.45rem .8rem;border-radius:.8rem;font-size:.9rem;width:100%;font-family:'Inter',sans-serif;}
-    .btn-calc{background:linear-gradient(95deg,#ff3c78,#cc1050);border:none;padding:.75rem 1.5rem;font-weight:700;border-radius:2rem;cursor:pointer;font-size:.9rem;color:#fff;width:100%;margin-top:.6rem;transition:.2s;}
-    .btn-calc:hover{transform:translateY(-2px);box-shadow:0 0 15px rgba(255,60,120,.4);}
-    .result-box{background:#280022;border-radius:1.5rem;padding:1rem;margin-top:.8rem;min-height:50px;font-family:'JetBrains Mono',monospace;font-size:.82rem;line-height:1.7;border:1px solid #ff3c7822;}
-    .result-good{color:#00ff88;}.result-warn{color:#ffaa00;}.result-bad{color:#ff5050;}
-    .risk-meter{width:100%;height:14px;background:linear-gradient(90deg,#00ff88,#ffaa00,#ff5050);border-radius:1rem;position:relative;margin:.5rem 0;}
-    .risk-needle{width:4px;height:22px;background:#fff;position:absolute;top:-4px;border-radius:2px;transition:.5s;transform:translateX(-50%);}
-    .prob-bar{display:flex;align-items:center;gap:.5rem;margin:.3rem 0;}
-    .prob-bar .lbl{font-size:.75rem;color:#cc4488;min-width:60px;}
-    .prob-bar .track{flex:1;background:#280022;border-radius:.5rem;height:10px;overflow:hidden;}
-    .prob-bar .fill{height:100%;border-radius:.5rem;transition:width .5s ease;}
-    .prob-bar .val{font-size:.75rem;font-family:monospace;min-width:40px;text-align:right;}
-    .scenario-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-top:.5rem;}
-    .scenario-cell{background:#28001a;border-radius:1rem;padding:.6rem;text-align:center;}
-    .scenario-cell .sc-label{font-size:.7rem;color:#cc4488;}
-    .scenario-cell .sc-val{font-size:1rem;font-weight:700;font-family:monospace;}
-    .kelly-advice{background:#1a0010;border-radius:1rem;padding:.6rem .8rem;margin-top:.5rem;font-size:.8rem;line-height:1.5;}
-    .ruin-canvas-box{margin-top:.5rem;}
-    .feedback{background:#00000088;margin:0 2rem 1rem;padding:.9rem;border-radius:1.5rem;text-align:center;border-left:4px solid #ff3c78;font-size:.9rem;line-height:1.5;}
-    .insignia{text-align:center;background:#1a0010;border-radius:2rem;margin:0 2rem 1.5rem;padding:1rem;border:1px dashed gold;}
-    .insignia i{font-size:2.5rem;color:gold;}
-    .hidden{display:none;}
-    .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.5rem 2rem;}
-    .nav-link{background:#2c3e66;padding:.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:.5rem;transition:.2s;}
-    .nav-link:hover{transform:translateY(-2px);}
-    .nav-link.next{background:linear-gradient(95deg,#f0a500,#ff6a00);color:#1e1a0c;}
-    .nav-link.menu{background:#1a2a4a;border:1px solid #ff3c78;}
-    footer{text-align:center;padding:1rem;font-size:.75rem;border-top:1px solid #280022;}
-    @media(max-width:700px){.tools-grid{grid-template-columns:1fr;}.hero h1{font-size:1.5rem;}}
-  </style>
-  <link rel="stylesheet" href="../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Bot Trader | Gestión de Riesgo</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:linear-gradient(145deg,#1a0010 0%,#300022 100%);font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem;}
+  .container{max-width:1250px;width:100%;background:rgba(20,0,15,.85);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(255,60,120,.25);box-shadow:0 25px 45px rgba(0,0,0,.6);overflow:hidden;}
+  .hero{background:linear-gradient(95deg,#140010,#280022);padding:1.8rem 2rem;text-align:center;border-bottom:2px solid #ff3c78;}
+  .hero h1{font-size:2rem;font-weight:800;background:linear-gradient(135deg,#ffd0e6,#ff99c0,#ff3c78);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .hero p{margin-top:.5rem;font-size:1rem;color:#e080a0;}
+  .analogy-card{background:#1a0014cc;margin:1.5rem 2rem;padding:1.2rem 1.8rem;border-radius:2rem;border-left:8px solid #ff3c78;font-size:.95rem;line-height:1.6;}
+  .analogy-card strong{color:#ff80aa;}
+  .tools-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:1.5rem;padding:0 2rem 1.5rem;}
+  .tool-card{background:#1a0014dd;border-radius:2rem;padding:1.4rem;border:1px solid #ff3c7844;}
+  .tool-card h2{font-size:1.05rem;font-weight:700;color:#ff80aa;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;}
+  .field-row{margin-bottom:.8rem;}
+  .field-label{font-size:.75rem;color:#cc4488;text-transform:uppercase;letter-spacing:.05rem;margin-bottom:.3rem;}
+  .slider-row{display:flex;align-items:center;gap:.5rem;}
+  .slider-row input[type=range]{flex:1;accent-color:#ff3c78;}
+  .slider-row span{font-size:.8rem;color:#ff80aa;font-family:monospace;min-width:55px;text-align:right;}
+  input[type=number]{background:#280022;border:1px solid #ff3c7844;color:#eef5ff;padding:.45rem .8rem;border-radius:.8rem;font-size:.9rem;width:100%;font-family:'Inter',sans-serif;}
+  .btn-calc{background:linear-gradient(95deg,#ff3c78,#cc1050);border:none;padding:.75rem 1.5rem;font-weight:700;border-radius:2rem;cursor:pointer;font-size:.9rem;color:#fff;width:100%;margin-top:.6rem;transition:.2s;}
+  .btn-calc:hover{transform:translateY(-2px);box-shadow:0 0 15px rgba(255,60,120,.4);}
+  .result-box{background:#280022;border-radius:1.5rem;padding:1rem;margin-top:.8rem;min-height:50px;font-family:'JetBrains Mono',monospace;font-size:.82rem;line-height:1.7;border:1px solid #ff3c7822;}
+  .result-good{color:#00ff88;}.result-warn{color:#ffaa00;}.result-bad{color:#ff5050;}
+  .risk-meter{width:100%;height:14px;background:linear-gradient(90deg,#00ff88,#ffaa00,#ff5050);border-radius:1rem;position:relative;margin:.5rem 0;}
+  .risk-needle{width:4px;height:22px;background:#fff;position:absolute;top:-4px;border-radius:2px;transition:.5s;transform:translateX(-50%);}
+  .prob-bar{display:flex;align-items:center;gap:.5rem;margin:.3rem 0;}
+  .prob-bar .lbl{font-size:.75rem;color:#cc4488;min-width:60px;}
+  .prob-bar .track{flex:1;background:#280022;border-radius:.5rem;height:10px;overflow:hidden;}
+  .prob-bar .fill{height:100%;border-radius:.5rem;transition:width .5s ease;}
+  .prob-bar .val{font-size:.75rem;font-family:monospace;min-width:40px;text-align:right;}
+  .scenario-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-top:.5rem;}
+  .scenario-cell{background:#28001a;border-radius:1rem;padding:.6rem;text-align:center;}
+  .scenario-cell .sc-label{font-size:.7rem;color:#cc4488;}
+  .scenario-cell .sc-val{font-size:1rem;font-weight:700;font-family:monospace;}
+  .kelly-advice{background:#1a0010;border-radius:1rem;padding:.6rem .8rem;margin-top:.5rem;font-size:.8rem;line-height:1.5;}
+  .ruin-canvas-box{margin-top:.5rem;}
+  .feedback{background:#00000088;margin:0 2rem 1rem;padding:.9rem;border-radius:1.5rem;text-align:center;border-left:4px solid #ff3c78;font-size:.9rem;line-height:1.5;}
+  .insignia{text-align:center;background:#1a0010;border-radius:2rem;margin:0 2rem 1.5rem;padding:1rem;border:1px dashed gold;}
+  .insignia i{font-size:2.5rem;color:gold;}
+  .hidden{display:none;}
+  .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.5rem 2rem;}
+  .nav-link{background:#2c3e66;padding:.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:.5rem;transition:.2s;}
+  .nav-link:hover{transform:translateY(-2px);}
+  .nav-link.next{background:linear-gradient(95deg,#f0a500,#ff6a00);color:#1e1a0c;}
+  .nav-link.menu{background:#1a2a4a;border:1px solid #ff3c78;}
+  footer{text-align:center;padding:1rem;font-size:.75rem;border-top:1px solid #280022;}
+  @media(max-width:700px){.tools-grid{grid-template-columns:1fr;}.hero h1{font-size:1.5rem;}}
+ </style>
+ <link rel="stylesheet" href="../../assets/css/theme.css">
 </head>
 <body>
-  <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+ <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
 <div class="container">
-  <div class="hero">
-    <h1>🛡️ GESTIÓN DE RIESGO: El Arte de Sobrevivir al Mercado</h1>
-    <p>Tres calculadoras profesionales: Position Sizing · Kelly Criterion · Probabilidad de Ruina</p>
-  </div>
-  <div class="analogy-card">
-    <strong>🃏 Piénsalo así:</strong> Un trader sin gestión de riesgo es como un jugador de póker que apuesta todo en cada mano. Incluso con una estrategia ganadora, una mala racha te saca del juego. <strong>El Kelly Criterion</strong> (1956) fue inventado por un físico de Bell Labs para calcular exactamente cuánto apostar cada vez para maximizar el crecimiento a largo plazo sin arriesgar la quiebra.
-    <br><br>
-    <strong>📚 Fuentes:</strong> Kelly, J.L. (1956) — <em>"A New Interpretation of Information Rate"</em>. Bell System Technical Journal. / Van Tharp (2006) — <em>"Trade Your Way to Financial Freedom"</em>. McGraw-Hill.
-  </div>
-  <div class="tools-grid">
-    <!-- HERRAMIENTA 1: Position Sizing -->
-    <div class="tool-card">
-      <h2><i class="fas fa-weight-hanging" style="color:#ff3c78"></i> Position Sizing</h2>
-      <div class="field-row"><div class="field-label">Capital total ($)</div><input type="number" id="ps_capital" value="10000" min="100"></div>
-      <div class="field-row"><div class="field-label">Riesgo por trade</div><div class="slider-row"><input type="range" id="ps_risk" min="0.5" max="5" step="0.5" value="1"><span id="ps_riskV">1%</span></div></div>
-      <div class="field-row"><div class="field-label">Precio de entrada ($)</div><input type="number" id="ps_entry" value="45000" min="1"></div>
-      <div class="field-row"><div class="field-label">Stop Loss ($)</div><input type="number" id="ps_stop" value="43000" min="1"></div>
-      <button class="btn-calc" onclick="calcPositionSizing()"><i class="fas fa-calculator"></i> Calcular Posición</button>
-      <div class="result-box" id="ps_result">
-        <span style="color:#cc4488;">Rellena los datos y calcula...</span>
-      </div>
-      <div style="margin-top:.6rem;font-size:.75rem;color:#cc4488;">
-        <strong>Regla de oro:</strong> Nunca arriesgar más del 1-2% del capital por trade.
-      </div>
-    </div>
-
-    <!-- HERRAMIENTA 2: Kelly Criterion -->
-    <div class="tool-card">
-      <h2><i class="fas fa-percentage" style="color:#ff3c78"></i> Kelly Criterion</h2>
-      <div class="field-row"><div class="field-label">Win Rate de tu estrategia</div><div class="slider-row"><input type="range" id="k_wr" min="30" max="80" value="55"><span id="k_wrV">55%</span></div></div>
-      <div class="field-row"><div class="field-label">Ganancia promedio ($)</div><input type="number" id="k_win" value="300" min="1"></div>
-      <div class="field-row"><div class="field-label">Pérdida promedio ($)</div><input type="number" id="k_loss" value="200" min="1"></div>
-      <button class="btn-calc" onclick="calcKelly()"><i class="fas fa-brain"></i> Calcular Kelly</button>
-      <div class="result-box" id="k_result">
-        <span style="color:#cc4488;">Kelly f = (p·b - q) / b</span>
-      </div>
-      <div class="kelly-advice" id="k_advice" style="display:none;"></div>
-    </div>
-
-    <!-- HERRAMIENTA 3: Probabilidad de Ruina -->
-    <div class="tool-card">
-      <h2><i class="fas fa-skull-crossbones" style="color:#ff3c78"></i> Probabilidad de Ruina</h2>
-      <div class="field-row"><div class="field-label">Capital inicial ($)</div><input type="number" id="r_capital" value="10000" min="100"></div>
-      <div class="field-row"><div class="field-label">Nivel de ruina ($)</div><input type="number" id="r_ruin" value="5000" min="100"></div>
-      <div class="field-row"><div class="field-label">Win Rate</div><div class="slider-row"><input type="range" id="r_wr" min="30" max="70" value="55"><span id="r_wrV">55%</span></div></div>
-      <div class="field-row"><div class="field-label">Risk/Reward</div><div class="slider-row"><input type="range" id="r_rr" min="0.5" max="4" step="0.5" value="1.5"><span id="r_rrV">1.5x</span></div></div>
-      <button class="btn-calc" onclick="calcRuin()"><i class="fas fa-chart-bar"></i> Simular Montecarlo</button>
-      <div class="result-box" id="r_result"><span style="color:#cc4488;">Simula para ver la probabilidad de ruina...</span></div>
-      <canvas id="ruinChart" height="100" style="width:100%;border-radius:1rem;margin-top:.5rem;display:block;"></canvas>
-    </div>
-
-    <!-- HERRAMIENTA 4: Escenarios de Riesgo -->
-    <div class="tool-card">
-      <h2><i class="fas fa-shield-alt" style="color:#ff3c78"></i> Simulador de Drawdown</h2>
-      <div class="field-row"><div class="field-label">Capital ($)</div><input type="number" id="d_capital" value="10000" min="100"></div>
-      <div class="field-row"><div class="field-label">Risk por trade</div><div class="slider-row"><input type="range" id="d_risk" min="0.5" max="10" step="0.5" value="2"><span id="d_riskV">2%</span></div></div>
-      <div class="field-row"><div class="field-label">Racha perdedora máxima</div><div class="slider-row"><input type="range" id="d_streak" min="3" max="20" value="8"><span id="d_streakV">8</span></div></div>
-      <button class="btn-calc" onclick="calcDrawdown()"><i class="fas fa-arrow-down"></i> Calcular Escenarios</button>
-      <div style="margin-top:.6rem;">
-        <div style="font-size:.78rem;color:#cc4488;margin-bottom:.4rem;">Medidor de Riesgo</div>
-        <div class="risk-meter"><div class="risk-needle" id="riskNeedle" style="left:10%"></div></div>
-        <div style="display:flex;justify-content:space-between;font-size:.65rem;color:#888;"><span>Conservador</span><span>Moderado</span><span>Agresivo</span></div>
-      </div>
-      <div class="scenario-grid" id="scenarioGrid"></div>
-      <div class="result-box" id="d_result" style="margin-top:.5rem;"><span style="color:#cc4488;">Configura y calcula...</span></div>
-    </div>
+ <div class="hero">
+  <h1>🛡️ GESTIÓN DE RIESGO: El Arte de Sobrevivir al Mercado</h1>
+  <p>Tres calculadoras profesionales: Position Sizing · Kelly Criterion · Probabilidad de Ruina</p>
+ </div>
+ <div class="analogy-card">
+  <strong>🃏 Piénsalo así:</strong> Un trader sin gestión de riesgo es como un jugador de póker que apuesta todo en cada mano. Incluso con una estrategia ganadora, una mala racha te saca del juego. <strong>El Kelly Criterion</strong> (1956) fue inventado por un físico de Bell Labs para calcular exactamente cuánto apostar cada vez para maximizar el crecimiento a largo plazo sin arriesgar la quiebra.
+  <br><br>
+  <strong>📚 Fuentes:</strong> Kelly, J.L. (1956) — <em>"A New Interpretation of Information Rate"</em>. Bell System Technical Journal. / Van Tharp (2006) — <em>"Trade Your Way to Financial Freedom"</em>. McGraw-Hill.
+ </div>
+ <div class="tools-grid">
+  <!-- HERRAMIENTA 1: Position Sizing -->
+  <div class="tool-card">
+   <h2><i class="fas fa-weight-hanging" style="color:#ff3c78"></i> Position Sizing</h2>
+   <div class="field-row"><div class="field-label">Capital total ($)</div><input type="number" id="ps_capital" value="10000" min="100"></div>
+   <div class="field-row"><div class="field-label">Riesgo por trade</div><div class="slider-row"><input type="range" id="ps_risk" min="0.5" max="5" step="0.5" value="1"><span id="ps_riskV">1%</span></div></div>
+   <div class="field-row"><div class="field-label">Precio de entrada ($)</div><input type="number" id="ps_entry" value="45000" min="1"></div>
+   <div class="field-row"><div class="field-label">Stop Loss ($)</div><input type="number" id="ps_stop" value="43000" min="1"></div>
+   <button class="btn-calc" onclick="calcPositionSizing()"><i class="fas fa-calculator"></i> Calcular Posición</button>
+   <div class="result-box" id="ps_result">
+    <span style="color:#cc4488;">Rellena los datos y calcula...</span>
+   </div>
+   <div style="margin-top:.6rem;font-size:.75rem;color:#cc4488;">
+    <strong>Regla de oro:</strong> Nunca arriesgar más del 1-2% del capital por trade.
+   </div>
   </div>
 
-  <div id="feedbackMsg" class="feedback">🛡️ Usa las cuatro herramientas para dominar la gestión de riesgo. Completa al menos 3 cálculos para desbloquear la insignia.</div>
-  <div id="insigniaArea" class="insignia hidden">
-    <i class="fas fa-shield-alt"></i>
-    <h3>🏅 ¡INSIGNIA DE RISK MANAGER! 🏅</h3>
-    <p>Has calculado position sizing, Kelly Criterion, probabilidad de ruina y escenarios de drawdown. ¡Eres el tipo de trader que sobrevive los crashes!</p>
+  <!-- HERRAMIENTA 2: Kelly Criterion -->
+  <div class="tool-card">
+   <h2><i class="fas fa-percentage" style="color:#ff3c78"></i> Kelly Criterion</h2>
+   <div class="field-row"><div class="field-label">Win Rate de tu estrategia</div><div class="slider-row"><input type="range" id="k_wr" min="30" max="80" value="55"><span id="k_wrV">55%</span></div></div>
+   <div class="field-row"><div class="field-label">Ganancia promedio ($)</div><input type="number" id="k_win" value="300" min="1"></div>
+   <div class="field-row"><div class="field-label">Pérdida promedio ($)</div><input type="number" id="k_loss" value="200" min="1"></div>
+   <button class="btn-calc" onclick="calcKelly()"><i class="fas fa-brain"></i> Calcular Kelly</button>
+   <div class="result-box" id="k_result">
+    <span style="color:#cc4488;">Kelly f = (p·b - q) / b</span>
+   </div>
+   <div class="kelly-advice" id="k_advice" style="display:none;"></div>
   </div>
 
-  <div class="nav-links">
-    <a href="08-backtesting.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
-    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
-    <a href="10-construye-tu-bot.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  <!-- HERRAMIENTA 3: Probabilidad de Ruina -->
+  <div class="tool-card">
+   <h2><i class="fas fa-skull-crossbones" style="color:#ff3c78"></i> Probabilidad de Ruina</h2>
+   <div class="field-row"><div class="field-label">Capital inicial ($)</div><input type="number" id="r_capital" value="10000" min="100"></div>
+   <div class="field-row"><div class="field-label">Nivel de ruina ($)</div><input type="number" id="r_ruin" value="5000" min="100"></div>
+   <div class="field-row"><div class="field-label">Win Rate</div><div class="slider-row"><input type="range" id="r_wr" min="30" max="70" value="55"><span id="r_wrV">55%</span></div></div>
+   <div class="field-row"><div class="field-label">Risk/Reward</div><div class="slider-row"><input type="range" id="r_rr" min="0.5" max="4" step="0.5" value="1.5"><span id="r_rrV">1.5x</span></div></div>
+   <button class="btn-calc" onclick="calcRuin()"><i class="fas fa-chart-bar"></i> Simular Montecarlo</button>
+   <div class="result-box" id="r_result"><span style="color:#cc4488;">Simula para ver la probabilidad de ruina...</span></div>
+   <canvas id="ruinChart" height="100" style="width:100%;border-radius:1rem;margin-top:.5rem;display:block;"></canvas>
   </div>
-  <footer><i class="fas fa-crown"></i> Bot Trader Adventure · Módulo 9 de 12 · Kelly (1956) · Van Tharp (2006) "Trade Your Way to Financial Freedom"</footer>
+
+  <!-- HERRAMIENTA 4: Escenarios de Riesgo -->
+  <div class="tool-card">
+   <h2><i class="fas fa-shield-alt" style="color:#ff3c78"></i> Simulador de Drawdown</h2>
+   <div class="field-row"><div class="field-label">Capital ($)</div><input type="number" id="d_capital" value="10000" min="100"></div>
+   <div class="field-row"><div class="field-label">Risk por trade</div><div class="slider-row"><input type="range" id="d_risk" min="0.5" max="10" step="0.5" value="2"><span id="d_riskV">2%</span></div></div>
+   <div class="field-row"><div class="field-label">Racha perdedora máxima</div><div class="slider-row"><input type="range" id="d_streak" min="3" max="20" value="8"><span id="d_streakV">8</span></div></div>
+   <button class="btn-calc" onclick="calcDrawdown()"><i class="fas fa-arrow-down"></i> Calcular Escenarios</button>
+   <div style="margin-top:.6rem;">
+    <div style="font-size:.78rem;color:#cc4488;margin-bottom:.4rem;">Medidor de Riesgo</div>
+    <div class="risk-meter"><div class="risk-needle" id="riskNeedle" style="left:10%"></div></div>
+    <div style="display:flex;justify-content:space-between;font-size:.65rem;color:#888;"><span>Conservador</span><span>Moderado</span><span>Agresivo</span></div>
+   </div>
+   <div class="scenario-grid" id="scenarioGrid"></div>
+   <div class="result-box" id="d_result" style="margin-top:.5rem;"><span style="color:#cc4488;">Configura y calcula...</span></div>
+  </div>
+ </div>
+
+ <div id="feedbackMsg" class="feedback">🛡️ Usa las cuatro herramientas para dominar la gestión de riesgo. Completa al menos 3 cálculos para desbloquear la insignia.</div>
+ <div id="insigniaArea" class="insignia hidden">
+  <i class="fas fa-shield-alt"></i>
+  <h3>🏅 ¡INSIGNIA DE RISK MANAGER! 🏅</h3>
+  <p>Has calculado position sizing, Kelly Criterion, probabilidad de ruina y escenarios de drawdown. ¡Eres el tipo de trader que sobrevive los crashes!</p>
+ </div>
+
+ <div class="nav-links">
+  <a href="08-backtesting.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
+  <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+  <a href="10-construye-tu-bot.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+ </div>
+ <footer><i class="fas fa-crown"></i> Bot Trader Adventure · Módulo 9 de 12 · Kelly (1956) · Van Tharp (2006) "Trade Your Way to Financial Freedom"</footer>
 </div>
 <script>
 const STORAGE_KEY='tbot_risk9';
@@ -148,29 +148,29 @@ let calcsCount=0, completed=false;
 function R(min,max){return min+(Math.random()*(max-min));}
 
 function markCalc(){
-  calcsCount++;
-  if(calcsCount>=3&&!completed){
-    completed=true;localStorage.setItem(STORAGE_KEY,'true');
-    document.getElementById('insigniaArea').classList.remove('hidden');
-    document.getElementById('feedbackMsg').innerHTML=I18N.t('fb_0');
-  } else {
-    document.getElementById('feedbackMsg').innerHTML=`🛡️ ¡Bien! ${calcsCount}/3 herramientas usadas. ${3-calcsCount>0?'Usa '+(3-calcsCount)+' más para desbloquear la insignia.':'¡Casi!'}`;
-  }
+ calcsCount++;
+ if(calcsCount>=3&&!completed){
+  completed=true;localStorage.setItem(STORAGE_KEY,'true');
+  document.getElementById('insigniaArea').classList.remove('hidden');
+  document.getElementById('feedbackMsg').innerHTML=I18N.t('fb_0');
+ } else {
+  document.getElementById('feedbackMsg').innerHTML=`🛡️ ¡Bien! ${calcsCount}/3 herramientas usadas. ${3-calcsCount>0?'Usa '+(3-calcsCount)+' más para desbloquear la insignia.':'¡Casi!'}`;
+ }
 }
 
 function calcPositionSizing(){
-  const capital=+document.getElementById('ps_capital').value;
-  const risk=+document.getElementById('ps_risk').value/100;
-  const entry=+document.getElementById('ps_entry').value;
-  const stop=+document.getElementById('ps_stop').value;
-  if(stop>=entry){document.getElementById('ps_result').innerHTML=I18N.t('fb_1');return;}
-  const riskAmt=capital*risk;
-  const slPct=(entry-stop)/entry;
-  const units=riskAmt/(entry*slPct);
-  const posSize=units*entry;
-  const pct=posSize/capital*100;
-  const color=pct>25?'result-bad':pct>15?'result-warn':'result-good';
-  document.getElementById('ps_result').innerHTML=`<span class="${color}">
+ const capital=+document.getElementById('ps_capital').value;
+ const risk=+document.getElementById('ps_risk').value/100;
+ const entry=+document.getElementById('ps_entry').value;
+ const stop=+document.getElementById('ps_stop').value;
+ if(stop>=entry){document.getElementById('ps_result').innerHTML=I18N.t('fb_1');return;}
+ const riskAmt=capital*risk;
+ const slPct=(entry-stop)/entry;
+ const units=riskAmt/(entry*slPct);
+ const posSize=units*entry;
+ const pct=posSize/capital*100;
+ const color=pct>25?'result-bad':pct>15?'result-warn':'result-good';
+ document.getElementById('ps_result').innerHTML=`<span class="${color}">
 ✅ Monto a arriesgar: <strong>$${riskAmt.toFixed(2)}</strong>
 📦 Unidades: <strong>${units.toFixed(4)}</strong>
 💼 Tamaño de posición: <strong>$${posSize.toFixed(2)}</strong>
@@ -178,119 +178,119 @@ function calcPositionSizing(){
 ⛔ Stop: ${((entry-stop)/entry*100).toFixed(2)}% de caída
 ${pct>25?'⚠️ ¡Posición muy grande para tu capital!':pct>15?'⚡ Posición moderada-alta. Considera reducir.':'✅ Tamaño conservador y saludable.'}
 </span>`;
-  markCalc();
+ markCalc();
 }
 
 function calcKelly(){
-  const wr=+document.getElementById('k_wr').value/100;
-  const win=+document.getElementById('k_win').value;
-  const loss=+document.getElementById('k_loss').value;
-  const b=win/loss;
-  const kelly=(wr*b-(1-wr))/b;
-  const halfKelly=kelly/2;
-  const color=kelly>0.25?'result-bad':kelly>0.1?'result-warn':'result-good';
-  document.getElementById('k_result').innerHTML=`<span class="${color}">
+ const wr=+document.getElementById('k_wr').value/100;
+ const win=+document.getElementById('k_win').value;
+ const loss=+document.getElementById('k_loss').value;
+ const b=win/loss;
+ const kelly=(wr*b-(1-wr))/b;
+ const halfKelly=kelly/2;
+ const color=kelly>0.25?'result-bad':kelly>0.1?'result-warn':'result-good';
+ document.getElementById('k_result').innerHTML=`<span class="${color}">
 f* (Kelly completo) = <strong>${(kelly*100).toFixed(1)}%</strong>
 f/2 (Half-Kelly) = <strong>${(halfKelly*100).toFixed(1)}%</strong>
 RR Ratio (b): <strong>${b.toFixed(2)}x</strong>
 Ventaja por trade: <strong>${((wr*b-(1-wr))*100).toFixed(1)}%</strong>
 </span>`;
-  const advice=document.getElementById('k_advice');
-  advice.style.display='block';
-  if(kelly<=0){advice.innerHTML=I18N.t('fb_2');}
-  else if(kelly>0.25){advice.innerHTML=I18N.t('fb_3')+( halfKelly*100).toFixed(1)+'%) para reducir volatilidad del portafolio.</span>';}
-  else{advice.innerHTML=I18N.t('fb_4')+(halfKelly*100).toFixed(1)+'% del capital por trade.</span>';}
-  markCalc();
+ const advice=document.getElementById('k_advice');
+ advice.style.display='block';
+ if(kelly<=0){advice.innerHTML=I18N.t('fb_2');}
+ else if(kelly>0.25){advice.innerHTML=I18N.t('fb_3')+( halfKelly*100).toFixed(1)+'%) para reducir volatilidad del portafolio.</span>';}
+ else{advice.innerHTML=I18N.t('fb_4')+(halfKelly*100).toFixed(1)+'% del capital por trade.</span>';}
+ markCalc();
 }
 
 function calcRuin(){
-  const capital=+document.getElementById('r_capital').value;
-  const ruin=+document.getElementById('r_ruin').value;
-  const wr=+document.getElementById('r_wr').value/100;
-  const rr=+document.getElementById('r_rr').value;
-  const betSize=capital*0.02;
-  const nSim=5000, paths=[];
-  let ruinCount=0;
-  const equityPaths=[];
+ const capital=+document.getElementById('r_capital').value;
+ const ruin=+document.getElementById('r_ruin').value;
+ const wr=+document.getElementById('r_wr').value/100;
+ const rr=+document.getElementById('r_rr').value;
+ const betSize=capital*0.02;
+ const nSim=5000, paths=[];
+ let ruinCount=0;
+ const equityPaths=[];
 
-  for(let s=0;s<nSim;s++){
-    let c=capital, path=[c];
-    let ruined=false;
-    for(let t=0;t<200;t++){
-      if(Math.random()<wr)c+=betSize*rr;
-      else c-=betSize;
-      path.push(c);
-      if(c<=ruin){ruined=true;ruinCount++;break;}
-    }
-    if(s<50)equityPaths.push(path);
-    paths.push(path[path.length-1]);
+ for(let s=0;s<nSim;s++){
+  let c=capital, path=[c];
+  let ruined=false;
+  for(let t=0;t<200;t++){
+   if(Math.random()<wr)c+=betSize*rr;
+   else c-=betSize;
+   path.push(c);
+   if(c<=ruin){ruined=true;ruinCount++;break;}
   }
+  if(s<50)equityPaths.push(path);
+  paths.push(path[path.length-1]);
+ }
 
-  const ruinProb=(ruinCount/nSim*100);
-  const finalMedian=paths.sort((a,b)=>a-b)[Math.floor(nSim/2)];
-  const color=ruinProb>30?'result-bad':ruinProb>10?'result-warn':'result-good';
-  document.getElementById('r_result').innerHTML=`<span class="${color}">
+ const ruinProb=(ruinCount/nSim*100);
+ const finalMedian=paths.sort((a,b)=>a-b)[Math.floor(nSim/2)];
+ const color=ruinProb>30?'result-bad':ruinProb>10?'result-warn':'result-good';
+ document.getElementById('r_result').innerHTML=`<span class="${color}">
 🎲 Simulaciones: <strong>5,000</strong>
 ⚠️ Prob. de Ruina: <strong>${ruinProb.toFixed(1)}%</strong>
 📈 Capital Mediano (200 trades): <strong>$${finalMedian.toFixed(0)}</strong>
 ${ruinProb>30?'❌ Riesgo de ruina MUY alto. Reduce el tamaño de posición.':ruinProb>10?'⚡ Riesgo de ruina moderado. Considera reducir el riesgo por trade.':'✅ Probabilidad de ruina baja. Estrategia conservadora.'}
 </span>`;
 
-  drawRuinChart(equityPaths,capital,ruin);
-  markCalc();
+ drawRuinChart(equityPaths,capital,ruin);
+ markCalc();
 }
 
 function drawRuinChart(paths,capital,ruin){
-  const canvas=document.getElementById('ruinChart');
-  const W=canvas.parentElement.clientWidth-30;
-  canvas.width=W;canvas.height=100;
-  const ctx=canvas.getContext('2d');
-  ctx.fillStyle='#28001a';ctx.fillRect(0,0,W,100);
+ const canvas=document.getElementById('ruinChart');
+ const W=canvas.parentElement.clientWidth-30;
+ canvas.width=W;canvas.height=100;
+ const ctx=canvas.getContext('2d');
+ ctx.fillStyle='#28001a';ctx.fillRect(0,0,W,100);
 
-  const maxLen=Math.max(...paths.map(p=>p.length));
-  const allVals=paths.flat();
-  const mn=Math.min(...allVals)*0.95, mx=Math.max(...allVals)*1.05;
-  const yS=v=>95-((v-mn)/(mx-mn))*88;
-  const xS=(i,n)=>(i/(n-1))*(W-20)+10;
+ const maxLen=Math.max(...paths.map(p=>p.length));
+ const allVals=paths.flat();
+ const mn=Math.min(...allVals)*0.95, mx=Math.max(...allVals)*1.05;
+ const yS=v=>95-((v-mn)/(mx-mn))*88;
+ const xS=(i,n)=>(i/(n-1))*(W-20)+10;
 
-  paths.slice(0,30).forEach(path=>{
-    const last=path[path.length-1];
-    const color=last<=ruin?'rgba(255,80,80,.3)':'rgba(255,60,120,.15)';
-    ctx.beginPath();ctx.strokeStyle=color;ctx.lineWidth=1;
-    path.forEach((v,i)=>{i===0?ctx.moveTo(xS(i,path.length),yS(v)):ctx.lineTo(xS(i,path.length),yS(v));});
-    ctx.stroke();
-  });
-  ctx.strokeStyle='rgba(255,80,80,.8)';ctx.setLineDash([4,4]);ctx.lineWidth=1;
-  const ruinY=yS(ruin);ctx.beginPath();ctx.moveTo(0,ruinY);ctx.lineTo(W,ruinY);ctx.stroke();ctx.setLineDash([]);
+ paths.slice(0,30).forEach(path=>{
+  const last=path[path.length-1];
+  const color=last<=ruin?'rgba(255,80,80,.3)':'rgba(255,60,120,.15)';
+  ctx.beginPath();ctx.strokeStyle=color;ctx.lineWidth=1;
+  path.forEach((v,i)=>{i===0?ctx.moveTo(xS(i,path.length),yS(v)):ctx.lineTo(xS(i,path.length),yS(v));});
+  ctx.stroke();
+ });
+ ctx.strokeStyle='rgba(255,80,80,.8)';ctx.setLineDash([4,4]);ctx.lineWidth=1;
+ const ruinY=yS(ruin);ctx.beginPath();ctx.moveTo(0,ruinY);ctx.lineTo(W,ruinY);ctx.stroke();ctx.setLineDash([]);
 }
 
 function calcDrawdown(){
-  const capital=+document.getElementById('d_capital').value;
-  const risk=+document.getElementById('d_risk').value/100;
-  const streak=+document.getElementById('d_streak').value;
-  const betAmt=capital*risk;
-  let remaining=capital;
-  for(let i=0;i<streak;i++) remaining-=remaining*risk;
-  const dd=(capital-remaining)/capital*100;
-  const n50=(1-Math.pow(1-risk,streak))*100;
-  const color=dd>30?'result-bad':dd>15?'result-warn':'result-good';
-  const needle=Math.min(risk*1000,95);
-  document.getElementById('riskNeedle').style.left=needle+'%';
+ const capital=+document.getElementById('d_capital').value;
+ const risk=+document.getElementById('d_risk').value/100;
+ const streak=+document.getElementById('d_streak').value;
+ const betAmt=capital*risk;
+ let remaining=capital;
+ for(let i=0;i<streak;i++) remaining-=remaining*risk;
+ const dd=(capital-remaining)/capital*100;
+ const n50=(1-Math.pow(1-risk,streak))*100;
+ const color=dd>30?'result-bad':dd>15?'result-warn':'result-good';
+ const needle=Math.min(risk*1000,95);
+ document.getElementById('riskNeedle').style.left=needle+'%';
 
-  document.getElementById('scenarioGrid').innerHTML=`
-    <div class="scenario-cell"><div class="sc-label">Pérdida por racha</div><div class="sc-val ${dd>20?'result-bad':'result-good'}">-${dd.toFixed(1)}%</div></div>
-    <div class="scenario-cell"><div class="sc-label">Capital restante</div><div class="sc-val">$${remaining.toFixed(0)}</div></div>
-    <div class="scenario-cell"><div class="sc-label">Recuperación requerida</div><div class="sc-val ${dd>30?'result-bad':'result-warn'}">${(100/(100-dd)-1)*100>0?'+':''} ${((100/(100-dd)-1)*100).toFixed(1)}%</div></div>
-    <div class="scenario-cell"><div class="sc-label">Apuesta por trade</div><div class="sc-val">$${betAmt.toFixed(0)}</div></div>
-  `;
+ document.getElementById('scenarioGrid').innerHTML=`
+  <div class="scenario-cell"><div class="sc-label">Pérdida por racha</div><div class="sc-val ${dd>20?'result-bad':'result-good'}">-${dd.toFixed(1)}%</div></div>
+  <div class="scenario-cell"><div class="sc-label">Capital restante</div><div class="sc-val">$${remaining.toFixed(0)}</div></div>
+  <div class="scenario-cell"><div class="sc-label">Recuperación requerida</div><div class="sc-val ${dd>30?'result-bad':'result-warn'}">${(100/(100-dd)-1)*100>0?'+':''} ${((100/(100-dd)-1)*100).toFixed(1)}%</div></div>
+  <div class="scenario-cell"><div class="sc-label">Apuesta por trade</div><div class="sc-val">$${betAmt.toFixed(0)}</div></div>
+ `;
 
-  document.getElementById('d_result').innerHTML=`<span class="${color}">
+ document.getElementById('d_result').innerHTML=`<span class="${color}">
 Drawdown por ${streak} pérdidas seguidas: <strong>${dd.toFixed(1)}%</strong>
 Capital restante: <strong>$${remaining.toFixed(2)}</strong>
 Para recuperar, necesitas: <strong>+${((100/(100-dd)-1)*100).toFixed(1)}%</strong>
 ${dd>40?'❌ CATASTRÓFICO: Reduce el riesgo por trade inmediatamente.':dd>20?'⚠️ SIGNIFICATIVO: Considera reducir al 1% por trade.':'✅ MANEJABLE: Esta racha es recuperable.'}
 </span>`;
-  markCalc();
+ markCalc();
 }
 
 document.getElementById('ps_risk').addEventListener('input',e=>document.getElementById('ps_riskV').textContent=e.target.value+'%');
@@ -302,15 +302,13 @@ document.getElementById('d_streak').addEventListener('input',e=>document.getElem
 
 if(localStorage.getItem(STORAGE_KEY)==='true'){completed=true;calcsCount=3;document.getElementById('insigniaArea').classList.remove('hidden');}
 </script>
-  <script src="../../assets/js/cookie-consent.js"></script>
-
-<script>
+ <script>
 window.I18N_DATA={
-  'fb_0': { es: '🛡️ ¡<strong>MÓDULO COMPLETADO</strong>! Dominaste las cuatro herramientas de gestión de riesgo. Recuerda: sobrevivir es ganar. <strong style="color:#ff80aa">¡Insignia de Risk Manager desbloqueada!</strong>', en: '🛡️ ¡<strong>MÓDULO COMPLETADO</strong>! You masteredte las cuatro herramientas de gestión de riesgo. Recuerda: sobrevivir es ganar. <strong style="color:#ff80aa">¡Insignia de Risk Manager desbloqueada!</strong>' },
-  'fb_1': { es: '<span class="result-bad">⚠️ El stop debe ser menor al precio de entrada.</span>', en: '<span class="result-bad">⚠️ El stop debe ser menor al precio de entrada.</span>' },
-  'fb_2': { es: '<span class="result-bad">❌ Kelly negativo: tu estrategia NO tiene ventaja estadística. No deberías operar.</span>', en: '<span class="result-bad">❌ Kelly negativo: tu estrategia NO tiene ventaja estadística. No deberías operar.</span>' },
-  'fb_3': { es: '<span class="result-warn">⚠️ Kelly > 25%: usa Half-Kelly (', en: '<span class="result-warn">⚠️ Kelly > 25%: usa Half-Kelly (' },
-  'fb_4': { es: '<span class="result-good">✅ Kelly saludable. Half-Kelly recomendado: ', en: '<span class="result-good">✅ Kelly saludable. Half-Kelly recomendado: ' }
+ 'fb_0': { es: '🛡️ ¡<strong>MÓDULO COMPLETADO</strong>! Dominaste las cuatro herramientas de gestión de riesgo. Recuerda: sobrevivir es ganar. <strong style="color:#ff80aa">¡Insignia de Risk Manager desbloqueada!</strong>', en: '🛡️ ¡<strong>MÓDULO COMPLETADO</strong>! You masteredte las cuatro herramientas de gestión de riesgo. Recuerda: sobrevivir es ganar. <strong style="color:#ff80aa">¡Insignia de Risk Manager desbloqueada!</strong>' },
+ 'fb_1': { es: '<span class="result-bad">⚠️ El stop debe ser menor al precio de entrada.</span>', en: '<span class="result-bad">⚠️ El stop debe ser menor al precio de entrada.</span>' },
+ 'fb_2': { es: '<span class="result-bad">❌ Kelly negativo: tu estrategia NO tiene ventaja estadística. No deberías operar.</span>', en: '<span class="result-bad">❌ Kelly negativo: tu estrategia NO tiene ventaja estadística. No deberías operar.</span>' },
+ 'fb_3': { es: '<span class="result-warn">⚠️ Kelly > 25%: usa Half-Kelly (', en: '<span class="result-warn">⚠️ Kelly > 25%: usa Half-Kelly (' },
+ 'fb_4': { es: '<span class="result-good">✅ Kelly saludable. Half-Kelly recomendado: ', en: '<span class="result-good">✅ Kelly saludable. Half-Kelly recomendado: ' }
 };
 </script>
 </body>

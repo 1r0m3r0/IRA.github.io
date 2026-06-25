@@ -1,133 +1,133 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Bot Trader N2 | Sentiment & NLP</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box;}
-    body{background:linear-gradient(145deg,#001a0a 0%,#002a14 100%);font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem;}
-    .container{max-width:1200px;width:100%;background:rgba(0,15,8,.85);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(0,220,100,.25);box-shadow:0 25px 45px rgba(0,0,0,.6);overflow:hidden;}
-    .hero{background:linear-gradient(95deg,#001508,#002a14);padding:1.8rem 2rem;text-align:center;border-bottom:2px solid #00dc64;}
-    .hero h1{font-size:1.8rem;font-weight:800;background:linear-gradient(135deg,#ccffe6,#80ffbb,#00dc64);-webkit-background-clip:text;background-clip:text;color:transparent;}
-    .hero p{margin-top:.5rem;font-size:.95rem;color:#60cc80;}
-    .badge{display:inline-block;background:#003318;border:1px solid #00dc6444;color:#00dc64;font-size:.7rem;padding:.2rem .8rem;border-radius:1rem;margin-top:.4rem;}
-    .analogy-card{background:#001a0acc;margin:1.5rem 2rem;padding:1.2rem 1.8rem;border-radius:2rem;border-left:8px solid #00dc64;font-size:.93rem;line-height:1.6;}
-    .analogy-card strong{color:#80ffbb;}
-    .lab{padding:0 2rem 1.5rem;display:flex;flex-direction:column;gap:1.5rem;}
-    .section-title{font-size:1rem;font-weight:700;color:#80ffbb;margin-bottom:.8rem;}
-    .analyzer-box{background:#00150add;border-radius:2rem;padding:1.4rem;border:1px solid #00dc6422;}
-    textarea{width:100%;background:#002210;border:1px solid #00dc6433;color:#eef5ff;padding:.8rem 1rem;border-radius:1rem;font-family:'Inter',sans-serif;font-size:.88rem;resize:vertical;min-height:80px;line-height:1.5;}
-    .btn-analyze{background:linear-gradient(95deg,#00dc64,#009944);border:none;padding:.7rem 2rem;font-weight:700;border-radius:2rem;cursor:pointer;color:#001a0a;font-size:.9rem;margin-top:.5rem;transition:.2s;}
-    .btn-analyze:hover{transform:translateY(-2px);}
-    .sentiment-result{background:#001a0a;border-radius:1.5rem;padding:1rem;margin-top:.8rem;display:none;}
-    .sent-bar-wrap{margin:.5rem 0;}
-    .sent-label{font-size:.75rem;color:#80aabb;margin-bottom:.2rem;}
-    .sent-bar-track{background:#002210;border-radius:.5rem;height:16px;overflow:hidden;}
-    .sent-bar-fill{height:100%;border-radius:.5rem;transition:width .8s ease;}
-    .sent-val{font-size:.75rem;font-family:monospace;text-align:right;margin-top:.1rem;}
-    .compound-score{text-align:center;padding:.8rem;border-radius:1rem;margin-top:.5rem;font-size:1.1rem;font-weight:700;}
-    .news-feed{background:#00150add;border-radius:2rem;padding:1.4rem;border:1px solid #00dc6422;}
-    .news-grid{display:flex;flex-direction:column;gap:.6rem;}
-    .news-card{background:#001a0a;border-radius:1.5rem;padding:.9rem;display:flex;gap:.8rem;align-items:flex-start;border-left:4px solid transparent;transition:.2s;}
-    .news-card.bull{border-left-color:#00ff88;}
-    .news-card.bear{border-left-color:#ff5050;}
-    .news-card.neutral{border-left-color:#888;}
-    .news-sent{min-width:70px;text-align:center;padding:.3rem .5rem;border-radius:.8rem;font-size:.72rem;font-weight:700;}
-    .sent-bull{background:#002a10;color:#00ff88;}
-    .sent-bear{background:#2a0a0a;color:#ff8080;}
-    .sent-neutral{background:#1a1a1a;color:#aaa;}
-    .news-content .nc-title{font-size:.85rem;font-weight:700;line-height:1.3;}
-    .news-content .nc-meta{font-size:.72rem;color:#558866;margin-top:.2rem;}
-    .fear-greed{background:#00150add;border-radius:2rem;padding:1.4rem;border:1px solid #00dc6422;text-align:center;}
-    .fg-gauge{width:200px;height:100px;margin:.5rem auto;position:relative;}
-    canvas#fgCanvas{width:200px;height:100px;}
-    .fg-val{font-size:2.5rem;font-weight:800;font-family:monospace;margin:.3rem 0;}
-    .fg-label{font-size:.9rem;font-weight:700;}
-    .fg-history{display:flex;gap:.4rem;justify-content:center;flex-wrap:wrap;margin-top:.6rem;}
-    .fg-chip{background:#001a0a;border-radius:.8rem;padding:.3rem .7rem;font-size:.72rem;border:1px solid #003318;}
-    .fg-chip span{font-weight:700;margin-left:.3rem;}
-    .feedback{background:#00000088;margin:0 2rem 1rem;padding:.9rem;border-radius:1.5rem;text-align:center;border-left:4px solid #00dc64;font-size:.9rem;line-height:1.5;}
-    .insignia{text-align:center;background:#001508;border-radius:2rem;margin:0 2rem 1.5rem;padding:1rem;border:1px dashed gold;}
-    .insignia i{font-size:2.5rem;color:gold;}
-    .hidden{display:none;}
-    .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.5rem 2rem;}
-    .nav-link{background:#2c3e66;padding:.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:.5rem;transition:.2s;}
-    .nav-link:hover{transform:translateY(-2px);}
-    .nav-link.next{background:linear-gradient(95deg,#f0a500,#ff6a00);color:#1e1a0c;}
-    .nav-link.menu{background:#1a2a4a;border:1px solid #00dc64;}
-    footer{text-align:center;padding:1rem;font-size:.75rem;border-top:1px solid #001a0a;}
-    .three-col{display:flex;flex-wrap:wrap;gap:1.2rem;}
-    .three-col>div{flex:1;min-width:260px;}
-  </style>
-  <link rel="stylesheet" href="../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Bot Trader N2 | Sentiment & NLP</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:linear-gradient(145deg,#001a0a 0%,#002a14 100%);font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem;}
+  .container{max-width:1200px;width:100%;background:rgba(0,15,8,.85);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(0,220,100,.25);box-shadow:0 25px 45px rgba(0,0,0,.6);overflow:hidden;}
+  .hero{background:linear-gradient(95deg,#001508,#002a14);padding:1.8rem 2rem;text-align:center;border-bottom:2px solid #00dc64;}
+  .hero h1{font-size:1.8rem;font-weight:800;background:linear-gradient(135deg,#ccffe6,#80ffbb,#00dc64);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .hero p{margin-top:.5rem;font-size:.95rem;color:#60cc80;}
+  .badge{display:inline-block;background:#003318;border:1px solid #00dc6444;color:#00dc64;font-size:.7rem;padding:.2rem .8rem;border-radius:1rem;margin-top:.4rem;}
+  .analogy-card{background:#001a0acc;margin:1.5rem 2rem;padding:1.2rem 1.8rem;border-radius:2rem;border-left:8px solid #00dc64;font-size:.93rem;line-height:1.6;}
+  .analogy-card strong{color:#80ffbb;}
+  .lab{padding:0 2rem 1.5rem;display:flex;flex-direction:column;gap:1.5rem;}
+  .section-title{font-size:1rem;font-weight:700;color:#80ffbb;margin-bottom:.8rem;}
+  .analyzer-box{background:#00150add;border-radius:2rem;padding:1.4rem;border:1px solid #00dc6422;}
+  textarea{width:100%;background:#002210;border:1px solid #00dc6433;color:#eef5ff;padding:.8rem 1rem;border-radius:1rem;font-family:'Inter',sans-serif;font-size:.88rem;resize:vertical;min-height:80px;line-height:1.5;}
+  .btn-analyze{background:linear-gradient(95deg,#00dc64,#009944);border:none;padding:.7rem 2rem;font-weight:700;border-radius:2rem;cursor:pointer;color:#001a0a;font-size:.9rem;margin-top:.5rem;transition:.2s;}
+  .btn-analyze:hover{transform:translateY(-2px);}
+  .sentiment-result{background:#001a0a;border-radius:1.5rem;padding:1rem;margin-top:.8rem;display:none;}
+  .sent-bar-wrap{margin:.5rem 0;}
+  .sent-label{font-size:.75rem;color:#80aabb;margin-bottom:.2rem;}
+  .sent-bar-track{background:#002210;border-radius:.5rem;height:16px;overflow:hidden;}
+  .sent-bar-fill{height:100%;border-radius:.5rem;transition:width .8s ease;}
+  .sent-val{font-size:.75rem;font-family:monospace;text-align:right;margin-top:.1rem;}
+  .compound-score{text-align:center;padding:.8rem;border-radius:1rem;margin-top:.5rem;font-size:1.1rem;font-weight:700;}
+  .news-feed{background:#00150add;border-radius:2rem;padding:1.4rem;border:1px solid #00dc6422;}
+  .news-grid{display:flex;flex-direction:column;gap:.6rem;}
+  .news-card{background:#001a0a;border-radius:1.5rem;padding:.9rem;display:flex;gap:.8rem;align-items:flex-start;border-left:4px solid transparent;transition:.2s;}
+  .news-card.bull{border-left-color:#00ff88;}
+  .news-card.bear{border-left-color:#ff5050;}
+  .news-card.neutral{border-left-color:#888;}
+  .news-sent{min-width:70px;text-align:center;padding:.3rem .5rem;border-radius:.8rem;font-size:.72rem;font-weight:700;}
+  .sent-bull{background:#002a10;color:#00ff88;}
+  .sent-bear{background:#2a0a0a;color:#ff8080;}
+  .sent-neutral{background:#1a1a1a;color:#aaa;}
+  .news-content .nc-title{font-size:.85rem;font-weight:700;line-height:1.3;}
+  .news-content .nc-meta{font-size:.72rem;color:#558866;margin-top:.2rem;}
+  .fear-greed{background:#00150add;border-radius:2rem;padding:1.4rem;border:1px solid #00dc6422;text-align:center;}
+  .fg-gauge{width:200px;height:100px;margin:.5rem auto;position:relative;}
+  canvas#fgCanvas{width:200px;height:100px;}
+  .fg-val{font-size:2.5rem;font-weight:800;font-family:monospace;margin:.3rem 0;}
+  .fg-label{font-size:.9rem;font-weight:700;}
+  .fg-history{display:flex;gap:.4rem;justify-content:center;flex-wrap:wrap;margin-top:.6rem;}
+  .fg-chip{background:#001a0a;border-radius:.8rem;padding:.3rem .7rem;font-size:.72rem;border:1px solid #003318;}
+  .fg-chip span{font-weight:700;margin-left:.3rem;}
+  .feedback{background:#00000088;margin:0 2rem 1rem;padding:.9rem;border-radius:1.5rem;text-align:center;border-left:4px solid #00dc64;font-size:.9rem;line-height:1.5;}
+  .insignia{text-align:center;background:#001508;border-radius:2rem;margin:0 2rem 1.5rem;padding:1rem;border:1px dashed gold;}
+  .insignia i{font-size:2.5rem;color:gold;}
+  .hidden{display:none;}
+  .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.5rem 2rem;}
+  .nav-link{background:#2c3e66;padding:.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:.5rem;transition:.2s;}
+  .nav-link:hover{transform:translateY(-2px);}
+  .nav-link.next{background:linear-gradient(95deg,#f0a500,#ff6a00);color:#1e1a0c;}
+  .nav-link.menu{background:#1a2a4a;border:1px solid #00dc64;}
+  footer{text-align:center;padding:1rem;font-size:.75rem;border-top:1px solid #001a0a;}
+  .three-col{display:flex;flex-wrap:wrap;gap:1.2rem;}
+  .three-col>div{flex:1;min-width:260px;}
+ </style>
+ <link rel="stylesheet" href="../../assets/css/theme.css">
 </head>
 <body>
-  <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+ <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
 <div class="container">
-  <div class="hero">
-    <h1>📰 SENTIMENT & NLP: El Mercado Tiene Emociones</h1>
-    <p>Analiza noticias, tweets y el Fear & Greed Index para predecir movimientos de mercado</p>
-    <span class="badge">⚡ NIVEL 2 — Módulo Avanzado</span>
-  </div>
-  <div class="analogy-card">
-    <strong>📊 Piénsalo así:</strong> Los mercados no son solo números — son emociones colectivas. Cuando Elon Musk tweetea "Doge to the moon 🌙", el precio de Dogecoin explota en minutos. Eso es <strong>sentiment trading</strong>. El <strong>NLP (Natural Language Processing)</strong> enseña a las máquinas a leer noticias, tweets y reportes como lo haría un analista humano, pero a una velocidad imposible para cualquier persona.
-    <br><br>
-    <strong>📚 Fuentes:</strong> Tetlock, P. (2007) — <em>"Giving Content to Investor Sentiment: The Role of Media in the Stock Market"</em>. Journal of Finance. / Hu, M. & Liu, B. (2004) — <em>"Mining and Summarizing Customer Reviews"</em>. KDD. / VADER: Hutto & Gilbert (2014). Georgia Tech.
-  </div>
-  <div class="lab">
-    <div class="three-col">
-      <!-- Sentiment Analyzer -->
-      <div class="analyzer-box" style="flex:1.5;min-width:300px;">
-        <div class="section-title"><i class="fas fa-comments"></i> Analizador de Sentiment en Tiempo Real</div>
-        <textarea id="sentText" placeholder="Escribe un headline, tweet o texto sobre crypto/mercados... Ej: 'Bitcoin crashes below $40k as SEC announces major crackdown on exchanges'"></textarea>
-        <button class="btn-analyze" onclick="analyzeSentiment()"><i class="fas fa-search"></i> Analizar Sentiment</button>
-        <div class="sentiment-result" id="sentResult">
-          <div class="sent-bar-wrap"><div class="sent-label">Positivo</div><div class="sent-bar-track"><div class="sent-bar-fill" id="barPos" style="width:0%;background:#00ff88;"></div></div><div class="sent-val" id="valPos" style="color:#00ff88;">0%</div></div>
-          <div class="sent-bar-wrap"><div class="sent-label">Negativo</div><div class="sent-bar-track"><div class="sent-bar-fill" id="barNeg" style="width:0%;background:#ff5050;"></div></div><div class="sent-val" id="valNeg" style="color:#ff5050;">0%</div></div>
-          <div class="sent-bar-wrap"><div class="sent-label">Neutro</div><div class="sent-bar-track"><div class="sent-bar-fill" id="barNeu" style="width:0%;background:#888;"></div></div><div class="sent-val" id="valNeu" style="color:#888;">0%</div></div>
-          <div class="compound-score" id="compoundScore"></div>
-          <div style="font-size:.75rem;color:#558866;margin-top:.4rem;" id="sentWords"></div>
-        </div>
-      </div>
-
-      <!-- Fear & Greed -->
-      <div class="fear-greed">
-        <div class="section-title"><i class="fas fa-gauge"></i> Fear & Greed Index</div>
-        <div class="fg-gauge"><canvas id="fgCanvas"></canvas></div>
-        <div class="fg-val" id="fgVal">—</div>
-        <div class="fg-label" id="fgLabel" style="color:#888;">Cargando...</div>
-        <div style="font-size:.75rem;color:#558866;margin:.5rem 0;">Datos históricos recientes (simulados):</div>
-        <div class="fg-history" id="fgHistory"></div>
-        <button class="btn-analyze" style="margin-top:.8rem;font-size:.8rem;padding:.5rem 1.2rem;" onclick="refreshFG()"><i class="fas fa-sync"></i> Actualizar Index</button>
-        <div style="font-size:.72rem;color:#446655;margin-top:.6rem;">Basado en: Volatilidad · Momentum · Social Media · Dominancia BTC · Google Trends</div>
-      </div>
+ <div class="hero">
+  <h1>📰 SENTIMENT & NLP: El Mercado Tiene Emociones</h1>
+  <p>Analiza noticias, tweets y el Fear & Greed Index para predecir movimientos de mercado</p>
+  <span class="badge">⚡ NIVEL 2 — Módulo Avanzado</span>
+ </div>
+ <div class="analogy-card">
+  <strong>📊 Piénsalo así:</strong> Los mercados no son solo números — son emociones colectivas. Cuando Elon Musk tweetea "Doge to the moon 🌙", el precio de Dogecoin explota en minutos. Eso es <strong>sentiment trading</strong>. El <strong>NLP (Natural Language Processing)</strong> enseña a las máquinas a leer noticias, tweets y reportes como lo haría un analista humano, pero a una velocidad imposible para cualquier persona.
+  <br><br>
+  <strong>📚 Fuentes:</strong> Tetlock, P. (2007) — <em>"Giving Content to Investor Sentiment: The Role of Media in the Stock Market"</em>. Journal of Finance. / Hu, M. & Liu, B. (2004) — <em>"Mining and Summarizing Customer Reviews"</em>. KDD. / VADER: Hutto & Gilbert (2014). Georgia Tech.
+ </div>
+ <div class="lab">
+  <div class="three-col">
+   <!-- Sentiment Analyzer -->
+   <div class="analyzer-box" style="flex:1.5;min-width:300px;">
+    <div class="section-title"><i class="fas fa-comments"></i> Analizador de Sentiment en Tiempo Real</div>
+    <textarea id="sentText" placeholder="Escribe un headline, tweet o texto sobre crypto/mercados... Ej: 'Bitcoin crashes below $40k as SEC announces major crackdown on exchanges'"></textarea>
+    <button class="btn-analyze" onclick="analyzeSentiment()"><i class="fas fa-search"></i> Analizar Sentiment</button>
+    <div class="sentiment-result" id="sentResult">
+     <div class="sent-bar-wrap"><div class="sent-label">Positivo</div><div class="sent-bar-track"><div class="sent-bar-fill" id="barPos" style="width:0%;background:#00ff88;"></div></div><div class="sent-val" id="valPos" style="color:#00ff88;">0%</div></div>
+     <div class="sent-bar-wrap"><div class="sent-label">Negativo</div><div class="sent-bar-track"><div class="sent-bar-fill" id="barNeg" style="width:0%;background:#ff5050;"></div></div><div class="sent-val" id="valNeg" style="color:#ff5050;">0%</div></div>
+     <div class="sent-bar-wrap"><div class="sent-label">Neutro</div><div class="sent-bar-track"><div class="sent-bar-fill" id="barNeu" style="width:0%;background:#888;"></div></div><div class="sent-val" id="valNeu" style="color:#888;">0%</div></div>
+     <div class="compound-score" id="compoundScore"></div>
+     <div style="font-size:.75rem;color:#558866;margin-top:.4rem;" id="sentWords"></div>
     </div>
+   </div>
 
-    <!-- News Feed Sentiment -->
-    <div class="news-feed">
-      <div class="section-title"><i class="fas fa-newspaper"></i> Stream de Noticias con Sentiment Score</div>
-      <div class="news-grid" id="newsGrid"></div>
-      <button class="btn-analyze" style="margin-top:.8rem;font-size:.8rem;padding:.5rem 1.5rem;" onclick="refreshNews()"><i class="fas fa-sync"></i> Cargar Nuevas Noticias</button>
-    </div>
+   <!-- Fear & Greed -->
+   <div class="fear-greed">
+    <div class="section-title"><i class="fas fa-gauge"></i> Fear & Greed Index</div>
+    <div class="fg-gauge"><canvas id="fgCanvas"></canvas></div>
+    <div class="fg-val" id="fgVal">—</div>
+    <div class="fg-label" id="fgLabel" style="color:#888;">Cargando...</div>
+    <div style="font-size:.75rem;color:#558866;margin:.5rem 0;">Datos históricos recientes (simulados):</div>
+    <div class="fg-history" id="fgHistory"></div>
+    <button class="btn-analyze" style="margin-top:.8rem;font-size:.8rem;padding:.5rem 1.2rem;" onclick="refreshFG()"><i class="fas fa-sync"></i> Actualizar Index</button>
+    <div style="font-size:.72rem;color:#446655;margin-top:.6rem;">Basado en: Volatilidad · Momentum · Social Media · Dominancia BTC · Google Trends</div>
+   </div>
   </div>
 
-  <div id="feedbackMsg" class="feedback">📰 Analiza textos con el sentiment analyzer, explora el Fear & Greed Index y lee el stream de noticias. Completa 2 análisis para desbloquear la insignia.</div>
-  <div id="insigniaArea" class="insignia hidden">
-    <i class="fas fa-comments"></i>
-    <h3>🏅 ¡INSIGNIA DE SENTIMENT ANALYST! 🏅</h3>
-    <p>Dominas el análisis de sentiment. ¡Tu bot ahora puede leer las emociones del mercado!</p>
+  <!-- News Feed Sentiment -->
+  <div class="news-feed">
+   <div class="section-title"><i class="fas fa-newspaper"></i> Stream de Noticias con Sentiment Score</div>
+   <div class="news-grid" id="newsGrid"></div>
+   <button class="btn-analyze" style="margin-top:.8rem;font-size:.8rem;padding:.5rem 1.5rem;" onclick="refreshNews()"><i class="fas fa-sync"></i> Cargar Nuevas Noticias</button>
   </div>
+ </div>
 
-  <div class="nav-links">
-    <a href="nivel2-02-lstm-deep.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
-    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
-    <a href="nivel2-04-portfolio.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
-  </div>
-  <footer><i class="fas fa-crown"></i> Bot Trader Adventure · Nivel 2 Módulo 3 · Tetlock (2007) · VADER: Hutto & Gilbert (2014)</footer>
+ <div id="feedbackMsg" class="feedback">📰 Analiza textos con el sentiment analyzer, explora el Fear & Greed Index y lee el stream de noticias. Completa 2 análisis para desbloquear la insignia.</div>
+ <div id="insigniaArea" class="insignia hidden">
+  <i class="fas fa-comments"></i>
+  <h3>🏅 ¡INSIGNIA DE SENTIMENT ANALYST! 🏅</h3>
+  <p>Dominas el análisis de sentiment. ¡Tu bot ahora puede leer las emociones del mercado!</p>
+ </div>
+
+ <div class="nav-links">
+  <a href="nivel2-02-lstm-deep.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
+  <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+  <a href="nivel2-04-portfolio.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+ </div>
+ <footer><i class="fas fa-crown"></i> Bot Trader Adventure · Nivel 2 Módulo 3 · Tetlock (2007) · VADER: Hutto & Gilbert (2014)</footer>
 </div>
 <script>
 const STORAGE_KEY='tbot_n2nlp';
@@ -138,113 +138,112 @@ const BEAR_WORDS=['crash','dump','bear','loss','sell','hack','ban','regulation',
 const NEU_WORDS=['bitcoin','crypto','market','trading','price','ethereum','blockchain','exchange'];
 
 function analyzeSentiment(){
-  const text=document.getElementById('sentText').value.toLowerCase();
-  if(text.trim().length<5){return;}
-  const words=text.split(/\W+/);
-  let bull=0,bear=0,neu=0;
-  const foundBull=[],foundBear=[];
-  words.forEach(w=>{
-    if(BULL_WORDS.includes(w)){bull+=1+Math.random()*0.5;foundBull.push(w);}
-    else if(BEAR_WORDS.includes(w)){bear+=1+Math.random()*0.5;foundBear.push(w);}
-    else if(NEU_WORDS.includes(w)) neu+=0.5;
-  });
-  if(bull+bear+neu===0){bull=0.1;bear=0.1;neu=0.8;}
-  const total=bull+bear+neu;
-  const pos=(bull/total*100),neg=(bear/total*100),neutral=(neu/total*100);
-  const compound=(pos-neg)/100;
+ const text=document.getElementById('sentText').value.toLowerCase();
+ if(text.trim().length<5){return;}
+ const words=text.split(/\W+/);
+ let bull=0,bear=0,neu=0;
+ const foundBull=[],foundBear=[];
+ words.forEach(w=>{
+  if(BULL_WORDS.includes(w)){bull+=1+Math.random()*0.5;foundBull.push(w);}
+  else if(BEAR_WORDS.includes(w)){bear+=1+Math.random()*0.5;foundBear.push(w);}
+  else if(NEU_WORDS.includes(w)) neu+=0.5;
+ });
+ if(bull+bear+neu===0){bull=0.1;bear=0.1;neu=0.8;}
+ const total=bull+bear+neu;
+ const pos=(bull/total*100),neg=(bear/total*100),neutral=(neu/total*100);
+ const compound=(pos-neg)/100;
 
-  document.getElementById('sentResult').style.display='block';
-  ['Pos','Neg','Neu'].forEach((k,i)=>{
-    const v=[pos,neg,neutral][i];
-    document.getElementById('bar'+k).style.width=v.toFixed(1)+'%';
-    document.getElementById('val'+k).textContent=v.toFixed(1)+'%';
-  });
+ document.getElementById('sentResult').style.display='block';
+ ['Pos','Neg','Neu'].forEach((k,i)=>{
+  const v=[pos,neg,neutral][i];
+  document.getElementById('bar'+k).style.width=v.toFixed(1)+'%';
+  document.getElementById('val'+k).textContent=v.toFixed(1)+'%';
+ });
 
-  const color=compound>0.05?'#00ff88':compound<-0.05?'#ff5050':'#aaaaaa';
-  const label=compound>0.2?'🚀 MUY ALCISTA':compound>0.05?'📈 ALCISTA':compound<-0.2?'💥 MUY BAJISTA':compound<-0.05?'📉 BAJISTA':'😐 NEUTRO';
-  document.getElementById('compoundScore').style.background=compound>0?'#002a10':compound<0?'#2a0808':'#1a1a1a';
-  document.getElementById('compoundScore').style.color=color;
-  document.getElementById('compoundScore').innerHTML=`Compound Score: ${compound.toFixed(3)} &nbsp;—&nbsp; ${label}`;
-  document.getElementById('sentWords').innerHTML=`🟢 Señales alcistas: <strong>${foundBull.join(', ')||'ninguna'}</strong><br>🔴 Señales bajistas: <strong>${foundBear.join(', ')||'ninguna'}</strong>`;
+ const color=compound>0.05?'#00ff88':compound<-0.05?'#ff5050':'#aaaaaa';
+ const label=compound>0.2?'🚀 MUY ALCISTA':compound>0.05?'📈 ALCISTA':compound<-0.2?'💥 MUY BAJISTA':compound<-0.05?'📉 BAJISTA':'😐 NEUTRO';
+ document.getElementById('compoundScore').style.background=compound>0?'#002a10':compound<0?'#2a0808':'#1a1a1a';
+ document.getElementById('compoundScore').style.color=color;
+ document.getElementById('compoundScore').innerHTML=`Compound Score: ${compound.toFixed(3)} &nbsp;—&nbsp; ${label}`;
+ document.getElementById('sentWords').innerHTML=`🟢 Señales alcistas: <strong>${foundBull.join(', ')||'ninguna'}</strong><br>🔴 Señales bajistas: <strong>${foundBear.join(', ')||'ninguna'}</strong>`;
 
-  document.getElementById('feedbackMsg').innerHTML=`📰 Sentiment analizado: <strong>${label}</strong> (score: ${compound.toFixed(3)}). ${compound>0.1?'Las noticias positivas tienden a correlacionar con +1-3% en las próximas horas.':compound<-0.1?'Las noticias negativas tienden a presionar el precio a la baja a corto plazo.':'Sentiment neutro — el precio seguirá factores técnicos.'}`;
+ document.getElementById('feedbackMsg').innerHTML=`📰 Sentiment analizado: <strong>${label}</strong> (score: ${compound.toFixed(3)}). ${compound>0.1?'Las noticias positivas tienden a correlacionar con +1-3% en las próximas horas.':compound<-0.1?'Las noticias negativas tienden a presionar el precio a la baja a corto plazo.':'Sentiment neutro — el precio seguirá factores técnicos.'}`;
 
-  analysesCount++;
-  if(analysesCount>=2&&!completed){
-    completed=true;localStorage.setItem(STORAGE_KEY,'true');
-    document.getElementById('insigniaArea').classList.remove('hidden');
-  }
+ analysesCount++;
+ if(analysesCount>=2&&!completed){
+  completed=true;localStorage.setItem(STORAGE_KEY,'true');
+  document.getElementById('insigniaArea').classList.remove('hidden');
+ }
 }
 
 const FG_HISTORY_DATA=[
-  {val:72,label:'Codicia Extrema',color:'#00cc44'},
-  {val:58,label:'Codicia',color:'#88cc00'},
-  {val:45,label:'Neutro',color:'#aaaa00'},
-  {val:28,label:'Miedo',color:'#cc8800'},
-  {val:18,label:'Miedo Extremo',color:'#cc2200'},
-  {val:51,label:'Neutro',color:'#aaaa00'},
-  {val:63,label:'Codicia',color:'#88cc00'},
+ {val:72,label:'Codicia Extrema',color:'#00cc44'},
+ {val:58,label:'Codicia',color:'#88cc00'},
+ {val:45,label:'Neutro',color:'#aaaa00'},
+ {val:28,label:'Miedo',color:'#cc8800'},
+ {val:18,label:'Miedo Extremo',color:'#cc2200'},
+ {val:51,label:'Neutro',color:'#aaaa00'},
+ {val:63,label:'Codicia',color:'#88cc00'},
 ];
 
 function refreshFG(){
-  const val=Math.round(Math.random()*100);
-  const label=val>=75?'😱 CODICIA EXTREMA':val>=55?'😀 CODICIA':val>=45?'😐 NEUTRO':val>=25?'😨 MIEDO':'💀 MIEDO EXTREMO';
-  const color=val>=75?'#00cc44':val>=55?'#88cc00':val>=45?'#aaaa00':val>=25?'#cc8800':'#cc2200';
+ const val=Math.round(Math.random()*100);
+ const label=val>=75?'😱 CODICIA EXTREMA':val>=55?'😀 CODICIA':val>=45?'😐 NEUTRO':val>=25?'😨 MIEDO':'💀 MIEDO EXTREMO';
+ const color=val>=75?'#00cc44':val>=55?'#88cc00':val>=45?'#aaaa00':val>=25?'#cc8800':'#cc2200';
 
-  document.getElementById('fgVal').textContent=val;
-  document.getElementById('fgVal').style.color=color;
-  document.getElementById('fgLabel').textContent=label;
-  document.getElementById('fgLabel').style.color=color;
+ document.getElementById('fgVal').textContent=val;
+ document.getElementById('fgVal').style.color=color;
+ document.getElementById('fgLabel').textContent=label;
+ document.getElementById('fgLabel').style.color=color;
 
-  const canvas=document.getElementById('fgCanvas');
-  canvas.width=200;canvas.height=100;
-  const ctx=canvas.getContext('2d');
-  ctx.clearRect(0,0,200,100);
-  const grad=ctx.createLinearGradient(0,0,200,0);
-  grad.addColorStop(0,'#cc2200');grad.addColorStop(0.25,'#cc8800');grad.addColorStop(0.5,'#aaaa00');grad.addColorStop(0.75,'#88cc00');grad.addColorStop(1,'#00cc44');
-  ctx.beginPath();ctx.arc(100,100,85,Math.PI,0);ctx.lineWidth=16;ctx.strokeStyle=grad;ctx.stroke();
+ const canvas=document.getElementById('fgCanvas');
+ canvas.width=200;canvas.height=100;
+ const ctx=canvas.getContext('2d');
+ ctx.clearRect(0,0,200,100);
+ const grad=ctx.createLinearGradient(0,0,200,0);
+ grad.addColorStop(0,'#cc2200');grad.addColorStop(0.25,'#cc8800');grad.addColorStop(0.5,'#aaaa00');grad.addColorStop(0.75,'#88cc00');grad.addColorStop(1,'#00cc44');
+ ctx.beginPath();ctx.arc(100,100,85,Math.PI,0);ctx.lineWidth=16;ctx.strokeStyle=grad;ctx.stroke();
 
-  const angle=Math.PI+(val/100)*Math.PI;
-  const nx=100+65*Math.cos(angle), ny=100+65*Math.sin(angle);
-  ctx.beginPath();ctx.moveTo(100,100);ctx.lineTo(nx,ny);ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.stroke();
-  ctx.beginPath();ctx.arc(100,100,6,0,2*Math.PI);ctx.fillStyle='#fff';ctx.fill();
+ const angle=Math.PI+(val/100)*Math.PI;
+ const nx=100+65*Math.cos(angle), ny=100+65*Math.sin(angle);
+ ctx.beginPath();ctx.moveTo(100,100);ctx.lineTo(nx,ny);ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.stroke();
+ ctx.beginPath();ctx.arc(100,100,6,0,2*Math.PI);ctx.fillStyle='#fff';ctx.fill();
 
-  document.getElementById('fgHistory').innerHTML=FG_HISTORY_DATA.map((d,i)=>`
-    <div class="fg-chip"><small>D-${FG_HISTORY_DATA.length-i}</small><span style="color:${d.color}">${d.val}</span></div>`).join('');
+ document.getElementById('fgHistory').innerHTML=FG_HISTORY_DATA.map((d,i)=>`
+  <div class="fg-chip"><small>D-${FG_HISTORY_DATA.length-i}</small><span style="color:${d.color}">${d.val}</span></div>`).join('');
 }
 
 const NEWS=[
-  {t:"Bitcoin surges past $52,000 as institutional adoption accelerates — BlackRock ETF sees record $2B inflows",src:"Bloomberg",time:"hace 15 min",s:"bull"},
-  {t:"SEC approves spot Bitcoin ETF options trading, opening the door for mainstream derivatives market",src:"Reuters",time:"hace 45 min",s:"bull"},
-  {t:"Ethereum core devs confirm Pectra upgrade timeline — major gas improvements incoming",src:"The Block",time:"hace 1h",s:"bull"},
-  {t:"Crypto exchange Binance reaches $1B settlement with DOJ over compliance failures",src:"WSJ",time:"hace 2h",s:"bear"},
-  {t:"China reaffirms crypto mining ban, orders power companies to cut supply to farms",src:"CNBC",time:"hace 3h",s:"bear"},
-  {t:"Bitcoin dominance reaches 58% as altcoins bleed — risk-off sentiment spreads to DeFi",src:"CoinDesk",time:"hace 4h",s:"bear"},
-  {t:"Total crypto market cap consolidates at $1.8T ahead of Fed meeting next week",src:"CryptoSlate",time:"hace 5h",s:"neutral"},
-  {t:"Solana DEX volume surpasses Ethereum for third consecutive week",src:"The Defiant",time:"hace 6h",s:"bull"},
-  {t:"Hedge funds increase short positions on BTC futures — CME data shows 3-month high",src:"Kaiko",time:"hace 8h",s:"bear"},
+ {t:"Bitcoin surges past $52,000 as institutional adoption accelerates — BlackRock ETF sees record $2B inflows",src:"Bloomberg",time:"hace 15 min",s:"bull"},
+ {t:"SEC approves spot Bitcoin ETF options trading, opening the door for mainstream derivatives market",src:"Reuters",time:"hace 45 min",s:"bull"},
+ {t:"Ethereum core devs confirm Pectra upgrade timeline — major gas improvements incoming",src:"The Block",time:"hace 1h",s:"bull"},
+ {t:"Crypto exchange Binance reaches $1B settlement with DOJ over compliance failures",src:"WSJ",time:"hace 2h",s:"bear"},
+ {t:"China reaffirms crypto mining ban, orders power companies to cut supply to farms",src:"CNBC",time:"hace 3h",s:"bear"},
+ {t:"Bitcoin dominance reaches 58% as altcoins bleed — risk-off sentiment spreads to DeFi",src:"CoinDesk",time:"hace 4h",s:"bear"},
+ {t:"Total crypto market cap consolidates at $1.8T ahead of Fed meeting next week",src:"CryptoSlate",time:"hace 5h",s:"neutral"},
+ {t:"Solana DEX volume surpasses Ethereum for third consecutive week",src:"The Defiant",time:"hace 6h",s:"bull"},
+ {t:"Hedge funds increase short positions on BTC futures — CME data shows 3-month high",src:"Kaiko",time:"hace 8h",s:"bear"},
 ];
 
 function refreshNews(){
-  const shuffled=[...NEWS].sort(()=>Math.random()-0.5).slice(0,6);
-  const scoreMap={bull:'🟢 +0.'+Math.round(Math.random()*4+4),bear:'🔴 -0.'+Math.round(Math.random()*4+3),neutral:'⚪ +0.0'+Math.round(Math.random()*9)};
-  document.getElementById('newsGrid').innerHTML=shuffled.map(n=>`
-    <div class="news-card ${n.s}">
-      <div class="news-sent sent-${n.s}">${scoreMap[n.s]||'—'}<br>${n.s==='bull'?'ALCISTA':n.s==='bear'?'BAJISTA':'NEUTRO'}</div>
-      <div class="news-content">
-        <div class="nc-title">${n.t}</div>
-        <div class="nc-meta"><i class="fas fa-newspaper"></i> ${n.src} &nbsp;·&nbsp; ${n.time}</div>
-      </div>
-    </div>`).join('');
-  analysesCount++;
-  if(analysesCount>=2&&!completed){completed=true;localStorage.setItem(STORAGE_KEY,'true');document.getElementById('insigniaArea').classList.remove('hidden');}
+ const shuffled=[...NEWS].sort(()=>Math.random()-0.5).slice(0,6);
+ const scoreMap={bull:'🟢 +0.'+Math.round(Math.random()*4+4),bear:'🔴 -0.'+Math.round(Math.random()*4+3),neutral:'⚪ +0.0'+Math.round(Math.random()*9)};
+ document.getElementById('newsGrid').innerHTML=shuffled.map(n=>`
+  <div class="news-card ${n.s}">
+   <div class="news-sent sent-${n.s}">${scoreMap[n.s]||'—'}<br>${n.s==='bull'?'ALCISTA':n.s==='bear'?'BAJISTA':'NEUTRO'}</div>
+   <div class="news-content">
+    <div class="nc-title">${n.t}</div>
+    <div class="nc-meta"><i class="fas fa-newspaper"></i> ${n.src} &nbsp;·&nbsp; ${n.time}</div>
+   </div>
+  </div>`).join('');
+ analysesCount++;
+ if(analysesCount>=2&&!completed){completed=true;localStorage.setItem(STORAGE_KEY,'true');document.getElementById('insigniaArea').classList.remove('hidden');}
 }
 
 refreshFG();refreshNews();
 if(localStorage.getItem(STORAGE_KEY)==='true'){completed=true;document.getElementById('insigniaArea').classList.remove('hidden');}
 </script>
-  <script src="../../assets/js/cookie-consent.js"></script>
-</body>
+ </body>
 </html>
 
 

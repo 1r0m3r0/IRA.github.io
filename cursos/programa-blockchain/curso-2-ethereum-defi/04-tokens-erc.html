@@ -1,245 +1,244 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Tokens ERC-20, ERC-721, ERC-1155 | Curso 2</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 100%); font-family: 'Inter', sans-serif; color: #eef5ff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; }
-    .course-container { max-width: 1300px; width: 100%; background: rgba(15,25,45,0.65); backdrop-filter: blur(12px); border-radius: 3rem; border: 1px solid rgba(98,126,234,0.25); box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden; }
-    .hero-header { background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%); padding: 2rem 2rem 1.5rem; text-align: center; border-bottom: 2px solid #627eea; }
-    .hero-header h1 { font-size: 2.6rem; font-weight: 800; background: linear-gradient(135deg, #FFF, #8099f0, #627eea); -webkit-background-clip: text; background-clip: text; color: transparent; }
-    .hero-header p { font-size: 1.1rem; color: #b9e2ff; margin-top: 0.5rem; }
-    .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1.2rem; flex-wrap: wrap; }
-    .chip { background: rgba(98,126,234,0.15); border: 1px solid #627eea; padding: 0.4rem 1rem; border-radius: 40px; font-size: 0.8rem; font-weight: 600; }
-    .analogy-card { background: #1e2a3acc; margin: 1.5rem 2rem; padding: 1.2rem 1.8rem; border-radius: 2rem; border-left: 8px solid #627eea; font-size: 1rem; line-height: 1.6; }
-    .main-area { padding: 1rem 2rem 2rem; }
-    .sim-box { background: rgba(0,10,25,0.7); border-radius: 2rem; padding: 1.5rem; border: 1px solid #627eea; margin-bottom: 1.5rem; }
-    .sim-box h3 { margin-bottom: 1rem; color: #8099f0; }
-    .selector-grid { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin-bottom: 1.5rem; }
-    .std-btn { background: #1e2a3e; border: 2px solid #2c3e66; padding: 0.8rem 1.5rem; border-radius: 2rem; cursor: pointer; font-weight: 600; transition: 0.2s; color: #eef5ff; font-family: 'Inter', sans-serif; }
-    .std-btn:hover { border-color: #627eea; }
-    .std-btn.active { background: #627eea; border-color: #627eea; color: #fff; }
-    .form-group { margin: 1rem 0; text-align: left; max-width: 400px; margin-left: auto; margin-right: auto; }
-    .form-group label { display: block; font-size: 0.9rem; color: #b9e2ff; margin-bottom: 0.3rem; }
-    .form-group input { width: 100%; padding: 0.6rem 1rem; border-radius: 1rem; border: 1px solid #2c3e66; background: #0f1a2c; color: #eef5ff; font-family: 'Inter', sans-serif; font-size: 1rem; }
-    .btn-action { background: linear-gradient(95deg, #627eea, #8099f0); border: none; padding: 0.8rem 1.8rem; font-weight: bold; border-radius: 3rem; margin: 0.5rem; cursor: pointer; font-size: 1rem; transition: 0.2s; color: #fff; }
-    .btn-action:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(98,126,234,0.5); }
-    .contract-preview { background: #0a1220; border-radius: 1.5rem; padding: 1.5rem; margin-top: 1rem; border: 1px solid #627eea; text-align: left; font-family: monospace; font-size: 0.85rem; color: #b9e2ff; overflow-x: auto; white-space: pre-wrap; }
-    .use-cases { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 1rem; margin-top: 1rem; }
-    .use-card { background: #0f1a2c; border-radius: 1rem; padding: 1rem; border-left: 4px solid #627eea; }
-    .use-card h4 { color: #8099f0; font-size: 0.95rem; }
-    .use-card p { font-size: 0.8rem; color: #8899bb; }
-    .feedback { background: #00000099; margin: 1rem 0; padding: 1rem; border-radius: 1.5rem; text-align: center; font-weight: 500; border-left: 4px solid #627eea; }
-    .quiz-block { background: rgba(0,10,25,0.5); border-radius: 2rem; padding: 1.5rem; margin-top: 1.5rem; border: 1px solid #627eea; }
-    .quiz-block h3 { color: #8099f0; margin-bottom: 1rem; }
-    .quiz-q { margin: 1rem 0; padding: 1rem; background: #0f1a2c; border-radius: 1rem; }
-    .quiz-q p { font-weight: 600; margin-bottom: 0.5rem; }
-    .quiz-q .opt { display: inline-block; background: #1e2a3e; padding: 0.4rem 1rem; border-radius: 2rem; margin: 0.2rem; cursor: pointer; transition: 0.2s; font-size: 0.9rem; }
-    .quiz-q .opt:hover { background: #2c3e66; }
-    .quiz-q .opt.selected { background: #627eea; color: #fff; }
-    .insignia { text-align: center; background: #0c1b2f; border-radius: 2rem; margin: 1rem 0; padding: 1rem; border: 1px dashed gold; }
-    .insignia i { font-size: 2.5rem; color: gold; }
-    .hidden { display: none; }
-    .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
-    .nav-link { background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem; font-weight: 600; text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; }
-    .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(98,126,234,0.4); }
-    .nav-link.next { background: linear-gradient(95deg, #627eea, #8099f0); color: #fff; }
-    .nav-link.menu { background: #1a2a4a; border: 1px solid #627eea; }
-    footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
-    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
-  </style>
-  <link rel="stylesheet" href="../../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Tokens ERC-20, ERC-721, ERC-1155 | Curso 2</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 100%); font-family: 'Inter', sans-serif; color: #eef5ff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; }
+  .course-container { max-width: 1300px; width: 100%; background: rgba(15,25,45,0.65); backdrop-filter: blur(12px); border-radius: 3rem; border: 1px solid rgba(98,126,234,0.25); box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden; }
+  .hero-header { background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%); padding: 2rem 2rem 1.5rem; text-align: center; border-bottom: 2px solid #627eea; }
+  .hero-header h1 { font-size: 2.6rem; font-weight: 800; background: linear-gradient(135deg, #FFF, #8099f0, #627eea); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero-header p { font-size: 1.1rem; color: #b9e2ff; margin-top: 0.5rem; }
+  .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1.2rem; flex-wrap: wrap; }
+  .chip { background: rgba(98,126,234,0.15); border: 1px solid #627eea; padding: 0.4rem 1rem; border-radius: 40px; font-size: 0.8rem; font-weight: 600; }
+  .analogy-card { background: #1e2a3acc; margin: 1.5rem 2rem; padding: 1.2rem 1.8rem; border-radius: 2rem; border-left: 8px solid #627eea; font-size: 1rem; line-height: 1.6; }
+  .main-area { padding: 1rem 2rem 2rem; }
+  .sim-box { background: rgba(0,10,25,0.7); border-radius: 2rem; padding: 1.5rem; border: 1px solid #627eea; margin-bottom: 1.5rem; }
+  .sim-box h3 { margin-bottom: 1rem; color: #8099f0; }
+  .selector-grid { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin-bottom: 1.5rem; }
+  .std-btn { background: #1e2a3e; border: 2px solid #2c3e66; padding: 0.8rem 1.5rem; border-radius: 2rem; cursor: pointer; font-weight: 600; transition: 0.2s; color: #eef5ff; font-family: 'Inter', sans-serif; }
+  .std-btn:hover { border-color: #627eea; }
+  .std-btn.active { background: #627eea; border-color: #627eea; color: #fff; }
+  .form-group { margin: 1rem 0; text-align: left; max-width: 400px; margin-left: auto; margin-right: auto; }
+  .form-group label { display: block; font-size: 0.9rem; color: #b9e2ff; margin-bottom: 0.3rem; }
+  .form-group input { width: 100%; padding: 0.6rem 1rem; border-radius: 1rem; border: 1px solid #2c3e66; background: #0f1a2c; color: #eef5ff; font-family: 'Inter', sans-serif; font-size: 1rem; }
+  .btn-action { background: linear-gradient(95deg, #627eea, #8099f0); border: none; padding: 0.8rem 1.8rem; font-weight: bold; border-radius: 3rem; margin: 0.5rem; cursor: pointer; font-size: 1rem; transition: 0.2s; color: #fff; }
+  .btn-action:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(98,126,234,0.5); }
+  .contract-preview { background: #0a1220; border-radius: 1.5rem; padding: 1.5rem; margin-top: 1rem; border: 1px solid #627eea; text-align: left; font-family: monospace; font-size: 0.85rem; color: #b9e2ff; overflow-x: auto; white-space: pre-wrap; }
+  .use-cases { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 1rem; margin-top: 1rem; }
+  .use-card { background: #0f1a2c; border-radius: 1rem; padding: 1rem; border-left: 4px solid #627eea; }
+  .use-card h4 { color: #8099f0; font-size: 0.95rem; }
+  .use-card p { font-size: 0.8rem; color: #8899bb; }
+  .feedback { background: #00000099; margin: 1rem 0; padding: 1rem; border-radius: 1.5rem; text-align: center; font-weight: 500; border-left: 4px solid #627eea; }
+  .quiz-block { background: rgba(0,10,25,0.5); border-radius: 2rem; padding: 1.5rem; margin-top: 1.5rem; border: 1px solid #627eea; }
+  .quiz-block h3 { color: #8099f0; margin-bottom: 1rem; }
+  .quiz-q { margin: 1rem 0; padding: 1rem; background: #0f1a2c; border-radius: 1rem; }
+  .quiz-q p { font-weight: 600; margin-bottom: 0.5rem; }
+  .quiz-q .opt { display: inline-block; background: #1e2a3e; padding: 0.4rem 1rem; border-radius: 2rem; margin: 0.2rem; cursor: pointer; transition: 0.2s; font-size: 0.9rem; }
+  .quiz-q .opt:hover { background: #2c3e66; }
+  .quiz-q .opt.selected { background: #627eea; color: #fff; }
+  .insignia { text-align: center; background: #0c1b2f; border-radius: 2rem; margin: 1rem 0; padding: 1rem; border: 1px dashed gold; }
+  .insignia i { font-size: 2.5rem; color: gold; }
+  .hidden { display: none; }
+  .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
+  .nav-link { background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem; font-weight: 600; text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; }
+  .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(98,126,234,0.4); }
+  .nav-link.next { background: linear-gradient(95deg, #627eea, #8099f0); color: #fff; }
+  .nav-link.menu { background: #1a2a4a; border: 1px solid #627eea; }
+  footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
+ </style>
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
 </head>
 <body>
-  <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Blockchain</a></nav>
+ <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Blockchain</a></nav>
 
 <div class="course-container">
-  <div class="hero-header">
-    <h1> TOKENS ERC-20, ERC-721 Y ERC-1155</h1>
-    <p>Los est&aacute;ndares que impulsan la econom&iacute;a tokenizada de Ethereum</p>
-    <div class="badge-area">
-      <span class="chip"><i class="fas fa-coins"></i> ERC-20</span>
-      <span class="chip"><i class="fas fa-image"></i> ERC-721</span>
-      <span class="chip"><i class="fas fa-layer-group"></i> ERC-1155</span>
-    </div>
+ <div class="hero-header">
+  <h1> TOKENS ERC-20, ERC-721 Y ERC-1155</h1>
+  <p>Los est&aacute;ndares que impulsan la econom&iacute;a tokenizada de Ethereum</p>
+  <div class="badge-area">
+   <span class="chip"><i class="fas fa-coins"></i> ERC-20</span>
+   <span class="chip"><i class="fas fa-image"></i> ERC-721</span>
+   <span class="chip"><i class="fas fa-layer-group"></i> ERC-1155</span>
+  </div>
+ </div>
+
+ <div class="analogy-card">
+  <strong> Piénsalo as&iacute;:</strong> ERC-20 son como billetes iguales entre s&iacute;, ERC-721 son como cromos &uacute;nicos numerados, ERC-1155 es una caja que puede contener ambos tipos &mdash; fungibles y no fungibles.
+ </div>
+
+ <div class="main-area">
+  <div class="sim-box">
+   <h3><i class="fas fa-wrench"></i> Creador de Tokens</h3>
+   <p>Elige un est&aacute;ndar, define nombre, s&iacute;mbolo y supply, y genera el contrato.</p>
+
+   <div class="selector-grid">
+    <button class="std-btn active" data-std="erc20">ERC-20 (Fungible)</button>
+    <button class="std-btn" data-std="erc721">ERC-721 (NFT)</button>
+    <button class="std-btn" data-std="erc1155">ERC-1155 (Semi-Fungible)</button>
+   </div>
+
+   <div class="form-group">
+    <label>Nombre del token</label>
+    <input type="text" id="tokenName" value="Mi Token" placeholder="Nombre">
+   </div>
+   <div class="form-group">
+    <label>S&iacute;mbolo</label>
+    <input type="text" id="tokenSymbol" value="MTK" placeholder="S&iacute;mbolo (3-5 letras)">
+   </div>
+   <div class="form-group" id="supplyGroup">
+    <label>Supply inicial</label>
+    <input type="number" id="tokenSupply" value="1000000" placeholder="Supply">
+   </div>
+
+   <button class="btn-action" id="generateBtn"> Generar Contrato</button>
+   <div class="contract-preview" id="contractPreview">Haz clic en "Generar Contrato" para ver el c&oacute;digo</div>
+   <div class="feedback" id="tokenFeedback">Selecciona un est&aacute;ndar y completa los campos</div>
   </div>
 
-  <div class="analogy-card">
-    <strong> Piénsalo as&iacute;:</strong> ERC-20 son como billetes iguales entre s&iacute;, ERC-721 son como cromos &uacute;nicos numerados, ERC-1155 es una caja que puede contener ambos tipos &mdash; fungibles y no fungibles.
+  <div class="use-cases">
+   <div class="use-card"><h4>USDC (ERC-20)</h4><p>Stablecoin fungible: cada USDC vale 1 USD y es intercambiable por cualquier otro USDC.</p></div>
+   <div class="use-card"><h4>CryptoPunks (ERC-721)</h4><p>NFTs &uacute;nicos: cada punk tiene atributos distintos y no es intercambiable 1:1.</p></div>
+   <div class="use-card"><h4>Items de juegos (ERC-1155)</h4><p>Un mismo contrato gestiona oro (fungible) y espadas &uacute;nicas (no fungibles).</p></div>
   </div>
 
-  <div class="main-area">
-    <div class="sim-box">
-      <h3><i class="fas fa-wrench"></i> Creador de Tokens</h3>
-      <p>Elige un est&aacute;ndar, define nombre, s&iacute;mbolo y supply, y genera el contrato.</p>
-
-      <div class="selector-grid">
-        <button class="std-btn active" data-std="erc20">ERC-20 (Fungible)</button>
-        <button class="std-btn" data-std="erc721">ERC-721 (NFT)</button>
-        <button class="std-btn" data-std="erc1155">ERC-1155 (Semi-Fungible)</button>
-      </div>
-
-      <div class="form-group">
-        <label>Nombre del token</label>
-        <input type="text" id="tokenName" value="Mi Token" placeholder="Nombre">
-      </div>
-      <div class="form-group">
-        <label>S&iacute;mbolo</label>
-        <input type="text" id="tokenSymbol" value="MTK" placeholder="S&iacute;mbolo (3-5 letras)">
-      </div>
-      <div class="form-group" id="supplyGroup">
-        <label>Supply inicial</label>
-        <input type="number" id="tokenSupply" value="1000000" placeholder="Supply">
-      </div>
-
-      <button class="btn-action" id="generateBtn"> Generar Contrato</button>
-      <div class="contract-preview" id="contractPreview">Haz clic en "Generar Contrato" para ver el c&oacute;digo</div>
-      <div class="feedback" id="tokenFeedback">Selecciona un est&aacute;ndar y completa los campos</div>
-    </div>
-
-    <div class="use-cases">
-      <div class="use-card"><h4>USDC (ERC-20)</h4><p>Stablecoin fungible: cada USDC vale 1 USD y es intercambiable por cualquier otro USDC.</p></div>
-      <div class="use-card"><h4>CryptoPunks (ERC-721)</h4><p>NFTs &uacute;nicos: cada punk tiene atributos distintos y no es intercambiable 1:1.</p></div>
-      <div class="use-card"><h4>Items de juegos (ERC-1155)</h4><p>Un mismo contrato gestiona oro (fungible) y espadas &uacute;nicas (no fungibles).</p></div>
-    </div>
-
-    <div class="quiz-block">
-      <h3> Cuestionario Express</h3>
-      <div id="quizQs"></div>
-      <button class="btn-action" id="submitQuiz"> Validar respuestas</button>
-      <div id="quizFeedback" class="feedback" style="margin-top:1rem;"></div>
-    </div>
-
-    <div id="insigniaArea" class="insignia hidden">
-      <i class="fas fa-medal"></i>
-      <h3> INSIGNIA DE ARQUITECTO DE TOKENS </h3>
-      <p>&iexcl;Dominas los est&aacute;ndares de tokenizaci&oacute;n de Ethereum!</p>
-    </div>
+  <div class="quiz-block">
+   <h3> Cuestionario Express</h3>
+   <div id="quizQs"></div>
+   <button class="btn-action" id="submitQuiz"> Validar respuestas</button>
+   <div id="quizFeedback" class="feedback" style="margin-top:1rem;"></div>
   </div>
 
-  <div class="nav-links">
-    <a href="03-evm-gas.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
-    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
-    <a href="05-amm-uniswap.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  <div id="insigniaArea" class="insignia hidden">
+   <i class="fas fa-medal"></i>
+   <h3> INSIGNIA DE ARQUITECTO DE TOKENS </h3>
+   <p>&iexcl;Dominas los est&aacute;ndares de tokenizaci&oacute;n de Ethereum!</p>
   </div>
-  <footer>
-    <i class="fas fa-crown"></i> Programa Blockchain &middot; Curso 2 &middot; M&oacute;dulo 4
-  </footer>
+ </div>
+
+ <div class="nav-links">
+  <a href="03-evm-gas.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
+  <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
+  <a href="05-amm-uniswap.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+ </div>
+ <footer>
+  <i class="fas fa-crown"></i> Programa Blockchain &middot; Curso 2 &middot; M&oacute;dulo 4
+ </footer>
 </div>
 
 <script>
-  const STORAGE_KEY = 'block_2_04';
-  let currentStd = 'erc20';
-  let quizAnswers = [null, null, null];
-  let quizCompleted = false;
+ const STORAGE_KEY = 'block_2_04';
+ let currentStd = 'erc20';
+ let quizAnswers = [null, null, null];
+ let quizCompleted = false;
 
-  function generateContract() {
-    var name = document.getElementById('tokenName').value || 'MiToken';
-    var symbol = document.getElementById('tokenSymbol').value || 'MTK';
-    var supply = document.getElementById('tokenSupply').value || 1000000;
-    var code = '';
+ function generateContract() {
+  var name = document.getElementById('tokenName').value || 'MiToken';
+  var symbol = document.getElementById('tokenSymbol').value || 'MTK';
+  var supply = document.getElementById('tokenSupply').value || 1000000;
+  var code = '';
 
-    if (currentStd === 'erc20') {
-      code = '// SPDX-License-Identifier: MIT\npragma solidity ^0.8.20;\n\nimport "@openzeppelin/contracts/token/ERC20/ERC20.sol";\n\ncontract ' + name.replace(/[^a-zA-Z0-9]/g,'') + ' is ERC20 {\n    constructor() ERC20("' + name + '", "' + symbol + '") {\n        _mint(msg.sender, ' + supply + ' * 10**18);\n    }\n}';
-    } else if (currentStd === 'erc721') {
-      code = '// SPDX-License-Identifier: MIT\npragma solidity ^0.8.20;\n\nimport "@openzeppelin/contracts/token/ERC721/ERC721.sol";\n\ncontract ' + name.replace(/[^a-zA-Z0-9]/g,'') + ' is ERC721 {\n    uint256 private _nextTokenId;\n\n    constructor() ERC721("' + name + '", "' + symbol + '") {}\n\n    function safeMint(address to) public returns (uint256) {\n        uint256 tokenId = _nextTokenId++;\n        _safeMint(to, tokenId);\n        return tokenId;\n    }\n}';
+  if (currentStd === 'erc20') {
+   code = '// SPDX-License-Identifier: MIT\npragma solidity ^0.8.20;\n\nimport "@openzeppelin/contracts/token/ERC20/ERC20.sol";\n\ncontract ' + name.replace(/[^a-zA-Z0-9]/g,'') + ' is ERC20 {\n  constructor() ERC20("' + name + '", "' + symbol + '") {\n    _mint(msg.sender, ' + supply + ' * 10**18);\n  }\n}';
+  } else if (currentStd === 'erc721') {
+   code = '// SPDX-License-Identifier: MIT\npragma solidity ^0.8.20;\n\nimport "@openzeppelin/contracts/token/ERC721/ERC721.sol";\n\ncontract ' + name.replace(/[^a-zA-Z0-9]/g,'') + ' is ERC721 {\n  uint256 private _nextTokenId;\n\n  constructor() ERC721("' + name + '", "' + symbol + '") {}\n\n  function safeMint(address to) public returns (uint256) {\n    uint256 tokenId = _nextTokenId++;\n    _safeMint(to, tokenId);\n    return tokenId;\n  }\n}';
+  } else {
+   code = '// SPDX-License-Identifier: MIT\npragma solidity ^0.8.20;\n\nimport "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";\n\ncontract ' + name.replace(/[^a-zA-Z0-9]/g,'') + ' is ERC1155 {\n  constructor() ERC1155("") {}\n\n  function mint(address to, uint256 id, uint256 amount, bytes memory data) public {\n    _mint(to, id, amount, data);\n  }\n}';
+  }
+
+  document.getElementById('contractPreview').textContent = code;
+  document.getElementById('tokenFeedback').innerHTML = ' Contrato ' + currentStd.toUpperCase() + ' generado: ' + name + ' (' + symbol + ')';
+ }
+
+ function init() {
+  var btns = document.querySelectorAll('.std-btn');
+  btns.forEach(function(btn) {
+   btn.addEventListener('click', function() {
+    btns.forEach(function(b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    currentStd = btn.dataset.std;
+    if (currentStd === 'erc721') {
+     document.getElementById('supplyGroup').style.display = 'none';
     } else {
-      code = '// SPDX-License-Identifier: MIT\npragma solidity ^0.8.20;\n\nimport "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";\n\ncontract ' + name.replace(/[^a-zA-Z0-9]/g,'') + ' is ERC1155 {\n    constructor() ERC1155("") {}\n\n    function mint(address to, uint256 id, uint256 amount, bytes memory data) public {\n        _mint(to, id, amount, data);\n    }\n}';
+     document.getElementById('supplyGroup').style.display = 'block';
     }
+    document.getElementById('tokenFeedback').innerHTML = ' Est&aacute;ndar seleccionado: ' + currentStd.toUpperCase();
+   });
+  });
 
-    document.getElementById('contractPreview').textContent = code;
-    document.getElementById('tokenFeedback').innerHTML = ' Contrato ' + currentStd.toUpperCase() + ' generado: ' + name + ' (' + symbol + ')';
+  document.getElementById('generateBtn').addEventListener('click', generateContract);
+
+  renderQuiz();
+  document.getElementById('submitQuiz').addEventListener('click', checkQuiz);
+
+  var saved = localStorage.getItem(STORAGE_KEY);
+  if (saved === 'true') {
+   quizCompleted = true;
+   document.getElementById('insigniaArea').classList.remove('hidden');
   }
+ }
 
-  function init() {
-    var btns = document.querySelectorAll('.std-btn');
-    btns.forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        btns.forEach(function(b) { b.classList.remove('active'); });
-        btn.classList.add('active');
-        currentStd = btn.dataset.std;
-        if (currentStd === 'erc721') {
-          document.getElementById('supplyGroup').style.display = 'none';
-        } else {
-          document.getElementById('supplyGroup').style.display = 'block';
-        }
-        document.getElementById('tokenFeedback').innerHTML = ' Est&aacute;ndar seleccionado: ' + currentStd.toUpperCase();
-      });
+ var quizData = [
+  { q: "&iquest;Qu&eacute; est&aacute;ndar usar&iacute;as para una stablecoin como USDC?", opts: ["ERC-721", "ERC-20", "ERC-1155", "ERC-777"], correct: 1 },
+  { q: "&iquest;Qu&eacute; hace &uacute;nico a un token ERC-721?", opts: ["Todos son iguales", "Cada token tiene un ID &uacute;nico", "Solo puede haber uno", "No se puede transferir"], correct: 1 },
+  { q: "&iquest;Para qu&eacute; es ideal ERC-1155?", opts: ["Solo NFTs", "Solo tokens fungibles", "Gesti&oacute;n h&iacute;brida de tokens fungibles y no fungibles", "Stablecoins"], correct: 2 }
+ ];
+
+ function renderQuiz() {
+  var container = document.getElementById('quizQs');
+  container.innerHTML = '';
+  quizData.forEach(function(q, idx) {
+   var div = document.createElement('div');
+   div.className = 'quiz-q';
+   div.innerHTML = '<p>' + q.q + '</p><div class="opts" id="qopts-' + idx + '"></div>';
+   var optsDiv = div.querySelector('.opts');
+   q.opts.forEach(function(opt, oi) {
+    var span = document.createElement('span');
+    span.className = 'opt';
+    span.textContent = opt;
+    span.dataset.qi = idx;
+    span.dataset.oi = oi;
+    span.addEventListener('click', function() {
+     if (quizCompleted) return;
+     var parent = span.parentElement;
+     Array.from(parent.children).forEach(function(c) { c.classList.remove('selected'); });
+     span.classList.add('selected');
+     quizAnswers[idx] = oi;
     });
+    optsDiv.appendChild(span);
+   });
+   container.appendChild(div);
+  });
+ }
 
-    document.getElementById('generateBtn').addEventListener('click', generateContract);
-
-    renderQuiz();
-    document.getElementById('submitQuiz').addEventListener('click', checkQuiz);
-
-    var saved = localStorage.getItem(STORAGE_KEY);
-    if (saved === 'true') {
-      quizCompleted = true;
-      document.getElementById('insigniaArea').classList.remove('hidden');
-    }
+ function checkQuiz() {
+  if (quizCompleted) { document.getElementById('quizFeedback').innerHTML = I18N.t('fb_0'); return; }
+  var allAnswered = quizAnswers.every(function(a) { return a !== null; });
+  if (!allAnswered) { document.getElementById('quizFeedback').innerHTML = ' Responde todas las preguntas primero.'; return; }
+  var correct = 0;
+  for (var i = 0; i < quizData.length; i++) { if (quizAnswers[i] === quizData[i].correct) correct++; }
+  if (correct >= 2) {
+   quizCompleted = true;
+   document.getElementById('quizFeedback').innerHTML = I18N.t('fb_1') + correct + '/' + quizData.length + '. &iexcl;Dominas los est&aacute;ndares ERC!';
+   document.getElementById('insigniaArea').classList.remove('hidden');
+   localStorage.setItem(STORAGE_KEY, 'true');
+  } else {
+   document.getElementById('quizFeedback').innerHTML = ' Obtuviste ' + correct + '/' + quizData.length + '. Repasa los conceptos e int&eacute;ntalo de nuevo.';
   }
+ }
 
-  var quizData = [
-    { q: "&iquest;Qu&eacute; est&aacute;ndar usar&iacute;as para una stablecoin como USDC?", opts: ["ERC-721", "ERC-20", "ERC-1155", "ERC-777"], correct: 1 },
-    { q: "&iquest;Qu&eacute; hace &uacute;nico a un token ERC-721?", opts: ["Todos son iguales", "Cada token tiene un ID &uacute;nico", "Solo puede haber uno", "No se puede transferir"], correct: 1 },
-    { q: "&iquest;Para qu&eacute; es ideal ERC-1155?", opts: ["Solo NFTs", "Solo tokens fungibles", "Gesti&oacute;n h&iacute;brida de tokens fungibles y no fungibles", "Stablecoins"], correct: 2 }
-  ];
-
-  function renderQuiz() {
-    var container = document.getElementById('quizQs');
-    container.innerHTML = '';
-    quizData.forEach(function(q, idx) {
-      var div = document.createElement('div');
-      div.className = 'quiz-q';
-      div.innerHTML = '<p>' + q.q + '</p><div class="opts" id="qopts-' + idx + '"></div>';
-      var optsDiv = div.querySelector('.opts');
-      q.opts.forEach(function(opt, oi) {
-        var span = document.createElement('span');
-        span.className = 'opt';
-        span.textContent = opt;
-        span.dataset.qi = idx;
-        span.dataset.oi = oi;
-        span.addEventListener('click', function() {
-          if (quizCompleted) return;
-          var parent = span.parentElement;
-          Array.from(parent.children).forEach(function(c) { c.classList.remove('selected'); });
-          span.classList.add('selected');
-          quizAnswers[idx] = oi;
-        });
-        optsDiv.appendChild(span);
-      });
-      container.appendChild(div);
-    });
-  }
-
-  function checkQuiz() {
-    if (quizCompleted) { document.getElementById('quizFeedback').innerHTML = I18N.t('fb_0'); return; }
-    var allAnswered = quizAnswers.every(function(a) { return a !== null; });
-    if (!allAnswered) { document.getElementById('quizFeedback').innerHTML = ' Responde todas las preguntas primero.'; return; }
-    var correct = 0;
-    for (var i = 0; i < quizData.length; i++) { if (quizAnswers[i] === quizData[i].correct) correct++; }
-    if (correct >= 2) {
-      quizCompleted = true;
-      document.getElementById('quizFeedback').innerHTML = I18N.t('fb_1') + correct + '/' + quizData.length + '. &iexcl;Dominas los est&aacute;ndares ERC!';
-      document.getElementById('insigniaArea').classList.remove('hidden');
-      localStorage.setItem(STORAGE_KEY, 'true');
-    } else {
-      document.getElementById('quizFeedback').innerHTML = ' Obtuviste ' + correct + '/' + quizData.length + '. Repasa los conceptos e int&eacute;ntalo de nuevo.';
-    }
-  }
-
-  init();
+ init();
 </script>
-<script src="../../../assets/js/cookie-consent.js"></script>
 <script>
 window.I18N_DATA={
-  'fb_0': { es: ' Ya completaste este cuestionario.', en: ' Ya completaste este cuestionario.' },
-  'fb_1': { es: ' &iexcl;Correcto! ', en: ' &iexcl;Correcto! ' }
+ 'fb_0': { es: ' Ya completaste este cuestionario.', en: ' Ya completaste este cuestionario.' },
+ 'fb_1': { es: ' &iexcl;Correcto! ', en: ' &iexcl;Correcto! ' }
 };
 </script>
-<script src="../../../assets/js/i18n.js"></script>  </body>
+<script src="../../../assets/js/i18n.js"></script> </body>
 </html>

@@ -1,175 +1,175 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Curso 5 | 🌐 WebRequest y APIs Externas</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <link rel="stylesheet" href="../../../assets/css/theme.css">
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { background:linear-gradient(135deg,#0a0f1e,#0c1222,#111a2e); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
-    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-    .modulo-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,102,192,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
-    .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #ff66c0; }
-    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#ff99dd,#ff66c0); -webkit-background-clip:text; background-clip:text; color:transparent; }
-    .hero-header p { font-size:1.1rem; color:#e6b8d4; margin-top:0.5rem; font-weight:500; }
-    .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
-    .chip { background:rgba(255,102,192,0.15); border:1px solid #ff66c0; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
-    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ff66c0; font-size:1rem; line-height:1.6; }
-    .main-area { padding:1.5rem 2rem; display:flex; flex-direction:column; gap:1.5rem; }
-    .panel { background:rgba(0,10,25,0.7); border-radius:1.5rem; padding:1.3rem; border:1px solid rgba(255,102,192,0.2); }
-    .panel h3 { font-size:1.1rem; margin-bottom:0.8rem; color:#ff99dd; display:flex; align-items:center; gap:0.5rem; }
-    .api-list { display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.8rem; }
-    .api-btn { background:#0f1a2c; border:1px solid #2a3a5a; border-radius:1rem; padding:0.6rem 1rem; cursor:pointer; transition:0.2s; text-align:center; min-width:100px; flex:1; }
-    .api-btn:hover { border-color:#ff66c0; transform:translateY(-2px); }
-    .api-btn.active { border-color:#ff66c0; background:rgba(255,102,192,0.1); }
-    .api-btn .api-name { font-weight:600; font-size:0.85rem; }
-    .api-btn .api-desc { font-size:0.65rem; color:#8899cc; }
-    .request-config { display:flex; flex-direction:column; gap:0.5rem; }
-    .request-config label { font-size:0.8rem; color:#99aacc; }
-    .request-config input, .request-config textarea, .request-config select { background:#0f1a2c; border:1px solid #2a3a5a; border-radius:0.5rem; padding:0.4rem; color:#eef5ff; font-family:'Courier New',monospace; font-size:0.8rem; }
-    .request-config textarea { min-height:60px; resize:vertical; }
-    .response-box { background:#0b1120; border-radius:0.8rem; padding:0.8rem; min-height:80px; max-height:200px; overflow-y:auto; font-family:'Courier New',monospace; font-size:0.75rem; border:1px solid #1a2a4a; }
-    .response-box .success { color:#00ff88; } .response-box .error { color:#ff5050; } .response-box .key { color:#ff66c0; } .response-box .string { color:#ff99dd; } .response-box .number { color:#00e0ff; }
-    .code-box { background:#0b1120; border-radius:1rem; padding:1rem; font-family:'Courier New',monospace; font-size:0.8rem; color:#00ff88; white-space:pre-wrap; border:1px solid #1a2a4a; min-height:80px; max-height:180px; overflow-y:auto; }
-    .btn-action { background:linear-gradient(95deg,#ff66c0,#ff3399); border:none; padding:0.8rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin-top:0.5rem; }
-    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(255,102,192,0.5); }
-    .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
-    .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #ff66c0; }
-    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:0 2rem 1.5rem; padding:1rem; border:2px dashed gold; }
-    .insignia i { font-size:2.5rem; color:gold; }
-    .hidden { display:none !important; }
-    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
-    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; font-size:0.95rem; }
-    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(255,102,192,0.4); }
-    .nav-link.next { background:linear-gradient(95deg,#ff66c0,#ff3399); color:#1e1a0c; }
-    .nav-link.menu { background:#1a2a4a; border:1px solid #ff66c0; }
-    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; color:#667799; }
-    .json-tree { font-family:'Courier New',monospace; font-size:0.75rem; line-height:1.6; }
-    .json-tree .indent { padding-left:1rem; }
-    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
-  </style>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Curso 5 | 🌐 WebRequest y APIs Externas</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
+ <style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:linear-gradient(135deg,#0a0f1e,#0c1222,#111a2e); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+  @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .modulo-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,102,192,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+  .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #ff66c0; }
+  .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#ff99dd,#ff66c0); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero-header p { font-size:1.1rem; color:#e6b8d4; margin-top:0.5rem; font-weight:500; }
+  .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+  .chip { background:rgba(255,102,192,0.15); border:1px solid #ff66c0; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+  .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ff66c0; font-size:1rem; line-height:1.6; }
+  .main-area { padding:1.5rem 2rem; display:flex; flex-direction:column; gap:1.5rem; }
+  .panel { background:rgba(0,10,25,0.7); border-radius:1.5rem; padding:1.3rem; border:1px solid rgba(255,102,192,0.2); }
+  .panel h3 { font-size:1.1rem; margin-bottom:0.8rem; color:#ff99dd; display:flex; align-items:center; gap:0.5rem; }
+  .api-list { display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.8rem; }
+  .api-btn { background:#0f1a2c; border:1px solid #2a3a5a; border-radius:1rem; padding:0.6rem 1rem; cursor:pointer; transition:0.2s; text-align:center; min-width:100px; flex:1; }
+  .api-btn:hover { border-color:#ff66c0; transform:translateY(-2px); }
+  .api-btn.active { border-color:#ff66c0; background:rgba(255,102,192,0.1); }
+  .api-btn .api-name { font-weight:600; font-size:0.85rem; }
+  .api-btn .api-desc { font-size:0.65rem; color:#8899cc; }
+  .request-config { display:flex; flex-direction:column; gap:0.5rem; }
+  .request-config label { font-size:0.8rem; color:#99aacc; }
+  .request-config input, .request-config textarea, .request-config select { background:#0f1a2c; border:1px solid #2a3a5a; border-radius:0.5rem; padding:0.4rem; color:#eef5ff; font-family:'Courier New',monospace; font-size:0.8rem; }
+  .request-config textarea { min-height:60px; resize:vertical; }
+  .response-box { background:#0b1120; border-radius:0.8rem; padding:0.8rem; min-height:80px; max-height:200px; overflow-y:auto; font-family:'Courier New',monospace; font-size:0.75rem; border:1px solid #1a2a4a; }
+  .response-box .success { color:#00ff88; } .response-box .error { color:#ff5050; } .response-box .key { color:#ff66c0; } .response-box .string { color:#ff99dd; } .response-box .number { color:#00e0ff; }
+  .code-box { background:#0b1120; border-radius:1rem; padding:1rem; font-family:'Courier New',monospace; font-size:0.8rem; color:#00ff88; white-space:pre-wrap; border:1px solid #1a2a4a; min-height:80px; max-height:180px; overflow-y:auto; }
+  .btn-action { background:linear-gradient(95deg,#ff66c0,#ff3399); border:none; padding:0.8rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin-top:0.5rem; }
+  .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(255,102,192,0.5); }
+  .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
+  .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #ff66c0; }
+  .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:0 2rem 1.5rem; padding:1rem; border:2px dashed gold; }
+  .insignia i { font-size:2.5rem; color:gold; }
+  .hidden { display:none !important; }
+  .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+  .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; font-size:0.95rem; }
+  .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(255,102,192,0.4); }
+  .nav-link.next { background:linear-gradient(95deg,#ff66c0,#ff3399); color:#1e1a0c; }
+  .nav-link.menu { background:#1a2a4a; border:1px solid #ff66c0; }
+  footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; color:#667799; }
+  .json-tree { font-family:'Courier New',monospace; font-size:0.75rem; line-height:1.6; }
+  .json-tree .indent { padding-left:1rem; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
+ </style>
 </head>
 <body>
 <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a></nav>
 <div class="modulo-container">
-  <div class="hero-header">
-    <h1>🌐 WebRequest y APIs Externas</h1>
-    <p>"Conecta tu EA al mundo exterior — HTTP, JSON y APIs REST"</p>
-    <div class="badge-area">
-      <span class="chip"><i class="fas fa-globe"></i> HTTP</span>
-      <span class="chip"><i class="fas fa-code"></i> JSON</span>
-      <span class="chip"><i class="fas fa-plug"></i> APIs</span>
-    </div>
+ <div class="hero-header">
+  <h1>🌐 WebRequest y APIs Externas</h1>
+  <p>"Conecta tu EA al mundo exterior — HTTP, JSON y APIs REST"</p>
+  <div class="badge-area">
+   <span class="chip"><i class="fas fa-globe"></i> HTTP</span>
+   <span class="chip"><i class="fas fa-code"></i> JSON</span>
+   <span class="chip"><i class="fas fa-plug"></i> APIs</span>
   </div>
-  <div class="analogy-card">
-    <strong><i class="fas fa-tty"></i> Piénsalo así:</strong> WebRequest es como el teléfono de tu EA. Puede llamar (GET) para pedir información, o enviar mensajes (POST) con datos. El JSON es el idioma universal que ambos lados entienden. Tu EA puede pedirle el clima económico a una API y decidir si opera basado en eso.
-  </div>
-  <div class="main-area">
-    <div class="panel">
-      <h3><i class="fas fa-server"></i> API Selector</h3>
-      <div class="api-list" id="apiList">
-        <div class="api-btn active" data-api="coingecko" onclick="selectAPI('coingecko')">
-          <div class="api-name">🪙 CoinGecko</div>
-          <div class="api-desc">Precio cripto</div>
-        </div>
-        <div class="api-btn" data-api="weather" onclick="selectAPI('weather')">
-          <div class="api-name">🌤️ Weather</div>
-          <div class="api-desc">Clima económico</div>
-        </div>
-        <div class="api-btn" data-api="news" onclick="selectAPI('news')">
-          <div class="api-name">📰 News API</div>
-          <div class="api-desc">Noticias financieras</div>
-        </div>
-        <div class="api-btn" data-api="custom" onclick="selectAPI('custom')">
-          <div class="api-name">🔧 Custom</div>
-          <div class="api-desc">URL personalizada</div>
-        </div>
-      </div>
+ </div>
+ <div class="analogy-card">
+  <strong><i class="fas fa-tty"></i> Piénsalo así:</strong> WebRequest es como el teléfono de tu EA. Puede llamar (GET) para pedir información, o enviar mensajes (POST) con datos. El JSON es el idioma universal que ambos lados entienden. Tu EA puede pedirle el clima económico a una API y decidir si opera basado en eso.
+ </div>
+ <div class="main-area">
+  <div class="panel">
+   <h3><i class="fas fa-server"></i> API Selector</h3>
+   <div class="api-list" id="apiList">
+    <div class="api-btn active" data-api="coingecko" onclick="selectAPI('coingecko')">
+     <div class="api-name">🪙 CoinGecko</div>
+     <div class="api-desc">Precio cripto</div>
     </div>
-    <div class="panel">
-      <h3><i class="fas fa-wrench"></i> Request Configuration</h3>
-      <div class="request-config">
-        <label>Método HTTP:</label>
-        <select id="httpMethod"><option value="GET">GET</option><option value="POST">POST</option></select>
-        <label>URL:</label>
-        <input type="text" id="requestUrl" value="https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd">
-        <label id="bodyLabel" style="display:none;">Body (JSON):</label>
-        <textarea id="requestBody" style="display:none;" placeholder='{"key": "value"}'></textarea>
-        <label>Headers (opcional):</label>
-        <input type="text" id="requestHeaders" placeholder="Content-Type: application/json">
-      </div>
-      <button class="btn-action" onclick="sendRequest()">🚀 Enviar WebRequest</button>
+    <div class="api-btn" data-api="weather" onclick="selectAPI('weather')">
+     <div class="api-name">🌤️ Weather</div>
+     <div class="api-desc">Clima económico</div>
     </div>
-    <div class="panel">
-      <h3><i class="fas fa-reply"></i> Response</h3>
-      <div class="response-box" id="responseBox">
-        <span style="color:#667799;">// Envía una request para ver la respuesta JSON simulada</span>
-      </div>
-      <div style="display:flex;gap:0.5rem;margin-top:0.5rem;">
-        <span style="font-size:0.75rem;color:#99aacc;">Status: <strong id="respStatus" style="color:#8899cc;">—</strong></span>
-        <span style="font-size:0.75rem;color:#99aacc;">Time: <strong id="respTime" style="color:#8899cc;">—</strong></span>
-      </div>
+    <div class="api-btn" data-api="news" onclick="selectAPI('news')">
+     <div class="api-name">📰 News API</div>
+     <div class="api-desc">Noticias financieras</div>
     </div>
-    <div class="panel">
-      <h3><i class="fas fa-code"></i> Código MQL5 Generado</h3>
-      <div class="code-box" id="codeBox">// Configura y envía una request para ver el código MQL5</div>
+    <div class="api-btn" data-api="custom" onclick="selectAPI('custom')">
+     <div class="api-name">🔧 Custom</div>
+     <div class="api-desc">URL personalizada</div>
     </div>
+   </div>
   </div>
-  <div id="feedbackMsg" class="feedback">💡 Selecciona una API, configura la request y envía para ver la respuesta JSON simulada y el código MQL5.</div>
-  <div id="insigniaArea" class="insignia hidden">
-    <i class="fas fa-medal"></i>
-    <h3>🏅 Integrador de APIs 🏅</h3>
-    <p>Has conectado tu EA a APIs externas usando WebRequest. ¡Tu robot ahora habla con el mundo!</p>
+  <div class="panel">
+   <h3><i class="fas fa-wrench"></i> Request Configuration</h3>
+   <div class="request-config">
+    <label>Método HTTP:</label>
+    <select id="httpMethod"><option value="GET">GET</option><option value="POST">POST</option></select>
+    <label>URL:</label>
+    <input type="text" id="requestUrl" value="https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd">
+    <label id="bodyLabel" style="display:none;">Body (JSON):</label>
+    <textarea id="requestBody" style="display:none;" placeholder='{"key": "value"}'></textarea>
+    <label>Headers (opcional):</label>
+    <input type="text" id="requestHeaders" placeholder="Content-Type: application/json">
+   </div>
+   <button class="btn-action" onclick="sendRequest()">🚀 Enviar WebRequest</button>
   </div>
-  <div class="nav-links">
-    <a href="10-sqlite.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
-    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
-    <a href="12-certificado.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  <div class="panel">
+   <h3><i class="fas fa-reply"></i> Response</h3>
+   <div class="response-box" id="responseBox">
+    <span style="color:#667799;">// Envía una request para ver la respuesta JSON simulada</span>
+   </div>
+   <div style="display:flex;gap:0.5rem;margin-top:0.5rem;">
+    <span style="font-size:0.75rem;color:#99aacc;">Status: <strong id="respStatus" style="color:#8899cc;">—</strong></span>
+    <span style="font-size:0.75rem;color:#99aacc;">Time: <strong id="respTime" style="color:#8899cc;">—</strong></span>
+   </div>
   </div>
-  <footer><i class="fas fa-crown"></i> Curso 5: EAs Avanzados · Multi-símbolo, ML y ONNX</footer>
+  <div class="panel">
+   <h3><i class="fas fa-code"></i> Código MQL5 Generado</h3>
+   <div class="code-box" id="codeBox">// Configura y envía una request para ver el código MQL5</div>
+  </div>
+ </div>
+ <div id="feedbackMsg" class="feedback">💡 Selecciona una API, configura la request y envía para ver la respuesta JSON simulada y el código MQL5.</div>
+ <div id="insigniaArea" class="insignia hidden">
+  <i class="fas fa-medal"></i>
+  <h3>🏅 Integrador de APIs 🏅</h3>
+  <p>Has conectado tu EA a APIs externas usando WebRequest. ¡Tu robot ahora habla con el mundo!</p>
+ </div>
+ <div class="nav-links">
+  <a href="10-sqlite.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+  <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+  <a href="12-certificado.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+ </div>
+ <footer><i class="fas fa-crown"></i> Curso 5: EAs Avanzados · Multi-símbolo, ML y ONNX</footer>
 </div>
 <script>
 const STORAGE_KEY = 'mql5_5_11';
 let currentAPI = 'coingecko';
 const APIS = {
-  coingecko: { url: 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd', method: 'GET', response: { bitcoin: { usd: 65432.10 } } },
-  weather: { url: 'https://api.weather.gov/points/39.7456,-97.0892', method: 'GET', response: { properties: { relativeLocation: { city: 'New York', state: 'NY' }, forecast: 'Partly cloudy' } } },
-  news: { url: 'https://newsapi.org/v2/everything?q=bitcoin&pageSize=1', method: 'GET', response: { status: 'ok', totalResults: 1234, articles: [{ title: 'Bitcoin reaches new all-time high', source: 'CryptoNews', publishedAt: '2026-06-18' }] } },
-  custom: { url: 'https://api.example.com/data', method: 'POST', response: { success: true, data: { message: 'Custom response' } } }
+ coingecko: { url: 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd', method: 'GET', response: { bitcoin: { usd: 65432.10 } } },
+ weather: { url: 'https://api.weather.gov/points/39.7456,-97.0892', method: 'GET', response: { properties: { relativeLocation: { city: 'New York', state: 'NY' }, forecast: 'Partly cloudy' } } },
+ news: { url: 'https://newsapi.org/v2/everything?q=bitcoin&pageSize=1', method: 'GET', response: { status: 'ok', totalResults: 1234, articles: [{ title: 'Bitcoin reaches new all-time high', source: 'CryptoNews', publishedAt: '2026-06-18' }] } },
+ custom: { url: 'https://api.example.com/data', method: 'POST', response: { success: true, data: { message: 'Custom response' } } }
 };
 function getProgress() { return JSON.parse(localStorage.getItem('mql5_5_progress')) || []; }
 function selectAPI(name) {
-  currentAPI = name;
-  document.querySelectorAll('.api-btn').forEach(b => b.classList.remove('active'));
-  document.querySelector(`.api-btn[data-api="${name}"]`).classList.add('active');
-  const api = APIS[name];
-  document.getElementById('requestUrl').value = api.url;
-  document.getElementById('httpMethod').value = api.method;
-  const isPost = api.method === 'POST';
-  document.getElementById('bodyLabel').style.display = isPost ? 'block' : 'none';
-  document.getElementById('requestBody').style.display = isPost ? 'block' : 'none';
-  if (isPost) document.getElementById('requestBody').value = JSON.stringify(api.response, null, 2);
+ currentAPI = name;
+ document.querySelectorAll('.api-btn').forEach(b => b.classList.remove('active'));
+ document.querySelector(`.api-btn[data-api="${name}"]`).classList.add('active');
+ const api = APIS[name];
+ document.getElementById('requestUrl').value = api.url;
+ document.getElementById('httpMethod').value = api.method;
+ const isPost = api.method === 'POST';
+ document.getElementById('bodyLabel').style.display = isPost ? 'block' : 'none';
+ document.getElementById('requestBody').style.display = isPost ? 'block' : 'none';
+ if (isPost) document.getElementById('requestBody').value = JSON.stringify(api.response, null, 2);
 }
 function sendRequest() {
-  const method = document.getElementById('httpMethod').value;
-  const url = document.getElementById('requestUrl').value;
-  const body = document.getElementById('requestBody').value;
-  const api = APIS[currentAPI] || APIS.custom;
-  const resp = api.response;
-  const delay = 300 + Math.random() * 700;
-  setTimeout(() => {
-    const respBox = document.getElementById('responseBox');
-    let html = '<div class="json-tree">';
-    html += formatJSON(resp, 0);
-    html += '</div>';
-    respBox.innerHTML = html;
-    document.getElementById('respStatus').textContent = '200 OK';
-    document.getElementById('respTime').textContent = delay.toFixed(0) + 'ms';
-    const urlCode = url.length > 60 ? url.slice(0, 60) + '...' : url;
-    document.getElementById('codeBox').innerHTML = `<span style="color:#667799;">// WebRequest ${method} — ${currentAPI}</span>
+ const method = document.getElementById('httpMethod').value;
+ const url = document.getElementById('requestUrl').value;
+ const body = document.getElementById('requestBody').value;
+ const api = APIS[currentAPI] || APIS.custom;
+ const resp = api.response;
+ const delay = 300 + Math.random() * 700;
+ setTimeout(() => {
+  const respBox = document.getElementById('responseBox');
+  let html = '<div class="json-tree">';
+  html += formatJSON(resp, 0);
+  html += '</div>';
+  respBox.innerHTML = html;
+  document.getElementById('respStatus').textContent = '200 OK';
+  document.getElementById('respTime').textContent = delay.toFixed(0) + 'ms';
+  const urlCode = url.length > 60 ? url.slice(0, 60) + '...' : url;
+  document.getElementById('codeBox').innerHTML = `<span style="color:#667799;">// WebRequest ${method} — ${currentAPI}</span>
 <span style="color:#66ccff;">#property</span> webreq_ssl <span style="color:#ff99dd;">"api.coingecko.com"</span>
 
 <span style="color:#66ccff;">string</span> headers = <span style="color:#ff99dd;">"Content-Type: application/json\r\n"</span>;
@@ -182,62 +182,61 @@ function sendRequest() {
 <span style="color:#66ccff;">int</span> status = WebRequest(<span style="color:#ff99dd;">"${method}"</span>, url, headers, timeout, data, res, result);
 
 <span style="color:#66ccff;">if</span>(status == 200) {
-   <span style="color:#66ccff;">Print</span>(<span style="color:#ff99dd;">"Respuesta: "</span>, result);
+  <span style="color:#66ccff;">Print</span>(<span style="color:#ff99dd;">"Respuesta: "</span>, result);
 } <span style="color:#ff66c0;">else</span> {
-   <span style="color:#66ccff;">Print</span>(<span style="color:#ff99dd;">"Error: "</span>, status);
+  <span style="color:#66ccff;">Print</span>(<span style="color:#ff99dd;">"Error: "</span>, status);
 }`;
-    document.getElementById('feedbackMsg').textContent = I18N.t('fb_0') + method + ' → ' + url.split('/')[2] + ' (200 OK, ' + delay.toFixed(0) + 'ms)';
-    const p = getProgress();
-    if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem('mql5_5_progress', JSON.stringify(p)); document.getElementById('insigniaArea').classList.remove('hidden'); }
-  }, delay);
-  document.getElementById('feedbackMsg').textContent = '⏳ Enviando request a ' + url.split('/')[2] + '...';
+  document.getElementById('feedbackMsg').textContent = I18N.t('fb_0') + method + ' → ' + url.split('/')[2] + ' (200 OK, ' + delay.toFixed(0) + 'ms)';
+  const p = getProgress();
+  if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem('mql5_5_progress', JSON.stringify(p)); document.getElementById('insigniaArea').classList.remove('hidden'); }
+ }, delay);
+ document.getElementById('feedbackMsg').textContent = '⏳ Enviando request a ' + url.split('/')[2] + '...';
 }
 function formatJSON(obj, depth) {
-  if (obj === null) return '<span style="color:#ff5050;">null</span>';
-  if (typeof obj === 'string') return '<span style="color:#ff99dd;">"' + obj + '"</span>';
-  if (typeof obj === 'number') return '<span style="color:#00e0ff;">' + obj + '</span>';
-  if (typeof obj === 'boolean') return '<span style="color:#ffd700;">' + obj + '</span>';
-  if (Array.isArray(obj)) {
-    if (obj.length === 0) return '[]';
-    let html = '[<br>';
-    obj.forEach((item, i) => {
-      html += '<div class="indent">' + formatJSON(item, depth + 1);
-      if (i < obj.length - 1) html += ',';
-      html += '</div>';
-    });
-    return html + ']';
-  }
-  if (typeof obj === 'object') {
-    const keys = Object.keys(obj);
-    if (keys.length === 0) return '{}';
-    let html = '{<br>';
-    keys.forEach((k, i) => {
-      html += '<div class="indent"><span style="color:#ff66c0;">"' + k + '"</span>: ' + formatJSON(obj[k], depth + 1);
-      if (i < keys.length - 1) html += ',';
-      html += '</div>';
-    });
-    return html + '}';
-  }
-  return String(obj);
+ if (obj === null) return '<span style="color:#ff5050;">null</span>';
+ if (typeof obj === 'string') return '<span style="color:#ff99dd;">"' + obj + '"</span>';
+ if (typeof obj === 'number') return '<span style="color:#00e0ff;">' + obj + '</span>';
+ if (typeof obj === 'boolean') return '<span style="color:#ffd700;">' + obj + '</span>';
+ if (Array.isArray(obj)) {
+  if (obj.length === 0) return '[]';
+  let html = '[<br>';
+  obj.forEach((item, i) => {
+   html += '<div class="indent">' + formatJSON(item, depth + 1);
+   if (i < obj.length - 1) html += ',';
+   html += '</div>';
+  });
+  return html + ']';
+ }
+ if (typeof obj === 'object') {
+  const keys = Object.keys(obj);
+  if (keys.length === 0) return '{}';
+  let html = '{<br>';
+  keys.forEach((k, i) => {
+   html += '<div class="indent"><span style="color:#ff66c0;">"' + k + '"</span>: ' + formatJSON(obj[k], depth + 1);
+   if (i < keys.length - 1) html += ',';
+   html += '</div>';
+  });
+  return html + '}';
+ }
+ return String(obj);
 }
 document.getElementById('httpMethod').addEventListener('change', function() {
-  const isPost = this.value === 'POST';
-  document.getElementById('bodyLabel').style.display = isPost ? 'block' : 'none';
-  document.getElementById('requestBody').style.display = isPost ? 'block' : 'none';
+ const isPost = this.value === 'POST';
+ document.getElementById('bodyLabel').style.display = isPost ? 'block' : 'none';
+ document.getElementById('requestBody').style.display = isPost ? 'block' : 'none';
 });
 (function() { const p = getProgress(); if (p.includes(STORAGE_KEY)) { document.getElementById('insigniaArea').classList.remove('hidden'); document.getElementById('feedbackMsg').textContent = I18N.t('fb_1'); } })();
 </script>
-<script src="../../../assets/js/cookie-consent.js"></script>
 <script>
 window.I18N_DATA={
-  "fb_0": {
-    "es": "✅ WebRequest ",
-    "en": "✅ WebRequest "
-  },
-  "fb_1": {
-    "es": "🏅 Ya completaste este módulo.",
-    "en": "🏅 Ya completaste este module."
-  }
+ "fb_0": {
+  "es": "✅ WebRequest ",
+  "en": "✅ WebRequest "
+ },
+ "fb_1": {
+  "es": "🏅 Ya completaste este módulo.",
+  "en": "🏅 Ya completaste este module."
+ }
 };
 </script>
 <script src="../../../assets/js/i18n.js"></script>

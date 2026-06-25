@@ -1,182 +1,182 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>ML para Trading | LSTM y GRU</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #111a2e 100%);
-      background-size: 200% 200%; animation: gradientShift 20s ease infinite;
-      font-family: 'Inter', sans-serif; color: #eef5ff; min-height: 100vh;
-      display: flex; align-items: center; justify-content: center; padding: 2rem 1rem;
-    }
-    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-    .curso4-container {
-      max-width: 1300px; width: 100%;
-      background: rgba(15, 25, 45, 0.65); backdrop-filter: blur(12px);
-      border-radius: 3rem; border: 1px solid rgba(156,100,255,0.25);
-      box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden;
-    }
-    .hero-header { background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%); padding: 2rem 2rem 1.5rem; text-align: center; border-bottom: 2px solid #9c64ff; }
-    .hero-header h1 { font-size: 2.6rem; font-weight: 800; background: linear-gradient(135deg, #FFF, #c084fc, #9c64ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
-    .hero-header p { font-size: 1.1rem; color: #b9e2ff; margin-top: 0.3rem; }
-    .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
-    .chip { background: rgba(156,100,255,0.15); border: 1px solid #9c64ff; padding: 0.3rem 1rem; border-radius: 40px; font-size: 0.8rem; font-weight: 600; }
-    .analogy-card { background: #1e2a3acc; margin: 1.5rem 2rem; padding: 1.2rem 1.8rem; border-radius: 2rem; border-left: 8px solid #9c64ff; font-size: 1rem; line-height: 1.6; }
-    .main-area { padding: 0.5rem 2rem; }
-    .param-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 1rem; margin: 1rem 0; }
-    .param-grid label { display: flex; flex-direction: column; gap: 0.3rem; font-size: 0.9rem; }
-    .param-grid input[type=range] { width: 100%; }
-    .param-grid .val { font-family: monospace; font-weight: 700; }
-    .pred-chart { background: #0a0f1e; border-radius: 1.5rem; padding: 1rem; margin: 1rem 0; }
-    .pred-chart canvas { display: block; margin: 0 auto; width: 100%; max-width: 600px; height: 250px; background: #0a0f1e; border-radius: 1rem; border: 1px solid #2c3e66; }
-    .model-select { display: flex; justify-content: center; gap: 1rem; margin: 0.5rem 0; }
-    .model-select label { display: flex; align-items: center; gap: 0.3rem; cursor: pointer; }
-    .model-select input { accent-color: #9c64ff; }
-    .feedback { background: #00000099; margin: 1.5rem 2rem; padding: 1rem; border-radius: 1.5rem; text-align: center; font-weight: 500; border-left: 4px solid #9c64ff; }
-    .insignia { text-align: center; background: #0c1b2f; border-radius: 2rem; margin: 0 2rem 1.5rem; padding: 1rem; border: 1px dashed gold; }
-    .insignia i { font-size: 2.5rem; color: gold; }
-    .hidden { display: none; }
-    .btn-action { background: linear-gradient(95deg, #f0a500, #ff6a00); border: none; padding: 0.8rem 1.8rem; font-weight: bold; border-radius: 3rem; cursor: pointer; font-size: 1rem; transition: 0.2s; color: #1e1a0c; }
-    .btn-action:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(240,165,0,0.5); }
-    .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
-    .nav-link { background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem; font-weight: 600; text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; }
-    .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(156,100,255,0.4); }
-    .nav-link.next { background: linear-gradient(95deg, #f0a500, #ff6a00); color: #1e1a0c; }
-    .nav-link.menu { background: #1a2a4a; border: 1px solid #3399ff; }
-    footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
-    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
-  </style>
-  <link rel="stylesheet" href="../../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>ML para Trading | LSTM y GRU</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+   background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #111a2e 100%);
+   background-size: 200% 200%; animation: gradientShift 20s ease infinite;
+   font-family: 'Inter', sans-serif; color: #eef5ff; min-height: 100vh;
+   display: flex; align-items: center; justify-content: center; padding: 2rem 1rem;
+  }
+  @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .curso4-container {
+   max-width: 1300px; width: 100%;
+   background: rgba(15, 25, 45, 0.65); backdrop-filter: blur(12px);
+   border-radius: 3rem; border: 1px solid rgba(156,100,255,0.25);
+   box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden;
+  }
+  .hero-header { background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%); padding: 2rem 2rem 1.5rem; text-align: center; border-bottom: 2px solid #9c64ff; }
+  .hero-header h1 { font-size: 2.6rem; font-weight: 800; background: linear-gradient(135deg, #FFF, #c084fc, #9c64ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero-header p { font-size: 1.1rem; color: #b9e2ff; margin-top: 0.3rem; }
+  .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
+  .chip { background: rgba(156,100,255,0.15); border: 1px solid #9c64ff; padding: 0.3rem 1rem; border-radius: 40px; font-size: 0.8rem; font-weight: 600; }
+  .analogy-card { background: #1e2a3acc; margin: 1.5rem 2rem; padding: 1.2rem 1.8rem; border-radius: 2rem; border-left: 8px solid #9c64ff; font-size: 1rem; line-height: 1.6; }
+  .main-area { padding: 0.5rem 2rem; }
+  .param-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 1rem; margin: 1rem 0; }
+  .param-grid label { display: flex; flex-direction: column; gap: 0.3rem; font-size: 0.9rem; }
+  .param-grid input[type=range] { width: 100%; }
+  .param-grid .val { font-family: monospace; font-weight: 700; }
+  .pred-chart { background: #0a0f1e; border-radius: 1.5rem; padding: 1rem; margin: 1rem 0; }
+  .pred-chart canvas { display: block; margin: 0 auto; width: 100%; max-width: 600px; height: 250px; background: #0a0f1e; border-radius: 1rem; border: 1px solid #2c3e66; }
+  .model-select { display: flex; justify-content: center; gap: 1rem; margin: 0.5rem 0; }
+  .model-select label { display: flex; align-items: center; gap: 0.3rem; cursor: pointer; }
+  .model-select input { accent-color: #9c64ff; }
+  .feedback { background: #00000099; margin: 1.5rem 2rem; padding: 1rem; border-radius: 1.5rem; text-align: center; font-weight: 500; border-left: 4px solid #9c64ff; }
+  .insignia { text-align: center; background: #0c1b2f; border-radius: 2rem; margin: 0 2rem 1.5rem; padding: 1rem; border: 1px dashed gold; }
+  .insignia i { font-size: 2.5rem; color: gold; }
+  .hidden { display: none; }
+  .btn-action { background: linear-gradient(95deg, #f0a500, #ff6a00); border: none; padding: 0.8rem 1.8rem; font-weight: bold; border-radius: 3rem; cursor: pointer; font-size: 1rem; transition: 0.2s; color: #1e1a0c; }
+  .btn-action:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(240,165,0,0.5); }
+  .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
+  .nav-link { background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem; font-weight: 600; text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; }
+  .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(156,100,255,0.4); }
+  .nav-link.next { background: linear-gradient(95deg, #f0a500, #ff6a00); color: #1e1a0c; }
+  .nav-link.menu { background: #1a2a4a; border: 1px solid #3399ff; }
+  footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
+ </style>
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
 </head>
 <body>
-  <nav class="brand-return-nav"><a href="../../../../index.html">&larr; Portfolio</a><a href="../../../../cursos/index.html">Cursos</a></nav>
+ <nav class="brand-return-nav"><a href="../../../../index.html">&larr; Portfolio</a><a href="../../../../cursos/index.html">Cursos</a></nav>
 
-  <div class="curso4-container">
-    <div class="hero-header">
-      <h1>🔄 LSTM y GRU</h1>
-      <p>Memoria a largo plazo para predicción secuencial de precios</p>
-      <div class="badge-area">
-        <span class="chip"><i class="fas fa-history"></i> Secuencial</span>
-        <span class="chip"><i class="fas fa-brain"></i> Memoria</span>
-      </div>
-    </div>
-    <div class="analogy-card"><strong>🔄 Piénsalo así:</strong> Una red recurrente (RNN) es como leer un libro: entiendes cada palabra por su contexto y recuerdas lo que pasó antes. LSTM es como tener un cuaderno de notas donde decides qué recordar, qué olvidar y qué escribir nuevo en cada paso.</div>
-    <div class="main-area">
-      <div class="param-grid">
-        <label>Sequence length: <input type="range" id="seqLen" min="5" max="60" value="20" step="5"><span id="seqLenVal" class="val">20</span></label>
-        <label>Capas (n_layers): <input type="range" id="nLayers" min="1" max="3" value="1"><span id="nLayersVal" class="val">1</span></label>
-        <label>Hidden size: <input type="range" id="hiddenSize" min="16" max="128" value="32" step="16"><span id="hiddenSizeVal" class="val">32</span></label>
-      </div>
-      <div class="model-select">
-        <label><input type="radio" name="modelType" value="lstm" checked> LSTM</label>
-        <label><input type="radio" name="modelType" value="gru"> GRU</label>
-        <label><input type="radio" name="modelType" value="mlp"> MLP simple</label>
-      </div>
-      <div class="pred-chart">
-        <canvas id="predCanvas" width="600" height="250"></canvas>
-      </div>
-      <div style="text-align:center;margin:0.5rem 0"><button id="predictBtn" class="btn-action"><i class="fas fa-chart-line"></i> Predecir</button></div>
-    </div>
-    <div id="feedbackMsg" class="feedback">💡 Configura la arquitectura y predice 10 pasos adelante. Compara LSTM vs GRU vs MLP.</div>
-    <div id="insigniaArea" class="insignia hidden">
-      <i class="fas fa-medal"></i>
-      <h3>🏅 MAESTRO DE MEMORIA 🏅</h3>
-      <p>Dominas LSTM y GRU para predicción secuencial en finanzas. ¡Memoria de elefante!</p>
-    </div>
-    <div class="nav-links">
-      <a href="07-redes-neuronales.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
-      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
-      <a href="09-cnn-1d.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
-    </div>
-    <footer><i class="fas fa-crown"></i> ML para Trading · Trading Algorítmico con Python</footer>
+ <div class="curso4-container">
+  <div class="hero-header">
+   <h1>ðŸ”„ LSTM y GRU</h1>
+   <p>Memoria a largo plazo para predicciÃ³n secuencial de precios</p>
+   <div class="badge-area">
+    <span class="chip"><i class="fas fa-history"></i> Secuencial</span>
+    <span class="chip"><i class="fas fa-brain"></i> Memoria</span>
+   </div>
   </div>
+  <div class="analogy-card"><strong>ðŸ”„ PiÃ©nsalo asÃ­:</strong> Una red recurrente (RNN) es como leer un libro: entiendes cada palabra por su contexto y recuerdas lo que pasÃ³ antes. LSTM es como tener un cuaderno de notas donde decides quÃ© recordar, quÃ© olvidar y quÃ© escribir nuevo en cada paso.</div>
+  <div class="main-area">
+   <div class="param-grid">
+    <label>Sequence length: <input type="range" id="seqLen" min="5" max="60" value="20" step="5"><span id="seqLenVal" class="val">20</span></label>
+    <label>Capas (n_layers): <input type="range" id="nLayers" min="1" max="3" value="1"><span id="nLayersVal" class="val">1</span></label>
+    <label>Hidden size: <input type="range" id="hiddenSize" min="16" max="128" value="32" step="16"><span id="hiddenSizeVal" class="val">32</span></label>
+   </div>
+   <div class="model-select">
+    <label><input type="radio" name="modelType" value="lstm" checked> LSTM</label>
+    <label><input type="radio" name="modelType" value="gru"> GRU</label>
+    <label><input type="radio" name="modelType" value="mlp"> MLP simple</label>
+   </div>
+   <div class="pred-chart">
+    <canvas id="predCanvas" width="600" height="250"></canvas>
+   </div>
+   <div style="text-align:center;margin:0.5rem 0"><button id="predictBtn" class="btn-action"><i class="fas fa-chart-line"></i> Predecir</button></div>
+  </div>
+  <div id="feedbackMsg" class="feedback">ðŸ’¡ Configura la arquitectura y predice 10 pasos adelante. Compara LSTM vs GRU vs MLP.</div>
+  <div id="insigniaArea" class="insignia hidden">
+   <i class="fas fa-medal"></i>
+   <h3>ðŸ… MAESTRO DE MEMORIA ðŸ…</h3>
+   <p>Dominas LSTM y GRU para predicciÃ³n secuencial en finanzas. Â¡Memoria de elefante!</p>
+  </div>
+  <div class="nav-links">
+   <a href="07-redes-neuronales.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+   <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> MenÃº</a>
+   <a href="09-cnn-1d.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> ML para Trading Â· Trading AlgorÃ­tmico con Python</footer>
+ </div>
 
-  <script>
-    const STORAGE_KEY = 'py_trade_4_08';
+ <script>
+  const STORAGE_KEY = 'py_trade_4_08';
 
-    function generatePriceSeries(len) {
-      const series = [100];
-      for (let i=1; i<len+10; i++) series.push(series[i-1] * (1 + (Math.random()-0.48)*0.02));
-      return series;
+  function generatePriceSeries(len) {
+   const series = [100];
+   for (let i=1; i<len+10; i++) series.push(series[i-1] * (1 + (Math.random()-0.48)*0.02));
+   return series;
+  }
+
+  function simulatePrediction() {
+   const seqLen = parseInt(document.getElementById('seqLen').value);
+   const nLayers = parseInt(document.getElementById('nLayers').value);
+   const hiddenSize = parseInt(document.getElementById('hiddenSize').value);
+   const modelType = document.querySelector('input[name="modelType"]:checked').value;
+   document.getElementById('seqLenVal').textContent = seqLen;
+   document.getElementById('nLayersVal').textContent = nLayers;
+   document.getElementById('hiddenSizeVal').textContent = hiddenSize;
+
+   const histLen = seqLen + 30;
+   const prices = generatePriceSeries(histLen);
+   const history = prices.slice(0, seqLen);
+
+   let predictions = [];
+   const lastVal = prices[seqLen-1];
+   const trend = (prices[seqLen-1] - prices[0]) / seqLen;
+   const capacity = hiddenSize * nLayers / 32;
+
+   for (let i=0; i<10; i++) {
+    let pred;
+    if (modelType === 'lstm') {
+     pred = lastVal + trend*(i+1) + (Math.random()-0.5)*2*Math.max(1, 3/capacity);
+    } else if (modelType === 'gru') {
+     pred = lastVal + trend*(i+1)*0.9 + (Math.random()-0.5)*3*Math.max(1, 2/capacity);
+    } else {
+     pred = lastVal + (Math.random()-0.5)*5;
     }
+    predictions.push(pred);
+   }
 
-    function simulatePrediction() {
-      const seqLen = parseInt(document.getElementById('seqLen').value);
-      const nLayers = parseInt(document.getElementById('nLayers').value);
-      const hiddenSize = parseInt(document.getElementById('hiddenSize').value);
-      const modelType = document.querySelector('input[name="modelType"]:checked').value;
-      document.getElementById('seqLenVal').textContent = seqLen;
-      document.getElementById('nLayersVal').textContent = nLayers;
-      document.getElementById('hiddenSizeVal').textContent = hiddenSize;
+   const actual = prices.slice(seqLen, seqLen+10);
 
-      const histLen = seqLen + 30;
-      const prices = generatePriceSeries(histLen);
-      const history = prices.slice(0, seqLen);
+   const c = document.getElementById('predCanvas');
+   const ctx = c.getContext('2d');
+   ctx.clearRect(0,0,c.width,c.height);
+   const margin = 40, w = c.width-2*margin, h = c.height-2*margin;
+   const allVals = [...history, ...actual, ...predictions];
+   const minV = Math.min(...allVals)*0.99, maxV = Math.max(...allVals)*1.01;
 
-      let predictions = [];
-      const lastVal = prices[seqLen-1];
-      const trend = (prices[seqLen-1] - prices[0]) / seqLen;
-      const capacity = hiddenSize * nLayers / 32;
+   function scale(val, i, total) { return { x: margin + i/total*w, y: margin + (1-(val-minV)/(maxV-minV))*h }; }
 
-      for (let i=0; i<10; i++) {
-        let pred;
-        if (modelType === 'lstm') {
-          pred = lastVal + trend*(i+1) + (Math.random()-0.5)*2*Math.max(1, 3/capacity);
-        } else if (modelType === 'gru') {
-          pred = lastVal + trend*(i+1)*0.9 + (Math.random()-0.5)*3*Math.max(1, 2/capacity);
-        } else {
-          pred = lastVal + (Math.random()-0.5)*5;
-        }
-        predictions.push(pred);
-      }
+   ctx.strokeStyle = '#2b9eff'; ctx.lineWidth = 2; ctx.beginPath();
+   const total = history.length + actual.length + predictions.length;
+   [...history, ...actual].forEach((v,i) => { const p = scale(v,i,total); i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y); });
+   ctx.stroke();
 
-      const actual = prices.slice(seqLen, seqLen+10);
+   ctx.strokeStyle = '#ff64dc'; ctx.lineWidth = 2; ctx.setLineDash([5,5]); ctx.beginPath();
+   history.forEach((v,i) => { const p = scale(v,i,total); i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y); });
+   let started = false;
+   predictions.forEach((v,i) => { const p = scale(v, history.length+actual.length+i, total); if(!started) { ctx.moveTo(scale(actual[actual.length-1], history.length+actual.length-1, total).x, scale(actual[actual.length-1], history.length+actual.length-1, total).y); started=true; } ctx.lineTo(p.x,p.y); });
+   ctx.stroke(); ctx.setLineDash([]);
 
-      const c = document.getElementById('predCanvas');
-      const ctx = c.getContext('2d');
-      ctx.clearRect(0,0,c.width,c.height);
-      const margin = 40, w = c.width-2*margin, h = c.height-2*margin;
-      const allVals = [...history, ...actual, ...predictions];
-      const minV = Math.min(...allVals)*0.99, maxV = Math.max(...allVals)*1.01;
+   ctx.fillStyle = '#8899bb'; ctx.font = '12px Inter';
+   ctx.fillText('â€” Real (azul) - - PredicciÃ³n (rosa)', margin, c.height-5);
 
-      function scale(val, i, total) { return { x: margin + i/total*w, y: margin + (1-(val-minV)/(maxV-minV))*h }; }
+   const mse = predictions.reduce((a,p,i) => a+(p-actual[i])**2,0)/10;
+   document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_0') + modelType.toUpperCase() + ' Â· seq_len='+seqLen+' Â· MSE: '+mse.toFixed(2);
+   localStorage.setItem(STORAGE_KEY, 'true');
+   document.getElementById('insigniaArea').classList.remove('hidden');
+  }
 
-      ctx.strokeStyle = '#2b9eff'; ctx.lineWidth = 2; ctx.beginPath();
-      const total = history.length + actual.length + predictions.length;
-      [...history, ...actual].forEach((v,i) => { const p = scale(v,i,total); i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y); });
-      ctx.stroke();
-
-      ctx.strokeStyle = '#ff64dc'; ctx.lineWidth = 2; ctx.setLineDash([5,5]); ctx.beginPath();
-      history.forEach((v,i) => { const p = scale(v,i,total); i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y); });
-      let started = false;
-      predictions.forEach((v,i) => { const p = scale(v, history.length+actual.length+i, total); if(!started) { ctx.moveTo(scale(actual[actual.length-1], history.length+actual.length-1, total).x, scale(actual[actual.length-1], history.length+actual.length-1, total).y); started=true; } ctx.lineTo(p.x,p.y); });
-      ctx.stroke(); ctx.setLineDash([]);
-
-      ctx.fillStyle = '#8899bb'; ctx.font = '12px Inter';
-      ctx.fillText('— Real (azul)  - - Predicción (rosa)', margin, c.height-5);
-
-      const mse = predictions.reduce((a,p,i) => a+(p-actual[i])**2,0)/10;
-      document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_0') + modelType.toUpperCase() + ' · seq_len='+seqLen+' · MSE: '+mse.toFixed(2);
-      localStorage.setItem(STORAGE_KEY, 'true');
-      document.getElementById('insigniaArea').classList.remove('hidden');
-    }
-
-    document.getElementById('predictBtn').addEventListener('click', simulatePrediction);
-    ['seqLen','nLayers','hiddenSize'].forEach(id => {
-      document.getElementById(id).addEventListener('input', () => { document.getElementById(id+'Val').textContent = document.getElementById(id).value; });
-    });
-  </script>
+  document.getElementById('predictBtn').addEventListener('click', simulatePrediction);
+  ['seqLen','nLayers','hiddenSize'].forEach(id => {
+   document.getElementById(id).addEventListener('input', () => { document.getElementById(id+'Val').textContent = document.getElementById(id).value; });
+  });
+ </script>
 
 <script>
 window.I18N_DATA={
-  'fb_0': { es: '📊 ', en: '📊 ' }
+ 'fb_0': { es: 'ðŸ“Š ', en: 'ðŸ“Š ' }
 };
 </script>
-</body>
+ </body>
 </html>
 

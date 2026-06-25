@@ -1,264 +1,264 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Estrategias y Backtesting | Estrategias de Volatilidad</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #111a2e 100%);
-      background-size: 200% 200%; animation: gradientShift 20s ease infinite;
-      font-family: 'Inter', sans-serif; color: #eef5ff; min-height: 100vh;
-      display: flex; align-items: center; justify-content: center; padding: 2rem 1rem;
-    }
-    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-    .curso3-container {
-      max-width: 1300px; width: 100%;
-      background: rgba(15, 25, 45, 0.65); backdrop-filter: blur(12px);
-      border-radius: 3rem; border: 1px solid rgba(255, 215, 0, 0.25);
-      box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden;
-    }
-    .hero-header { background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%); padding: 2rem 2rem 1.5rem; text-align: center; border-bottom: 2px solid #ffd700; }
-    .hero-header h1 { font-size: 2.6rem; font-weight: 800; background: linear-gradient(135deg, #FFF, #ffe866, #ffd700); -webkit-background-clip: text; background-clip: text; color: transparent; }
-    .hero-header p { font-size: 1.1rem; color: #b9e2ff; margin-top: 0.3rem; }
-    .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
-    .chip { background: rgba(255,215,0,0.15); border: 1px solid #ffd700; padding: 0.3rem 1rem; border-radius: 40px; font-size: 0.8rem; font-weight: 600; }
-    .analogy-card { background: #1e2a3acc; margin: 1.5rem 2rem; padding: 1.2rem 1.8rem; border-radius: 2rem; border-left: 8px solid #ffd700; font-size: 1rem; line-height: 1.6; }
-    .main-area { padding: 0.5rem 2rem; }
-    .feedback { background: #00000099; margin: 1.5rem 2rem; padding: 1rem; border-radius: 1.5rem; text-align: center; font-weight: 500; border-left: 4px solid #ffd700; }
-    .insignia { text-align: center; background: #0c1b2f; border-radius: 2rem; margin: 0 2rem 1.5rem; padding: 1rem; border: 1px dashed gold; }
-    .insignia i { font-size: 2.5rem; color: gold; }
-    .hidden { display: none; }
-    .btn-action { background: linear-gradient(95deg, #f0a500, #ff6a00); border: none; padding: 0.8rem 1.8rem; font-weight: bold; border-radius: 3rem; cursor: pointer; font-size: 1rem; transition: 0.2s; color: #1e1a0c; }
-    .btn-action:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(240,165,0,0.5); }
-    .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
-    .nav-link { background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem; font-weight: 600; text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; }
-    .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(255,215,0,0.4); }
-    .nav-link.next { background: linear-gradient(95deg, #f0a500, #ff6a00); color: #1e1a0c; }
-    .nav-link.menu { background: #1a2a4a; border: 1px solid #3399ff; }
-    footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
-    .param-group { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin: 1rem 0; }
-    .param-group label { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; font-size: 0.85rem; }
-    .param-group input, .param-group select { width: 80px; padding: 0.4rem; border-radius: 0.8rem; border: 1px solid #2c3e66; background: #0f1a2e; color: #eef5ff; text-align: center; }
-    .chart-area { background: #0c1222; border-radius: 1.5rem; padding: 1rem; margin: 1rem 0; min-height: 200px; border: 1px solid #2c3e66; overflow-x: auto; }
-    .chart-area canvas { width: 100% !important; height: auto !important; }
-    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap: 0.8rem; margin: 1rem 0; }
-    .stat-card { background: #1a2640cc; border-radius: 1rem; padding: 0.8rem; text-align: center; border: 1px solid #2c3e66; }
-    .stat-card .val { font-size: 1.4rem; font-weight: 700; color: #ffd700; }
-    .stat-card .label { font-size: 0.75rem; color: #8899bb; }
-    .scenario-selector { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin: 0.5rem 0; }
-    .scenario-btn { background: #1a2640; border: 1px solid #2c3e66; padding: 0.4rem 1rem; border-radius: 2rem; cursor: pointer; transition: 0.2s; color: #eef5ff; }
-    .scenario-btn.active { border-color: #ffd700; background: #2a2a0a; }
-    .scenario-btn:hover { border-color: #ffd700; }
-    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
-  </style>
-  <link rel="stylesheet" href="../../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Estrategias y Backtesting | Estrategias de Volatilidad</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+   background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #111a2e 100%);
+   background-size: 200% 200%; animation: gradientShift 20s ease infinite;
+   font-family: 'Inter', sans-serif; color: #eef5ff; min-height: 100vh;
+   display: flex; align-items: center; justify-content: center; padding: 2rem 1rem;
+  }
+  @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .curso3-container {
+   max-width: 1300px; width: 100%;
+   background: rgba(15, 25, 45, 0.65); backdrop-filter: blur(12px);
+   border-radius: 3rem; border: 1px solid rgba(255, 215, 0, 0.25);
+   box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden;
+  }
+  .hero-header { background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%); padding: 2rem 2rem 1.5rem; text-align: center; border-bottom: 2px solid #ffd700; }
+  .hero-header h1 { font-size: 2.6rem; font-weight: 800; background: linear-gradient(135deg, #FFF, #ffe866, #ffd700); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero-header p { font-size: 1.1rem; color: #b9e2ff; margin-top: 0.3rem; }
+  .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
+  .chip { background: rgba(255,215,0,0.15); border: 1px solid #ffd700; padding: 0.3rem 1rem; border-radius: 40px; font-size: 0.8rem; font-weight: 600; }
+  .analogy-card { background: #1e2a3acc; margin: 1.5rem 2rem; padding: 1.2rem 1.8rem; border-radius: 2rem; border-left: 8px solid #ffd700; font-size: 1rem; line-height: 1.6; }
+  .main-area { padding: 0.5rem 2rem; }
+  .feedback { background: #00000099; margin: 1.5rem 2rem; padding: 1rem; border-radius: 1.5rem; text-align: center; font-weight: 500; border-left: 4px solid #ffd700; }
+  .insignia { text-align: center; background: #0c1b2f; border-radius: 2rem; margin: 0 2rem 1.5rem; padding: 1rem; border: 1px dashed gold; }
+  .insignia i { font-size: 2.5rem; color: gold; }
+  .hidden { display: none; }
+  .btn-action { background: linear-gradient(95deg, #f0a500, #ff6a00); border: none; padding: 0.8rem 1.8rem; font-weight: bold; border-radius: 3rem; cursor: pointer; font-size: 1rem; transition: 0.2s; color: #1e1a0c; }
+  .btn-action:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(240,165,0,0.5); }
+  .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
+  .nav-link { background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem; font-weight: 600; text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; }
+  .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(255,215,0,0.4); }
+  .nav-link.next { background: linear-gradient(95deg, #f0a500, #ff6a00); color: #1e1a0c; }
+  .nav-link.menu { background: #1a2a4a; border: 1px solid #3399ff; }
+  footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
+  .param-group { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin: 1rem 0; }
+  .param-group label { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; font-size: 0.85rem; }
+  .param-group input, .param-group select { width: 80px; padding: 0.4rem; border-radius: 0.8rem; border: 1px solid #2c3e66; background: #0f1a2e; color: #eef5ff; text-align: center; }
+  .chart-area { background: #0c1222; border-radius: 1.5rem; padding: 1rem; margin: 1rem 0; min-height: 200px; border: 1px solid #2c3e66; overflow-x: auto; }
+  .chart-area canvas { width: 100% !important; height: auto !important; }
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap: 0.8rem; margin: 1rem 0; }
+  .stat-card { background: #1a2640cc; border-radius: 1rem; padding: 0.8rem; text-align: center; border: 1px solid #2c3e66; }
+  .stat-card .val { font-size: 1.4rem; font-weight: 700; color: #ffd700; }
+  .stat-card .label { font-size: 0.75rem; color: #8899bb; }
+  .scenario-selector { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin: 0.5rem 0; }
+  .scenario-btn { background: #1a2640; border: 1px solid #2c3e66; padding: 0.4rem 1rem; border-radius: 2rem; cursor: pointer; transition: 0.2s; color: #eef5ff; }
+  .scenario-btn.active { border-color: #ffd700; background: #2a2a0a; }
+  .scenario-btn:hover { border-color: #ffd700; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
+ </style>
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
 </head>
 <body>
-  <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a></nav>
+ <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a></nav>
 
-  <div class="curso3-container">
-    <div class="hero-header">
-      <h1>🌊 ESTRATEGIAS DE VOLATILIDAD</h1>
-      <p>Volatility Breakout y ATR Trailing Stops</p>
-      <div class="badge-area">
-        <span class="chip"><i class="fas fa-ruler"></i> ATR</span>
-        <span class="chip"><i class="fas fa-stop"></i> Stop Dinámico</span>
-      </div>
-    </div>
-    <div class="analogy-card"><strong>🌊 Piénsalo así:</strong> La volatilidad es como el oleaje: en días de tormenta las olas son grandes (ATR alto), en calma son pequeñas (ATR bajo). El breakout de volatilidad te sube a la ola justo cuando rompe.</div>
-    <div class="main-area">
-      <div class="scenario-selector">
-        <button class="scenario-btn active" data-sc="0">🌊 Alta Volatilidad</button>
-        <button class="scenario-btn" data-sc="1">🌊 Volatilidad Creciente</button>
-        <button class="scenario-btn" data-sc="2">🌊 Volatilidad Decreciente</button>
-        <button class="scenario-btn" data-sc="3">🌊 Volátil-Estable</button>
-      </div>
-      <div class="param-group">
-        <label>ATR Período <input type="number" id="atrPeriod" value="14" min="5" max="50"></label>
-        <label>Multiplicador <input type="number" id="multiplier" value="2" min="1" max="5" step="0.5"></label>
-        <button id="runBtn" class="btn-action"><i class="fas fa-play"></i> Simular</button>
-      </div>
-      <div class="chart-area">
-        <canvas id="chartCanvas" height="250"></canvas>
-      </div>
-      <div class="stats-grid" id="statsGrid">
-        <div class="stat-card"><div class="val" id="tradesVal">0</div><div class="label">Trades</div></div>
-        <div class="stat-card"><div class="val" id="winRateVal">0%</div><div class="label">Win Rate</div></div>
-        <div class="stat-card"><div class="val" id="pnlVal">0%</div><div class="label">P&L Total</div></div>
-        <div class="stat-card"><div class="val" id="avgATR">0</div><div class="label">ATR Prom.</div></div>
-      </div>
-    </div>
-    <div id="feedbackMsg" class="feedback">💡 Ajusta el período ATR y multiplicador para capturar rupturas. Prueba los 4 escenarios de volatilidad.</div>
-    <div id="insigniaArea" class="insignia hidden">
-      <i class="fas fa-medal"></i>
-      <h3>🏅 ROMPEDOR DE VOLATILIDAD 🏅</h3>
-      <p>¡Dominas las estrategias de volatilidad con ATR y stops dinámicos!</p>
-    </div>
-    <div class="nav-links">
-      <a href="04-momentum.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
-      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
-      <a href="06-backtesting-vectorizado.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
-    </div>
-    <footer><i class="fas fa-crown"></i> Estrategias y Backtesting · Trading Algorítmico con Python</footer>
+ <div class="curso3-container">
+  <div class="hero-header">
+   <h1>ðŸŒŠ ESTRATEGIAS DE VOLATILIDAD</h1>
+   <p>Volatility Breakout y ATR Trailing Stops</p>
+   <div class="badge-area">
+    <span class="chip"><i class="fas fa-ruler"></i> ATR</span>
+    <span class="chip"><i class="fas fa-stop"></i> Stop DinÃ¡mico</span>
+   </div>
   </div>
+  <div class="analogy-card"><strong>ðŸŒŠ PiÃ©nsalo asÃ­:</strong> La volatilidad es como el oleaje: en dÃ­as de tormenta las olas son grandes (ATR alto), en calma son pequeÃ±as (ATR bajo). El breakout de volatilidad te sube a la ola justo cuando rompe.</div>
+  <div class="main-area">
+   <div class="scenario-selector">
+    <button class="scenario-btn active" data-sc="0">ðŸŒŠ Alta Volatilidad</button>
+    <button class="scenario-btn" data-sc="1">ðŸŒŠ Volatilidad Creciente</button>
+    <button class="scenario-btn" data-sc="2">ðŸŒŠ Volatilidad Decreciente</button>
+    <button class="scenario-btn" data-sc="3">ðŸŒŠ VolÃ¡til-Estable</button>
+   </div>
+   <div class="param-group">
+    <label>ATR PerÃ­odo <input type="number" id="atrPeriod" value="14" min="5" max="50"></label>
+    <label>Multiplicador <input type="number" id="multiplier" value="2" min="1" max="5" step="0.5"></label>
+    <button id="runBtn" class="btn-action"><i class="fas fa-play"></i> Simular</button>
+   </div>
+   <div class="chart-area">
+    <canvas id="chartCanvas" height="250"></canvas>
+   </div>
+   <div class="stats-grid" id="statsGrid">
+    <div class="stat-card"><div class="val" id="tradesVal">0</div><div class="label">Trades</div></div>
+    <div class="stat-card"><div class="val" id="winRateVal">0%</div><div class="label">Win Rate</div></div>
+    <div class="stat-card"><div class="val" id="pnlVal">0%</div><div class="label">P&L Total</div></div>
+    <div class="stat-card"><div class="val" id="avgATR">0</div><div class="label">ATR Prom.</div></div>
+   </div>
+  </div>
+  <div id="feedbackMsg" class="feedback">ðŸ’¡ Ajusta el perÃ­odo ATR y multiplicador para capturar rupturas. Prueba los 4 escenarios de volatilidad.</div>
+  <div id="insigniaArea" class="insignia hidden">
+   <i class="fas fa-medal"></i>
+   <h3>ðŸ… ROMPEDOR DE VOLATILIDAD ðŸ…</h3>
+   <p>Â¡Dominas las estrategias de volatilidad con ATR y stops dinÃ¡micos!</p>
+  </div>
+  <div class="nav-links">
+   <a href="04-momentum.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
+   <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> MenÃº</a>
+   <a href="06-backtesting-vectorizado.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Estrategias y Backtesting Â· Trading AlgorÃ­tmico con Python</footer>
+ </div>
 
-  <script>
-    const STORAGE_KEY = 'py_trade_3_05';
-    let currentScenario = 0;
-    let currentData = [];
+ <script>
+  const STORAGE_KEY = 'py_trade_3_05';
+  let currentScenario = 0;
+  let currentData = [];
 
-    function generateScenarioData(scIdx) {
-      const n = 200;
-      const data = [];
-      let price = 100;
-      const vols = [
-        { base: 0.025, trend: 0.001 },    // Alta
-        { base: 0.01, trend: 0.002 },      // Creciente
-        { base: 0.035, trend: -0.0008 },   // Decreciente
-        { base: 0.02, trend: 0 }           // Volátil-Estable
-      ];
-      const v = vols[scIdx];
-      for (let i = 0; i < n; i++) {
-        const vol = Math.max(v.base + v.trend * i, 0.005);
-        const ret = (Math.random() - 0.48) * vol;
-        price += price * ret;
-        data.push({ price: Math.max(price, 10), trueRange: vol * price });
-      }
-      return data;
+  function generateScenarioData(scIdx) {
+   const n = 200;
+   const data = [];
+   let price = 100;
+   const vols = [
+    { base: 0.025, trend: 0.001 },  // Alta
+    { base: 0.01, trend: 0.002 },   // Creciente
+    { base: 0.035, trend: -0.0008 },  // Decreciente
+    { base: 0.02, trend: 0 }      // VolÃ¡til-Estable
+   ];
+   const v = vols[scIdx];
+   for (let i = 0; i < n; i++) {
+    const vol = Math.max(v.base + v.trend * i, 0.005);
+    const ret = (Math.random() - 0.48) * vol;
+    price += price * ret;
+    data.push({ price: Math.max(price, 10), trueRange: vol * price });
+   }
+   return data;
+  }
+
+  function calcATR(data, period) {
+   const atr = [];
+   for (let i = 0; i < data.length; i++) {
+    if (i < period) { atr.push(null); continue; }
+    let sum = 0;
+    for (let j = 0; j < period; j++) sum += data[i - j].trueRange;
+    atr.push(sum / period);
+   }
+   return atr;
+  }
+
+  function runScenario() {
+   const atrPeriod = parseInt(document.getElementById('atrPeriod').value) || 14;
+   const mult = parseFloat(document.getElementById('multiplier').value) || 2;
+   const data = currentData;
+   const atr = calcATR(data, atrPeriod);
+   let trades = 0, wins = 0, pnl = 0;
+   let inPosition = false, entryPrice = 0, stopPrice = 0;
+
+   const prices = data.map(d => d.price);
+   const signals = [];
+
+   for (let i = atrPeriod; i < data.length; i++) {
+    const atrVal = atr[i];
+    if (atrVal === null) continue;
+    const sma = i >= 20 ? prices.slice(i-20, i).reduce((a,b)=>a+b,0)/20 : prices[i];
+    if (!inPosition) {
+     if (prices[i] > sma + mult * atrVal) {
+      inPosition = true;
+      entryPrice = prices[i];
+      stopPrice = entryPrice - 2 * atrVal;
+      signals.push({ idx: i, type: 'buy' });
+     }
+    } else {
+     stopPrice = Math.max(stopPrice, prices[i] - 2 * atrVal);
+     if (prices[i] <= stopPrice) {
+      inPosition = false;
+      const ret = (prices[i] - entryPrice) / entryPrice;
+      pnl += ret;
+      trades++;
+      if (ret > 0) wins++;
+      signals.push({ idx: i, type: 'sell' });
+     }
     }
+   }
+   if (inPosition) {
+    const ret = (prices[prices.length-1] - entryPrice) / entryPrice;
+    pnl += ret;
+    trades++;
+    if (ret > 0) wins++;
+   }
 
-    function calcATR(data, period) {
-      const atr = [];
-      for (let i = 0; i < data.length; i++) {
-        if (i < period) { atr.push(null); continue; }
-        let sum = 0;
-        for (let j = 0; j < period; j++) sum += data[i - j].trueRange;
-        atr.push(sum / period);
-      }
-      return atr;
-    }
+   document.getElementById('tradesVal').textContent = trades;
+   document.getElementById('winRateVal').textContent = trades > 0 ? (wins/trades*100).toFixed(1) + '%' : '0%';
+   document.getElementById('pnlVal').textContent = (pnl*100).toFixed(2) + '%';
+   const avgAtr = atr.filter(v => v !== null).reduce((a,b)=>a+b,0) / atr.filter(v => v !== null).length;
+   document.getElementById('avgATR').textContent = avgAtr.toFixed(4);
 
-    function runScenario() {
-      const atrPeriod = parseInt(document.getElementById('atrPeriod').value) || 14;
-      const mult = parseFloat(document.getElementById('multiplier').value) || 2;
-      const data = currentData;
-      const atr = calcATR(data, atrPeriod);
-      let trades = 0, wins = 0, pnl = 0;
-      let inPosition = false, entryPrice = 0, stopPrice = 0;
+   const canvas = document.getElementById('chartCanvas');
+   const ctx = canvas.getContext('2d');
+   const W = canvas.parentElement.clientWidth - 40;
+   canvas.width = W;
+   canvas.height = 250;
+   const pad = { top: 20, bottom: 30, left: 40, right: 20 };
+   const chartW = W - pad.left - pad.right;
+   const chartH = 250 - pad.top - pad.bottom;
+   const minP = Math.min(...prices) * 0.97;
+   const maxP = Math.max(...prices) * 1.03;
 
-      const prices = data.map(d => d.price);
-      const signals = [];
+   ctx.clearRect(0, 0, W, 250);
+   ctx.fillStyle = '#0c1222';
+   ctx.fillRect(0, 0, W, 250);
 
-      for (let i = atrPeriod; i < data.length; i++) {
-        const atrVal = atr[i];
-        if (atrVal === null) continue;
-        const sma = i >= 20 ? prices.slice(i-20, i).reduce((a,b)=>a+b,0)/20 : prices[i];
-        if (!inPosition) {
-          if (prices[i] > sma + mult * atrVal) {
-            inPosition = true;
-            entryPrice = prices[i];
-            stopPrice = entryPrice - 2 * atrVal;
-            signals.push({ idx: i, type: 'buy' });
-          }
-        } else {
-          stopPrice = Math.max(stopPrice, prices[i] - 2 * atrVal);
-          if (prices[i] <= stopPrice) {
-            inPosition = false;
-            const ret = (prices[i] - entryPrice) / entryPrice;
-            pnl += ret;
-            trades++;
-            if (ret > 0) wins++;
-            signals.push({ idx: i, type: 'sell' });
-          }
-        }
-      }
-      if (inPosition) {
-        const ret = (prices[prices.length-1] - entryPrice) / entryPrice;
-        pnl += ret;
-        trades++;
-        if (ret > 0) wins++;
-      }
+   function xPos(i) { return pad.left + (i / (prices.length-1)) * chartW; }
+   function yPos(v) { return pad.top + chartH - ((v - minP) / (maxP - minP)) * chartH; }
 
-      document.getElementById('tradesVal').textContent = trades;
-      document.getElementById('winRateVal').textContent = trades > 0 ? (wins/trades*100).toFixed(1) + '%' : '0%';
-      document.getElementById('pnlVal').textContent = (pnl*100).toFixed(2) + '%';
-      const avgAtr = atr.filter(v => v !== null).reduce((a,b)=>a+b,0) / atr.filter(v => v !== null).length;
-      document.getElementById('avgATR').textContent = avgAtr.toFixed(4);
+   ctx.strokeStyle = '#2c3e66';
+   ctx.lineWidth = 0.5;
+   for (let i = 0; i < 5; i++) { const y = pad.top + (i/4)*chartH; ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W-pad.right, y); ctx.stroke(); }
 
-      const canvas = document.getElementById('chartCanvas');
-      const ctx = canvas.getContext('2d');
-      const W = canvas.parentElement.clientWidth - 40;
-      canvas.width = W;
-      canvas.height = 250;
-      const pad = { top: 20, bottom: 30, left: 40, right: 20 };
-      const chartW = W - pad.left - pad.right;
-      const chartH = 250 - pad.top - pad.bottom;
-      const minP = Math.min(...prices) * 0.97;
-      const maxP = Math.max(...prices) * 1.03;
+   ctx.strokeStyle = '#ffd700';
+   ctx.lineWidth = 1.5;
+   ctx.beginPath();
+   prices.forEach((v, i) => { i === 0 ? ctx.moveTo(xPos(i), yPos(v)) : ctx.lineTo(xPos(i), yPos(v)); });
+   ctx.stroke();
 
-      ctx.clearRect(0, 0, W, 250);
-      ctx.fillStyle = '#0c1222';
-      ctx.fillRect(0, 0, W, 250);
+   signals.forEach(s => {
+    const x = xPos(s.idx);
+    const y = yPos(prices[s.idx]);
+    ctx.fillStyle = s.type === 'buy' ? '#00ff88' : '#ff3030';
+    ctx.beginPath(); ctx.arc(x, y, 6, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.font = '10px Inter';
+    ctx.fillText(s.type === 'buy' ? 'â–²' : 'â–¼', x-4, s.type === 'buy' ? y-8 : y+16);
+   });
 
-      function xPos(i) { return pad.left + (i / (prices.length-1)) * chartW; }
-      function yPos(v) { return pad.top + chartH - ((v - minP) / (maxP - minP)) * chartH; }
+   if (pnl > 0.02 && trades >= 2) {
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    localStorage.setItem(STORAGE_KEY, 'true');
+   }
 
-      ctx.strokeStyle = '#2c3e66';
-      ctx.lineWidth = 0.5;
-      for (let i = 0; i < 5; i++) { const y = pad.top + (i/4)*chartH; ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W-pad.right, y); ctx.stroke(); }
+   document.getElementById('feedbackMsg').textContent = I18N.t('fb_0') + trades + ' | Win Rate: ' + (trades > 0 ? (wins/trades*100).toFixed(1) : '0') + '% | P&L: ' + (pnl*100).toFixed(2) + '%';
+  }
 
-      ctx.strokeStyle = '#ffd700';
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      prices.forEach((v, i) => { i === 0 ? ctx.moveTo(xPos(i), yPos(v)) : ctx.lineTo(xPos(i), yPos(v)); });
-      ctx.stroke();
-
-      signals.forEach(s => {
-        const x = xPos(s.idx);
-        const y = yPos(prices[s.idx]);
-        ctx.fillStyle = s.type === 'buy' ? '#00ff88' : '#ff3030';
-        ctx.beginPath(); ctx.arc(x, y, 6, 0, Math.PI*2); ctx.fill();
-        ctx.fillStyle = '#fff';
-        ctx.font = '10px Inter';
-        ctx.fillText(s.type === 'buy' ? '▲' : '▼', x-4, s.type === 'buy' ? y-8 : y+16);
-      });
-
-      if (pnl > 0.02 && trades >= 2) {
-        document.getElementById('insigniaArea').classList.remove('hidden');
-        localStorage.setItem(STORAGE_KEY, 'true');
-      }
-
-      document.getElementById('feedbackMsg').textContent = I18N.t('fb_0') + trades + ' | Win Rate: ' + (trades > 0 ? (wins/trades*100).toFixed(1) : '0') + '% | P&L: ' + (pnl*100).toFixed(2) + '%';
-    }
-
-    document.querySelectorAll('.scenario-btn').forEach(btn => {
-      btn.addEventListener('click', function() {
-        document.querySelectorAll('.scenario-btn').forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-        currentScenario = parseInt(this.dataset.sc);
-        currentData = generateScenarioData(currentScenario);
-        runScenario();
-      });
-    });
-
-    document.getElementById('runBtn').addEventListener('click', runScenario);
-
-    currentData = generateScenarioData(0);
+  document.querySelectorAll('.scenario-btn').forEach(btn => {
+   btn.addEventListener('click', function() {
+    document.querySelectorAll('.scenario-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    currentScenario = parseInt(this.dataset.sc);
+    currentData = generateScenarioData(currentScenario);
     runScenario();
-  </script>
+   });
+  });
+
+  document.getElementById('runBtn').addEventListener('click', runScenario);
+
+  currentData = generateScenarioData(0);
+  runScenario();
+ </script>
 <script>
 window.I18N_DATA={
-  "fb_0": {
-    "es": "📊 Trades: ",
-    "en": "📊 Trades: "
-  }
+ "fb_0": {
+  "es": "ðŸ“Š Trades: ",
+  "en": "ðŸ“Š Trades: "
+ }
 };
 </script>
 <script src="../../../assets/js/i18n.js"></script>
-</body>
+ </body>
 </html>
 

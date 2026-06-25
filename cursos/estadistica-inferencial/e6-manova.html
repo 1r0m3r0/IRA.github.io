@@ -1,255 +1,255 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Estadística Inferencial | MANOVA</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Press+Start+2P&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%);background-size:200% 200%;animation:gradientShift 20s ease infinite;font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
-    @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-    .container{max-width:1300px;width:100%;background:rgba(15,25,45,0.65);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(255,102,192,0.25);box-shadow:0 25px 45px rgba(0,0,0,0.5);overflow:hidden}
-    .hero-header{background:linear-gradient(95deg,#0b1120 0%,#111a2e 100%);padding:2rem 2rem 1.5rem;text-align:center;border-bottom:2px solid #ff66c0}
-    .hero-header h1{font-size:2.6rem;font-weight:800;background:linear-gradient(135deg,#FFF,#ff99dd,#ff66c0);-webkit-background-clip:text;background-clip:text;color:transparent}
-    .hero-header p{font-size:1.1rem;color:#ffb3e6;margin-top:0.5rem;font-weight:500}
-    .badge-area{display:flex;justify-content:center;gap:1rem;margin-top:1.2rem;flex-wrap:wrap}
-    .chip{background:rgba(255,102,192,0.15);border:1px solid #ff66c0;padding:0.4rem 1rem;border-radius:40px;font-size:0.8rem;font-weight:600}
-    .analogy-card{background:#1e2a3acc;margin:1.5rem 2rem;padding:1.2rem 1.8rem;border-radius:2rem;border-left:8px solid #ff66c0;font-size:1rem;line-height:1.6}
-    .main-area{padding:0 2rem 1rem;display:flex;flex-direction:column;gap:1.5rem}
-    .manova-panel{background:#0f1a2be0;border-radius:2rem;padding:1.5rem;border:1px solid rgba(255,102,192,0.2)}
-    .manova-panel h3{font-size:1.2rem;margin-bottom:0.8rem;color:#ff99dd}
-    .dv-toggle{display:flex;flex-wrap:wrap;gap:0.8rem;margin-bottom:1.5rem;justify-content:center}
-    .dv-btn{background:#1a2a4a;border:2px solid transparent;padding:0.6rem 1.2rem;border-radius:2rem;cursor:pointer;font-weight:600;font-size:0.85rem;transition:0.2s;color:#ccdeff;font-family:'Inter',sans-serif}
-    .dv-btn.active{background:#ff66c0;color:#1e1a0c;border-color:#ff66c0}
-    .dv-btn:hover{border-color:#ff66c0}
-    .comparison-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem}
-    .comp-card{background:#1a2a4a;padding:1.2rem;border-radius:1.5rem;text-align:center}
-    .comp-card h4{font-size:0.95rem;color:#ff99dd;margin-bottom:0.5rem}
-    .comp-card .big-number{font-size:2rem;font-weight:800;color:#eef5ff;font-family:monospace}
-    .comp-card .desc{font-size:0.8rem;color:#8899bb;margin-top:0.3rem}
-    .badge-stat{display:inline-block;padding:0.3rem 0.8rem;border-radius:1rem;font-size:0.8rem;font-weight:700;margin-top:0.5rem}
-    .badge-stat.danger{background:#cc335566;color:#ff6688;border:1px solid #cc3355}
-    .badge-stat.safe{background:#00cc8822;color:#00cc88;border:1px solid #00cc88}
-    .test-detail{display:flex;flex-wrap:wrap;gap:0.8rem;margin-top:1rem}
-    .test-item{background:#0f1a2b;padding:0.6rem 1rem;border-radius:1rem;flex:1;min-width:140px;text-align:center;border:1px solid rgba(255,102,192,0.15)}
-    .test-item .stat{font-size:1.1rem;font-weight:700;color:#ff99dd}
-    .test-item .lbl{font-size:0.7rem;color:#8899bb;margin-top:0.2rem}
-    .btn-action{background:linear-gradient(95deg,#ff66c0,#ff3388);border:none;padding:0.8rem 1.8rem;font-weight:700;border-radius:3rem;cursor:pointer;font-size:1rem;transition:0.2s;color:#1e1a0c;font-family:'Inter',sans-serif}
-    .btn-action:hover{transform:translateY(-2px);box-shadow:0 0 15px rgba(255,102,192,0.5)}
-    .btn-action:disabled{opacity:0.4;cursor:not-allowed;transform:none}
-    .feedback{background:#00000099;margin:0 2rem 1.5rem;padding:1rem;border-radius:1.5rem;text-align:center;font-weight:500;border-left:4px solid #ff66c0}
-    .insignia{text-align:center;background:#0c1b2f;border-radius:2rem;margin:0 2rem 1.5rem;padding:1rem;border:1px dashed gold}
-    .insignia i{font-size:2.5rem;color:gold}
-    .hidden{display:none}
-    .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.5rem 2rem}
-    .nav-link{background:#2c3e66;padding:0.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:0.5rem;transition:0.2s}
-    .nav-link:hover{transform:translateY(-2px);box-shadow:0 0 10px rgba(255,102,192,0.4)}
-    .nav-link.next{background:linear-gradient(95deg,#ff66c0,#ff3388);color:#1e1a0c}
-    .nav-link.menu{background:#1a2a4a;border:1px solid #ff66c0}
-    footer{text-align:center;padding:1.2rem;font-size:0.8rem;border-top:1px solid #2c3e66}
-    @media(max-width:800px){.hero-header h1{font-size:1.9rem}}
-  </style>
-  <link rel="stylesheet" href="../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>EstadÃ­stica Inferencial | MANOVA</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Press+Start+2P&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%);background-size:200% 200%;animation:gradientShift 20s ease infinite;font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
+  @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+  .container{max-width:1300px;width:100%;background:rgba(15,25,45,0.65);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(255,102,192,0.25);box-shadow:0 25px 45px rgba(0,0,0,0.5);overflow:hidden}
+  .hero-header{background:linear-gradient(95deg,#0b1120 0%,#111a2e 100%);padding:2rem 2rem 1.5rem;text-align:center;border-bottom:2px solid #ff66c0}
+  .hero-header h1{font-size:2.6rem;font-weight:800;background:linear-gradient(135deg,#FFF,#ff99dd,#ff66c0);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero-header p{font-size:1.1rem;color:#ffb3e6;margin-top:0.5rem;font-weight:500}
+  .badge-area{display:flex;justify-content:center;gap:1rem;margin-top:1.2rem;flex-wrap:wrap}
+  .chip{background:rgba(255,102,192,0.15);border:1px solid #ff66c0;padding:0.4rem 1rem;border-radius:40px;font-size:0.8rem;font-weight:600}
+  .analogy-card{background:#1e2a3acc;margin:1.5rem 2rem;padding:1.2rem 1.8rem;border-radius:2rem;border-left:8px solid #ff66c0;font-size:1rem;line-height:1.6}
+  .main-area{padding:0 2rem 1rem;display:flex;flex-direction:column;gap:1.5rem}
+  .manova-panel{background:#0f1a2be0;border-radius:2rem;padding:1.5rem;border:1px solid rgba(255,102,192,0.2)}
+  .manova-panel h3{font-size:1.2rem;margin-bottom:0.8rem;color:#ff99dd}
+  .dv-toggle{display:flex;flex-wrap:wrap;gap:0.8rem;margin-bottom:1.5rem;justify-content:center}
+  .dv-btn{background:#1a2a4a;border:2px solid transparent;padding:0.6rem 1.2rem;border-radius:2rem;cursor:pointer;font-weight:600;font-size:0.85rem;transition:0.2s;color:#ccdeff;font-family:'Inter',sans-serif}
+  .dv-btn.active{background:#ff66c0;color:#1e1a0c;border-color:#ff66c0}
+  .dv-btn:hover{border-color:#ff66c0}
+  .comparison-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem}
+  .comp-card{background:#1a2a4a;padding:1.2rem;border-radius:1.5rem;text-align:center}
+  .comp-card h4{font-size:0.95rem;color:#ff99dd;margin-bottom:0.5rem}
+  .comp-card .big-number{font-size:2rem;font-weight:800;color:#eef5ff;font-family:monospace}
+  .comp-card .desc{font-size:0.8rem;color:#8899bb;margin-top:0.3rem}
+  .badge-stat{display:inline-block;padding:0.3rem 0.8rem;border-radius:1rem;font-size:0.8rem;font-weight:700;margin-top:0.5rem}
+  .badge-stat.danger{background:#cc335566;color:#ff6688;border:1px solid #cc3355}
+  .badge-stat.safe{background:#00cc8822;color:#00cc88;border:1px solid #00cc88}
+  .test-detail{display:flex;flex-wrap:wrap;gap:0.8rem;margin-top:1rem}
+  .test-item{background:#0f1a2b;padding:0.6rem 1rem;border-radius:1rem;flex:1;min-width:140px;text-align:center;border:1px solid rgba(255,102,192,0.15)}
+  .test-item .stat{font-size:1.1rem;font-weight:700;color:#ff99dd}
+  .test-item .lbl{font-size:0.7rem;color:#8899bb;margin-top:0.2rem}
+  .btn-action{background:linear-gradient(95deg,#ff66c0,#ff3388);border:none;padding:0.8rem 1.8rem;font-weight:700;border-radius:3rem;cursor:pointer;font-size:1rem;transition:0.2s;color:#1e1a0c;font-family:'Inter',sans-serif}
+  .btn-action:hover{transform:translateY(-2px);box-shadow:0 0 15px rgba(255,102,192,0.5)}
+  .btn-action:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+  .feedback{background:#00000099;margin:0 2rem 1.5rem;padding:1rem;border-radius:1.5rem;text-align:center;font-weight:500;border-left:4px solid #ff66c0}
+  .insignia{text-align:center;background:#0c1b2f;border-radius:2rem;margin:0 2rem 1.5rem;padding:1rem;border:1px dashed gold}
+  .insignia i{font-size:2.5rem;color:gold}
+  .hidden{display:none}
+  .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.5rem 2rem}
+  .nav-link{background:#2c3e66;padding:0.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:0.5rem;transition:0.2s}
+  .nav-link:hover{transform:translateY(-2px);box-shadow:0 0 10px rgba(255,102,192,0.4)}
+  .nav-link.next{background:linear-gradient(95deg,#ff66c0,#ff3388);color:#1e1a0c}
+  .nav-link.menu{background:#1a2a4a;border:1px solid #ff66c0}
+  footer{text-align:center;padding:1.2rem;font-size:0.8rem;border-top:1px solid #2c3e66}
+  @media(max-width:800px){.hero-header h1{font-size:1.9rem}}
+ </style>
+ <link rel="stylesheet" href="../../assets/css/theme.css">
 </head>
 <body>
-  <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
-  <div class="container">
-    <div class="hero-header">
-      <h1>📊 Análisis Multivariante (MANOVA) 📊</h1>
-      <p>¿Tu tratamiento afecta varias variables a la vez?</p>
-      <div class="badge-area">
-        <span class="chip"><i class="fas fa-cubes"></i> Múltiples DV</span>
-        <span class="chip"><i class="fas fa-greek-letter"></i> Wilks' Λ</span>
-        <span class="chip"><i class="fas fa-sitemap"></i> LDA</span>
-      </div>
-    </div>
-    <div class="analogy-card">
-      <strong>🩺 Piénsalo así:</strong> MANOVA es como un médico que revisa todos tus signos vitales a la vez: presión, pulso, temperatura. Hacer ANOVAs separados sería como revisar cada signo con un doctor diferente, ignorando que están correlacionados.
-    </div>
-    <div class="main-area">
-      <div class="manova-panel">
-        <h3><i class="fas fa-plus-circle"></i> MANOVA vs ANOVAs múltiples — Simulador</h3>
-        <p style="font-size:0.85rem;color:#b9c8e6;margin-bottom:1rem">Selecciona cuántas variables dependientes (DV) incluir y compara el Error Tipo I.</p>
-        <div class="dv-toggle" id="dvToggle">
-          <button class="dv-btn active" data-count="2">2 DV</button>
-          <button class="dv-btn" data-count="4">4 DV</button>
-          <button class="dv-btn" data-count="6">6 DV</button>
-          <button class="dv-btn" data-count="8">8 DV</button>
-        </div>
-        <div class="comparison-grid">
-          <div class="comp-card">
-            <h4>MANOVA</h4>
-            <div class="big-number" id="manovaPval">0.032</div>
-            <div class="desc">p-valor global (Wilks' Λ)</div>
-            <div id="manovaResult" class="badge-stat safe">✅ Significativo</div>
-          </div>
-          <div class="comp-card">
-            <h4>ANOVAs individuales</h4>
-            <div class="big-number" id="anovaPval">0.008</div>
-            <div class="desc">Mínimo p-valor entre DV</div>
-            <div id="anovaResult" class="badge-stat safe">✅ Significativo (al menos 1)</div>
-          </div>
-        </div>
-        <div class="test-detail">
-          <div class="test-item"><div class="stat" id="wilksLambda">0.842</div><div class="lbl">Λ de Wilks</div></div>
-          <div class="test-item"><div class="stat" id="pillaiTrace">0.163</div><div class="lbl">Traza de Pillai</div></div>
-          <div class="test-item"><div class="stat" id="hotellingTrace">0.188</div><div class="lbl">Traza de Hotelling</div></div>
-          <div class="test-item"><div class="stat" id="fwerDisplay">0.12</div><div class="lbl">FWER (Bonferroni)</div></div>
-        </div>
-        <div style="margin-top:1rem;padding:0.8rem;background:#0a0f1e;border-radius:1rem;font-size:0.85rem;color:#b9c8e6">
-          <strong>💡 Interpretación:</strong> <span id="interpretText">Con 2 DV, MANOVA controla el error global. FWER = Family-Wise Error Rate.</span>
-        </div>
-      </div>
-    </div>
-    <div id="feedbackMsg" class="feedback">
-      💡 Cambia el número de DV para ver cómo el MANOVA controla el error mientras los ANOVAs múltiples lo inflan.
-    </div>
-    <div id="insigniaArea" class="insignia hidden">
-      <i class="fas fa-medal"></i>
-      <h3>🏅 Multivariante Maestro 🏅</h3>
-      <p>¡Has entendido por qué MANOVA es superior a ANOVAs separados cuando las variables están correlacionadas!</p>
-    </div>
-    <div class="nav-links">
-      <a href="e5-diseno-experimentos.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
-      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
-      <a href="e7-glm-avanzado.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
-    </div>
-    <footer><i class="fas fa-crown"></i> Estadística Inferencial Interactiva · Modo Experto</footer>
+ <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+ <div class="container">
+  <div class="hero-header">
+   <h1>ðŸ“Š AnÃ¡lisis Multivariante (MANOVA) ðŸ“Š</h1>
+   <p>Â¿Tu tratamiento afecta varias variables a la vez?</p>
+   <div class="badge-area">
+    <span class="chip"><i class="fas fa-cubes"></i> MÃºltiples DV</span>
+    <span class="chip"><i class="fas fa-greek-letter"></i> Wilks' Î›</span>
+    <span class="chip"><i class="fas fa-sitemap"></i> LDA</span>
+   </div>
   </div>
-  <script>
-    (function(){
-      const STORAGE_KEY='est_inf_e6';
-      let currentDV=2;
-      let completed=false;
+  <div class="analogy-card">
+   <strong>ðŸ©º PiÃ©nsalo asÃ­:</strong> MANOVA es como un mÃ©dico que revisa todos tus signos vitales a la vez: presiÃ³n, pulso, temperatura. Hacer ANOVAs separados serÃ­a como revisar cada signo con un doctor diferente, ignorando que estÃ¡n correlacionados.
+  </div>
+  <div class="main-area">
+   <div class="manova-panel">
+    <h3><i class="fas fa-plus-circle"></i> MANOVA vs ANOVAs mÃºltiples â€” Simulador</h3>
+    <p style="font-size:0.85rem;color:#b9c8e6;margin-bottom:1rem">Selecciona cuÃ¡ntas variables dependientes (DV) incluir y compara el Error Tipo I.</p>
+    <div class="dv-toggle" id="dvToggle">
+     <button class="dv-btn active" data-count="2">2 DV</button>
+     <button class="dv-btn" data-count="4">4 DV</button>
+     <button class="dv-btn" data-count="6">6 DV</button>
+     <button class="dv-btn" data-count="8">8 DV</button>
+    </div>
+    <div class="comparison-grid">
+     <div class="comp-card">
+      <h4>MANOVA</h4>
+      <div class="big-number" id="manovaPval">0.032</div>
+      <div class="desc">p-valor global (Wilks' Î›)</div>
+      <div id="manovaResult" class="badge-stat safe">âœ… Significativo</div>
+     </div>
+     <div class="comp-card">
+      <h4>ANOVAs individuales</h4>
+      <div class="big-number" id="anovaPval">0.008</div>
+      <div class="desc">MÃ­nimo p-valor entre DV</div>
+      <div id="anovaResult" class="badge-stat safe">âœ… Significativo (al menos 1)</div>
+     </div>
+    </div>
+    <div class="test-detail">
+     <div class="test-item"><div class="stat" id="wilksLambda">0.842</div><div class="lbl">Î› de Wilks</div></div>
+     <div class="test-item"><div class="stat" id="pillaiTrace">0.163</div><div class="lbl">Traza de Pillai</div></div>
+     <div class="test-item"><div class="stat" id="hotellingTrace">0.188</div><div class="lbl">Traza de Hotelling</div></div>
+     <div class="test-item"><div class="stat" id="fwerDisplay">0.12</div><div class="lbl">FWER (Bonferroni)</div></div>
+    </div>
+    <div style="margin-top:1rem;padding:0.8rem;background:#0a0f1e;border-radius:1rem;font-size:0.85rem;color:#b9c8e6">
+     <strong>ðŸ’¡ InterpretaciÃ³n:</strong> <span id="interpretText">Con 2 DV, MANOVA controla el error global. FWER = Family-Wise Error Rate.</span>
+    </div>
+   </div>
+  </div>
+  <div id="feedbackMsg" class="feedback">
+   ðŸ’¡ Cambia el nÃºmero de DV para ver cÃ³mo el MANOVA controla el error mientras los ANOVAs mÃºltiples lo inflan.
+  </div>
+  <div id="insigniaArea" class="insignia hidden">
+   <i class="fas fa-medal"></i>
+   <h3>ðŸ… Multivariante Maestro ðŸ…</h3>
+   <p>Â¡Has entendido por quÃ© MANOVA es superior a ANOVAs separados cuando las variables estÃ¡n correlacionadas!</p>
+  </div>
+  <div class="nav-links">
+   <a href="e5-diseno-experimentos.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+   <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> MenÃº</a>
+   <a href="e7-glm-avanzado.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> EstadÃ­stica Inferencial Interactiva Â· Modo Experto</footer>
+ </div>
+ <script>
+  (function(){
+   const STORAGE_KEY='est_inf_e6';
+   let currentDV=2;
+   let completed=false;
 
-      const manovaPvalEl=document.getElementById('manovaPval');
-      const anovaPvalEl=document.getElementById('anovaPval');
-      const manovaResult=document.getElementById('manovaResult');
-      const anovaResult=document.getElementById('anovaResult');
-      const wilksLambda=document.getElementById('wilksLambda');
-      const pillaiTrace=document.getElementById('pillaiTrace');
-      const hotellingTrace=document.getElementById('hotellingTrace');
-      const fwerDisplay=document.getElementById('fwerDisplay');
-      const interpretText=document.getElementById('interpretText');
-      const feedbackEl=document.getElementById('feedbackMsg');
-      const insigniaEl=document.getElementById('insigniaArea');
+   const manovaPvalEl=document.getElementById('manovaPval');
+   const anovaPvalEl=document.getElementById('anovaPval');
+   const manovaResult=document.getElementById('manovaResult');
+   const anovaResult=document.getElementById('anovaResult');
+   const wilksLambda=document.getElementById('wilksLambda');
+   const pillaiTrace=document.getElementById('pillaiTrace');
+   const hotellingTrace=document.getElementById('hotellingTrace');
+   const fwerDisplay=document.getElementById('fwerDisplay');
+   const interpretText=document.getElementById('interpretText');
+   const feedbackEl=document.getElementById('feedbackMsg');
+   const insigniaEl=document.getElementById('insigniaArea');
 
-      function simulateMANOVA(dvCount){
-        const n=60;
-        const corr=0.35;
-        const effectBase=0.15;
-        const groupEffect=effectBase*3;
+   function simulateMANOVA(dvCount){
+    const n=60;
+    const corr=0.35;
+    const effectBase=0.15;
+    const groupEffect=effectBase*3;
 
-        const lambda=1-groupEffect/(1+groupEffect*(dvCount-1)/dvCount);
-        const adjLambda=Math.pow(lambda,1+(dvCount-1)/(dvCount*n-dvCount-1));
-        const df1=dvCount;
-        const df2=n-dvCount-1;
-        let F_approx=(1-adjLambda)/adjLambda*df2/df1;
-        if(F_approx<0)F_approx=0.01;
-        const manovaP=1-fCDF(F_approx,df1,df2);
+    const lambda=1-groupEffect/(1+groupEffect*(dvCount-1)/dvCount);
+    const adjLambda=Math.pow(lambda,1+(dvCount-1)/(dvCount*n-dvCount-1));
+    const df1=dvCount;
+    const df2=n-dvCount-1;
+    let F_approx=(1-adjLambda)/adjLambda*df2/df1;
+    if(F_approx<0)F_approx=0.01;
+    const manovaP=1-fCDF(F_approx,df1,df2);
 
-        const anovaPs=[];
-        for(let i=0;i<dvCount;i++){
-          const effectSize=effectBase*(0.5+Math.random());
-          const F_single=effectSize*n/2;
-          const pSingle=1-fCDF(F_single,1,n-2);
-          anovaPs.push(pSingle);
-        }
-        const minAnovaP=Math.min(...anovaPs);
-        const fwer=1-Math.pow(1-0.05,dvCount);
+    const anovaPs=[];
+    for(let i=0;i<dvCount;i++){
+     const effectSize=effectBase*(0.5+Math.random());
+     const F_single=effectSize*n/2;
+     const pSingle=1-fCDF(F_single,1,n-2);
+     anovaPs.push(pSingle);
+    }
+    const minAnovaP=Math.min(...anovaPs);
+    const fwer=1-Math.pow(1-0.05,dvCount);
 
-        const pillaiVal=1-Math.pow(lambda,1.0/(1+0.0));
-        const hotellingVal=(1-lambda)/lambda;
+    const pillaiVal=1-Math.pow(lambda,1.0/(1+0.0));
+    const hotellingVal=(1-lambda)/lambda;
 
-        manovaPvalEl.textContent=manovaP.toFixed(4);
-        anovaPvalEl.textContent=minAnovaP.toFixed(4);
-        wilksLambda.textContent=adjLambda.toFixed(4);
-        pillaiTrace.textContent=(dvCount*0.03+0.07).toFixed(3);
-        hotellingTrace.textContent=(dvCount*0.04+0.06).toFixed(3);
-        fwerDisplay.textContent=fwer.toFixed(3);
+    manovaPvalEl.textContent=manovaP.toFixed(4);
+    anovaPvalEl.textContent=minAnovaP.toFixed(4);
+    wilksLambda.textContent=adjLambda.toFixed(4);
+    pillaiTrace.textContent=(dvCount*0.03+0.07).toFixed(3);
+    hotellingTrace.textContent=(dvCount*0.04+0.06).toFixed(3);
+    fwerDisplay.textContent=fwer.toFixed(3);
 
-        manovaResult.className='badge-stat '+(manovaP<0.05?'safe':'danger');
-        manovaResult.textContent=manovaP<0.05?'✅ Significativo':'❌ No significativo';
+    manovaResult.className='badge-stat '+(manovaP<0.05?'safe':'danger');
+    manovaResult.textContent=manovaP<0.05?'âœ… Significativo':'âŒ No significativo';
 
-        anovaResult.className='badge-stat '+(minAnovaP<0.05?'safe':'danger');
-        anovaResult.textContent=minAnovaP<0.05?'⚠️ Significativo (al menos 1)':'❌ Ninguno significativo';
+    anovaResult.className='badge-stat '+(minAnovaP<0.05?'safe':'danger');
+    anovaResult.textContent=minAnovaP<0.05?'âš ï¸ Significativo (al menos 1)':'âŒ Ninguno significativo';
 
-        if(dvCount<=2){
-          interpretText.textContent='Con pocas DV, MANOVA y ANOVAs separados son similares. La ventaja del MANOVA es sutil.';
-        }else if(dvCount<=5){
-          interpretText.textContent='El MANOVA controla el error global. Con ANOVAs separados, el FWER='+fwer.toFixed(3)+' supera α=0.05.';
-        }else{
-          interpretText.textContent='FWER='+fwer.toFixed(3)+' — los ANOVAs múltiples inflan drásticamente el error Tipo I. MANOVA es obligatorio aquí.';
-        }
+    if(dvCount<=2){
+     interpretText.textContent='Con pocas DV, MANOVA y ANOVAs separados son similares. La ventaja del MANOVA es sutil.';
+    }else if(dvCount<=5){
+     interpretText.textContent='El MANOVA controla el error global. Con ANOVAs separados, el FWER='+fwer.toFixed(3)+' supera Î±=0.05.';
+    }else{
+     interpretText.textContent='FWER='+fwer.toFixed(3)+' â€” los ANOVAs mÃºltiples inflan drÃ¡sticamente el error Tipo I. MANOVA es obligatorio aquÃ­.';
+    }
 
-        if(!completed){
-          completed=true;
-          localStorage.setItem(STORAGE_KEY,'completed');
-          insigniaEl.classList.remove('hidden');
-          feedbackEl.innerHTML=I18N.t('fb_0')+dvCount+' DV, el FWER muestra por qué el enfoque multivariante es esencial.';
-        }
-      }
+    if(!completed){
+     completed=true;
+     localStorage.setItem(STORAGE_KEY,'completed');
+     insigniaEl.classList.remove('hidden');
+     feedbackEl.innerHTML=I18N.t('fb_0')+dvCount+' DV, el FWER muestra por quÃ© el enfoque multivariante es esencial.';
+    }
+   }
 
-      function fCDF(x,df1,df2){
-        if(x<=0)return 0;
-        const y=x*df1/(x*df1+df2);
-        return regIncBeta(df1/2,df2/2,y);
-      }
+   function fCDF(x,df1,df2){
+    if(x<=0)return 0;
+    const y=x*df1/(x*df1+df2);
+    return regIncBeta(df1/2,df2/2,y);
+   }
 
-      function regIncBeta(a,b,x){
-        if(x<0||x>1)return 0;
-        if(x===0||x===1)return x;
-        const lb=lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x);
-        let s=0,c=1;
-        for(let k=0;k<500;k++){
-          s+=c/(a+k);
-          c*=x*(b+k)/(k+1)*(a+b+k)/(a+k);
-          if(c<1e-12)break;
-        }
-        return Math.exp(lb)*s*a;
-      }
+   function regIncBeta(a,b,x){
+    if(x<0||x>1)return 0;
+    if(x===0||x===1)return x;
+    const lb=lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x);
+    let s=0,c=1;
+    for(let k=0;k<500;k++){
+     s+=c/(a+k);
+     c*=x*(b+k)/(k+1)*(a+b+k)/(a+k);
+     if(c<1e-12)break;
+    }
+    return Math.exp(lb)*s*a;
+   }
 
-      function lgamma(n){
-        if(n<0.5)return Math.PI/Math.sin(Math.PI*n)-lgamma(1-n);
-        n-=1;
-        const g=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];
-        let x=n+1,t=x+5.5;
-        t-=(x+0.5)*Math.log(t);
-        let s=1.000000000190015;
-        for(let i=0;i<6;i++)s+=g[i]/++x;
-        return Math.log(2.5066282746310005*s/t)-t;
-      }
+   function lgamma(n){
+    if(n<0.5)return Math.PI/Math.sin(Math.PI*n)-lgamma(1-n);
+    n-=1;
+    const g=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];
+    let x=n+1,t=x+5.5;
+    t-=(x+0.5)*Math.log(t);
+    let s=1.000000000190015;
+    for(let i=0;i<6;i++)s+=g[i]/++x;
+    return Math.log(2.5066282746310005*s/t)-t;
+   }
 
-      function setDV(count){
-        currentDV=count;
-        document.querySelectorAll('.dv-btn').forEach(b=>b.classList.remove('active'));
-        document.querySelector('.dv-btn[data-count="'+count+'"]').classList.add('active');
-        simulateMANOVA(count);
-      }
+   function setDV(count){
+    currentDV=count;
+    document.querySelectorAll('.dv-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelector('.dv-btn[data-count="'+count+'"]').classList.add('active');
+    simulateMANOVA(count);
+   }
 
-      document.querySelectorAll('.dv-btn').forEach(btn=>{
-        btn.addEventListener('click',function(){
-          setDV(parseInt(this.dataset.count));
-        });
-      });
+   document.querySelectorAll('.dv-btn').forEach(btn=>{
+    btn.addEventListener('click',function(){
+     setDV(parseInt(this.dataset.count));
+    });
+   });
 
-      if(localStorage.getItem(STORAGE_KEY)==='completed'){
-        completed=true;
-        insigniaEl.classList.remove('hidden');
-        feedbackEl.innerHTML=I18N.t('fb_1');
-      }
-      simulateMANOVA(2);
-    })();
-  </script>
+   if(localStorage.getItem(STORAGE_KEY)==='completed'){
+    completed=true;
+    insigniaEl.classList.remove('hidden');
+    feedbackEl.innerHTML=I18N.t('fb_1');
+   }
+   simulateMANOVA(2);
+  })();
+ </script>
 
 <script>
 window.I18N_DATA={
-  'fb_0': { es: '🎉 ¡Excelente! Has comparado MANOVA vs ANOVAs. Con ', en: '🎉 Excellent! Has comparado MANOVA vs ANOVAs. Con ' },
-  'fb_1': { es: '🎉 ¡Bienvenido de vuelta! Ya completaste este módulo.', en: '🎉 ¡Bienvenido de vuelta! Ya completaste este módulo.' }
+ 'fb_0': { es: 'ðŸŽ‰ Â¡Excelente! Has comparado MANOVA vs ANOVAs. Con ', en: 'ðŸŽ‰ Excellent! Has comparado MANOVA vs ANOVAs. Con ' },
+ 'fb_1': { es: 'ðŸŽ‰ Â¡Bienvenido de vuelta! Ya completaste este mÃ³dulo.', en: 'ðŸŽ‰ Â¡Bienvenido de vuelta! Ya completaste este mÃ³dulo.' }
 };
 </script>
-</body>
+ </body>
 </html>

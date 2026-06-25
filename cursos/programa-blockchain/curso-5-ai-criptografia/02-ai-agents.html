@@ -1,233 +1,232 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>AI Agents On-Chain | Curso 5: AI &times; Blockchain</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Press+Start+2P&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{background:linear-gradient(135deg,#0a0f1e,#0c1222);font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
-    .mod-container{max-width:1300px;width:100%;background:rgba(15,25,45,0.65);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(168,85,247,0.25);box-shadow:0 25px 45px rgba(0,0,0,0.5);overflow:hidden}
-    .hero-header{background:linear-gradient(95deg,#0b1120,#111a2e);padding:2rem 2rem 1.5rem;text-align:center;border-bottom:2px solid #a855f7}
-    .hero-header h1{font-size:2.4rem;font-weight:800;background:linear-gradient(135deg,#FFF,#c48aff,#a855f7);-webkit-background-clip:text;background-clip:text;color:transparent}
-    .hero-header p{font-size:1.05rem;color:#ddbbff;margin-top:0.5rem}
-    .badge-area{display:flex;justify-content:center;gap:1rem;margin-top:1.2rem;flex-wrap:wrap}
-    .chip{background:rgba(168,85,247,0.15);border:1px solid #a855f7;padding:0.4rem 1rem;border-radius:40px;font-size:0.8rem;font-weight:600}
-    .analogy-card{background:#1e2a3acc;margin:1.5rem 2rem;padding:1.2rem 1.8rem;border-radius:2rem;border-left:8px solid #a855f7;font-size:1rem;line-height:1.6}
-    .main-area{padding:0 2rem 1rem}
-    .sim-box{background:rgba(0,10,25,0.7);border-radius:2rem;padding:1.5rem;border:1px solid #a855f7;margin-bottom:1.5rem}
-    .sim-box h3{color:#c48aff;margin-bottom:0.8rem}
-    .sim-row{display:flex;gap:1rem;flex-wrap:wrap;margin:0.8rem 0}
-    .sim-row label{min-width:100px;font-weight:600}
-    .sim-row select,.sim-row input{background:#1e2a3e;border:1px solid #a855f7;padding:0.5rem 1rem;border-radius:2rem;color:#eef5ff;font-size:0.9rem;flex:1;min-width:150px}
-    .sim-row select option{background:#1e2a3e}
-    .btn-action{background:linear-gradient(95deg,#a855f7,#c48aff);border:none;padding:0.8rem 1.8rem;font-weight:bold;border-radius:3rem;cursor:pointer;font-size:1rem;transition:0.2s;color:#fff}
-    .btn-action:hover{transform:translateY(-2px);box-shadow:0 0 15px rgba(168,85,247,0.5)}
-    .tx-log{background:#0a0f1e;border-radius:1.2rem;padding:1rem;max-height:200px;overflow-y:auto;font-family:monospace;font-size:0.85rem;margin-top:1rem;border:1px solid #2c3e66}
-    .tx-log .entry{color:#88ff88;padding:0.2rem 0}
-    .tx-log .entry i{margin-right:0.5rem}
-    .data-card{background:#0f1a2c;border-radius:1.2rem;padding:1rem;margin:0.8rem 0;border:1px solid #2c3e66}
-    .data-card .stat{display:flex;justify-content:space-between;padding:0.3rem 0;border-bottom:1px solid #1a2a4a}
-    .data-card .stat:last-child{border:none}
-    .feedback{background:#00000099;margin:0 2rem 1.5rem;padding:1rem;border-radius:1.5rem;text-align:center;font-weight:500;border-left:4px solid #a855f7}
-    .insignia{text-align:center;background:#0c1b2f;border-radius:2rem;margin:0 2rem 1.5rem;padding:1rem;border:1px dashed gold}
-    .insignia i{font-size:2.5rem;color:gold}
-    .hidden{display:none}
-    .quiz-area{background:rgba(0,10,25,0.7);border-radius:2rem;padding:1.5rem;border:1px solid #a855f7;margin-bottom:1.5rem}
-    .question{background:#0f1a2c;margin:1rem 0;padding:1rem;border-radius:1.2rem}
-    .question p{font-weight:600;margin-bottom:0.5rem}
-    .options{display:flex;flex-wrap:wrap;gap:0.8rem}
-    .opt{background:#1e2a3e;padding:0.4rem 1rem;border-radius:2rem;cursor:pointer;transition:0.2s;font-size:0.9rem}
-    .opt:hover{background:#2c3e66}
-    .opt.selected{background:#a855f7;color:#fff;font-weight:bold}
-    .opt.correct{background:#22c55e;color:#fff}
-    .opt.wrong{background:#ef4444;color:#fff}
-    .btn-validate{background:linear-gradient(95deg,#a855f7,#c48aff);border:none;padding:0.8rem 1.8rem;font-weight:bold;border-radius:3rem;cursor:pointer;font-size:1rem;color:#fff;margin-top:0.5rem}
-    .btn-validate:disabled{opacity:0.5;cursor:not-allowed}
-    .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.5rem 2rem}
-    .nav-link{background:#2c3e66;padding:0.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:0.5rem;transition:0.2s;font-size:0.95rem}
-    .nav-link:hover{transform:translateY(-2px);box-shadow:0 0 10px rgba(168,85,247,0.4)}
-    .nav-link.next{background:linear-gradient(95deg,#a855f7,#c48aff);color:#fff}
-    .nav-link.menu{background:#1a2a4a;border:1px solid #a855f7}
-    .nav-link.disabled{opacity:0.4;pointer-events:none}
-    footer{text-align:center;padding:1.2rem;font-size:0.8rem;border-top:1px solid #2c3e66}
-    @media(max-width:800px){.hero-header h1{font-size:1.7rem}}
-  </style>
-  <link rel="stylesheet" href="../../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>AI Agents On-Chain | Curso 5: AI &times; Blockchain</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Press+Start+2P&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:linear-gradient(135deg,#0a0f1e,#0c1222);font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
+  .mod-container{max-width:1300px;width:100%;background:rgba(15,25,45,0.65);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(168,85,247,0.25);box-shadow:0 25px 45px rgba(0,0,0,0.5);overflow:hidden}
+  .hero-header{background:linear-gradient(95deg,#0b1120,#111a2e);padding:2rem 2rem 1.5rem;text-align:center;border-bottom:2px solid #a855f7}
+  .hero-header h1{font-size:2.4rem;font-weight:800;background:linear-gradient(135deg,#FFF,#c48aff,#a855f7);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero-header p{font-size:1.05rem;color:#ddbbff;margin-top:0.5rem}
+  .badge-area{display:flex;justify-content:center;gap:1rem;margin-top:1.2rem;flex-wrap:wrap}
+  .chip{background:rgba(168,85,247,0.15);border:1px solid #a855f7;padding:0.4rem 1rem;border-radius:40px;font-size:0.8rem;font-weight:600}
+  .analogy-card{background:#1e2a3acc;margin:1.5rem 2rem;padding:1.2rem 1.8rem;border-radius:2rem;border-left:8px solid #a855f7;font-size:1rem;line-height:1.6}
+  .main-area{padding:0 2rem 1rem}
+  .sim-box{background:rgba(0,10,25,0.7);border-radius:2rem;padding:1.5rem;border:1px solid #a855f7;margin-bottom:1.5rem}
+  .sim-box h3{color:#c48aff;margin-bottom:0.8rem}
+  .sim-row{display:flex;gap:1rem;flex-wrap:wrap;margin:0.8rem 0}
+  .sim-row label{min-width:100px;font-weight:600}
+  .sim-row select,.sim-row input{background:#1e2a3e;border:1px solid #a855f7;padding:0.5rem 1rem;border-radius:2rem;color:#eef5ff;font-size:0.9rem;flex:1;min-width:150px}
+  .sim-row select option{background:#1e2a3e}
+  .btn-action{background:linear-gradient(95deg,#a855f7,#c48aff);border:none;padding:0.8rem 1.8rem;font-weight:bold;border-radius:3rem;cursor:pointer;font-size:1rem;transition:0.2s;color:#fff}
+  .btn-action:hover{transform:translateY(-2px);box-shadow:0 0 15px rgba(168,85,247,0.5)}
+  .tx-log{background:#0a0f1e;border-radius:1.2rem;padding:1rem;max-height:200px;overflow-y:auto;font-family:monospace;font-size:0.85rem;margin-top:1rem;border:1px solid #2c3e66}
+  .tx-log .entry{color:#88ff88;padding:0.2rem 0}
+  .tx-log .entry i{margin-right:0.5rem}
+  .data-card{background:#0f1a2c;border-radius:1.2rem;padding:1rem;margin:0.8rem 0;border:1px solid #2c3e66}
+  .data-card .stat{display:flex;justify-content:space-between;padding:0.3rem 0;border-bottom:1px solid #1a2a4a}
+  .data-card .stat:last-child{border:none}
+  .feedback{background:#00000099;margin:0 2rem 1.5rem;padding:1rem;border-radius:1.5rem;text-align:center;font-weight:500;border-left:4px solid #a855f7}
+  .insignia{text-align:center;background:#0c1b2f;border-radius:2rem;margin:0 2rem 1.5rem;padding:1rem;border:1px dashed gold}
+  .insignia i{font-size:2.5rem;color:gold}
+  .hidden{display:none}
+  .quiz-area{background:rgba(0,10,25,0.7);border-radius:2rem;padding:1.5rem;border:1px solid #a855f7;margin-bottom:1.5rem}
+  .question{background:#0f1a2c;margin:1rem 0;padding:1rem;border-radius:1.2rem}
+  .question p{font-weight:600;margin-bottom:0.5rem}
+  .options{display:flex;flex-wrap:wrap;gap:0.8rem}
+  .opt{background:#1e2a3e;padding:0.4rem 1rem;border-radius:2rem;cursor:pointer;transition:0.2s;font-size:0.9rem}
+  .opt:hover{background:#2c3e66}
+  .opt.selected{background:#a855f7;color:#fff;font-weight:bold}
+  .opt.correct{background:#22c55e;color:#fff}
+  .opt.wrong{background:#ef4444;color:#fff}
+  .btn-validate{background:linear-gradient(95deg,#a855f7,#c48aff);border:none;padding:0.8rem 1.8rem;font-weight:bold;border-radius:3rem;cursor:pointer;font-size:1rem;color:#fff;margin-top:0.5rem}
+  .btn-validate:disabled{opacity:0.5;cursor:not-allowed}
+  .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.5rem 2rem}
+  .nav-link{background:#2c3e66;padding:0.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:0.5rem;transition:0.2s;font-size:0.95rem}
+  .nav-link:hover{transform:translateY(-2px);box-shadow:0 0 10px rgba(168,85,247,0.4)}
+  .nav-link.next{background:linear-gradient(95deg,#a855f7,#c48aff);color:#fff}
+  .nav-link.menu{background:#1a2a4a;border:1px solid #a855f7}
+  .nav-link.disabled{opacity:0.4;pointer-events:none}
+  footer{text-align:center;padding:1.2rem;font-size:0.8rem;border-top:1px solid #2c3e66}
+  @media(max-width:800px){.hero-header h1{font-size:1.7rem}}
+ </style>
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
 </head>
 <body>
-  <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Blockchain</a></nav>
-  <div class="mod-container">
-    <div class="hero-header">
-      <h1><i class="fas fa-robot"></i> AI AGENTS ON-CHAIN: x402, AGENT.MARKET</h1>
-      <p>Agentes aut&oacute;nomos que operan con wallet propia en la blockchain</p>
-      <div class="badge-area">
-        <span class="chip"><i class="fas fa-bolt"></i> x402 Protocol</span>
-        <span class="chip"><i class="fas fa-store"></i> Agent.market</span>
-        <span class="chip"><i class="fas fa-coin"></i> 165M txs</span>
-      </div>
-    </div>
-    <div class="analogy-card">
-      <strong> Pi&eacute;nsalo as&iacute;:</strong> Los AI agents on-chain son como asistentes personales con cuenta bancaria propia &mdash; pueden pagar servicios, comprar datos y alquilar compute sin intervenci&oacute;n humana.
-    </div>
-    <div class="main-area">
-      <div class="sim-box">
-        <h3><i class="fas fa-sliders-h"></i> Configura tu AI Agent</h3>
-        <div class="sim-row">
-          <label>Presupuesto (USD):</label>
-          <select id="budgetSelect"><option value="10"></option><option value="50" selected></option><option value="200"></option><option value="1000">,000</option></select>
-        </div>
-        <div class="sim-row">
-          <label>Tarea:</label>
-          <select id="taskSelect"><option value="data">An&aacute;lisis de datos on-chain</option><option value="trading">Trading automatizado</option><option value="content">Generaci&oacute;n de contenido NFT</option></select>
-        </div>
-        <button id="deployAgentBtn" class="btn-action"><i class="fas fa-play"></i> Desplegar AI Agent</button>
-        <div id="txLog" class="tx-log">
-          <div class="entry"><i class="fas fa-circle"></i> Esperando configuraci&oacute;n...</div>
-        </div>
-        <div id="agentStats" class="data-card hidden">
-          <h4 style="color:#c48aff;margin-bottom:0.5rem"><i class="fas fa-chart-bar"></i> Resultados del agente</h4>
-          <div class="stat"><span>Tareas ejecutadas:</span><span id="statTasks">0</span></div>
-          <div class="stat"><span>Gas gastado:</span><span id="statGas">0 ETH</span></div>
-          <div class="stat"><span>Presupuesto restante:</span><span id="statBudget"></span></div>
-        </div>
-      </div>
-      <div class="data-card">
-        <h4 style="color:#c48aff;margin-bottom:0.5rem"><i class="fas fa-info-circle"></i> &iquest;Qu&eacute; es x402?</h4>
-        <p style="color:#b9ccee;line-height:1.6;font-size:0.9rem">x402 es un protocolo que permite a AI agents pagar transacciones on-chain de forma aut&oacute;noma. Proces&oacute; m&aacute;s de <strong>165 millones de transacciones</strong> con un volumen acumulado de <strong> millones</strong>. Coinbase lanz&oacute; <strong>Agent.market</strong>, un marketplace donde developers pueden crear y monetizar AI agents. El ecosistema cuenta con <strong>69K agentes activos</strong> en 2026, respaldado por inversores institucionales como AWS, Google, Visa, Stripe y Circle.</p>
-      </div>
-      <div class="quiz-area">
-        <h3 style="color:#c48aff"><i class="fas fa-question-circle"></i> Mini Quiz</h3>
-        <div id="quiz02"></div>
-        <button id="validateQuiz02" class="btn-validate" disabled> Validar respuestas</button>
-        <div id="quizResult02" style="margin-top:0.8rem;font-weight:600"></div>
-      </div>
-    </div>
-    <div id="feedbackMsg" class="feedback"> Configura y despliega tu AI agent para verlo en acci&oacute;n</div>
-    <div id="insigniaArea" class="insignia hidden">
-      <i class="fas fa-medal"></i>
-      <h3> INSIGNIA DE ARQUITECTO DE AGENTS </h3>
-      <p>&iexcl;Has dominado los fundamentos de los AI agents on-chain!</p>
-    </div>
-    <div class="nav-links">
-      <a href="01-portal.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
-      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
-      <a href="03-m2m-payments.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
-    </div>
-    <footer><i class="fas fa-crown"></i> Programa Blockchain &middot; Curso 5: AI &times; Blockchain &middot; M&oacute;dulo 2</footer>
+ <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Blockchain</a></nav>
+ <div class="mod-container">
+  <div class="hero-header">
+   <h1><i class="fas fa-robot"></i> AI AGENTS ON-CHAIN: x402, AGENT.MARKET</h1>
+   <p>Agentes aut&oacute;nomos que operan con wallet propia en la blockchain</p>
+   <div class="badge-area">
+    <span class="chip"><i class="fas fa-bolt"></i> x402 Protocol</span>
+    <span class="chip"><i class="fas fa-store"></i> Agent.market</span>
+    <span class="chip"><i class="fas fa-coin"></i> 165M txs</span>
+   </div>
   </div>
-  <script>
-    const STORAGE_KEY='block_5_02';
-    let quizDone=false;
-    let agentDeployed=false;
-    const quizData=[
-      {q:"&iquest;Qu&eacute; es el protocolo x402?",opts:["Un protocolo para que AI agents paguen transacciones","Un nuevo est&aacute;ndar de tokens","Un algoritmo de consenso","Un explorador de bloques"],a:0},
-      {q:"&iquest;Cu&aacute；ntos agentes activos hay en 2026 seg&uacute;n el contenido?",opts:["1,000","10,000","69,000","1,000,000"],a:2},
-      {q:"&iquest;Qui&eacute;nes respaldan institucionalmente el ecosistema de AI agents?",opts:["Solo Coinbase","AWS, Google, Visa, Stripe, Circle","Solo Ventures de Silicon Valley","Bancos centrales"],a:1}
-    ];
-    let quizAns=[null,null,null];
-    function renderQuiz(){
-      var c=document.getElementById('quiz02');c.innerHTML='';
-      quizData.forEach(function(q,i){
-        var d=document.createElement('div');d.className='question';
-        d.innerHTML='<p>'+(i+1)+'. '+q.q+'</p><div class="options" id="qoz-'+i+'"></div>';
-        var o=d.querySelector('.options');
-        q.opts.forEach(function(t,j){
-          var s=document.createElement('div');s.className='opt';s.textContent=t;
-          s.addEventListener('click',function(){
-            if(quizDone)return;
-            var p=s.parentElement;
-            Array.from(p.children).forEach(function(c){c.classList.remove('selected');});
-            s.classList.add('selected');quizAns[i]=j;updateQuizBtn();
-          });
-          o.appendChild(s);
-        });
-        if(quizAns[i]!==null){var os=o.querySelectorAll('.opt');if(os[quizAns[i]])os[quizAns[i]].classList.add('selected');}
-        c.appendChild(d);
-      });
-    }
-    function updateQuizBtn(){var a=quizAns.every(function(v){return v!==null;});document.getElementById('validateQuiz02').disabled=!(a&&!quizDone);}
-    document.getElementById('validateQuiz02').addEventListener('click',function(){
+  <div class="analogy-card">
+   <strong> Pi&eacute;nsalo as&iacute;:</strong> Los AI agents on-chain son como asistentes personales con cuenta bancaria propia &mdash; pueden pagar servicios, comprar datos y alquilar compute sin intervenci&oacute;n humana.
+  </div>
+  <div class="main-area">
+   <div class="sim-box">
+    <h3><i class="fas fa-sliders-h"></i> Configura tu AI Agent</h3>
+    <div class="sim-row">
+     <label>Presupuesto (USD):</label>
+     <select id="budgetSelect"><option value="10"></option><option value="50" selected></option><option value="200"></option><option value="1000">,000</option></select>
+    </div>
+    <div class="sim-row">
+     <label>Tarea:</label>
+     <select id="taskSelect"><option value="data">An&aacute;lisis de datos on-chain</option><option value="trading">Trading automatizado</option><option value="content">Generaci&oacute;n de contenido NFT</option></select>
+    </div>
+    <button id="deployAgentBtn" class="btn-action"><i class="fas fa-play"></i> Desplegar AI Agent</button>
+    <div id="txLog" class="tx-log">
+     <div class="entry"><i class="fas fa-circle"></i> Esperando configuraci&oacute;n...</div>
+    </div>
+    <div id="agentStats" class="data-card hidden">
+     <h4 style="color:#c48aff;margin-bottom:0.5rem"><i class="fas fa-chart-bar"></i> Resultados del agente</h4>
+     <div class="stat"><span>Tareas ejecutadas:</span><span id="statTasks">0</span></div>
+     <div class="stat"><span>Gas gastado:</span><span id="statGas">0 ETH</span></div>
+     <div class="stat"><span>Presupuesto restante:</span><span id="statBudget"></span></div>
+    </div>
+   </div>
+   <div class="data-card">
+    <h4 style="color:#c48aff;margin-bottom:0.5rem"><i class="fas fa-info-circle"></i> &iquest;Qu&eacute; es x402?</h4>
+    <p style="color:#b9ccee;line-height:1.6;font-size:0.9rem">x402 es un protocolo que permite a AI agents pagar transacciones on-chain de forma aut&oacute;noma. Proces&oacute; m&aacute;s de <strong>165 millones de transacciones</strong> con un volumen acumulado de <strong> millones</strong>. Coinbase lanz&oacute; <strong>Agent.market</strong>, un marketplace donde developers pueden crear y monetizar AI agents. El ecosistema cuenta con <strong>69K agentes activos</strong> en 2026, respaldado por inversores institucionales como AWS, Google, Visa, Stripe y Circle.</p>
+   </div>
+   <div class="quiz-area">
+    <h3 style="color:#c48aff"><i class="fas fa-question-circle"></i> Mini Quiz</h3>
+    <div id="quiz02"></div>
+    <button id="validateQuiz02" class="btn-validate" disabled> Validar respuestas</button>
+    <div id="quizResult02" style="margin-top:0.8rem;font-weight:600"></div>
+   </div>
+  </div>
+  <div id="feedbackMsg" class="feedback"> Configura y despliega tu AI agent para verlo en acci&oacute;n</div>
+  <div id="insigniaArea" class="insignia hidden">
+   <i class="fas fa-medal"></i>
+   <h3> INSIGNIA DE ARQUITECTO DE AGENTS </h3>
+   <p>&iexcl;Has dominado los fundamentos de los AI agents on-chain!</p>
+  </div>
+  <div class="nav-links">
+   <a href="01-portal.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
+   <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
+   <a href="03-m2m-payments.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Programa Blockchain &middot; Curso 5: AI &times; Blockchain &middot; M&oacute;dulo 2</footer>
+ </div>
+ <script>
+  const STORAGE_KEY='block_5_02';
+  let quizDone=false;
+  let agentDeployed=false;
+  const quizData=[
+   {q:"&iquest;Qu&eacute; es el protocolo x402?",opts:["Un protocolo para que AI agents paguen transacciones","Un nuevo est&aacute;ndar de tokens","Un algoritmo de consenso","Un explorador de bloques"],a:0},
+   {q:"&iquest;Cu&aacute；ntos agentes activos hay en 2026 seg&uacute;n el contenido?",opts:["1,000","10,000","69,000","1,000,000"],a:2},
+   {q:"&iquest;Qui&eacute;nes respaldan institucionalmente el ecosistema de AI agents?",opts:["Solo Coinbase","AWS, Google, Visa, Stripe, Circle","Solo Ventures de Silicon Valley","Bancos centrales"],a:1}
+  ];
+  let quizAns=[null,null,null];
+  function renderQuiz(){
+   var c=document.getElementById('quiz02');c.innerHTML='';
+   quizData.forEach(function(q,i){
+    var d=document.createElement('div');d.className='question';
+    d.innerHTML='<p>'+(i+1)+'. '+q.q+'</p><div class="options" id="qoz-'+i+'"></div>';
+    var o=d.querySelector('.options');
+    q.opts.forEach(function(t,j){
+     var s=document.createElement('div');s.className='opt';s.textContent=t;
+     s.addEventListener('click',function(){
       if(quizDone)return;
-      var c=0;quizData.forEach(function(q,i){if(quizAns[i]===q.a)c++;});
-      var r=document.getElementById('quizResult02');
-      var allOpts=document.querySelectorAll('#quiz02 .opt');
-      quizData.forEach(function(q,i){
-        var os=document.querySelectorAll('#qoz-'+i+' .opt');
-        os.forEach(function(o,idx){
-          if(idx===q.a)o.classList.add('correct');
-          else if(idx===quizAns[i]&&quizAns[i]!==q.a)o.classList.add('wrong');
-        });
-      });
-      quizDone=true;
-      if(c>=2){
-        r.innerHTML=I18N.t('fb_0')+c+'/3 correctas</span>';
-        document.getElementById('insigniaArea').classList.remove('hidden');
-        document.getElementById('feedbackMsg').textContent=' &iexcl;Has completado el m&oacute;dulo de AI Agents On-Chain!';
-        localStorage.setItem(STORAGE_KEY,'true');
-      }else{
-        r.innerHTML='<span style="color:#ef4444"> Obtuviste '+c+'/3. &iexcl;Revisa el contenido e int&eacute;ntalo de nuevo!</span>';
-        setTimeout(function(){quizDone=false;renderQuiz();r.innerHTML='';updateQuizBtn();},2000);
-      }
+      var p=s.parentElement;
+      Array.from(p.children).forEach(function(c){c.classList.remove('selected');});
+      s.classList.add('selected');quizAns[i]=j;updateQuizBtn();
+     });
+     o.appendChild(s);
     });
-    document.getElementById('deployAgentBtn').addEventListener('click',function(){
-      if(agentDeployed){document.getElementById('feedbackMsg').textContent=' El agente ya est&aacute; desplegado. &iexcl;Completa el quiz para ganar la insignia!';return;}
-      var budget=parseInt(document.getElementById('budgetSelect').value);
-      var task=document.getElementById('taskSelect').value;
-      var logDiv=document.getElementById('txLog');
-      var tasks=['data','trading','content'];
-      var txns=[];
-      var taskNames={'data':'An&aacute;lisis de datos on-chain','trading':'Trading automatizado','content':'Generaci&oacute;n de contenido NFT'};
-      txns.push('Inicializando AI agent...');
-      txns.push('Asignando presupuesto de $'+budget);
-      txns.push('Conectando a protocolo x402...');
-      txns.push('Ejecutando tarea: '+taskNames[task]);
-      var gasUsed=(Math.random()*0.05+0.01).toFixed(4);
-      for(var i=0;i<3;i++){
-        var t='0x'+(Math.random()*1e16).toString(16).slice(0,16);
-        txns.push('<i class="fas fa-check-circle" style="color:#22c55e"></i> Tx '+t+' - $'+(budget/5).toFixed(2)+' (gas: '+(Math.random()*0.002+0.0005).toFixed(4)+' ETH)');
-      }
-      txns.push('Tarea completada exitosamente');
-      txns.push('Agente en espera de nueva instrucci&oacute;n...');
-      var idx=0;
-      logDiv.innerHTML='';
-      var interval=setInterval(function(){
-        if(idx<txns.length){logDiv.innerHTML+='<div class="entry"><i class="fas fa-circle" style="font-size:0.5rem;color:#a855f7"></i> '+txns[idx]+'</div>';logDiv.scrollTop=logDiv.scrollHeight;idx++;}
-        else{
-          clearInterval(interval);
-          agentDeployed=true;
-          document.getElementById('agentStats').classList.remove('hidden');
-          document.getElementById('statTasks').textContent='3 ejecuciones';
-          document.getElementById('statGas').textContent=gasUsed+' ETH';
-          document.getElementById('statBudget').textContent='$'+(budget*0.7).toFixed(2);
-          document.getElementById('feedbackMsg').textContent=' &iexcl;AI agent desplegado con &eacute;xito! Ahora completa el quiz.';
-          document.getElementById('deployAgentBtn').textContent=' Agente activo';
-          document.getElementById('deployAgentBtn').style.background='linear-gradient(95deg,#22c55e,#16a34a)';
-        }
-      },400);
+    if(quizAns[i]!==null){var os=o.querySelectorAll('.opt');if(os[quizAns[i]])os[quizAns[i]].classList.add('selected');}
+    c.appendChild(d);
+   });
+  }
+  function updateQuizBtn(){var a=quizAns.every(function(v){return v!==null;});document.getElementById('validateQuiz02').disabled=!(a&&!quizDone);}
+  document.getElementById('validateQuiz02').addEventListener('click',function(){
+   if(quizDone)return;
+   var c=0;quizData.forEach(function(q,i){if(quizAns[i]===q.a)c++;});
+   var r=document.getElementById('quizResult02');
+   var allOpts=document.querySelectorAll('#quiz02 .opt');
+   quizData.forEach(function(q,i){
+    var os=document.querySelectorAll('#qoz-'+i+' .opt');
+    os.forEach(function(o,idx){
+     if(idx===q.a)o.classList.add('correct');
+     else if(idx===quizAns[i]&&quizAns[i]!==q.a)o.classList.add('wrong');
     });
-    function restoreProgress(){
-      if(localStorage.getItem(STORAGE_KEY)==='true'){
-        quizDone=true;
-        document.getElementById('insigniaArea').classList.remove('hidden');
-        document.getElementById('feedbackMsg').textContent=' Ya completaste este m&oacute;dulo. &iexcl;Bien hecho!';
-        document.getElementById('validateQuiz02').disabled=true;
-        document.getElementById('quizResult02').innerHTML='<span style="color:#22c55e"> M&oacute;dulo completado </span>';
-        quizData.forEach(function(q,i){
-          var os=document.querySelectorAll('#qoz-'+i+' .opt');
-          os.forEach(function(o,idx){if(idx===q.a)o.classList.add('correct');});
-        });
-      }
+   });
+   quizDone=true;
+   if(c>=2){
+    r.innerHTML=I18N.t('fb_0')+c+'/3 correctas</span>';
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').textContent=' &iexcl;Has completado el m&oacute;dulo de AI Agents On-Chain!';
+    localStorage.setItem(STORAGE_KEY,'true');
+   }else{
+    r.innerHTML='<span style="color:#ef4444"> Obtuviste '+c+'/3. &iexcl;Revisa el contenido e int&eacute;ntalo de nuevo!</span>';
+    setTimeout(function(){quizDone=false;renderQuiz();r.innerHTML='';updateQuizBtn();},2000);
+   }
+  });
+  document.getElementById('deployAgentBtn').addEventListener('click',function(){
+   if(agentDeployed){document.getElementById('feedbackMsg').textContent=' El agente ya est&aacute; desplegado. &iexcl;Completa el quiz para ganar la insignia!';return;}
+   var budget=parseInt(document.getElementById('budgetSelect').value);
+   var task=document.getElementById('taskSelect').value;
+   var logDiv=document.getElementById('txLog');
+   var tasks=['data','trading','content'];
+   var txns=[];
+   var taskNames={'data':'An&aacute;lisis de datos on-chain','trading':'Trading automatizado','content':'Generaci&oacute;n de contenido NFT'};
+   txns.push('Inicializando AI agent...');
+   txns.push('Asignando presupuesto de $'+budget);
+   txns.push('Conectando a protocolo x402...');
+   txns.push('Ejecutando tarea: '+taskNames[task]);
+   var gasUsed=(Math.random()*0.05+0.01).toFixed(4);
+   for(var i=0;i<3;i++){
+    var t='0x'+(Math.random()*1e16).toString(16).slice(0,16);
+    txns.push('<i class="fas fa-check-circle" style="color:#22c55e"></i> Tx '+t+' - $'+(budget/5).toFixed(2)+' (gas: '+(Math.random()*0.002+0.0005).toFixed(4)+' ETH)');
+   }
+   txns.push('Tarea completada exitosamente');
+   txns.push('Agente en espera de nueva instrucci&oacute;n...');
+   var idx=0;
+   logDiv.innerHTML='';
+   var interval=setInterval(function(){
+    if(idx<txns.length){logDiv.innerHTML+='<div class="entry"><i class="fas fa-circle" style="font-size:0.5rem;color:#a855f7"></i> '+txns[idx]+'</div>';logDiv.scrollTop=logDiv.scrollHeight;idx++;}
+    else{
+     clearInterval(interval);
+     agentDeployed=true;
+     document.getElementById('agentStats').classList.remove('hidden');
+     document.getElementById('statTasks').textContent='3 ejecuciones';
+     document.getElementById('statGas').textContent=gasUsed+' ETH';
+     document.getElementById('statBudget').textContent='$'+(budget*0.7).toFixed(2);
+     document.getElementById('feedbackMsg').textContent=' &iexcl;AI agent desplegado con &eacute;xito! Ahora completa el quiz.';
+     document.getElementById('deployAgentBtn').textContent=' Agente activo';
+     document.getElementById('deployAgentBtn').style.background='linear-gradient(95deg,#22c55e,#16a34a)';
     }
-    renderQuiz();updateQuizBtn();restoreProgress();
-  </script>
-<script src="../../../assets/js/cookie-consent.js"></script>
+   },400);
+  });
+  function restoreProgress(){
+   if(localStorage.getItem(STORAGE_KEY)==='true'){
+    quizDone=true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').textContent=' Ya completaste este m&oacute;dulo. &iexcl;Bien hecho!';
+    document.getElementById('validateQuiz02').disabled=true;
+    document.getElementById('quizResult02').innerHTML='<span style="color:#22c55e"> M&oacute;dulo completado </span>';
+    quizData.forEach(function(q,i){
+     var os=document.querySelectorAll('#qoz-'+i+' .opt');
+     os.forEach(function(o,idx){if(idx===q.a)o.classList.add('correct');});
+    });
+   }
+  }
+  renderQuiz();updateQuizBtn();restoreProgress();
+ </script>
 <script>
 window.I18N_DATA={
-  'fb_0': { es: '<span style="color:#22c55e"> &iexcl;Excelente! ', en: '<span style="color:#22c55e"> &iexcl;Excelente! ' }
+ 'fb_0': { es: '<span style="color:#22c55e"> &iexcl;Excelente! ', en: '<span style="color:#22c55e"> &iexcl;Excelente! ' }
 };
 </script>
-<script src="../../../assets/js/i18n.js"></script>  </body>
+<script src="../../../assets/js/i18n.js"></script> </body>
 </html>

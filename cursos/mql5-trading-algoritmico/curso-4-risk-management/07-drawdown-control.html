@@ -1,311 +1,310 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Risk Management | ⛔ Drawdown Control</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { background:linear-gradient(135deg,#1a0808,#1f0a0a,#0f0505); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#ffe6e6; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
-    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-    .container { max-width:1300px; width:100%; background:rgba(30,12,12,0.85); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid #ff5050; box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
-    .hero { background:linear-gradient(95deg,#2a0f0f,#3a1212); padding:1.5rem 2rem; text-align:center; border-bottom:3px solid #ff5050; }
-    .hero h1 { font-size:2rem; font-weight:800; background:linear-gradient(135deg,#ffaaaa,#ff5050); -webkit-background-clip:text; background-clip:text; color:transparent; }
-    .hero p { margin-top:0.5rem; font-size:1rem; color:#ffcccc; }
-    .content { padding:1.5rem 2rem; }
-    .card { background:rgba(25,10,10,0.9); border-radius:2rem; padding:1.5rem; border:1px solid #ff505066; margin-bottom:1.5rem; }
-    .card h2 { color:#ff8888; margin-bottom:1rem; font-size:1.3rem; }
-    .card h3 { color:#ffaa66; margin:1rem 0 0.5rem; font-size:1.1rem; }
-    .form-group { margin-bottom:0.8rem; }
-    .form-group label { display:block; font-size:0.85rem; color:#ffbbbb; margin-bottom:0.3rem; }
-    .form-group input,.form-group select { width:100%; padding:0.6rem; border-radius:1rem; border:1px solid #ff505066; background:#1a0808; color:#ffe6e6; font-size:0.95rem; }
-    .btn { background:linear-gradient(95deg,#ff5050,#cc3333); border:none; padding:0.7rem 2rem; border-radius:3rem; font-weight:600; font-size:1rem; cursor:pointer; color:#fff; transition:0.2s; }
-    .btn:hover { transform:scale(1.02); box-shadow:0 0 20px #ff505066; }
-    .btn-secondary { background:linear-gradient(95deg,#555,#333); }
-    .result-box { background:#1a0a0a; border-radius:1.5rem; padding:1rem; border:1px solid #ff505044; margin-top:1rem; }
-    .result-box .value { font-size:1.5rem; font-weight:700; color:#ff8888; }
-    .result-box .label { font-size:0.8rem; color:#ffaaaa; }
-    .result-row { display:flex; justify-content:space-between; padding:0.5rem 0; border-bottom:1px solid #ff505022; }
-    .analogy-box { background:linear-gradient(135deg,#2a1212,#1a0808); border-left:4px solid #ff5050; border-radius:1.5rem; padding:1.2rem; margin-bottom:1.5rem; font-style:italic; color:#ffcccc; }
-    .analogy-box i { color:#ff5050; margin-right:0.5rem; }
-    .equity-visual { height:220px; background:#0f0505; border-radius:1.5rem; margin:1rem 0; position:relative; overflow:hidden; }
-    .equity-line { position:absolute; bottom:0; left:0; width:100%; height:100%; }
-    .kill-switch-line { position:absolute; width:100%; height:2px; background:#ff0000; border:1px dashed #ff000066; transition:top 0.5s; }
-    .dd-marker { position:absolute; width:10px; height:10px; border-radius:50%; }
-    .status-led { display:inline-block; width:14px; height:14px; border-radius:50%; margin-right:0.5rem; }
-    .status-led.green { background:#00ff88; box-shadow:0 0 8px #00ff88; }
-    .status-led.red { background:#ff5050; box-shadow:0 0 8px #ff5050; }
-    .insignia { text-align:center; padding:1.5rem; border:2px dashed gold; border-radius:2rem; margin:1.5rem 0; font-size:1.2rem; display:none; }
-    .insignia.show { display:block; animation:glowPulse 2s ease infinite; }
-    @keyframes glowPulse { 0%,100%{box-shadow:0 0 20px rgba(255,215,0,0.3)} 50%{box-shadow:0 0 40px rgba(255,215,0,0.6)} }
-    .progress-section { display:flex; align-items:center; gap:1rem; padding:0.5rem 2rem; }
-    .progress-bar-outer { flex:1; height:8px; background:#1a1a1a; border-radius:1rem; overflow:hidden; }
-    .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#ff5050,#cc3333); border-radius:1rem; transition:width 0.5s; }
-    .progress-text { font-size:0.8rem; color:#cc8888; white-space:nowrap; }
-    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
-    .nav-link { background:#3a1a1a; border:none; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; cursor:pointer; text-decoration:none; color:#ffe6e6; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; font-size:0.95rem; }
-    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px #ff505066; }
-    .nav-link.menu { background:#1a1a1a; border:1px solid #ff5050; }
-    footer { text-align:center; padding:0.8rem; font-size:0.7rem; border-top:1px solid #ff505044; }
-    @media(max-width:600px){ .hero h1{font-size:1.4rem} .content{padding:1rem} .nav-links{gap:0.5rem} .nav-link{font-size:0.8rem;padding:0.5rem 1rem} }
-  </style>
-  <link rel="stylesheet" href="../../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Risk Management | ⛔ Drawdown Control</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:linear-gradient(135deg,#1a0808,#1f0a0a,#0f0505); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#ffe6e6; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+  @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .container { max-width:1300px; width:100%; background:rgba(30,12,12,0.85); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid #ff5050; box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+  .hero { background:linear-gradient(95deg,#2a0f0f,#3a1212); padding:1.5rem 2rem; text-align:center; border-bottom:3px solid #ff5050; }
+  .hero h1 { font-size:2rem; font-weight:800; background:linear-gradient(135deg,#ffaaaa,#ff5050); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero p { margin-top:0.5rem; font-size:1rem; color:#ffcccc; }
+  .content { padding:1.5rem 2rem; }
+  .card { background:rgba(25,10,10,0.9); border-radius:2rem; padding:1.5rem; border:1px solid #ff505066; margin-bottom:1.5rem; }
+  .card h2 { color:#ff8888; margin-bottom:1rem; font-size:1.3rem; }
+  .card h3 { color:#ffaa66; margin:1rem 0 0.5rem; font-size:1.1rem; }
+  .form-group { margin-bottom:0.8rem; }
+  .form-group label { display:block; font-size:0.85rem; color:#ffbbbb; margin-bottom:0.3rem; }
+  .form-group input,.form-group select { width:100%; padding:0.6rem; border-radius:1rem; border:1px solid #ff505066; background:#1a0808; color:#ffe6e6; font-size:0.95rem; }
+  .btn { background:linear-gradient(95deg,#ff5050,#cc3333); border:none; padding:0.7rem 2rem; border-radius:3rem; font-weight:600; font-size:1rem; cursor:pointer; color:#fff; transition:0.2s; }
+  .btn:hover { transform:scale(1.02); box-shadow:0 0 20px #ff505066; }
+  .btn-secondary { background:linear-gradient(95deg,#555,#333); }
+  .result-box { background:#1a0a0a; border-radius:1.5rem; padding:1rem; border:1px solid #ff505044; margin-top:1rem; }
+  .result-box .value { font-size:1.5rem; font-weight:700; color:#ff8888; }
+  .result-box .label { font-size:0.8rem; color:#ffaaaa; }
+  .result-row { display:flex; justify-content:space-between; padding:0.5rem 0; border-bottom:1px solid #ff505022; }
+  .analogy-box { background:linear-gradient(135deg,#2a1212,#1a0808); border-left:4px solid #ff5050; border-radius:1.5rem; padding:1.2rem; margin-bottom:1.5rem; font-style:italic; color:#ffcccc; }
+  .analogy-box i { color:#ff5050; margin-right:0.5rem; }
+  .equity-visual { height:220px; background:#0f0505; border-radius:1.5rem; margin:1rem 0; position:relative; overflow:hidden; }
+  .equity-line { position:absolute; bottom:0; left:0; width:100%; height:100%; }
+  .kill-switch-line { position:absolute; width:100%; height:2px; background:#ff0000; border:1px dashed #ff000066; transition:top 0.5s; }
+  .dd-marker { position:absolute; width:10px; height:10px; border-radius:50%; }
+  .status-led { display:inline-block; width:14px; height:14px; border-radius:50%; margin-right:0.5rem; }
+  .status-led.green { background:#00ff88; box-shadow:0 0 8px #00ff88; }
+  .status-led.red { background:#ff5050; box-shadow:0 0 8px #ff5050; }
+  .insignia { text-align:center; padding:1.5rem; border:2px dashed gold; border-radius:2rem; margin:1.5rem 0; font-size:1.2rem; display:none; }
+  .insignia.show { display:block; animation:glowPulse 2s ease infinite; }
+  @keyframes glowPulse { 0%,100%{box-shadow:0 0 20px rgba(255,215,0,0.3)} 50%{box-shadow:0 0 40px rgba(255,215,0,0.6)} }
+  .progress-section { display:flex; align-items:center; gap:1rem; padding:0.5rem 2rem; }
+  .progress-bar-outer { flex:1; height:8px; background:#1a1a1a; border-radius:1rem; overflow:hidden; }
+  .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#ff5050,#cc3333); border-radius:1rem; transition:width 0.5s; }
+  .progress-text { font-size:0.8rem; color:#cc8888; white-space:nowrap; }
+  .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+  .nav-link { background:#3a1a1a; border:none; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; cursor:pointer; text-decoration:none; color:#ffe6e6; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; font-size:0.95rem; }
+  .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px #ff505066; }
+  .nav-link.menu { background:#1a1a1a; border:1px solid #ff5050; }
+  footer { text-align:center; padding:0.8rem; font-size:0.7rem; border-top:1px solid #ff505044; }
+  @media(max-width:600px){ .hero h1{font-size:1.4rem} .content{padding:1rem} .nav-links{gap:0.5rem} .nav-link{font-size:0.8rem;padding:0.5rem 1rem} }
+ </style>
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
 </head>
 <body>
 <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a></nav>
 
 <div class="container">
-  <div class="hero">
-    <h1><i class="fas fa-ban"></i> Drawdown Control</h1>
-    <p>Protege tu cuenta con límites de pérdida y kill-switch automático</p>
+ <div class="hero">
+  <h1><i class="fas fa-ban"></i> Drawdown Control</h1>
+  <p>Protege tu cuenta con límites de pérdida y kill-switch automático</p>
+ </div>
+
+ <div class="progress-section">
+  <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+  <span class="progress-text" id="progressText">Módulo 7 de 12</span>
+ </div>
+
+ <div class="content">
+  <div class="analogy-box">
+   <i class="fas fa-quote-left fa-2x"></i> Un kill-switch de equity es como el cortacircuitos de tu casa: cuando hay una sobrecarga (pérdidas excesivas), se activa y corta todo para evitar un incendio (pérdida total de la cuenta). No es cobardía, es inteligencia eléctrica.
   </div>
 
-  <div class="progress-section">
-    <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
-    <span class="progress-text" id="progressText">Módulo 7 de 12</span>
+  <div class="card">
+   <h2><i class="fas fa-chart-line"></i> Simulador de Equity y Kill-Switch</h2>
+   <p style="font-size:0.85rem;color:#ffcccc;margin-bottom:1rem;">Configura tu cuenta, límite diario y drawdown máximo. Luego observa cómo evoluciona el equity y cuándo se activa el kill-switch.</p>
+   <div class="form-group">
+    <label>Saldo Inicial ($)</label>
+    <input type="number" id="ddBalance" value="10000" min="100" step="100">
+   </div>
+   <div class="form-group">
+    <label>Drawdown Máximo Permitido (%)</label>
+    <input type="number" id="ddMaxDD" value="20" min="1" max="50" step="1">
+   </div>
+   <div class="form-group">
+    <label>Límite Diario de Pérdida ($)</label>
+    <input type="number" id="ddDailyLimit" value="500" min="50" step="50">
+   </div>
+   <button class="btn" id="startDDSim"><i class="fas fa-play"></i> Iniciar Simulación</button>
+   <button class="btn btn-secondary" id="stopDDSim" style="display:none;"><i class="fas fa-stop"></i> Detener</button>
+   <button class="btn btn-secondary" id="resetDDSim"><i class="fas fa-undo"></i> Reset</button>
+
+   <div class="equity-visual" id="equityVis">
+    <canvas id="equityCanvas" style="width:100%;height:100%;"></canvas>
+    <div class="kill-switch-line" id="killSwitchLine" style="top:80%;"></div>
+    <div style="position:absolute;top:76%;right:5%;font-size:0.65rem;color:#ff0000;">Kill-switch</div>
+   </div>
+
+   <div id="ddStatus" class="result-box">
+    <div class="result-row"><span class="label"><span class="status-led green" id="ddLed"></span> Estado</span><span class="value" id="ddStateText">Listo</span></div>
+    <div class="result-row"><span class="label">Equity Actual</span><span class="value" id="ddEquity">$10,000</span></div>
+    <div class="result-row"><span class="label">Drawdown Actual</span><span class="value" id="ddCurrentDD">0.00%</span></div>
+    <div class="result-row"><span class="label">Pérdida Diaria</span><span class="value" id="ddDailyLoss">$0</span></div>
+    <div class="result-row"><span class="label">Trades Simulados</span><span class="value" id="ddTrades">0</span></div>
+   </div>
   </div>
 
-  <div class="content">
-    <div class="analogy-box">
-      <i class="fas fa-quote-left fa-2x"></i> Un kill-switch de equity es como el cortacircuitos de tu casa: cuando hay una sobrecarga (pérdidas excesivas), se activa y corta todo para evitar un incendio (pérdida total de la cuenta). No es cobardía, es inteligencia eléctrica.
-    </div>
-
-    <div class="card">
-      <h2><i class="fas fa-chart-line"></i> Simulador de Equity y Kill-Switch</h2>
-      <p style="font-size:0.85rem;color:#ffcccc;margin-bottom:1rem;">Configura tu cuenta, límite diario y drawdown máximo. Luego observa cómo evoluciona el equity y cuándo se activa el kill-switch.</p>
-      <div class="form-group">
-        <label>Saldo Inicial ($)</label>
-        <input type="number" id="ddBalance" value="10000" min="100" step="100">
-      </div>
-      <div class="form-group">
-        <label>Drawdown Máximo Permitido (%)</label>
-        <input type="number" id="ddMaxDD" value="20" min="1" max="50" step="1">
-      </div>
-      <div class="form-group">
-        <label>Límite Diario de Pérdida ($)</label>
-        <input type="number" id="ddDailyLimit" value="500" min="50" step="50">
-      </div>
-      <button class="btn" id="startDDSim"><i class="fas fa-play"></i> Iniciar Simulación</button>
-      <button class="btn btn-secondary" id="stopDDSim" style="display:none;"><i class="fas fa-stop"></i> Detener</button>
-      <button class="btn btn-secondary" id="resetDDSim"><i class="fas fa-undo"></i> Reset</button>
-
-      <div class="equity-visual" id="equityVis">
-        <canvas id="equityCanvas" style="width:100%;height:100%;"></canvas>
-        <div class="kill-switch-line" id="killSwitchLine" style="top:80%;"></div>
-        <div style="position:absolute;top:76%;right:5%;font-size:0.65rem;color:#ff0000;">Kill-switch</div>
-      </div>
-
-      <div id="ddStatus" class="result-box">
-        <div class="result-row"><span class="label"><span class="status-led green" id="ddLed"></span> Estado</span><span class="value" id="ddStateText">Listo</span></div>
-        <div class="result-row"><span class="label">Equity Actual</span><span class="value" id="ddEquity">$10,000</span></div>
-        <div class="result-row"><span class="label">Drawdown Actual</span><span class="value" id="ddCurrentDD">0.00%</span></div>
-        <div class="result-row"><span class="label">Pérdida Diaria</span><span class="value" id="ddDailyLoss">$0</span></div>
-        <div class="result-row"><span class="label">Trades Simulados</span><span class="value" id="ddTrades">0</span></div>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2><i class="fas fa-question-circle"></i> Comprensión</h2>
-      <p style="font-size:0.85rem;color:#ffcccc;">Si tu cuenta es de $10,000 con un drawdown máximo del 20%, el kill-switch se activará cuando el equity caiga a <strong>$8,000</strong>. Esto protege el 80% de tu capital para que puedas seguir operando otro día.</p>
-    </div>
-
-    <div class="insignia" id="insignia">
-      🏅 Guardián de Cuenta 🏅<br>
-      <span style="font-size:0.9rem;">Implementas protección activa contra drawdown excesivo</span>
-    </div>
+  <div class="card">
+   <h2><i class="fas fa-question-circle"></i> Comprensión</h2>
+   <p style="font-size:0.85rem;color:#ffcccc;">Si tu cuenta es de $10,000 con un drawdown máximo del 20%, el kill-switch se activará cuando el equity caiga a <strong>$8,000</strong>. Esto protege el 80% de tu capital para que puedas seguir operando otro día.</p>
   </div>
 
-  <div class="nav-links">
-    <a href="06-atr-sizing.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
-    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
-    <a href="08-trailing-stops.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  <div class="insignia" id="insignia">
+   🏅 Guardián de Cuenta 🏅<br>
+   <span style="font-size:0.9rem;">Implementas protección activa contra drawdown excesivo</span>
   </div>
-  <footer><i class="fas fa-ban"></i> No se trata de no caer; se trata de levantarse con capital suficiente</footer>
+ </div>
+
+ <div class="nav-links">
+  <a href="06-atr-sizing.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+  <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+  <a href="08-trailing-stops.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+ </div>
+ <footer><i class="fas fa-ban"></i> No se trata de no caer; se trata de levantarse con capital suficiente</footer>
 </div>
 
 <script>
-  const STORAGE_KEY = 'mql5_4_07';
-  const PROGRESS_KEY = 'mql5_4_progress';
-  let ddInterval = null;
-  let equity = 10000;
-  let peakEquity = 10000;
-  let dailyLoss = 0;
-  let tradesDone = 0;
-  let killSwitchActive = false;
-  let ddHistory = [];
+ const STORAGE_KEY = 'mql5_4_07';
+ const PROGRESS_KEY = 'mql5_4_progress';
+ let ddInterval = null;
+ let equity = 10000;
+ let peakEquity = 10000;
+ let dailyLoss = 0;
+ let tradesDone = 0;
+ let killSwitchActive = false;
+ let ddHistory = [];
 
-  function updateProgress() {
-    const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
-    document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
-    document.getElementById('progressText').textContent = I18N.t('fb_0');
-  }
+ function updateProgress() {
+  const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+  document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
+  document.getElementById('progressText').textContent = I18N.t('fb_0');
+ }
+ updateProgress();
+
+ function saveProgress() {
+  let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+  if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
+  localStorage.setItem(STORAGE_KEY, 'true');
   updateProgress();
+  checkInsignia();
+ }
 
-  function saveProgress() {
-    let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
-    if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
-    localStorage.setItem(STORAGE_KEY, 'true');
-    updateProgress();
-    checkInsignia();
+ function checkInsignia() {
+  const ins = document.getElementById('insignia');
+  if (localStorage.getItem(STORAGE_KEY) === 'true') {
+   ins.classList.add('show');
+  }
+ }
+
+ function drawEquity() {
+  const canvas = document.getElementById('equityCanvas');
+  const rect = canvas.parentElement.getBoundingClientRect();
+  canvas.width = rect.width;
+  canvas.height = rect.height;
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width;
+  const h = canvas.height;
+
+  const maxBal = parseFloat(document.getElementById('ddBalance').value) || 10000;
+  const maxDD = parseFloat(document.getElementById('ddMaxDD').value) || 20;
+  const minBal = maxBal * (1 - maxDD / 100);
+  const range = maxBal - minBal;
+
+  ctx.clearRect(0, 0, w, h);
+
+  if (ddHistory.length < 2) {
+   ctx.fillStyle = '#ffaaaa';
+   ctx.font = '14px Inter';
+   ctx.textAlign = 'center';
+   ctx.fillText('Inicia la simulación para ver la curva de equity', w/2, h/2);
+   return;
   }
 
-  function checkInsignia() {
-    const ins = document.getElementById('insignia');
-    if (localStorage.getItem(STORAGE_KEY) === 'true') {
-      ins.classList.add('show');
-    }
-  }
-
-  function drawEquity() {
-    const canvas = document.getElementById('equityCanvas');
-    const rect = canvas.parentElement.getBoundingClientRect();
-    canvas.width = rect.width;
-    canvas.height = rect.height;
-    const ctx = canvas.getContext('2d');
-    const w = canvas.width;
-    const h = canvas.height;
-
-    const maxBal = parseFloat(document.getElementById('ddBalance').value) || 10000;
-    const maxDD = parseFloat(document.getElementById('ddMaxDD').value) || 20;
-    const minBal = maxBal * (1 - maxDD / 100);
-    const range = maxBal - minBal;
-
-    ctx.clearRect(0, 0, w, h);
-
-    if (ddHistory.length < 2) {
-      ctx.fillStyle = '#ffaaaa';
-      ctx.font = '14px Inter';
-      ctx.textAlign = 'center';
-      ctx.fillText('Inicia la simulación para ver la curva de equity', w/2, h/2);
-      return;
-    }
-
-    const step = w / (ddHistory.length - 1);
-    ctx.beginPath();
-    ctx.strokeStyle = '#00e0ff';
-    ctx.lineWidth = 2;
-    ddHistory.forEach((eq, i) => {
-      const y = h - ((eq - minBal) / range) * (h - 20) - 10;
-      if (i === 0) ctx.moveTo(i * step, y);
-      else ctx.lineTo(i * step, y);
-    });
-    ctx.stroke();
-
-    // Fill below
-    ctx.lineTo(w, h);
-    ctx.lineTo(0, h);
-    ctx.closePath();
-    ctx.fillStyle = 'rgba(0,224,255,0.05)';
-    ctx.fill();
-
-    // Kill-switch line
-    const ksY = h - ((maxBal * (1 - maxDD/100) - minBal) / range) * (h - 20) - 10;
-    document.getElementById('killSwitchLine').style.top = (ksY / h * 100) + '%';
-  }
-
-  document.getElementById('startDDSim').addEventListener('click', function() {
-    equity = parseFloat(document.getElementById('ddBalance').value) || 10000;
-    peakEquity = equity;
-    dailyLoss = 0;
-    tradesDone = 0;
-    killSwitchActive = false;
-    ddHistory = [equity];
-    const maxDD = parseFloat(document.getElementById('ddMaxDD').value) || 20;
-    const dailyLimit = parseFloat(document.getElementById('ddDailyLimit').value) || 500;
-
-    document.getElementById('startDDSim').style.display = 'none';
-    document.getElementById('stopDDSim').style.display = 'inline-block';
-    document.getElementById('ddLed').className = 'status-led green';
-
-    if (ddInterval) clearInterval(ddInterval);
-    ddInterval = setInterval(function() {
-      if (killSwitchActive) return;
-
-      const tradePL = (Math.random() - 0.45) * 600;
-      equity += tradePL;
-      if (equity > peakEquity) peakEquity = equity;
-      if (tradePL < 0) dailyLoss += Math.abs(tradePL);
-      tradesDone++;
-      ddHistory.push(equity);
-
-      const ddPct = ((peakEquity - equity) / peakEquity) * 100;
-      const maxDDVal = peakEquity * (maxDD / 100);
-      const ddFromPeak = peakEquity - equity;
-
-      document.getElementById('ddEquity').textContent = '$' + equity.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
-      document.getElementById('ddCurrentDD').textContent = ddPct.toFixed(2) + '%';
-      document.getElementById('ddDailyLoss').textContent = '$' + dailyLoss.toFixed(2);
-      document.getElementById('ddTrades').textContent = tradesDone;
-      document.getElementById('ddCurrentDD').style.color = ddPct > maxDD * 0.7 ? '#ff5050' : '#ff8888';
-
-      if (ddPct >= maxDD || dailyLoss >= dailyLimit) {
-        killSwitchActive = true;
-        document.getElementById('ddLed').className = 'status-led red';
-        document.getElementById('ddStateText').textContent = I18N.t('fb_1');
-        document.getElementById('ddStateText').style.color = '#ff5050';
-        clearInterval(ddInterval);
-        ddInterval = null;
-        document.getElementById('startDDSim').style.display = 'inline-block';
-        document.getElementById('stopDDSim').style.display = 'none';
-        if (ddPct >= maxDD) {
-          document.getElementById('ddStateText').textContent += ' (Drawdown máximo alcanzado)';
-        } else {
-          document.getElementById('ddStateText').textContent += ' (Límite diario alcanzado)';
-        }
-        saveProgress();
-      }
-
-      drawEquity();
-    }, 500);
+  const step = w / (ddHistory.length - 1);
+  ctx.beginPath();
+  ctx.strokeStyle = '#00e0ff';
+  ctx.lineWidth = 2;
+  ddHistory.forEach((eq, i) => {
+   const y = h - ((eq - minBal) / range) * (h - 20) - 10;
+   if (i === 0) ctx.moveTo(i * step, y);
+   else ctx.lineTo(i * step, y);
   });
+  ctx.stroke();
 
-  document.getElementById('stopDDSim').addEventListener('click', function() {
-    if (ddInterval) { clearInterval(ddInterval); ddInterval = null; }
+  // Fill below
+  ctx.lineTo(w, h);
+  ctx.lineTo(0, h);
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(0,224,255,0.05)';
+  ctx.fill();
+
+  // Kill-switch line
+  const ksY = h - ((maxBal * (1 - maxDD/100) - minBal) / range) * (h - 20) - 10;
+  document.getElementById('killSwitchLine').style.top = (ksY / h * 100) + '%';
+ }
+
+ document.getElementById('startDDSim').addEventListener('click', function() {
+  equity = parseFloat(document.getElementById('ddBalance').value) || 10000;
+  peakEquity = equity;
+  dailyLoss = 0;
+  tradesDone = 0;
+  killSwitchActive = false;
+  ddHistory = [equity];
+  const maxDD = parseFloat(document.getElementById('ddMaxDD').value) || 20;
+  const dailyLimit = parseFloat(document.getElementById('ddDailyLimit').value) || 500;
+
+  document.getElementById('startDDSim').style.display = 'none';
+  document.getElementById('stopDDSim').style.display = 'inline-block';
+  document.getElementById('ddLed').className = 'status-led green';
+
+  if (ddInterval) clearInterval(ddInterval);
+  ddInterval = setInterval(function() {
+   if (killSwitchActive) return;
+
+   const tradePL = (Math.random() - 0.45) * 600;
+   equity += tradePL;
+   if (equity > peakEquity) peakEquity = equity;
+   if (tradePL < 0) dailyLoss += Math.abs(tradePL);
+   tradesDone++;
+   ddHistory.push(equity);
+
+   const ddPct = ((peakEquity - equity) / peakEquity) * 100;
+   const maxDDVal = peakEquity * (maxDD / 100);
+   const ddFromPeak = peakEquity - equity;
+
+   document.getElementById('ddEquity').textContent = '$' + equity.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
+   document.getElementById('ddCurrentDD').textContent = ddPct.toFixed(2) + '%';
+   document.getElementById('ddDailyLoss').textContent = '$' + dailyLoss.toFixed(2);
+   document.getElementById('ddTrades').textContent = tradesDone;
+   document.getElementById('ddCurrentDD').style.color = ddPct > maxDD * 0.7 ? '#ff5050' : '#ff8888';
+
+   if (ddPct >= maxDD || dailyLoss >= dailyLimit) {
+    killSwitchActive = true;
+    document.getElementById('ddLed').className = 'status-led red';
+    document.getElementById('ddStateText').textContent = I18N.t('fb_1');
+    document.getElementById('ddStateText').style.color = '#ff5050';
+    clearInterval(ddInterval);
+    ddInterval = null;
     document.getElementById('startDDSim').style.display = 'inline-block';
     document.getElementById('stopDDSim').style.display = 'none';
-    document.getElementById('ddStateText').textContent = I18N.t('fb_2');
-  });
+    if (ddPct >= maxDD) {
+     document.getElementById('ddStateText').textContent += ' (Drawdown máximo alcanzado)';
+    } else {
+     document.getElementById('ddStateText').textContent += ' (Límite diario alcanzado)';
+    }
+    saveProgress();
+   }
 
-  document.getElementById('resetDDSim').addEventListener('click', function() {
-    if (ddInterval) { clearInterval(ddInterval); ddInterval = null; }
-    equity = parseFloat(document.getElementById('ddBalance').value) || 10000;
-    peakEquity = equity;
-    dailyLoss = 0;
-    tradesDone = 0;
-    killSwitchActive = false;
-    ddHistory = [equity];
-    document.getElementById('startDDSim').style.display = 'inline-block';
-    document.getElementById('stopDDSim').style.display = 'none';
-    document.getElementById('ddLed').className = 'status-led green';
-    document.getElementById('ddStateText').textContent = 'Listo';
-    document.getElementById('ddStateText').style.color = '#ffe6e6';
-    document.getElementById('ddEquity').textContent = '$' + equity.toFixed(2);
-    document.getElementById('ddCurrentDD').textContent = '0.00%';
-    document.getElementById('ddDailyLoss').textContent = '$0';
-    document.getElementById('ddTrades').textContent = '0';
-    document.getElementById('ddCurrentDD').style.color = '#ff8888';
-    drawEquity();
-  });
+   drawEquity();
+  }, 500);
+ });
 
-  window.addEventListener('resize', drawEquity);
+ document.getElementById('stopDDSim').addEventListener('click', function() {
+  if (ddInterval) { clearInterval(ddInterval); ddInterval = null; }
+  document.getElementById('startDDSim').style.display = 'inline-block';
+  document.getElementById('stopDDSim').style.display = 'none';
+  document.getElementById('ddStateText').textContent = I18N.t('fb_2');
+ });
+
+ document.getElementById('resetDDSim').addEventListener('click', function() {
+  if (ddInterval) { clearInterval(ddInterval); ddInterval = null; }
+  equity = parseFloat(document.getElementById('ddBalance').value) || 10000;
+  peakEquity = equity;
+  dailyLoss = 0;
+  tradesDone = 0;
+  killSwitchActive = false;
+  ddHistory = [equity];
+  document.getElementById('startDDSim').style.display = 'inline-block';
+  document.getElementById('stopDDSim').style.display = 'none';
+  document.getElementById('ddLed').className = 'status-led green';
+  document.getElementById('ddStateText').textContent = 'Listo';
+  document.getElementById('ddStateText').style.color = '#ffe6e6';
+  document.getElementById('ddEquity').textContent = '$' + equity.toFixed(2);
+  document.getElementById('ddCurrentDD').textContent = '0.00%';
+  document.getElementById('ddDailyLoss').textContent = '$0';
+  document.getElementById('ddTrades').textContent = '0';
+  document.getElementById('ddCurrentDD').style.color = '#ff8888';
+  drawEquity();
+ });
+
+ window.addEventListener('resize', drawEquity);
 </script>
-<script src="../../../assets/js/cookie-consent.js"></script>
 <script>
 window.I18N_DATA={
-  "fb_0": {
-    "es": "Módulo 7 de 12",
-    "en": "Module 7 de 12"
-  },
-  "fb_1": {
-    "es": "🔴 KILL-SWITCH ACTIVADO",
-    "en": "🔴 KILL-SWITCH ACTIVADO"
-  },
-  "fb_2": {
-    "es": "⏸️ Simulación pausada",
-    "en": "⏸️ Simulación pausada"
-  }
+ "fb_0": {
+  "es": "Módulo 7 de 12",
+  "en": "Module 7 de 12"
+ },
+ "fb_1": {
+  "es": "🔴 KILL-SWITCH ACTIVADO",
+  "en": "🔴 KILL-SWITCH ACTIVADO"
+ },
+ "fb_2": {
+  "es": "⏸️ Simulación pausada",
+  "en": "⏸️ Simulación pausada"
+ }
 };
 </script>
 <script src="../../../assets/js/i18n.js"></script>

@@ -1,186 +1,186 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Ejecución y Despliegue | Logging y Monitoreo</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #111a2e 100%);
-      background-size: 200% 200%; animation: gradientShift 20s ease infinite;
-      font-family: 'Inter', sans-serif; color: #eef5ff; min-height: 100vh;
-      display: flex; align-items: center; justify-content: center; padding: 2rem 1rem;
-    }
-    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-    .curso5-container {
-      max-width: 1300px; width: 100%;
-      background: rgba(15, 25, 45, 0.65); backdrop-filter: blur(12px);
-      border-radius: 3rem; border: 1px solid rgba(255,100,220,0.25);
-      box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden;
-    }
-    .hero-header { background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%); padding: 2rem 2rem 1.5rem; text-align: center; border-bottom: 2px solid #ff64dc; }
-    .hero-header h1 { font-size: 2.6rem; font-weight: 800; background: linear-gradient(135deg, #FFF, #ff99dd, #ff64dc); -webkit-background-clip: text; background-clip: text; color: transparent; }
-    .hero-header p { font-size: 1.1rem; color: #ffb9ee; margin-top: 0.3rem; }
-    .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
-    .chip { background: rgba(255,100,220,0.15); border: 1px solid #ff64dc; padding: 0.3rem 1rem; border-radius: 40px; font-size: 0.8rem; font-weight: 600; }
-    .analogy-card { background: #1e2a3acc; margin: 1.5rem 2rem; padding: 1.2rem 1.8rem; border-radius: 2rem; border-left: 8px solid #ff64dc; font-size: 1rem; line-height: 1.6; }
-    .main-area { padding: 0.5rem 2rem; }
-    .dash-box { background: #141e33cc; border-radius: 2rem; padding: 1.5rem; margin: 1rem 0; }
-    .dash-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(140px,1fr)); gap: 0.8rem; margin: 1rem 0; }
-    .metric-card { background: #1a2a4a; border-radius: 1.2rem; padding: 0.8rem; border: 1px solid #2c3e66; text-align: center; transition: 0.2s; }
-    .metric-card .val { font-size: 1.4rem; font-weight: 700; }
-    .metric-card .lbl { font-size: 0.7rem; color: #aaa; margin-top: 0.2rem; }
-    .metric-card .toggle { margin-top: 0.4rem; }
-    .config-row { display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center; margin: 0.5rem 0; }
-    .config-row label { font-size: 0.85rem; }
-    .config-row input[type="checkbox"] { width: 1rem; height: 1rem; }
-    .log-stream { background: #0a1220; border-radius: 1rem; height: 140px; overflow-y: scroll; padding: 0.5rem; font-family: monospace; font-size: 0.75rem; border: 1px solid #2c3e66; margin-top: 0.5rem; }
-    .log-entry { padding: 0.15rem 0; border-bottom: 1px solid #1a2a3a; }
-    .log-info { color: #88ddff; }
-    .log-warn { color: #ffdd44; }
-    .log-error { color: #ff5050; }
-    .log-trade { color: #00ff88; }
-    .feedback { background: #00000099; margin: 1.5rem 2rem; padding: 1rem; border-radius: 1.5rem; text-align: center; font-weight: 500; border-left: 4px solid #ff64dc; }
-    .insignia { text-align: center; background: #0c1b2f; border-radius: 2rem; margin: 0 2rem 1.5rem; padding: 1rem; border: 1px dashed gold; }
-    .insignia i { font-size: 2.5rem; color: gold; }
-    .hidden { display: none; }
-    .btn-action { background: linear-gradient(95deg, #f0a500, #ff6a00); border: none; padding: 0.8rem 1.8rem; font-weight: bold; border-radius: 3rem; cursor: pointer; font-size: 1rem; transition: 0.2s; color: #1e1a0c; }
-    .btn-action:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(240,165,0,0.5); }
-    .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
-    .nav-link { background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem; font-weight: 600; text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; }
-    .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(255,100,220,0.4); }
-    .nav-link.next { background: linear-gradient(95deg, #f0a500, #ff6a00); color: #1e1a0c; }
-    .nav-link.menu { background: #1a2a4a; border: 1px solid #3399ff; }
-    footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
-    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
-  </style>
-  <link rel="stylesheet" href="../../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>EjecuciÃ³n y Despliegue | Logging y Monitoreo</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+   background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #111a2e 100%);
+   background-size: 200% 200%; animation: gradientShift 20s ease infinite;
+   font-family: 'Inter', sans-serif; color: #eef5ff; min-height: 100vh;
+   display: flex; align-items: center; justify-content: center; padding: 2rem 1rem;
+  }
+  @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .curso5-container {
+   max-width: 1300px; width: 100%;
+   background: rgba(15, 25, 45, 0.65); backdrop-filter: blur(12px);
+   border-radius: 3rem; border: 1px solid rgba(255,100,220,0.25);
+   box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden;
+  }
+  .hero-header { background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%); padding: 2rem 2rem 1.5rem; text-align: center; border-bottom: 2px solid #ff64dc; }
+  .hero-header h1 { font-size: 2.6rem; font-weight: 800; background: linear-gradient(135deg, #FFF, #ff99dd, #ff64dc); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero-header p { font-size: 1.1rem; color: #ffb9ee; margin-top: 0.3rem; }
+  .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
+  .chip { background: rgba(255,100,220,0.15); border: 1px solid #ff64dc; padding: 0.3rem 1rem; border-radius: 40px; font-size: 0.8rem; font-weight: 600; }
+  .analogy-card { background: #1e2a3acc; margin: 1.5rem 2rem; padding: 1.2rem 1.8rem; border-radius: 2rem; border-left: 8px solid #ff64dc; font-size: 1rem; line-height: 1.6; }
+  .main-area { padding: 0.5rem 2rem; }
+  .dash-box { background: #141e33cc; border-radius: 2rem; padding: 1.5rem; margin: 1rem 0; }
+  .dash-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(140px,1fr)); gap: 0.8rem; margin: 1rem 0; }
+  .metric-card { background: #1a2a4a; border-radius: 1.2rem; padding: 0.8rem; border: 1px solid #2c3e66; text-align: center; transition: 0.2s; }
+  .metric-card .val { font-size: 1.4rem; font-weight: 700; }
+  .metric-card .lbl { font-size: 0.7rem; color: #aaa; margin-top: 0.2rem; }
+  .metric-card .toggle { margin-top: 0.4rem; }
+  .config-row { display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center; margin: 0.5rem 0; }
+  .config-row label { font-size: 0.85rem; }
+  .config-row input[type="checkbox"] { width: 1rem; height: 1rem; }
+  .log-stream { background: #0a1220; border-radius: 1rem; height: 140px; overflow-y: scroll; padding: 0.5rem; font-family: monospace; font-size: 0.75rem; border: 1px solid #2c3e66; margin-top: 0.5rem; }
+  .log-entry { padding: 0.15rem 0; border-bottom: 1px solid #1a2a3a; }
+  .log-info { color: #88ddff; }
+  .log-warn { color: #ffdd44; }
+  .log-error { color: #ff5050; }
+  .log-trade { color: #00ff88; }
+  .feedback { background: #00000099; margin: 1.5rem 2rem; padding: 1rem; border-radius: 1.5rem; text-align: center; font-weight: 500; border-left: 4px solid #ff64dc; }
+  .insignia { text-align: center; background: #0c1b2f; border-radius: 2rem; margin: 0 2rem 1.5rem; padding: 1rem; border: 1px dashed gold; }
+  .insignia i { font-size: 2.5rem; color: gold; }
+  .hidden { display: none; }
+  .btn-action { background: linear-gradient(95deg, #f0a500, #ff6a00); border: none; padding: 0.8rem 1.8rem; font-weight: bold; border-radius: 3rem; cursor: pointer; font-size: 1rem; transition: 0.2s; color: #1e1a0c; }
+  .btn-action:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(240,165,0,0.5); }
+  .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
+  .nav-link { background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem; font-weight: 600; text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; }
+  .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(255,100,220,0.4); }
+  .nav-link.next { background: linear-gradient(95deg, #f0a500, #ff6a00); color: #1e1a0c; }
+  .nav-link.menu { background: #1a2a4a; border: 1px solid #3399ff; }
+  footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
+ </style>
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
 </head>
 <body>
-  <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a></nav>
-  <div class="curso5-container">
-    <div class="hero-header">
-      <h1>📈 Logging y Monitoreo</h1>
-      <p>Dashboards con telemetría en tiempo real</p>
-      <div class="badge-area">
-        <span class="chip"><i class="fas fa-tachometer-alt"></i> Dashboard</span>
-        <span class="chip"><i class="fas fa-chart-pie"></i> Métricas</span>
-        <span class="chip"><i class="fas fa-list"></i> Logs</span>
-      </div>
-    </div>
-    <div class="analogy-card"><strong>📈 Piénsalo así:</strong> Un bot de trading sin monitoreo es como conducir con los ojos cerrados. El dashboard es tu tablero de instrumentos: velocidad (P&L), temperatura (drawdown), combustible (balance), y las luces de alerta (errores). Sin él, no sabes si vas camino al éxito o al desastre.</div>
-    <div class="main-area">
-      <div class="dash-box">
-        <h3>🎛️ Personaliza tu Dashboard</h3>
-        <div class="config-row">
-          <label><input type="checkbox" id="chkBalance" checked onchange="updateDashboard()"> Balance</label>
-          <label><input type="checkbox" id="chkPnL" checked onchange="updateDashboard()"> P&L Diario</label>
-          <label><input type="checkbox" id="chkSharpe" checked onchange="updateDashboard()"> Sharpe Móvil</label>
-          <label><input type="checkbox" id="chkPositions" checked onchange="updateDashboard()"> Posiciones</label>
-          <label><input type="checkbox" id="chkOrders" checked onchange="updateDashboard()"> Órdenes Pend.</label>
-          <label><input type="checkbox" id="chkErrors" checked onchange="updateDashboard()"> Logs Error</label>
-        </div>
-        <div class="dash-grid" id="dashGrid">
-          <div class="metric-card" id="mBalance"><div class="val" id="vBalance">$125,430</div><div class="lbl">💰 Balance</div></div>
-          <div class="metric-card" id="mPnL"><div class="val" id="vPnL" style="color:#00ff88;">+$1,230</div><div class="lbl">📊 P&L Diario</div></div>
-          <div class="metric-card" id="mSharpe"><div class="val" id="vSharpe">1.85</div><div class="lbl">📐 Sharpe (30d)</div></div>
-          <div class="metric-card" id="mPositions"><div class="val" id="vPositions">3</div><div class="lbl">📦 Posiciones</div></div>
-          <div class="metric-card" id="mOrders"><div class="val" id="vOrders">2</div><div class="lbl">📋 Órdenes Pend.</div></div>
-          <div class="metric-card" id="mErrors"><div class="val" id="vErrors" style="color:#ff5050;">0</div><div class="lbl">⚠️ Errores</div></div>
-        </div>
-        <button class="btn-action" onclick="startStream()" style="padding:0.5rem 1.2rem;font-size:0.9rem;"><i class="fas fa-play"></i> Iniciar Telemetría</button>
-        <div class="log-stream" id="logStream">
-          <div class="log-entry log-info" style="color:#668;">⏳ Inicia la telemetría para ver los logs en vivo...</div>
-        </div>
-      </div>
-    </div>
-    <div id="feedbackMsg" class="feedback">💡 Personaliza tu dashboard y activa la telemetría para ver métricas y logs en tiempo real.</div>
-    <div id="insigniaArea" class="insignia hidden">
-      <i class="fas fa-medal"></i>
-      <h3>🏅 MONITOR DE SISTEMAS 🏅</h3>
-      <p>Sabes construir dashboards efectivos y monitorear tu bot en tiempo real. ¡Nunca te tomarán por sorpresa!</p>
-    </div>
-    <div style="text-align:center;margin:1rem 0;">
-      <button class="btn-action" onclick="completeModule()"><i class="fas fa-check"></i> Completar Módulo</button>
-    </div>
-    <div class="nav-links">
-      <a href="07-risk-management.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
-      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
-      <a href="09-despliegue-cloud.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
-    </div>
-    <footer><i class="fas fa-crown"></i> Ejecución y Despliegue · Trading Algorítmico con Python</footer>
+ <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a></nav>
+ <div class="curso5-container">
+  <div class="hero-header">
+   <h1>ðŸ“ˆ Logging y Monitoreo</h1>
+   <p>Dashboards con telemetrÃ­a en tiempo real</p>
+   <div class="badge-area">
+    <span class="chip"><i class="fas fa-tachometer-alt"></i> Dashboard</span>
+    <span class="chip"><i class="fas fa-chart-pie"></i> MÃ©tricas</span>
+    <span class="chip"><i class="fas fa-list"></i> Logs</span>
+   </div>
   </div>
-  <script>
-    const STORAGE_KEY = '08';
-    let streamActive = false, streamInterval = null;
-    function updateDashboard() {
-      const show = (id, chkId) => {
-        document.getElementById(id).style.display = document.getElementById(chkId).checked ? '' : 'none';
-      };
-      show('mBalance', 'chkBalance');
-      show('mPnL', 'chkPnL');
-      show('mSharpe', 'chkSharpe');
-      show('mPositions', 'chkPositions');
-      show('mOrders', 'chkOrders');
-      show('mErrors', 'chkErrors');
-    }
-    function startStream() {
-      if (streamActive) return;
-      streamActive = true;
-      const logStream = document.getElementById('logStream');
-      logStream.innerHTML = '';
-      streamInterval = setInterval(() => {
-        const now = new Date().toLocaleTimeString();
-        const events = [
-          {type: 'trade', msg: `✅ Orden ejecutada: COMPRA 0.5 BTC @ $67,452`},
-          {type: 'info', msg: `ℹ️ Balance actualizado: $125,430`},
-          {type: 'warn', msg: `⚠️ Spread elevado en BTC/USDT: 0.15%`},
-          {type: 'info', msg: `ℹ️ Sharpe móvil (30d): 1.85`},
-          {type: 'error', msg: `❌ Error conexión WebSocket — reconectando...`},
-        ];
-        const evt = events[Math.floor(Math.random() * events.length)];
-        const div = document.createElement('div');
-        div.className = 'log-entry log-' + evt.type;
-        div.textContent = `[${now}] ${evt.msg}`;
-        logStream.appendChild(div);
-        logStream.scrollTop = logStream.scrollHeight;
-        if (logStream.children.length > 30) logStream.removeChild(logStream.firstChild);
-        const bal = 125000 + Math.random() * 1000;
-        document.getElementById('vBalance').textContent = '$' + bal.toFixed(0);
-        const pnl = (bal - 125000) > 0 ? '+' : '';
-        document.getElementById('vPnL').textContent = pnl + '$' + (bal - 125000).toFixed(0);
-        document.getElementById('vPnL').style.color = (bal - 125000) >= 0 ? '#00ff88' : '#ff5050';
-        document.getElementById('vSharpe').textContent = (1.5 + Math.random() * 0.6).toFixed(2);
-        document.getElementById('vPositions').textContent = Math.floor(Math.random() * 5 + 1);
-        document.getElementById('vOrders').textContent = Math.floor(Math.random() * 4);
-        document.getElementById('vErrors').textContent = Math.floor(Math.random() * 3);
-      }, 2000);
-    }
-    function completeModule() {
-      if (!streamActive) { document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_0'); return; }
-      clearInterval(streamInterval);
-      const insignia = document.getElementById('insigniaArea');
-      insignia.classList.remove('hidden');
-      localStorage.setItem(STORAGE_KEY, 'true');
-      document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_1');
-    }
-    updateDashboard();
-    if (localStorage.getItem(STORAGE_KEY) === 'true') {
-      document.getElementById('insigniaArea').classList.remove('hidden');
-      document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_2');
-    }
-  </script>
+  <div class="analogy-card"><strong>ðŸ“ˆ PiÃ©nsalo asÃ­:</strong> Un bot de trading sin monitoreo es como conducir con los ojos cerrados. El dashboard es tu tablero de instrumentos: velocidad (P&L), temperatura (drawdown), combustible (balance), y las luces de alerta (errores). Sin Ã©l, no sabes si vas camino al Ã©xito o al desastre.</div>
+  <div class="main-area">
+   <div class="dash-box">
+    <h3>ðŸŽ›ï¸ Personaliza tu Dashboard</h3>
+    <div class="config-row">
+     <label><input type="checkbox" id="chkBalance" checked onchange="updateDashboard()"> Balance</label>
+     <label><input type="checkbox" id="chkPnL" checked onchange="updateDashboard()"> P&L Diario</label>
+     <label><input type="checkbox" id="chkSharpe" checked onchange="updateDashboard()"> Sharpe MÃ³vil</label>
+     <label><input type="checkbox" id="chkPositions" checked onchange="updateDashboard()"> Posiciones</label>
+     <label><input type="checkbox" id="chkOrders" checked onchange="updateDashboard()"> Ã“rdenes Pend.</label>
+     <label><input type="checkbox" id="chkErrors" checked onchange="updateDashboard()"> Logs Error</label>
+    </div>
+    <div class="dash-grid" id="dashGrid">
+     <div class="metric-card" id="mBalance"><div class="val" id="vBalance">$125,430</div><div class="lbl">ðŸ’° Balance</div></div>
+     <div class="metric-card" id="mPnL"><div class="val" id="vPnL" style="color:#00ff88;">+$1,230</div><div class="lbl">ðŸ“Š P&L Diario</div></div>
+     <div class="metric-card" id="mSharpe"><div class="val" id="vSharpe">1.85</div><div class="lbl">ðŸ“ Sharpe (30d)</div></div>
+     <div class="metric-card" id="mPositions"><div class="val" id="vPositions">3</div><div class="lbl">ðŸ“¦ Posiciones</div></div>
+     <div class="metric-card" id="mOrders"><div class="val" id="vOrders">2</div><div class="lbl">ðŸ“‹ Ã“rdenes Pend.</div></div>
+     <div class="metric-card" id="mErrors"><div class="val" id="vErrors" style="color:#ff5050;">0</div><div class="lbl">âš ï¸ Errores</div></div>
+    </div>
+    <button class="btn-action" onclick="startStream()" style="padding:0.5rem 1.2rem;font-size:0.9rem;"><i class="fas fa-play"></i> Iniciar TelemetrÃ­a</button>
+    <div class="log-stream" id="logStream">
+     <div class="log-entry log-info" style="color:#668;">â³ Inicia la telemetrÃ­a para ver los logs en vivo...</div>
+    </div>
+   </div>
+  </div>
+  <div id="feedbackMsg" class="feedback">ðŸ’¡ Personaliza tu dashboard y activa la telemetrÃ­a para ver mÃ©tricas y logs en tiempo real.</div>
+  <div id="insigniaArea" class="insignia hidden">
+   <i class="fas fa-medal"></i>
+   <h3>ðŸ… MONITOR DE SISTEMAS ðŸ…</h3>
+   <p>Sabes construir dashboards efectivos y monitorear tu bot en tiempo real. Â¡Nunca te tomarÃ¡n por sorpresa!</p>
+  </div>
+  <div style="text-align:center;margin:1rem 0;">
+   <button class="btn-action" onclick="completeModule()"><i class="fas fa-check"></i> Completar MÃ³dulo</button>
+  </div>
+  <div class="nav-links">
+   <a href="07-risk-management.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+   <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> MenÃº</a>
+   <a href="09-despliegue-cloud.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> EjecuciÃ³n y Despliegue Â· Trading AlgorÃ­tmico con Python</footer>
+ </div>
+ <script>
+  const STORAGE_KEY = '08';
+  let streamActive = false, streamInterval = null;
+  function updateDashboard() {
+   const show = (id, chkId) => {
+    document.getElementById(id).style.display = document.getElementById(chkId).checked ? '' : 'none';
+   };
+   show('mBalance', 'chkBalance');
+   show('mPnL', 'chkPnL');
+   show('mSharpe', 'chkSharpe');
+   show('mPositions', 'chkPositions');
+   show('mOrders', 'chkOrders');
+   show('mErrors', 'chkErrors');
+  }
+  function startStream() {
+   if (streamActive) return;
+   streamActive = true;
+   const logStream = document.getElementById('logStream');
+   logStream.innerHTML = '';
+   streamInterval = setInterval(() => {
+    const now = new Date().toLocaleTimeString();
+    const events = [
+     {type: 'trade', msg: `âœ… Orden ejecutada: COMPRA 0.5 BTC @ $67,452`},
+     {type: 'info', msg: `â„¹ï¸ Balance actualizado: $125,430`},
+     {type: 'warn', msg: `âš ï¸ Spread elevado en BTC/USDT: 0.15%`},
+     {type: 'info', msg: `â„¹ï¸ Sharpe mÃ³vil (30d): 1.85`},
+     {type: 'error', msg: `âŒ Error conexiÃ³n WebSocket â€” reconectando...`},
+    ];
+    const evt = events[Math.floor(Math.random() * events.length)];
+    const div = document.createElement('div');
+    div.className = 'log-entry log-' + evt.type;
+    div.textContent = `[${now}] ${evt.msg}`;
+    logStream.appendChild(div);
+    logStream.scrollTop = logStream.scrollHeight;
+    if (logStream.children.length > 30) logStream.removeChild(logStream.firstChild);
+    const bal = 125000 + Math.random() * 1000;
+    document.getElementById('vBalance').textContent = '$' + bal.toFixed(0);
+    const pnl = (bal - 125000) > 0 ? '+' : '';
+    document.getElementById('vPnL').textContent = pnl + '$' + (bal - 125000).toFixed(0);
+    document.getElementById('vPnL').style.color = (bal - 125000) >= 0 ? '#00ff88' : '#ff5050';
+    document.getElementById('vSharpe').textContent = (1.5 + Math.random() * 0.6).toFixed(2);
+    document.getElementById('vPositions').textContent = Math.floor(Math.random() * 5 + 1);
+    document.getElementById('vOrders').textContent = Math.floor(Math.random() * 4);
+    document.getElementById('vErrors').textContent = Math.floor(Math.random() * 3);
+   }, 2000);
+  }
+  function completeModule() {
+   if (!streamActive) { document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_0'); return; }
+   clearInterval(streamInterval);
+   const insignia = document.getElementById('insigniaArea');
+   insignia.classList.remove('hidden');
+   localStorage.setItem(STORAGE_KEY, 'true');
+   document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_1');
+  }
+  updateDashboard();
+  if (localStorage.getItem(STORAGE_KEY) === 'true') {
+   document.getElementById('insigniaArea').classList.remove('hidden');
+   document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_2');
+  }
+ </script>
 
 <script>
 window.I18N_DATA={
-  'fb_0': { es: '⚠️ Activa la telemetría antes de completar.', en: '⚠️ Activa la telemetría antes de completar.' },
-  'fb_1': { es: '✅ Módulo completado. ¡Eres un monitor de sistemas!', en: '✅ Módulo completado. ¡Eres un monitor de sistemas!' },
-  'fb_2': { es: '✅ Ya completaste este módulo. ¡Bien hecho!', en: '✅ Ya completaste este módulo. ¡Bien hecho!' }
+ 'fb_0': { es: 'âš ï¸ Activa la telemetrÃ­a antes de completar.', en: 'âš ï¸ Activa la telemetrÃ­a antes de completar.' },
+ 'fb_1': { es: 'âœ… MÃ³dulo completado. Â¡Eres un monitor de sistemas!', en: 'âœ… MÃ³dulo completado. Â¡Eres un monitor de sistemas!' },
+ 'fb_2': { es: 'âœ… Ya completaste este mÃ³dulo. Â¡Bien hecho!', en: 'âœ… Ya completaste este mÃ³dulo. Â¡Bien hecho!' }
 };
 </script>
-</body>
+ </body>
 </html>
 

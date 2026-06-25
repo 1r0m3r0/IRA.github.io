@@ -1,228 +1,213 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Risk Management | 🔄 Trailing Stops Avanzados</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { background:linear-gradient(135deg,#1a0808,#1f0a0a,#0f0505); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#ffe6e6; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
-    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-    .container { max-width:1300px; width:100%; background:rgba(30,12,12,0.85); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid #ff5050; box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
-    .hero { background:linear-gradient(95deg,#2a0f0f,#3a1212); padding:1.5rem 2rem; text-align:center; border-bottom:3px solid #ff5050; }
-    .hero h1 { font-size:2rem; font-weight:800; background:linear-gradient(135deg,#ffaaaa,#ff5050); -webkit-background-clip:text; background-clip:text; color:transparent; }
-    .hero p { margin-top:0.5rem; font-size:1rem; color:#ffcccc; }
-    .content { padding:1.5rem 2rem; }
-    .card { background:rgba(25,10,10,0.9); border-radius:2rem; padding:1.5rem; border:1px solid #ff505066; margin-bottom:1.5rem; }
-    .card h2 { color:#ff8888; margin-bottom:1rem; font-size:1.3rem; }
-    .card h3 { color:#ffaa66; margin:1rem 0 0.5rem; font-size:1.1rem; }
-    .form-group { margin-bottom:0.8rem; }
-    .form-group label { display:block; font-size:0.85rem; color:#ffbbbb; margin-bottom:0.3rem; }
-    .form-group input,.form-group select { width:100%; padding:0.6rem; border-radius:1rem; border:1px solid #ff505066; background:#1a0808; color:#ffe6e6; font-size:0.95rem; }
-    .btn { background:linear-gradient(95deg,#ff5050,#cc3333); border:none; padding:0.7rem 2rem; border-radius:3rem; font-weight:600; font-size:1rem; cursor:pointer; color:#fff; transition:0.2s; }
-    .btn:hover { transform:scale(1.02); box-shadow:0 0 20px #ff505066; }
-    .btn-secondary { background:linear-gradient(95deg,#555,#333); }
-    .btn-secondary:hover { box-shadow:0 0 20px #55555566; }
-    .result-box { background:#1a0a0a; border-radius:1.5rem; padding:1rem; border:1px solid #ff505044; margin-top:1rem; }
-    .result-box .value { font-size:1.2rem; font-weight:700; color:#ff8888; }
-    .result-box .label { font-size:0.8rem; color:#ffaaaa; }
-    .analogy-box { background:linear-gradient(135deg,#2a1212,#1a0808); border-left:4px solid #ff5050; border-radius:1.5rem; padding:1.2rem; margin-bottom:1.5rem; font-style:italic; color:#ffcccc; }
-    .analogy-box i { color:#ff5050; margin-right:0.5rem; }
-    .trail-visual { position:relative; height:200px; background:#0f0505; border-radius:1.5rem; margin:1rem 0; overflow:hidden; }
-    .trail-price { position:absolute; left:10%; width:80%; height:4px; background:#00e0ff; transition:top 0.3s; }
-    .trail-sl { position:absolute; left:10%; width:80%; height:4px; background:#ff5050; transition:top 0.3s; border:1px dashed #ff5050; }
-    .trail-label { position:absolute; font-size:0.7rem; }
-    .insignia { text-align:center; padding:1.5rem; border:2px dashed gold; border-radius:2rem; margin:1.5rem 0; font-size:1.2rem; display:none; }
-    .insignia.show { display:block; animation:glowPulse 2s ease infinite; }
-    @keyframes glowPulse { 0%,100%{box-shadow:0 0 20px rgba(255,215,0,0.3)} 50%{box-shadow:0 0 40px rgba(255,215,0,0.6)} }
-    .progress-section { display:flex; align-items:center; gap:1rem; padding:0.5rem 2rem; }
-    .progress-bar-outer { flex:1; height:8px; background:#1a1a1a; border-radius:1rem; overflow:hidden; }
-    .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#ff5050,#cc3333); border-radius:1rem; transition:width 0.5s; }
-    .progress-text { font-size:0.8rem; color:#cc8888; white-space:nowrap; }
-    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
-    .nav-link { background:#3a1a1a; border:none; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; cursor:pointer; text-decoration:none; color:#ffe6e6; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; font-size:0.95rem; }
-    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px #ff505066; }
-    .nav-link.menu { background:#1a1a1a; border:1px solid #ff5050; }
-    footer { text-align:center; padding:0.8rem; font-size:0.7rem; border-top:1px solid #ff505044; }
-    .trail-stats { display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-top:0.5rem; }
-    .trail-stat { background:#0f0505; border-radius:1rem; padding:0.5rem; text-align:center; }
-    .trail-stat .num { font-size:1.1rem; font-weight:700; color:#ff8888; }
-    .trail-stat .desc { font-size:0.7rem; color:#ffaaaa; }
-    @media(max-width:600px){ .hero h1{font-size:1.4rem} .content{padding:1rem} .nav-links{gap:0.5rem} .nav-link{font-size:0.8rem;padding:0.5rem 1rem} }
-  </style>
-  <link rel="stylesheet" href="../../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Risk Management | 🔄 Trailing Stops Avanzados</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:linear-gradient(135deg,#1a0808,#1f0a0a,#0f0505); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#ffe6e6; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+  @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .container { max-width:1300px; width:100%; background:rgba(30,12,12,0.85); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid #ff5050; box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+  .hero { background:linear-gradient(95deg,#2a0f0f,#3a1212); padding:1.5rem 2rem; text-align:center; border-bottom:3px solid #ff5050; }
+  .hero h1 { font-size:2rem; font-weight:800; background:linear-gradient(135deg,#ffaaaa,#ff5050); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero p { margin-top:0.5rem; font-size:1rem; color:#ffcccc; }
+  .content { padding:1.5rem 2rem; }
+  .card { background:rgba(25,10,10,0.9); border-radius:2rem; padding:1.5rem; border:1px solid #ff505066; margin-bottom:1.5rem; }
+  .card h2 { color:#ff8888; margin-bottom:1rem; font-size:1.3rem; }
+  .card h3 { color:#ffaa66; margin:1rem 0 0.5rem; font-size:1.1rem; }
+  .form-group { margin-bottom:0.8rem; }
+  .form-group label { display:block; font-size:0.85rem; color:#ffbbbb; margin-bottom:0.3rem; }
+  .form-group input,.form-group select { width:100%; padding:0.6rem; border-radius:1rem; border:1px solid #ff505066; background:#1a0808; color:#ffe6e6; font-size:0.95rem; }
+  .btn { background:linear-gradient(95deg,#ff5050,#cc3333); border:none; padding:0.7rem 2rem; border-radius:3rem; font-weight:600; font-size:1rem; cursor:pointer; color:#fff; transition:0.2s; }
+  .btn:hover { transform:scale(1.02); box-shadow:0 0 20px #ff505066; }
+  .btn-secondary { background:linear-gradient(95deg,#555,#333); }
+  .btn-secondary:hover { box-shadow:0 0 20px #55555566; }
+  .result-box { background:#1a0a0a; border-radius:1.5rem; padding:1rem; border:1px solid #ff505044; margin-top:1rem; }
+  .result-box .value { font-size:1.2rem; font-weight:700; color:#ff8888; }
+  .result-box .label { font-size:0.8rem; color:#ffaaaa; }
+  .analogy-box { background:linear-gradient(135deg,#2a1212,#1a0808); border-left:4px solid #ff5050; border-radius:1.5rem; padding:1.2rem; margin-bottom:1.5rem; font-style:italic; color:#ffcccc; }
+  .analogy-box i { color:#ff5050; margin-right:0.5rem; }
+  .trail-visual { position:relative; height:200px; background:#0f0505; border-radius:1.5rem; margin:1rem 0; overflow:hidden; }
+  .trail-price { position:absolute; left:10%; width:80%; height:4px; background:#00e0ff; transition:top 0.3s; }
+  .trail-sl { position:absolute; left:10%; width:80%; height:4px; background:#ff5050; transition:top 0.3s; border:1px dashed #ff5050; }
+  .trail-label { position:absolute; font-size:0.7rem; }
+  .insignia { text-align:center; padding:1.5rem; border:2px dashed gold; border-radius:2rem; margin:1.5rem 0; font-size:1.2rem; display:none; }
+  .insignia.show { display:block; animation:glowPulse 2s ease infinite; }
+  @keyframes glowPulse { 0%,100%{box-shadow:0 0 20px rgba(255,215,0,0.3)} 50%{box-shadow:0 0 40px rgba(255,215,0,0.6)} }
+  .progress-section { display:flex; align-items:center; gap:1rem; padding:0.5rem 2rem; }
+  .progress-bar-outer { flex:1; height:8px; background:#1a1a1a; border-radius:1rem; overflow:hidden; }
+  .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#ff5050,#cc3333); border-radius:1rem; transition:width 0.5s; }
+  .progress-text { font-size:0.8rem; color:#cc8888; white-space:nowrap; }
+  .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+  .nav-link { background:#3a1a1a; border:none; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; cursor:pointer; text-decoration:none; color:#ffe6e6; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; font-size:0.95rem; }
+  .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px #ff505066; }
+  .nav-link.menu { background:#1a1a1a; border:1px solid #ff5050; }
+  footer { text-align:center; padding:0.8rem; font-size:0.7rem; border-top:1px solid #ff505044; }
+  .trail-stats { display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-top:0.5rem; }
+  .trail-stat { background:#0f0505; border-radius:1rem; padding:0.5rem; text-align:center; }
+  .trail-stat .num { font-size:1.1rem; font-weight:700; color:#ff8888; }
+  .trail-stat .desc { font-size:0.7rem; color:#ffaaaa; }
+  @media(max-width:600px){ .hero h1{font-size:1.4rem} .content{padding:1rem} .nav-links{gap:0.5rem} .nav-link{font-size:0.8rem;padding:0.5rem 1rem} }
+ </style>
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
 </head>
 <body>
 <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a></nav>
 
 <div class="container">
-  <div class="hero">
-    <h1><i class="fas fa-chart-line"></i> Trailing Stops Avanzados</h1>
-    <p>Protege ganancias ajustando el stop loss dinámicamente al precio</p>
+ <div class="hero">
+  <h1><i class="fas fa-chart-line"></i> Trailing Stops Avanzados</h1>
+  <p>Protege ganancias ajustando el stop loss dinámicamente al precio</p>
+ </div>
+
+ <div class="progress-section">
+  <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+  <span class="progress-text" id="progressText">Módulo 8 de 12</span>
+ </div>
+
+ <div class="content">
+  <div class="analogy-box">
+   <i class="fas fa-quote-left fa-2x"></i> Un trailing stop es como un perro que camina contigo: la correa representa la distancia entre el precio y el stop. Cuando avanzas, el perro te sigue; cuando te detienes o retrocedes, el perro se acerca. La correa nunca se estira, solo se acorta si el precio cae.
   </div>
 
-  <div class="progress-section">
-    <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
-    <span class="progress-text" id="progressText">Módulo 8 de 12</span>
+  <div class="card">
+   <h2><i class="fas fa-sliders-h"></i> Simulador Trailing Stop</h2>
+   <div class="form-group">
+    <label>Trail Distance (pips)</label>
+    <input type="number" id="trailDistance" value="20" min="5" step="5">
+   </div>
+   <div class="form-group">
+    <label>Velocidad de simulación</label>
+    <select id="trailSpeed">
+     <option value="400">Normal</option>
+     <option value="200">Rápido</option>
+     <option value="100">Turbo</option>
+    </select>
+   </div>
+   <button class="btn" id="startTrailBtn"><i class="fas fa-play"></i> Iniciar Trail</button>
+   <button class="btn btn-secondary" id="stopTrailBtn" style="display:none;"><i class="fas fa-stop"></i> Detener</button>
+
+   <div class="trail-visual" id="trailVisual">
+    <div style="position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;padding:0.3rem 0.5rem;font-size:0.7rem;color:#666;"><span>Price</span><span>SL</span></div>
+    <div class="trail-price" id="trailPriceLine" style="top:30px;"></div>
+    <div class="trail-sl" id="trailSLLine" style="top:70px;"></div>
+    <div class="trail-label" id="trailPriceLabel" style="top:26px;left:5%;color:#00e0ff;">Price: 1.10000</div>
+    <div class="trail-label" id="trailSLLabel" style="top:66px;left:5%;color:#ff5050;">SL: 1.09800</div>
+   </div>
+
+   <div id="trailStatus" style="text-align:center;font-size:0.85rem;color:#ffaaaa;margin-top:0.5rem;"></div>
+
+   <div id="trailStats" class="result-box" style="display:none;">
+    <div class="trail-stats">
+     <div class="trail-stat"><div class="num" id="trailMaxPrice">0</div><div class="desc">Máximo Precio</div></div>
+     <div class="trail-stat"><div class="num" id="trailFinalSL">0</div><div class="desc">SL Final</div></div>
+     <div class="trail-stat"><div class="num" id="trailPipsLocked">0</div><div class="desc">Pips Bloqueados</div></div>
+     <div class="trail-stat"><div class="num" id="trailDuration">0</div><div class="desc">Duración (pasos)</div></div>
+    </div>
+   </div>
   </div>
 
-  <div class="content">
-    <div class="analogy-box">
-      <i class="fas fa-quote-left fa-2x"></i> Un trailing stop es como un perro que camina contigo: la correa representa la distancia entre el precio y el stop. Cuando avanzas, el perro te sigue; cuando te detienes o retrocedes, el perro se acerca. La correa nunca se estira, solo se acorta si el precio cae.
-    </div>
-
-    <div class="card">
-      <h2><i class="fas fa-sliders-h"></i> Simulador Trailing Stop</h2>
-      <div class="form-group">
-        <label>Trail Distance (pips)</label>
-        <input type="number" id="trailDistance" value="20" min="5" step="5">
-      </div>
-      <div class="form-group">
-        <label>Velocidad de simulación</label>
-        <select id="trailSpeed">
-          <option value="400">Normal</option>
-          <option value="200">Rápido</option>
-          <option value="100">Turbo</option>
-        </select>
-      </div>
-      <button class="btn" id="startTrailBtn"><i class="fas fa-play"></i> Iniciar Trail</button>
-      <button class="btn btn-secondary" id="stopTrailBtn" style="display:none;"><i class="fas fa-stop"></i> Detener</button>
-
-      <div class="trail-visual" id="trailVisual">
-        <div style="position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;padding:0.3rem 0.5rem;font-size:0.7rem;color:#666;"><span>Price</span><span>SL</span></div>
-        <div class="trail-price" id="trailPriceLine" style="top:30px;"></div>
-        <div class="trail-sl" id="trailSLLine" style="top:70px;"></div>
-        <div class="trail-label" id="trailPriceLabel" style="top:26px;left:5%;color:#00e0ff;">Price: 1.10000</div>
-        <div class="trail-label" id="trailSLLabel" style="top:66px;left:5%;color:#ff5050;">SL: 1.09800</div>
-      </div>
-
-      <div id="trailStatus" style="text-align:center;font-size:0.85rem;color:#ffaaaa;margin-top:0.5rem;"></div>
-
-      <div id="trailStats" class="result-box" style="display:none;">
-        <div class="trail-stats">
-          <div class="trail-stat"><div class="num" id="trailMaxPrice">0</div><div class="desc">Máximo Precio</div></div>
-          <div class="trail-stat"><div class="num" id="trailFinalSL">0</div><div class="desc">SL Final</div></div>
-          <div class="trail-stat"><div class="num" id="trailPipsLocked">0</div><div class="desc">Pips Bloqueados</div></div>
-          <div class="trail-stat"><div class="num" id="trailDuration">0</div><div class="desc">Duración (pasos)</div></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2><i class="fas fa-question-circle"></i> ¿Cómo funciona?</h2>
-      <p style="font-size:0.85rem;color:#ffcccc;">El trailing stop mueve el stop loss hacia arriba (en posiciones largas) cada vez que el precio alcanza un nuevo máximo. La distancia (pips) se mantiene constante. Si el precio retrocede y toca el SL, la posición se cierra automáticamente.</p>
-      <div class="formula-breakdown" style="margin-top:0.5rem;font-size:0.85rem;">
-        <strong>Regla:</strong> SL = Highest Price - Trail Distance<br>
-        MQL5: <code>trailingStop = NormalizeDouble(Bid - trailPips * Point, Digits);</code><br>
-        if (trailingStop &gt; PositionGetDouble(POSITION_SL)) modify SL
-      </div>
-    </div>
-
-    <div class="insignia" id="insignia">
-      🏅 Trader Trail 🏅<br>
-      <span style="font-size:0.9rem;">Dominas el trailing stop dinámico para proteger ganancias</span>
-    </div>
+  <div class="card">
+   <h2><i class="fas fa-question-circle"></i> ¿Cómo funciona?</h2>
+   <p style="font-size:0.85rem;color:#ffcccc;">El trailing stop mueve el stop loss hacia arriba (en posiciones largas) cada vez que el precio alcanza un nuevo máximo. La distancia (pips) se mantiene constante. Si el precio retrocede y toca el SL, la posición se cierra automáticamente.</p>
+   <div class="formula-breakdown" style="margin-top:0.5rem;font-size:0.85rem;">
+    <strong>Regla:</strong> SL = Highest Price - Trail Distance<br>
+    MQL5: <code>trailingStop = NormalizeDouble(Bid - trailPips * Point, Digits);</code><br>
+    if (trailingStop &gt; PositionGetDouble(POSITION_SL)) modify SL
+   </div>
   </div>
 
-  <div class="nav-links">
-    <a href="07-drawdown-control.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
-    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
-    <a href="09-correlacion-portfolio.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  <div class="insignia" id="insignia">
+   🏅 Trader Trail 🏅<br>
+   <span style="font-size:0.9rem;">Dominas el trailing stop dinámico para proteger ganancias</span>
   </div>
-  <footer><i class="fas fa-chart-line"></i> No intentes predecir el precio; deja que el trailing stop proteja tu camino</footer>
+ </div>
+
+ <div class="nav-links">
+  <a href="07-drawdown-control.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+  <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+  <a href="09-correlacion-portfolio.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+ </div>
+ <footer><i class="fas fa-chart-line"></i> No intentes predecir el precio; deja que el trailing stop proteja tu camino</footer>
 </div>
 
 <script>
-  const STORAGE_KEY = 'mql5_4_08';
-  const PROGRESS_KEY = 'mql5_4_progress';
+ const STORAGE_KEY = 'mql5_4_08';
+ const PROGRESS_KEY = 'mql5_4_progress';
 
-  function updateProgress() {
-    const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
-    document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
-    document.getElementById('progressText').textContent = I18N.t('fb_0');
-  }
+ function updateProgress() {
+  const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+  document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
+  document.getElementById('progressText').textContent = I18N.t('fb_0');
+ }
+ updateProgress();
+
+ function saveProgress() {
+  let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+  if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
+  localStorage.setItem(STORAGE_KEY, 'true');
   updateProgress();
+  checkInsignia();
+ }
 
-  function saveProgress() {
-    let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
-    if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
-    localStorage.setItem(STORAGE_KEY, 'true');
-    updateProgress();
-    checkInsignia();
+ function checkInsignia() {
+  const ins = document.getElementById('insignia');
+  if (document.getElementById('trailStats').style.display === 'block') {
+   ins.classList.add('show');
+   saveProgress();
   }
+ }
 
-  function checkInsignia() {
-    const ins = document.getElementById('insignia');
-    if (document.getElementById('trailStats').style.display === 'block') {
-      ins.classList.add('show');
-      saveProgress();
-    }
-  }
+ let trailInterval = null;
+ let trailPrice = 1.1000;
+ let trailBaseSL = 1.0980;
+ let trailHighestPrice = 1.1000;
+ let trailSteps = 0;
+ let trailMaxReached = 1.1000;
+ let trailPipsLockedCount = 0;
 
-  let trailInterval = null;
-  let trailPrice = 1.1000;
-  let trailBaseSL = 1.0980;
-  let trailHighestPrice = 1.1000;
-  let trailSteps = 0;
-  let trailMaxReached = 1.1000;
-  let trailPipsLockedCount = 0;
+ document.getElementById('startTrailBtn').addEventListener('click', function() {
+  const dist = parseFloat(document.getElementById('trailDistance').value) || 20;
+  const speed = parseInt(document.getElementById('trailSpeed').value) || 400;
+  trailPrice = 1.1000;
+  trailBaseSL = trailPrice - (dist * 0.0001);
+  trailHighestPrice = trailPrice;
+  trailMaxReached = trailPrice;
+  trailSteps = 0;
+  trailPipsLockedCount = 0;
 
-  document.getElementById('startTrailBtn').addEventListener('click', function() {
-    const dist = parseFloat(document.getElementById('trailDistance').value) || 20;
-    const speed = parseInt(document.getElementById('trailSpeed').value) || 400;
-    trailPrice = 1.1000;
-    trailBaseSL = trailPrice - (dist * 0.0001);
+  document.getElementById('startTrailBtn').style.display = 'none';
+  document.getElementById('stopTrailBtn').style.display = 'inline-block';
+  document.getElementById('trailStatus').textContent = I18N.t('fb_1');
+  document.getElementById('trailStats').style.display = 'none';
+
+  if (trailInterval) clearInterval(trailInterval);
+  trailInterval = setInterval(() => {
+   const move = (Math.random() - 0.48) * 0.0020;
+   trailPrice += move;
+   trailSteps++;
+
+   if (trailPrice > trailHighestPrice) {
     trailHighestPrice = trailPrice;
-    trailMaxReached = trailPrice;
-    trailSteps = 0;
-    trailPipsLockedCount = 0;
+    trailBaseSL = trailPrice - (dist * 0.0001);
+    const locked = (trailHighestPrice - trailMaxReached) / 0.0001;
+    if (locked > 0) trailPipsLockedCount = Math.round(locked);
+   }
 
-    document.getElementById('startTrailBtn').style.display = 'none';
-    document.getElementById('stopTrailBtn').style.display = 'inline-block';
-    document.getElementById('trailStatus').textContent = I18N.t('fb_1');
-    document.getElementById('trailStats').style.display = 'none';
+   const pricePx = 160 - ((trailPrice - 1.0800) / 0.0400) * 150;
+   const slPx = 160 - ((trailBaseSL - 1.0800) / 0.0400) * 150;
+   document.getElementById('trailPriceLine').style.top = Math.max(5, Math.min(155, pricePx)) + 'px';
+   document.getElementById('trailSLLine').style.top = Math.max(5, Math.min(155, slPx)) + 'px';
+   document.getElementById('trailPriceLabel').textContent = 'Price: ' + trailPrice.toFixed(5);
+   document.getElementById('trailSLLabel').textContent = 'SL: ' + trailBaseSL.toFixed(5);
 
-    if (trailInterval) clearInterval(trailInterval);
-    trailInterval = setInterval(() => {
-      const move = (Math.random() - 0.48) * 0.0020;
-      trailPrice += move;
-      trailSteps++;
-
-      if (trailPrice > trailHighestPrice) {
-        trailHighestPrice = trailPrice;
-        trailBaseSL = trailPrice - (dist * 0.0001);
-        const locked = (trailHighestPrice - trailMaxReached) / 0.0001;
-        if (locked > 0) trailPipsLockedCount = Math.round(locked);
-      }
-
-      const pricePx = 160 - ((trailPrice - 1.0800) / 0.0400) * 150;
-      const slPx = 160 - ((trailBaseSL - 1.0800) / 0.0400) * 150;
-      document.getElementById('trailPriceLine').style.top = Math.max(5, Math.min(155, pricePx)) + 'px';
-      document.getElementById('trailSLLine').style.top = Math.max(5, Math.min(155, slPx)) + 'px';
-      document.getElementById('trailPriceLabel').textContent = 'Price: ' + trailPrice.toFixed(5);
-      document.getElementById('trailSLLabel').textContent = 'SL: ' + trailBaseSL.toFixed(5);
-
-      if (trailPrice <= trailBaseSL) {
-        document.getElementById('trailStatus').textContent = I18N.t('fb_2') + trailPrice.toFixed(5);
-        clearInterval(trailInterval);
-        trailInterval = null;
-        document.getElementById('startTrailBtn').style.display = 'inline-block';
-        document.getElementById('stopTrailBtn').style.display = 'none';
-        document.getElementById('trailMaxPrice').textContent = trailHighestPrice.toFixed(5);
-        document.getElementById('trailFinalSL').textContent = trailBaseSL.toFixed(5);
-        document.getElementById('trailPipsLocked').textContent = trailPipsLockedCount + ' pips';
-        document.getElementById('trailDuration').textContent = trailSteps;
-        document.getElementById('trailStats').style.display = 'block';
-        checkInsignia();
-      }
-    }, speed);
-  });
-
-  document.getElementById('stopTrailBtn').addEventListener('click', function() {
-    if (trailInterval) { clearInterval(trailInterval); trailInterval = null; }
-    document.getElementById('trailStatus').textContent = I18N.t('fb_3');
+   if (trailPrice <= trailBaseSL) {
+    document.getElementById('trailStatus').textContent = I18N.t('fb_2') + trailPrice.toFixed(5);
+    clearInterval(trailInterval);
+    trailInterval = null;
     document.getElementById('startTrailBtn').style.display = 'inline-block';
     document.getElementById('stopTrailBtn').style.display = 'none';
     document.getElementById('trailMaxPrice').textContent = trailHighestPrice.toFixed(5);
@@ -230,27 +215,41 @@
     document.getElementById('trailPipsLocked').textContent = trailPipsLockedCount + ' pips';
     document.getElementById('trailDuration').textContent = trailSteps;
     document.getElementById('trailStats').style.display = 'block';
-  });
+    checkInsignia();
+   }
+  }, speed);
+ });
+
+ document.getElementById('stopTrailBtn').addEventListener('click', function() {
+  if (trailInterval) { clearInterval(trailInterval); trailInterval = null; }
+  document.getElementById('trailStatus').textContent = I18N.t('fb_3');
+  document.getElementById('startTrailBtn').style.display = 'inline-block';
+  document.getElementById('stopTrailBtn').style.display = 'none';
+  document.getElementById('trailMaxPrice').textContent = trailHighestPrice.toFixed(5);
+  document.getElementById('trailFinalSL').textContent = trailBaseSL.toFixed(5);
+  document.getElementById('trailPipsLocked').textContent = trailPipsLockedCount + ' pips';
+  document.getElementById('trailDuration').textContent = trailSteps;
+  document.getElementById('trailStats').style.display = 'block';
+ });
 </script>
-<script src="../../../assets/js/cookie-consent.js"></script>
 <script>
 window.I18N_DATA={
-  "fb_0": {
-    "es": "Módulo 8 de 12",
-    "en": "Module 8 de 12"
-  },
-  "fb_1": {
-    "es": "🟢 Trailing activo...",
-    "en": "🟢 Trailing activo..."
-  },
-  "fb_2": {
-    "es": "🔴 Stop Loss alcanzado en ",
-    "en": "🔴 Stop Loss alcanzado en "
-  },
-  "fb_3": {
-    "es": "⏹️ Trailing detenido manualmente",
-    "en": "⏹️ Trailing detenido manualmente"
-  }
+ "fb_0": {
+  "es": "Módulo 8 de 12",
+  "en": "Module 8 de 12"
+ },
+ "fb_1": {
+  "es": "🟢 Trailing activo...",
+  "en": "🟢 Trailing activo..."
+ },
+ "fb_2": {
+  "es": "🔴 Stop Loss alcanzado en ",
+  "en": "🔴 Stop Loss alcanzado en "
+ },
+ "fb_3": {
+  "es": "⏹️ Trailing detenido manualmente",
+  "en": "⏹️ Trailing detenido manualmente"
+ }
 };
 </script>
 <script src="../../../assets/js/i18n.js"></script>

@@ -1,160 +1,160 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Probabilidades Interactiva | Procesos de Poisson</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Press+Start+2P&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
-    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-    .e-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,102,192,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
-    .hero-header { background:linear-gradient(95deg,#0b1120 0%,#111a2e 100%); padding:2rem 2rem 1.5rem 2rem; text-align:center; border-bottom:2px solid #ff66c0; }
-    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#ff99d6,#ff66c0); -webkit-background-clip:text; background-clip:text; color:transparent; }
-    .hero-header p { font-size:1.1rem; color:#f0c0e0; margin-top:0.5rem; font-weight:500; }
-    .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
-    .chip { background:rgba(255,102,192,0.15); border:1px solid #ff66c0; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
-    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ff66c0; font-size:1rem; line-height:1.6; }
-    .main-area { padding:0 2rem 1rem 2rem; display:flex; flex-direction:column; gap:1.5rem; }
-    .sim-box { background:#0f1a2c; border-radius:2rem; padding:1.5rem; border:1px solid rgba(255,102,192,0.2); }
-    .sim-box h3 { color:#ff99d6; margin-bottom:0.8rem; font-size:1.2rem; }
-    .sim-box p { font-size:0.9rem; color:#aac; margin-bottom:0.5rem; }
-    .btn-action { background:linear-gradient(95deg,#ff66c0,#ff3388); border:none; padding:0.7rem 1.5rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:0.95rem; color:#fff; transition:0.2s; }
-    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(255,102,192,0.4); }
-    .btn-secondary-action { background:#2c3e66; border:none; padding:0.6rem 1.2rem; font-weight:600; border-radius:3rem; cursor:pointer; font-size:0.9rem; color:#eef5ff; transition:0.2s; }
-    .btn-secondary-action:hover { transform:translateY(-2px); }
-    .slider-row { display:flex; gap:2rem; align-items:center; flex-wrap:wrap; justify-content:center; }
-    .slider-group { display:flex; flex-direction:column; align-items:center; gap:0.3rem; }
-    .slider-group label { font-size:0.85rem; color:#aac; }
-    .slider-group input { width:180px; }
-    .arrival-vis { display:flex; gap:2px; align-items:flex-end; min-height:120px; padding:0.5rem; background:#0a0f1e; border-radius:1rem; flex-wrap:wrap; justify-content:center; }
-    .arrival-bar { width:18px; background:linear-gradient(180deg,#ff66c0,#ff3388); border-radius:4px 4px 0 0; transition:height 0.3s; min-height:2px; }
-    .stats-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:0.5rem; margin-top:0.5rem; }
-    .stat-card { background:#0f1a2c; border-radius:1.2rem; padding:0.8rem; border:1px solid rgba(255,102,192,0.15); text-align:center; }
-    .stat-card .num { font-size:1.6rem; font-weight:800; color:#ff99d6; }
-    .stat-card .lbl { font-size:0.75rem; color:#aac; }
-    .mm1-box { display:flex; gap:1.5rem; align-items:center; justify-content:center; flex-wrap:wrap; }
-    .queue-vis { background:#0a0f1e; border-radius:1rem; padding:0.5rem 1rem; min-height:40px; display:flex; gap:0.3rem; flex-wrap:wrap; align-items:center; }
-    .queue-item { background:#ff66c0; color:#000; border-radius:50%; width:32px; height:32px; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.8rem; animation:popIn 0.3s; }
-    @keyframes popIn { 0%{transform:scale(0)} 100%{transform:scale(1)} }
-    .value-display { font-size:1.4rem; font-weight:700; color:#ff66c0; text-align:center; padding:0.5rem; }
-    .feedback { background:#00000099; margin:0 2rem 1.5rem 2rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #ff66c0; }
-    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:0 2rem 1.5rem; padding:1rem; border:1px dashed gold; }
-    .insignia i { font-size:2.5rem; color:gold; }
-    .hidden { display:none; }
-    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
-    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
-    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(255,102,192,0.4); }
-    .nav-link.next { background:linear-gradient(95deg,#ff66c0,#ff3388); color:#fff; }
-    .nav-link.menu { background:#1a2a4a; border:1px solid #ff66c0; }
-    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
-    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .arrival-bar { width:12px; } }
-  </style>
-  <link rel="stylesheet" href="../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Probabilidades Interactiva | Procesos de Poisson</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Press+Start+2P&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+  @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .e-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,102,192,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+  .hero-header { background:linear-gradient(95deg,#0b1120 0%,#111a2e 100%); padding:2rem 2rem 1.5rem 2rem; text-align:center; border-bottom:2px solid #ff66c0; }
+  .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#ff99d6,#ff66c0); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero-header p { font-size:1.1rem; color:#f0c0e0; margin-top:0.5rem; font-weight:500; }
+  .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+  .chip { background:rgba(255,102,192,0.15); border:1px solid #ff66c0; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+  .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ff66c0; font-size:1rem; line-height:1.6; }
+  .main-area { padding:0 2rem 1rem 2rem; display:flex; flex-direction:column; gap:1.5rem; }
+  .sim-box { background:#0f1a2c; border-radius:2rem; padding:1.5rem; border:1px solid rgba(255,102,192,0.2); }
+  .sim-box h3 { color:#ff99d6; margin-bottom:0.8rem; font-size:1.2rem; }
+  .sim-box p { font-size:0.9rem; color:#aac; margin-bottom:0.5rem; }
+  .btn-action { background:linear-gradient(95deg,#ff66c0,#ff3388); border:none; padding:0.7rem 1.5rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:0.95rem; color:#fff; transition:0.2s; }
+  .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(255,102,192,0.4); }
+  .btn-secondary-action { background:#2c3e66; border:none; padding:0.6rem 1.2rem; font-weight:600; border-radius:3rem; cursor:pointer; font-size:0.9rem; color:#eef5ff; transition:0.2s; }
+  .btn-secondary-action:hover { transform:translateY(-2px); }
+  .slider-row { display:flex; gap:2rem; align-items:center; flex-wrap:wrap; justify-content:center; }
+  .slider-group { display:flex; flex-direction:column; align-items:center; gap:0.3rem; }
+  .slider-group label { font-size:0.85rem; color:#aac; }
+  .slider-group input { width:180px; }
+  .arrival-vis { display:flex; gap:2px; align-items:flex-end; min-height:120px; padding:0.5rem; background:#0a0f1e; border-radius:1rem; flex-wrap:wrap; justify-content:center; }
+  .arrival-bar { width:18px; background:linear-gradient(180deg,#ff66c0,#ff3388); border-radius:4px 4px 0 0; transition:height 0.3s; min-height:2px; }
+  .stats-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:0.5rem; margin-top:0.5rem; }
+  .stat-card { background:#0f1a2c; border-radius:1.2rem; padding:0.8rem; border:1px solid rgba(255,102,192,0.15); text-align:center; }
+  .stat-card .num { font-size:1.6rem; font-weight:800; color:#ff99d6; }
+  .stat-card .lbl { font-size:0.75rem; color:#aac; }
+  .mm1-box { display:flex; gap:1.5rem; align-items:center; justify-content:center; flex-wrap:wrap; }
+  .queue-vis { background:#0a0f1e; border-radius:1rem; padding:0.5rem 1rem; min-height:40px; display:flex; gap:0.3rem; flex-wrap:wrap; align-items:center; }
+  .queue-item { background:#ff66c0; color:#000; border-radius:50%; width:32px; height:32px; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.8rem; animation:popIn 0.3s; }
+  @keyframes popIn { 0%{transform:scale(0)} 100%{transform:scale(1)} }
+  .value-display { font-size:1.4rem; font-weight:700; color:#ff66c0; text-align:center; padding:0.5rem; }
+  .feedback { background:#00000099; margin:0 2rem 1.5rem 2rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #ff66c0; }
+  .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:0 2rem 1.5rem; padding:1rem; border:1px dashed gold; }
+  .insignia i { font-size:2.5rem; color:gold; }
+  .hidden { display:none; }
+  .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+  .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+  .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(255,102,192,0.4); }
+  .nav-link.next { background:linear-gradient(95deg,#ff66c0,#ff3388); color:#fff; }
+  .nav-link.menu { background:#1a2a4a; border:1px solid #ff66c0; }
+  footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .arrival-bar { width:12px; } }
+ </style>
+ <link rel="stylesheet" href="../../assets/css/theme.css">
 </head>
 <body>
 <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
 <div class="e-container">
-  <div class="hero-header">
-    <h1>🌧️ PROCESOS DE POISSON</h1>
-    <p>Modela eventos aleatorios en el tiempo</p>
-    <div class="badge-area">
-      <span class="chip"><i class="fas fa-clock"></i> Llegadas aleatorias</span>
-      <span class="chip"><i class="fas fa-chart-bar"></i> N(t) ~ Poisson(λt)</span>
-      <span class="chip"><i class="fas fa-server"></i> Colas M/M/1</span>
+ <div class="hero-header">
+  <h1>🌧️ PROCESOS DE POISSON</h1>
+  <p>Modela eventos aleatorios en el tiempo</p>
+  <div class="badge-area">
+   <span class="chip"><i class="fas fa-clock"></i> Llegadas aleatorias</span>
+   <span class="chip"><i class="fas fa-chart-bar"></i> N(t) ~ Poisson(λt)</span>
+   <span class="chip"><i class="fas fa-server"></i> Colas M/M/1</span>
+  </div>
+ </div>
+
+ <div class="analogy-card">
+  <strong>🌧️ Piénsalo así:</strong> Un proceso de Poisson es como la lluvia: sabes cuántas gotas caen por minuto en promedio (λ), pero no exactamente cuándo caerá cada una. Los tiempos entre gotas son impredecibles pero siguen un patrón exponencial.
+ </div>
+
+ <div class="main-area">
+  <div class="sim-box">
+   <h3><i class="fas fa-cloud-rain"></i> Simulador de Llegadas Poisson</h3>
+   <div class="slider-row">
+    <div class="slider-group">
+     <label>Tasa λ (eventos/segundo): <span id="lambdaDisplay">3</span></label>
+     <input id="lambdaSlider" type="range" min="0.5" max="10" step="0.5" value="3" oninput="document.getElementById('lambdaDisplay').textContent=this.value">
     </div>
+    <div class="slider-group">
+     <label>Tiempo T (segundos): <span id="timeDisplay">10</span></label>
+     <input id="timeSlider" type="range" min="2" max="30" step="1" value="10" oninput="document.getElementById('timeDisplay').textContent=this.value">
+    </div>
+    <button class="btn-action" onclick="simulatePoisson()">🌧️ Simular</button>
+   </div>
+   <div id="arrivalStats" class="stats-row">
+    <div class="stat-card"><div class="lbl">N(t) observado</div><div class="num" id="observedN">—</div></div>
+    <div class="stat-card"><div class="lbl">Media λ·t</div><div class="num" id="expectedN">—</div></div>
+    <div class="stat-card"><div class="lbl">T. inter-llegada medio</div><div class="num" id="meanInter">—</div></div>
+    <div class="stat-card"><div class="lbl">1/λ teórico</div><div class="num" id="expectedInter">—</div></div>
+   </div>
+   <div id="arrivalVis" class="arrival-vis"></div>
   </div>
 
-  <div class="analogy-card">
-    <strong>🌧️ Piénsalo así:</strong> Un proceso de Poisson es como la lluvia: sabes cuántas gotas caen por minuto en promedio (λ), pero no exactamente cuándo caerá cada una. Los tiempos entre gotas son impredecibles pero siguen un patrón exponencial.
+  <div class="sim-box">
+   <h3><i class="fas fa-chart-line"></i> Poisson No Homogéneo: λ(t) variable</h3>
+   <p>λ(t) = 2 + 3·sin(t) — la tasa varía con el tiempo, como llamadas a un call center.</p>
+   <div style="text-align:center;">
+    <button class="btn-action" onclick="simulateNonHom()">🌊 Simular λ(t) variable</button>
+   </div>
+   <div id="nonHomVis" class="arrival-vis" style="min-height:80px;margin-top:0.5rem;"></div>
   </div>
 
-  <div class="main-area">
-    <div class="sim-box">
-      <h3><i class="fas fa-cloud-rain"></i> Simulador de Llegadas Poisson</h3>
-      <div class="slider-row">
-        <div class="slider-group">
-          <label>Tasa λ (eventos/segundo): <span id="lambdaDisplay">3</span></label>
-          <input id="lambdaSlider" type="range" min="0.5" max="10" step="0.5" value="3" oninput="document.getElementById('lambdaDisplay').textContent=this.value">
-        </div>
-        <div class="slider-group">
-          <label>Tiempo T (segundos): <span id="timeDisplay">10</span></label>
-          <input id="timeSlider" type="range" min="2" max="30" step="1" value="10" oninput="document.getElementById('timeDisplay').textContent=this.value">
-        </div>
-        <button class="btn-action" onclick="simulatePoisson()">🌧️ Simular</button>
-      </div>
-      <div id="arrivalStats" class="stats-row">
-        <div class="stat-card"><div class="lbl">N(t) observado</div><div class="num" id="observedN">—</div></div>
-        <div class="stat-card"><div class="lbl">Media λ·t</div><div class="num" id="expectedN">—</div></div>
-        <div class="stat-card"><div class="lbl">T. inter-llegada medio</div><div class="num" id="meanInter">—</div></div>
-        <div class="stat-card"><div class="lbl">1/λ teórico</div><div class="num" id="expectedInter">—</div></div>
-      </div>
-      <div id="arrivalVis" class="arrival-vis"></div>
-    </div>
-
-    <div class="sim-box">
-      <h3><i class="fas fa-chart-line"></i> Poisson No Homogéneo: λ(t) variable</h3>
-      <p>λ(t) = 2 + 3·sin(t) — la tasa varía con el tiempo, como llamadas a un call center.</p>
-      <div style="text-align:center;">
-        <button class="btn-action" onclick="simulateNonHom()">🌊 Simular λ(t) variable</button>
-      </div>
-      <div id="nonHomVis" class="arrival-vis" style="min-height:80px;margin-top:0.5rem;"></div>
-    </div>
-
-    <div class="sim-box">
-      <h3><i class="fas fa-weight"></i> Compound Poisson: llegadas con tamaño aleatorio</h3>
-      <p>Cada llegada tiene un "tamaño" aleatorio (ej: monto de transacción).</p>
-      <div style="text-align:center;">
-        <button class="btn-action" onclick="simulateCompound()">💰 Simular Compound</button>
-      </div>
-      <div class="stats-row" style="margin-top:0.5rem;">
-        <div class="stat-card"><div class="lbl">N° eventos</div><div class="num" id="compN">—</div></div>
-        <div class="stat-card"><div class="lbl">Suma total</div><div class="num" id="compSum">—</div></div>
-        <div class="stat-card"><div class="lbl">Tamaño promedio</div><div class="num" id="compAvg">—</div></div>
-      </div>
-      <div id="compVis" class="arrival-vis" style="min-height:80px;margin-top:0.5rem;"></div>
-    </div>
-
-    <div class="sim-box">
-      <h3><i class="fas fa-server"></i> Cola M/M/1</h3>
-      <p>λ = tasa de llegada, μ = tasa de servicio. La cola crece si λ ≥ μ.</p>
-      <div class="mm1-box">
-        <div class="slider-group">
-          <label>λ (llegada): <span id="mm1Lambda">3</span>/s</label>
-          <input id="mm1LambdaS" type="range" min="0.5" max="8" step="0.5" value="3" oninput="document.getElementById('mm1Lambda').textContent=this.value">
-        </div>
-        <div class="slider-group">
-          <label>μ (servicio): <span id="mm1Mu">4</span>/s</label>
-          <input id="mm1MuS" type="range" min="0.5" max="8" step="0.5" value="4" oninput="document.getElementById('mm1Mu').textContent=this.value">
-        </div>
-        <button class="btn-action" onclick="simulateMM1()">⚡ Simular cola</button>
-      </div>
-      <div class="stats-row" style="margin-top:0.5rem;">
-        <div class="stat-card"><div class="lbl">ρ = λ/μ</div><div class="num" id="mm1Rho">—</div></div>
-        <div class="stat-card"><div class="lbl">L (clientes en sistema)</div><div class="num" id="mm1L">—</div></div>
-        <div class="stat-card"><div class="lbl">W (tiempo en sistema)</div><div class="num" id="mm1W">—</div></div>
-      </div>
-      <div id="mm1Vis" class="queue-vis" style="margin-top:0.5rem;justify-content:center;"></div>
-    </div>
+  <div class="sim-box">
+   <h3><i class="fas fa-weight"></i> Compound Poisson: llegadas con tamaño aleatorio</h3>
+   <p>Cada llegada tiene un "tamaño" aleatorio (ej: monto de transacción).</p>
+   <div style="text-align:center;">
+    <button class="btn-action" onclick="simulateCompound()">💰 Simular Compound</button>
+   </div>
+   <div class="stats-row" style="margin-top:0.5rem;">
+    <div class="stat-card"><div class="lbl">N° eventos</div><div class="num" id="compN">—</div></div>
+    <div class="stat-card"><div class="lbl">Suma total</div><div class="num" id="compSum">—</div></div>
+    <div class="stat-card"><div class="lbl">Tamaño promedio</div><div class="num" id="compAvg">—</div></div>
+   </div>
+   <div id="compVis" class="arrival-vis" style="min-height:80px;margin-top:0.5rem;"></div>
   </div>
 
-  <div id="feedbackMsg" class="feedback">💡 Ajusta la tasa λ y el tiempo T, luego presiona "Simular" para ver el proceso de Poisson en acción.</div>
-
-  <div id="insigniaArea" class="insignia hidden">
-    <i class="fas fa-medal"></i>
-    <h3>🏅 ¡EXPERTO EN POISSON! 🏅</h3>
-    <p>Dominas los procesos de Poisson, llegadas aleatorias y teoría de colas.</p>
+  <div class="sim-box">
+   <h3><i class="fas fa-server"></i> Cola M/M/1</h3>
+   <p>λ = tasa de llegada, μ = tasa de servicio. La cola crece si λ ≥ μ.</p>
+   <div class="mm1-box">
+    <div class="slider-group">
+     <label>λ (llegada): <span id="mm1Lambda">3</span>/s</label>
+     <input id="mm1LambdaS" type="range" min="0.5" max="8" step="0.5" value="3" oninput="document.getElementById('mm1Lambda').textContent=this.value">
+    </div>
+    <div class="slider-group">
+     <label>μ (servicio): <span id="mm1Mu">4</span>/s</label>
+     <input id="mm1MuS" type="range" min="0.5" max="8" step="0.5" value="4" oninput="document.getElementById('mm1Mu').textContent=this.value">
+    </div>
+    <button class="btn-action" onclick="simulateMM1()">⚡ Simular cola</button>
+   </div>
+   <div class="stats-row" style="margin-top:0.5rem;">
+    <div class="stat-card"><div class="lbl">ρ = λ/μ</div><div class="num" id="mm1Rho">—</div></div>
+    <div class="stat-card"><div class="lbl">L (clientes en sistema)</div><div class="num" id="mm1L">—</div></div>
+    <div class="stat-card"><div class="lbl">W (tiempo en sistema)</div><div class="num" id="mm1W">—</div></div>
+   </div>
+   <div id="mm1Vis" class="queue-vis" style="margin-top:0.5rem;justify-content:center;"></div>
   </div>
+ </div>
 
-  <div class="nav-links">
-    <a href="e1-markov.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
-    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
-    <a href="e3-martingalas.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
-  </div>
-  <footer><i class="fas fa-crown"></i> Probabilidades Interactiva · Modo Experto · Domina la teoría</footer>
+ <div id="feedbackMsg" class="feedback">💡 Ajusta la tasa λ y el tiempo T, luego presiona "Simular" para ver el proceso de Poisson en acción.</div>
+
+ <div id="insigniaArea" class="insignia hidden">
+  <i class="fas fa-medal"></i>
+  <h3>🏅 ¡EXPERTO EN POISSON! 🏅</h3>
+  <p>Dominas los procesos de Poisson, llegadas aleatorias y teoría de colas.</p>
+ </div>
+
+ <div class="nav-links">
+  <a href="e1-markov.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+  <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+  <a href="e3-martingalas.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+ </div>
+ <footer><i class="fas fa-crown"></i> Probabilidades Interactiva · Modo Experto · Domina la teoría</footer>
 </div>
 
 <script>
@@ -162,157 +162,155 @@ const STORAGE_KEY = 'prob_e2';
 let completed = false;
 
 function simulatePoisson() {
-  const lambda = parseFloat(document.getElementById('lambdaSlider').value);
-  const T = parseFloat(document.getElementById('timeSlider').value);
-  const arrivals = [];
-  let t = 0;
-  while (true) {
-    const u = Math.random();
-    const inter = -Math.log(1 - u) / lambda;
-    t += inter;
-    if (t > T) break;
-    arrivals.push(t);
-  }
-  const N = arrivals.length;
-  document.getElementById('observedN').textContent = N;
-  document.getElementById('expectedN').textContent = (lambda * T).toFixed(1);
-  const inters = arrivals.map((v,i) => i===0 ? arrivals[0] : arrivals[i] - arrivals[i-1]);
-  const meanInter = inters.length > 0 ? inters.reduce((a,b)=>a+b,0)/inters.length : 0;
-  document.getElementById('meanInter').textContent = meanInter.toFixed(3) + 's';
-  document.getElementById('expectedInter').textContent = (1/lambda).toFixed(3) + 's';
-  renderArrivals(arrivals, T, 'arrivalVis');
-  showFeedback(`🌧️ Llegaron ${N} eventos en T=${T}s (esperados ${(lambda*T).toFixed(1)}). ¡La magia de Poisson!`);
-  checkCompletion();
+ const lambda = parseFloat(document.getElementById('lambdaSlider').value);
+ const T = parseFloat(document.getElementById('timeSlider').value);
+ const arrivals = [];
+ let t = 0;
+ while (true) {
+  const u = Math.random();
+  const inter = -Math.log(1 - u) / lambda;
+  t += inter;
+  if (t > T) break;
+  arrivals.push(t);
+ }
+ const N = arrivals.length;
+ document.getElementById('observedN').textContent = N;
+ document.getElementById('expectedN').textContent = (lambda * T).toFixed(1);
+ const inters = arrivals.map((v,i) => i===0 ? arrivals[0] : arrivals[i] - arrivals[i-1]);
+ const meanInter = inters.length > 0 ? inters.reduce((a,b)=>a+b,0)/inters.length : 0;
+ document.getElementById('meanInter').textContent = meanInter.toFixed(3) + 's';
+ document.getElementById('expectedInter').textContent = (1/lambda).toFixed(3) + 's';
+ renderArrivals(arrivals, T, 'arrivalVis');
+ showFeedback(`🌧️ Llegaron ${N} eventos en T=${T}s (esperados ${(lambda*T).toFixed(1)}). ¡La magia de Poisson!`);
+ checkCompletion();
 }
 
 function renderArrivals(arrivals, T, containerId) {
-  const container = document.getElementById(containerId);
-  container.innerHTML = '';
-  if (arrivals.length === 0) { container.innerHTML = '<span style="color:#aac;">Sin llegadas</span>'; return; }
-  const maxPerBin = 5;
-  const numBins = Math.min(Math.floor(T * 2), 40);
-  const bins = Array(numBins).fill(0);
-  const binSize = T / numBins;
-  arrivals.forEach(a => { const idx = Math.min(Math.floor(a / binSize), numBins - 1); bins[idx]++; });
-  const maxCount = Math.max(...bins, 1);
-  bins.forEach((count, i) => {
-    const bar = document.createElement('div');
-    bar.className = 'arrival-bar';
-    const h = Math.max(4, (count / maxCount) * 100);
-    bar.style.height = h + 'px';
-    bar.title = `t=${(i*binSize).toFixed(1)}-${((i+1)*binSize).toFixed(1)}s: ${count} llegadas`;
-    container.appendChild(bar);
-  });
+ const container = document.getElementById(containerId);
+ container.innerHTML = '';
+ if (arrivals.length === 0) { container.innerHTML = '<span style="color:#aac;">Sin llegadas</span>'; return; }
+ const maxPerBin = 5;
+ const numBins = Math.min(Math.floor(T * 2), 40);
+ const bins = Array(numBins).fill(0);
+ const binSize = T / numBins;
+ arrivals.forEach(a => { const idx = Math.min(Math.floor(a / binSize), numBins - 1); bins[idx]++; });
+ const maxCount = Math.max(...bins, 1);
+ bins.forEach((count, i) => {
+  const bar = document.createElement('div');
+  bar.className = 'arrival-bar';
+  const h = Math.max(4, (count / maxCount) * 100);
+  bar.style.height = h + 'px';
+  bar.title = `t=${(i*binSize).toFixed(1)}-${((i+1)*binSize).toFixed(1)}s: ${count} llegadas`;
+  container.appendChild(bar);
+ });
 }
 
 function simulateNonHom() {
-  const maxT = 20;
-  const arrivals = [];
-  let t = 0;
-  const maxLambda = 5;
-  while (t < maxT) {
-    const u1 = Math.random();
-    const inter = -Math.log(1 - u1) / maxLambda;
-    t += inter;
-    if (t > maxT) break;
-    const lambda_t = 2 + 3 * Math.sin(t);
-    const u2 = Math.random();
-    if (u2 < lambda_t / maxLambda) arrivals.push(t);
-  }
-  renderArrivals(arrivals, maxT, 'nonHomVis');
-  showFeedback(`🌊 λ(t) variable generó ${arrivals.length} eventos. Más llegadas en los picos de sin(t).`);
-  checkCompletion();
+ const maxT = 20;
+ const arrivals = [];
+ let t = 0;
+ const maxLambda = 5;
+ while (t < maxT) {
+  const u1 = Math.random();
+  const inter = -Math.log(1 - u1) / maxLambda;
+  t += inter;
+  if (t > maxT) break;
+  const lambda_t = 2 + 3 * Math.sin(t);
+  const u2 = Math.random();
+  if (u2 < lambda_t / maxLambda) arrivals.push(t);
+ }
+ renderArrivals(arrivals, maxT, 'nonHomVis');
+ showFeedback(`🌊 λ(t) variable generó ${arrivals.length} eventos. Más llegadas en los picos de sin(t).`);
+ checkCompletion();
 }
 
 function simulateCompound() {
-  const lambda = 2;
-  const T = 10;
-  const arrivals = [];
-  let t = 0;
-  while (true) {
-    const inter = -Math.log(1 - Math.random()) / lambda;
-    t += inter;
-    if (t > T) break;
-    const size = Math.round(Math.random() * 90 + 10);
-    arrivals.push({ t, size });
-  }
-  document.getElementById('compN').textContent = arrivals.length;
-  const total = arrivals.reduce((s,a) => s + a.size, 0);
-  document.getElementById('compSum').textContent = '$' + total;
-  document.getElementById('compAvg').textContent = arrivals.length > 0 ? '$' + (total / arrivals.length).toFixed(0) : '—';
-  const container = document.getElementById('compVis');
-  container.innerHTML = '';
-  const maxSize = Math.max(...arrivals.map(a => a.size), 1);
-  arrivals.forEach(a => {
-    const bar = document.createElement('div');
-    bar.className = 'arrival-bar';
-    bar.style.height = Math.max(4, (a.size / maxSize) * 100) + 'px';
-    bar.style.background = 'linear-gradient(180deg,#ffd700,#ff8c00)';
-    bar.title = `$${a.size} en t=${a.t.toFixed(1)}s`;
-    container.appendChild(bar);
-  });
-  showFeedback(`💰 Compound Poisson: ${arrivals.length} pagos totalizando $${total}.`);
-  checkCompletion();
+ const lambda = 2;
+ const T = 10;
+ const arrivals = [];
+ let t = 0;
+ while (true) {
+  const inter = -Math.log(1 - Math.random()) / lambda;
+  t += inter;
+  if (t > T) break;
+  const size = Math.round(Math.random() * 90 + 10);
+  arrivals.push({ t, size });
+ }
+ document.getElementById('compN').textContent = arrivals.length;
+ const total = arrivals.reduce((s,a) => s + a.size, 0);
+ document.getElementById('compSum').textContent = '$' + total;
+ document.getElementById('compAvg').textContent = arrivals.length > 0 ? '$' + (total / arrivals.length).toFixed(0) : '—';
+ const container = document.getElementById('compVis');
+ container.innerHTML = '';
+ const maxSize = Math.max(...arrivals.map(a => a.size), 1);
+ arrivals.forEach(a => {
+  const bar = document.createElement('div');
+  bar.className = 'arrival-bar';
+  bar.style.height = Math.max(4, (a.size / maxSize) * 100) + 'px';
+  bar.style.background = 'linear-gradient(180deg,#ffd700,#ff8c00)';
+  bar.title = `$${a.size} en t=${a.t.toFixed(1)}s`;
+  container.appendChild(bar);
+ });
+ showFeedback(`💰 Compound Poisson: ${arrivals.length} pagos totalizando $${total}.`);
+ checkCompletion();
 }
 
 function simulateMM1() {
-  const lambda = parseFloat(document.getElementById('mm1LambdaS').value);
-  const mu = parseFloat(document.getElementById('mm1MuS').value);
-  const rho = lambda / mu;
-  document.getElementById('mm1Rho').textContent = rho.toFixed(3);
-  if (rho >= 1) {
-    document.getElementById('mm1L').textContent = '∞ (inestable)';
-    document.getElementById('mm1W').textContent = '∞';
-    document.getElementById('mm1Vis').innerHTML = I18N.t('fb_0');
-    showFeedback('⚠️ λ ≥ μ: la cola es inestable. Necesitas μ > λ para estabilidad.');
-    return;
-  }
-  const L = rho / (1 - rho);
-  const W = 1 / (mu - lambda);
-  document.getElementById('mm1L').textContent = L.toFixed(2);
-  document.getElementById('mm1W').textContent = W.toFixed(3) + 's';
-  const vis = document.getElementById('mm1Vis');
-  vis.innerHTML = '';
-  const numInSys = Math.min(Math.round(L + Math.random() * 2), 10);
-  for (let i = 0; i < numInSys; i++) {
-    const el = document.createElement('div');
-    el.className = 'queue-item';
-    el.textContent = i === 0 ? 'S' : (i).toString();
-    if (i === 0) el.style.background = '#ffd700';
-    vis.appendChild(el);
-  }
-  showFeedback(`📊 M/M/1 estable: ρ=${rho.toFixed(3)}, L=${L.toFixed(2)} clientes en sistema.`);
-  checkCompletion();
+ const lambda = parseFloat(document.getElementById('mm1LambdaS').value);
+ const mu = parseFloat(document.getElementById('mm1MuS').value);
+ const rho = lambda / mu;
+ document.getElementById('mm1Rho').textContent = rho.toFixed(3);
+ if (rho >= 1) {
+  document.getElementById('mm1L').textContent = '∞ (inestable)';
+  document.getElementById('mm1W').textContent = '∞';
+  document.getElementById('mm1Vis').innerHTML = I18N.t('fb_0');
+  showFeedback('⚠️ λ ≥ μ: la cola es inestable. Necesitas μ > λ para estabilidad.');
+  return;
+ }
+ const L = rho / (1 - rho);
+ const W = 1 / (mu - lambda);
+ document.getElementById('mm1L').textContent = L.toFixed(2);
+ document.getElementById('mm1W').textContent = W.toFixed(3) + 's';
+ const vis = document.getElementById('mm1Vis');
+ vis.innerHTML = '';
+ const numInSys = Math.min(Math.round(L + Math.random() * 2), 10);
+ for (let i = 0; i < numInSys; i++) {
+  const el = document.createElement('div');
+  el.className = 'queue-item';
+  el.textContent = i === 0 ? 'S' : (i).toString();
+  if (i === 0) el.style.background = '#ffd700';
+  vis.appendChild(el);
+ }
+ showFeedback(`📊 M/M/1 estable: ρ=${rho.toFixed(3)}, L=${L.toFixed(2)} clientes en sistema.`);
+ checkCompletion();
 }
 
 function checkCompletion() {
-  if (!completed) {
-    completed = true;
-    document.getElementById('insigniaArea').classList.remove('hidden');
-    localStorage.setItem(STORAGE_KEY, 'true');
-  }
+ if (!completed) {
+  completed = true;
+  document.getElementById('insigniaArea').classList.remove('hidden');
+  localStorage.setItem(STORAGE_KEY, 'true');
+ }
 }
 
 function showFeedback(msg) {
-  document.getElementById('feedbackMsg').innerHTML = msg;
+ document.getElementById('feedbackMsg').innerHTML = msg;
 }
 
 function restoreProgress() {
-  if (localStorage.getItem(STORAGE_KEY) === 'true') {
-    completed = true;
-    document.getElementById('insigniaArea').classList.remove('hidden');
-    showFeedback('🏆 ¡Ya completaste este módulo! Repasa los conceptos.');
-  }
+ if (localStorage.getItem(STORAGE_KEY) === 'true') {
+  completed = true;
+  document.getElementById('insigniaArea').classList.remove('hidden');
+  showFeedback('🏆 ¡Ya completaste este módulo! Repasa los conceptos.');
+ }
 }
 
 simulatePoisson();
 restoreProgress();
 </script>
-<script src="../../assets/js/cookie-consent.js"></script>
-
 <script>
 window.I18N_DATA={
-  'fb_0': { es: '<span style="color:#ff5050;">⚠️ ρ ≥ 1: la cola crece sin límite</span>', en: '<span style="color:#ff5050;">⚠️ ρ ≥ 1: la cola crece sin límite</span>' }
+ 'fb_0': { es: '<span style="color:#ff5050;">⚠️ ρ ≥ 1: la cola crece sin límite</span>', en: '<span style="color:#ff5050;">⚠️ ρ ≥ 1: la cola crece sin límite</span>' }
 };
 </script>
 </body>

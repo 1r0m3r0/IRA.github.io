@@ -1,280 +1,279 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Portal de Diagn&oacute;stico | Curso 2: Ethereum &amp; DeFi</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Press+Start+2P&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 100%);
-      font-family: 'Inter', sans-serif; color: #eef5ff; min-height: 100vh;
-      display: flex; align-items: center; justify-content: center; padding: 2rem 1rem;
-    }
-    .course-container {
-      max-width: 1300px; width: 100%;
-      background: rgba(15, 25, 45, 0.65); backdrop-filter: blur(12px);
-      border-radius: 3rem; border: 1px solid rgba(98,126,234,0.25);
-      box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden;
-    }
-    .hero-header {
-      background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%);
-      padding: 2rem 2rem 1.5rem; text-align: center;
-      border-bottom: 2px solid #627eea;
-    }
-    .hero-header h1 {
-      font-size: 2.8rem; font-weight: 800;
-      background: linear-gradient(135deg, #FFF, #8099f0, #627eea);
-      -webkit-background-clip: text; background-clip: text; color: transparent;
-    }
-    .hero-header p { font-size: 1.2rem; color: #b9e2ff; margin-top: 0.5rem; }
-    .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1.2rem; flex-wrap: wrap; }
-    .chip { background: rgba(98,126,234,0.15); border: 1px solid #627eea; padding: 0.4rem 1rem; border-radius: 40px; font-size: 0.8rem; font-weight: 600; }
-    .challenge-timer {
-      background: #00000055; border-radius: 2rem; margin: 1.5rem 2rem;
-      padding: 0.8rem 1.5rem; display: flex; align-items: center; justify-content: space-between;
-      flex-wrap: wrap; gap: 1rem; border: 1px solid #627eea; box-shadow: 0 0 10px rgba(98,126,234,0.3);
-    }
-    .timer-box {
-      display: flex; align-items: center; gap: 1rem; font-family: 'Press Start 2P', monospace;
-      font-size: 1.8rem; background: #000000aa; padding: 0.4rem 1.2rem; border-radius: 3rem; letter-spacing: 2px;
-    }
-    .timer-box i { font-size: 2rem; color: #627eea; }
-    .challenge-text { font-weight: 700; background: linear-gradient(120deg, #8099f0, #627eea); -webkit-background-clip: text; background-clip: text; color: transparent; }
-    .main-flex { display: flex; flex-wrap: wrap; gap: 2rem; padding: 1.5rem 2rem 2rem; }
-    .quiz-area { flex: 1.8; min-width: 280px; background: rgba(0,10,25,0.7); border-radius: 2rem; padding: 1.5rem; backdrop-filter: blur(8px); border: 1px solid #627eea; }
-    .quiz-title { font-size: 1.6rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.6rem; }
-    .question { background: #0f1a2c; margin: 1rem 0; padding: 1rem; border-radius: 1.2rem; }
-    .question p { font-weight: 600; margin-bottom: 0.5rem; }
-    .options { display: flex; flex-wrap: wrap; gap: 1rem; }
-    .opt { background: #1e2a3e; padding: 0.4rem 1rem; border-radius: 2rem; cursor: pointer; transition: 0.2s; font-size: 0.9rem; }
-    .opt:hover { background: #2c3e66; transform: translateY(-2px); }
-    .opt.selected { background: #627eea; color: #fff; font-weight: bold; box-shadow: 0 0 8px #627eea; }
-    .btn-submit { background: linear-gradient(95deg, #627eea, #8099f0); border: none; padding: 0.8rem 1.8rem; font-weight: bold; border-radius: 3rem; margin-top: 1rem; cursor: pointer; font-size: 1rem; transition: 0.2s; color: #fff; }
-    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
-    .insignia { text-align: center; background: #0c1b2f; border-radius: 2rem; margin-top: 1.5rem; padding: 1rem; border: 1px dashed gold; }
-    .insignia i { font-size: 2.5rem; color: gold; }
-    .hidden { display: none; }
-    .next-btn { background: #627eea; border: none; padding: 0.8rem 2rem; border-radius: 3rem; font-weight: bold; color: #fff; margin-top: 1rem; width: 100%; cursor: pointer; }
-    .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
-    .nav-link { background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem; font-weight: 600; cursor: pointer; text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; font-size: 0.95rem; }
-    .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(98,126,234,0.4); }
-    .nav-link.next { background: linear-gradient(95deg, #627eea, #8099f0); color: #fff; }
-    .nav-link.menu { background: #1a2a4a; border: 1px solid #627eea; }
-    .nav-link.disabled { opacity: 0.4; pointer-events: none; }
-    footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
-    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .timer-box { font-size:1.2rem; } .quiz-title { font-size:1.3rem; } }
-  </style>
-  <link rel="stylesheet" href="../../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Portal de Diagn&oacute;stico | Curso 2: Ethereum &amp; DeFi</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Press+Start+2P&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+   background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 100%);
+   font-family: 'Inter', sans-serif; color: #eef5ff; min-height: 100vh;
+   display: flex; align-items: center; justify-content: center; padding: 2rem 1rem;
+  }
+  .course-container {
+   max-width: 1300px; width: 100%;
+   background: rgba(15, 25, 45, 0.65); backdrop-filter: blur(12px);
+   border-radius: 3rem; border: 1px solid rgba(98,126,234,0.25);
+   box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden;
+  }
+  .hero-header {
+   background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%);
+   padding: 2rem 2rem 1.5rem; text-align: center;
+   border-bottom: 2px solid #627eea;
+  }
+  .hero-header h1 {
+   font-size: 2.8rem; font-weight: 800;
+   background: linear-gradient(135deg, #FFF, #8099f0, #627eea);
+   -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .hero-header p { font-size: 1.2rem; color: #b9e2ff; margin-top: 0.5rem; }
+  .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1.2rem; flex-wrap: wrap; }
+  .chip { background: rgba(98,126,234,0.15); border: 1px solid #627eea; padding: 0.4rem 1rem; border-radius: 40px; font-size: 0.8rem; font-weight: 600; }
+  .challenge-timer {
+   background: #00000055; border-radius: 2rem; margin: 1.5rem 2rem;
+   padding: 0.8rem 1.5rem; display: flex; align-items: center; justify-content: space-between;
+   flex-wrap: wrap; gap: 1rem; border: 1px solid #627eea; box-shadow: 0 0 10px rgba(98,126,234,0.3);
+  }
+  .timer-box {
+   display: flex; align-items: center; gap: 1rem; font-family: 'Press Start 2P', monospace;
+   font-size: 1.8rem; background: #000000aa; padding: 0.4rem 1.2rem; border-radius: 3rem; letter-spacing: 2px;
+  }
+  .timer-box i { font-size: 2rem; color: #627eea; }
+  .challenge-text { font-weight: 700; background: linear-gradient(120deg, #8099f0, #627eea); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .main-flex { display: flex; flex-wrap: wrap; gap: 2rem; padding: 1.5rem 2rem 2rem; }
+  .quiz-area { flex: 1.8; min-width: 280px; background: rgba(0,10,25,0.7); border-radius: 2rem; padding: 1.5rem; backdrop-filter: blur(8px); border: 1px solid #627eea; }
+  .quiz-title { font-size: 1.6rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.6rem; }
+  .question { background: #0f1a2c; margin: 1rem 0; padding: 1rem; border-radius: 1.2rem; }
+  .question p { font-weight: 600; margin-bottom: 0.5rem; }
+  .options { display: flex; flex-wrap: wrap; gap: 1rem; }
+  .opt { background: #1e2a3e; padding: 0.4rem 1rem; border-radius: 2rem; cursor: pointer; transition: 0.2s; font-size: 0.9rem; }
+  .opt:hover { background: #2c3e66; transform: translateY(-2px); }
+  .opt.selected { background: #627eea; color: #fff; font-weight: bold; box-shadow: 0 0 8px #627eea; }
+  .btn-submit { background: linear-gradient(95deg, #627eea, #8099f0); border: none; padding: 0.8rem 1.8rem; font-weight: bold; border-radius: 3rem; margin-top: 1rem; cursor: pointer; font-size: 1rem; transition: 0.2s; color: #fff; }
+  .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+  .insignia { text-align: center; background: #0c1b2f; border-radius: 2rem; margin-top: 1.5rem; padding: 1rem; border: 1px dashed gold; }
+  .insignia i { font-size: 2.5rem; color: gold; }
+  .hidden { display: none; }
+  .next-btn { background: #627eea; border: none; padding: 0.8rem 2rem; border-radius: 3rem; font-weight: bold; color: #fff; margin-top: 1rem; width: 100%; cursor: pointer; }
+  .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
+  .nav-link { background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem; font-weight: 600; cursor: pointer; text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; font-size: 0.95rem; }
+  .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(98,126,234,0.4); }
+  .nav-link.next { background: linear-gradient(95deg, #627eea, #8099f0); color: #fff; }
+  .nav-link.menu { background: #1a2a4a; border: 1px solid #627eea; }
+  .nav-link.disabled { opacity: 0.4; pointer-events: none; }
+  footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .timer-box { font-size:1.2rem; } .quiz-title { font-size:1.3rem; } }
+ </style>
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
 </head>
 <body>
-  <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Blockchain</a></nav>
+ <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Blockchain</a></nav>
 
 <div class="course-container">
-  <div class="hero-header">
-    <h1> PORTAL DE DIAGN&Oacute;STICO</h1>
-    <p>&iquest;Qu&eacute; sabes sobre Ethereum, smart contracts y DeFi?</p>
-    <div class="badge-area">
-      <span class="chip"><i class="fas fa-brain"></i> 6 preguntas</span>
-      <span class="chip"><i class="fas fa-hourglass-half"></i> 120 segundos</span>
-    </div>
+ <div class="hero-header">
+  <h1> PORTAL DE DIAGN&Oacute;STICO</h1>
+  <p>&iquest;Qu&eacute; sabes sobre Ethereum, smart contracts y DeFi?</p>
+  <div class="badge-area">
+   <span class="chip"><i class="fas fa-brain"></i> 6 preguntas</span>
+   <span class="chip"><i class="fas fa-hourglass-half"></i> 120 segundos</span>
   </div>
+ </div>
 
-  <div class="challenge-timer">
-    <div><i class="fas fa-hourglass-half"></i> <span class="challenge-text"> DESAF&Iacute;O EXPRESS </span></div>
-    <div class="timer-box">
-      <i class="fas fa-stopwatch"></i>
-      <span id="timerDisplay">00:00</span>
-    </div>
-    <div><span id="challengeMsg" class="challenge-text"> Responde antes de que acabe el tiempo</span></div>
+ <div class="challenge-timer">
+  <div><i class="fas fa-hourglass-half"></i> <span class="challenge-text"> DESAF&Iacute;O EXPRESS </span></div>
+  <div class="timer-box">
+   <i class="fas fa-stopwatch"></i>
+   <span id="timerDisplay">00:00</span>
   </div>
+  <div><span id="challengeMsg" class="challenge-text"> Responde antes de que acabe el tiempo</span></div>
+ </div>
 
-  <div class="main-flex">
-    <div class="quiz-area">
-      <div class="quiz-title">
-        <i class="fas fa-question-circle"></i> Cuestionario de ingreso: Ethereum &amp; DeFi
-      </div>
-      <div id="quizContainer"></div>
-      <button id="submitQuizBtn" class="btn-submit"> Validar respuestas</button>
+ <div class="main-flex">
+  <div class="quiz-area">
+   <div class="quiz-title">
+    <i class="fas fa-question-circle"></i> Cuestionario de ingreso: Ethereum &amp; DeFi
+   </div>
+   <div id="quizContainer"></div>
+   <button id="submitQuizBtn" class="btn-submit"> Validar respuestas</button>
 
-      <div id="insigniaArea" class="insignia hidden">
-        <i class="fas fa-medal"></i>
-        <h3> INSIGNIA DE EXPLORADOR ETHEREUM </h3>
-        <p>Has superado el diagn&oacute;stico inicial. &iexcl;Tu viaje por Ethereum comienza ahora!</p>
-      </div>
+   <div id="insigniaArea" class="insignia hidden">
+    <i class="fas fa-medal"></i>
+    <h3> INSIGNIA DE EXPLORADOR ETHEREUM </h3>
+    <p>Has superado el diagn&oacute;stico inicial. &iexcl;Tu viaje por Ethereum comienza ahora!</p>
+   </div>
 
-      <button id="nextPageBtn" class="next-btn hidden" onclick="window.location.href='02-ethereum-pos.html'"> Siguiente: Ethereum Post-Merge</button>
-    </div>
+   <button id="nextPageBtn" class="next-btn hidden" onclick="window.location.href='02-ethereum-pos.html'"> Siguiente: Ethereum Post-Merge</button>
   </div>
+ </div>
 
-  <div class="nav-links">
-    <a class="nav-link disabled"><i class="fas fa-arrow-left"></i> Anterior</a>
-    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
-    <a href="02-ethereum-pos.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
-  </div>
-  <footer>
-    <i class="fas fa-crown"></i> Programa Blockchain &middot; Curso 2: Ethereum, Smart Contracts y DeFi &middot; M&oacute;dulo 1
-  </footer>
+ <div class="nav-links">
+  <a class="nav-link disabled"><i class="fas fa-arrow-left"></i> Anterior</a>
+  <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
+  <a href="02-ethereum-pos.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+ </div>
+ <footer>
+  <i class="fas fa-crown"></i> Programa Blockchain &middot; Curso 2: Ethereum, Smart Contracts y DeFi &middot; M&oacute;dulo 1
+ </footer>
 </div>
 
 <script>
-  const STORAGE_KEY = 'block_2_01';
-  const questions = [
-    { text: "&iquest;Qu&eacute; es Ethereum? (elige la mejor respuesta)", options: ["Una criptomoneda como Bitcoin", "Una plataforma descentralizada de c&oacute;mputo con contratos inteligentes", "Un exchange de criptomonedas", "Un wallet para guardar cripto"], correct: 1 },
-    { text: "&iquest;Qu&eacute; es un smart contract?", options: ["Un contrato legal tradicional en PDF", "Un programa autoejecutable almacenado en la blockchain", "Una cuenta bancaria compartida", "Un tipo de token"], correct: 1 },
-    { text: "&iquest;Qu&eacute; es el 'gas' en Ethereum?", options: ["El precio del ETH en el mercado", "La tarifa que pagas para ejecutar una transacci&oacute;n", "Un tipo de token ERC-20", "El nombre del combustible para minar"], correct: 1 },
-    { text: "&iquest;Qu&eacute; significa DeFi?", options: ["Definici&oacute;n Financiera", "Finanzas Descentralizadas", "Dep&oacute;sito Fijo", "Deuda Financiera"], correct: 1 },
-    { text: "&iquest;Qu&eacute; es un DEX?", options: ["Un exchange descentralizado", "Un tipo de token", "Un contrato de derivados", "Un explorador de bloques"], correct: 0 },
-    { text: "&iquest;Qu&eacute; significa hacer staking en Ethereum?", options: ["Comprar ETH y esperar que suba", "Bloquear ETH como garant&iacute;a para validar transacciones y ganar recompensas", "Vender ETH en un exchange", "Transferir ETH a otra wallet"], correct: 1 }
-  ];
-  let userAnswers = new Array(questions.length).fill(null);
-  let quizCompleted = false;
-  let timerInterval = null;
-  let timeSeconds = 0;
-  const MAX_TIME = 120;
-  const quizContainer = document.getElementById('quizContainer');
-  const submitBtn = document.getElementById('submitQuizBtn');
-  const insigniaDiv = document.getElementById('insigniaArea');
-  const nextBtn = document.getElementById('nextPageBtn');
-  const timerDisplaySpan = document.getElementById('timerDisplay');
-  const challengeMsgSpan = document.getElementById('challengeMsg');
+ const STORAGE_KEY = 'block_2_01';
+ const questions = [
+  { text: "&iquest;Qu&eacute; es Ethereum? (elige la mejor respuesta)", options: ["Una criptomoneda como Bitcoin", "Una plataforma descentralizada de c&oacute;mputo con contratos inteligentes", "Un exchange de criptomonedas", "Un wallet para guardar cripto"], correct: 1 },
+  { text: "&iquest;Qu&eacute; es un smart contract?", options: ["Un contrato legal tradicional en PDF", "Un programa autoejecutable almacenado en la blockchain", "Una cuenta bancaria compartida", "Un tipo de token"], correct: 1 },
+  { text: "&iquest;Qu&eacute; es el 'gas' en Ethereum?", options: ["El precio del ETH en el mercado", "La tarifa que pagas para ejecutar una transacci&oacute;n", "Un tipo de token ERC-20", "El nombre del combustible para minar"], correct: 1 },
+  { text: "&iquest;Qu&eacute; significa DeFi?", options: ["Definici&oacute;n Financiera", "Finanzas Descentralizadas", "Dep&oacute;sito Fijo", "Deuda Financiera"], correct: 1 },
+  { text: "&iquest;Qu&eacute; es un DEX?", options: ["Un exchange descentralizado", "Un tipo de token", "Un contrato de derivados", "Un explorador de bloques"], correct: 0 },
+  { text: "&iquest;Qu&eacute; significa hacer staking en Ethereum?", options: ["Comprar ETH y esperar que suba", "Bloquear ETH como garant&iacute;a para validar transacciones y ganar recompensas", "Vender ETH en un exchange", "Transferir ETH a otra wallet"], correct: 1 }
+ ];
+ let userAnswers = new Array(questions.length).fill(null);
+ let quizCompleted = false;
+ let timerInterval = null;
+ let timeSeconds = 0;
+ const MAX_TIME = 120;
+ const quizContainer = document.getElementById('quizContainer');
+ const submitBtn = document.getElementById('submitQuizBtn');
+ const insigniaDiv = document.getElementById('insigniaArea');
+ const nextBtn = document.getElementById('nextPageBtn');
+ const timerDisplaySpan = document.getElementById('timerDisplay');
+ const challengeMsgSpan = document.getElementById('challengeMsg');
 
-  function renderQuestions() {
-    quizContainer.innerHTML = '';
-    questions.forEach(function(q, idx) {
-      var qDiv = document.createElement('div');
-      qDiv.classList.add('question');
-      qDiv.innerHTML = '<p>' + q.text + '</p><div class="options" id="options-' + idx + '"></div>';
-      var optionsDiv = qDiv.querySelector('.options');
-      q.options.forEach(function(opt, optIdx) {
-        var optSpan = document.createElement('div');
-        optSpan.classList.add('opt');
-        optSpan.textContent = opt;
-        optSpan.dataset.qIdx = idx;
-        optSpan.dataset.optIdx = optIdx;
-        optSpan.addEventListener('click', function(e) {
-          if (quizCompleted) return;
-          var parent = optSpan.parentElement;
-          Array.from(parent.children).forEach(function(c) { c.classList.remove('selected'); });
-          optSpan.classList.add('selected');
-          userAnswers[idx] = optIdx;
-          updateSubmitButtonState();
-        });
-        optionsDiv.appendChild(optSpan);
-      });
-      if (userAnswers[idx] !== null) {
-        var opts = optionsDiv.querySelectorAll('.opt');
-        if (opts[userAnswers[idx]]) opts[userAnswers[idx]].classList.add('selected');
-      }
-      quizContainer.appendChild(qDiv);
+ function renderQuestions() {
+  quizContainer.innerHTML = '';
+  questions.forEach(function(q, idx) {
+   var qDiv = document.createElement('div');
+   qDiv.classList.add('question');
+   qDiv.innerHTML = '<p>' + q.text + '</p><div class="options" id="options-' + idx + '"></div>';
+   var optionsDiv = qDiv.querySelector('.options');
+   q.options.forEach(function(opt, optIdx) {
+    var optSpan = document.createElement('div');
+    optSpan.classList.add('opt');
+    optSpan.textContent = opt;
+    optSpan.dataset.qIdx = idx;
+    optSpan.dataset.optIdx = optIdx;
+    optSpan.addEventListener('click', function(e) {
+     if (quizCompleted) return;
+     var parent = optSpan.parentElement;
+     Array.from(parent.children).forEach(function(c) { c.classList.remove('selected'); });
+     optSpan.classList.add('selected');
+     userAnswers[idx] = optIdx;
+     updateSubmitButtonState();
     });
-  }
+    optionsDiv.appendChild(optSpan);
+   });
+   if (userAnswers[idx] !== null) {
+    var opts = optionsDiv.querySelectorAll('.opt');
+    if (opts[userAnswers[idx]]) opts[userAnswers[idx]].classList.add('selected');
+   }
+   quizContainer.appendChild(qDiv);
+  });
+ }
 
-  function updateSubmitButtonState() {
-    var allAnswered = userAnswers.every(function(a) { return a !== null; });
-    submitBtn.disabled = !(allAnswered && !quizCompleted);
-    submitBtn.style.opacity = submitBtn.disabled ? '0.6' : '1';
-  }
+ function updateSubmitButtonState() {
+  var allAnswered = userAnswers.every(function(a) { return a !== null; });
+  submitBtn.disabled = !(allAnswered && !quizCompleted);
+  submitBtn.style.opacity = submitBtn.disabled ? '0.6' : '1';
+ }
 
-  function evaluateQuiz() {
-    var correctCount = 0;
-    for (var i = 0; i < questions.length; i++) {
-      if (userAnswers[i] === questions[i].correct) correctCount++;
-    }
-    return correctCount;
+ function evaluateQuiz() {
+  var correctCount = 0;
+  for (var i = 0; i < questions.length; i++) {
+   if (userAnswers[i] === questions[i].correct) correctCount++;
   }
+  return correctCount;
+ }
 
-  function showInsigniaAndNext() {
-    if (quizCompleted) return;
-    var correct = evaluateQuiz();
-    var passed = correct >= 4;
-    if (passed) {
-      quizCompleted = true;
-      insigniaDiv.classList.remove('hidden');
-      nextBtn.classList.remove('hidden');
-      submitBtn.disabled = true;
-      if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-        challengeMsgSpan.innerHTML = I18N.t('fb_0');
-      }
-      localStorage.setItem(STORAGE_KEY, 'true');
-      var allOpts = document.querySelectorAll('.opt');
-      allOpts.forEach(function(o) { o.style.pointerEvents = 'none'; });
-    } else {
-      alert(' A&uacute;n no alcanzas la insignia... Obtuviste ' + correct + ' de ' + questions.length + ' correctas. Necesitas al menos 4. &iexcl;Reintenta!');
-      updateSubmitButtonState();
-    }
+ function showInsigniaAndNext() {
+  if (quizCompleted) return;
+  var correct = evaluateQuiz();
+  var passed = correct >= 4;
+  if (passed) {
+   quizCompleted = true;
+   insigniaDiv.classList.remove('hidden');
+   nextBtn.classList.remove('hidden');
+   submitBtn.disabled = true;
+   if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    challengeMsgSpan.innerHTML = I18N.t('fb_0');
+   }
+   localStorage.setItem(STORAGE_KEY, 'true');
+   var allOpts = document.querySelectorAll('.opt');
+   allOpts.forEach(function(o) { o.style.pointerEvents = 'none'; });
+  } else {
+   alert(' A&uacute;n no alcanzas la insignia... Obtuviste ' + correct + ' de ' + questions.length + ' correctas. Necesitas al menos 4. &iexcl;Reintenta!');
+   updateSubmitButtonState();
   }
+ }
 
-  function handleSubmit() {
-    if (quizCompleted) { alert("Ya tienes la insignia, &iexcl;contin&uacute;a tu viaje!"); return; }
-    var allAnswered = userAnswers.every(function(a) { return a !== null; });
-    if (!allAnswered) { alert(" Responde todas las preguntas para completar el desaf&iacute;o."); return; }
-    showInsigniaAndNext();
-  }
+ function handleSubmit() {
+  if (quizCompleted) { alert("Ya tienes la insignia, &iexcl;contin&uacute;a tu viaje!"); return; }
+  var allAnswered = userAnswers.every(function(a) { return a !== null; });
+  if (!allAnswered) { alert(" Responde todas las preguntas para completar el desaf&iacute;o."); return; }
+  showInsigniaAndNext();
+ }
 
-  function startTimer() {
-    timeSeconds = 0;
+ function startTimer() {
+  timeSeconds = 0;
+  updateTimerDisplay();
+  timerInterval = setInterval(function() {
+   if (quizCompleted) return;
+   if (timeSeconds >= MAX_TIME) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    challengeMsgSpan.innerHTML = I18N.t('fb_1');
+    submitBtn.disabled = true;
+    alert(" El cron&oacute;metro ha llegado a cero. &iexcl;Recarga la p&aacute;gina para un nuevo intento!");
+   } else {
+    timeSeconds++;
     updateTimerDisplay();
-    timerInterval = setInterval(function() {
-      if (quizCompleted) return;
-      if (timeSeconds >= MAX_TIME) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-        challengeMsgSpan.innerHTML = I18N.t('fb_1');
-        submitBtn.disabled = true;
-        alert(" El cron&oacute;metro ha llegado a cero. &iexcl;Recarga la p&aacute;gina para un nuevo intento!");
-      } else {
-        timeSeconds++;
-        updateTimerDisplay();
-        if (timeSeconds > MAX_TIME - 15 && !quizCompleted) {
-          challengeMsgSpan.innerHTML = ' &iexcl;&Uacute;ltimos segundos! &iexcl;Date prisa campe&oacute;n!';
-        }
-      }
-    }, 1000);
-  }
-
-  function updateTimerDisplay() {
-    var minutes = Math.floor(timeSeconds / 60);
-    var secs = timeSeconds % 60;
-    timerDisplaySpan.textContent = minutes.toString().padStart(2,'0') + ':' + secs.toString().padStart(2,'0');
-  }
-
-  function restoreProgress() {
-    var completed = localStorage.getItem(STORAGE_KEY);
-    if (completed === 'true') {
-      quizCompleted = true;
-      insigniaDiv.classList.remove('hidden');
-      nextBtn.classList.remove('hidden');
-      submitBtn.disabled = true;
-      if (timerInterval) clearInterval(timerInterval);
-      timerDisplaySpan.textContent = "00:00";
-      challengeMsgSpan.innerHTML = I18N.t('fb_2');
-      var allOpts = document.querySelectorAll('.opt');
-      allOpts.forEach(function(o) { o.style.pointerEvents = 'none'; });
-    } else {
-      startTimer();
+    if (timeSeconds > MAX_TIME - 15 && !quizCompleted) {
+     challengeMsgSpan.innerHTML = ' &iexcl;&Uacute;ltimos segundos! &iexcl;Date prisa campe&oacute;n!';
     }
-  }
+   }
+  }, 1000);
+ }
 
-  function init() {
-    renderQuestions();
-    updateSubmitButtonState();
-    submitBtn.addEventListener('click', handleSubmit);
-    restoreProgress();
+ function updateTimerDisplay() {
+  var minutes = Math.floor(timeSeconds / 60);
+  var secs = timeSeconds % 60;
+  timerDisplaySpan.textContent = minutes.toString().padStart(2,'0') + ':' + secs.toString().padStart(2,'0');
+ }
+
+ function restoreProgress() {
+  var completed = localStorage.getItem(STORAGE_KEY);
+  if (completed === 'true') {
+   quizCompleted = true;
+   insigniaDiv.classList.remove('hidden');
+   nextBtn.classList.remove('hidden');
+   submitBtn.disabled = true;
+   if (timerInterval) clearInterval(timerInterval);
+   timerDisplaySpan.textContent = "00:00";
+   challengeMsgSpan.innerHTML = I18N.t('fb_2');
+   var allOpts = document.querySelectorAll('.opt');
+   allOpts.forEach(function(o) { o.style.pointerEvents = 'none'; });
+  } else {
+   startTimer();
   }
-  init();
+ }
+
+ function init() {
+  renderQuestions();
+  updateSubmitButtonState();
+  submitBtn.addEventListener('click', handleSubmit);
+  restoreProgress();
+ }
+ init();
 </script>
-<script src="../../../assets/js/cookie-consent.js"></script>
 <script>
 window.I18N_DATA={
-  'fb_0': { es: ' &iexcl;LO LOGRASTE! Has superado el diagn&oacute;stico.', en: ' &iexcl;LO LOGRASTE! Has superado el diagn&oacute;stico.' },
-  'fb_1': { es: ' TIEMPO AGOTADO  &iexcl;Pero puedes refrescar la p&aacute;gina e intentarlo de nuevo!', en: ' TIEMPO AGOTADO  &iexcl;Pero puedes refrescar la p&aacute;gina e intentarlo de nuevo!' },
-  'fb_2': { es: ' Ya tienes la insignia. &iexcl;Contin&uacute;a al siguiente m&oacute;dulo!', en: ' Ya tienes la insignia. &iexcl;Contin&uacute;a al siguiente m&oacute;dulo!' }
+ 'fb_0': { es: ' &iexcl;LO LOGRASTE! Has superado el diagn&oacute;stico.', en: ' &iexcl;LO LOGRASTE! Has superado el diagn&oacute;stico.' },
+ 'fb_1': { es: ' TIEMPO AGOTADO &iexcl;Pero puedes refrescar la p&aacute;gina e intentarlo de nuevo!', en: ' TIEMPO AGOTADO &iexcl;Pero puedes refrescar la p&aacute;gina e intentarlo de nuevo!' },
+ 'fb_2': { es: ' Ya tienes la insignia. &iexcl;Contin&uacute;a al siguiente m&oacute;dulo!', en: ' Ya tienes la insignia. &iexcl;Contin&uacute;a al siguiente m&oacute;dulo!' }
 };
 </script>
-<script src="../../../assets/js/i18n.js"></script>  </body>
+<script src="../../../assets/js/i18n.js"></script> </body>
 </html>

@@ -1,197 +1,197 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Curso 5 | 🧮 Matrices y OpenBLAS</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Press+Start+2P&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <link rel="stylesheet" href="../../../assets/css/theme.css">
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
-    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-    .modulo-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,102,192,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
-    .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #ff66c0; }
-    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#ffb0d8,#ff66c0); -webkit-background-clip:text; background-clip:text; color:transparent; }
-    .hero-header p { font-size:1.1rem; color:#ffccdd; margin-top:0.5rem; font-weight:500; }
-    .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
-    .chip { background:rgba(255,102,192,0.15); border:1px solid #ff66c0; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
-    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ff66c0; font-size:1rem; line-height:1.6; }
-    .main-area { padding:1.5rem 2rem; }
-    .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#ff66c0; }
-    .matrix-workspace { display:flex; flex-wrap:wrap; gap:2rem; margin-bottom:2rem; }
-    .matrix-panel { flex:1; min-width:280px; background:#0d1830; border-radius:1.5rem; padding:1.2rem; border:1px solid #ff66c055; }
-    .matrix-panel h3 { color:#ff66c0; margin-bottom:0.8rem; font-size:1rem; }
-    .matrix-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:0.4rem; margin-bottom:0.8rem; }
-    .matrix-grid input { width:100%; padding:0.4rem; background:#0b1120; border:1px solid #2a3d5a; border-radius:0.5rem; color:#eef5ff; text-align:center; font-size:0.7rem; }
-    .matrix-grid input:focus { border-color:#ff66c0; outline:none; box-shadow:0 0 8px rgba(255,102,192,0.4); }
-    .ops-row { display:flex; flex-wrap:wrap; gap:0.5rem; margin:1rem 0; }
-    .btn-op { background:#1a2a4a; border:1px solid #ff66c0; padding:0.5rem 1rem; border-radius:2rem; color:#eef5ff; font-weight:600; cursor:pointer; transition:0.2s; font-size:0.8rem; }
-    .btn-op:hover { background:#ff66c0; color:#0b1120; transform:translateY(-2px); }
-    .result-matrix { background:#0b1120; border-radius:1rem; padding:1rem; margin-top:0.5rem; border:1px solid #ff66c055; min-height:60px; }
-    .result-grid { display:grid; gap:0.3rem; margin-top:0.5rem; }
-    .result-grid .cell { background:#0f1a2c; padding:0.3rem; text-align:center; border-radius:0.3rem; font-size:0.65rem; color:#00ff88; }
-    .cell.filled { animation:cellPop 0.3s ease; }
-    @keyframes cellPop { 0%{transform:scale(0.5);opacity:0} 100%{transform:scale(1);opacity:1} }
-    .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #ff66c0; }
-    .btn-action { background:linear-gradient(95deg,#ff66c0,#ff3399); border:none; padding:0.6rem 1.4rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:0.9rem; transition:0.2s; color:#1e1a0c; }
-    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(255,102,192,0.5); }
-    .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
-    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:0 2rem 1.5rem; padding:1rem; border:1px dashed gold; }
-    .insignia i { font-size:2.5rem; color:gold; }
-    .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
-    .hidden { display:none; }
-    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
-    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
-    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(255,102,192,0.4); }
-    .nav-link.next { background:linear-gradient(95deg,#ff66c0,#ff3399); color:#1e1a0c; }
-    .nav-link.menu { background:#1a2a4a; border:1px solid #ff66c0; }
-    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
-    .tab-bar { display:flex; gap:0.5rem; margin-bottom:1rem; flex-wrap:wrap; }
-    .tab-btn { background:#0b1120; border:1px solid #2a3d5a; padding:0.5rem 1rem; border-radius:2rem; cursor:pointer; font-size:0.8rem; color:#8899cc; transition:0.2s; }
-    .tab-btn.active { background:#ff66c0; color:#0b1120; border-color:#ff66c0; font-weight:600; }
-    .tab-content { display:none; }
-    .tab-content.active { display:block; }
-    .code-panel { background:#0b1120; border-radius:1rem; padding:1rem; margin:0.5rem 0; border:1px solid #ff66c055; }
-    .code-panel pre { font-family:'Courier New',monospace; font-size:0.8rem; color:#00ff88; white-space:pre-wrap; }
-    .openblas-info { background:#0d1830; border-radius:1rem; padding:1rem; margin:1rem 0; border:1px solid #ff66c055; }
-    .openblas-info h4 { color:#ff66c0; margin-bottom:0.5rem; }
-    .openblas-info table { width:100%; border-collapse:collapse; font-size:0.8rem; }
-    .openblas-info td { padding:0.3rem 0.5rem; border-bottom:1px solid #1a2a4a; }
-    .openblas-info .mql5 { color:#00ff88; }
-    .openblas-info .blas { color:#66ccff; }
-    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .matrix-workspace { flex-direction:column; } }
-  </style>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Curso 5 | 🧮 Matrices y OpenBLAS</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Press+Start+2P&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
+ <style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+  @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .modulo-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,102,192,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+  .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #ff66c0; }
+  .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#ffb0d8,#ff66c0); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero-header p { font-size:1.1rem; color:#ffccdd; margin-top:0.5rem; font-weight:500; }
+  .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+  .chip { background:rgba(255,102,192,0.15); border:1px solid #ff66c0; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+  .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ff66c0; font-size:1rem; line-height:1.6; }
+  .main-area { padding:1.5rem 2rem; }
+  .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#ff66c0; }
+  .matrix-workspace { display:flex; flex-wrap:wrap; gap:2rem; margin-bottom:2rem; }
+  .matrix-panel { flex:1; min-width:280px; background:#0d1830; border-radius:1.5rem; padding:1.2rem; border:1px solid #ff66c055; }
+  .matrix-panel h3 { color:#ff66c0; margin-bottom:0.8rem; font-size:1rem; }
+  .matrix-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:0.4rem; margin-bottom:0.8rem; }
+  .matrix-grid input { width:100%; padding:0.4rem; background:#0b1120; border:1px solid #2a3d5a; border-radius:0.5rem; color:#eef5ff; text-align:center; font-size:0.7rem; }
+  .matrix-grid input:focus { border-color:#ff66c0; outline:none; box-shadow:0 0 8px rgba(255,102,192,0.4); }
+  .ops-row { display:flex; flex-wrap:wrap; gap:0.5rem; margin:1rem 0; }
+  .btn-op { background:#1a2a4a; border:1px solid #ff66c0; padding:0.5rem 1rem; border-radius:2rem; color:#eef5ff; font-weight:600; cursor:pointer; transition:0.2s; font-size:0.8rem; }
+  .btn-op:hover { background:#ff66c0; color:#0b1120; transform:translateY(-2px); }
+  .result-matrix { background:#0b1120; border-radius:1rem; padding:1rem; margin-top:0.5rem; border:1px solid #ff66c055; min-height:60px; }
+  .result-grid { display:grid; gap:0.3rem; margin-top:0.5rem; }
+  .result-grid .cell { background:#0f1a2c; padding:0.3rem; text-align:center; border-radius:0.3rem; font-size:0.65rem; color:#00ff88; }
+  .cell.filled { animation:cellPop 0.3s ease; }
+  @keyframes cellPop { 0%{transform:scale(0.5);opacity:0} 100%{transform:scale(1);opacity:1} }
+  .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #ff66c0; }
+  .btn-action { background:linear-gradient(95deg,#ff66c0,#ff3399); border:none; padding:0.6rem 1.4rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:0.9rem; transition:0.2s; color:#1e1a0c; }
+  .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(255,102,192,0.5); }
+  .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
+  .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:0 2rem 1.5rem; padding:1rem; border:1px dashed gold; }
+  .insignia i { font-size:2.5rem; color:gold; }
+  .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
+  .hidden { display:none; }
+  .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+  .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+  .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(255,102,192,0.4); }
+  .nav-link.next { background:linear-gradient(95deg,#ff66c0,#ff3399); color:#1e1a0c; }
+  .nav-link.menu { background:#1a2a4a; border:1px solid #ff66c0; }
+  footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+  .tab-bar { display:flex; gap:0.5rem; margin-bottom:1rem; flex-wrap:wrap; }
+  .tab-btn { background:#0b1120; border:1px solid #2a3d5a; padding:0.5rem 1rem; border-radius:2rem; cursor:pointer; font-size:0.8rem; color:#8899cc; transition:0.2s; }
+  .tab-btn.active { background:#ff66c0; color:#0b1120; border-color:#ff66c0; font-weight:600; }
+  .tab-content { display:none; }
+  .tab-content.active { display:block; }
+  .code-panel { background:#0b1120; border-radius:1rem; padding:1rem; margin:0.5rem 0; border:1px solid #ff66c055; }
+  .code-panel pre { font-family:'Courier New',monospace; font-size:0.8rem; color:#00ff88; white-space:pre-wrap; }
+  .openblas-info { background:#0d1830; border-radius:1rem; padding:1rem; margin:1rem 0; border:1px solid #ff66c055; }
+  .openblas-info h4 { color:#ff66c0; margin-bottom:0.5rem; }
+  .openblas-info table { width:100%; border-collapse:collapse; font-size:0.8rem; }
+  .openblas-info td { padding:0.3rem 0.5rem; border-bottom:1px solid #1a2a4a; }
+  .openblas-info .mql5 { color:#00ff88; }
+  .openblas-info .blas { color:#66ccff; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .matrix-workspace { flex-direction:column; } }
+ </style>
 </head>
 <body>
 <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a></nav>
 <div class="modulo-container">
-  <div class="hero-header">
-    <h1>🧮 Matrices y OpenBLAS</h1>
-    <p>Matemáticas de alto rendimiento con aceleración OpenBLAS</p>
-    <div class="badge-area">
-      <span class="chip"><i class="fas fa-th"></i> Matrix Class</span>
-      <span class="chip"><i class="fas fa-microchip"></i> OpenBLAS</span>
-      <span class="chip"><i class="fas fa-rocket"></i> BLAS API</span>
-    </div>
+ <div class="hero-header">
+  <h1>🧮 Matrices y OpenBLAS</h1>
+  <p>Matemáticas de alto rendimiento con aceleración OpenBLAS</p>
+  <div class="badge-area">
+   <span class="chip"><i class="fas fa-th"></i> Matrix Class</span>
+   <span class="chip"><i class="fas fa-microchip"></i> OpenBLAS</span>
+   <span class="chip"><i class="fas fa-rocket"></i> BLAS API</span>
   </div>
-  <div class="analogy-card">
-    <strong>💡 Piénsalo así:</strong> Una matriz es como una hoja de cálculo: filas y columnas de números. OpenBLAS es como tener un equipo de cien calculadoras humanas trabajando en paralelo. MQL5 integra ambas: la matrix class para manipulación y OpenBLAS para aceleración numérica.
+ </div>
+ <div class="analogy-card">
+  <strong>💡 Piénsalo así:</strong> Una matriz es como una hoja de cálculo: filas y columnas de números. OpenBLAS es como tener un equipo de cien calculadoras humanas trabajando en paralelo. MQL5 integra ambas: la matrix class para manipulación y OpenBLAS para aceleración numérica.
+ </div>
+ <div class="main-area">
+  <div class="tab-bar">
+   <button class="tab-btn active" data-tab="sandbox">🧪 Matrix Sandbox</button>
+   <button class="tab-btn" data-tab="blas">⚡ OpenBLAS API</button>
+   <button class="tab-btn" data-tab="code">📟 Código MQL5</button>
   </div>
-  <div class="main-area">
-    <div class="tab-bar">
-      <button class="tab-btn active" data-tab="sandbox">🧪 Matrix Sandbox</button>
-      <button class="tab-btn" data-tab="blas">⚡ OpenBLAS API</button>
-      <button class="tab-btn" data-tab="code">📟 Código MQL5</button>
+  <div id="tab-sandbox" class="tab-content active">
+   <div class="section-title"><i class="fas fa-pencil-alt"></i> Matrix Sandbox</div>
+   <p style="color:#b9e2ff;margin-bottom:1rem;">Ingresa valores en las matrices A y B (3x3), luego elige una operación.</p>
+   <div class="matrix-workspace">
+    <div class="matrix-panel">
+     <h3><i class="fas fa-font"></i> Matriz A</h3>
+     <div class="matrix-grid" id="matrixA"></div>
+     <button class="btn-op" onclick="randomFill('A')">🎲 Aleatorio</button>
+     <button class="btn-op" onclick="resetMatrix('A')">🔄 Reset</button>
     </div>
-    <div id="tab-sandbox" class="tab-content active">
-      <div class="section-title"><i class="fas fa-pencil-alt"></i> Matrix Sandbox</div>
-      <p style="color:#b9e2ff;margin-bottom:1rem;">Ingresa valores en las matrices A y B (3x3), luego elige una operación.</p>
-      <div class="matrix-workspace">
-        <div class="matrix-panel">
-          <h3><i class="fas fa-font"></i> Matriz A</h3>
-          <div class="matrix-grid" id="matrixA"></div>
-          <button class="btn-op" onclick="randomFill('A')">🎲 Aleatorio</button>
-          <button class="btn-op" onclick="resetMatrix('A')">🔄 Reset</button>
-        </div>
-        <div class="matrix-panel">
-          <h3><i class="fas fa-font"></i> Matriz B</h3>
-          <div class="matrix-grid" id="matrixB"></div>
-          <button class="btn-op" onclick="randomFill('B')">🎲 Aleatorio</button>
-          <button class="btn-op" onclick="resetMatrix('B')">🔄 Reset</button>
-        </div>
-        <div class="matrix-panel" style="flex:1.5">
-          <h3><i class="fas fa-equals"></i> Resultado</h3>
-          <div class="ops-row">
-            <button class="btn-op" onclick="computeOp('add')">➕ Sumar</button>
-            <button class="btn-op" onclick="computeOp('sub')">➖ Restar</button>
-            <button class="btn-op" onclick="computeOp('elemul')">✖️ Elem-Wise</button>
-            <button class="btn-op" onclick="computeOp('dot')">🔗 Dot Product</button>
-            <button class="btn-op" onclick="computeOp('transposeA')">🔄 Transponer A</button>
-            <button class="btn-op" onclick="computeOp('inverseA')">🔢 Inversa A</button>
-            <button class="btn-op" onclick="computeOp('detA')">📐 Det(A)</button>
-          </div>
-          <div class="result-matrix" id="resultMatrix"><p style="color:#667799;font-size:0.85rem;">Presiona un botón para ver el resultado</p></div>
-        </div>
-      </div>
+    <div class="matrix-panel">
+     <h3><i class="fas fa-font"></i> Matriz B</h3>
+     <div class="matrix-grid" id="matrixB"></div>
+     <button class="btn-op" onclick="randomFill('B')">🎲 Aleatorio</button>
+     <button class="btn-op" onclick="resetMatrix('B')">🔄 Reset</button>
     </div>
-    <div id="tab-blas" class="tab-content">
-      <div class="section-title"><i class="fas fa-microchip"></i> OpenBLAS API Reference</div>
-      <p style="color:#b9e2ff;margin-bottom:0.8rem;">Equivalencia entre funciones MQL5 Matrix y rutinas OpenBLAS:</p>
-      <div class="openblas-info" id="blasTable">
-        <table><thead><tr><td style="color:#ff66c0;font-weight:600;">MQL5 Matrix</td><td style="color:#ff66c0;font-weight:600;">OpenBLAS</td><td style="color:#ff66c0;font-weight:600;">Descripción</td></tr></thead>
-        <tbody>
-          <tr><td class="mql5">A.MatMul(B)</td><td class="blas">cblas_dgemm</td><td>Multiplicación de matrices (GEMM)</td></tr>
-          <tr><td class="mql5">A.Transpose()</td><td class="blas">— (manual)</td><td>Transposición de matriz</td></tr>
-          <tr><td class="mql5">A.Inv()</td><td class="blas">dgetrf + dgetri</td><td>Inversa vía LU decomposition</td></tr>
-          <tr><td class="mql5">A.Det()</td><td class="blas">dgetrf</td><td>Determinante vía LU</td></tr>
-          <tr><td class="mql5">w.Dot(cov.MatMul(w))</td><td class="blas">cblas_dsymm + cblas_ddot</td><td>Varianza de portafolio</td></tr>
-          <tr><td class="mql5">SVD</td><td class="blas">dgesdd</td><td>Descomposición en valores singulares</td></tr>
-          <tr><td class="mql5">Eigenvalue</td><td class="blas">dsyev</td><td>Eigenvalores de matriz simétrica</td></tr>
-          <tr><td class="mql5">Cholesky</td><td class="blas">dpotrf</td><td>Descomposición de Cholesky</td></tr>
-        </tbody></table>
-      </div>
-      <div class="code-panel" style="margin-top:1rem;"><pre><span class="comment">// OpenBLAS se activa automáticamente en MQL5 build 2680+</span>
+    <div class="matrix-panel" style="flex:1.5">
+     <h3><i class="fas fa-equals"></i> Resultado</h3>
+     <div class="ops-row">
+      <button class="btn-op" onclick="computeOp('add')">➕ Sumar</button>
+      <button class="btn-op" onclick="computeOp('sub')">➖ Restar</button>
+      <button class="btn-op" onclick="computeOp('elemul')">✖️ Elem-Wise</button>
+      <button class="btn-op" onclick="computeOp('dot')">🔗 Dot Product</button>
+      <button class="btn-op" onclick="computeOp('transposeA')">🔄 Transponer A</button>
+      <button class="btn-op" onclick="computeOp('inverseA')">🔢 Inversa A</button>
+      <button class="btn-op" onclick="computeOp('detA')">📐 Det(A)</button>
+     </div>
+     <div class="result-matrix" id="resultMatrix"><p style="color:#667799;font-size:0.85rem;">Presiona un botón para ver el resultado</p></div>
+    </div>
+   </div>
+  </div>
+  <div id="tab-blas" class="tab-content">
+   <div class="section-title"><i class="fas fa-microchip"></i> OpenBLAS API Reference</div>
+   <p style="color:#b9e2ff;margin-bottom:0.8rem;">Equivalencia entre funciones MQL5 Matrix y rutinas OpenBLAS:</p>
+   <div class="openblas-info" id="blasTable">
+    <table><thead><tr><td style="color:#ff66c0;font-weight:600;">MQL5 Matrix</td><td style="color:#ff66c0;font-weight:600;">OpenBLAS</td><td style="color:#ff66c0;font-weight:600;">Descripción</td></tr></thead>
+    <tbody>
+     <tr><td class="mql5">A.MatMul(B)</td><td class="blas">cblas_dgemm</td><td>Multiplicación de matrices (GEMM)</td></tr>
+     <tr><td class="mql5">A.Transpose()</td><td class="blas">— (manual)</td><td>Transposición de matriz</td></tr>
+     <tr><td class="mql5">A.Inv()</td><td class="blas">dgetrf + dgetri</td><td>Inversa vía LU decomposition</td></tr>
+     <tr><td class="mql5">A.Det()</td><td class="blas">dgetrf</td><td>Determinante vía LU</td></tr>
+     <tr><td class="mql5">w.Dot(cov.MatMul(w))</td><td class="blas">cblas_dsymm + cblas_ddot</td><td>Varianza de portafolio</td></tr>
+     <tr><td class="mql5">SVD</td><td class="blas">dgesdd</td><td>Descomposición en valores singulares</td></tr>
+     <tr><td class="mql5">Eigenvalue</td><td class="blas">dsyev</td><td>Eigenvalores de matriz simétrica</td></tr>
+     <tr><td class="mql5">Cholesky</td><td class="blas">dpotrf</td><td>Descomposición de Cholesky</td></tr>
+    </tbody></table>
+   </div>
+   <div class="code-panel" style="margin-top:1rem;"><pre><span class="comment">// OpenBLAS se activa automáticamente en MQL5 build 2680+</span>
 <span class="comment">// Las funciones matrix/vector usan OpenBLAS cuando están disponibles</span>
 <span class="type">matrix</span>&lt;<span class="type">double</span>&gt; A = {{1,2},{3,4}};
 <span class="type">matrix</span>&lt;<span class="type">double</span>&gt; B = {{5,6},{7,8}};
 <span class="type">matrix</span>&lt;<span class="type">double</span>&gt; C = A.MatMul(B); <span class="comment">// Usa cblas_dgemm internamente</span>
 <span class="type">Print</span>(<span class="string">"C[0][0]="</span>, C[0][0]);</pre></div>
-    </div>
-    <div id="tab-code" class="tab-content">
-      <div class="section-title"><i class="fas fa-code"></i> Código MQL5: Matrix Class</div>
-      <div class="code-panel" id="codePanel"><pre>// Selecciona una operación en el Sandbox para ver el código MQL5 correspondiente</pre></div>
-      <p style="color:#667799;font-size:0.75rem;margin-top:0.5rem;">MQL5 usa <span style="color:#ff66c0;">matrix&lt;double&gt;</span> y <span style="color:#66ccff;">vector&lt;double&gt;</span> desde build 2680+ con aceleración OpenBLAS</p>
-    </div>
-    <div id="insigniaArea" class="insignia hidden">
-      <i class="fas fa-medal"></i>
-      <h3>🏅 Operador de Matrices 🏅</h3>
-      <p>Has dominado las operaciones matriciales con OpenBLAS en MQL5. ¡El álgebra lineal de alto rendimiento no tiene secretos para ti!</p>
-    </div>
   </div>
-  <div id="feedbackMsg" class="feedback">💡 Explora las matrices usando el Sandbox primero, luego consulta la API de OpenBLAS.</div>
-  <div class="nav-links">
-    <a href="05-objetos-graficos.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
-    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
-    <a href="07-algebra-lineal.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  <div id="tab-code" class="tab-content">
+   <div class="section-title"><i class="fas fa-code"></i> Código MQL5: Matrix Class</div>
+   <div class="code-panel" id="codePanel"><pre>// Selecciona una operación en el Sandbox para ver el código MQL5 correspondiente</pre></div>
+   <p style="color:#667799;font-size:0.75rem;margin-top:0.5rem;">MQL5 usa <span style="color:#ff66c0;">matrix&lt;double&gt;</span> y <span style="color:#66ccff;">vector&lt;double&gt;</span> desde build 2680+ con aceleración OpenBLAS</p>
   </div>
-  <footer><i class="fas fa-crown"></i> Curso 5: EAs Avanzados · Multi-símbolo, ML y ONNX</footer>
+  <div id="insigniaArea" class="insignia hidden">
+   <i class="fas fa-medal"></i>
+   <h3>🏅 Operador de Matrices 🏅</h3>
+   <p>Has dominado las operaciones matriciales con OpenBLAS en MQL5. ¡El álgebra lineal de alto rendimiento no tiene secretos para ti!</p>
+  </div>
+ </div>
+ <div id="feedbackMsg" class="feedback">💡 Explora las matrices usando el Sandbox primero, luego consulta la API de OpenBLAS.</div>
+ <div class="nav-links">
+  <a href="05-objetos-graficos.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+  <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+  <a href="07-algebra-lineal.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+ </div>
+ <footer><i class="fas fa-crown"></i> Curso 5: EAs Avanzados · Multi-símbolo, ML y ONNX</footer>
 </div>
 <script>
 const STORAGE_KEY = 'mql5_5_06';
 function getProgress() { return JSON.parse(localStorage.getItem('mql5_5_progress')) || []; }
 let matA = [[1,2,3],[4,5,6],[7,8,9]], matB = [[9,8,7],[6,5,4],[3,2,1]];
 function renderMatrix(id, data) {
-  const c = document.getElementById(id); c.innerHTML = '';
-  for (let r = 0; r < 3; r++) for (let t = 0; t < 3; t++) {
-    const i = document.createElement('input'); i.type = 'number'; i.value = data[r][t];
-    i.dataset.r = r; i.dataset.c = t; i.dataset.mat = id === 'matrixA' ? 'A' : 'B';
-    i.addEventListener('input', function() { const m = this.dataset.mat === 'A' ? matA : matB; m[parseInt(this.dataset.r)][parseInt(this.dataset.c)] = parseFloat(this.value) || 0; });
-    c.appendChild(i);
-  }
+ const c = document.getElementById(id); c.innerHTML = '';
+ for (let r = 0; r < 3; r++) for (let t = 0; t < 3; t++) {
+  const i = document.createElement('input'); i.type = 'number'; i.value = data[r][t];
+  i.dataset.r = r; i.dataset.c = t; i.dataset.mat = id === 'matrixA' ? 'A' : 'B';
+  i.addEventListener('input', function() { const m = this.dataset.mat === 'A' ? matA : matB; m[parseInt(this.dataset.r)][parseInt(this.dataset.c)] = parseFloat(this.value) || 0; });
+  c.appendChild(i);
+ }
 }
 function randomFill(id) { const m = id === 'A' ? matA : matB; for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) m[r][c] = Math.floor(Math.random() * 20) - 10 + Math.round(Math.random() * 100) / 100; renderMatrix('matrix' + id, m); document.getElementById('feedbackMsg').textContent = I18N.t('fb_0') + id + ' aleatoria.'; }
 function resetMatrix(id) { const m = id === 'A' ? matA : matB; for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) m[r][c] = id === 'A' ? (r * 3 + c + 1) : (9 - (r * 3 + c)); renderMatrix('matrix' + id, m); document.getElementById('feedbackMsg').textContent = I18N.t('fb_1') + id + ' reiniciada.'; }
 function matHTML(m) { if (typeof m === 'number') return '<div style="font-family:monospace;font-size:1rem;color:#ff66c0;padding:1rem;text-align:center;">= ' + m.toFixed(4) + '</div>'; if (!m || !m.length) return '<p style="color:#ff4455;">Error</p>'; let h = '<div class="result-grid" style="grid-template-columns: repeat(' + m[0].length + ',1fr);">'; for (let r = 0; r < m.length; r++) for (let c = 0; c < m[0].length; c++) h += '<div class="cell filled">' + (typeof m[r][c] === 'number' ? m[r][c].toFixed(2) : m[r][c]) + '</div>'; return h + '</div>'; }
 function computeOp(op) {
-  try {
-    let r; let c = '';
-    const cp = document.getElementById('codePanel');
-    switch(op) {
-      case 'add': r = matA.map((a,i) => a.map((v,j) => v + matB[i][j])); c = `matrix<double> A={{${matA[0].join(',')}},{${matA[1].join(',')}},{${matA[2].join(',')}}};\nmatrix<double> B={{${matB[0].join(',')}},{${matB[1].join(',')}},{${matB[2].join(',')}}};\nmatrix<double> C = A + B;\nPrint("Suma=",C);`; document.getElementById('feedbackMsg').textContent = '➕ Suma elemento a elemento.'; break;
-      case 'sub': r = matA.map((a,i) => a.map((v,j) => v - matB[i][j])); c = `matrix<double> A={{${matA[0].join(',')}},{${matA[1].join(',')}},{${matA[2].join(',')}}};\nmatrix<double> B={{${matB[0].join(',')}},{${matB[1].join(',')}},{${matB[2].join(',')}}};\nmatrix<double> C = A - B;\nPrint("Resta=",C);`; document.getElementById('feedbackMsg').textContent = '➖ Resta elemento a elemento.'; break;
-      case 'elemul': r = matA.map((a,i) => a.map((v,j) => v * matB[i][j])); c = `matrix<double> A={{${matA[0].join(',')}},{${matA[1].join(',')}},{${matA[2].join(',')}}};\nmatrix<double> B={{${matB[0].join(',')}},{${matB[1].join(',')}},{${matB[2].join(',')}}};\nmatrix<double> C = A.MatMul(B);\nPrint("Producto=",C);`; document.getElementById('feedbackMsg').textContent = I18N.t('fb_2'); break;
-      case 'dot': r = multiplyMatrices(matA, matB); c = `matrix<double> A={{${matA[0].join(',')}},{${matA[1].join(',')}},{${matA[2].join(',')}}};\nmatrix<double> B={{${matB[0].join(',')}},{${matB[1].join(',')}},{${matB[2].join(',')}}};\nmatrix<double> C = A.MatMul(B);\nPrint("Dot=",C);`; document.getElementById('feedbackMsg').textContent = I18N.t('fb_3'); break;
-      case 'transposeA': r = transposeMatrix(matA); c = `matrix<double> A={{${matA[0].join(',')}},{${matA[1].join(',')}},{${matA[2].join(',')}}};\nmatrix<double> AT = A.Transpose();\nPrint("Transpuesta=",AT);`; document.getElementById('feedbackMsg').textContent = I18N.t('fb_4'); break;
-      case 'inverseA': r = inverseMatrix(matA); c = `matrix<double> A={{${matA[0].join(',')}},{${matA[1].join(',')}},{${matA[2].join(',')}}};\nmatrix<double> Ainv = A.Inv();\nPrint("Inversa=",Ainv);`; document.getElementById('feedbackMsg').textContent = I18N.t('fb_5'); break;
-      case 'detA': r = determinant(matA); c = `matrix<double> A={{${matA[0].join(',')}},{${matA[1].join(',')}},{${matA[2].join(',')}}};\ndouble d = A.Det();\nPrint("Det=",d);`; document.getElementById('feedbackMsg').textContent = I18N.t('fb_6'); break;
-    }
-    if (r !== undefined) document.getElementById('resultMatrix').innerHTML = matHTML(r);
-    if (c) cp.innerHTML = '<pre>' + c.replace(/(matrix|vector|double|int|void|bool|string|Print)/g, '<span style="color:#66ccff;">$1</span>') + '</pre>';
-    const p = getProgress();
-    if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem('mql5_5_progress', JSON.stringify(p)); document.getElementById('insigniaArea').classList.remove('hidden'); }
-  } catch(e) { document.getElementById('feedbackMsg').textContent = '❌ ' + e.message; }
+ try {
+  let r; let c = '';
+  const cp = document.getElementById('codePanel');
+  switch(op) {
+   case 'add': r = matA.map((a,i) => a.map((v,j) => v + matB[i][j])); c = `matrix<double> A={{${matA[0].join(',')}},{${matA[1].join(',')}},{${matA[2].join(',')}}};\nmatrix<double> B={{${matB[0].join(',')}},{${matB[1].join(',')}},{${matB[2].join(',')}}};\nmatrix<double> C = A + B;\nPrint("Suma=",C);`; document.getElementById('feedbackMsg').textContent = '➕ Suma elemento a elemento.'; break;
+   case 'sub': r = matA.map((a,i) => a.map((v,j) => v - matB[i][j])); c = `matrix<double> A={{${matA[0].join(',')}},{${matA[1].join(',')}},{${matA[2].join(',')}}};\nmatrix<double> B={{${matB[0].join(',')}},{${matB[1].join(',')}},{${matB[2].join(',')}}};\nmatrix<double> C = A - B;\nPrint("Resta=",C);`; document.getElementById('feedbackMsg').textContent = '➖ Resta elemento a elemento.'; break;
+   case 'elemul': r = matA.map((a,i) => a.map((v,j) => v * matB[i][j])); c = `matrix<double> A={{${matA[0].join(',')}},{${matA[1].join(',')}},{${matA[2].join(',')}}};\nmatrix<double> B={{${matB[0].join(',')}},{${matB[1].join(',')}},{${matB[2].join(',')}}};\nmatrix<double> C = A.MatMul(B);\nPrint("Producto=",C);`; document.getElementById('feedbackMsg').textContent = I18N.t('fb_2'); break;
+   case 'dot': r = multiplyMatrices(matA, matB); c = `matrix<double> A={{${matA[0].join(',')}},{${matA[1].join(',')}},{${matA[2].join(',')}}};\nmatrix<double> B={{${matB[0].join(',')}},{${matB[1].join(',')}},{${matB[2].join(',')}}};\nmatrix<double> C = A.MatMul(B);\nPrint("Dot=",C);`; document.getElementById('feedbackMsg').textContent = I18N.t('fb_3'); break;
+   case 'transposeA': r = transposeMatrix(matA); c = `matrix<double> A={{${matA[0].join(',')}},{${matA[1].join(',')}},{${matA[2].join(',')}}};\nmatrix<double> AT = A.Transpose();\nPrint("Transpuesta=",AT);`; document.getElementById('feedbackMsg').textContent = I18N.t('fb_4'); break;
+   case 'inverseA': r = inverseMatrix(matA); c = `matrix<double> A={{${matA[0].join(',')}},{${matA[1].join(',')}},{${matA[2].join(',')}}};\nmatrix<double> Ainv = A.Inv();\nPrint("Inversa=",Ainv);`; document.getElementById('feedbackMsg').textContent = I18N.t('fb_5'); break;
+   case 'detA': r = determinant(matA); c = `matrix<double> A={{${matA[0].join(',')}},{${matA[1].join(',')}},{${matA[2].join(',')}}};\ndouble d = A.Det();\nPrint("Det=",d);`; document.getElementById('feedbackMsg').textContent = I18N.t('fb_6'); break;
+  }
+  if (r !== undefined) document.getElementById('resultMatrix').innerHTML = matHTML(r);
+  if (c) cp.innerHTML = '<pre>' + c.replace(/(matrix|vector|double|int|void|bool|string|Print)/g, '<span style="color:#66ccff;">$1</span>') + '</pre>';
+  const p = getProgress();
+  if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem('mql5_5_progress', JSON.stringify(p)); document.getElementById('insigniaArea').classList.remove('hidden'); }
+ } catch(e) { document.getElementById('feedbackMsg').textContent = '❌ ' + e.message; }
 }
 function multiplyMatrices(A, B) { const r = A.length, c = B[0].length, n = A[0].length; const C = Array.from({length: r}, () => Array(c).fill(0)); for (let i = 0; i < r; i++) for (let j = 0; j < c; j++) for (let k = 0; k < n; k++) C[i][j] += A[i][k] * B[k][j]; return C; }
 function transposeMatrix(m) { return m[0].map((_,i) => m.map(r => r[i])); }
@@ -201,41 +201,40 @@ document.querySelectorAll('.tab-btn').forEach(btn => { btn.addEventListener('cli
 renderMatrix('matrixA', matA); renderMatrix('matrixB', matB);
 (function() { const p = getProgress(); if (p.includes(STORAGE_KEY)) { document.getElementById('insigniaArea').classList.remove('hidden'); document.getElementById('feedbackMsg').textContent = I18N.t('fb_7'); } })();
 </script>
-<script src="../../../assets/js/cookie-consent.js"></script>
 <script>
 window.I18N_DATA={
-  "fb_0": {
-    "es": "🎲 Matriz ",
-    "en": "🎲 Matriz "
-  },
-  "fb_1": {
-    "es": "🔄 Matriz ",
-    "en": "🔄 Matriz "
-  },
-  "fb_2": {
-    "es": "✖️ Multiplicación elemento a elemento.",
-    "en": "✖️ Multiplicación elemento a elemento."
-  },
-  "fb_3": {
-    "es": "🔗 Dot Product: filas×columnas (cblas_dgemm).",
-    "en": "🔗 Dot Product: filas×columnas (cblas_dgemm)."
-  },
-  "fb_4": {
-    "es": "🔄 Transpuesta: filas↔columnas.",
-    "en": "🔄 Transpuesta: filas↔columnas."
-  },
-  "fb_5": {
-    "es": "🔢 Inversa: A×A⁻¹=I (dgetrf+dgetri).",
-    "en": "🔢 Inversa: A×A⁻¹=I (dgetrf+dgetri)."
-  },
-  "fb_6": {
-    "es": "📐 Determinante: si es 0, no hay inversa.",
-    "en": "📐 Determinante: si es 0, no hay inversa."
-  },
-  "fb_7": {
-    "es": "🏅 Ya completaste este módulo.",
-    "en": "🏅 Ya completaste este module."
-  }
+ "fb_0": {
+  "es": "🎲 Matriz ",
+  "en": "🎲 Matriz "
+ },
+ "fb_1": {
+  "es": "🔄 Matriz ",
+  "en": "🔄 Matriz "
+ },
+ "fb_2": {
+  "es": "✖️ Multiplicación elemento a elemento.",
+  "en": "✖️ Multiplicación elemento a elemento."
+ },
+ "fb_3": {
+  "es": "🔗 Dot Product: filas×columnas (cblas_dgemm).",
+  "en": "🔗 Dot Product: filas×columnas (cblas_dgemm)."
+ },
+ "fb_4": {
+  "es": "🔄 Transpuesta: filas↔columnas.",
+  "en": "🔄 Transpuesta: filas↔columnas."
+ },
+ "fb_5": {
+  "es": "🔢 Inversa: A×A⁻¹=I (dgetrf+dgetri).",
+  "en": "🔢 Inversa: A×A⁻¹=I (dgetrf+dgetri)."
+ },
+ "fb_6": {
+  "es": "📐 Determinante: si es 0, no hay inversa.",
+  "en": "📐 Determinante: si es 0, no hay inversa."
+ },
+ "fb_7": {
+  "es": "🏅 Ya completaste este módulo.",
+  "en": "🏅 Ya completaste este module."
+ }
 };
 </script>
 <script src="../../../assets/js/i18n.js"></script>

@@ -1,198 +1,198 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Estrategias y Backtesting | Momentum</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #111a2e 100%);
-      background-size: 200% 200%; animation: gradientShift 20s ease infinite;
-      font-family: 'Inter', sans-serif; color: #eef5ff; min-height: 100vh;
-      display: flex; align-items: center; justify-content: center; padding: 2rem 1rem;
-    }
-    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-    .curso3-container {
-      max-width: 1300px; width: 100%;
-      background: rgba(15, 25, 45, 0.65); backdrop-filter: blur(12px);
-      border-radius: 3rem; border: 1px solid rgba(156, 100, 255, 0.25);
-      box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden;
-    }
-    .hero-header { background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%); padding: 2rem 2rem 1.5rem; text-align: center; border-bottom: 2px solid #9c64ff; }
-    .hero-header h1 { font-size: 2.6rem; font-weight: 800; background: linear-gradient(135deg, #FFF, #c8a0ff, #9c64ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
-    .hero-header p { font-size: 1.1rem; color: #b9e2ff; margin-top: 0.3rem; }
-    .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
-    .chip { background: rgba(156,100,255,0.15); border: 1px solid #9c64ff; padding: 0.3rem 1rem; border-radius: 40px; font-size: 0.8rem; font-weight: 600; }
-    .analogy-card { background: #1e2a3acc; margin: 1.5rem 2rem; padding: 1.2rem 1.8rem; border-radius: 2rem; border-left: 8px solid #9c64ff; font-size: 1rem; line-height: 1.6; }
-    .main-area { padding: 0.5rem 2rem; }
-    .feedback { background: #00000099; margin: 1.5rem 2rem; padding: 1rem; border-radius: 1.5rem; text-align: center; font-weight: 500; border-left: 4px solid #9c64ff; }
-    .insignia { text-align: center; background: #0c1b2f; border-radius: 2rem; margin: 0 2rem 1.5rem; padding: 1rem; border: 1px dashed gold; }
-    .insignia i { font-size: 2.5rem; color: gold; }
-    .hidden { display: none; }
-    .btn-action { background: linear-gradient(95deg, #f0a500, #ff6a00); border: none; padding: 0.8rem 1.8rem; font-weight: bold; border-radius: 3rem; cursor: pointer; font-size: 1rem; transition: 0.2s; color: #1e1a0c; }
-    .btn-action:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(240,165,0,0.5); }
-    .btn-action.small { padding: 0.4rem 1rem; font-size: 0.85rem; }
-    .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
-    .nav-link { background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem; font-weight: 600; text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; }
-    .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(156,100,255,0.4); }
-    .nav-link.next { background: linear-gradient(95deg, #f0a500, #ff6a00); color: #1e1a0c; }
-    .nav-link.menu { background: #1a2a4a; border: 1px solid #3399ff; }
-    footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
-    .param-group { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin: 1rem 0; align-items: center; }
-    .param-group label { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; font-size: 0.85rem; }
-    .param-group input { width: 80px; padding: 0.4rem; border-radius: 0.8rem; border: 1px solid #2c3e66; background: #0f1a2e; color: #eef5ff; text-align: center; }
-    .asset-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
-    .asset-table th, .asset-table td { padding: 0.5rem 0.8rem; text-align: center; border-bottom: 1px solid #2c3e66; }
-    .asset-table th { font-size: 0.8rem; color: #8899bb; }
-    .asset-table td { font-size: 0.9rem; }
-    .asset-table .rank-input { width: 50px; padding: 0.3rem; border-radius: 0.5rem; border: 1px solid #2c3e66; background: #0f1a2e; color: #eef5ff; text-align: center; }
-    .asset-table .top { color: #00ff88; }
-    .asset-table .bottom { color: #ff5050; }
-    .asset-table tr.selected-top { background: #0a2a1a33; }
-    .asset-table tr.selected-bottom { background: #2a0a0a33; }
-    .pnl-display { font-size: 2rem; font-weight: 800; text-align: center; margin: 0.5rem 0; }
-    .pnl-display.positive { color: #00ff88; }
-    .pnl-display.negative { color: #ff5050; }
-    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
-  </style>
-  <link rel="stylesheet" href="../../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Estrategias y Backtesting | Momentum</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+   background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #111a2e 100%);
+   background-size: 200% 200%; animation: gradientShift 20s ease infinite;
+   font-family: 'Inter', sans-serif; color: #eef5ff; min-height: 100vh;
+   display: flex; align-items: center; justify-content: center; padding: 2rem 1rem;
+  }
+  @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .curso3-container {
+   max-width: 1300px; width: 100%;
+   background: rgba(15, 25, 45, 0.65); backdrop-filter: blur(12px);
+   border-radius: 3rem; border: 1px solid rgba(156, 100, 255, 0.25);
+   box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden;
+  }
+  .hero-header { background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%); padding: 2rem 2rem 1.5rem; text-align: center; border-bottom: 2px solid #9c64ff; }
+  .hero-header h1 { font-size: 2.6rem; font-weight: 800; background: linear-gradient(135deg, #FFF, #c8a0ff, #9c64ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero-header p { font-size: 1.1rem; color: #b9e2ff; margin-top: 0.3rem; }
+  .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
+  .chip { background: rgba(156,100,255,0.15); border: 1px solid #9c64ff; padding: 0.3rem 1rem; border-radius: 40px; font-size: 0.8rem; font-weight: 600; }
+  .analogy-card { background: #1e2a3acc; margin: 1.5rem 2rem; padding: 1.2rem 1.8rem; border-radius: 2rem; border-left: 8px solid #9c64ff; font-size: 1rem; line-height: 1.6; }
+  .main-area { padding: 0.5rem 2rem; }
+  .feedback { background: #00000099; margin: 1.5rem 2rem; padding: 1rem; border-radius: 1.5rem; text-align: center; font-weight: 500; border-left: 4px solid #9c64ff; }
+  .insignia { text-align: center; background: #0c1b2f; border-radius: 2rem; margin: 0 2rem 1.5rem; padding: 1rem; border: 1px dashed gold; }
+  .insignia i { font-size: 2.5rem; color: gold; }
+  .hidden { display: none; }
+  .btn-action { background: linear-gradient(95deg, #f0a500, #ff6a00); border: none; padding: 0.8rem 1.8rem; font-weight: bold; border-radius: 3rem; cursor: pointer; font-size: 1rem; transition: 0.2s; color: #1e1a0c; }
+  .btn-action:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(240,165,0,0.5); }
+  .btn-action.small { padding: 0.4rem 1rem; font-size: 0.85rem; }
+  .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
+  .nav-link { background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem; font-weight: 600; text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; }
+  .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(156,100,255,0.4); }
+  .nav-link.next { background: linear-gradient(95deg, #f0a500, #ff6a00); color: #1e1a0c; }
+  .nav-link.menu { background: #1a2a4a; border: 1px solid #3399ff; }
+  footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
+  .param-group { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin: 1rem 0; align-items: center; }
+  .param-group label { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; font-size: 0.85rem; }
+  .param-group input { width: 80px; padding: 0.4rem; border-radius: 0.8rem; border: 1px solid #2c3e66; background: #0f1a2e; color: #eef5ff; text-align: center; }
+  .asset-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+  .asset-table th, .asset-table td { padding: 0.5rem 0.8rem; text-align: center; border-bottom: 1px solid #2c3e66; }
+  .asset-table th { font-size: 0.8rem; color: #8899bb; }
+  .asset-table td { font-size: 0.9rem; }
+  .asset-table .rank-input { width: 50px; padding: 0.3rem; border-radius: 0.5rem; border: 1px solid #2c3e66; background: #0f1a2e; color: #eef5ff; text-align: center; }
+  .asset-table .top { color: #00ff88; }
+  .asset-table .bottom { color: #ff5050; }
+  .asset-table tr.selected-top { background: #0a2a1a33; }
+  .asset-table tr.selected-bottom { background: #2a0a0a33; }
+  .pnl-display { font-size: 2rem; font-weight: 800; text-align: center; margin: 0.5rem 0; }
+  .pnl-display.positive { color: #00ff88; }
+  .pnl-display.negative { color: #ff5050; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
+ </style>
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
 </head>
 <body>
-  <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a></nav>
+ <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a></nav>
 
-  <div class="curso3-container">
-    <div class="hero-header">
-      <h1>🚀 MOMENTUM</h1>
-      <p>ROC clasificador, ranking y momentum cross-sectional</p>
-      <div class="badge-area">
-        <span class="chip"><i class="fas fa-sort-amount-up"></i> Ranking</span>
-        <span class="chip"><i class="fas fa-balance-scale"></i> Long/Short</span>
-      </div>
-    </div>
-    <div class="analogy-card"><strong>🚀 Piénsalo así:</strong> El momentum es como apostar a los caballos que van ganando: compras los que más han subido (long) y vendes los que más han bajado (short), esperando que la tendencia continúe.</div>
-    <div class="main-area">
-      <div class="param-group">
-        <label>Días ROC <input type="number" id="rocPeriod" value="20" min="5" max="60"></label>
-        <button id="generateBtn" class="btn-action small"><i class="fas fa-dice"></i> Generar</button>
-        <button id="calcBtn" class="btn-action">Calcular P&L</button>
-      </div>
-      <div style="overflow-x:auto;">
-        <table class="asset-table" id="assetTable">
-          <thead><tr><th>#</th><th>Activo</th><th>Precio Inicial</th><th>Precio Actual</th><th>ROC (%)</th><th>Ranking</th></tr></thead>
-          <tbody id="tableBody"></tbody>
-        </table>
-      </div>
-      <div id="pnlDisplay" class="pnl-display">P&L: —</div>
-    </div>
-    <div id="feedbackMsg" class="feedback">💡 Asigna ranking (1=mejor, 10=peor) según el ROC. Luego marca top 3 y bottom 3 para la estrategia long/short.</div>
-    <div id="insigniaArea" class="insignia hidden">
-      <i class="fas fa-medal"></i>
-      <h3>🏅 MOMENTUM TRADER 🏅</h3>
-      <p>¡Dominas el ranking cross-sectional para capturar momentum!</p>
-    </div>
-    <div class="nav-links">
-      <a href="03-mean-reversion.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
-      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
-      <a href="05-volatilidad.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
-    </div>
-    <footer><i class="fas fa-crown"></i> Estrategias y Backtesting · Trading Algorítmico con Python</footer>
+ <div class="curso3-container">
+  <div class="hero-header">
+   <h1>ðŸš€ MOMENTUM</h1>
+   <p>ROC clasificador, ranking y momentum cross-sectional</p>
+   <div class="badge-area">
+    <span class="chip"><i class="fas fa-sort-amount-up"></i> Ranking</span>
+    <span class="chip"><i class="fas fa-balance-scale"></i> Long/Short</span>
+   </div>
   </div>
+  <div class="analogy-card"><strong>ðŸš€ PiÃ©nsalo asÃ­:</strong> El momentum es como apostar a los caballos que van ganando: compras los que mÃ¡s han subido (long) y vendes los que mÃ¡s han bajado (short), esperando que la tendencia continÃºe.</div>
+  <div class="main-area">
+   <div class="param-group">
+    <label>DÃ­as ROC <input type="number" id="rocPeriod" value="20" min="5" max="60"></label>
+    <button id="generateBtn" class="btn-action small"><i class="fas fa-dice"></i> Generar</button>
+    <button id="calcBtn" class="btn-action">Calcular P&L</button>
+   </div>
+   <div style="overflow-x:auto;">
+    <table class="asset-table" id="assetTable">
+     <thead><tr><th>#</th><th>Activo</th><th>Precio Inicial</th><th>Precio Actual</th><th>ROC (%)</th><th>Ranking</th></tr></thead>
+     <tbody id="tableBody"></tbody>
+    </table>
+   </div>
+   <div id="pnlDisplay" class="pnl-display">P&L: â€”</div>
+  </div>
+  <div id="feedbackMsg" class="feedback">ðŸ’¡ Asigna ranking (1=mejor, 10=peor) segÃºn el ROC. Luego marca top 3 y bottom 3 para la estrategia long/short.</div>
+  <div id="insigniaArea" class="insignia hidden">
+   <i class="fas fa-medal"></i>
+   <h3>ðŸ… MOMENTUM TRADER ðŸ…</h3>
+   <p>Â¡Dominas el ranking cross-sectional para capturar momentum!</p>
+  </div>
+  <div class="nav-links">
+   <a href="03-mean-reversion.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
+   <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> MenÃº</a>
+   <a href="05-volatilidad.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Estrategias y Backtesting Â· Trading AlgorÃ­tmico con Python</footer>
+ </div>
 
-  <script>
-    const STORAGE_KEY = 'py_trade_3_04';
-    const assetNames = ['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA', 'META', 'NVDA', 'JPM', 'V', 'JNJ'];
-    let assets = [];
-    let userRanks = [];
+ <script>
+  const STORAGE_KEY = 'py_trade_3_04';
+  const assetNames = ['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA', 'META', 'NVDA', 'JPM', 'V', 'JNJ'];
+  let assets = [];
+  let userRanks = [];
 
-    function generateAssets(rocPeriod) {
-      assets = assetNames.map((name, idx) => {
-        const startPrice = 50 + Math.random() * 200;
-        const roc = (Math.random() - 0.5) * 40;
-        const endPrice = startPrice * (1 + roc / 100);
-        return { name, startPrice: startPrice.toFixed(2), endPrice: endPrice.toFixed(2), roc: roc, rank: 0 };
-      });
-      userRanks = new Array(10).fill(0);
-      renderTable();
-      document.getElementById('pnlDisplay').textContent = 'P&L: —';
-    }
+  function generateAssets(rocPeriod) {
+   assets = assetNames.map((name, idx) => {
+    const startPrice = 50 + Math.random() * 200;
+    const roc = (Math.random() - 0.5) * 40;
+    const endPrice = startPrice * (1 + roc / 100);
+    return { name, startPrice: startPrice.toFixed(2), endPrice: endPrice.toFixed(2), roc: roc, rank: 0 };
+   });
+   userRanks = new Array(10).fill(0);
+   renderTable();
+   document.getElementById('pnlDisplay').textContent = 'P&L: â€”';
+  }
 
-    function renderTable() {
-      const tbody = document.getElementById('tableBody');
-      tbody.innerHTML = '';
-      // Sort by ROC descending for display
-      const sorted = [...assets].sort((a, b) => b.roc - a.roc);
-      sorted.forEach((a, i) => {
-        const tr = document.createElement('tr');
-        const rankClass = i < 3 ? 'top' : (i >= 7 ? 'bottom' : '');
-        tr.innerHTML = `
-          <td>${i+1}</td>
-          <td class="${rankClass}">${a.name}</td>
-          <td>${a.startPrice}</td>
-          <td>${a.endPrice}</td>
-          <td class="${rankClass}">${a.roc.toFixed(2)}%</td>
-          <td><input type="number" class="rank-input" data-idx="${i}" value="${userRanks[i] || ''}" min="1" max="10" placeholder="1-10"></td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
+  function renderTable() {
+   const tbody = document.getElementById('tableBody');
+   tbody.innerHTML = '';
+   // Sort by ROC descending for display
+   const sorted = [...assets].sort((a, b) => b.roc - a.roc);
+   sorted.forEach((a, i) => {
+    const tr = document.createElement('tr');
+    const rankClass = i < 3 ? 'top' : (i >= 7 ? 'bottom' : '');
+    tr.innerHTML = `
+     <td>${i+1}</td>
+     <td class="${rankClass}">${a.name}</td>
+     <td>${a.startPrice}</td>
+     <td>${a.endPrice}</td>
+     <td class="${rankClass}">${a.roc.toFixed(2)}%</td>
+     <td><input type="number" class="rank-input" data-idx="${i}" value="${userRanks[i] || ''}" min="1" max="10" placeholder="1-10"></td>
+    `;
+    tbody.appendChild(tr);
+   });
+  }
 
-    function calculatePNL() {
-      const inputs = document.querySelectorAll('.rank-input');
-      const rankings = [];
-      inputs.forEach(inp => {
-        const val = parseInt(inp.value);
-        if (val >= 1 && val <= 10) rankings.push({ idx: parseInt(inp.dataset.idx), rank: val });
-      });
-      if (rankings.length < 10) {
-        document.getElementById('feedbackMsg').textContent = I18N.t('fb_0');
-        return;
-      }
-      rankings.sort((a, b) => a.rank - b.rank);
-      const top3 = rankings.slice(0, 3);
-      const bottom3 = rankings.slice(7);
-      const sortedAssets = [...assets].sort((a, b) => b.roc - a.roc);
-      let longPnl = 0, shortPnl = 0;
-      top3.forEach(r => { longPnl += sortedAssets[r.idx].roc; });
-      bottom3.forEach(r => { shortPnl -= sortedAssets[r.idx].roc; });
-      const totalPnl = (longPnl / 3 + shortPnl / 3);
-      const display = document.getElementById('pnlDisplay');
-      display.textContent = 'P&L: ' + totalPnl.toFixed(2) + '%';
-      display.className = 'pnl-display ' + (totalPnl >= 0 ? 'positive' : 'negative');
-      document.getElementById('feedbackMsg').textContent = totalPnl >= 0
-        ? '✅ ¡Estrategia rentable! Long: +' + (longPnl/3).toFixed(2) + '% | Short: +' + (shortPnl/3).toFixed(2) + '%'
-        : '📉 La estrategia perdió dinero. Revisa tu ranking.';
-      if (totalPnl > 0) {
-        document.getElementById('insigniaArea').classList.remove('hidden');
-        localStorage.setItem(STORAGE_KEY, 'true');
-      }
-    }
+  function calculatePNL() {
+   const inputs = document.querySelectorAll('.rank-input');
+   const rankings = [];
+   inputs.forEach(inp => {
+    const val = parseInt(inp.value);
+    if (val >= 1 && val <= 10) rankings.push({ idx: parseInt(inp.dataset.idx), rank: val });
+   });
+   if (rankings.length < 10) {
+    document.getElementById('feedbackMsg').textContent = I18N.t('fb_0');
+    return;
+   }
+   rankings.sort((a, b) => a.rank - b.rank);
+   const top3 = rankings.slice(0, 3);
+   const bottom3 = rankings.slice(7);
+   const sortedAssets = [...assets].sort((a, b) => b.roc - a.roc);
+   let longPnl = 0, shortPnl = 0;
+   top3.forEach(r => { longPnl += sortedAssets[r.idx].roc; });
+   bottom3.forEach(r => { shortPnl -= sortedAssets[r.idx].roc; });
+   const totalPnl = (longPnl / 3 + shortPnl / 3);
+   const display = document.getElementById('pnlDisplay');
+   display.textContent = 'P&L: ' + totalPnl.toFixed(2) + '%';
+   display.className = 'pnl-display ' + (totalPnl >= 0 ? 'positive' : 'negative');
+   document.getElementById('feedbackMsg').textContent = totalPnl >= 0
+    ? 'âœ… Â¡Estrategia rentable! Long: +' + (longPnl/3).toFixed(2) + '% | Short: +' + (shortPnl/3).toFixed(2) + '%'
+    : 'ðŸ“‰ La estrategia perdiÃ³ dinero. Revisa tu ranking.';
+   if (totalPnl > 0) {
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    localStorage.setItem(STORAGE_KEY, 'true');
+   }
+  }
 
-    document.getElementById('generateBtn').addEventListener('click', () => {
-      const period = parseInt(document.getElementById('rocPeriod').value) || 20;
-      generateAssets(period);
-      document.getElementById('feedbackMsg').textContent = I18N.t('fb_1');
-    });
+  document.getElementById('generateBtn').addEventListener('click', () => {
+   const period = parseInt(document.getElementById('rocPeriod').value) || 20;
+   generateAssets(period);
+   document.getElementById('feedbackMsg').textContent = I18N.t('fb_1');
+  });
 
-    document.getElementById('calcBtn').addEventListener('click', calculatePNL);
+  document.getElementById('calcBtn').addEventListener('click', calculatePNL);
 
-    generateAssets(20);
-  </script>
+  generateAssets(20);
+ </script>
 <script>
 window.I18N_DATA={
-  "fb_0": {
-    "es": "⚠️ Asigna ranking del 1 al 10 a todos los activos.",
-    "en": "⚠️ Asigna ranking del 1 al 10 a todos los activos."
-  },
-  "fb_1": {
-    "es": "💡 Nuevos datos generados. Asigna ranking según ROC.",
-    "en": "💡 Nuevos datos generados. Asigna ranking según ROC."
-  }
+ "fb_0": {
+  "es": "âš ï¸ Asigna ranking del 1 al 10 a todos los activos.",
+  "en": "âš ï¸ Asigna ranking del 1 al 10 a todos los activos."
+ },
+ "fb_1": {
+  "es": "ðŸ’¡ Nuevos datos generados. Asigna ranking segÃºn ROC.",
+  "en": "ðŸ’¡ Nuevos datos generados. Asigna ranking segÃºn ROC."
+ }
 };
 </script>
 <script src="../../../assets/js/i18n.js"></script>
-</body>
+ </body>
 </html>
 

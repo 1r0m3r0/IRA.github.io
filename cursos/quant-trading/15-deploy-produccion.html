@@ -1,237 +1,235 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Quant Trading | Deploy y Producción</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
-    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-    .modulo-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(43,158,255,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
-    .hero-header { background:linear-gradient(95deg,#0b1120 0%,#111a2e 100%); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #2b9eff; }
-    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#99ccff,#2b9eff); -webkit-background-clip:text; background-clip:text; color:transparent; }
-    .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
-    .chip { background:rgba(43,158,255,0.15); border:1px solid #2b9eff; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
-    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #2b9eff; font-size:1rem; line-height:1.6; }
-    .main-area { padding:1.5rem 2rem; display:flex; flex-direction:column; gap:1.5rem; }
-    .grid-2col { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; }
-    .grid-3col { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem; }
-    .panel { background:rgba(10,18,40,0.7); border-radius:1.8rem; padding:1.5rem; border:1px solid rgba(43,158,255,0.15); }
-    .panel h3 { font-size:1.2rem; margin-bottom:1rem; color:#99ccff; }
-    .param-row { display:flex; align-items:center; gap:1rem; margin-bottom:0.8rem; flex-wrap:wrap; }
-    .param-row label { min-width:90px; font-weight:600; }
-    .param-row select, .param-row input { flex:1; max-width:200px; background:#1a2a44; border:1px solid #2b9eff55; color:#fff; padding:0.4rem 0.8rem; border-radius:8px; font-family:'Inter',sans-serif; }
-    .param-row input[type=range] { accent-color:#2b9eff; height:6px; max-width:250px; }
-    .param-row .val { font-weight:700; color:#2b9eff; min-width:40px; text-align:right; }
-    .stat-row { display:flex; justify-content:space-between; padding:0.5rem 0; border-bottom:1px solid rgba(43,158,255,0.1); }
-    .stat-row .label { color:#8899bb; }
-    .stat-row .value { font-weight:700; }
-    .stat-row .value.green { color:#00e676; }
-    .stat-row .value.red { color:#ff5050; }
-    .stat-row .value.gold { color:#ffd700; }
-    .dashboard-card { background:#0a1228; border-radius:1.2rem; padding:1rem; text-align:center; border:1px solid rgba(43,158,255,0.1); }
-    .dashboard-card .num { font-size:1.8rem; font-weight:800; }
-    .dashboard-card .lbl { font-size:0.75rem; color:#8899bb; margin-top:0.2rem; }
-    .status-dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:0.4rem; }
-    .status-dot.online { background:#00e676; }
-    .status-dot.error { background:#ff5050; animation:pulse 1s infinite; }
-    @keyframes pulse { 0%{opacity:1} 50%{opacity:0.3} 100%{opacity:1} }
-    .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #2b9eff; }
-    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:0 2rem 1.5rem; padding:1rem; border:1px dashed gold; }
-    .insignia i { font-size:2.5rem; color:gold; }
-    .hidden { display:none; }
-    .btn-action { background:linear-gradient(95deg,#f0a500,#ff6a00); border:none; padding:0.8rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; color:#1e1a0c; transition:0.2s; }
-    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(240,165,0,0.5); }
-    .btn-deploy { background:linear-gradient(95deg,#2b9eff,#0066cc); color:#fff; }
-    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
-    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
-    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(43,158,255,0.4); }
-    .nav-link.next { background:linear-gradient(95deg,#f0a500,#ff6a00); color:#1e1a0c; }
-    .nav-link.menu { background:#1a2a4a; border:1px solid #3399ff; }
-    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
-    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .grid-2col, .grid-3col { grid-template-columns:1fr; } }
-  </style>
-  <link rel="stylesheet" href="../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Quant Trading | Deploy y Producción</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+  @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .modulo-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(43,158,255,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+  .hero-header { background:linear-gradient(95deg,#0b1120 0%,#111a2e 100%); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #2b9eff; }
+  .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#99ccff,#2b9eff); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+  .chip { background:rgba(43,158,255,0.15); border:1px solid #2b9eff; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+  .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #2b9eff; font-size:1rem; line-height:1.6; }
+  .main-area { padding:1.5rem 2rem; display:flex; flex-direction:column; gap:1.5rem; }
+  .grid-2col { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; }
+  .grid-3col { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem; }
+  .panel { background:rgba(10,18,40,0.7); border-radius:1.8rem; padding:1.5rem; border:1px solid rgba(43,158,255,0.15); }
+  .panel h3 { font-size:1.2rem; margin-bottom:1rem; color:#99ccff; }
+  .param-row { display:flex; align-items:center; gap:1rem; margin-bottom:0.8rem; flex-wrap:wrap; }
+  .param-row label { min-width:90px; font-weight:600; }
+  .param-row select, .param-row input { flex:1; max-width:200px; background:#1a2a44; border:1px solid #2b9eff55; color:#fff; padding:0.4rem 0.8rem; border-radius:8px; font-family:'Inter',sans-serif; }
+  .param-row input[type=range] { accent-color:#2b9eff; height:6px; max-width:250px; }
+  .param-row .val { font-weight:700; color:#2b9eff; min-width:40px; text-align:right; }
+  .stat-row { display:flex; justify-content:space-between; padding:0.5rem 0; border-bottom:1px solid rgba(43,158,255,0.1); }
+  .stat-row .label { color:#8899bb; }
+  .stat-row .value { font-weight:700; }
+  .stat-row .value.green { color:#00e676; }
+  .stat-row .value.red { color:#ff5050; }
+  .stat-row .value.gold { color:#ffd700; }
+  .dashboard-card { background:#0a1228; border-radius:1.2rem; padding:1rem; text-align:center; border:1px solid rgba(43,158,255,0.1); }
+  .dashboard-card .num { font-size:1.8rem; font-weight:800; }
+  .dashboard-card .lbl { font-size:0.75rem; color:#8899bb; margin-top:0.2rem; }
+  .status-dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:0.4rem; }
+  .status-dot.online { background:#00e676; }
+  .status-dot.error { background:#ff5050; animation:pulse 1s infinite; }
+  @keyframes pulse { 0%{opacity:1} 50%{opacity:0.3} 100%{opacity:1} }
+  .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #2b9eff; }
+  .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:0 2rem 1.5rem; padding:1rem; border:1px dashed gold; }
+  .insignia i { font-size:2.5rem; color:gold; }
+  .hidden { display:none; }
+  .btn-action { background:linear-gradient(95deg,#f0a500,#ff6a00); border:none; padding:0.8rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; color:#1e1a0c; transition:0.2s; }
+  .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(240,165,0,0.5); }
+  .btn-deploy { background:linear-gradient(95deg,#2b9eff,#0066cc); color:#fff; }
+  .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+  .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+  .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(43,158,255,0.4); }
+  .nav-link.next { background:linear-gradient(95deg,#f0a500,#ff6a00); color:#1e1a0c; }
+  .nav-link.menu { background:#1a2a4a; border:1px solid #3399ff; }
+  footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .grid-2col, .grid-3col { grid-template-columns:1fr; } }
+ </style>
+ <link rel="stylesheet" href="../../assets/css/theme.css">
 </head>
 <body>
-  <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
-  <div class="modulo-container">
-    <div class="hero-header">
-      <h1><i class="fas fa-rocket"></i> Deploy y Producción</h1>
-      <p>Lleva tu bot de trading cuantitativo a producción como un profesional</p>
-      <div class="badge-area">
-        <span class="chip"><i class="fab fa-docker"></i> Docker</span>
-        <span class="chip"><i class="fas fa-plug"></i> Broker API</span>
-        <span class="chip"><i class="fas fa-tachometer-alt"></i> Monitoring</span>
-      </div>
-    </div>
-    <div class="analogy-card">
-      <strong><i class="fas fa-lightbulb"></i> Piénsalo así:</strong> Tener un bot de trading en tu computadora es como tener un restaurante en tu cocina. Para servir al mundo necesitas: una cocina industrial (Docker → entorno aislado y portable), un proveedor de ingredientes confiable (Broker API → conexión al exchange), y un sistema de calidad (monitoring → saber si se está quemando la comida). En producción no basta con que la estrategia funcione: tiene que funcionar 24/7 sin que nadie le dé de comer.
-    </div>
-    <div class="main-area">
-      <div class="grid-2col">
-        <div class="panel">
-          <h3><i class="fas fa-cog"></i> Configuración</h3>
-          <div class="param-row"><label>Exchange</label><select id="exchangeSelect"><option value="binance">Binance</option><option value="coinbase">Coinbase</option><option value="kraken">Kraken</option><option value="bybit">Bybit</option></select></div>
-          <div class="param-row"><label>Estrategia</label><select id="strategySelect"><option value="momentum">Momentum</option><option value="mean-rev">Mean Reversion</option><option value="grid">Grid Trading</option><option value="dca">DCA Promedio</option></select></div>
-          <div class="param-row"><label>Risk Limit</label><input type="range" id="riskLimit" min="1" max="20" value="5"><span class="val" id="rlVal">5%</span></div>
-          <div class="param-row"><label>Capital ($)</label><input type="number" id="deployCapital" value="50000" step="1000" style="flex:1;max-width:200px;background:#1a2a44;border:1px solid #2b9eff55;color:#fff;padding:0.4rem 0.8rem;border-radius:8px;"></div>
-          <button class="btn-action btn-deploy" id="deployBtn" style="width:100%;margin-top:0.8rem;"><i class="fas fa-rocket"></i> Desplegar Bot</button>
-          <button class="btn-action" id="stopBtn" style="width:100%;margin-top:0.5rem;background:linear-gradient(95deg,#ff5050,#cc0000);display:none;"><i class="fas fa-stop"></i> Detener Bot</button>
-        </div>
-        <div class="panel">
-          <h3><i class="fas fa-tachometer-alt"></i> Dashboard</h3>
-          <div class="grid-3col" style="margin-bottom:1rem;">
-            <div class="dashboard-card"><div class="num gold" id="pnlVal">$0</div><div class="lbl">P&L</div></div>
-            <div class="dashboard-card"><div class="num" id="tradesVal">0</div><div class="lbl">Trades</div></div>
-            <div class="dashboard-card"><div class="num green" id="winRateDash">0%</div><div class="lbl">Win Rate</div></div>
-          </div>
-          <div class="stat-row"><span class="label"><span class="status-dot" id="statusDot"></span> Estado</span><span class="value" id="statusText">Detenido</span></div>
-          <div class="stat-row"><span class="label">Exchange</span><span class="value" id="exchangeDisplay">-</span></div>
-          <div class="stat-row"><span class="label">Estrategia</span><span class="value" id="strategyDisplay">-</span></div>
-          <div class="stat-row"><span class="label">Risk / Trade</span><span class="value" id="riskDisplay">-</span></div>
-          <div class="stat-row"><span class="label">Uptime</span><span class="value" id="uptimeVal">0h 0m</span></div>
-        </div>
-      </div>
-      <div class="panel">
-        <h3><i class="fas fa-terminal"></i> Logs del Sistema</h3>
-        <div style="background:#080e1a;border-radius:1rem;padding:0.8rem;font-family:'Courier New',monospace;font-size:0.8rem;color:#99aabb;max-height:180px;overflow-y:auto;" id="systemLogs">
-          <div class="log-entry">🐳 Sistema de deploy listo</div>
-          <div class="log-entry">🌐 Conectando al gateway de trading...</div>
-        </div>
-      </div>
-    </div>
-    <div id="feedbackMsg" class="feedback">💡 Configura el exchange, estrategia y riesgo, luego haz clic en "Desplegar Bot". ¡Tu bot cuantitativo en vivo!</div>
-    <div id="insigniaArea" class="insignia hidden">
-      <i class="fas fa-medal"></i>
-      <h3>🏅 Production Engineer 🏅</h3>
-      <p>Has desplegado un bot de trading cuantitativo en producción. ¡Wall Street te espera!</p>
-    </div>
-    <div class="nav-links">
-      <a href="14-reinforcement-learning.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
-      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
-      <a href="16-certificado.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
-    </div>
-    <footer><i class="fas fa-crown"></i> Quant Trading · Domina los algoritmos que mueven Wall Street</footer>
+ <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+ <div class="modulo-container">
+  <div class="hero-header">
+   <h1><i class="fas fa-rocket"></i> Deploy y Producción</h1>
+   <p>Lleva tu bot de trading cuantitativo a producción como un profesional</p>
+   <div class="badge-area">
+    <span class="chip"><i class="fab fa-docker"></i> Docker</span>
+    <span class="chip"><i class="fas fa-plug"></i> Broker API</span>
+    <span class="chip"><i class="fas fa-tachometer-alt"></i> Monitoring</span>
+   </div>
   </div>
-  <script>
-    const STORAGE_KEY = 'quant_trading_15';
-    let botRunning = false;
-    let botInterval = null;
-    let uptimeSeconds = 0;
-    let pnl = 0;
-    let totalTrades = 0;
-    let wins = 0;
+  <div class="analogy-card">
+   <strong><i class="fas fa-lightbulb"></i> Piénsalo así:</strong> Tener un bot de trading en tu computadora es como tener un restaurante en tu cocina. Para servir al mundo necesitas: una cocina industrial (Docker → entorno aislado y portable), un proveedor de ingredientes confiable (Broker API → conexión al exchange), y un sistema de calidad (monitoring → saber si se está quemando la comida). En producción no basta con que la estrategia funcione: tiene que funcionar 24/7 sin que nadie le dé de comer.
+  </div>
+  <div class="main-area">
+   <div class="grid-2col">
+    <div class="panel">
+     <h3><i class="fas fa-cog"></i> Configuración</h3>
+     <div class="param-row"><label>Exchange</label><select id="exchangeSelect"><option value="binance">Binance</option><option value="coinbase">Coinbase</option><option value="kraken">Kraken</option><option value="bybit">Bybit</option></select></div>
+     <div class="param-row"><label>Estrategia</label><select id="strategySelect"><option value="momentum">Momentum</option><option value="mean-rev">Mean Reversion</option><option value="grid">Grid Trading</option><option value="dca">DCA Promedio</option></select></div>
+     <div class="param-row"><label>Risk Limit</label><input type="range" id="riskLimit" min="1" max="20" value="5"><span class="val" id="rlVal">5%</span></div>
+     <div class="param-row"><label>Capital ($)</label><input type="number" id="deployCapital" value="50000" step="1000" style="flex:1;max-width:200px;background:#1a2a44;border:1px solid #2b9eff55;color:#fff;padding:0.4rem 0.8rem;border-radius:8px;"></div>
+     <button class="btn-action btn-deploy" id="deployBtn" style="width:100%;margin-top:0.8rem;"><i class="fas fa-rocket"></i> Desplegar Bot</button>
+     <button class="btn-action" id="stopBtn" style="width:100%;margin-top:0.5rem;background:linear-gradient(95deg,#ff5050,#cc0000);display:none;"><i class="fas fa-stop"></i> Detener Bot</button>
+    </div>
+    <div class="panel">
+     <h3><i class="fas fa-tachometer-alt"></i> Dashboard</h3>
+     <div class="grid-3col" style="margin-bottom:1rem;">
+      <div class="dashboard-card"><div class="num gold" id="pnlVal">$0</div><div class="lbl">P&L</div></div>
+      <div class="dashboard-card"><div class="num" id="tradesVal">0</div><div class="lbl">Trades</div></div>
+      <div class="dashboard-card"><div class="num green" id="winRateDash">0%</div><div class="lbl">Win Rate</div></div>
+     </div>
+     <div class="stat-row"><span class="label"><span class="status-dot" id="statusDot"></span> Estado</span><span class="value" id="statusText">Detenido</span></div>
+     <div class="stat-row"><span class="label">Exchange</span><span class="value" id="exchangeDisplay">-</span></div>
+     <div class="stat-row"><span class="label">Estrategia</span><span class="value" id="strategyDisplay">-</span></div>
+     <div class="stat-row"><span class="label">Risk / Trade</span><span class="value" id="riskDisplay">-</span></div>
+     <div class="stat-row"><span class="label">Uptime</span><span class="value" id="uptimeVal">0h 0m</span></div>
+    </div>
+   </div>
+   <div class="panel">
+    <h3><i class="fas fa-terminal"></i> Logs del Sistema</h3>
+    <div style="background:#080e1a;border-radius:1rem;padding:0.8rem;font-family:'Courier New',monospace;font-size:0.8rem;color:#99aabb;max-height:180px;overflow-y:auto;" id="systemLogs">
+     <div class="log-entry">🐳 Sistema de deploy listo</div>
+     <div class="log-entry">🌐 Conectando al gateway de trading...</div>
+    </div>
+   </div>
+  </div>
+  <div id="feedbackMsg" class="feedback">💡 Configura el exchange, estrategia y riesgo, luego haz clic en "Desplegar Bot". ¡Tu bot cuantitativo en vivo!</div>
+  <div id="insigniaArea" class="insignia hidden">
+   <i class="fas fa-medal"></i>
+   <h3>🏅 Production Engineer 🏅</h3>
+   <p>Has desplegado un bot de trading cuantitativo en producción. ¡Wall Street te espera!</p>
+  </div>
+  <div class="nav-links">
+   <a href="14-reinforcement-learning.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+   <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+   <a href="16-certificado.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Quant Trading · Domina los algoritmos que mueven Wall Street</footer>
+ </div>
+ <script>
+  const STORAGE_KEY = 'quant_trading_15';
+  let botRunning = false;
+  let botInterval = null;
+  let uptimeSeconds = 0;
+  let pnl = 0;
+  let totalTrades = 0;
+  let wins = 0;
 
-    document.getElementById('riskLimit').addEventListener('input',function(){
-      document.getElementById('rlVal').textContent = this.value+'%';
-    });
+  document.getElementById('riskLimit').addEventListener('input',function(){
+   document.getElementById('rlVal').textContent = this.value+'%';
+  });
 
-    function log(msg) {
-      const logs = document.getElementById('systemLogs');
-      const entry = document.createElement('div');
-      const time = new Date().toLocaleTimeString();
-      entry.textContent = '['+time+'] '+msg;
-      logs.appendChild(entry);
-      logs.scrollTop = logs.scrollHeight;
+  function log(msg) {
+   const logs = document.getElementById('systemLogs');
+   const entry = document.createElement('div');
+   const time = new Date().toLocaleTimeString();
+   entry.textContent = '['+time+'] '+msg;
+   logs.appendChild(entry);
+   logs.scrollTop = logs.scrollHeight;
+  }
+
+  function updateDashboard() {
+   const tradePnl = (Math.random() * 200 - 60) * (1 + Math.random());
+   const isWin = tradePnl > 0;
+   pnl += tradePnl;
+   totalTrades++;
+   if(isWin) wins++;
+   const winRate = totalTrades > 0 ? (wins/totalTrades)*100 : 0;
+
+   document.getElementById('pnlVal').textContent = '$'+pnl.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+   document.getElementById('pnlVal').className = 'num '+(pnl>=0?'gold':'red');
+   document.getElementById('tradesVal').textContent = totalTrades;
+   document.getElementById('winRateDash').textContent = winRate.toFixed(1)+'%';
+
+   const h = Math.floor(uptimeSeconds/3600);
+   const m = Math.floor((uptimeSeconds%3600)/60);
+   document.getElementById('uptimeVal').textContent = h+'h '+m+'m';
+
+   const action = isWin ? 'COMPRA' : 'VENTA';
+   log((isWin?'✅ ':'❌ ')+action+' | P&L: '+(tradePnl>0?'+':'')+tradePnl.toFixed(2));
+  }
+
+  function startBot() {
+   if(botRunning) return;
+   const exchange = document.getElementById('exchangeSelect').value;
+   const strategy = document.getElementById('strategySelect').value;
+   const risk = document.getElementById('riskLimit').value;
+   const capital = parseFloat(document.getElementById('deployCapital').value)||50000;
+
+   botRunning = true;
+   pnl = 0;
+   totalTrades = 0;
+   wins = 0;
+   uptimeSeconds = 0;
+
+   document.getElementById('exchangeDisplay').textContent = exchange.charAt(0).toUpperCase()+exchange.slice(1);
+   document.getElementById('strategyDisplay').textContent = strategy.replace('-',' ').replace(/\b\w/g,c=>c.toUpperCase());
+   document.getElementById('riskDisplay').textContent = risk+'% ($'+(capital*risk/100).toFixed(0)+')';
+   document.getElementById('statusText').textContent = 'Vivo';
+   document.getElementById('statusDot').className = 'status-dot online';
+
+   document.getElementById('deployBtn').style.display = 'none';
+   document.getElementById('stopBtn').style.display = 'block';
+
+   log('🚀 Desplegando bot en '+exchange+' con estrategia '+strategy+'...');
+   log('🐳 Contenedor Docker iniciado');
+   log('🔌 Conectado a API de '+exchange);
+   log('💰 Capital: $'+capital.toLocaleString()+' | Risk: '+risk+'% por trade');
+   log('✅ Bot operando. Monitoreando mercados...');
+
+   document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_0')+exchange+' | Estrategia: '+strategy+' | Risk: '+risk+'%';
+
+   botInterval = setInterval(() => {
+    if(!botRunning) return;
+    uptimeSeconds += 3;
+    updateDashboard();
+    if(uptimeSeconds >= 60) {
+     log('⏰ Checkpoint: '+uptimeSeconds+'s de operación | P&L: $'+pnl.toFixed(0));
     }
+   }, 3000);
 
-    function updateDashboard() {
-      const tradePnl = (Math.random() * 200 - 60) * (1 + Math.random());
-      const isWin = tradePnl > 0;
-      pnl += tradePnl;
-      totalTrades++;
-      if(isWin) wins++;
-      const winRate = totalTrades > 0 ? (wins/totalTrades)*100 : 0;
+   localStorage.setItem(STORAGE_KEY,'completed');
+   document.getElementById('insigniaArea').classList.remove('hidden');
+  }
 
-      document.getElementById('pnlVal').textContent = '$'+pnl.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,',');
-      document.getElementById('pnlVal').className = 'num '+(pnl>=0?'gold':'red');
-      document.getElementById('tradesVal').textContent = totalTrades;
-      document.getElementById('winRateDash').textContent = winRate.toFixed(1)+'%';
+  function stopBot() {
+   if(!botRunning) return;
+   botRunning = false;
+   clearInterval(botInterval);
+   document.getElementById('statusText').textContent = 'Detenido';
+   document.getElementById('statusDot').className = 'status-dot';
+   document.getElementById('deployBtn').style.display = 'block';
+   document.getElementById('stopBtn').style.display = 'none';
+   log('🛑 Bot detenido. Sesión finalizada.');
+   log('📊 Resumen: P&L: $'+pnl.toFixed(0)+' | Trades: '+totalTrades+' | Win Rate: '+(totalTrades>0?(wins/totalTrades*100).toFixed(1):'0')+'%');
+   document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_1')+pnl.toFixed(0)+' | Trades: '+totalTrades;
+  }
 
-      const h = Math.floor(uptimeSeconds/3600);
-      const m = Math.floor((uptimeSeconds%3600)/60);
-      document.getElementById('uptimeVal').textContent = h+'h '+m+'m';
+  document.getElementById('deployBtn').addEventListener('click',startBot);
+  document.getElementById('stopBtn').addEventListener('click',stopBot);
 
-      const action = isWin ? 'COMPRA' : 'VENTA';
-      log((isWin?'✅ ':'❌ ')+action+' | P&L: '+(tradePnl>0?'+':'')+tradePnl.toFixed(2));
-    }
-
-    function startBot() {
-      if(botRunning) return;
-      const exchange = document.getElementById('exchangeSelect').value;
-      const strategy = document.getElementById('strategySelect').value;
-      const risk = document.getElementById('riskLimit').value;
-      const capital = parseFloat(document.getElementById('deployCapital').value)||50000;
-
-      botRunning = true;
-      pnl = 0;
-      totalTrades = 0;
-      wins = 0;
-      uptimeSeconds = 0;
-
-      document.getElementById('exchangeDisplay').textContent = exchange.charAt(0).toUpperCase()+exchange.slice(1);
-      document.getElementById('strategyDisplay').textContent = strategy.replace('-',' ').replace(/\b\w/g,c=>c.toUpperCase());
-      document.getElementById('riskDisplay').textContent = risk+'% ($'+(capital*risk/100).toFixed(0)+')';
-      document.getElementById('statusText').textContent = 'Vivo';
-      document.getElementById('statusDot').className = 'status-dot online';
-
-      document.getElementById('deployBtn').style.display = 'none';
-      document.getElementById('stopBtn').style.display = 'block';
-
-      log('🚀 Desplegando bot en '+exchange+' con estrategia '+strategy+'...');
-      log('🐳 Contenedor Docker iniciado');
-      log('🔌 Conectado a API de '+exchange);
-      log('💰 Capital: $'+capital.toLocaleString()+' | Risk: '+risk+'% por trade');
-      log('✅ Bot operando. Monitoreando mercados...');
-
-      document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_0')+exchange+' | Estrategia: '+strategy+' | Risk: '+risk+'%';
-
-      botInterval = setInterval(() => {
-        if(!botRunning) return;
-        uptimeSeconds += 3;
-        updateDashboard();
-        if(uptimeSeconds >= 60) {
-          log('⏰ Checkpoint: '+uptimeSeconds+'s de operación | P&L: $'+pnl.toFixed(0));
-        }
-      }, 3000);
-
-      localStorage.setItem(STORAGE_KEY,'completed');
-      document.getElementById('insigniaArea').classList.remove('hidden');
-    }
-
-    function stopBot() {
-      if(!botRunning) return;
-      botRunning = false;
-      clearInterval(botInterval);
-      document.getElementById('statusText').textContent = 'Detenido';
-      document.getElementById('statusDot').className = 'status-dot';
-      document.getElementById('deployBtn').style.display = 'block';
-      document.getElementById('stopBtn').style.display = 'none';
-      log('🛑 Bot detenido. Sesión finalizada.');
-      log('📊 Resumen: P&L: $'+pnl.toFixed(0)+' | Trades: '+totalTrades+' | Win Rate: '+(totalTrades>0?(wins/totalTrades*100).toFixed(1):'0')+'%');
-      document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_1')+pnl.toFixed(0)+' | Trades: '+totalTrades;
-    }
-
-    document.getElementById('deployBtn').addEventListener('click',startBot);
-    document.getElementById('stopBtn').addEventListener('click',stopBot);
-
-    if(localStorage.getItem(STORAGE_KEY)==='completed') {
-      document.getElementById('insigniaArea').classList.remove('hidden');
-      document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_2');
-    }
-  </script>
-  <script src="../../assets/js/cookie-consent.js"></script>
-
-<script>
+  if(localStorage.getItem(STORAGE_KEY)==='completed') {
+   document.getElementById('insigniaArea').classList.remove('hidden');
+   document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_2');
+  }
+ </script>
+ <script>
 window.I18N_DATA={
-  'fb_0': { es: '✅ Bot desplegado en ', en: '✅ Bot desplegado en ' },
-  'fb_1': { es: '🛑 Bot detenido | P&L: $', en: '🛑 Bot detenido | P&L: $' },
-  'fb_2': { es: '✅ Ya has desplegado un bot antes. ¡Vuelve a hacerlo con otra configuración!', en: '✅ Ya has desplegado un bot antes. ¡Vuelve a hacerlo con otra configuración!' }
+ 'fb_0': { es: '✅ Bot desplegado en ', en: '✅ Bot desplegado en ' },
+ 'fb_1': { es: '🛑 Bot detenido | P&L: $', en: '🛑 Bot detenido | P&L: $' },
+ 'fb_2': { es: '✅ Ya has desplegado un bot antes. ¡Vuelve a hacerlo con otra configuración!', en: '✅ Ya has desplegado un bot antes. ¡Vuelve a hacerlo con otra configuración!' }
 };
 </script>
 </body>

@@ -1,261 +1,260 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Riesgo de Mercado — VaR y Stress Testing | Curso 5</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    :root { --accent: #ff5050; --accent-rgb: 255,80,80; --accent2: #f59e0b; }
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 100%); font-family: 'Inter', sans-serif; color: #eef5ff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; }
-    .modulo-container { max-width: 1100px; width: 100%; background: rgba(15,25,45,0.65); backdrop-filter: blur(12px); border-radius: 3rem; border: 1px solid rgba(var(--accent-rgb),0.25); box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden; }
-    .hero-header { background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%); padding: 1.5rem 2rem; text-align: center; border-bottom: 2px solid var(--accent); }
-    .hero-header h1 { font-size: 1.8rem; font-weight: 800; background: linear-gradient(135deg, #FFF, #fca5a5, var(--accent)); -webkit-background-clip: text; background-clip: text; color: transparent; }
-    .hero-header p { font-size: 1rem; color: #fca5a5; margin-top: 0.2rem; }
-    .progress-bar { margin: 0.8rem 2rem; padding: 0.5rem 1rem; background: #00000055; border-radius: 2rem; display: flex; align-items: center; gap: 1rem; border: 1px solid var(--accent); }
-    .progress-fill-bg { flex:1; height:8px; background:#ffffff15; border-radius:8px; overflow:hidden; }
-    .progress-fill { height:100%; width:8%; background:linear-gradient(90deg,var(--accent),#fca5a5); border-radius:8px; transition:width 0.5s ease; }
-    .progress-text { font-size:0.75rem; color:#fca5a5; white-space:nowrap; }
-    .analogy-card { background: #1e2a3acc; margin: 1rem 2rem; padding: 1rem 1.5rem; border-radius: 1.5rem; border-left: 6px solid var(--accent); font-size: 0.95rem; }
-    .analogy-card i { color: var(--accent); }
-    .main-area { padding: 1rem 2rem 1.5rem; }
-    .dashboard { display:grid; grid-template-columns: 1fr 1fr 1fr; gap:0.5rem; margin-bottom:0.8rem; }
-    .dash-card { background:#0f1a2c; border-radius:0.8rem; padding:0.6rem; text-align:center; border:1px solid #2c3e66; }
-    .dash-card .d-label { font-size:0.65rem; color:#8899bb; }
-    .dash-card .d-value { font-size:1.2rem; font-weight:700; }
-    .dash-card .d-value.good { color:#00ffc8; }
-    .dash-card .d-value.bad { color:#ff5050; }
-    .dash-card .d-value.warn { color:#f59e0b; }
-    .sim-panel { background: rgba(0,10,25,0.7); border-radius: 1.5rem; padding: 1.2rem; border: 1px solid var(--accent); }
-    .sim-title { font-size: 1.2rem; font-weight: 700; color: var(--accent); margin-bottom: 0.5rem; }
-    .btn-action { background: linear-gradient(95deg, var(--accent), #fca5a5); border: none; padding: 0.6rem 1.2rem; font-weight: 700; border-radius: 2rem; cursor: pointer; font-size: 0.9rem; color: #000; transition: 0.2s; font-family: 'Inter', sans-serif; }
-    .btn-action:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(var(--accent-rgb),0.4); }
-    .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
-    .scenario-grid { display:flex; gap:0.4rem; flex-wrap:wrap; margin:0.5rem 0; }
-    .scenario-btn { background:#1e2a3e; border:1px solid #2c3e66; padding:0.4rem 0.8rem; border-radius:2rem; cursor:pointer; font-size:0.75rem; font-weight:600; transition:0.2s; color:#eef5ff; }
-    .scenario-btn:hover { border-color:var(--accent); }
-    .scenario-btn.selected { background:var(--accent); color:#000; }
-    .var-results { background:#0f1a2c; border-radius:1rem; padding:0.8rem; border:1px solid #2c3e66; margin-top:0.5rem; }
-    .var-table { width:100%; border-collapse:collapse; margin-top:0.5rem; }
-    .var-table th { font-size:0.7rem; color:#8899bb; text-align:left; padding:0.3rem; border-bottom:1px solid #2c3e66; }
-    .var-table td { font-size:0.85rem; padding:0.3rem; border-bottom:1px solid #1e2a3e; }
-    .feedback { background: #00000099; margin: 0.5rem 2rem 1rem; padding: 0.8rem; border-radius: 1rem; text-align: center; font-weight: 500; border-left: 4px solid var(--accent); font-size: 0.9rem; }
-    .insignia { text-align: center; background: #0c1b2f; border-radius: 1.5rem; margin: 0.8rem 2rem; padding: 0.8rem; border: 2px solid gold; }
-    .insignia i { font-size: 2rem; color: gold; }
-    .hidden { display: none; }
-    .nav-links { display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap; padding: 1rem 2rem; }
-    .nav-link { background: #2c3e66; padding: 0.6rem 1.2rem; border-radius: 2rem; font-weight: 600; cursor: pointer; text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; font-size: 0.85rem; }
-    .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(var(--accent-rgb),0.4); }
-    .nav-link.next { background: linear-gradient(95deg, var(--accent), #fca5a5); color: #000; }
-    footer { text-align: center; padding: 1rem; font-size: 0.75rem; border-top: 1px solid #2c3e66; }
-    @media (max-width:800px) { .hero-header h1 { font-size:1.3rem; } .dashboard { grid-template-columns:1fr 1fr; } }
-  </style>
-  <link rel="stylesheet" href="../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Riesgo de Mercado — VaR y Stress Testing | Curso 5</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  :root { --accent: #ff5050; --accent-rgb: 255,80,80; --accent2: #f59e0b; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 100%); font-family: 'Inter', sans-serif; color: #eef5ff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; }
+  .modulo-container { max-width: 1100px; width: 100%; background: rgba(15,25,45,0.65); backdrop-filter: blur(12px); border-radius: 3rem; border: 1px solid rgba(var(--accent-rgb),0.25); box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden; }
+  .hero-header { background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%); padding: 1.5rem 2rem; text-align: center; border-bottom: 2px solid var(--accent); }
+  .hero-header h1 { font-size: 1.8rem; font-weight: 800; background: linear-gradient(135deg, #FFF, #fca5a5, var(--accent)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero-header p { font-size: 1rem; color: #fca5a5; margin-top: 0.2rem; }
+  .progress-bar { margin: 0.8rem 2rem; padding: 0.5rem 1rem; background: #00000055; border-radius: 2rem; display: flex; align-items: center; gap: 1rem; border: 1px solid var(--accent); }
+  .progress-fill-bg { flex:1; height:8px; background:#ffffff15; border-radius:8px; overflow:hidden; }
+  .progress-fill { height:100%; width:8%; background:linear-gradient(90deg,var(--accent),#fca5a5); border-radius:8px; transition:width 0.5s ease; }
+  .progress-text { font-size:0.75rem; color:#fca5a5; white-space:nowrap; }
+  .analogy-card { background: #1e2a3acc; margin: 1rem 2rem; padding: 1rem 1.5rem; border-radius: 1.5rem; border-left: 6px solid var(--accent); font-size: 0.95rem; }
+  .analogy-card i { color: var(--accent); }
+  .main-area { padding: 1rem 2rem 1.5rem; }
+  .dashboard { display:grid; grid-template-columns: 1fr 1fr 1fr; gap:0.5rem; margin-bottom:0.8rem; }
+  .dash-card { background:#0f1a2c; border-radius:0.8rem; padding:0.6rem; text-align:center; border:1px solid #2c3e66; }
+  .dash-card .d-label { font-size:0.65rem; color:#8899bb; }
+  .dash-card .d-value { font-size:1.2rem; font-weight:700; }
+  .dash-card .d-value.good { color:#00ffc8; }
+  .dash-card .d-value.bad { color:#ff5050; }
+  .dash-card .d-value.warn { color:#f59e0b; }
+  .sim-panel { background: rgba(0,10,25,0.7); border-radius: 1.5rem; padding: 1.2rem; border: 1px solid var(--accent); }
+  .sim-title { font-size: 1.2rem; font-weight: 700; color: var(--accent); margin-bottom: 0.5rem; }
+  .btn-action { background: linear-gradient(95deg, var(--accent), #fca5a5); border: none; padding: 0.6rem 1.2rem; font-weight: 700; border-radius: 2rem; cursor: pointer; font-size: 0.9rem; color: #000; transition: 0.2s; font-family: 'Inter', sans-serif; }
+  .btn-action:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(var(--accent-rgb),0.4); }
+  .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
+  .scenario-grid { display:flex; gap:0.4rem; flex-wrap:wrap; margin:0.5rem 0; }
+  .scenario-btn { background:#1e2a3e; border:1px solid #2c3e66; padding:0.4rem 0.8rem; border-radius:2rem; cursor:pointer; font-size:0.75rem; font-weight:600; transition:0.2s; color:#eef5ff; }
+  .scenario-btn:hover { border-color:var(--accent); }
+  .scenario-btn.selected { background:var(--accent); color:#000; }
+  .var-results { background:#0f1a2c; border-radius:1rem; padding:0.8rem; border:1px solid #2c3e66; margin-top:0.5rem; }
+  .var-table { width:100%; border-collapse:collapse; margin-top:0.5rem; }
+  .var-table th { font-size:0.7rem; color:#8899bb; text-align:left; padding:0.3rem; border-bottom:1px solid #2c3e66; }
+  .var-table td { font-size:0.85rem; padding:0.3rem; border-bottom:1px solid #1e2a3e; }
+  .feedback { background: #00000099; margin: 0.5rem 2rem 1rem; padding: 0.8rem; border-radius: 1rem; text-align: center; font-weight: 500; border-left: 4px solid var(--accent); font-size: 0.9rem; }
+  .insignia { text-align: center; background: #0c1b2f; border-radius: 1.5rem; margin: 0.8rem 2rem; padding: 0.8rem; border: 2px solid gold; }
+  .insignia i { font-size: 2rem; color: gold; }
+  .hidden { display: none; }
+  .nav-links { display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap; padding: 1rem 2rem; }
+  .nav-link { background: #2c3e66; padding: 0.6rem 1.2rem; border-radius: 2rem; font-weight: 600; cursor: pointer; text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; font-size: 0.85rem; }
+  .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(var(--accent-rgb),0.4); }
+  .nav-link.next { background: linear-gradient(95deg, var(--accent), #fca5a5); color: #000; }
+  footer { text-align: center; padding: 1rem; font-size: 0.75rem; border-top: 1px solid #2c3e66; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.3rem; } .dashboard { grid-template-columns:1fr 1fr; } }
+ </style>
+ <link rel="stylesheet" href="../../assets/css/theme.css">
 </head>
 <body>
-  <nav class="brand-return-nav"><a href="../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa</a><a href="index.html">Curso 5</a></nav>
+ <nav class="brand-return-nav"><a href="../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa</a><a href="index.html">Curso 5</a></nav>
 
 <div class="modulo-container">
-  <div class="hero-header">
-    <h1><i class="fas fa-chart-simple"></i> Riesgo de Mercado — VaR y Stress Testing</h1>
-    <p>Módulo 8 · Mide y anticipa pérdidas potenciales</p>
+ <div class="hero-header">
+  <h1><i class="fas fa-chart-simple"></i> Riesgo de Mercado — VaR y Stress Testing</h1>
+  <p>Módulo 8 · Mide y anticipa pérdidas potenciales</p>
+ </div>
+
+ <div class="progress-bar">
+  <span>📊 Curso 5</span>
+  <div class="progress-fill-bg"><div class="progress-fill" id="progressFill"></div></div>
+  <span class="progress-text" id="progressText">0%</span>
+ </div>
+
+ <div class="analogy-card">
+  <i class="fas fa-car-crash"></i> <strong>El cinturón de seguridad:</strong> El VaR te dice: "conduciendo a 100 km/h, en el peor 1% de los casos, el impacto será de al menos 30G de fuerza". No evita el accidente, pero te permite saber qué tan grave puede llegar a ser. El stress test es la simulación de choque contra un muro concreto.
+ </div>
+
+ <div class="main-area">
+  <div class="sim-panel">
+   <div class="sim-title"><i class="fas fa-gauge-high"></i> Dashboard de Riesgo de Mercado</div>
+
+   <div class="dashboard">
+    <div class="dash-card"><div class="d-label">Portafolio</div><div class="d-value">$5,000,000</div></div>
+    <div class="dash-card"><div class="d-label">Volatilidad Anual</div><div class="d-value warn" id="volDisplay">18%</div></div>
+    <div class="dash-card"><div class="d-label">Horizonte</div><div class="d-value">10 días</div></div>
+   </div>
+
+   <button class="btn-action" id="calcVarBtn"><i class="fas fa-calculator"></i> Calcular VaR</button>
+
+   <div class="scenario-grid">
+    <span style="font-size:0.75rem;color:#8899bb;width:100%;">Stress Tests históricos:</span>
+    <button class="scenario-btn" data-stress="2008">2008 Crisis</button>
+    <button class="scenario-btn" data-stress="covid">COVID 2020</button>
+    <button class="scenario-btn" data-stress="2022">2022 Rate Hike</button>
+   </div>
+
+   <div id="varResults" class="var-results hidden"></div>
   </div>
+ </div>
 
-  <div class="progress-bar">
-    <span>📊 Curso 5</span>
-    <div class="progress-fill-bg"><div class="progress-fill" id="progressFill"></div></div>
-    <span class="progress-text" id="progressText">0%</span>
-  </div>
+ <div id="feedback" class="feedback">
+  💡 Calcula el VaR de tu portafolio y corre stress tests basados en crisis históricas reales.
+ </div>
 
-  <div class="analogy-card">
-    <i class="fas fa-car-crash"></i> <strong>El cinturón de seguridad:</strong> El VaR te dice: "conduciendo a 100 km/h, en el peor 1% de los casos, el impacto será de al menos 30G de fuerza". No evita el accidente, pero te permite saber qué tan grave puede llegar a ser. El stress test es la simulación de choque contra un muro concreto.
-  </div>
+ <div id="insignia" class="insignia hidden">
+  <i class="fas fa-medal"></i>
+  <h3>🏅 ¡RISK METRICS PRO! 🏅</h3>
+  <p>Dominas el VaR, CVaR y stress testing. Sabes cuantificar el riesgo de mercado como un CRO.</p>
+ </div>
 
-  <div class="main-area">
-    <div class="sim-panel">
-      <div class="sim-title"><i class="fas fa-gauge-high"></i> Dashboard de Riesgo de Mercado</div>
-
-      <div class="dashboard">
-        <div class="dash-card"><div class="d-label">Portafolio</div><div class="d-value">$5,000,000</div></div>
-        <div class="dash-card"><div class="d-label">Volatilidad Anual</div><div class="d-value warn" id="volDisplay">18%</div></div>
-        <div class="dash-card"><div class="d-label">Horizonte</div><div class="d-value">10 días</div></div>
-      </div>
-
-      <button class="btn-action" id="calcVarBtn"><i class="fas fa-calculator"></i> Calcular VaR</button>
-
-      <div class="scenario-grid">
-        <span style="font-size:0.75rem;color:#8899bb;width:100%;">Stress Tests históricos:</span>
-        <button class="scenario-btn" data-stress="2008">2008 Crisis</button>
-        <button class="scenario-btn" data-stress="covid">COVID 2020</button>
-        <button class="scenario-btn" data-stress="2022">2022 Rate Hike</button>
-      </div>
-
-      <div id="varResults" class="var-results hidden"></div>
-    </div>
-  </div>
-
-  <div id="feedback" class="feedback">
-    💡 Calcula el VaR de tu portafolio y corre stress tests basados en crisis históricas reales.
-  </div>
-
-  <div id="insignia" class="insignia hidden">
-    <i class="fas fa-medal"></i>
-    <h3>🏅 ¡RISK METRICS PRO! 🏅</h3>
-    <p>Dominas el VaR, CVaR y stress testing. Sabes cuantificar el riesgo de mercado como un CRO.</p>
-  </div>
-
-  <div class="nav-links">
-    <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Menú</a>
-    <button id="nextBtn" class="nav-link next hidden">Siguiente <i class="fas fa-arrow-right"></i></button>
-  </div>
-  <footer>
-    <i class="fas fa-chart-simple"></i> Mercados Globales · Módulo 8 · VaR y Stress Testing
-  </footer>
+ <div class="nav-links">
+  <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Menú</a>
+  <button id="nextBtn" class="nav-link next hidden">Siguiente <i class="fas fa-arrow-right"></i></button>
+ </div>
+ <footer>
+  <i class="fas fa-chart-simple"></i> Mercados Globales · Módulo 8 · VaR y Stress Testing
+ </footer>
 </div>
 
 <script>
-  const MODULE_ID = 'c5m8';
-  const PROGRESS_KEY = 'finanzas_progress';
-  const BADGE_KEY = 'finanzas_c5m8';
-  const TOTAL_MODULES = 72;
+ const MODULE_ID = 'c5m8';
+ const PROGRESS_KEY = 'finanzas_progress';
+ const BADGE_KEY = 'finanzas_c5m8';
+ const TOTAL_MODULES = 72;
 
-  var varDone = false;
-  const PORTFOLIO = 5000000;
-  const HORIZON = 10;
-  var volatility = 0.18;
+ var varDone = false;
+ const PORTFOLIO = 5000000;
+ const HORIZON = 10;
+ var volatility = 0.18;
 
-  function getProgress() { return JSON.parse(localStorage.getItem(PROGRESS_KEY)) || []; }
-  function saveProgress() {
-    let p = getProgress();
-    if (!p.includes(MODULE_ID)) { p.push(MODULE_ID); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
-    let pct = Math.round((p.length / TOTAL_MODULES) * 100);
-    document.getElementById('progressFill').style.width = pct + '%';
-    document.getElementById('progressText').textContent = pct + '% (progr. global)';
+ function getProgress() { return JSON.parse(localStorage.getItem(PROGRESS_KEY)) || []; }
+ function saveProgress() {
+  let p = getProgress();
+  if (!p.includes(MODULE_ID)) { p.push(MODULE_ID); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
+  let pct = Math.round((p.length / TOTAL_MODULES) * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = pct + '% (progr. global)';
+ }
+ function getBadge() { return localStorage.getItem(BADGE_KEY) === 'true'; }
+ function setBadge() { localStorage.setItem(BADGE_KEY, 'true'); }
+
+ function normalQuantile(p) {
+  // Approximation of normal quantile
+  if (p < 0.5) return -normalQuantile(1 - p);
+  var a = [2.5066, 1.0478, 0.0479, -0.0101, 0.0002];
+  var t = Math.sqrt(-2 * Math.log(1 - p));
+  return t + a[0] + a[1]*t + a[2]*t*t + a[3]*t*t*t + a[4]*t*t*t*t;
+ }
+
+ document.getElementById('calcVarBtn').addEventListener('click', function() {
+  var vol = volatility;
+  var horizon = HORIZON;
+  var sqrtT = Math.sqrt(horizon / 252);
+  var annualReturn = 0.08; // assumed drift
+
+  var z95 = normalQuantile(0.95);
+  var z99 = normalQuantile(0.99);
+
+  // Parametric VaR
+  var var95Param = portfolioLoss(annualReturn, vol, sqrtT, z95);
+  var var99Param = portfolioLoss(annualReturn, vol, sqrtT, z99);
+
+  // CVaR (expected shortfall)
+  var cvar95 = (PORTFOLIO * annualReturn * horizon/252) - PORTFOLIO * vol * sqrtT * Math.exp(-z95*z95/2) / (Math.sqrt(2*Math.PI) * 0.05);
+
+  var results = document.getElementById('varResults');
+  results.classList.remove('hidden');
+  results.innerHTML = `
+   <h4 style="color:var(--accent);margin-bottom:0.5rem;">📊 Value at Risk (10 días)</h4>
+   <table class="var-table">
+    <tr><th>Métrica</th><th>Valor</th><th>% Portafolio</th></tr>
+    <tr><td>VaR 95% (Paramétrico)</td><td style="color:#ff5050">$${var95Param.toFixed(0)}</td><td style="color:#f59e0b">${(var95Param/PORTFOLIO*100).toFixed(1)}%</td></tr>
+    <tr><td>VaR 99% (Paramétrico)</td><td style="color:#ff5050">$${var99Param.toFixed(0)}</td><td style="color:#ff5050">${(var99Param/PORTFOLIO*100).toFixed(1)}%</td></tr>
+    <tr><td>CVaR 95% (Expected Shortfall)</td><td style="color:#ff2020">$${Math.abs(cvar95).toFixed(0)}</td><td style="color:#ff2020">${(Math.abs(cvar95)/PORTFOLIO*100).toFixed(1)}%</td></tr>
+   </table>
+   <p style="font-size:0.8rem;color:#8899bb;margin-top:0.5rem;">Interpretación: Hay 95% de probabilidad de que la pérdida máxima en 10 días no supere los $${var95Param.toFixed(0)}. Con 99% confianza, la pérdida máxima es $${var99Param.toFixed(0)}.</p>
+  `;
+
+  document.getElementById('feedback').textContent = '✅ VaR calculado: 95% → $' + var95Param.toFixed(0) + ' | 99% → $' + var99Param.toFixed(0);
+
+  if (!varDone) {
+   varDone = true;
+   document.getElementById('insignia').classList.remove('hidden');
+   document.getElementById('nextBtn').classList.remove('hidden');
+   setBadge();
+   saveProgress();
+   document.getElementById('feedback').textContent = I18N.t('fb_0') + document.getElementById('feedback').textContent;
   }
-  function getBadge() { return localStorage.getItem(BADGE_KEY) === 'true'; }
-  function setBadge() { localStorage.setItem(BADGE_KEY, 'true'); }
+ });
 
-  function normalQuantile(p) {
-    // Approximation of normal quantile
-    if (p < 0.5) return -normalQuantile(1 - p);
-    var a = [2.5066, 1.0478, 0.0479, -0.0101, 0.0002];
-    var t = Math.sqrt(-2 * Math.log(1 - p));
-    return t + a[0] + a[1]*t + a[2]*t*t + a[3]*t*t*t + a[4]*t*t*t*t;
+ function portfolioLoss(drift, vol, sqrtT, z) {
+  return PORTFOLIO - (PORTFOLIO * (1 + drift * (10/252) - vol * sqrtT * (z > 0 ? z : 1.65)));
+ }
+
+ // Stress tests
+ document.querySelectorAll('.scenario-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+   document.querySelectorAll('.scenario-btn').forEach(function(b) { b.classList.remove('selected'); });
+   this.classList.add('selected');
+
+   var lossPct, label;
+   switch (this.dataset.stress) {
+    case '2008': lossPct = 0.385; label = 'Crisis 2008 (S&P 500 cayó 38.5%)'; break;
+    case 'covid': lossPct = 0.34; label = 'COVID Crash (S&P 500 cayó 34% en 23 días)'; break;
+    case '2022': lossPct = 0.25; label = '2022 Rate Hike (NASDAQ cayó 33%, S&P 500 -25%)'; break;
+   }
+
+   var loss = PORTFOLIO * lossPct;
+   var results = document.getElementById('varResults');
+   results.classList.remove('hidden');
+   results.innerHTML += `
+    <div style="margin-top:0.8rem;background:#0f1a2c;padding:0.6rem;border-radius:0.8rem;border:1px solid #ff5050;">
+     <strong style="color:#ff5050;">⚠️ Stress Test: ${label}</strong>
+     <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-top:0.3rem;">
+      <div>Pérdida Potencial: <strong style="color:#ff5050;">$${loss.toFixed(0)}</strong></div>
+      <div>% Portafolio: <strong style="color:#ff5050;">${(lossPct*100).toFixed(1)}%</strong></div>
+     </div>
+    </div>
+   `;
+   document.getElementById('feedback').textContent = I18N.t('fb_1') + label + '. Pérdida potencial: $' + loss.toFixed(0) + ' (' + (lossPct*100).toFixed(1) + '%).';
+  });
+ });
+
+ document.getElementById('nextBtn').addEventListener('click', function() {
+  alert('🔄 Transición al Módulo 9: Riesgo Operacional y Liquidez');
+  window.location.href = '09-riesgo-operacional.html';
+ });
+
+ (function restore() {
+  if (getBadge()) {
+   document.getElementById('insignia').classList.remove('hidden');
+   document.getElementById('nextBtn').classList.remove('hidden');
+   document.getElementById('feedback').textContent = I18N.t('fb_2');
+   varDone = true;
   }
-
-  document.getElementById('calcVarBtn').addEventListener('click', function() {
-    var vol = volatility;
-    var horizon = HORIZON;
-    var sqrtT = Math.sqrt(horizon / 252);
-    var annualReturn = 0.08; // assumed drift
-
-    var z95 = normalQuantile(0.95);
-    var z99 = normalQuantile(0.99);
-
-    // Parametric VaR
-    var var95Param = portfolioLoss(annualReturn, vol, sqrtT, z95);
-    var var99Param = portfolioLoss(annualReturn, vol, sqrtT, z99);
-
-    // CVaR (expected shortfall)
-    var cvar95 = (PORTFOLIO * annualReturn * horizon/252) - PORTFOLIO * vol * sqrtT * Math.exp(-z95*z95/2) / (Math.sqrt(2*Math.PI) * 0.05);
-
-    var results = document.getElementById('varResults');
-    results.classList.remove('hidden');
-    results.innerHTML = `
-      <h4 style="color:var(--accent);margin-bottom:0.5rem;">📊 Value at Risk (10 días)</h4>
-      <table class="var-table">
-        <tr><th>Métrica</th><th>Valor</th><th>% Portafolio</th></tr>
-        <tr><td>VaR 95% (Paramétrico)</td><td style="color:#ff5050">$${var95Param.toFixed(0)}</td><td style="color:#f59e0b">${(var95Param/PORTFOLIO*100).toFixed(1)}%</td></tr>
-        <tr><td>VaR 99% (Paramétrico)</td><td style="color:#ff5050">$${var99Param.toFixed(0)}</td><td style="color:#ff5050">${(var99Param/PORTFOLIO*100).toFixed(1)}%</td></tr>
-        <tr><td>CVaR 95% (Expected Shortfall)</td><td style="color:#ff2020">$${Math.abs(cvar95).toFixed(0)}</td><td style="color:#ff2020">${(Math.abs(cvar95)/PORTFOLIO*100).toFixed(1)}%</td></tr>
-      </table>
-      <p style="font-size:0.8rem;color:#8899bb;margin-top:0.5rem;">Interpretación: Hay 95% de probabilidad de que la pérdida máxima en 10 días no supere los $${var95Param.toFixed(0)}. Con 99% confianza, la pérdida máxima es $${var99Param.toFixed(0)}.</p>
-    `;
-
-    document.getElementById('feedback').textContent = '✅ VaR calculado: 95% → $' + var95Param.toFixed(0) + ' | 99% → $' + var99Param.toFixed(0);
-
-    if (!varDone) {
-      varDone = true;
-      document.getElementById('insignia').classList.remove('hidden');
-      document.getElementById('nextBtn').classList.remove('hidden');
-      setBadge();
-      saveProgress();
-      document.getElementById('feedback').textContent = I18N.t('fb_0') + document.getElementById('feedback').textContent;
-    }
-  });
-
-  function portfolioLoss(drift, vol, sqrtT, z) {
-    return PORTFOLIO - (PORTFOLIO * (1 + drift * (10/252) - vol * sqrtT * (z > 0 ? z : 1.65)));
+  let p = getProgress();
+  if (p.includes(MODULE_ID)) {
+   let pct = Math.round((p.length / TOTAL_MODULES) * 100);
+   document.getElementById('progressFill').style.width = pct + '%';
+   document.getElementById('progressText').textContent = pct + '% (progr. global)';
   }
-
-  // Stress tests
-  document.querySelectorAll('.scenario-btn').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      document.querySelectorAll('.scenario-btn').forEach(function(b) { b.classList.remove('selected'); });
-      this.classList.add('selected');
-
-      var lossPct, label;
-      switch (this.dataset.stress) {
-        case '2008': lossPct = 0.385; label = 'Crisis 2008 (S&P 500 cayó 38.5%)'; break;
-        case 'covid': lossPct = 0.34; label = 'COVID Crash (S&P 500 cayó 34% en 23 días)'; break;
-        case '2022': lossPct = 0.25; label = '2022 Rate Hike (NASDAQ cayó 33%, S&P 500 -25%)'; break;
-      }
-
-      var loss = PORTFOLIO * lossPct;
-      var results = document.getElementById('varResults');
-      results.classList.remove('hidden');
-      results.innerHTML += `
-        <div style="margin-top:0.8rem;background:#0f1a2c;padding:0.6rem;border-radius:0.8rem;border:1px solid #ff5050;">
-          <strong style="color:#ff5050;">⚠️ Stress Test: ${label}</strong>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-top:0.3rem;">
-            <div>Pérdida Potencial: <strong style="color:#ff5050;">$${loss.toFixed(0)}</strong></div>
-            <div>% Portafolio: <strong style="color:#ff5050;">${(lossPct*100).toFixed(1)}%</strong></div>
-          </div>
-        </div>
-      `;
-      document.getElementById('feedback').textContent = I18N.t('fb_1') + label + '. Pérdida potencial: $' + loss.toFixed(0) + ' (' + (lossPct*100).toFixed(1) + '%).';
-    });
-  });
-
-  document.getElementById('nextBtn').addEventListener('click', function() {
-    alert('🔄 Transición al Módulo 9: Riesgo Operacional y Liquidez');
-    window.location.href = '09-riesgo-operacional.html';
-  });
-
-  (function restore() {
-    if (getBadge()) {
-      document.getElementById('insignia').classList.remove('hidden');
-      document.getElementById('nextBtn').classList.remove('hidden');
-      document.getElementById('feedback').textContent = I18N.t('fb_2');
-      varDone = true;
-    }
-    let p = getProgress();
-    if (p.includes(MODULE_ID)) {
-      let pct = Math.round((p.length / TOTAL_MODULES) * 100);
-      document.getElementById('progressFill').style.width = pct + '%';
-      document.getElementById('progressText').textContent = pct + '% (progr. global)';
-    }
-  })();
+ })();
 </script>
-  <script src="../../assets/js/cookie-consent.js"></script>
-<script>
+ <script>
 window.I18N_DATA={
-  "fb_0": {
-    "es": "🏅 ¡VAR COMPLETADO! ",
-    "en": "🏅 !VAR COMPLETADO! "
-  },
-  "fb_1": {
-    "es": "✅ Stress test: ",
-    "en": "✅ Stress test: "
-  },
-  "fb_2": {
-    "es": "✅ Ya completaste este módulo. ¡Risk Metrics Pro!",
-    "en": "✅ Ya completaste este module. !Risk Metrics Pro!"
-  }
+ "fb_0": {
+  "es": "🏅 ¡VAR COMPLETADO! ",
+  "en": "🏅 !VAR COMPLETADO! "
+ },
+ "fb_1": {
+  "es": "✅ Stress test: ",
+  "en": "✅ Stress test: "
+ },
+ "fb_2": {
+  "es": "✅ Ya completaste este módulo. ¡Risk Metrics Pro!",
+  "en": "✅ Ya completaste este module. !Risk Metrics Pro!"
+ }
 };
 </script>
-<script src="../../../assets/js/i18n.js"></script>  </body>
+<script src="../../../assets/js/i18n.js"></script> </body>
 </html>

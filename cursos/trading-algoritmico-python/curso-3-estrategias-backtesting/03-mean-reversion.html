@@ -1,303 +1,303 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Estrategias y Backtesting | Mean Reversion</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #111a2e 100%);
-      background-size: 200% 200%; animation: gradientShift 20s ease infinite;
-      font-family: 'Inter', sans-serif; color: #eef5ff; min-height: 100vh;
-      display: flex; align-items: center; justify-content: center; padding: 2rem 1rem;
-    }
-    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-    .curso3-container {
-      max-width: 1300px; width: 100%;
-      background: rgba(15, 25, 45, 0.65); backdrop-filter: blur(12px);
-      border-radius: 3rem; border: 1px solid rgba(0, 255, 200, 0.25);
-      box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden;
-    }
-    .hero-header { background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%); padding: 2rem 2rem 1.5rem; text-align: center; border-bottom: 2px solid #00ffc8; }
-    .hero-header h1 { font-size: 2.6rem; font-weight: 800; background: linear-gradient(135deg, #FFF, #66ffe0, #00ffc8); -webkit-background-clip: text; background-clip: text; color: transparent; }
-    .hero-header p { font-size: 1.1rem; color: #b9e2ff; margin-top: 0.3rem; }
-    .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
-    .chip { background: rgba(0,255,200,0.15); border: 1px solid #00ffc8; padding: 0.3rem 1rem; border-radius: 40px; font-size: 0.8rem; font-weight: 600; }
-    .analogy-card { background: #1e2a3acc; margin: 1.5rem 2rem; padding: 1.2rem 1.8rem; border-radius: 2rem; border-left: 8px solid #00ffc8; font-size: 1rem; line-height: 1.6; }
-    .main-area { padding: 0.5rem 2rem; }
-    .feedback { background: #00000099; margin: 1.5rem 2rem; padding: 1rem; border-radius: 1.5rem; text-align: center; font-weight: 500; border-left: 4px solid #00ffc8; }
-    .insignia { text-align: center; background: #0c1b2f; border-radius: 2rem; margin: 0 2rem 1.5rem; padding: 1rem; border: 1px dashed gold; }
-    .insignia i { font-size: 2.5rem; color: gold; }
-    .hidden { display: none; }
-    .btn-action { background: linear-gradient(95deg, #f0a500, #ff6a00); border: none; padding: 0.8rem 1.8rem; font-weight: bold; border-radius: 3rem; cursor: pointer; font-size: 1rem; transition: 0.2s; color: #1e1a0c; }
-    .btn-action:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(240,165,0,0.5); }
-    .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
-    .nav-link { background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem; font-weight: 600; text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; }
-    .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(0,255,200,0.4); }
-    .nav-link.next { background: linear-gradient(95deg, #f0a500, #ff6a00); color: #1e1a0c; }
-    .nav-link.menu { background: #1a2a4a; border: 1px solid #3399ff; }
-    footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
-    .param-group { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin: 1rem 0; }
-    .param-group label { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; font-size: 0.85rem; }
-    .param-group input { width: 80px; padding: 0.4rem; border-radius: 0.8rem; border: 1px solid #2c3e66; background: #0f1a2e; color: #eef5ff; text-align: center; }
-    .chart-area { background: #0c1222; border-radius: 1.5rem; padding: 1rem; margin: 1rem 0; min-height: 200px; border: 1px solid #2c3e66; overflow-x: auto; }
-    .chart-area canvas { width: 100% !important; height: auto !important; }
-    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap: 0.8rem; margin: 1rem 0; }
-    .stat-card { background: #1a2640cc; border-radius: 1rem; padding: 0.8rem; text-align: center; border: 1px solid #2c3e66; }
-    .stat-card .val { font-size: 1.4rem; font-weight: 700; color: #66ffe0; }
-    .stat-card .label { font-size: 0.75rem; color: #8899bb; }
-    .round-info { text-align: center; font-size: 1.1rem; margin: 0.5rem 0; }
-    .round-info strong { color: #00ffc8; }
-    .b-value { text-align: center; font-size: 1rem; margin: 0.3rem 0; color: #b9e2ff; }
-    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
-  </style>
-  <link rel="stylesheet" href="../../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Estrategias y Backtesting | Mean Reversion</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+   background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #111a2e 100%);
+   background-size: 200% 200%; animation: gradientShift 20s ease infinite;
+   font-family: 'Inter', sans-serif; color: #eef5ff; min-height: 100vh;
+   display: flex; align-items: center; justify-content: center; padding: 2rem 1rem;
+  }
+  @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .curso3-container {
+   max-width: 1300px; width: 100%;
+   background: rgba(15, 25, 45, 0.65); backdrop-filter: blur(12px);
+   border-radius: 3rem; border: 1px solid rgba(0, 255, 200, 0.25);
+   box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden;
+  }
+  .hero-header { background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%); padding: 2rem 2rem 1.5rem; text-align: center; border-bottom: 2px solid #00ffc8; }
+  .hero-header h1 { font-size: 2.6rem; font-weight: 800; background: linear-gradient(135deg, #FFF, #66ffe0, #00ffc8); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero-header p { font-size: 1.1rem; color: #b9e2ff; margin-top: 0.3rem; }
+  .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
+  .chip { background: rgba(0,255,200,0.15); border: 1px solid #00ffc8; padding: 0.3rem 1rem; border-radius: 40px; font-size: 0.8rem; font-weight: 600; }
+  .analogy-card { background: #1e2a3acc; margin: 1.5rem 2rem; padding: 1.2rem 1.8rem; border-radius: 2rem; border-left: 8px solid #00ffc8; font-size: 1rem; line-height: 1.6; }
+  .main-area { padding: 0.5rem 2rem; }
+  .feedback { background: #00000099; margin: 1.5rem 2rem; padding: 1rem; border-radius: 1.5rem; text-align: center; font-weight: 500; border-left: 4px solid #00ffc8; }
+  .insignia { text-align: center; background: #0c1b2f; border-radius: 2rem; margin: 0 2rem 1.5rem; padding: 1rem; border: 1px dashed gold; }
+  .insignia i { font-size: 2.5rem; color: gold; }
+  .hidden { display: none; }
+  .btn-action { background: linear-gradient(95deg, #f0a500, #ff6a00); border: none; padding: 0.8rem 1.8rem; font-weight: bold; border-radius: 3rem; cursor: pointer; font-size: 1rem; transition: 0.2s; color: #1e1a0c; }
+  .btn-action:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(240,165,0,0.5); }
+  .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
+  .nav-link { background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem; font-weight: 600; text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; }
+  .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(0,255,200,0.4); }
+  .nav-link.next { background: linear-gradient(95deg, #f0a500, #ff6a00); color: #1e1a0c; }
+  .nav-link.menu { background: #1a2a4a; border: 1px solid #3399ff; }
+  footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
+  .param-group { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin: 1rem 0; }
+  .param-group label { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; font-size: 0.85rem; }
+  .param-group input { width: 80px; padding: 0.4rem; border-radius: 0.8rem; border: 1px solid #2c3e66; background: #0f1a2e; color: #eef5ff; text-align: center; }
+  .chart-area { background: #0c1222; border-radius: 1.5rem; padding: 1rem; margin: 1rem 0; min-height: 200px; border: 1px solid #2c3e66; overflow-x: auto; }
+  .chart-area canvas { width: 100% !important; height: auto !important; }
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap: 0.8rem; margin: 1rem 0; }
+  .stat-card { background: #1a2640cc; border-radius: 1rem; padding: 0.8rem; text-align: center; border: 1px solid #2c3e66; }
+  .stat-card .val { font-size: 1.4rem; font-weight: 700; color: #66ffe0; }
+  .stat-card .label { font-size: 0.75rem; color: #8899bb; }
+  .round-info { text-align: center; font-size: 1.1rem; margin: 0.5rem 0; }
+  .round-info strong { color: #00ffc8; }
+  .b-value { text-align: center; font-size: 1rem; margin: 0.3rem 0; color: #b9e2ff; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
+ </style>
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
 </head>
 <body>
-  <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a></nav>
+ <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a></nav>
 
-  <div class="curso3-container">
-    <div class="hero-header">
-      <h1>🔄 MEAN REVERSION</h1>
-      <p>RSI extremos, Bollinger %B y Pairs Trading</p>
-      <div class="badge-area">
-        <span class="chip"><i class="fas fa-chart-bar"></i> Bollinger Bands</span>
-        <span class="chip"><i class="fas fa-percent"></i> %B</span>
-      </div>
-    </div>
-    <div class="analogy-card"><strong>🔄 Piénsalo así:</strong> Las Bollinger Bands son como una goma elástica: cuanto más se estira el precio, más fuerte será la contracción. Comprar barato y vender caro en un rango es la esencia del mean reversion.</div>
-    <div class="main-area">
-      <div class="round-info">Activo: <strong id="assetName">BTC/USD</strong> | Ronda <span id="roundNum">1</span>/3</div>
-      <div class="param-group">
-        <label>Período <input type="number" id="period" value="20" min="5" max="50"></label>
-        <label>Desviaciones <input type="number" id="stdDev" value="2" min="1" max="4" step="0.5"></label>
-        <button id="runBtn" class="btn-action"><i class="fas fa-play"></i> Calcular</button>
-      </div>
-      <div id="bValue" class="b-value">%B: —</div>
-      <div class="chart-area">
-        <canvas id="chartCanvas" height="250"></canvas>
-      </div>
-      <div class="stats-grid" id="statsGrid">
-        <div class="stat-card"><div class="val" id="signalsVal">0</div><div class="label">Señales</div></div>
-        <div class="stat-card"><div class="val" id="upperBand">0</div><div class="label">Banda Superior</div></div>
-        <div class="stat-card"><div class="val" id="lowerBand">0</div><div class="label">Banda Inferior</div></div>
-        <div class="stat-card"><div class="val" id="bValueDisplay">0.00</div><div class="label">%B Actual</div></div>
-      </div>
-    </div>
-    <div id="feedbackMsg" class="feedback">💡 Configura período y desviaciones para generar señales de compra/venta. Completa 3 rondas para ganar la insignia.</div>
-    <div id="insigniaArea" class="insignia hidden">
-      <i class="fas fa-medal"></i>
-      <h3>🏅 REVERSOR DE MEDIA 🏅</h3>
-      <p>¡Dominas las Bollinger Bands y el %B para identificar reversiones!</p>
-    </div>
-    <div class="nav-links">
-      <a href="02-trend-following.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
-      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
-      <a href="04-momentum.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
-    </div>
-    <footer><i class="fas fa-crown"></i> Estrategias y Backtesting · Trading Algorítmico con Python</footer>
+ <div class="curso3-container">
+  <div class="hero-header">
+   <h1>ðŸ”„ MEAN REVERSION</h1>
+   <p>RSI extremos, Bollinger %B y Pairs Trading</p>
+   <div class="badge-area">
+    <span class="chip"><i class="fas fa-chart-bar"></i> Bollinger Bands</span>
+    <span class="chip"><i class="fas fa-percent"></i> %B</span>
+   </div>
   </div>
+  <div class="analogy-card"><strong>ðŸ”„ PiÃ©nsalo asÃ­:</strong> Las Bollinger Bands son como una goma elÃ¡stica: cuanto mÃ¡s se estira el precio, mÃ¡s fuerte serÃ¡ la contracciÃ³n. Comprar barato y vender caro en un rango es la esencia del mean reversion.</div>
+  <div class="main-area">
+   <div class="round-info">Activo: <strong id="assetName">BTC/USD</strong> | Ronda <span id="roundNum">1</span>/3</div>
+   <div class="param-group">
+    <label>PerÃ­odo <input type="number" id="period" value="20" min="5" max="50"></label>
+    <label>Desviaciones <input type="number" id="stdDev" value="2" min="1" max="4" step="0.5"></label>
+    <button id="runBtn" class="btn-action"><i class="fas fa-play"></i> Calcular</button>
+   </div>
+   <div id="bValue" class="b-value">%B: â€”</div>
+   <div class="chart-area">
+    <canvas id="chartCanvas" height="250"></canvas>
+   </div>
+   <div class="stats-grid" id="statsGrid">
+    <div class="stat-card"><div class="val" id="signalsVal">0</div><div class="label">SeÃ±ales</div></div>
+    <div class="stat-card"><div class="val" id="upperBand">0</div><div class="label">Banda Superior</div></div>
+    <div class="stat-card"><div class="val" id="lowerBand">0</div><div class="label">Banda Inferior</div></div>
+    <div class="stat-card"><div class="val" id="bValueDisplay">0.00</div><div class="label">%B Actual</div></div>
+   </div>
+  </div>
+  <div id="feedbackMsg" class="feedback">ðŸ’¡ Configura perÃ­odo y desviaciones para generar seÃ±ales de compra/venta. Completa 3 rondas para ganar la insignia.</div>
+  <div id="insigniaArea" class="insignia hidden">
+   <i class="fas fa-medal"></i>
+   <h3>ðŸ… REVERSOR DE MEDIA ðŸ…</h3>
+   <p>Â¡Dominas las Bollinger Bands y el %B para identificar reversiones!</p>
+  </div>
+  <div class="nav-links">
+   <a href="02-trend-following.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
+   <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> MenÃº</a>
+   <a href="04-momentum.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Estrategias y Backtesting Â· Trading AlgorÃ­tmico con Python</footer>
+ </div>
 
-  <script>
-    const STORAGE_KEY = 'py_trade_3_03';
-    const assetNames = ['BTC/USD', 'ETH/USD', 'SOL/USD'];
-    let currentRound = 0;
-    let roundCompleted = [false, false, false];
-    let currentData = [];
+ <script>
+  const STORAGE_KEY = 'py_trade_3_03';
+  const assetNames = ['BTC/USD', 'ETH/USD', 'SOL/USD'];
+  let currentRound = 0;
+  let roundCompleted = [false, false, false];
+  let currentData = [];
 
-    function generateAssetData(seed) {
-      const data = [];
-      let price = 100 + seed * 20;
-      const center = price;
-      for (let i = 0; i < 150; i++) {
-        const cycle = Math.sin(i * 0.08 + seed) * 15;
-        const noise = (Math.random() - 0.5) * 6;
-        price = center + cycle + noise;
-        data.push(Math.max(price, 50));
-      }
-      return data;
+  function generateAssetData(seed) {
+   const data = [];
+   let price = 100 + seed * 20;
+   const center = price;
+   for (let i = 0; i < 150; i++) {
+    const cycle = Math.sin(i * 0.08 + seed) * 15;
+    const noise = (Math.random() - 0.5) * 6;
+    price = center + cycle + noise;
+    data.push(Math.max(price, 50));
+   }
+   return data;
+  }
+
+  function calcSMA(data, period) {
+   const result = [];
+   for (let i = 0; i < data.length; i++) {
+    if (i < period - 1) { result.push(null); continue; }
+    let sum = 0;
+    for (let j = 0; j < period; j++) sum += data[i - j];
+    result.push(sum / period);
+   }
+   return result;
+  }
+
+  function calcStd(data, period, sma) {
+   const result = [];
+   for (let i = 0; i < data.length; i++) {
+    if (i < period - 1 || sma[i] === null) { result.push(null); continue; }
+    let sum = 0;
+    for (let j = 0; j < period; j++) sum += Math.pow(data[i - j] - sma[i], 2);
+    result.push(Math.sqrt(sum / period));
+   }
+   return result;
+  }
+
+  function runAnalysis() {
+   const period = parseInt(document.getElementById('period').value) || 20;
+   const stdDev = parseFloat(document.getElementById('stdDev').value) || 2;
+   const data = currentData;
+   const sma = calcSMA(data, period);
+   const std = calcStd(data, period, sma);
+   let signals = 0;
+   let bCurrent = 0;
+
+   const upper = [], lower = [], bValues = [];
+   for (let i = 0; i < data.length; i++) {
+    if (sma[i] === null || std[i] === null) {
+     upper.push(null); lower.push(null); bValues.push(null);
+     continue;
     }
+    const u = sma[i] + stdDev * std[i];
+    const l = sma[i] - stdDev * std[i];
+    upper.push(u);
+    lower.push(l);
+    const b = (data[i] - l) / (u - l);
+    bValues.push(b);
 
-    function calcSMA(data, period) {
-      const result = [];
-      for (let i = 0; i < data.length; i++) {
-        if (i < period - 1) { result.push(null); continue; }
-        let sum = 0;
-        for (let j = 0; j < period; j++) sum += data[i - j];
-        result.push(sum / period);
-      }
-      return result;
+    if (i > 0) {
+     if (data[i] <= l && data[i-1] > l) signals++;
+     if (data[i] >= u && data[i-1] < u) signals++;
     }
+   }
+   bCurrent = bValues[bValues.length-1] || 0;
 
-    function calcStd(data, period, sma) {
-      const result = [];
-      for (let i = 0; i < data.length; i++) {
-        if (i < period - 1 || sma[i] === null) { result.push(null); continue; }
-        let sum = 0;
-        for (let j = 0; j < period; j++) sum += Math.pow(data[i - j] - sma[i], 2);
-        result.push(Math.sqrt(sum / period));
-      }
-      return result;
+   document.getElementById('signalsVal').textContent = signals;
+   document.getElementById('upperBand').textContent = upper[upper.length-1]?.toFixed(2) || 'â€”';
+   document.getElementById('lowerBand').textContent = lower[lower.length-1]?.toFixed(2) || 'â€”';
+   document.getElementById('bValueDisplay').textContent = bCurrent.toFixed(2);
+   document.getElementById('bValue').textContent = '%B: ' + bCurrent.toFixed(2) + ' ' + (bCurrent > 1 ? '(Sobrecompra)' : bCurrent < 0 ? '(Sobreventa)' : '(Neutral)');
+
+   const canvas = document.getElementById('chartCanvas');
+   const ctx = canvas.getContext('2d');
+   const W = canvas.parentElement.clientWidth - 40;
+   canvas.width = W;
+   canvas.height = 250;
+   const pad = { top: 20, bottom: 30, left: 40, right: 20 };
+   const chartW = W - pad.left - pad.right;
+   const chartH = 250 - pad.top - pad.bottom;
+   const valid = data.filter(v => v !== null);
+   const minP = Math.min(...valid) * 0.97;
+   const maxP = Math.max(...valid) * 1.03;
+
+   ctx.clearRect(0, 0, W, 250);
+   ctx.fillStyle = '#0c1222';
+   ctx.fillRect(0, 0, W, 250);
+
+   function xPos(i) { return pad.left + (i / (data.length-1)) * chartW; }
+   function yPos(v) { return pad.top + chartH - ((v - minP) / (maxP - minP)) * chartH; }
+
+   ctx.strokeStyle = '#00ffc8';
+   ctx.lineWidth = 0.5;
+   ctx.setLineDash([3,3]);
+   upper.forEach((v, i) => {
+    if (v === null) return;
+    ctx.fillStyle = '#00ffc833';
+    ctx.fillRect(xPos(i), yPos(v), chartW/data.length, yPos(lower[i])-yPos(v));
+   });
+   ctx.setLineDash([]);
+
+   ctx.strokeStyle = '#2c3e66';
+   ctx.lineWidth = 0.5;
+   for (let i = 0; i < 5; i++) { const y = pad.top + (i/4)*chartH; ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W-pad.right, y); ctx.stroke(); }
+
+   ctx.strokeStyle = '#3399ff';
+   ctx.lineWidth = 1.5;
+   ctx.beginPath();
+   data.forEach((v, i) => { i === 0 ? ctx.moveTo(xPos(i), yPos(v)) : ctx.lineTo(xPos(i), yPos(v)); });
+   ctx.stroke();
+
+   ctx.strokeStyle = '#ff9944';
+   ctx.lineWidth = 1;
+   ctx.setLineDash([4,4]);
+   ctx.beginPath();
+   let started = false;
+   sma.forEach((v, i) => { if (v === null) { started = false; return; } if (!started) { ctx.moveTo(xPos(i), yPos(v)); started = true; } else ctx.lineTo(xPos(i), yPos(v)); });
+   ctx.stroke();
+   ctx.setLineDash([]);
+
+   ctx.strokeStyle = '#00ffc8';
+   ctx.lineWidth = 1;
+   ctx.beginPath();
+   started = false;
+   upper.forEach((v, i) => { if (v === null) { started = false; return; } if (!started) { ctx.moveTo(xPos(i), yPos(v)); started = true; } else ctx.lineTo(xPos(i), yPos(v)); });
+   ctx.stroke();
+
+   ctx.strokeStyle = '#00ffc8';
+   ctx.lineWidth = 1;
+   ctx.beginPath();
+   started = false;
+   lower.forEach((v, i) => { if (v === null) { started = false; return; } if (!started) { ctx.moveTo(xPos(i), yPos(v)); started = true; } else ctx.lineTo(xPos(i), yPos(v)); });
+   ctx.stroke();
+
+   for (let i = period; i < data.length; i++) {
+    if (data[i] <= lower[i] && data[i-1] > lower[i-1]) {
+     ctx.fillStyle = '#00ff88';
+     ctx.beginPath(); ctx.arc(xPos(i), yPos(data[i]), 5, 0, Math.PI*2); ctx.fill();
     }
-
-    function runAnalysis() {
-      const period = parseInt(document.getElementById('period').value) || 20;
-      const stdDev = parseFloat(document.getElementById('stdDev').value) || 2;
-      const data = currentData;
-      const sma = calcSMA(data, period);
-      const std = calcStd(data, period, sma);
-      let signals = 0;
-      let bCurrent = 0;
-
-      const upper = [], lower = [], bValues = [];
-      for (let i = 0; i < data.length; i++) {
-        if (sma[i] === null || std[i] === null) {
-          upper.push(null); lower.push(null); bValues.push(null);
-          continue;
-        }
-        const u = sma[i] + stdDev * std[i];
-        const l = sma[i] - stdDev * std[i];
-        upper.push(u);
-        lower.push(l);
-        const b = (data[i] - l) / (u - l);
-        bValues.push(b);
-
-        if (i > 0) {
-          if (data[i] <= l && data[i-1] > l) signals++;
-          if (data[i] >= u && data[i-1] < u) signals++;
-        }
-      }
-      bCurrent = bValues[bValues.length-1] || 0;
-
-      document.getElementById('signalsVal').textContent = signals;
-      document.getElementById('upperBand').textContent = upper[upper.length-1]?.toFixed(2) || '—';
-      document.getElementById('lowerBand').textContent = lower[lower.length-1]?.toFixed(2) || '—';
-      document.getElementById('bValueDisplay').textContent = bCurrent.toFixed(2);
-      document.getElementById('bValue').textContent = '%B: ' + bCurrent.toFixed(2) + ' ' + (bCurrent > 1 ? '(Sobrecompra)' : bCurrent < 0 ? '(Sobreventa)' : '(Neutral)');
-
-      const canvas = document.getElementById('chartCanvas');
-      const ctx = canvas.getContext('2d');
-      const W = canvas.parentElement.clientWidth - 40;
-      canvas.width = W;
-      canvas.height = 250;
-      const pad = { top: 20, bottom: 30, left: 40, right: 20 };
-      const chartW = W - pad.left - pad.right;
-      const chartH = 250 - pad.top - pad.bottom;
-      const valid = data.filter(v => v !== null);
-      const minP = Math.min(...valid) * 0.97;
-      const maxP = Math.max(...valid) * 1.03;
-
-      ctx.clearRect(0, 0, W, 250);
-      ctx.fillStyle = '#0c1222';
-      ctx.fillRect(0, 0, W, 250);
-
-      function xPos(i) { return pad.left + (i / (data.length-1)) * chartW; }
-      function yPos(v) { return pad.top + chartH - ((v - minP) / (maxP - minP)) * chartH; }
-
-      ctx.strokeStyle = '#00ffc8';
-      ctx.lineWidth = 0.5;
-      ctx.setLineDash([3,3]);
-      upper.forEach((v, i) => {
-        if (v === null) return;
-        ctx.fillStyle = '#00ffc833';
-        ctx.fillRect(xPos(i), yPos(v), chartW/data.length, yPos(lower[i])-yPos(v));
-      });
-      ctx.setLineDash([]);
-
-      ctx.strokeStyle = '#2c3e66';
-      ctx.lineWidth = 0.5;
-      for (let i = 0; i < 5; i++) { const y = pad.top + (i/4)*chartH; ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W-pad.right, y); ctx.stroke(); }
-
-      ctx.strokeStyle = '#3399ff';
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      data.forEach((v, i) => { i === 0 ? ctx.moveTo(xPos(i), yPos(v)) : ctx.lineTo(xPos(i), yPos(v)); });
-      ctx.stroke();
-
-      ctx.strokeStyle = '#ff9944';
-      ctx.lineWidth = 1;
-      ctx.setLineDash([4,4]);
-      ctx.beginPath();
-      let started = false;
-      sma.forEach((v, i) => { if (v === null) { started = false; return; } if (!started) { ctx.moveTo(xPos(i), yPos(v)); started = true; } else ctx.lineTo(xPos(i), yPos(v)); });
-      ctx.stroke();
-      ctx.setLineDash([]);
-
-      ctx.strokeStyle = '#00ffc8';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      started = false;
-      upper.forEach((v, i) => { if (v === null) { started = false; return; } if (!started) { ctx.moveTo(xPos(i), yPos(v)); started = true; } else ctx.lineTo(xPos(i), yPos(v)); });
-      ctx.stroke();
-
-      ctx.strokeStyle = '#00ffc8';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      started = false;
-      lower.forEach((v, i) => { if (v === null) { started = false; return; } if (!started) { ctx.moveTo(xPos(i), yPos(v)); started = true; } else ctx.lineTo(xPos(i), yPos(v)); });
-      ctx.stroke();
-
-      for (let i = period; i < data.length; i++) {
-        if (data[i] <= lower[i] && data[i-1] > lower[i-1]) {
-          ctx.fillStyle = '#00ff88';
-          ctx.beginPath(); ctx.arc(xPos(i), yPos(data[i]), 5, 0, Math.PI*2); ctx.fill();
-        }
-        if (data[i] >= upper[i] && data[i-1] < upper[i-1]) {
-          ctx.fillStyle = '#ff3030';
-          ctx.beginPath(); ctx.arc(xPos(i), yPos(data[i]), 5, 0, Math.PI*2); ctx.fill();
-        }
-      }
-
-      if (signals > 0 && !roundCompleted[currentRound]) {
-        roundCompleted[currentRound] = true;
-        document.getElementById('feedbackMsg').textContent = I18N.t('fb_0') + (currentRound+1) + ' completada con ' + signals + ' señales.';
-        if (roundCompleted.every(v => v)) {
-          document.getElementById('insigniaArea').classList.remove('hidden');
-          localStorage.setItem(STORAGE_KEY, 'true');
-          document.getElementById('feedbackMsg').textContent = I18N.t('fb_1');
-        } else {
-          setTimeout(() => {
-            currentRound = roundCompleted.findIndex(v => !v);
-            if (currentRound === -1) currentRound = 2;
-            loadRound();
-          }, 1500);
-        }
-      } else {
-        document.getElementById('feedbackMsg').textContent = signals > 0 ? '📊 Se generaron ' + signals + ' señales en esta configuración.' : '💡 Ajusta los parámetros para generar señales de compra/venta.';
-      }
+    if (data[i] >= upper[i] && data[i-1] < upper[i-1]) {
+     ctx.fillStyle = '#ff3030';
+     ctx.beginPath(); ctx.arc(xPos(i), yPos(data[i]), 5, 0, Math.PI*2); ctx.fill();
     }
+   }
 
-    function loadRound() {
-      currentData = generateAssetData(currentRound);
-      document.getElementById('assetName').textContent = assetNames[currentRound];
-      document.getElementById('roundNum').textContent = currentRound + 1;
-      runAnalysis();
+   if (signals > 0 && !roundCompleted[currentRound]) {
+    roundCompleted[currentRound] = true;
+    document.getElementById('feedbackMsg').textContent = I18N.t('fb_0') + (currentRound+1) + ' completada con ' + signals + ' seÃ±ales.';
+    if (roundCompleted.every(v => v)) {
+     document.getElementById('insigniaArea').classList.remove('hidden');
+     localStorage.setItem(STORAGE_KEY, 'true');
+     document.getElementById('feedbackMsg').textContent = I18N.t('fb_1');
+    } else {
+     setTimeout(() => {
+      currentRound = roundCompleted.findIndex(v => !v);
+      if (currentRound === -1) currentRound = 2;
+      loadRound();
+     }, 1500);
     }
+   } else {
+    document.getElementById('feedbackMsg').textContent = signals > 0 ? 'ðŸ“Š Se generaron ' + signals + ' seÃ±ales en esta configuraciÃ³n.' : 'ðŸ’¡ Ajusta los parÃ¡metros para generar seÃ±ales de compra/venta.';
+   }
+  }
 
-    document.getElementById('runBtn').addEventListener('click', runAnalysis);
+  function loadRound() {
+   currentData = generateAssetData(currentRound);
+   document.getElementById('assetName').textContent = assetNames[currentRound];
+   document.getElementById('roundNum').textContent = currentRound + 1;
+   runAnalysis();
+  }
 
-    if (localStorage.getItem(STORAGE_KEY)) {
-      document.getElementById('insigniaArea').classList.remove('hidden');
-    }
+  document.getElementById('runBtn').addEventListener('click', runAnalysis);
 
-    loadRound();
-  </script>
+  if (localStorage.getItem(STORAGE_KEY)) {
+   document.getElementById('insigniaArea').classList.remove('hidden');
+  }
+
+  loadRound();
+ </script>
 <script>
 window.I18N_DATA={
-  "fb_0": {
-    "es": "✅ Ronda ",
-    "en": "✅ Ronda "
-  },
-  "fb_1": {
-    "es": "🎉 ¡Todas las rondas completadas!",
-    "en": "🎉 !Todas las rondas completadas!"
-  }
+ "fb_0": {
+  "es": "âœ… Ronda ",
+  "en": "âœ… Ronda "
+ },
+ "fb_1": {
+  "es": "ðŸŽ‰ Â¡Todas las rondas completadas!",
+  "en": "ðŸŽ‰ !Todas las rondas completadas!"
+ }
 };
 </script>
 <script src="../../../assets/js/i18n.js"></script>
-</body>
+ </body>
 </html>
 

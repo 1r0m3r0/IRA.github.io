@@ -1,229 +1,228 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Producción | VPS y Despliegue 24/7</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
-    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-    .mod-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,215,0,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
-    .hero-header { background:linear-gradient(95deg,#0b1120 0%,#111a2e 100%); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #ffd700; }
-    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#ffe87c,#ffd700); -webkit-background-clip:text; background-clip:text; color:transparent; }
-    .hero-header p { font-size:1.1rem; color:#ffe87c; margin-top:0.5rem; }
-    .badge-area { display:flex; justify-content:center; gap:1rem; margin:1.2rem 0 0.5rem; flex-wrap:wrap; }
-    .chip { background:rgba(255,215,0,0.15); border:1px solid #ffd700; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
-    .progress-section { padding:1.2rem 2rem; border-bottom:1px solid #2a2a1a; }
-    .progress-bar-outer { background:#2a2a1a; border-radius:20px; height:16px; overflow:hidden; }
-    .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#ffd700,#ffaa00); border-radius:20px; transition:width 0.5s ease; }
-    .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#aa9944; }
-    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ffd700; font-size:1rem; line-height:1.6; }
-    .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #ffd700; }
-    .btn-action { background:linear-gradient(95deg,#ffd700,#ffaa00); border:none; padding:0.8rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; display:inline-flex; align-items:center; gap:0.5rem; }
-    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(255,215,0,0.5); }
-    .section-title { font-size:1.3rem; font-weight:700; color:#ffd700; margin:1.5rem 2rem 1rem; display:flex; align-items:center; gap:0.6rem; }
-    .vps-layout { display:grid; grid-template-columns:1fr 1fr; gap:1.2rem; margin:0 2rem 1.5rem; }
-    .checklist-panel { background:rgba(0,10,25,0.7); border-radius:1.5rem; padding:1.2rem; border:1px solid #ffd700; }
-    .checklist-item { display:flex; align-items:center; gap:0.8rem; padding:0.5rem 0; border-bottom:1px solid #1a2a4a; cursor:pointer; }
-    .checklist-item:last-child { border-bottom:none; }
-    .checklist-item .checkbox { width:20px; height:20px; border-radius:4px; border:2px solid #2c3e66; transition:0.2s; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-    .checklist-item.done .checkbox { background:#00cc88; border-color:#00cc88; }
-    .checklist-item.done .checkbox::after { content:'✓'; color:#000; font-weight:bold; font-size:0.8rem; }
-    .checklist-item .label { font-size:0.9rem; }
-    .checklist-item .label .desc { font-size:0.75rem; color:#8899bb; display:block; }
-    .dashboard-panel { background:rgba(0,10,25,0.7); border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
-    .metric-row { display:flex; justify-content:space-between; padding:0.5rem 0; border-bottom:1px solid #1a2a4a; }
-    .metric-row .metric-name { color:#8899bb; font-size:0.85rem; }
-    .metric-row .metric-val { font-weight:600; }
-    .metric-row .metric-val.good { color:#00cc88; }
-    .metric-row .metric-val.warn { color:#ffaa00; }
-    .metric-row .metric-val.bad { color:#ff4455; }
-    .alert-box { background:rgba(255,68,85,0.1); border:1px solid #ff4455; border-radius:1rem; padding:0.6rem 1rem; margin-top:0.8rem; display:flex; align-items:center; gap:0.8rem; }
-    .alert-box i { color:#ff4455; }
-    .alert-box.good { background:rgba(0,204,136,0.1); border-color:#00cc88; }
-    .alert-box.good i { color:#00cc88; }
-    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:0 2rem 1.5rem; padding:1rem; border:1px dashed gold; }
-    .insignia i { font-size:2.5rem; color:gold; }
-    .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
-    .hidden { display:none; }
-    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
-    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
-    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(255,215,0,0.4); }
-    .nav-link.next { background:linear-gradient(95deg,#ffd700,#ffaa00); color:#1e1a0c; }
-    .nav-link.menu { background:#1a2a4a; border:1px solid #ffd700; }
-    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
-    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .vps-layout { grid-template-columns:1fr; } }
-  </style>
-  <link rel="stylesheet" href="../../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Producción | VPS y Despliegue 24/7</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+  @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .mod-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,215,0,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+  .hero-header { background:linear-gradient(95deg,#0b1120 0%,#111a2e 100%); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #ffd700; }
+  .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#ffe87c,#ffd700); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero-header p { font-size:1.1rem; color:#ffe87c; margin-top:0.5rem; }
+  .badge-area { display:flex; justify-content:center; gap:1rem; margin:1.2rem 0 0.5rem; flex-wrap:wrap; }
+  .chip { background:rgba(255,215,0,0.15); border:1px solid #ffd700; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+  .progress-section { padding:1.2rem 2rem; border-bottom:1px solid #2a2a1a; }
+  .progress-bar-outer { background:#2a2a1a; border-radius:20px; height:16px; overflow:hidden; }
+  .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#ffd700,#ffaa00); border-radius:20px; transition:width 0.5s ease; }
+  .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#aa9944; }
+  .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ffd700; font-size:1rem; line-height:1.6; }
+  .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #ffd700; }
+  .btn-action { background:linear-gradient(95deg,#ffd700,#ffaa00); border:none; padding:0.8rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; display:inline-flex; align-items:center; gap:0.5rem; }
+  .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(255,215,0,0.5); }
+  .section-title { font-size:1.3rem; font-weight:700; color:#ffd700; margin:1.5rem 2rem 1rem; display:flex; align-items:center; gap:0.6rem; }
+  .vps-layout { display:grid; grid-template-columns:1fr 1fr; gap:1.2rem; margin:0 2rem 1.5rem; }
+  .checklist-panel { background:rgba(0,10,25,0.7); border-radius:1.5rem; padding:1.2rem; border:1px solid #ffd700; }
+  .checklist-item { display:flex; align-items:center; gap:0.8rem; padding:0.5rem 0; border-bottom:1px solid #1a2a4a; cursor:pointer; }
+  .checklist-item:last-child { border-bottom:none; }
+  .checklist-item .checkbox { width:20px; height:20px; border-radius:4px; border:2px solid #2c3e66; transition:0.2s; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .checklist-item.done .checkbox { background:#00cc88; border-color:#00cc88; }
+  .checklist-item.done .checkbox::after { content:'✓'; color:#000; font-weight:bold; font-size:0.8rem; }
+  .checklist-item .label { font-size:0.9rem; }
+  .checklist-item .label .desc { font-size:0.75rem; color:#8899bb; display:block; }
+  .dashboard-panel { background:rgba(0,10,25,0.7); border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
+  .metric-row { display:flex; justify-content:space-between; padding:0.5rem 0; border-bottom:1px solid #1a2a4a; }
+  .metric-row .metric-name { color:#8899bb; font-size:0.85rem; }
+  .metric-row .metric-val { font-weight:600; }
+  .metric-row .metric-val.good { color:#00cc88; }
+  .metric-row .metric-val.warn { color:#ffaa00; }
+  .metric-row .metric-val.bad { color:#ff4455; }
+  .alert-box { background:rgba(255,68,85,0.1); border:1px solid #ff4455; border-radius:1rem; padding:0.6rem 1rem; margin-top:0.8rem; display:flex; align-items:center; gap:0.8rem; }
+  .alert-box i { color:#ff4455; }
+  .alert-box.good { background:rgba(0,204,136,0.1); border-color:#00cc88; }
+  .alert-box.good i { color:#00cc88; }
+  .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:0 2rem 1.5rem; padding:1rem; border:1px dashed gold; }
+  .insignia i { font-size:2.5rem; color:gold; }
+  .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
+  .hidden { display:none; }
+  .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+  .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+  .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(255,215,0,0.4); }
+  .nav-link.next { background:linear-gradient(95deg,#ffd700,#ffaa00); color:#1e1a0c; }
+  .nav-link.menu { background:#1a2a4a; border:1px solid #ffd700; }
+  footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .vps-layout { grid-template-columns:1fr; } }
+ </style>
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
 </head>
 <body>
-  <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a><a href="../index.html">Programa MQL5</a></nav>
-  <div class="mod-container" id="app">
-    <div class="hero-header">
-      <h1>VPS y Despliegue 24/7</h1>
-      <p>Tu EA funcionando sin pausa, desde cualquier lugar del mundo</p>
-      <div class="badge-area">
-        <span class="chip"><i class="fas fa-server"></i> VPS</span>
-        <span class="chip"><i class="fas fa-clock"></i> 24/7</span>
-        <span class="chip"><i class="fas fa-bell"></i> Alertas</span>
-      </div>
-    </div>
-    <div class="progress-section">
-      <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
-      <span class="progress-text" id="progressText">Módulo 7 de 12</span>
-    </div>
-    <div class="analogy-card">
-      <strong>Piensa así:</strong> Un VPS es como tener tu EA viviendo en un departamento con energía eléctrica 24/7, internet dedicado y un conserje que cuida que nunca se apague. Tú solo te conectas cuando quieres ver cómo va. Sin VPS, tu EA depende de que tu computadora personal esté encendida.
-    </div>
-
-    <div class="section-title"><i class="fas fa-clipboard-check"></i> Checklist de Despliegue</div>
-    <div class="vps-layout">
-      <div class="checklist-panel">
-        <div id="checklistContainer"></div>
-        <div style="text-align:center;margin-top:1rem;">
-          <button class="btn-action" id="resetChecklist"><i class="fas fa-redo"></i> Reiniciar</button>
-          <span id="checklistScore" style="margin-left:1rem;font-weight:600;color:#ffd700;">0/9</span>
-        </div>
-      </div>
-      <div class="dashboard-panel">
-        <h4 style="margin-bottom:0.8rem;color:#ffd700;"><i class="fas fa-tachometer-alt"></i> Dashboard de Monitoreo</h4>
-        <div class="metric-row"><span class="metric-name"><i class="fas fa-plug"></i> Estado MT5</span><span class="metric-val good">Conectado</span></div>
-        <div class="metric-row"><span class="metric-name"><i class="fas fa-sync"></i> Uptime</span><span class="metric-val good">14d 7h 32m</span></div>
-        <div class="metric-row"><span class="metric-name"><i class="fas fa-microchip"></i> CPU</span><span class="metric-val good">23%</span></div>
-        <div class="metric-row"><span class="metric-name"><i class="fas fa-memory"></i> RAM</span><span class="metric-val warn">1.8 GB / 4 GB</span></div>
-        <div class="metric-row"><span class="metric-name"><i class="fas fa-hdd"></i> Disco</span><span class="metric-val good">6.2 GB / 40 GB</span></div>
-        <div class="metric-row"><span class="metric-name"><i class="fas fa-network-wired"></i> Latencia Broker</span><span class="metric-val good">12 ms</span></div>
-        <div class="metric-row"><span class="metric-name"><i class="fas fa-chart-line"></i> Trades Hoy</span><span class="metric-val good">23</span></div>
-        <div class="alert-box good" id="alertBox"><i class="fas fa-check-circle"></i><span>Sistema funcionando normalmente</span></div>
-        <button class="btn-action" id="simAlertBtn" style="margin-top:0.6rem;width:100%;justify-content:center;"><i class="fas fa-exclamation-triangle"></i> Simular Alerta</button>
-      </div>
-    </div>
-
-    <div id="feedbackMsg" class="feedback">Marca los items del checklist de despliegue y explora el dashboard para completar el módulo.</div>
-    <div id="insigniaArea" class="insignia hidden">
-      <i class="fas fa-medal"></i>
-      <h3>DevOps Trader</h3>
-      <p>Tu EA vive en la nube 24/7. Eres un verdadero profesional del despliegue algorítmico.</p>
-    </div>
-    <div class="nav-links">
-      <a href="06-automatizacion-scripts.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
-      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
-      <a href="08-knitpkg-cicd.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
-    </div>
-    <footer><i class="fas fa-cloud-upload-alt"></i> Curso 6: Producción y Publicación Profesional · Automatiza. Publica. Escala.</footer>
+ <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a><a href="../index.html">Programa MQL5</a></nav>
+ <div class="mod-container" id="app">
+  <div class="hero-header">
+   <h1>VPS y Despliegue 24/7</h1>
+   <p>Tu EA funcionando sin pausa, desde cualquier lugar del mundo</p>
+   <div class="badge-area">
+    <span class="chip"><i class="fas fa-server"></i> VPS</span>
+    <span class="chip"><i class="fas fa-clock"></i> 24/7</span>
+    <span class="chip"><i class="fas fa-bell"></i> Alertas</span>
+   </div>
+  </div>
+  <div class="progress-section">
+   <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+   <span class="progress-text" id="progressText">Módulo 7 de 12</span>
+  </div>
+  <div class="analogy-card">
+   <strong>Piensa así:</strong> Un VPS es como tener tu EA viviendo en un departamento con energía eléctrica 24/7, internet dedicado y un conserje que cuida que nunca se apague. Tú solo te conectas cuando quieres ver cómo va. Sin VPS, tu EA depende de que tu computadora personal esté encendida.
   </div>
 
-  <script>
-    const STORAGE_KEY = 'mql5_6_07';
-    const PROGRESS_KEY = 'mql5_6_progress';
-    let completed = false;
+  <div class="section-title"><i class="fas fa-clipboard-check"></i> Checklist de Despliegue</div>
+  <div class="vps-layout">
+   <div class="checklist-panel">
+    <div id="checklistContainer"></div>
+    <div style="text-align:center;margin-top:1rem;">
+     <button class="btn-action" id="resetChecklist"><i class="fas fa-redo"></i> Reiniciar</button>
+     <span id="checklistScore" style="margin-left:1rem;font-weight:600;color:#ffd700;">0/9</span>
+    </div>
+   </div>
+   <div class="dashboard-panel">
+    <h4 style="margin-bottom:0.8rem;color:#ffd700;"><i class="fas fa-tachometer-alt"></i> Dashboard de Monitoreo</h4>
+    <div class="metric-row"><span class="metric-name"><i class="fas fa-plug"></i> Estado MT5</span><span class="metric-val good">Conectado</span></div>
+    <div class="metric-row"><span class="metric-name"><i class="fas fa-sync"></i> Uptime</span><span class="metric-val good">14d 7h 32m</span></div>
+    <div class="metric-row"><span class="metric-name"><i class="fas fa-microchip"></i> CPU</span><span class="metric-val good">23%</span></div>
+    <div class="metric-row"><span class="metric-name"><i class="fas fa-memory"></i> RAM</span><span class="metric-val warn">1.8 GB / 4 GB</span></div>
+    <div class="metric-row"><span class="metric-name"><i class="fas fa-hdd"></i> Disco</span><span class="metric-val good">6.2 GB / 40 GB</span></div>
+    <div class="metric-row"><span class="metric-name"><i class="fas fa-network-wired"></i> Latencia Broker</span><span class="metric-val good">12 ms</span></div>
+    <div class="metric-row"><span class="metric-name"><i class="fas fa-chart-line"></i> Trades Hoy</span><span class="metric-val good">23</span></div>
+    <div class="alert-box good" id="alertBox"><i class="fas fa-check-circle"></i><span>Sistema funcionando normalmente</span></div>
+    <button class="btn-action" id="simAlertBtn" style="margin-top:0.6rem;width:100%;justify-content:center;"><i class="fas fa-exclamation-triangle"></i> Simular Alerta</button>
+   </div>
+  </div>
 
-    const checklistItems = [
-      { label:'Seleccionar VPS (MQL5 VPS o AWS/Linode)', desc:'Cercano al broker. 2GB+ RAM, SSD, Windows Server' },
-      { label:'Instalar MetaTrader 5', desc:'Última versión build 4000+. Configurar ruta de datos' },
-      { label:'Conectar cuenta de trading', desc:'Cuenta real o demo. Server del broker.' },
-      { label:'Desplegar EA compilado (.ex5)', desc:'Copiar a MQL5/Experts/. No código fuente.' },
-      { label:'Configurar AutoTrading', desc:'Herramientas → Opciones → Asesor Experto → Permitir' },
-      { label:'Configurar WebRequest (si aplica)', desc:'Lista blanca de URLs en Opciones → Asesor Experto' },
-      { label:'Configurar VPS Auto-Arranque', desc:'MT5 debe iniciar con Windows. Auto-login configurado.' },
-      { label:'Probar conectividad 24h', desc:'Monitorear primeras 24h. Verificar reconexión.' },
-      { label:'Configurar alertas y backup', desc:'Email/SMS si el EA se detiene. Backup semanal.' }
-    ];
+  <div id="feedbackMsg" class="feedback">Marca los items del checklist de despliegue y explora el dashboard para completar el módulo.</div>
+  <div id="insigniaArea" class="insignia hidden">
+   <i class="fas fa-medal"></i>
+   <h3>DevOps Trader</h3>
+   <p>Tu EA vive en la nube 24/7. Eres un verdadero profesional del despliegue algorítmico.</p>
+  </div>
+  <div class="nav-links">
+   <a href="06-automatizacion-scripts.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+   <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+   <a href="08-knitpkg-cicd.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-cloud-upload-alt"></i> Curso 6: Producción y Publicación Profesional · Automatiza. Publica. Escala.</footer>
+ </div>
 
-    function updateProgress() {
-      const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
-      document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
-      document.getElementById('progressText').textContent = 'M\u00f3dulo '+(p.length+1)+' de 12';
-    }
+ <script>
+  const STORAGE_KEY = 'mql5_6_07';
+  const PROGRESS_KEY = 'mql5_6_progress';
+  let completed = false;
 
-    function saveProgress() {
-      let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
-      if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
-      localStorage.setItem(STORAGE_KEY, 'true');
-    }
+  const checklistItems = [
+   { label:'Seleccionar VPS (MQL5 VPS o AWS/Linode)', desc:'Cercano al broker. 2GB+ RAM, SSD, Windows Server' },
+   { label:'Instalar MetaTrader 5', desc:'Última versión build 4000+. Configurar ruta de datos' },
+   { label:'Conectar cuenta de trading', desc:'Cuenta real o demo. Server del broker.' },
+   { label:'Desplegar EA compilado (.ex5)', desc:'Copiar a MQL5/Experts/. No código fuente.' },
+   { label:'Configurar AutoTrading', desc:'Herramientas → Opciones → Asesor Experto → Permitir' },
+   { label:'Configurar WebRequest (si aplica)', desc:'Lista blanca de URLs en Opciones → Asesor Experto' },
+   { label:'Configurar VPS Auto-Arranque', desc:'MT5 debe iniciar con Windows. Auto-login configurado.' },
+   { label:'Probar conectividad 24h', desc:'Monitorear primeras 24h. Verificar reconexión.' },
+   { label:'Configurar alertas y backup', desc:'Email/SMS si el EA se detiene. Backup semanal.' }
+  ];
 
-    function renderChecklist() {
-      const container = document.getElementById('checklistContainer');
-      container.innerHTML = '';
-      let done = 0;
-      checklistItems.forEach((item, i) => {
-        const div = document.createElement('div'); div.className = 'checklist-item';
-        const saved = JSON.parse(localStorage.getItem('mql5_6_07_checklist') || '[]');
-        if (saved.includes(i)) { div.classList.add('done'); done++; }
-        div.innerHTML = '<div class="checkbox"></div><div class="label">' + item.label + '<span class="desc">' + item.desc + '</span></div>';
-        div.addEventListener('click', function() {
-          const s = JSON.parse(localStorage.getItem('mql5_6_07_checklist') || '[]');
-          if (this.classList.contains('done')) {
-            this.classList.remove('done');
-            const idx = s.indexOf(i); if (idx > -1) s.splice(idx, 1);
-          } else {
-            this.classList.add('done'); s.push(i);
-          }
-          localStorage.setItem('mql5_6_07_checklist', JSON.stringify(s));
-          updateChecklistScore();
-          if (s.length === checklistItems.length) completeModule();
-        });
-        container.appendChild(div);
-      });
-      updateChecklistScore();
-    }
-
-    function updateChecklistScore() {
-      const s = JSON.parse(localStorage.getItem('mql5_6_07_checklist') || '[]');
-      document.getElementById('checklistScore').textContent = s.length + '/' + checklistItems.length;
-    }
-
-    function completeModule() {
-      if (completed) return;
-      completed = true;
-      document.getElementById('insigniaArea').classList.remove('hidden');
-      document.getElementById('feedbackMsg').textContent = I18N.t('fb_0');
-      saveProgress(); updateProgress();
-    }
-
-    document.getElementById('resetChecklist').addEventListener('click', function() {
-      localStorage.setItem('mql5_6_07_checklist', '[]');
-      renderChecklist();
-    });
-
-    document.getElementById('simAlertBtn').addEventListener('click', function() {
-      const box = document.getElementById('alertBox');
-      const alerts = [
-        { icon:'fa-exclamation-triangle', msg:'EA detenido — reconectando con broker...', cls:'' },
-        { icon:'fa-check-circle', msg:'Conexión restablecida. EA reanudado.', cls:'good' },
-        { icon:'fa-exclamation-circle', msg:'Spread elevado: 8.5 pips en EURUSD', cls:'' },
-        { icon:'fa-check-circle', msg:'Sistema funcionando normalmente', cls:'good' }
-      ];
-      const a = alerts[Math.floor(Math.random() * alerts.length)];
-      box.className = 'alert-box' + (a.cls ? ' ' + a.cls : '');
-      box.innerHTML = '<i class="fas ' + a.icon + '"></i><span>' + a.msg + '</span>';
-      completeModule();
-    });
-
-    function restoreProgress() {
-      const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
-      if (p.includes(STORAGE_KEY)) {
-        completed = true;
-        document.getElementById('insigniaArea').classList.remove('hidden');
-        document.getElementById('feedbackMsg').textContent = I18N.t('fb_1');
-      }
-    }
-    renderChecklist(); restoreProgress(); updateProgress();
-  </script>
-  <script src="../../../assets/js/cookie-consent.js"></script>
-<script>
-window.I18N_DATA={
-  "fb_0": {
-    "es": "Despliegue VPS completado. ¡Siguiente módulo!",
-    "en": "Despliegue VPS completed. !Next module!"
-  },
-  "fb_1": {
-    "es": "Ya completaste este módulo. Continúa al siguiente.",
-    "en": "Ya completaste este module. Continúa al siguiente."
+  function updateProgress() {
+   const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
+   document.getElementById('progressText').textContent = 'M\u00f3dulo '+(p.length+1)+' de 12';
   }
+
+  function saveProgress() {
+   let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
+   localStorage.setItem(STORAGE_KEY, 'true');
+  }
+
+  function renderChecklist() {
+   const container = document.getElementById('checklistContainer');
+   container.innerHTML = '';
+   let done = 0;
+   checklistItems.forEach((item, i) => {
+    const div = document.createElement('div'); div.className = 'checklist-item';
+    const saved = JSON.parse(localStorage.getItem('mql5_6_07_checklist') || '[]');
+    if (saved.includes(i)) { div.classList.add('done'); done++; }
+    div.innerHTML = '<div class="checkbox"></div><div class="label">' + item.label + '<span class="desc">' + item.desc + '</span></div>';
+    div.addEventListener('click', function() {
+     const s = JSON.parse(localStorage.getItem('mql5_6_07_checklist') || '[]');
+     if (this.classList.contains('done')) {
+      this.classList.remove('done');
+      const idx = s.indexOf(i); if (idx > -1) s.splice(idx, 1);
+     } else {
+      this.classList.add('done'); s.push(i);
+     }
+     localStorage.setItem('mql5_6_07_checklist', JSON.stringify(s));
+     updateChecklistScore();
+     if (s.length === checklistItems.length) completeModule();
+    });
+    container.appendChild(div);
+   });
+   updateChecklistScore();
+  }
+
+  function updateChecklistScore() {
+   const s = JSON.parse(localStorage.getItem('mql5_6_07_checklist') || '[]');
+   document.getElementById('checklistScore').textContent = s.length + '/' + checklistItems.length;
+  }
+
+  function completeModule() {
+   if (completed) return;
+   completed = true;
+   document.getElementById('insigniaArea').classList.remove('hidden');
+   document.getElementById('feedbackMsg').textContent = I18N.t('fb_0');
+   saveProgress(); updateProgress();
+  }
+
+  document.getElementById('resetChecklist').addEventListener('click', function() {
+   localStorage.setItem('mql5_6_07_checklist', '[]');
+   renderChecklist();
+  });
+
+  document.getElementById('simAlertBtn').addEventListener('click', function() {
+   const box = document.getElementById('alertBox');
+   const alerts = [
+    { icon:'fa-exclamation-triangle', msg:'EA detenido — reconectando con broker...', cls:'' },
+    { icon:'fa-check-circle', msg:'Conexión restablecida. EA reanudado.', cls:'good' },
+    { icon:'fa-exclamation-circle', msg:'Spread elevado: 8.5 pips en EURUSD', cls:'' },
+    { icon:'fa-check-circle', msg:'Sistema funcionando normalmente', cls:'good' }
+   ];
+   const a = alerts[Math.floor(Math.random() * alerts.length)];
+   box.className = 'alert-box' + (a.cls ? ' ' + a.cls : '');
+   box.innerHTML = '<i class="fas ' + a.icon + '"></i><span>' + a.msg + '</span>';
+   completeModule();
+  });
+
+  function restoreProgress() {
+   const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   if (p.includes(STORAGE_KEY)) {
+    completed = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').textContent = I18N.t('fb_1');
+   }
+  }
+  renderChecklist(); restoreProgress(); updateProgress();
+ </script>
+ <script>
+window.I18N_DATA={
+ "fb_0": {
+  "es": "Despliegue VPS completado. ¡Siguiente módulo!",
+  "en": "Despliegue VPS completed. !Next module!"
+ },
+ "fb_1": {
+  "es": "Ya completaste este módulo. Continúa al siguiente.",
+  "en": "Ya completaste este module. Continúa al siguiente."
+ }
 };
 </script>
 <script src="../../../assets/js/i18n.js"></script>

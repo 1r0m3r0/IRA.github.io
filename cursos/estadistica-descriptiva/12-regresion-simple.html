@@ -1,172 +1,172 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Estadística Descriptiva | Regresión Lineal Simple</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
-    body {
-      background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #111a2e 100%);
-      background-size: 200% 200%;
-      animation: gradientShift 20s ease infinite;
-      font-family: 'Inter', sans-serif;
-      color: #eef5ff;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem 1rem;
-    }
-    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-    .modulo-container {
-      max-width: 1300px; width: 100%;
-      background: rgba(15,25,45,0.65); backdrop-filter: blur(12px);
-      border-radius: 3rem; border: 1px solid rgba(0,230,118,0.25);
-      box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden;
-    }
-    .hero-header {
-      background: linear-gradient(95deg,#0b1120,#111a2e); padding: 2rem 2rem 1.5rem;
-      text-align: center; border-bottom: 2px solid #00e676;
-    }
-    .hero-header h1 {
-      font-size: 2.6rem; font-weight: 800;
-      background: linear-gradient(135deg,#FFF,#69f0ae,#00e676);
-      -webkit-background-clip: text; background-clip: text; color: transparent;
-    }
-    .hero-header p { color: #b9e2ff; margin-top: 0.5rem; font-weight: 500; }
-    .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1.2rem; flex-wrap: wrap; }
-    .chip {
-      background: rgba(0,230,118,0.15); border: 1px solid #00e676;
-      padding: 0.4rem 1rem; border-radius: 40px; font-size: 0.8rem; font-weight: 600;
-    }
-    .analogy-card {
-      background: #1e2a3acc; margin: 1.5rem 2rem; padding: 1.2rem 1.8rem;
-      border-radius: 2rem; border-left: 8px solid #00e676; font-size: 1rem; line-height: 1.6;
-    }
-    .main-area { padding: 0 2rem 1.5rem; display: flex; flex-wrap: wrap; gap: 1.5rem; }
-    .plot-section { flex: 2; min-width: 320px; }
-    .results-section { flex: 1; min-width: 280px; }
-    .canvas-wrap {
-      background: #0a0f1e; border-radius: 2rem; padding: 1rem;
-      border: 1px solid #00e67644; text-align: center;
-    }
-    .canvas-wrap canvas { width: 100%; height: auto; aspect-ratio: 1/1; max-width: 480px; cursor: crosshair; border-radius: 1rem; }
-    .results-panel {
-      background: #0f1a2ccc; border-radius: 2rem; padding: 1.2rem;
-      border: 1px solid #00e67633;
-    }
-    .results-panel h3 { color: #00e676; margin-bottom: 0.8rem; font-size: 1.1rem; }
-    .stat-row { display: flex; justify-content: space-between; padding: 0.4rem 0; border-bottom: 1px solid #ffffff0a; font-size: 0.9rem; }
-    .stat-row .val { font-family: monospace; font-weight: 700; color: #69f0ae; }
-    .btn-row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.8rem; }
-    .btn-sm {
-      background: #1a2a4a; border: 1px solid #00e67666; color: #eef5ff;
-      padding: 0.4rem 0.8rem; border-radius: 2rem; font-size: 0.75rem; cursor: pointer; font-weight: 600; transition: 0.2s;
-    }
-    .btn-sm:hover { background: #00e67633; transform: translateY(-1px); }
-    .btn-sm.primary { background: linear-gradient(95deg,#00e676,#00a853); border-color: #00e676; }
-    .predict-section { margin-top: 1rem; }
-    .predict-section label { font-size: 0.85rem; color: #b9e2ff; }
-    .predict-section input {
-      background: #0a0f1e; border: 1px solid #00e67644; color: #eef5ff; padding: 0.4rem 0.6rem;
-      border-radius: 1rem; width: 80px; font-family: monospace; text-align: center;
-    }
-    .feedback {
-      background: #00000099; margin: 0 2rem 1.5rem; padding: 1rem; border-radius: 1.5rem;
-      text-align: center; font-weight: 500; border-left: 4px solid #00e676;
-    }
-    .insignia {
-      text-align: center; background: #0c1b2f; border-radius: 2rem;
-      margin: 0 2rem 1.5rem; padding: 1rem; border: 1px dashed gold;
-    }
-    .insignia i { font-size: 2.5rem; color: gold; }
-    .hidden { display: none; }
-    .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
-    .nav-link {
-      background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem; font-weight: 600;
-      text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s;
-    }
-    .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(0,230,118,0.4); }
-    .nav-link.next { background: linear-gradient(95deg,#f0a500,#ff6a00); color: #1e1a0c; }
-    .nav-link.menu { background: #1a2a4a; border: 1px solid #3399ff; }
-    footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
-    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
-  </style>
-  <link rel="stylesheet" href="../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>EstadÃ­stica Descriptiva | RegresiÃ³n Lineal Simple</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+  body {
+   background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #111a2e 100%);
+   background-size: 200% 200%;
+   animation: gradientShift 20s ease infinite;
+   font-family: 'Inter', sans-serif;
+   color: #eef5ff;
+   min-height: 100vh;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   padding: 2rem 1rem;
+  }
+  @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .modulo-container {
+   max-width: 1300px; width: 100%;
+   background: rgba(15,25,45,0.65); backdrop-filter: blur(12px);
+   border-radius: 3rem; border: 1px solid rgba(0,230,118,0.25);
+   box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden;
+  }
+  .hero-header {
+   background: linear-gradient(95deg,#0b1120,#111a2e); padding: 2rem 2rem 1.5rem;
+   text-align: center; border-bottom: 2px solid #00e676;
+  }
+  .hero-header h1 {
+   font-size: 2.6rem; font-weight: 800;
+   background: linear-gradient(135deg,#FFF,#69f0ae,#00e676);
+   -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .hero-header p { color: #b9e2ff; margin-top: 0.5rem; font-weight: 500; }
+  .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1.2rem; flex-wrap: wrap; }
+  .chip {
+   background: rgba(0,230,118,0.15); border: 1px solid #00e676;
+   padding: 0.4rem 1rem; border-radius: 40px; font-size: 0.8rem; font-weight: 600;
+  }
+  .analogy-card {
+   background: #1e2a3acc; margin: 1.5rem 2rem; padding: 1.2rem 1.8rem;
+   border-radius: 2rem; border-left: 8px solid #00e676; font-size: 1rem; line-height: 1.6;
+  }
+  .main-area { padding: 0 2rem 1.5rem; display: flex; flex-wrap: wrap; gap: 1.5rem; }
+  .plot-section { flex: 2; min-width: 320px; }
+  .results-section { flex: 1; min-width: 280px; }
+  .canvas-wrap {
+   background: #0a0f1e; border-radius: 2rem; padding: 1rem;
+   border: 1px solid #00e67644; text-align: center;
+  }
+  .canvas-wrap canvas { width: 100%; height: auto; aspect-ratio: 1/1; max-width: 480px; cursor: crosshair; border-radius: 1rem; }
+  .results-panel {
+   background: #0f1a2ccc; border-radius: 2rem; padding: 1.2rem;
+   border: 1px solid #00e67633;
+  }
+  .results-panel h3 { color: #00e676; margin-bottom: 0.8rem; font-size: 1.1rem; }
+  .stat-row { display: flex; justify-content: space-between; padding: 0.4rem 0; border-bottom: 1px solid #ffffff0a; font-size: 0.9rem; }
+  .stat-row .val { font-family: monospace; font-weight: 700; color: #69f0ae; }
+  .btn-row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.8rem; }
+  .btn-sm {
+   background: #1a2a4a; border: 1px solid #00e67666; color: #eef5ff;
+   padding: 0.4rem 0.8rem; border-radius: 2rem; font-size: 0.75rem; cursor: pointer; font-weight: 600; transition: 0.2s;
+  }
+  .btn-sm:hover { background: #00e67633; transform: translateY(-1px); }
+  .btn-sm.primary { background: linear-gradient(95deg,#00e676,#00a853); border-color: #00e676; }
+  .predict-section { margin-top: 1rem; }
+  .predict-section label { font-size: 0.85rem; color: #b9e2ff; }
+  .predict-section input {
+   background: #0a0f1e; border: 1px solid #00e67644; color: #eef5ff; padding: 0.4rem 0.6rem;
+   border-radius: 1rem; width: 80px; font-family: monospace; text-align: center;
+  }
+  .feedback {
+   background: #00000099; margin: 0 2rem 1.5rem; padding: 1rem; border-radius: 1.5rem;
+   text-align: center; font-weight: 500; border-left: 4px solid #00e676;
+  }
+  .insignia {
+   text-align: center; background: #0c1b2f; border-radius: 2rem;
+   margin: 0 2rem 1.5rem; padding: 1rem; border: 1px dashed gold;
+  }
+  .insignia i { font-size: 2.5rem; color: gold; }
+  .hidden { display: none; }
+  .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
+  .nav-link {
+   background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem; font-weight: 600;
+   text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s;
+  }
+  .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(0,230,118,0.4); }
+  .nav-link.next { background: linear-gradient(95deg,#f0a500,#ff6a00); color: #1e1a0c; }
+  .nav-link.menu { background: #1a2a4a; border: 1px solid #3399ff; }
+  footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
+ </style>
+ <link rel="stylesheet" href="../../assets/css/theme.css">
 </head>
 <body>
 <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
 
 <div class="modulo-container">
-  <div class="hero-header">
-    <h1>📈 REGRESIÓN LINEAL SIMPLE 📈</h1>
-    <p>Dibuja la mejor línea recta a través de tus datos para hacer predicciones</p>
-    <div class="badge-area">
-      <span class="chip"><i class="fas fa-chart-line"></i> MCO / OLS</span>
-      <span class="chip"><i class="fas fa-r"></i> R²</span>
-      <span class="chip"><i class="fas fa-puzzle-piece"></i> SSE / SST / SSR</span>
+ <div class="hero-header">
+  <h1>ðŸ“ˆ REGRESIÃ“N LINEAL SIMPLE ðŸ“ˆ</h1>
+  <p>Dibuja la mejor lÃ­nea recta a travÃ©s de tus datos para hacer predicciones</p>
+  <div class="badge-area">
+   <span class="chip"><i class="fas fa-chart-line"></i> MCO / OLS</span>
+   <span class="chip"><i class="fas fa-r"></i> RÂ²</span>
+   <span class="chip"><i class="fas fa-puzzle-piece"></i> SSE / SST / SSR</span>
+  </div>
+ </div>
+
+ <div class="analogy-card">
+  <strong>ðŸ“ PiÃ©nsalo asÃ­:</strong> La regresiÃ³n es como dibujar la mejor lÃ­nea a travÃ©s de una nube de puntos, como cuando trazas la lÃ­nea que mejor representa la tendencia de tus puntos en un papel. Los coeficientes Î²â‚€ y Î²â‚ son como la ordenada al origen y la pendiente de esa lÃ­nea: Î²â‚€ te dice dÃ³nde empieza, Î²â‚ cuÃ¡nto sube o baja por cada unidad que avanzas en X.
+ </div>
+
+ <div class="main-area">
+  <div class="plot-section">
+   <div class="canvas-wrap">
+    <canvas id="regCanvas" width="480" height="480"></canvas>
+    <div class="btn-row" style="justify-content:center;margin-top:0.5rem;">
+     <button class="btn-sm primary" id="addPointBtn"><i class="fas fa-plus"></i> AÃ±adir punto</button>
+     <button class="btn-sm" id="clearBtn"><i class="fas fa-trash"></i> Limpiar</button>
+     <button class="btn-sm" id="sampleBtn"><i class="fas fa-database"></i> Datos ejemplo</button>
+     <button class="btn-sm" id="outlierBtn"><i class="fas fa-exclamation-circle"></i> AÃ±adir outlier</button>
     </div>
+    <p style="font-size:0.75rem;color:#8899bb;margin-top:0.4rem;">ðŸ–±ï¸ Haz clic para agregar puntos. La lÃ­nea naranja es la regresiÃ³n OLS.</p>
+   </div>
   </div>
+  <div class="results-section">
+   <div class="results-panel">
+    <h3><i class="fas fa-calculator"></i> Resultados de la regresiÃ³n</h3>
+    <div class="stat-row"><span>Î²â‚€ (intercepto)</span><span class="val" id="b0Val">â€”</span></div>
+    <div class="stat-row"><span>Î²â‚ (pendiente)</span><span class="val" id="b1Val">â€”</span></div>
+    <div class="stat-row"><span>RÂ²</span><span class="val" id="r2Val">â€”</span></div>
+    <div class="stat-row"><span>EcuaciÃ³n</span><span class="val" id="eqVal" style="font-size:0.75rem;">â€”</span></div>
+    <div class="stat-row" style="border-top:1px solid #00e67644;margin-top:0.4rem;padding-top:0.6rem;"><span>SSE (error)</span><span class="val" id="sseVal">â€”</span></div>
+    <div class="stat-row"><span>SSR (regresiÃ³n)</span><span class="val" id="ssrVal">â€”</span></div>
+    <div class="stat-row"><span>SST (total)</span><span class="val" id="sstVal">â€”</span></div>
+    <div class="stat-row"><span>n (puntos)</span><span class="val" id="nVal">0</span></div>
+   </div>
+   <div class="results-panel predict-section" style="margin-top:1rem;">
+    <h3><i class="fas fa-bullseye"></i> PredicciÃ³n</h3>
+    <label>X = </label>
+    <input type="number" id="predX" value="50" min="0" max="100">
+    <button class="btn-sm" id="predBtn"><i class="fas fa-arrow-right"></i> Predecir</button>
+    <div id="predResult" style="margin-top:0.4rem;font-size:0.9rem;min-height:2.5rem;padding:0.4rem;background:#0a0f1e;border-radius:1rem;">Å¶ = â€”</div>
+   </div>
+  </div>
+ </div>
 
-  <div class="analogy-card">
-    <strong>📏 Piénsalo así:</strong> La regresión es como dibujar la mejor línea a través de una nube de puntos, como cuando trazas la línea que mejor representa la tendencia de tus puntos en un papel. Los coeficientes β₀ y β₁ son como la ordenada al origen y la pendiente de esa línea: β₀ te dice dónde empieza, β₁ cuánto sube o baja por cada unidad que avanzas en X.
-  </div>
+ <div id="feedbackMsg" class="feedback">
+  ðŸ’¡ Haz clic en el grÃ¡fico para agregar puntos. Observa cÃ³mo la lÃ­nea de regresiÃ³n (naranja) se ajusta automÃ¡ticamente. Prueba los datos de ejemplo.
+ </div>
 
-  <div class="main-area">
-    <div class="plot-section">
-      <div class="canvas-wrap">
-        <canvas id="regCanvas" width="480" height="480"></canvas>
-        <div class="btn-row" style="justify-content:center;margin-top:0.5rem;">
-          <button class="btn-sm primary" id="addPointBtn"><i class="fas fa-plus"></i> Añadir punto</button>
-          <button class="btn-sm" id="clearBtn"><i class="fas fa-trash"></i> Limpiar</button>
-          <button class="btn-sm" id="sampleBtn"><i class="fas fa-database"></i> Datos ejemplo</button>
-          <button class="btn-sm" id="outlierBtn"><i class="fas fa-exclamation-circle"></i> Añadir outlier</button>
-        </div>
-        <p style="font-size:0.75rem;color:#8899bb;margin-top:0.4rem;">🖱️ Haz clic para agregar puntos. La línea naranja es la regresión OLS.</p>
-      </div>
-    </div>
-    <div class="results-section">
-      <div class="results-panel">
-        <h3><i class="fas fa-calculator"></i> Resultados de la regresión</h3>
-        <div class="stat-row"><span>β₀ (intercepto)</span><span class="val" id="b0Val">—</span></div>
-        <div class="stat-row"><span>β₁ (pendiente)</span><span class="val" id="b1Val">—</span></div>
-        <div class="stat-row"><span>R²</span><span class="val" id="r2Val">—</span></div>
-        <div class="stat-row"><span>Ecuación</span><span class="val" id="eqVal" style="font-size:0.75rem;">—</span></div>
-        <div class="stat-row" style="border-top:1px solid #00e67644;margin-top:0.4rem;padding-top:0.6rem;"><span>SSE (error)</span><span class="val" id="sseVal">—</span></div>
-        <div class="stat-row"><span>SSR (regresión)</span><span class="val" id="ssrVal">—</span></div>
-        <div class="stat-row"><span>SST (total)</span><span class="val" id="sstVal">—</span></div>
-        <div class="stat-row"><span>n (puntos)</span><span class="val" id="nVal">0</span></div>
-      </div>
-      <div class="results-panel predict-section" style="margin-top:1rem;">
-        <h3><i class="fas fa-bullseye"></i> Predicción</h3>
-        <label>X = </label>
-        <input type="number" id="predX" value="50" min="0" max="100">
-        <button class="btn-sm" id="predBtn"><i class="fas fa-arrow-right"></i> Predecir</button>
-        <div id="predResult" style="margin-top:0.4rem;font-size:0.9rem;min-height:2.5rem;padding:0.4rem;background:#0a0f1e;border-radius:1rem;">Ŷ = —</div>
-      </div>
-    </div>
-  </div>
+ <div id="insigniaArea" class="insignia hidden">
+  <i class="fas fa-medal"></i>
+  <h3>ðŸ… MAESTRO DE LA REGRESIÃ“N ðŸ…</h3>
+  <p>Â¡Dominas la regresiÃ³n lineal simple! Entiendes cÃ³mo MCO encuentra la mejor lÃ­nea, interpretas RÂ² y descompones la varianza en SSE, SSR y SST.</p>
+ </div>
 
-  <div id="feedbackMsg" class="feedback">
-    💡 Haz clic en el gráfico para agregar puntos. Observa cómo la línea de regresión (naranja) se ajusta automáticamente. Prueba los datos de ejemplo.
-  </div>
-
-  <div id="insigniaArea" class="insignia hidden">
-    <i class="fas fa-medal"></i>
-    <h3>🏅 MAESTRO DE LA REGRESIÓN 🏅</h3>
-    <p>¡Dominas la regresión lineal simple! Entiendes cómo MCO encuentra la mejor línea, interpretas R² y descompones la varianza en SSE, SSR y SST.</p>
-  </div>
-
-  <div class="nav-links">
-    <a href="11-correlacion.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
-    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
-    <a href="13-series-tiempo.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
-  </div>
-  <footer><i class="fas fa-crown"></i> Estadística Descriptiva Interactiva · Nivel 12: Regresión Lineal Simple</footer>
+ <div class="nav-links">
+  <a href="11-correlacion.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+  <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> MenÃº</a>
+  <a href="13-series-tiempo.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+ </div>
+ <footer><i class="fas fa-crown"></i> EstadÃ­stica Descriptiva Interactiva Â· Nivel 12: RegresiÃ³n Lineal Simple</footer>
 </div>
 
 <script>
@@ -180,206 +180,206 @@ const PAD = 40;
 let points = [];
 
 function toCanvas(px, py) {
-  return { x: (px - PAD) / (W - 2*PAD) * 100, y: 100 - (py - PAD) / (H - 2*PAD) * 100 };
+ return { x: (px - PAD) / (W - 2*PAD) * 100, y: 100 - (py - PAD) / (H - 2*PAD) * 100 };
 }
 function toPixel(x, y) {
-  return { px: PAD + x/100 * (W - 2*PAD), py: PAD + (100 - y)/100 * (H - 2*PAD) };
+ return { px: PAD + x/100 * (W - 2*PAD), py: PAD + (100 - y)/100 * (H - 2*PAD) };
 }
 
 function drawGrid() {
-  ctx.strokeStyle = '#00e67622';
-  ctx.lineWidth = 1;
-  for (let i = 0; i <= 10; i++) {
-    const pos = PAD + i/10 * (W - 2*PAD);
-    ctx.beginPath(); ctx.moveTo(pos, PAD); ctx.lineTo(pos, H - PAD); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(PAD, pos); ctx.lineTo(W - PAD, pos); ctx.stroke();
-  }
-  ctx.strokeStyle = '#00e67688';
-  ctx.lineWidth = 2;
-  ctx.strokeRect(PAD, PAD, W-2*PAD, H-2*PAD);
+ ctx.strokeStyle = '#00e67622';
+ ctx.lineWidth = 1;
+ for (let i = 0; i <= 10; i++) {
+  const pos = PAD + i/10 * (W - 2*PAD);
+  ctx.beginPath(); ctx.moveTo(pos, PAD); ctx.lineTo(pos, H - PAD); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(PAD, pos); ctx.lineTo(W - PAD, pos); ctx.stroke();
+ }
+ ctx.strokeStyle = '#00e67688';
+ ctx.lineWidth = 2;
+ ctx.strokeRect(PAD, PAD, W-2*PAD, H-2*PAD);
 }
 
 function computeOLS() {
-  const n = points.length;
-  document.getElementById('nVal').textContent = n;
-  if (n < 3) {
-    document.getElementById('b0Val').textContent = '—';
-    document.getElementById('b1Val').textContent = '—';
-    document.getElementById('r2Val').textContent = '—';
-    document.getElementById('eqVal').textContent = '—';
-    document.getElementById('sseVal').textContent = '—';
-    document.getElementById('ssrVal').textContent = '—';
-    document.getElementById('sstVal').textContent = '—';
-    return null;
-  }
-  const xs = points.map(p => p.x);
-  const ys = points.map(p => p.y);
-  const mx = xs.reduce((a,b)=>a+b,0)/n;
-  const my = ys.reduce((a,b)=>a+b,0)/n;
-  let num = 0, den = 0;
-  for (let i = 0; i < n; i++) { num += (xs[i]-mx)*(ys[i]-my); den += (xs[i]-mx)**2; }
-  if (Math.abs(den) < 1e-10) return null;
-  const b1 = num/den;
-  const b0 = my - b1*mx;
-  let sse = 0, sst = 0;
-  for (let i = 0; i < n; i++) {
-    const yHat = b0 + b1*xs[i];
-    sse += (ys[i] - yHat)**2;
-    sst += (ys[i] - my)**2;
-  }
-  const ssr = sst - sse;
-  const r2 = sst > 0 ? 1 - sse/sst : 0;
+ const n = points.length;
+ document.getElementById('nVal').textContent = n;
+ if (n < 3) {
+  document.getElementById('b0Val').textContent = 'â€”';
+  document.getElementById('b1Val').textContent = 'â€”';
+  document.getElementById('r2Val').textContent = 'â€”';
+  document.getElementById('eqVal').textContent = 'â€”';
+  document.getElementById('sseVal').textContent = 'â€”';
+  document.getElementById('ssrVal').textContent = 'â€”';
+  document.getElementById('sstVal').textContent = 'â€”';
+  return null;
+ }
+ const xs = points.map(p => p.x);
+ const ys = points.map(p => p.y);
+ const mx = xs.reduce((a,b)=>a+b,0)/n;
+ const my = ys.reduce((a,b)=>a+b,0)/n;
+ let num = 0, den = 0;
+ for (let i = 0; i < n; i++) { num += (xs[i]-mx)*(ys[i]-my); den += (xs[i]-mx)**2; }
+ if (Math.abs(den) < 1e-10) return null;
+ const b1 = num/den;
+ const b0 = my - b1*mx;
+ let sse = 0, sst = 0;
+ for (let i = 0; i < n; i++) {
+  const yHat = b0 + b1*xs[i];
+  sse += (ys[i] - yHat)**2;
+  sst += (ys[i] - my)**2;
+ }
+ const ssr = sst - sse;
+ const r2 = sst > 0 ? 1 - sse/sst : 0;
 
-  document.getElementById('b0Val').textContent = b0.toFixed(4);
-  document.getElementById('b1Val').textContent = b1.toFixed(4);
-  document.getElementById('r2Val').textContent = r2.toFixed(4);
-  document.getElementById('sseVal').textContent = sse.toFixed(2);
-  document.getElementById('ssrVal').textContent = ssr.toFixed(2);
-  document.getElementById('sstVal').textContent = sst.toFixed(2);
+ document.getElementById('b0Val').textContent = b0.toFixed(4);
+ document.getElementById('b1Val').textContent = b1.toFixed(4);
+ document.getElementById('r2Val').textContent = r2.toFixed(4);
+ document.getElementById('sseVal').textContent = sse.toFixed(2);
+ document.getElementById('ssrVal').textContent = ssr.toFixed(2);
+ document.getElementById('sstVal').textContent = sst.toFixed(2);
 
-  const b0s = b0 >= 0 ? b0.toFixed(2) : b0.toFixed(2);
-  const b1s = b1 >= 0 ? b1.toFixed(2) : b1.toFixed(2);
-  document.getElementById('eqVal').textContent = `Ŷ = ${b0s} + ${b1s}X`;
+ const b0s = b0 >= 0 ? b0.toFixed(2) : b0.toFixed(2);
+ const b1s = b1 >= 0 ? b1.toFixed(2) : b1.toFixed(2);
+ document.getElementById('eqVal').textContent = `Å¶ = ${b0s} + ${b1s}X`;
 
-  return { b0, b1, r2, sse, ssr, sst };
+ return { b0, b1, r2, sse, ssr, sst };
 }
 
 function draw() {
-  ctx.clearRect(0, 0, W, H);
-  drawGrid();
+ ctx.clearRect(0, 0, W, H);
+ drawGrid();
 
-  const result = computeOLS();
+ const result = computeOLS();
 
-  if (result && points.length >= 3) {
-    const x0 = 0, x1 = 100;
-    const y0 = result.b0 + result.b1*x0, y1 = result.b0 + result.b1*x1;
-    const p0 = toPixel(x0, Math.max(0, Math.min(100, y0)));
-    const p1 = toPixel(x1, Math.max(0, Math.min(100, y1)));
-    ctx.strokeStyle = '#ff6a00cc';
-    ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.moveTo(p0.px, p0.py); ctx.lineTo(p1.px, p1.py); ctx.stroke();
+ if (result && points.length >= 3) {
+  const x0 = 0, x1 = 100;
+  const y0 = result.b0 + result.b1*x0, y1 = result.b0 + result.b1*x1;
+  const p0 = toPixel(x0, Math.max(0, Math.min(100, y0)));
+  const p1 = toPixel(x1, Math.max(0, Math.min(100, y1)));
+  ctx.strokeStyle = '#ff6a00cc';
+  ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(p0.px, p0.py); ctx.lineTo(p1.px, p1.py); ctx.stroke();
 
-    // Residual lines
-    const xs = points.map(p => p.x);
-    const ys = points.map(p => p.y);
-    for (let i = 0; i < points.length; i++) {
-      const yHat = result.b0 + result.b1*xs[i];
-      const p = toPixel(xs[i], ys[i]);
-      const h = toPixel(xs[i], yHat);
-      ctx.strokeStyle = '#ff505066';
-      ctx.lineWidth = 1;
-      ctx.setLineDash([3,3]);
-      ctx.beginPath(); ctx.moveTo(p.px, p.py); ctx.lineTo(h.px, h.py); ctx.stroke();
-      ctx.setLineDash([]);
-    }
+  // Residual lines
+  const xs = points.map(p => p.x);
+  const ys = points.map(p => p.y);
+  for (let i = 0; i < points.length; i++) {
+   const yHat = result.b0 + result.b1*xs[i];
+   const p = toPixel(xs[i], ys[i]);
+   const h = toPixel(xs[i], yHat);
+   ctx.strokeStyle = '#ff505066';
+   ctx.lineWidth = 1;
+   ctx.setLineDash([3,3]);
+   ctx.beginPath(); ctx.moveTo(p.px, p.py); ctx.lineTo(h.px, h.py); ctx.stroke();
+   ctx.setLineDash([]);
   }
+ }
 
-  points.forEach(p => {
-    const { px, py } = toPixel(p.x, p.y);
-    ctx.beginPath();
-    ctx.arc(px, py, 6, 0, Math.PI*2);
-    ctx.fillStyle = '#00e676';
-    ctx.fill();
-    ctx.strokeStyle = '#ffffff88';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-  });
+ points.forEach(p => {
+  const { px, py } = toPixel(p.x, p.y);
+  ctx.beginPath();
+  ctx.arc(px, py, 6, 0, Math.PI*2);
+  ctx.fillStyle = '#00e676';
+  ctx.fill();
+  ctx.strokeStyle = '#ffffff88';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+ });
 }
 
 function completeCheck() {
-  if (points.length >= 5) {
-    const result = computeOLS();
-    if (result && result.r2 > 0.3) {
-      insigniaArea.classList.remove('hidden');
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ completed: true, points: points.length, r2: result.r2 })); } catch(e) {}
-      document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_0') + points.length + ' puntos con R² = ' + result.r2.toFixed(4) + '. Has ganado la insignia <strong>Maestro de la Regresión</strong>. ¡Sigue experimentando!';
-    }
+ if (points.length >= 5) {
+  const result = computeOLS();
+  if (result && result.r2 > 0.3) {
+   insigniaArea.classList.remove('hidden');
+   try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ completed: true, points: points.length, r2: result.r2 })); } catch(e) {}
+   document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_0') + points.length + ' puntos con RÂ² = ' + result.r2.toFixed(4) + '. Has ganado la insignia <strong>Maestro de la RegresiÃ³n</strong>. Â¡Sigue experimentando!';
   }
+ }
 }
 
 function getMousePos(e) {
-  const rect = canvas.getBoundingClientRect();
-  const scaleX = canvas.width / rect.width;
-  const scaleY = canvas.height / rect.height;
-  const px = (e.clientX - rect.left) * scaleX;
-  const py = (e.clientY - rect.top) * scaleY;
-  if (px < PAD || px > W-PAD || py < PAD || py > H-PAD) return null;
-  const p = toCanvas(px, py);
-  return p;
+ const rect = canvas.getBoundingClientRect();
+ const scaleX = canvas.width / rect.width;
+ const scaleY = canvas.height / rect.height;
+ const px = (e.clientX - rect.left) * scaleX;
+ const py = (e.clientY - rect.top) * scaleY;
+ if (px < PAD || px > W-PAD || py < PAD || py > H-PAD) return null;
+ const p = toCanvas(px, py);
+ return p;
 }
 
 canvas.addEventListener('click', (e) => {
-  const p = getMousePos(e);
-  if (!p) return;
-  points.push({ x: Math.round(p.x * 100) / 100, y: Math.round(p.y * 100) / 100 });
-  draw();
-  const result = computeOLS();
-  if (result) {
-    document.getElementById('feedbackMsg').innerHTML = `📊 Punto agregado (${points.length}). Ecuación: Ŷ = ${result.b0.toFixed(2)} + ${result.b1.toFixed(2)}X, R² = ${result.r2.toFixed(4)}.`;
-  }
-  completeCheck();
+ const p = getMousePos(e);
+ if (!p) return;
+ points.push({ x: Math.round(p.x * 100) / 100, y: Math.round(p.y * 100) / 100 });
+ draw();
+ const result = computeOLS();
+ if (result) {
+  document.getElementById('feedbackMsg').innerHTML = `ðŸ“Š Punto agregado (${points.length}). EcuaciÃ³n: Å¶ = ${result.b0.toFixed(2)} + ${result.b1.toFixed(2)}X, RÂ² = ${result.r2.toFixed(4)}.`;
+ }
+ completeCheck();
 });
 
 document.getElementById('addPointBtn').addEventListener('click', () => {
-  const x = 10 + Math.random() * 80;
-  const y = 10 + Math.random() * 80;
-  points.push({ x: Math.round(x*100)/100, y: Math.round(y*100)/100 });
-  draw(); computeOLS();
-  document.getElementById('feedbackMsg').innerHTML = '➕ Punto aleatorio agregado.';
-  completeCheck();
+ const x = 10 + Math.random() * 80;
+ const y = 10 + Math.random() * 80;
+ points.push({ x: Math.round(x*100)/100, y: Math.round(y*100)/100 });
+ draw(); computeOLS();
+ document.getElementById('feedbackMsg').innerHTML = 'âž• Punto aleatorio agregado.';
+ completeCheck();
 });
 
 document.getElementById('clearBtn').addEventListener('click', () => {
-  points = [];
-  draw(); computeOLS();
-  insigniaArea.classList.add('hidden');
-  document.getElementById('feedbackMsg').innerHTML = '🧹 Puntos limpiados.';
+ points = [];
+ draw(); computeOLS();
+ insigniaArea.classList.add('hidden');
+ document.getElementById('feedbackMsg').innerHTML = 'ðŸ§¹ Puntos limpiados.';
 });
 
 document.getElementById('sampleBtn').addEventListener('click', () => {
-  points = [];
-  for (let i = 0; i < 10; i++) {
-    const x = 5 + i * 10;
-    const y = 10 + 0.6*x + (Math.random()-0.5)*15;
-    points.push({ x: Math.round(x*100)/100, y: Math.round(y*100)/100 });
-  }
-  draw(); const r = computeOLS();
-  document.getElementById('feedbackMsg').innerHTML = `📊 Datos de ejemplo cargados. R² = ${r.r2.toFixed(4)}. ¡Nota cómo la línea atraviesa la nube de puntos!`;
-  completeCheck();
+ points = [];
+ for (let i = 0; i < 10; i++) {
+  const x = 5 + i * 10;
+  const y = 10 + 0.6*x + (Math.random()-0.5)*15;
+  points.push({ x: Math.round(x*100)/100, y: Math.round(y*100)/100 });
+ }
+ draw(); const r = computeOLS();
+ document.getElementById('feedbackMsg').innerHTML = `ðŸ“Š Datos de ejemplo cargados. RÂ² = ${r.r2.toFixed(4)}. Â¡Nota cÃ³mo la lÃ­nea atraviesa la nube de puntos!`;
+ completeCheck();
 });
 
 document.getElementById('outlierBtn').addEventListener('click', () => {
-  const x = 85 + Math.random() * 10;
-  const y = Math.random() * 15;
-  points.push({ x: Math.round(x*100)/100, y: Math.round(y*100)/100 });
-  draw(); const r = computeOLS();
-  document.getElementById('feedbackMsg').innerHTML = `⚠️ Outlier agregado en (${points[points.length-1].x}, ${points[points.length-1].y}). Observa cómo cambió la línea y el R² (ahora ${r.r2.toFixed(4)}).`;
+ const x = 85 + Math.random() * 10;
+ const y = Math.random() * 15;
+ points.push({ x: Math.round(x*100)/100, y: Math.round(y*100)/100 });
+ draw(); const r = computeOLS();
+ document.getElementById('feedbackMsg').innerHTML = `âš ï¸ Outlier agregado en (${points[points.length-1].x}, ${points[points.length-1].y}). Observa cÃ³mo cambiÃ³ la lÃ­nea y el RÂ² (ahora ${r.r2.toFixed(4)}).`;
 });
 
 document.getElementById('predBtn').addEventListener('click', () => {
-  const x = parseFloat(document.getElementById('predX').value);
-  if (isNaN(x)) return;
-  const result = computeOLS();
-  if (!result) { document.getElementById('predResult').innerHTML = I18N.t('fb_1'); return; }
-  const yHat = result.b0 + result.b1*x;
-  const n = points.length;
-  const xs = points.map(p => p.x);
-  const mx = xs.reduce((a,b)=>a+b,0)/n;
-  let sx2 = 0;
-  for (let i = 0; i < n; i++) sx2 += (xs[i]-mx)**2;
-  const mse = result.sse / (n - 2);
-  const sePred = Math.sqrt(mse * (1 + 1/n + (x-mx)**2/sx2));
-  const t95 = 2.04;
-  const lo = yHat - t95 * sePred;
-  const hi = yHat + t95 * sePred;
-  document.getElementById('predResult').innerHTML = `Ŷ = ${yHat.toFixed(2)}<br><span style="font-size:0.75rem;color:#8899bb;">IC 95%: [${Math.max(0,lo).toFixed(2)}, ${Math.min(100,hi).toFixed(2)}]</span>`;
+ const x = parseFloat(document.getElementById('predX').value);
+ if (isNaN(x)) return;
+ const result = computeOLS();
+ if (!result) { document.getElementById('predResult').innerHTML = I18N.t('fb_1'); return; }
+ const yHat = result.b0 + result.b1*x;
+ const n = points.length;
+ const xs = points.map(p => p.x);
+ const mx = xs.reduce((a,b)=>a+b,0)/n;
+ let sx2 = 0;
+ for (let i = 0; i < n; i++) sx2 += (xs[i]-mx)**2;
+ const mse = result.sse / (n - 2);
+ const sePred = Math.sqrt(mse * (1 + 1/n + (x-mx)**2/sx2));
+ const t95 = 2.04;
+ const lo = yHat - t95 * sePred;
+ const hi = yHat + t95 * sePred;
+ document.getElementById('predResult').innerHTML = `Å¶ = ${yHat.toFixed(2)}<br><span style="font-size:0.75rem;color:#8899bb;">IC 95%: [${Math.max(0,lo).toFixed(2)}, ${Math.min(100,hi).toFixed(2)}]</span>`;
 });
 
 (function load() {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) { const d = JSON.parse(saved); if (d.completed) insigniaArea.classList.remove('hidden'); }
-  } catch(e) {}
+ try {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) { const d = JSON.parse(saved); if (d.completed) insigniaArea.classList.remove('hidden'); }
+ } catch(e) {}
 })();
 
 draw();
@@ -388,9 +388,9 @@ computeOLS();
 
 <script>
 window.I18N_DATA={
-  'fb_0': { es: '🎉 ¡Excelente! Has creado ', en: '🎉 Excellent! Has creado ' },
-  'fb_1': { es: '⚠️ Agrega al menos 3 puntos primero.', en: '⚠️ Agrega al menos 3 puntos primero.' }
+ 'fb_0': { es: 'ðŸŽ‰ Â¡Excelente! Has creado ', en: 'ðŸŽ‰ Excellent! Has creado ' },
+ 'fb_1': { es: 'âš ï¸ Agrega al menos 3 puntos primero.', en: 'âš ï¸ Agrega al menos 3 puntos primero.' }
 };
 </script>
-</body>
+ </body>
 </html>

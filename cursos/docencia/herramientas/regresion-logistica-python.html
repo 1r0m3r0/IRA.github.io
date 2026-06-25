@@ -1,333 +1,333 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Regresión Logística con Python · Prof. Logístico</title>
-  <!-- MathJax para fórmulas -->
-  <script>
-    MathJax = {
-      tex: {
-        inlineMath: [['\\(', '\\)']],
-        displayMath: [['$$', '$$']]
-      }
-    };
-  </script>
-  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
-  <!-- highlight.js para resaltado de código Python -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
-  <script>hljs.highlightAll();</script>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f7f9fc;
-      color: #2d3436;
-      line-height: 1.6;
-      padding: 20px;
-    }
-    .container {
-      max-width: 1100px;
-      margin: 0 auto;
-      background: #ffffffdd;
-      backdrop-filter: blur(8px);
-      border-radius: 32px;
-      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.2);
-      padding: 30px 30px 50px;
-    }
-    h1, h2, h3 {
-      font-family: 'Fredoka', 'Segoe UI', sans-serif;
-      color: #2c3e50;
-    }
-    h1 {
-      font-size: 2.8em;
-      text-align: center;
-      margin-bottom: 0.2em;
-      background: linear-gradient(135deg, #11998e, #38ef7d);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .subtitle {
-      text-align: center;
-      font-size: 1.3em;
-      margin-bottom: 2em;
-      color: #636e72;
-    }
-    .prof-avatar {
-      display: block;
-      margin: 0 auto 20px;
-      font-size: 5em;
-      text-align: center;
-    }
-    .formula-box {
-      background: #f0fdf4;
-      border-left: 6px solid #10b981;
-      padding: 20px;
-      border-radius: 12px;
-      margin: 30px 0;
-      overflow-x: auto;
-    }
-    .formula-box p {
-      margin: 10px 0;
-    }
-    .simulator {
-      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-      border-radius: 24px;
-      padding: 25px;
-      color: white;
-      margin: 40px 0;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    }
-    .simulator h2 {
-      color: white;
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .controls {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      justify-content: center;
-      margin-bottom: 25px;
-    }
-    .control-group {
-      display: flex;
-      flex-direction: column;
-      min-width: 140px;
-    }
-    .control-group label {
-      font-weight: 600;
-      margin-bottom: 5px;
-      font-size: 0.9em;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .control-group select, .control-group input[type="range"] {
-      padding: 8px;
-      border-radius: 8px;
-      border: none;
-      font-size: 1em;
-    }
-    .range-value {
-      text-align: center;
-      margin-top: 3px;
-      font-weight: bold;
-    }
-    .btn-predict {
-      background: #38ef7d;
-      color: #0f2027;
-      border: none;
-      padding: 14px 30px;
-      border-radius: 50px;
-      font-size: 1.2em;
-      font-weight: bold;
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-      display: block;
-      margin: 0 auto;
-      box-shadow: 0 8px 15px rgba(56,239,125,0.3);
-    }
-    .btn-predict:hover {
-      transform: scale(1.05);
-      box-shadow: 0 12px 20px rgba(56,239,125,0.5);
-    }
-    .result-box {
-      text-align: center;
-      margin-top: 25px;
-      font-size: 1.4em;
-      min-height: 60px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .probability-bar {
-      width: 80%;
-      background: #ffffff30;
-      border-radius: 20px;
-      height: 30px;
-      margin: 10px auto;
-      overflow: hidden;
-    }
-    .probability-fill {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, #ff9a9e, #fad0c4, #fad0c4);
-      transition: width 0.6s ease;
-      border-radius: 20px;
-    }
-    .examples {
-      margin: 40px 0;
-    }
-    .accordion {
-      margin-bottom: 20px;
-      border: 1px solid #dfe6e9;
-      border-radius: 16px;
-      overflow: hidden;
-      background: white;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    }
-    .accordion-header {
-      background: #f8f9fa;
-      padding: 18px 25px;
-      font-size: 1.2em;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #dfe6e9;
-      transition: background 0.2s;
-    }
-    .accordion-header:hover {
-      background: #e9ecef;
-    }
-    .accordion-header::after {
-      content: '\\25BC';
-      font-size: 0.8em;
-      transition: transform 0.3s;
-    }
-    .accordion.active .accordion-header::after {
-      transform: rotate(180deg);
-    }
-    .accordion-body {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.4s ease;
-      background: white;
-      padding: 0 25px;
-    }
-    .accordion.active .accordion-body {
-      max-height: 2000px;
-      padding: 15px 25px;
-    }
-    .code-block {
-      position: relative;
-      margin: 15px 0;
-      border-radius: 12px;
-      overflow: hidden;
-    }
-    .code-block pre {
-      margin: 0;
-      border-radius: 12px;
-      padding: 20px !important;
-      font-size: 0.95em;
-    }
-    .copy-btn {
-      position: absolute;
-      top: 10px;
-      right: 15px;
-      background: #2d3436;
-      color: white;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 0.8em;
-      opacity: 0.8;
-      transition: opacity 0.3s;
-    }
-    .copy-btn:hover {
-      opacity: 1;
-    }
-    footer {
-      text-align: center;
-      margin-top: 50px;
-      font-style: italic;
-      color: #636e72;
-    }
-    @media (max-width: 700px) {
-      .controls {
-        flex-direction: column;
-        align-items: center;
-      }
-      h1 {
-        font-size: 2.2em;
-      }
-    }
-  </style>
-  <link rel="stylesheet" href="../../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Regresión Logística con Python · Prof. Logístico</title>
+ <!-- MathJax para fórmulas -->
+ <script>
+  MathJax = {
+   tex: {
+    inlineMath: [['\\(', '\\)']],
+    displayMath: [['$$', '$$']]
+   }
+  };
+ </script>
+ <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+ <!-- highlight.js para resaltado de código Python -->
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+ <script>hljs.highlightAll();</script>
+ <style>
+  * {
+   box-sizing: border-box;
+   margin: 0;
+   padding: 0;
+  }
+  body {
+   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+   background: #f7f9fc;
+   color: #2d3436;
+   line-height: 1.6;
+   padding: 20px;
+  }
+  .container {
+   max-width: 1100px;
+   margin: 0 auto;
+   background: #ffffffdd;
+   backdrop-filter: blur(8px);
+   border-radius: 32px;
+   box-shadow: 0 25px 50px -12px rgba(0,0,0,0.2);
+   padding: 30px 30px 50px;
+  }
+  h1, h2, h3 {
+   font-family: 'Fredoka', 'Segoe UI', sans-serif;
+   color: #2c3e50;
+  }
+  h1 {
+   font-size: 2.8em;
+   text-align: center;
+   margin-bottom: 0.2em;
+   background: linear-gradient(135deg, #11998e, #38ef7d);
+   -webkit-background-clip: text;
+   -webkit-text-fill-color: transparent;
+  }
+  .subtitle {
+   text-align: center;
+   font-size: 1.3em;
+   margin-bottom: 2em;
+   color: #636e72;
+  }
+  .prof-avatar {
+   display: block;
+   margin: 0 auto 20px;
+   font-size: 5em;
+   text-align: center;
+  }
+  .formula-box {
+   background: #f0fdf4;
+   border-left: 6px solid #10b981;
+   padding: 20px;
+   border-radius: 12px;
+   margin: 30px 0;
+   overflow-x: auto;
+  }
+  .formula-box p {
+   margin: 10px 0;
+  }
+  .simulator {
+   background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+   border-radius: 24px;
+   padding: 25px;
+   color: white;
+   margin: 40px 0;
+   box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  }
+  .simulator h2 {
+   color: white;
+   text-align: center;
+   margin-bottom: 20px;
+  }
+  .controls {
+   display: flex;
+   flex-wrap: wrap;
+   gap: 20px;
+   justify-content: center;
+   margin-bottom: 25px;
+  }
+  .control-group {
+   display: flex;
+   flex-direction: column;
+   min-width: 140px;
+  }
+  .control-group label {
+   font-weight: 600;
+   margin-bottom: 5px;
+   font-size: 0.9em;
+   text-transform: uppercase;
+   letter-spacing: 0.5px;
+  }
+  .control-group select, .control-group input[type="range"] {
+   padding: 8px;
+   border-radius: 8px;
+   border: none;
+   font-size: 1em;
+  }
+  .range-value {
+   text-align: center;
+   margin-top: 3px;
+   font-weight: bold;
+  }
+  .btn-predict {
+   background: #38ef7d;
+   color: #0f2027;
+   border: none;
+   padding: 14px 30px;
+   border-radius: 50px;
+   font-size: 1.2em;
+   font-weight: bold;
+   cursor: pointer;
+   transition: transform 0.2s, box-shadow 0.2s;
+   display: block;
+   margin: 0 auto;
+   box-shadow: 0 8px 15px rgba(56,239,125,0.3);
+  }
+  .btn-predict:hover {
+   transform: scale(1.05);
+   box-shadow: 0 12px 20px rgba(56,239,125,0.5);
+  }
+  .result-box {
+   text-align: center;
+   margin-top: 25px;
+   font-size: 1.4em;
+   min-height: 60px;
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+  }
+  .probability-bar {
+   width: 80%;
+   background: #ffffff30;
+   border-radius: 20px;
+   height: 30px;
+   margin: 10px auto;
+   overflow: hidden;
+  }
+  .probability-fill {
+   height: 100%;
+   width: 0%;
+   background: linear-gradient(90deg, #ff9a9e, #fad0c4, #fad0c4);
+   transition: width 0.6s ease;
+   border-radius: 20px;
+  }
+  .examples {
+   margin: 40px 0;
+  }
+  .accordion {
+   margin-bottom: 20px;
+   border: 1px solid #dfe6e9;
+   border-radius: 16px;
+   overflow: hidden;
+   background: white;
+   box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  }
+  .accordion-header {
+   background: #f8f9fa;
+   padding: 18px 25px;
+   font-size: 1.2em;
+   font-weight: 600;
+   cursor: pointer;
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   border-bottom: 1px solid #dfe6e9;
+   transition: background 0.2s;
+  }
+  .accordion-header:hover {
+   background: #e9ecef;
+  }
+  .accordion-header::after {
+   content: '\\25BC';
+   font-size: 0.8em;
+   transition: transform 0.3s;
+  }
+  .accordion.active .accordion-header::after {
+   transform: rotate(180deg);
+  }
+  .accordion-body {
+   max-height: 0;
+   overflow: hidden;
+   transition: max-height 0.4s ease;
+   background: white;
+   padding: 0 25px;
+  }
+  .accordion.active .accordion-body {
+   max-height: 2000px;
+   padding: 15px 25px;
+  }
+  .code-block {
+   position: relative;
+   margin: 15px 0;
+   border-radius: 12px;
+   overflow: hidden;
+  }
+  .code-block pre {
+   margin: 0;
+   border-radius: 12px;
+   padding: 20px !important;
+   font-size: 0.95em;
+  }
+  .copy-btn {
+   position: absolute;
+   top: 10px;
+   right: 15px;
+   background: #2d3436;
+   color: white;
+   border: none;
+   padding: 6px 12px;
+   border-radius: 6px;
+   cursor: pointer;
+   font-size: 0.8em;
+   opacity: 0.8;
+   transition: opacity 0.3s;
+  }
+  .copy-btn:hover {
+   opacity: 1;
+  }
+  footer {
+   text-align: center;
+   margin-top: 50px;
+   font-style: italic;
+   color: #636e72;
+  }
+  @media (max-width: 700px) {
+   .controls {
+    flex-direction: column;
+    align-items: center;
+   }
+   h1 {
+    font-size: 2.2em;
+   }
+  }
+ </style>
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
 </head>
 <body>
-  <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a></nav>
+ <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a></nav>
 
 <div class="container">
-  <div class="prof-avatar">🧑‍🏫📊</div>
-  <h1>Regresión Logística con Python</h1>
-  <p class="subtitle">por el Prof. Logístico – 30 años haciendo que los datos hablen</p>
+ <div class="prof-avatar">🧑‍🏫📊</div>
+ <h1>Regresión Logística con Python</h1>
+ <p class="subtitle">por el Prof. Logístico – 30 años haciendo que los datos hablen</p>
 
-  <!-- Fórmulas importantes -->
-  <div class="formula-box">
-    <h3>🧠 La función sigmoide (binomial)</h3>
-    <p>$$P(Y=1) = \frac{1}{1 + e^{-(\beta_0 + \beta_1 X_1 + \beta_2 X_2 + \cdots)}}$$</p>
-    <h3>🍕 La función softmax (multinomial)</h3>
-    <p>$$P(Y=k) = \frac{e^{z_k}}{\sum_{j=1}^{K} e^{z_j}}, \quad \text{donde } z_j = \beta_{0j} + \beta_{1j}X_1 + \cdots$$</p>
-    <p><strong>Odds ratio</strong> para interpretar coeficientes: \(OR = e^{\beta_i}\) – “por cada unidad que aumenta \(X_i\), las posibilidades se multiplican por \(e^{\beta_i}\)”.</p>
+ <!-- Fórmulas importantes -->
+ <div class="formula-box">
+  <h3>🧠 La función sigmoide (binomial)</h3>
+  <p>$$P(Y=1) = \frac{1}{1 + e^{-(\beta_0 + \beta_1 X_1 + \beta_2 X_2 + \cdots)}}$$</p>
+  <h3>🍕 La función softmax (multinomial)</h3>
+  <p>$$P(Y=k) = \frac{e^{z_k}}{\sum_{j=1}^{K} e^{z_j}}, \quad \text{donde } z_j = \beta_{0j} + \beta_{1j}X_1 + \cdots$$</p>
+  <p><strong>Odds ratio</strong> para interpretar coeficientes: \(OR = e^{\beta_i}\) – “por cada unidad que aumenta \(X_i\), las posibilidades se multiplican por \(e^{\beta_i}\)”.</p>
+ </div>
+
+ <!-- Simulador interactivo del Titanic -->
+ <div class="simulator">
+  <h2>🚢 Simulador de supervivencia – Titanic</h2>
+  <p style="text-align:center; margin-bottom:20px;">Ajusta las características de un pasajero y observa la probabilidad de sobrevivir según un modelo logístico entrenado.</p>
+  <div class="controls">
+   <div class="control-group">
+    <label>Clase</label>
+    <select id="pclass">
+     <option value="1">1ª clase</option>
+     <option value="2">2ª clase</option>
+     <option value="3" selected>3ª clase</option>
+    </select>
+   </div>
+   <div class="control-group">
+    <label>Sexo</label>
+    <select id="sex">
+     <option value="female">Mujer</option>
+     <option value="male" selected>Hombre</option>
+    </select>
+   </div>
+   <div class="control-group">
+    <label>Edad</label>
+    <input type="range" id="age" min="1" max="80" value="22" step="1">
+    <span class="range-value" id="ageVal">22</span>
+   </div>
+   <div class="control-group">
+    <label>Tarifa (£)</label>
+    <input type="range" id="fare" min="0" max="500" value="7" step="1">
+    <span class="range-value" id="fareVal">7</span>
+   </div>
+   <div class="control-group">
+    <label>Familiares a bordo</label>
+    <input type="range" id="family" min="0" max="10" value="0" step="1">
+    <span class="range-value" id="familyVal">0</span>
+   </div>
   </div>
-
-  <!-- Simulador interactivo del Titanic -->
-  <div class="simulator">
-    <h2>🚢 Simulador de supervivencia – Titanic</h2>
-    <p style="text-align:center; margin-bottom:20px;">Ajusta las características de un pasajero y observa la probabilidad de sobrevivir según un modelo logístico entrenado.</p>
-    <div class="controls">
-      <div class="control-group">
-        <label>Clase</label>
-        <select id="pclass">
-          <option value="1">1ª clase</option>
-          <option value="2">2ª clase</option>
-          <option value="3" selected>3ª clase</option>
-        </select>
-      </div>
-      <div class="control-group">
-        <label>Sexo</label>
-        <select id="sex">
-          <option value="female">Mujer</option>
-          <option value="male" selected>Hombre</option>
-        </select>
-      </div>
-      <div class="control-group">
-        <label>Edad</label>
-        <input type="range" id="age" min="1" max="80" value="22" step="1">
-        <span class="range-value" id="ageVal">22</span>
-      </div>
-      <div class="control-group">
-        <label>Tarifa (£)</label>
-        <input type="range" id="fare" min="0" max="500" value="7" step="1">
-        <span class="range-value" id="fareVal">7</span>
-      </div>
-      <div class="control-group">
-        <label>Familiares a bordo</label>
-        <input type="range" id="family" min="0" max="10" value="0" step="1">
-        <span class="range-value" id="familyVal">0</span>
-      </div>
-    </div>
-    <button class="btn-predict" onclick="predictTitanic()">Calcular probabilidad</button>
-    <div class="result-box" id="resultBox">
-      <div class="probability-bar">
-        <div class="probability-fill" id="probFill" style="width: 0%;"></div>
-      </div>
-      <span id="probText"></span>
-    </div>
-    <p style="font-size:0.8em; text-align:center; margin-top:20px;">Coeficientes ficticios basados en un modelo típico. Solo con fines educativos.</p>
+  <button class="btn-predict" onclick="predictTitanic()">Calcular probabilidad</button>
+  <div class="result-box" id="resultBox">
+   <div class="probability-bar">
+    <div class="probability-fill" id="probFill" style="width: 0%;"></div>
+   </div>
+   <span id="probText"></span>
   </div>
+  <p style="font-size:0.8em; text-align:center; margin-top:20px;">Coeficientes ficticios basados en un modelo típico. Solo con fines educativos.</p>
+ </div>
 
-  <!-- Ejemplos con acordeón -->
-  <div class="examples">
-    <h2 style="text-align:center; margin-bottom:30px;">📚 5 ejemplos paso a paso (Google Colab)</h2>
+ <!-- Ejemplos con acordeón -->
+ <div class="examples">
+  <h2 style="text-align:center; margin-bottom:30px;">📚 5 ejemplos paso a paso (Google Colab)</h2>
 
-    <!-- Ejemplo 1 Titanic -->
-    <div class="accordion">
-      <div class="accordion-header">1. Titanic – Supervivencia (Binomial)</div>
-      <div class="accordion-body">
-        <p>Dataset clásico. Predecimos si un pasajero sobrevivió según clase, sexo, edad...</p>
-        <div class="code-block">
-          <button class="copy-btn" onclick="copyCode(this, 'titanic_code')">Copiar</button>
-          <pre><code class="language-python" id="titanic_code">
+  <!-- Ejemplo 1 Titanic -->
+  <div class="accordion">
+   <div class="accordion-header">1. Titanic – Supervivencia (Binomial)</div>
+   <div class="accordion-body">
+    <p>Dataset clásico. Predecimos si un pasajero sobrevivió según clase, sexo, edad...</p>
+    <div class="code-block">
+     <button class="copy-btn" onclick="copyCode(this, 'titanic_code')">Copiar</button>
+     <pre><code class="language-python" id="titanic_code">
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
@@ -350,20 +350,20 @@ y_pred = model.predict(X_test)
 
 print(classification_report(y_test, y_pred))
 sns.heatmap(confusion_matrix(y_test, y_pred), annot=True, fmt='d')
-          </code></pre>
-        </div>
-        <p><a href="https://colab.research.google.com/" target="_blank">Abrir en Google Colab (copia y pega el código)</a></p>
-      </div>
+     </code></pre>
     </div>
+    <p><a href="https://colab.research.google.com/" target="_blank">Abrir en Google Colab (copia y pega el código)</a></p>
+   </div>
+  </div>
 
-    <!-- Ejemplo 2 Admisión -->
-    <div class="accordion">
-      <div class="accordion-header">2. Admisión universitaria – GRE, GPA y prestigio (Binomial)</div>
-      <div class="accordion-body">
-        <p>¿Será admitido un estudiante de posgrado? Basado en su GRE, expediente y rango de la universidad de origen.</p>
-        <div class="code-block">
-          <button class="copy-btn" onclick="copyCode(this, 'admit_code')">Copiar</button>
-          <pre><code class="language-python" id="admit_code">
+  <!-- Ejemplo 2 Admisión -->
+  <div class="accordion">
+   <div class="accordion-header">2. Admisión universitaria – GRE, GPA y prestigio (Binomial)</div>
+   <div class="accordion-body">
+    <p>¿Será admitido un estudiante de posgrado? Basado en su GRE, expediente y rango de la universidad de origen.</p>
+    <div class="code-block">
+     <button class="copy-btn" onclick="copyCode(this, 'admit_code')">Copiar</button>
+     <pre><code class="language-python" id="admit_code">
 url = 'https://stats.idre.ucla.edu/stat/data/binary.csv'
 adm = pd.read_csv(url)
 adm.rename(columns={'rank':'prestige'}, inplace=True)
@@ -377,19 +377,19 @@ model = LogisticRegression()
 model.fit(X_train, y_train)
 y_pred = model.predict(X_test)
 print(classification_report(y_test, y_pred))
-          </code></pre>
-        </div>
-      </div>
+     </code></pre>
     </div>
+   </div>
+  </div>
 
-    <!-- Ejemplo 3 Churn -->
-    <div class="accordion">
-      <div class="accordion-header">3. Rotación de clientes (Telco) – Churn (Binomial)</div>
-      <div class="accordion-body">
-        <p>¿Se irá el cliente de la compañía telefónica? Variables como duración del contrato, cargos mensuales...</p>
-        <div class="code-block">
-          <button class="copy-btn" onclick="copyCode(this, 'churn_code')">Copiar</button>
-          <pre><code class="language-python" id="churn_code">
+  <!-- Ejemplo 3 Churn -->
+  <div class="accordion">
+   <div class="accordion-header">3. Rotación de clientes (Telco) – Churn (Binomial)</div>
+   <div class="accordion-body">
+    <p>¿Se irá el cliente de la compañía telefónica? Variables como duración del contrato, cargos mensuales...</p>
+    <div class="code-block">
+     <button class="copy-btn" onclick="copyCode(this, 'churn_code')">Copiar</button>
+     <pre><code class="language-python" id="churn_code">
 url = 'https://raw.githubusercontent.com/IBM/telco-customer-churn-on-icp4d/master/data/Telco-Customer-Churn.csv'
 churn = pd.read_csv(url)
 churn['TotalCharges'] = pd.to_numeric(churn['TotalCharges'], errors='coerce')
@@ -405,19 +405,19 @@ model = LogisticRegression(max_iter=200)
 model.fit(X_train, y_train)
 y_pred = model.predict(X_test)
 print(classification_report(y_test, y_pred))
-          </code></pre>
-        </div>
-      </div>
+     </code></pre>
     </div>
+   </div>
+  </div>
 
-    <!-- Ejemplo 4 Pingüinos (Multinomial) -->
-    <div class="accordion">
-      <div class="accordion-header">4. Pingüinos de Palmer – 3 especies (Multinomial)</div>
-      <div class="accordion-body">
-        <p>Clasificamos pingüinos Adelie, Chinstrap y Gentoo por tamaño de pico y aletas.</p>
-        <div class="code-block">
-          <button class="copy-btn" onclick="copyCode(this, 'penguins_code')">Copiar</button>
-          <pre><code class="language-python" id="penguins_code">
+  <!-- Ejemplo 4 Pingüinos (Multinomial) -->
+  <div class="accordion">
+   <div class="accordion-header">4. Pingüinos de Palmer – 3 especies (Multinomial)</div>
+   <div class="accordion-body">
+    <p>Clasificamos pingüinos Adelie, Chinstrap y Gentoo por tamaño de pico y aletas.</p>
+    <div class="code-block">
+     <button class="copy-btn" onclick="copyCode(this, 'penguins_code')">Copiar</button>
+     <pre><code class="language-python" id="penguins_code">
 from sklearn.linear_model import LogisticRegression
 import seaborn as sns
 
@@ -436,22 +436,22 @@ import numpy as np
 import pandas as pd
 odds = np.exp(model.coef_)
 pd.DataFrame(odds, columns=X.columns, index=model.classes_)
-          </code></pre>
-        </div>
-      </div>
+     </code></pre>
     </div>
+   </div>
+  </div>
 
-    <!-- Ejemplo 5 Coches -->
-    <div class="accordion">
-      <div class="accordion-header">5. Evaluación de coches – 4 categorías (Multinomial)</div>
-      <div class="accordion-body">
-        <p>Dataset UCI: clasifica coches en inaceptable, aceptable, bueno, muy bueno según precio, seguridad...</p>
-        <div class="code-block">
-          <button class="copy-btn" onclick="copyCode(this, 'cars_code')">Copiar</button>
-          <pre><code class="language-python" id="cars_code">
+  <!-- Ejemplo 5 Coches -->
+  <div class="accordion">
+   <div class="accordion-header">5. Evaluación de coches – 4 categorías (Multinomial)</div>
+   <div class="accordion-body">
+    <p>Dataset UCI: clasifica coches en inaceptable, aceptable, bueno, muy bueno según precio, seguridad...</p>
+    <div class="code-block">
+     <button class="copy-btn" onclick="copyCode(this, 'cars_code')">Copiar</button>
+     <pre><code class="language-python" id="cars_code">
 columnas = ['buying','maint','doors','persons','lug_boot','safety','class']
 car = pd.read_csv('https://archive.ics.uci.edu/ml/machine-learning-databases/car/car.data',
-                   header=None, names=columnas)
+          header=None, names=columnas)
 car_dummies = pd.get_dummies(car.drop('class', axis=1), drop_first=True)
 y = car['class']
 X_train, X_test, y_train, y_test = train_test_split(car_dummies, y, test_size=0.2, stratify=y, random_state=1)
@@ -460,97 +460,96 @@ model = LogisticRegression(multi_class='multinomial', solver='lbfgs', max_iter=5
 model.fit(X_train, y_train)
 y_pred = model.predict(X_test)
 print(classification_report(y_test, y_pred))
-          </code></pre>
-        </div>
-      </div>
+     </code></pre>
     </div>
+   </div>
   </div>
+ </div>
 
-  <footer>
-    <p>🧑‍🏫 Prof. Logístico – “Enseñar es sembrar curiosidad; la logística es la navaja suiza de la clasificación”</p>
-    <p>© 2026 – Comparte, modifica y enseña sin miedo.</p>
-  </footer>
+ <footer>
+  <p>🧑‍🏫 Prof. Logístico – “Enseñar es sembrar curiosidad; la logística es la navaja suiza de la clasificación”</p>
+  <p>© 2026 – Comparte, modifica y enseña sin miedo.</p>
+ </footer>
 </div>
 
 <script>
-  // Acordeón
-  const headers = document.querySelectorAll('.accordion-header');
-  headers.forEach(header => {
-    header.addEventListener('click', () => {
-      const parent = header.parentElement;
-      parent.classList.toggle('active');
-    });
+ // Acordeón
+ const headers = document.querySelectorAll('.accordion-header');
+ headers.forEach(header => {
+  header.addEventListener('click', () => {
+   const parent = header.parentElement;
+   parent.classList.toggle('active');
   });
+ });
 
-  // Simulador Titanic
-  function predictTitanic() {
-    // Coeficientes ficticios entrenados con datos sin escalar (aproximados)
-    const b0 = 4.0;
-    const b_pclass = -1.2;
-    const b_sex_male = -2.5;
-    const b_age = -0.035;
-    const b_fare = 0.002;
-    const b_family = -0.3; // sibsp + parch
+ // Simulador Titanic
+ function predictTitanic() {
+  // Coeficientes ficticios entrenados con datos sin escalar (aproximados)
+  const b0 = 4.0;
+  const b_pclass = -1.2;
+  const b_sex_male = -2.5;
+  const b_age = -0.035;
+  const b_fare = 0.002;
+  const b_family = -0.3; // sibsp + parch
 
-    const pclass = parseInt(document.getElementById('pclass').value);
-    const sex = document.getElementById('sex').value;
-    const age = parseFloat(document.getElementById('age').value);
-    const fare = parseFloat(document.getElementById('fare').value);
-    const family = parseInt(document.getElementById('family').value);
+  const pclass = parseInt(document.getElementById('pclass').value);
+  const sex = document.getElementById('sex').value;
+  const age = parseFloat(document.getElementById('age').value);
+  const fare = parseFloat(document.getElementById('fare').value);
+  const family = parseInt(document.getElementById('family').value);
 
-    let sex_male = sex === 'male' ? 1 : 0;
+  let sex_male = sex === 'male' ? 1 : 0;
 
-    let z = b0 + b_pclass * pclass + b_sex_male * sex_male + b_age * age + b_fare * fare + b_family * family;
-    let prob = 1 / (1 + Math.exp(-z)); // sigmoide
-    let probPercent = (prob * 100).toFixed(1);
+  let z = b0 + b_pclass * pclass + b_sex_male * sex_male + b_age * age + b_fare * fare + b_family * family;
+  let prob = 1 / (1 + Math.exp(-z)); // sigmoide
+  let probPercent = (prob * 100).toFixed(1);
 
-    // Actualizar barra y texto
-    const fill = document.getElementById('probFill');
-    const text = document.getElementById('probText');
-    fill.style.width = probPercent + '%';
-    text.innerHTML = `Probabilidad de sobrevivir: <strong>${probPercent}%</strong>`;
-    if (prob > 0.5) {
-      text.innerHTML += ' 😄 ¡Hay esperanza!';
-    } else {
-      text.innerHTML += ' 😢 ¡Agárrate, que el agua está fría!';
-    }
+  // Actualizar barra y texto
+  const fill = document.getElementById('probFill');
+  const text = document.getElementById('probText');
+  fill.style.width = probPercent + '%';
+  text.innerHTML = `Probabilidad de sobrevivir: <strong>${probPercent}%</strong>`;
+  if (prob > 0.5) {
+   text.innerHTML += ' 😄 ¡Hay esperanza!';
+  } else {
+   text.innerHTML += ' 😢 ¡Agárrate, que el agua está fría!';
   }
+ }
 
-  // Actualizar valores de sliders
-  document.getElementById('age').addEventListener('input', function() {
-    document.getElementById('ageVal').textContent = this.value;
-  });
-  document.getElementById('fare').addEventListener('input', function() {
-    document.getElementById('fareVal').textContent = this.value;
-  });
-  document.getElementById('family').addEventListener('input', function() {
-    document.getElementById('familyVal').textContent = this.value;
-  });
+ // Actualizar valores de sliders
+ document.getElementById('age').addEventListener('input', function() {
+  document.getElementById('ageVal').textContent = this.value;
+ });
+ document.getElementById('fare').addEventListener('input', function() {
+  document.getElementById('fareVal').textContent = this.value;
+ });
+ document.getElementById('family').addEventListener('input', function() {
+  document.getElementById('familyVal').textContent = this.value;
+ });
 
-  // Función para copiar código
-  function copyCode(btn, codeId) {
-    const code = document.getElementById(codeId).innerText;
-    navigator.clipboard.writeText(code).then(() => {
-      const originalText = btn.textContent;
-      btn.textContent = I18N.t('fb_0');
-      setTimeout(() => { btn.textContent = originalText; }, 2000);
-    }).catch(err => {
-      alert('Error al copiar: ' + err);
-    });
-  }
+ // Función para copiar código
+ function copyCode(btn, codeId) {
+  const code = document.getElementById(codeId).innerText;
+  navigator.clipboard.writeText(code).then(() => {
+   const originalText = btn.textContent;
+   btn.textContent = I18N.t('fb_0');
+   setTimeout(() => { btn.textContent = originalText; }, 2000);
+  }).catch(err => {
+   alert('Error al copiar: ' + err);
+  });
+ }
 
-  // Inicializar sliders
-  document.getElementById('ageVal').textContent = document.getElementById('age').value;
-  document.getElementById('fareVal').textContent = document.getElementById('fare').value;
-  document.getElementById('familyVal').textContent = document.getElementById('family').value;
+ // Inicializar sliders
+ document.getElementById('ageVal').textContent = document.getElementById('age').value;
+ document.getElementById('fareVal').textContent = document.getElementById('fare').value;
+ document.getElementById('familyVal').textContent = document.getElementById('family').value;
 </script>
-  <script src="../../../assets/js/cookie-consent.js"></script>
-<script>
+ <script>
 window.I18N_DATA={
-  "fb_0": {
-    "es": "¡Copiado!",
-    "en": "!Copiado!"
-  }
+ "fb_0": {
+  "es": "¡Copiado!",
+  "en": "!Copiado!"
+ }
 };
 </script>
 <script src="../../../assets/js/i18n.js"></script>

@@ -1,153 +1,153 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Probabilidades Interactiva | Estadística Bayesiana</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Press+Start+2P&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%);background-size:200% 200%;animation:gradientShift 20s ease infinite;font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
-    @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-    .b-container{max-width:1300px;width:100%;background:rgba(15,25,45,0.65);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(255,102,192,0.25);box-shadow:0 25px 45px rgba(0,0,0,0.5);overflow:hidden}
-    .hero-header{background:linear-gradient(95deg,#0b1120 0%,#111a2e 100%);padding:2rem 2rem 1.5rem 2rem;text-align:center;border-bottom:2px solid #ff66c0}
-    .hero-header h1{font-size:2.6rem;font-weight:800;background:linear-gradient(135deg,#FFF,#ff99d6,#ff66c0);-webkit-background-clip:text;background-clip:text;color:transparent}
-    .hero-header p{font-size:1.1rem;color:#f0c0e0;margin-top:0.5rem;font-weight:500}
-    .badge-area{display:flex;justify-content:center;gap:1rem;margin-top:1.2rem;flex-wrap:wrap}
-    .chip{background:rgba(255,102,192,0.15);border:1px solid #ff66c0;padding:0.4rem 1rem;border-radius:40px;font-size:0.8rem;font-weight:600}
-    .analogy-card{background:#1e2a3acc;margin:1.5rem 2rem;padding:1.2rem 1.8rem;border-radius:2rem;border-left:8px solid #ff66c0;font-size:1rem;line-height:1.6}
-    .main-area{padding:0 2rem 1rem 2rem;display:flex;flex-direction:column;gap:1.5rem}
-    .sim-box{background:#0f1a2c;border-radius:2rem;padding:1.5rem;border:1px solid rgba(255,102,192,0.2)}
-    .sim-box h3{color:#ff99d6;margin-bottom:0.8rem;font-size:1.2rem}
-    .sim-box p{font-size:0.9rem;color:#aac;margin-bottom:0.5rem}
-    .dist-vis{display:flex;gap:2px;align-items:flex-end;min-height:120px;background:#0a0f1e;border-radius:1rem;padding:0.5rem}
-    .bar{width:16px;border-radius:3px 3px 0 0;transition:height 0.4s}
-    .bar.prior{background:linear-gradient(180deg,#6666ff,#4444cc)}
-    .bar.likelihood{background:linear-gradient(180deg,#ffaa44,#ff8800)}
-    .bar.posterior{background:linear-gradient(180deg,#ff66c0,#ff3388)}
-    .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:0.5rem;margin-top:0.5rem}
-    .stat-card{background:#0f1a2c;border-radius:1.2rem;padding:0.8rem;border:1px solid rgba(255,102,192,0.15);text-align:center}
-    .stat-card .num{font-size:1.6rem;font-weight:800;color:#ff99d6}
-    .stat-card .lbl{font-size:0.75rem;color:#aac}
-    .btn-action{background:linear-gradient(95deg,#ff66c0,#ff3388);border:none;padding:0.7rem 1.5rem;font-weight:bold;border-radius:3rem;cursor:pointer;font-size:0.95rem;color:#fff;transition:0.2s}
-    .btn-action:hover{transform:translateY(-2px);box-shadow:0 0 15px rgba(255,102,192,0.4)}
-    .btn-secondary-action{background:#2c3e66;border:none;padding:0.6rem 1.2rem;font-weight:600;border-radius:3rem;cursor:pointer;font-size:0.9rem;color:#eef5ff;transition:0.2s}
-    .btn-secondary-action:hover{transform:translateY(-2px)}
-    .slider-row{display:flex;gap:1.5rem;align-items:center;justify-content:center;flex-wrap:wrap}
-    .slider-group{display:flex;flex-direction:column;align-items:center;gap:0.3rem}
-    .slider-group label{font-size:0.85rem;color:#aac}
-    .beta-curve{position:relative;width:100%;height:140px;background:#0a0f1e;border-radius:1rem;overflow:hidden;margin-top:0.5rem}
-    .feedback{background:#00000099;margin:0 2rem 1.5rem 2rem;padding:1rem;border-radius:1.5rem;text-align:center;font-weight:500;border-left:4px solid #ff66c0}
-    .insignia{text-align:center;background:#0c1b2f;border-radius:2rem;margin:0 2rem 1.5rem;padding:1rem;border:1px dashed gold}
-    .insignia i{font-size:2.5rem;color:gold}
-    .hidden{display:none}
-    .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.5rem 2rem}
-    .nav-link{background:#2c3e66;padding:0.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:0.5rem;transition:0.2s}
-    .nav-link:hover{transform:translateY(-2px);box-shadow:0 0 10px rgba(255,102,192,0.4)}
-    .nav-link.next{background:linear-gradient(95deg,#ff66c0,#ff3388);color:#fff}
-    .nav-link.menu{background:#1a2a4a;border:1px solid #ff66c0}
-    footer{text-align:center;padding:1.2rem;font-size:0.8rem;border-top:1px solid #2c3e66}
-    @media(max-width:800px){.hero-header h1{font-size:1.9rem}}
-  </style>
-  <link rel="stylesheet" href="../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Probabilidades Interactiva | Estadística Bayesiana</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Press+Start+2P&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%);background-size:200% 200%;animation:gradientShift 20s ease infinite;font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
+  @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+  .b-container{max-width:1300px;width:100%;background:rgba(15,25,45,0.65);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(255,102,192,0.25);box-shadow:0 25px 45px rgba(0,0,0,0.5);overflow:hidden}
+  .hero-header{background:linear-gradient(95deg,#0b1120 0%,#111a2e 100%);padding:2rem 2rem 1.5rem 2rem;text-align:center;border-bottom:2px solid #ff66c0}
+  .hero-header h1{font-size:2.6rem;font-weight:800;background:linear-gradient(135deg,#FFF,#ff99d6,#ff66c0);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero-header p{font-size:1.1rem;color:#f0c0e0;margin-top:0.5rem;font-weight:500}
+  .badge-area{display:flex;justify-content:center;gap:1rem;margin-top:1.2rem;flex-wrap:wrap}
+  .chip{background:rgba(255,102,192,0.15);border:1px solid #ff66c0;padding:0.4rem 1rem;border-radius:40px;font-size:0.8rem;font-weight:600}
+  .analogy-card{background:#1e2a3acc;margin:1.5rem 2rem;padding:1.2rem 1.8rem;border-radius:2rem;border-left:8px solid #ff66c0;font-size:1rem;line-height:1.6}
+  .main-area{padding:0 2rem 1rem 2rem;display:flex;flex-direction:column;gap:1.5rem}
+  .sim-box{background:#0f1a2c;border-radius:2rem;padding:1.5rem;border:1px solid rgba(255,102,192,0.2)}
+  .sim-box h3{color:#ff99d6;margin-bottom:0.8rem;font-size:1.2rem}
+  .sim-box p{font-size:0.9rem;color:#aac;margin-bottom:0.5rem}
+  .dist-vis{display:flex;gap:2px;align-items:flex-end;min-height:120px;background:#0a0f1e;border-radius:1rem;padding:0.5rem}
+  .bar{width:16px;border-radius:3px 3px 0 0;transition:height 0.4s}
+  .bar.prior{background:linear-gradient(180deg,#6666ff,#4444cc)}
+  .bar.likelihood{background:linear-gradient(180deg,#ffaa44,#ff8800)}
+  .bar.posterior{background:linear-gradient(180deg,#ff66c0,#ff3388)}
+  .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:0.5rem;margin-top:0.5rem}
+  .stat-card{background:#0f1a2c;border-radius:1.2rem;padding:0.8rem;border:1px solid rgba(255,102,192,0.15);text-align:center}
+  .stat-card .num{font-size:1.6rem;font-weight:800;color:#ff99d6}
+  .stat-card .lbl{font-size:0.75rem;color:#aac}
+  .btn-action{background:linear-gradient(95deg,#ff66c0,#ff3388);border:none;padding:0.7rem 1.5rem;font-weight:bold;border-radius:3rem;cursor:pointer;font-size:0.95rem;color:#fff;transition:0.2s}
+  .btn-action:hover{transform:translateY(-2px);box-shadow:0 0 15px rgba(255,102,192,0.4)}
+  .btn-secondary-action{background:#2c3e66;border:none;padding:0.6rem 1.2rem;font-weight:600;border-radius:3rem;cursor:pointer;font-size:0.9rem;color:#eef5ff;transition:0.2s}
+  .btn-secondary-action:hover{transform:translateY(-2px)}
+  .slider-row{display:flex;gap:1.5rem;align-items:center;justify-content:center;flex-wrap:wrap}
+  .slider-group{display:flex;flex-direction:column;align-items:center;gap:0.3rem}
+  .slider-group label{font-size:0.85rem;color:#aac}
+  .beta-curve{position:relative;width:100%;height:140px;background:#0a0f1e;border-radius:1rem;overflow:hidden;margin-top:0.5rem}
+  .feedback{background:#00000099;margin:0 2rem 1.5rem 2rem;padding:1rem;border-radius:1.5rem;text-align:center;font-weight:500;border-left:4px solid #ff66c0}
+  .insignia{text-align:center;background:#0c1b2f;border-radius:2rem;margin:0 2rem 1.5rem;padding:1rem;border:1px dashed gold}
+  .insignia i{font-size:2.5rem;color:gold}
+  .hidden{display:none}
+  .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.5rem 2rem}
+  .nav-link{background:#2c3e66;padding:0.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:0.5rem;transition:0.2s}
+  .nav-link:hover{transform:translateY(-2px);box-shadow:0 0 10px rgba(255,102,192,0.4)}
+  .nav-link.next{background:linear-gradient(95deg,#ff66c0,#ff3388);color:#fff}
+  .nav-link.menu{background:#1a2a4a;border:1px solid #ff66c0}
+  footer{text-align:center;padding:1.2rem;font-size:0.8rem;border-top:1px solid #2c3e66}
+  @media(max-width:800px){.hero-header h1{font-size:1.9rem}}
+ </style>
+ <link rel="stylesheet" href="../../assets/css/theme.css">
 </head>
 <body>
 <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
 <div class="b-container">
-  <div class="hero-header">
-    <h1>🧠 ESTADÍSTICA BAYESIANA</h1>
-    <p>Actualiza tus creencias con datos: prior → likelihood → posterior</p>
-    <div class="badge-area">
-      <span class="chip"><i class="fas fa-sync"></i> Posterior ∝ Prior × Likelihood</span>
-      <span class="chip"><i class="fas fa-distribution"></i> Beta-Binomial</span>
-      <span class="chip"><i class="fas fa-balance-scale"></i> Bayes Factor</span>
+ <div class="hero-header">
+  <h1>🧠 ESTADÍSTICA BAYESIANA</h1>
+  <p>Actualiza tus creencias con datos: prior → likelihood → posterior</p>
+  <div class="badge-area">
+   <span class="chip"><i class="fas fa-sync"></i> Posterior ∝ Prior × Likelihood</span>
+   <span class="chip"><i class="fas fa-distribution"></i> Beta-Binomial</span>
+   <span class="chip"><i class="fas fa-balance-scale"></i> Bayes Factor</span>
+  </div>
+ </div>
+
+ <div class="analogy-card">
+  <strong>🔬 Piénsalo así:</strong> El enfoque bayesiano es como un científico que actualiza su hipótesis con cada nuevo experimento. Antes del experimento tienes una "corazonada" (prior). Al ver los datos, combinas la corazonada con la evidencia para formar una nueva creencia (posterior). ¡Más datos = menos influencia de la corazonada inicial!
+ </div>
+
+ <div class="main-area">
+  <div class="sim-box">
+   <h3><i class="fas fa-chart"></i> Beta-Binomial: creencia sobre una probabilidad</h3>
+   <p>Prior: Beta(α, β). Observas "éxitos" en "intentos". Posterior: Beta(α+éxitos, β+fracasos).</p>
+   <div class="slider-row">
+    <div class="slider-group">
+     <label>Prior α: <span id="priorA">2</span></label>
+     <input id="priorAS" type="range" min="0.5" max="20" step="0.5" value="2" oninput="document.getElementById('priorA').textContent=this.value;updateBayes()">
     </div>
-  </div>
-
-  <div class="analogy-card">
-    <strong>🔬 Piénsalo así:</strong> El enfoque bayesiano es como un científico que actualiza su hipótesis con cada nuevo experimento. Antes del experimento tienes una "corazonada" (prior). Al ver los datos, combinas la corazonada con la evidencia para formar una nueva creencia (posterior). ¡Más datos = menos influencia de la corazonada inicial!
-  </div>
-
-  <div class="main-area">
-    <div class="sim-box">
-      <h3><i class="fas fa-chart"></i> Beta-Binomial: creencia sobre una probabilidad</h3>
-      <p>Prior: Beta(α, β). Observas "éxitos" en "intentos". Posterior: Beta(α+éxitos, β+fracasos).</p>
-      <div class="slider-row">
-        <div class="slider-group">
-          <label>Prior α: <span id="priorA">2</span></label>
-          <input id="priorAS" type="range" min="0.5" max="20" step="0.5" value="2" oninput="document.getElementById('priorA').textContent=this.value;updateBayes()">
-        </div>
-        <div class="slider-group">
-          <label>Prior β: <span id="priorB">2</span></label>
-          <input id="priorBS" type="range" min="0.5" max="20" step="0.5" value="2" oninput="document.getElementById('priorB').textContent=this.value;updateBayes()">
-        </div>
-        <div class="slider-group">
-          <label>Éxitos: <span id="obsS">5</span></label>
-          <input id="obsSS" type="range" min="0" max="50" step="1" value="5" oninput="document.getElementById('obsS').textContent=this.value;updateBayes()">
-        </div>
-        <div class="slider-group">
-          <label>Intentos: <span id="obsN">20</span></label>
-          <input id="obsNS" type="range" min="1" max="100" step="1" value="20" oninput="document.getElementById('obsN').textContent=this.value;updateBayes()">
-        </div>
-      </div>
-      <div id="betaVis" class="beta-curve"></div>
-      <div class="stats-row">
-        <div class="stat-card"><div class="lbl">Media Prior</div><div class="num" id="priorMean">—</div></div>
-        <div class="stat-card"><div class="lbl">Media Posterior</div><div class="num" id="postMean">—</div></div>
-        <div class="stat-card"><div class="lbl">IC 95% Posterior</div><div class="num" id="postCI" style="font-size:0.9rem;">—</div></div>
-        <div class="stat-card"><div class="lbl">Moda Posterior</div><div class="num" id="postMode">—</div></div>
-      </div>
+    <div class="slider-group">
+     <label>Prior β: <span id="priorB">2</span></label>
+     <input id="priorBS" type="range" min="0.5" max="20" step="0.5" value="2" oninput="document.getElementById('priorB').textContent=this.value;updateBayes()">
     </div>
-
-    <div class="sim-box">
-      <h3><i class="fas fa-sync"></i> Actualización secuencial</h3>
-      <p>Primer lote: 3/10 éxitos. Segundo lote: 7/20 éxitos. ¿Cómo cambia la posterior?</p>
-      <div style="text-align:center;">
-        <button class="btn-action" onclick="sequentialUpdate()">🔄 Actualizar paso a paso</button>
-      </div>
-      <div id="seqVis" class="beta-curve" style="margin-top:0.5rem;"></div>
-      <div id="seqResult" style="text-align:center;margin-top:0.5rem;font-size:0.9rem;color:#aac;"></div>
+    <div class="slider-group">
+     <label>Éxitos: <span id="obsS">5</span></label>
+     <input id="obsSS" type="range" min="0" max="50" step="1" value="5" oninput="document.getElementById('obsS').textContent=this.value;updateBayes()">
     </div>
-
-    <div class="sim-box">
-      <h3><i class="fas fa-balance-scale"></i> Bayes Factor: ¿qué modelo explica mejor los datos?</h3>
-      <p>BF = P(datos | H₁) / P(datos | H₀). BF > 3: evidencia sustancial para H₁.</p>
-      <div class="slider-row">
-        <div class="slider-group">
-          <label>Éxitos observados: <span id="bfS">8</span></label>
-          <input id="bfSS" type="range" min="0" max="20" step="1" value="8" oninput="document.getElementById('bfS').textContent=this.value;calcBF()">
-        </div>
-        <div class="slider-group">
-          <label>Intentos: <span id="bfN">20</span></label>
-          <input id="bfNS" type="range" min="1" max="50" step="1" value="20" oninput="document.getElementById('bfN').textContent=this.value;calcBF()">
-        </div>
-      </div>
-      <div class="stats-row" style="margin-top:0.5rem;">
-        <div class="stat-card"><div class="lbl">BF₁₀ (H₁: p=0.5 vs H₀: p=0.3)</div><div class="num" id="bfResult">—</div></div>
-        <div class="stat-card"><div class="lbl">Evidencia</div><div class="num" id="bfEvidence" style="font-size:0.9rem;">—</div></div>
-      </div>
-      <div style="text-align:center;margin-top:0.5rem;">
-        <button class="btn-secondary-action" onclick="calcBF()">📊 Calcular BF</button>
-      </div>
+    <div class="slider-group">
+     <label>Intentos: <span id="obsN">20</span></label>
+     <input id="obsNS" type="range" min="1" max="100" step="1" value="20" oninput="document.getElementById('obsN').textContent=this.value;updateBayes()">
     </div>
+   </div>
+   <div id="betaVis" class="beta-curve"></div>
+   <div class="stats-row">
+    <div class="stat-card"><div class="lbl">Media Prior</div><div class="num" id="priorMean">—</div></div>
+    <div class="stat-card"><div class="lbl">Media Posterior</div><div class="num" id="postMean">—</div></div>
+    <div class="stat-card"><div class="lbl">IC 95% Posterior</div><div class="num" id="postCI" style="font-size:0.9rem;">—</div></div>
+    <div class="stat-card"><div class="lbl">Moda Posterior</div><div class="num" id="postMode">—</div></div>
+   </div>
   </div>
 
-  <div id="feedbackMsg" class="feedback">💡 Ajusta los parámetros de la Beta-Binomial y observa cómo los datos transforman tu prior en posterior.</div>
-
-  <div id="insigniaArea" class="insignia hidden">
-    <i class="fas fa-medal"></i>
-    <h3>🏅 ¡BAYESIANO CONVICTO! 🏅</h3>
-    <p>Dominas la inferencia bayesiana, conjugadas Beta-Binomial y el factor de Bayes.</p>
+  <div class="sim-box">
+   <h3><i class="fas fa-sync"></i> Actualización secuencial</h3>
+   <p>Primer lote: 3/10 éxitos. Segundo lote: 7/20 éxitos. ¿Cómo cambia la posterior?</p>
+   <div style="text-align:center;">
+    <button class="btn-action" onclick="sequentialUpdate()">🔄 Actualizar paso a paso</button>
+   </div>
+   <div id="seqVis" class="beta-curve" style="margin-top:0.5rem;"></div>
+   <div id="seqResult" style="text-align:center;margin-top:0.5rem;font-size:0.9rem;color:#aac;"></div>
   </div>
 
-  <div class="nav-links">
-    <a href="e6-simulacion.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
-    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
-    <a href="e8-temas-selectos.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  <div class="sim-box">
+   <h3><i class="fas fa-balance-scale"></i> Bayes Factor: ¿qué modelo explica mejor los datos?</h3>
+   <p>BF = P(datos | H₁) / P(datos | H₀). BF > 3: evidencia sustancial para H₁.</p>
+   <div class="slider-row">
+    <div class="slider-group">
+     <label>Éxitos observados: <span id="bfS">8</span></label>
+     <input id="bfSS" type="range" min="0" max="20" step="1" value="8" oninput="document.getElementById('bfS').textContent=this.value;calcBF()">
+    </div>
+    <div class="slider-group">
+     <label>Intentos: <span id="bfN">20</span></label>
+     <input id="bfNS" type="range" min="1" max="50" step="1" value="20" oninput="document.getElementById('bfN').textContent=this.value;calcBF()">
+    </div>
+   </div>
+   <div class="stats-row" style="margin-top:0.5rem;">
+    <div class="stat-card"><div class="lbl">BF₁₀ (H₁: p=0.5 vs H₀: p=0.3)</div><div class="num" id="bfResult">—</div></div>
+    <div class="stat-card"><div class="lbl">Evidencia</div><div class="num" id="bfEvidence" style="font-size:0.9rem;">—</div></div>
+   </div>
+   <div style="text-align:center;margin-top:0.5rem;">
+    <button class="btn-secondary-action" onclick="calcBF()">📊 Calcular BF</button>
+   </div>
   </div>
-  <footer><i class="fas fa-crown"></i> Probabilidades Interactiva · Modo Experto · Domina la teoría</footer>
+ </div>
+
+ <div id="feedbackMsg" class="feedback">💡 Ajusta los parámetros de la Beta-Binomial y observa cómo los datos transforman tu prior en posterior.</div>
+
+ <div id="insigniaArea" class="insignia hidden">
+  <i class="fas fa-medal"></i>
+  <h3>🏅 ¡BAYESIANO CONVICTO! 🏅</h3>
+  <p>Dominas la inferencia bayesiana, conjugadas Beta-Binomial y el factor de Bayes.</p>
+ </div>
+
+ <div class="nav-links">
+  <a href="e6-simulacion.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+  <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+  <a href="e8-temas-selectos.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+ </div>
+ <footer><i class="fas fa-crown"></i> Probabilidades Interactiva · Modo Experto · Domina la teoría</footer>
 </div>
 
 <script>
@@ -155,227 +155,226 @@ const STORAGE_KEY = 'prob_e7';
 let completed = false;
 
 function betaPDF(x, a, b) {
-  if (x <= 0 || x >= 1) return 0;
-  const B = Math.exp(lgamma(a) + lgamma(b) - lgamma(a + b));
-  return Math.pow(x, a - 1) * Math.pow(1 - x, b - 1) / B;
+ if (x <= 0 || x >= 1) return 0;
+ const B = Math.exp(lgamma(a) + lgamma(b) - lgamma(a + b));
+ return Math.pow(x, a - 1) * Math.pow(1 - x, b - 1) / B;
 }
 
 function lgamma(z) {
-  if (z < 0.5) return lgamma(z + 1) - Math.log(z);
-  const g = 7;
-  const c = [0.99999999999980993, 676.5203681218851, -1259.1392167224028, 771.32342877765313, -176.61502916214059, 12.507343278686905, -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
-  z -= 1;
-  let x = c[0];
-  for (let i = 1; i < g + 2; i++) x += c[i] / (z + i);
-  const t = z + g + 0.5;
-  return 0.5 * Math.log(2 * Math.PI) + (z + 0.5) * Math.log(t) - t + Math.log(x);
+ if (z < 0.5) return lgamma(z + 1) - Math.log(z);
+ const g = 7;
+ const c = [0.99999999999980993, 676.5203681218851, -1259.1392167224028, 771.32342877765313, -176.61502916214059, 12.507343278686905, -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
+ z -= 1;
+ let x = c[0];
+ for (let i = 1; i < g + 2; i++) x += c[i] / (z + i);
+ const t = z + g + 0.5;
+ return 0.5 * Math.log(2 * Math.PI) + (z + 0.5) * Math.log(t) - t + Math.log(x);
 }
 
 function renderBeta(a, b, a2, b2, canvasId) {
-  const canvas = document.getElementById(canvasId);
-  const ctx = canvas.getContext('2d');
-  const w = canvas.width, h = canvas.height;
-  ctx.clearRect(0, 0, w, h);
-  const steps = w;
-  const priorVals = [], postVals = [];
-  let maxV = 0;
-  for (let i = 0; i <= steps; i++) {
-    const x = i / steps;
-    const pv = betaPDF(x, a, b);
-    const pst = betaPDF(x, a2, b2);
-    priorVals.push(pv);
-    postVals.push(pst);
-    maxV = Math.max(maxV, pv, pst);
-  }
-  maxV *= 1.1;
-  // prior
-  ctx.strokeStyle = '#6666ff';
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  priorVals.forEach((v, i) => { const y = h - (v / maxV) * h * 0.9; i === 0 ? ctx.moveTo(i, y) : ctx.lineTo(i, y); });
-  ctx.stroke();
-  // posterior
-  ctx.strokeStyle = '#ff66c0';
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  postVals.forEach((v, i) => { const y = h - (v / maxV) * h * 0.9; i === 0 ? ctx.moveTo(i, y) : ctx.lineTo(i, y); });
-  ctx.stroke();
-  // prior mean
-  const priorMean = a / (a + b);
-  const postMean = a2 / (a2 + b2);
-  ctx.fillStyle = '#6666ff88';
-  ctx.fillRect(priorMean * w - 1, h - 10, 2, 10);
-  ctx.fillStyle = '#ff66c088';
-  ctx.fillRect(postMean * w - 1, h - 10, 2, 10);
-  ctx.fillStyle = '#aac';
-  ctx.font = '10px Inter';
-  ctx.fillText('Prior', 5, 12);
-  ctx.fillStyle = '#ff66c0';
-  ctx.fillText('Posterior', 5, 24);
+ const canvas = document.getElementById(canvasId);
+ const ctx = canvas.getContext('2d');
+ const w = canvas.width, h = canvas.height;
+ ctx.clearRect(0, 0, w, h);
+ const steps = w;
+ const priorVals = [], postVals = [];
+ let maxV = 0;
+ for (let i = 0; i <= steps; i++) {
+  const x = i / steps;
+  const pv = betaPDF(x, a, b);
+  const pst = betaPDF(x, a2, b2);
+  priorVals.push(pv);
+  postVals.push(pst);
+  maxV = Math.max(maxV, pv, pst);
+ }
+ maxV *= 1.1;
+ // prior
+ ctx.strokeStyle = '#6666ff';
+ ctx.lineWidth = 2;
+ ctx.beginPath();
+ priorVals.forEach((v, i) => { const y = h - (v / maxV) * h * 0.9; i === 0 ? ctx.moveTo(i, y) : ctx.lineTo(i, y); });
+ ctx.stroke();
+ // posterior
+ ctx.strokeStyle = '#ff66c0';
+ ctx.lineWidth = 3;
+ ctx.beginPath();
+ postVals.forEach((v, i) => { const y = h - (v / maxV) * h * 0.9; i === 0 ? ctx.moveTo(i, y) : ctx.lineTo(i, y); });
+ ctx.stroke();
+ // prior mean
+ const priorMean = a / (a + b);
+ const postMean = a2 / (a2 + b2);
+ ctx.fillStyle = '#6666ff88';
+ ctx.fillRect(priorMean * w - 1, h - 10, 2, 10);
+ ctx.fillStyle = '#ff66c088';
+ ctx.fillRect(postMean * w - 1, h - 10, 2, 10);
+ ctx.fillStyle = '#aac';
+ ctx.font = '10px Inter';
+ ctx.fillText('Prior', 5, 12);
+ ctx.fillStyle = '#ff66c0';
+ ctx.fillText('Posterior', 5, 24);
 }
 
 function updateBayes() {
-  const a = parseFloat(document.getElementById('priorAS').value);
-  const b = parseFloat(document.getElementById('priorBS').value);
-  const s = parseInt(document.getElementById('obsSS').value);
-  const n = parseInt(document.getElementById('obsNS').value);
-  const aPost = a + s;
-  const bPost = b + (n - s);
-  const priorMean = (a / (a + b));
-  const postMean = (aPost / (aPost + bPost));
-  document.getElementById('priorMean').textContent = priorMean.toFixed(3);
-  document.getElementById('postMean').textContent = postMean.toFixed(3);
-  document.getElementById('postMode').textContent = ((aPost - 1) / (aPost + bPost - 2)).toFixed(3);
-  const ciLow = qBeta(0.025, aPost, bPost);
-  const ciHigh = qBeta(0.975, aPost, bPost);
-  document.getElementById('postCI').textContent = `[${(ciLow*100).toFixed(1)}%, ${(ciHigh*100).toFixed(1)}%]`;
-  const canvas = document.getElementById('betaVis');
-  if (!canvas || canvas.tagName !== 'CANVAS') {
-    const newCanvas = document.createElement('canvas');
-    newCanvas.id = 'betaVis';
-    newCanvas.width = 600;
-    newCanvas.height = 140;
-    newCanvas.style.width = '100%';
-    newCanvas.style.height = '140px';
-    document.getElementById('betaVis').parentNode.replaceChild(newCanvas, document.getElementById('betaVis'));
-  }
-  renderBeta(a, b, aPost, bPost, 'betaVis');
-  showFeedback(`🧠 Prior: Beta(${a},${b}) → Posterior: Beta(${aPost},${bPost}). Media: ${(postMean*100).toFixed(1)}%.`);
-  checkCompletion();
+ const a = parseFloat(document.getElementById('priorAS').value);
+ const b = parseFloat(document.getElementById('priorBS').value);
+ const s = parseInt(document.getElementById('obsSS').value);
+ const n = parseInt(document.getElementById('obsNS').value);
+ const aPost = a + s;
+ const bPost = b + (n - s);
+ const priorMean = (a / (a + b));
+ const postMean = (aPost / (aPost + bPost));
+ document.getElementById('priorMean').textContent = priorMean.toFixed(3);
+ document.getElementById('postMean').textContent = postMean.toFixed(3);
+ document.getElementById('postMode').textContent = ((aPost - 1) / (aPost + bPost - 2)).toFixed(3);
+ const ciLow = qBeta(0.025, aPost, bPost);
+ const ciHigh = qBeta(0.975, aPost, bPost);
+ document.getElementById('postCI').textContent = `[${(ciLow*100).toFixed(1)}%, ${(ciHigh*100).toFixed(1)}%]`;
+ const canvas = document.getElementById('betaVis');
+ if (!canvas || canvas.tagName !== 'CANVAS') {
+  const newCanvas = document.createElement('canvas');
+  newCanvas.id = 'betaVis';
+  newCanvas.width = 600;
+  newCanvas.height = 140;
+  newCanvas.style.width = '100%';
+  newCanvas.style.height = '140px';
+  document.getElementById('betaVis').parentNode.replaceChild(newCanvas, document.getElementById('betaVis'));
+ }
+ renderBeta(a, b, aPost, bPost, 'betaVis');
+ showFeedback(`🧠 Prior: Beta(${a},${b}) → Posterior: Beta(${aPost},${bPost}). Media: ${(postMean*100).toFixed(1)}%.`);
+ checkCompletion();
 }
 
 function qBeta(p, a, b) {
-  let lo = 0, hi = 1;
-  for (let iter = 0; iter < 50; iter++) {
-    const mid = (lo + hi) / 2;
-    // incomplete beta approximation via numerical integration
-    const val = incompleteBeta(mid, a, b);
-    if (val < p) lo = mid;
-    else hi = mid;
-  }
-  return (lo + hi) / 2;
+ let lo = 0, hi = 1;
+ for (let iter = 0; iter < 50; iter++) {
+  const mid = (lo + hi) / 2;
+  // incomplete beta approximation via numerical integration
+  const val = incompleteBeta(mid, a, b);
+  if (val < p) lo = mid;
+  else hi = mid;
+ }
+ return (lo + hi) / 2;
 }
 
 function incompleteBeta(x, a, b) {
-  if (x <= 0) return 0;
-  if (x >= 1) return 1;
-  let sum = 0, steps = 200;
-  for (let i = 0; i <= steps; i++) {
-    const t = (i / steps) * x;
-    const w = (i === 0 || i === steps) ? 0.5 : 1;
-    sum += w * Math.pow(t, a - 1) * Math.pow(1 - t, b - 1);
-  }
-  sum *= x / steps;
-  const B = Math.exp(lgamma(a) + lgamma(b) - lgamma(a + b));
-  return sum / B;
+ if (x <= 0) return 0;
+ if (x >= 1) return 1;
+ let sum = 0, steps = 200;
+ for (let i = 0; i <= steps; i++) {
+  const t = (i / steps) * x;
+  const w = (i === 0 || i === steps) ? 0.5 : 1;
+  sum += w * Math.pow(t, a - 1) * Math.pow(1 - t, b - 1);
+ }
+ sum *= x / steps;
+ const B = Math.exp(lgamma(a) + lgamma(b) - lgamma(a + b));
+ return sum / B;
 }
 
 function sequentialUpdate() {
-  const canvas = document.getElementById('seqVis');
-  const ctx = canvas.getContext('2d');
-  const w = canvas.width, h = canvas.height;
-  ctx.clearRect(0, 0, w, h);
-  const stages = [
-    { name: 'Prior', a: 2, b: 2 },
-    { name: 'Lote 1: 3/10', a: 2+3, b: 2+7 },
-    { name: 'Lote 2: 7/20', a: 2+3+7, b: 2+7+13 }
-  ];
-  const colors = ['#6666ff', '#ffaa44', '#ff66c0'];
-  let maxV = 0;
-  const curves = stages.map(s => {
-    const vals = [];
-    for (let i = 0; i <= w; i++) {
-      const x = i / w;
-      const v = betaPDF(x, s.a, s.b);
-      vals.push(v);
-      maxV = Math.max(maxV, v);
-    }
-    return vals;
-  });
-  maxV *= 1.1;
-  curves.forEach((vals, idx) => {
-    ctx.strokeStyle = colors[idx];
-    ctx.lineWidth = idx === 2 ? 3 : 2;
-    ctx.beginPath();
-    vals.forEach((v, i) => { const y = h - (v / maxV) * h * 0.85; i === 0 ? ctx.moveTo(i, y) : ctx.lineTo(i, y); });
-    ctx.stroke();
-    ctx.fillStyle = colors[idx];
-    ctx.font = '10px Inter';
-    ctx.fillText(stages[idx].name, 5 + idx * 80, 12);
-  });
-  const final = stages[2];
-  const mean = final.a / (final.a + final.b);
-  document.getElementById('seqResult').innerHTML = `Posterior final: Beta(${final.a}, ${final.b}). Media = ${(mean*100).toFixed(1)}%.`;
-  showFeedback('🔄 Actualización secuencial completa. Cada lote de datos refina la estimación.');
-  checkCompletion();
+ const canvas = document.getElementById('seqVis');
+ const ctx = canvas.getContext('2d');
+ const w = canvas.width, h = canvas.height;
+ ctx.clearRect(0, 0, w, h);
+ const stages = [
+  { name: 'Prior', a: 2, b: 2 },
+  { name: 'Lote 1: 3/10', a: 2+3, b: 2+7 },
+  { name: 'Lote 2: 7/20', a: 2+3+7, b: 2+7+13 }
+ ];
+ const colors = ['#6666ff', '#ffaa44', '#ff66c0'];
+ let maxV = 0;
+ const curves = stages.map(s => {
+  const vals = [];
+  for (let i = 0; i <= w; i++) {
+   const x = i / w;
+   const v = betaPDF(x, s.a, s.b);
+   vals.push(v);
+   maxV = Math.max(maxV, v);
+  }
+  return vals;
+ });
+ maxV *= 1.1;
+ curves.forEach((vals, idx) => {
+  ctx.strokeStyle = colors[idx];
+  ctx.lineWidth = idx === 2 ? 3 : 2;
+  ctx.beginPath();
+  vals.forEach((v, i) => { const y = h - (v / maxV) * h * 0.85; i === 0 ? ctx.moveTo(i, y) : ctx.lineTo(i, y); });
+  ctx.stroke();
+  ctx.fillStyle = colors[idx];
+  ctx.font = '10px Inter';
+  ctx.fillText(stages[idx].name, 5 + idx * 80, 12);
+ });
+ const final = stages[2];
+ const mean = final.a / (final.a + final.b);
+ document.getElementById('seqResult').innerHTML = `Posterior final: Beta(${final.a}, ${final.b}). Media = ${(mean*100).toFixed(1)}%.`;
+ showFeedback('🔄 Actualización secuencial completa. Cada lote de datos refina la estimación.');
+ checkCompletion();
 }
 
 function calcBF() {
-  const s = parseInt(document.getElementById('bfSS').value);
-  const n = parseInt(document.getElementById('bfNS').value);
-  const f = n - s;
-  const p1 = Math.pow(0.5, s) * Math.pow(0.5, f);
-  const p0 = Math.pow(0.3, s) * Math.pow(0.7, f);
-  const BF = p1 / p0;
-  document.getElementById('bfResult').textContent = BF.toFixed(3);
-  let evidence;
-  if (BF > 100) evidence = 'Decisivo para H₁';
-  else if (BF > 30) evidence = 'Muy fuerte para H₁';
-  else if (BF > 10) evidence = 'Fuerte para H₁';
-  else if (BF > 3) evidence = 'Sustancial para H₁';
-  else if (BF > 1) evidence = 'Débil para H₁ (anecdótico)';
-  else if (BF > 1/3) evidence = 'Débil para H₀';
-  else if (BF > 1/10) evidence = 'Sustancial para H₀';
-  else evidence = 'Fuerte para H₀';
-  document.getElementById('bfEvidence').textContent = evidence;
-  showFeedback(`⚖️ BF₁₀ = ${BF.toFixed(3)}. ${evidence}. ¿Qué tan fuerte es tu evidencia?`);
-  checkCompletion();
+ const s = parseInt(document.getElementById('bfSS').value);
+ const n = parseInt(document.getElementById('bfNS').value);
+ const f = n - s;
+ const p1 = Math.pow(0.5, s) * Math.pow(0.5, f);
+ const p0 = Math.pow(0.3, s) * Math.pow(0.7, f);
+ const BF = p1 / p0;
+ document.getElementById('bfResult').textContent = BF.toFixed(3);
+ let evidence;
+ if (BF > 100) evidence = 'Decisivo para H₁';
+ else if (BF > 30) evidence = 'Muy fuerte para H₁';
+ else if (BF > 10) evidence = 'Fuerte para H₁';
+ else if (BF > 3) evidence = 'Sustancial para H₁';
+ else if (BF > 1) evidence = 'Débil para H₁ (anecdótico)';
+ else if (BF > 1/3) evidence = 'Débil para H₀';
+ else if (BF > 1/10) evidence = 'Sustancial para H₀';
+ else evidence = 'Fuerte para H₀';
+ document.getElementById('bfEvidence').textContent = evidence;
+ showFeedback(`⚖️ BF₁₀ = ${BF.toFixed(3)}. ${evidence}. ¿Qué tan fuerte es tu evidencia?`);
+ checkCompletion();
 }
 
 function checkCompletion() {
-  if (!completed) {
-    completed = true;
-    document.getElementById('insigniaArea').classList.remove('hidden');
-    localStorage.setItem(STORAGE_KEY, 'true');
-  }
+ if (!completed) {
+  completed = true;
+  document.getElementById('insigniaArea').classList.remove('hidden');
+  localStorage.setItem(STORAGE_KEY, 'true');
+ }
 }
 
 function showFeedback(msg) {
-  document.getElementById('feedbackMsg').innerHTML = msg;
+ document.getElementById('feedbackMsg').innerHTML = msg;
 }
 
 function restoreProgress() {
-  if (localStorage.getItem(STORAGE_KEY) === 'true') {
-    completed = true;
-    document.getElementById('insigniaArea').classList.remove('hidden');
-    showFeedback('🏆 ¡Ya completaste este módulo! Repasa los conceptos.');
-  }
+ if (localStorage.getItem(STORAGE_KEY) === 'true') {
+  completed = true;
+  document.getElementById('insigniaArea').classList.remove('hidden');
+  showFeedback('🏆 ¡Ya completaste este módulo! Repasa los conceptos.');
+ }
 }
 
 // Initialize canvas for beta vis
 window.addEventListener('DOMContentLoaded', () => {
-  const container = document.getElementById('betaVis');
-  const canvas = document.createElement('canvas');
-  canvas.id = 'betaVis';
-  canvas.width = 600;
-  canvas.height = 140;
-  canvas.style.width = '100%';
-  canvas.style.height = '140px';
-  container.parentNode.replaceChild(canvas, container);
-  updateBayes();
-  
-  const canvas2 = document.createElement('canvas');
-  canvas2.id = 'seqVis';
-  canvas2.width = 600;
-  canvas2.height = 140;
-  canvas2.style.width = '100%';
-  canvas2.style.height = '140px';
-  document.getElementById('seqVis').parentNode.replaceChild(canvas2, document.getElementById('seqVis'));
-  sequentialUpdate();
+ const container = document.getElementById('betaVis');
+ const canvas = document.createElement('canvas');
+ canvas.id = 'betaVis';
+ canvas.width = 600;
+ canvas.height = 140;
+ canvas.style.width = '100%';
+ canvas.style.height = '140px';
+ container.parentNode.replaceChild(canvas, container);
+ updateBayes();
+ 
+ const canvas2 = document.createElement('canvas');
+ canvas2.id = 'seqVis';
+ canvas2.width = 600;
+ canvas2.height = 140;
+ canvas2.style.width = '100%';
+ canvas2.style.height = '140px';
+ document.getElementById('seqVis').parentNode.replaceChild(canvas2, document.getElementById('seqVis'));
+ sequentialUpdate();
 });
 
 restoreProgress();
 </script>
-<script src="../../assets/js/cookie-consent.js"></script>
 </body>
 </html>

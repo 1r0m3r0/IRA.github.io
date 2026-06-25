@@ -1,104 +1,104 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Curso 5: Transacciones y Concurrencia | SQL Medio</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <link rel="stylesheet" href="../../../assets/css/theme.css">
-  <style>
-    :root{--c-accent:#ff5050;--c-hue:0;--c-glow:hsla(0,90%,55%,0.15);--c-gradient:linear-gradient(135deg,#fff,#ff5050);}
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:'Inter',sans-serif;background:#0a0e0f;color:#e8edee;min-height:100vh}
-    .tech-grid{position:fixed;inset:0;background-image:linear-gradient(rgba(255,255,255,0.02)1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.02)1px,transparent 1px);background-size:60px 60px;z-index:0;pointer-events:none}
-    .gradient-orb{position:fixed;border-radius:50%;filter:blur(120px);z-index:0;pointer-events:none}
-    .orb-1{width:600px;height:600px;background:hsla(0,70%,40%,0.12);top:-200px;right:-200px}
-    .orb-2{width:500px;height:500px;background:hsla(220,70%,40%,0.10);bottom:-150px;left:-150px}
-    .container{max-width:1200px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
-    .hero-section{padding:140px 0 40px;text-align:center}
-    .hero-section h1{font-size:clamp(2rem,5vw,3rem);font-weight:800;background:var(--c-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:12px}
-    .hero-section .subtitle{color:#8899aa;font-size:1.1rem;max-width:700px;margin:0 auto 32px;line-height:1.6}
-    .hero-emoji{font-size:3rem;margin-bottom:8px;display:block}
-    .progress-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:20px 24px;margin-bottom:32px;backdrop-filter:blur(12px)}
-    .progress-row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px}
-    .progress-label{color:#8899aa;font-size:0.9rem}
-    .progress-pct{color:var(--c-accent);font-size:0.9rem;font-weight:700}
-    .bar-track{height:6px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden}
-    .bar-fill{height:100%;background:var(--c-gradient);border-radius:3px;width:0%;transition:width .5s ease}
-    .program-progress{margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.06)}
-    .program-progress .mini-text{color:#667788;font-size:0.8rem}
-    .modules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;margin-bottom:40px}
-    .module-item{display:flex;align-items:center;gap:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:14px 18px;text-decoration:none;color:inherit;transition:all .3s ease}
-    .module-item:hover{transform:translateY(-2px);border-color:var(--c-accent);box-shadow:0 4px 20px var(--c-glow)}
-    .module-item .num{width:32px;height:32px;border-radius:50%;background:var(--c-accent);color:#000;font-weight:800;font-size:.85rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-    .module-item .title{flex:1;font-weight:500;font-size:.95rem}
-    .module-item .status{font-size:1rem;width:24px;text-align:center;flex-shrink:0}
-    footer{text-align:center;padding:32px 0;color:#667788;font-size:.85rem;border-top:1px solid rgba(255,255,255,0.06)}
-    @media(max-width:768px){.modules-grid{grid-template-columns:1fr}.hero-section{padding-top:100px}}
-  </style>
+ <meta charset="UTF-8">
+ <link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Curso 5: Transacciones y Concurrencia | SQL Medio</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
+ <style>
+  :root{--c-accent:#ff5050;--c-hue:0;--c-glow:hsla(0,90%,55%,0.15);--c-gradient:linear-gradient(135deg,#fff,#ff5050);}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:#0a0e0f;color:#e8edee;min-height:100vh}
+  .tech-grid{position:fixed;inset:0;background-image:linear-gradient(rgba(255,255,255,0.02)1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.02)1px,transparent 1px);background-size:60px 60px;z-index:0;pointer-events:none}
+  .gradient-orb{position:fixed;border-radius:50%;filter:blur(120px);z-index:0;pointer-events:none}
+  .orb-1{width:600px;height:600px;background:hsla(0,70%,40%,0.12);top:-200px;right:-200px}
+  .orb-2{width:500px;height:500px;background:hsla(220,70%,40%,0.10);bottom:-150px;left:-150px}
+  .container{max-width:1200px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+  .hero-section{padding:140px 0 40px;text-align:center}
+  .hero-section h1{font-size:clamp(2rem,5vw,3rem);font-weight:800;background:var(--c-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:12px}
+  .hero-section .subtitle{color:#8899aa;font-size:1.1rem;max-width:700px;margin:0 auto 32px;line-height:1.6}
+  .hero-emoji{font-size:3rem;margin-bottom:8px;display:block}
+  .progress-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:20px 24px;margin-bottom:32px;backdrop-filter:blur(12px)}
+  .progress-row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+  .progress-label{color:#8899aa;font-size:0.9rem}
+  .progress-pct{color:var(--c-accent);font-size:0.9rem;font-weight:700}
+  .bar-track{height:6px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden}
+  .bar-fill{height:100%;background:var(--c-gradient);border-radius:3px;width:0%;transition:width .5s ease}
+  .program-progress{margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.06)}
+  .program-progress .mini-text{color:#667788;font-size:0.8rem}
+  .modules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;margin-bottom:40px}
+  .module-item{display:flex;align-items:center;gap:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:14px 18px;text-decoration:none;color:inherit;transition:all .3s ease}
+  .module-item:hover{transform:translateY(-2px);border-color:var(--c-accent);box-shadow:0 4px 20px var(--c-glow)}
+  .module-item .num{width:32px;height:32px;border-radius:50%;background:var(--c-accent);color:#000;font-weight:800;font-size:.85rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .module-item .title{flex:1;font-weight:500;font-size:.95rem}
+  .module-item .status{font-size:1rem;width:24px;text-align:center;flex-shrink:0}
+  footer{text-align:center;padding:32px 0;color:#667788;font-size:.85rem;border-top:1px solid rgba(255,255,255,0.06)}
+  @media(max-width:768px){.modules-grid{grid-template-columns:1fr}.hero-section{padding-top:100px}}
+ </style>
 </head>
 <body>
-  <div class="tech-grid"></div>
-  <div class="gradient-orb orb-1"></div>
-  <div class="gradient-orb orb-2"></div>
-  <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a><a href="../index.html">Programa SQL Medio</a></nav>
-  <div class="container">
-    <div class="hero-section">
-      <span class="hero-emoji">🔐</span>
-      <h1>Curso 5: Transacciones y Concurrencia</h1>
-      <p class="subtitle">Controla transacciones con BEGIN/COMMIT/ROLLBACK, domina SAVEPOINT, niveles de aislamiento ACID, MVCC, locks y resolución de deadlocks en PostgreSQL.</p>
-    </div>
-    <div class="progress-card">
-      <div class="progress-row">
-        <span class="progress-label"><i class="fas fa-tasks"></i> Progreso del curso</span>
-        <span class="progress-pct" id="coursePct">0%</span>
-      </div>
-      <div class="bar-track"><div class="bar-fill" id="courseBar"></div></div>
-      <div class="program-progress">
-        <span class="mini-text"><i class="fas fa-chart-line"></i> Programa SQL Medio: <span id="progMods">0</span>/72 módulos - <span id="progPct">0%</span></span>
-        <div class="bar-track" style="margin-top:6px"><div class="bar-fill" id="progBar" style="width:0%"></div></div>
-      </div>
-    </div>
-    <div class="modules-grid">
-      <a href="01-begin-commit-rollback.html" class="module-item"><span class="num">1</span><span class="title">BEGIN / COMMIT / ROLLBACK</span><span class="status" data-module="49"></span></a>
-      <a href="02-savepoint.html" class="module-item"><span class="num">2</span><span class="title">SAVEPOINT</span><span class="status" data-module="50"></span></a>
-      <a href="03-acid.html" class="module-item"><span class="num">3</span><span class="title">ACID</span><span class="status" data-module="51"></span></a>
-      <a href="04-read-uncommitted-committed.html" class="module-item"><span class="num">4</span><span class="title">READ UNCOMMITTED / READ COMMITTED</span><span class="status" data-module="52"></span></a>
-      <a href="05-repeatable-read-serializable.html" class="module-item"><span class="num">5</span><span class="title">REPEATABLE READ / SERIALIZABLE</span><span class="status" data-module="53"></span></a>
-      <a href="06-anomalias-concurrencia.html" class="module-item"><span class="num">6</span><span class="title">Anomalías de Concurrencia</span><span class="status" data-module="54"></span></a>
-      <a href="07-for-update-share.html" class="module-item"><span class="num">7</span><span class="title">FOR UPDATE / FOR SHARE</span><span class="status" data-module="55"></span></a>
-      <a href="08-skip-locked-nowait.html" class="module-item"><span class="num">8</span><span class="title">SKIP LOCKED / NOWAIT</span><span class="status" data-module="56"></span></a>
-      <a href="09-deadlocks.html" class="module-item"><span class="num">9</span><span class="title">Deadlocks</span><span class="status" data-module="57"></span></a>
-      <a href="10-mvcc.html" class="module-item"><span class="num">10</span><span class="title">MVCC</span><span class="status" data-module="58"></span></a>
-      <a href="11-pg-locks.html" class="module-item"><span class="num">11</span><span class="title">pg_locks</span><span class="status" data-module="59"></span></a>
-      <a href="12-mini-proyecto-reservas.html" class="module-item"><span class="num">12</span><span class="title">Mini-Proyecto: Sistema de Reservas</span><span class="status" data-module="60"></span></a>
-    </div>
-    <footer><i class="fas fa-database"></i> Curso 5 - 12 módulos interactivos - PostgreSQL 19 - <span id="badgeCount">0</span> insignias</footer>
+ <div class="tech-grid"></div>
+ <div class="gradient-orb orb-1"></div>
+ <div class="gradient-orb orb-2"></div>
+ <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a><a href="../index.html">Programa SQL Medio</a></nav>
+ <div class="container">
+  <div class="hero-section">
+   <span class="hero-emoji">ðŸ”</span>
+   <h1>Curso 5: Transacciones y Concurrencia</h1>
+   <p class="subtitle">Controla transacciones con BEGIN/COMMIT/ROLLBACK, domina SAVEPOINT, niveles de aislamiento ACID, MVCC, locks y resoluciÃ³n de deadlocks en PostgreSQL.</p>
   </div>
-  <script>
-  (function(){
-    var P='sqlmedio',startMod=49;
-    function u(){
-      var d=JSON.parse(localStorage.getItem(P+'_progress'))||[],b=JSON.parse(localStorage.getItem(P+'_badges'))||[];
-      var cm=d.filter(function(m){return m>=startMod&&m<startMod+12});
-      document.getElementById('coursePct').textContent=cm.length+'/12';
-      document.getElementById('courseBar').style.width=Math.round(cm.length/12*100)+'%';
-      document.getElementById('progMods').textContent=d.length+'';
-      var pp=Math.round(d.length/72*100);
-      document.getElementById('progPct').textContent=pp+'%';
-      document.getElementById('progBar').style.width=pp+'%';
-      document.getElementById('badgeCount').textContent=b.length+'';
-      document.querySelectorAll('.module-item .status').forEach(function(el){
-        el.textContent=(d.indexOf(parseInt(el.dataset.module))>=0)?'\u2705':'\u23F3';
-      });
-    }
-    u(); setInterval(u,2000);
-    document.querySelectorAll('.module-item').forEach(function(a){
-      a.addEventListener('click',function(){localStorage.setItem(P+'_last','curso-5-transacciones/'+this.getAttribute('href'));});
-    });
-  })();
-  </script>
+  <div class="progress-card">
+   <div class="progress-row">
+    <span class="progress-label"><i class="fas fa-tasks"></i> Progreso del curso</span>
+    <span class="progress-pct" id="coursePct">0%</span>
+   </div>
+   <div class="bar-track"><div class="bar-fill" id="courseBar"></div></div>
+   <div class="program-progress">
+    <span class="mini-text"><i class="fas fa-chart-line"></i> Programa SQL Medio: <span id="progMods">0</span>/72 mÃ³dulos - <span id="progPct">0%</span></span>
+    <div class="bar-track" style="margin-top:6px"><div class="bar-fill" id="progBar" style="width:0%"></div></div>
+   </div>
+  </div>
+  <div class="modules-grid">
+   <a href="01-begin-commit-rollback.html" class="module-item"><span class="num">1</span><span class="title">BEGIN / COMMIT / ROLLBACK</span><span class="status" data-module="49"></span></a>
+   <a href="02-savepoint.html" class="module-item"><span class="num">2</span><span class="title">SAVEPOINT</span><span class="status" data-module="50"></span></a>
+   <a href="03-acid.html" class="module-item"><span class="num">3</span><span class="title">ACID</span><span class="status" data-module="51"></span></a>
+   <a href="04-read-uncommitted-committed.html" class="module-item"><span class="num">4</span><span class="title">READ UNCOMMITTED / READ COMMITTED</span><span class="status" data-module="52"></span></a>
+   <a href="05-repeatable-read-serializable.html" class="module-item"><span class="num">5</span><span class="title">REPEATABLE READ / SERIALIZABLE</span><span class="status" data-module="53"></span></a>
+   <a href="06-anomalias-concurrencia.html" class="module-item"><span class="num">6</span><span class="title">AnomalÃ­as de Concurrencia</span><span class="status" data-module="54"></span></a>
+   <a href="07-for-update-share.html" class="module-item"><span class="num">7</span><span class="title">FOR UPDATE / FOR SHARE</span><span class="status" data-module="55"></span></a>
+   <a href="08-skip-locked-nowait.html" class="module-item"><span class="num">8</span><span class="title">SKIP LOCKED / NOWAIT</span><span class="status" data-module="56"></span></a>
+   <a href="09-deadlocks.html" class="module-item"><span class="num">9</span><span class="title">Deadlocks</span><span class="status" data-module="57"></span></a>
+   <a href="10-mvcc.html" class="module-item"><span class="num">10</span><span class="title">MVCC</span><span class="status" data-module="58"></span></a>
+   <a href="11-pg-locks.html" class="module-item"><span class="num">11</span><span class="title">pg_locks</span><span class="status" data-module="59"></span></a>
+   <a href="12-mini-proyecto-reservas.html" class="module-item"><span class="num">12</span><span class="title">Mini-Proyecto: Sistema de Reservas</span><span class="status" data-module="60"></span></a>
+  </div>
+  <footer><i class="fas fa-database"></i> Curso 5 - 12 mÃ³dulos interactivos - PostgreSQL 19 - <span id="badgeCount">0</span> insignias</footer>
+ </div>
+ <script>
+ (function(){
+  var P='sqlmedio',startMod=49;
+  function u(){
+   var d=JSON.parse(localStorage.getItem(P+'_progress'))||[],b=JSON.parse(localStorage.getItem(P+'_badges'))||[];
+   var cm=d.filter(function(m){return m>=startMod&&m<startMod+12});
+   document.getElementById('coursePct').textContent=cm.length+'/12';
+   document.getElementById('courseBar').style.width=Math.round(cm.length/12*100)+'%';
+   document.getElementById('progMods').textContent=d.length+'';
+   var pp=Math.round(d.length/72*100);
+   document.getElementById('progPct').textContent=pp+'%';
+   document.getElementById('progBar').style.width=pp+'%';
+   document.getElementById('badgeCount').textContent=b.length+'';
+   document.querySelectorAll('.module-item .status').forEach(function(el){
+    el.textContent=(d.indexOf(parseInt(el.dataset.module))>=0)?'\u2705':'\u23F3';
+   });
+  }
+  u(); setInterval(u,2000);
+  document.querySelectorAll('.module-item').forEach(function(a){
+   a.addEventListener('click',function(){localStorage.setItem(P+'_last','curso-5-transacciones/'+this.getAttribute('href'));});
+  });
+ })();
+ </script>
 <script src="../../../assets/js/i18n.js"></script>  </body>
 </html>

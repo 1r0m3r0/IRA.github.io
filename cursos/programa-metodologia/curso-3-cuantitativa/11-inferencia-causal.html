@@ -1,188 +1,187 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Curso 3: Cuantitativa | Inferencia Causal</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&amp;display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%);background-size:200% 200%;animation:gradientShift 20s ease infinite;font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
-    @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-    .modulo-container{max-width:1300px;width:100%;background:rgba(15,25,45,0.65);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(20,184,166,0.25);box-shadow:0 25px 45px rgba(0,0,0,0.5);overflow:hidden}
-    .hero-header{background:linear-gradient(95deg,#0b1120,#111a2e);padding:2rem 2rem 1.5rem;text-align:center;border-bottom:2px solid #14b8a6}
-    .hero-header h1{font-size:2.6rem;font-weight:800;background:linear-gradient(135deg,#FFF,#5eead4,#14b8a6);-webkit-background-clip:text;background-clip:text;color:transparent}
-    .hero-header p{font-size:1.1rem;color:#99f6e4;margin-top:0.5rem;font-weight:500}
-    .badge-area{display:flex;justify-content:center;gap:1rem;margin-top:1.2rem;flex-wrap:wrap}
-    .chip{background:rgba(20,184,166,0.15);border:1px solid #14b8a6;padding:0.4rem 1rem;border-radius:40px;font-size:0.8rem;font-weight:600}
-    .analogy-card{background:#1e2a3acc;margin:1.5rem 2rem;padding:1.2rem 1.8rem;border-radius:2rem;border-left:8px solid #14b8a6;font-size:1rem;line-height:1.6}
-    .main-area{padding:0 2rem 2rem}
-    .dag-area{background:#0a0f1e;border-radius:1.5rem;padding:1.5rem;margin:1rem 0;text-align:center;position:relative;min-height:200px}
-    .dag-node{display:inline-block;background:#1a2a44;border:2px solid rgba(20,184,166,0.3);border-radius:1.5rem;padding:0.5rem 1rem;margin:0.3rem;font-weight:600;cursor:pointer;transition:0.2s;font-size:0.85rem}
-    .dag-node:hover{border-color:#14b8a6}
-    .dag-node.selected{background:rgba(20,184,166,0.2);border-color:#14b8a6;box-shadow:0 0 8px rgba(20,184,166,0.3)}
-    .dag-node.confounder{background:rgba(255,107,107,0.2);border-color:#ff6b6b}
-    .dag-node.collider{background:rgba(255,215,0,0.2);border-color:#ffd700}
-    .dag-arrow{font-size:2rem;color:#5eead4;margin:0 0.3rem}
-    .dag-label{font-size:0.75rem;color:#99f6e4;margin-top:0.3rem}
-    .causal-controls{display:flex;flex-wrap:wrap;gap:0.8rem;justify-content:center;margin:0.5rem 0}
-    .btn-action{background:linear-gradient(95deg,#14b8a6,#5eead4);border:none;padding:0.7rem 1.5rem;font-weight:bold;border-radius:3rem;cursor:pointer;font-size:0.9rem;transition:0.2s;color:#0a0f1e;font-family:'Inter',sans-serif}
-    .btn-action:hover{transform:translateY(-2px);box-shadow:0 0 15px rgba(20,184,166,0.5)}
-    .btn-action:disabled{opacity:0.4;cursor:not-allowed;transform:none}
-    .causal-stats{display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;margin:0.8rem 0}
-    .stat-pill{background:#0f1a2ce0;border-radius:1.5rem;padding:0.5rem 1.2rem;text-align:center;border:1px solid rgba(20,184,166,0.1);min-width:100px}
-    .stat-pill h4{font-size:0.65rem;color:#99f6e4}
-    .stat-pill .val{font-size:1.3rem;font-weight:700}
-    .feedback{background:#00000099;margin:0 2rem 1.5rem;padding:1rem;border-radius:1.5rem;text-align:center;font-weight:500;border-left:4px solid #14b8a6}
-    .insignia{text-align:center;background:#0c1b2f;border-radius:2rem;margin:0 2rem 1.5rem;padding:1rem;border:1px dashed gold}
-    .insignia i{font-size:2.5rem;color:gold}
-    .hidden{display:none}
-    .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.5rem 2rem}
-    .nav-link{background:#2c3e66;padding:0.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:0.5rem;transition:0.2s}
-    .nav-link:hover{transform:translateY(-2px);box-shadow:0 0 10px rgba(20,184,166,0.4)}
-    .nav-link.next{background:linear-gradient(95deg,#14b8a6,#5eead4);color:#0a0f1e}
-    .nav-link.menu{background:#1a2a4a;border:1px solid #14b8a6}
-    .nav-link.disabled{opacity:0.4;pointer-events:none}
-    footer{text-align:center;padding:1.2rem;font-size:0.8rem;border-top:1px solid rgba(20,184,166,0.2)}
-    @media(max-width:800px){.hero-header h1{font-size:1.9rem}}
-  </style>
-  <link rel="stylesheet" href="../../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Curso 3: Cuantitativa | Inferencia Causal</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&amp;display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%);background-size:200% 200%;animation:gradientShift 20s ease infinite;font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
+  @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+  .modulo-container{max-width:1300px;width:100%;background:rgba(15,25,45,0.65);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(20,184,166,0.25);box-shadow:0 25px 45px rgba(0,0,0,0.5);overflow:hidden}
+  .hero-header{background:linear-gradient(95deg,#0b1120,#111a2e);padding:2rem 2rem 1.5rem;text-align:center;border-bottom:2px solid #14b8a6}
+  .hero-header h1{font-size:2.6rem;font-weight:800;background:linear-gradient(135deg,#FFF,#5eead4,#14b8a6);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero-header p{font-size:1.1rem;color:#99f6e4;margin-top:0.5rem;font-weight:500}
+  .badge-area{display:flex;justify-content:center;gap:1rem;margin-top:1.2rem;flex-wrap:wrap}
+  .chip{background:rgba(20,184,166,0.15);border:1px solid #14b8a6;padding:0.4rem 1rem;border-radius:40px;font-size:0.8rem;font-weight:600}
+  .analogy-card{background:#1e2a3acc;margin:1.5rem 2rem;padding:1.2rem 1.8rem;border-radius:2rem;border-left:8px solid #14b8a6;font-size:1rem;line-height:1.6}
+  .main-area{padding:0 2rem 2rem}
+  .dag-area{background:#0a0f1e;border-radius:1.5rem;padding:1.5rem;margin:1rem 0;text-align:center;position:relative;min-height:200px}
+  .dag-node{display:inline-block;background:#1a2a44;border:2px solid rgba(20,184,166,0.3);border-radius:1.5rem;padding:0.5rem 1rem;margin:0.3rem;font-weight:600;cursor:pointer;transition:0.2s;font-size:0.85rem}
+  .dag-node:hover{border-color:#14b8a6}
+  .dag-node.selected{background:rgba(20,184,166,0.2);border-color:#14b8a6;box-shadow:0 0 8px rgba(20,184,166,0.3)}
+  .dag-node.confounder{background:rgba(255,107,107,0.2);border-color:#ff6b6b}
+  .dag-node.collider{background:rgba(255,215,0,0.2);border-color:#ffd700}
+  .dag-arrow{font-size:2rem;color:#5eead4;margin:0 0.3rem}
+  .dag-label{font-size:0.75rem;color:#99f6e4;margin-top:0.3rem}
+  .causal-controls{display:flex;flex-wrap:wrap;gap:0.8rem;justify-content:center;margin:0.5rem 0}
+  .btn-action{background:linear-gradient(95deg,#14b8a6,#5eead4);border:none;padding:0.7rem 1.5rem;font-weight:bold;border-radius:3rem;cursor:pointer;font-size:0.9rem;transition:0.2s;color:#0a0f1e;font-family:'Inter',sans-serif}
+  .btn-action:hover{transform:translateY(-2px);box-shadow:0 0 15px rgba(20,184,166,0.5)}
+  .btn-action:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+  .causal-stats{display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;margin:0.8rem 0}
+  .stat-pill{background:#0f1a2ce0;border-radius:1.5rem;padding:0.5rem 1.2rem;text-align:center;border:1px solid rgba(20,184,166,0.1);min-width:100px}
+  .stat-pill h4{font-size:0.65rem;color:#99f6e4}
+  .stat-pill .val{font-size:1.3rem;font-weight:700}
+  .feedback{background:#00000099;margin:0 2rem 1.5rem;padding:1rem;border-radius:1.5rem;text-align:center;font-weight:500;border-left:4px solid #14b8a6}
+  .insignia{text-align:center;background:#0c1b2f;border-radius:2rem;margin:0 2rem 1.5rem;padding:1rem;border:1px dashed gold}
+  .insignia i{font-size:2.5rem;color:gold}
+  .hidden{display:none}
+  .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.5rem 2rem}
+  .nav-link{background:#2c3e66;padding:0.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:0.5rem;transition:0.2s}
+  .nav-link:hover{transform:translateY(-2px);box-shadow:0 0 10px rgba(20,184,166,0.4)}
+  .nav-link.next{background:linear-gradient(95deg,#14b8a6,#5eead4);color:#0a0f1e}
+  .nav-link.menu{background:#1a2a4a;border:1px solid #14b8a6}
+  .nav-link.disabled{opacity:0.4;pointer-events:none}
+  footer{text-align:center;padding:1.2rem;font-size:0.8rem;border-top:1px solid rgba(20,184,166,0.2)}
+  @media(max-width:800px){.hero-header h1{font-size:1.9rem}}
+ </style>
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
 </head>
 <body>
-  <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Metodolog&iacute;a</a></nav>
+ <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Metodolog&iacute;a</a></nav>
 
 <div class="modulo-container">
-  <div class="hero-header">
-    <h1><i class="fas fa-project-diagram"></i> Inferencia Causal: DAGs, IV, Double ML</h1>
-    <p>Correlaci&oacute;n no es causalidad — aprende a distinguirlas</p>
-    <div class="badge-area">
-      <span class="chip"><i class="fas fa-code-branch"></i> DAG</span>
-      <span class="chip"><i class="fas fa-eye-slash"></i> Confusor</span>
-      <span class="chip"><i class="fas fa-bullseye"></i> ATE</span>
-    </div>
+ <div class="hero-header">
+  <h1><i class="fas fa-project-diagram"></i> Inferencia Causal: DAGs, IV, Double ML</h1>
+  <p>Correlaci&oacute;n no es causalidad — aprende a distinguirlas</p>
+  <div class="badge-area">
+   <span class="chip"><i class="fas fa-code-branch"></i> DAG</span>
+   <span class="chip"><i class="fas fa-eye-slash"></i> Confusor</span>
+   <span class="chip"><i class="fas fa-bullseye"></i> ATE</span>
   </div>
+ </div>
 
-  <div class="analogy-card">
-    <strong><i class="fas fa-map-signs"></i> Piénsalo así:</strong> Correlaci&oacute;n no es causalidad — los DAGs son mapas de ruta que muestran direcciones de causalidad. Un confusor es como un amigo que siempre aparece donde hay pelea pero no es quien pelea.
-  </div>
+ <div class="analogy-card">
+  <strong><i class="fas fa-map-signs"></i> Piénsalo así:</strong> Correlaci&oacute;n no es causalidad — los DAGs son mapas de ruta que muestran direcciones de causalidad. Un confusor es como un amigo que siempre aparece donde hay pelea pero no es quien pelea.
+ </div>
 
-  <div class="main-area">
-    <div style="text-align:center;margin-bottom:0.5rem;">
-      <p style="color:#99f6e4;font-weight:600;"><i class="fas fa-hand-pointer"></i> Explora el DAG: selecciona un nodo para ver sesgos</p>
-    </div>
-    <div class="dag-area" id="dagArea">
-      <div style="display:flex;align-items:center;justify-content:center;flex-wrap:wrap;">
-        <span class="dag-node" data-node="hielo">Ventas de helado</span>
-        <span class="dag-arrow">&rarr;</span>
-        <span class="dag-node" data-node="volume">Volume</span>
-        <span class="dag-arrow">?</span>
-        <span class="dag-node" data-node="crimen">Tasa de crimen</span>
-      </div>
-      <div style="margin-top:1rem;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;">
-        <span style="color:#ff6b6b;font-size:0.85rem;"><i class="fas fa-exclamation-triangle"></i> Confusor:</span>
-        <span class="dag-node confounder" data-node="temp">Temperatura</span>
-        <span style="color:#8899bb;font-size:0.8rem;margin-left:0.5rem;">&rarr; causa tanto el helado como el crimen</span>
-      </div>
-      <div class="dag-label" id="dagInfo">Haz clic en cualquier nodo para ver su rol causal</div>
-    </div>
-    <div class="causal-controls">
-      <button id="estimateATEbtn" class="btn-action"><i class="fas fa-calculator"></i> Estimar ATE (Double ML)</button>
-      <button id="resetCausalBtn" class="btn-action" style="background:#2c3e66;color:#eef5ff;"><i class="fas fa-redo"></i> Reiniciar</button>
-    </div>
-    <div class="causal-stats">
-      <div class="stat-pill"><h4>ATE estimado</h4><div class="val" id="ateVal" style="color:#14b8a6">?</div></div>
-      <div class="stat-pill"><h4>IC 95%</h4><div class="val" id="ciVal" style="color:#5eead4;font-size:0.9rem;">-</div></div>
-      <div class="stat-pill"><h4>p-valor</h4><div class="val" id="pCausal" style="color:#99f6e4">-</div></div>
-      <div class="stat-pill"><h4>Sesgo identificado</h4><div class="val" id="biasType" style="color:#ffd700;font-size:0.9rem;">-</div></div>
-    </div>
+ <div class="main-area">
+  <div style="text-align:center;margin-bottom:0.5rem;">
+   <p style="color:#99f6e4;font-weight:600;"><i class="fas fa-hand-pointer"></i> Explora el DAG: selecciona un nodo para ver sesgos</p>
   </div>
+  <div class="dag-area" id="dagArea">
+   <div style="display:flex;align-items:center;justify-content:center;flex-wrap:wrap;">
+    <span class="dag-node" data-node="hielo">Ventas de helado</span>
+    <span class="dag-arrow">&rarr;</span>
+    <span class="dag-node" data-node="volume">Volume</span>
+    <span class="dag-arrow">?</span>
+    <span class="dag-node" data-node="crimen">Tasa de crimen</span>
+   </div>
+   <div style="margin-top:1rem;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;">
+    <span style="color:#ff6b6b;font-size:0.85rem;"><i class="fas fa-exclamation-triangle"></i> Confusor:</span>
+    <span class="dag-node confounder" data-node="temp">Temperatura</span>
+    <span style="color:#8899bb;font-size:0.8rem;margin-left:0.5rem;">&rarr; causa tanto el helado como el crimen</span>
+   </div>
+   <div class="dag-label" id="dagInfo">Haz clic en cualquier nodo para ver su rol causal</div>
+  </div>
+  <div class="causal-controls">
+   <button id="estimateATEbtn" class="btn-action"><i class="fas fa-calculator"></i> Estimar ATE (Double ML)</button>
+   <button id="resetCausalBtn" class="btn-action" style="background:#2c3e66;color:#eef5ff;"><i class="fas fa-redo"></i> Reiniciar</button>
+  </div>
+  <div class="causal-stats">
+   <div class="stat-pill"><h4>ATE estimado</h4><div class="val" id="ateVal" style="color:#14b8a6">?</div></div>
+   <div class="stat-pill"><h4>IC 95%</h4><div class="val" id="ciVal" style="color:#5eead4;font-size:0.9rem;">-</div></div>
+   <div class="stat-pill"><h4>p-valor</h4><div class="val" id="pCausal" style="color:#99f6e4">-</div></div>
+   <div class="stat-pill"><h4>Sesgo identificado</h4><div class="val" id="biasType" style="color:#ffd700;font-size:0.9rem;">-</div></div>
+  </div>
+ </div>
 
-  <div id="feedbackMsg" class="feedback">
-    <i class="fas fa-lightbulb"></i> Observa el DAG: Temperatura es un confusor que afecta tanto a helado como a crimen, creando una correlaci&oacute;n espuria. Pulsa "Estimar ATE" para ver el efecto causal real.
-  </div>
+ <div id="feedbackMsg" class="feedback">
+  <i class="fas fa-lightbulb"></i> Observa el DAG: Temperatura es un confusor que afecta tanto a helado como a crimen, creando una correlaci&oacute;n espuria. Pulsa "Estimar ATE" para ver el efecto causal real.
+ </div>
 
-  <div id="insigniaArea" class="insignia hidden">
-    <i class="fas fa-medal"></i>
-    <h3>&#127941; Detective Causal &#127941;</h3>
-    <p>&iexcl;Identificas confusores, colisionadores y estimas efectos causales como un experto!</p>
-  </div>
+ <div id="insigniaArea" class="insignia hidden">
+  <i class="fas fa-medal"></i>
+  <h3>&#127941; Detective Causal &#127941;</h3>
+  <p>&iexcl;Identificas confusores, colisionadores y estimas efectos causales como un experto!</p>
+ </div>
 
-  <div class="nav-links">
-    <a href="10-ml-investigacion.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
-    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
-    <a href="12-certificado.html" id="nextLink11" class="nav-link next disabled">Siguiente <i class="fas fa-arrow-right"></i></a>
-  </div>
-  <footer><i class="fas fa-crown"></i> Programa Metodolog&iacute;a &middot; Curso 3: Investigaci&oacute;n Cuantitativa</footer>
+ <div class="nav-links">
+  <a href="10-ml-investigacion.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
+  <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
+  <a href="12-certificado.html" id="nextLink11" class="nav-link next disabled">Siguiente <i class="fas fa-arrow-right"></i></a>
+ </div>
+ <footer><i class="fas fa-crown"></i> Programa Metodolog&iacute;a &middot; Curso 3: Investigaci&oacute;n Cuantitativa</footer>
 </div>
 
 <script>
-  const STORAGE_KEY = 'meto_3_11';
-  let ateEstimated = false;
+ const STORAGE_KEY = 'meto_3_11';
+ let ateEstimated = false;
 
-  document.querySelectorAll('.dag-node').forEach(node => {
-    node.addEventListener('click', () => {
-      document.querySelectorAll('.dag-node').forEach(n => n.classList.remove('selected'));
-      node.classList.add('selected');
-      const name = node.dataset.node;
-      const info = document.getElementById('dagInfo');
-      if (name === 'temp') {
-        info.innerHTML = '<strong style="color:#ff6b6b;">Confusor:</strong> Temperatura causa tanto ventas de helado como tasa de crimen. Al no controlarla, ves una correlaci&oacute;n falsa entre helado y crimen.';
-        document.getElementById('biasType').textContent = 'Confusor';
-      } else if (name === 'hielo') {
-        info.innerHTML = '<strong style="color:#14b8a6;">Exposici&oacute;n (Tratamiento):</strong> Ventas de helado. Su efecto sobre el crimen est&aacute; contaminado por el confusor temperatura.';
-        document.getElementById('biasType').textContent = 'Exposici&oacute;n';
-      } else if (name === 'crimen') {
-        info.innerHTML = '<strong style="color:#14b8a6;">Outcome (Resultado):</strong> Tasa de crimen. Sin ajustar por confusores, parece que el helado aumenta el crimen, pero es la temperatura.';
-        document.getElementById('biasType').textContent = 'Outcome';
-      } else if (name === 'volume') {
-        info.innerHTML = '<strong style="color:#ffd700;">Colisionador potencial:</strong> &quot;Volume&quot; podr&iacute;a ser un colisionador si lo condicionamos incorrectamente. Cuidado con sesgos de selecci&oacute;n.';
-        document.getElementById('biasType').textContent = 'Colisionador';
-      }
-    });
+ document.querySelectorAll('.dag-node').forEach(node => {
+  node.addEventListener('click', () => {
+   document.querySelectorAll('.dag-node').forEach(n => n.classList.remove('selected'));
+   node.classList.add('selected');
+   const name = node.dataset.node;
+   const info = document.getElementById('dagInfo');
+   if (name === 'temp') {
+    info.innerHTML = '<strong style="color:#ff6b6b;">Confusor:</strong> Temperatura causa tanto ventas de helado como tasa de crimen. Al no controlarla, ves una correlaci&oacute;n falsa entre helado y crimen.';
+    document.getElementById('biasType').textContent = 'Confusor';
+   } else if (name === 'hielo') {
+    info.innerHTML = '<strong style="color:#14b8a6;">Exposici&oacute;n (Tratamiento):</strong> Ventas de helado. Su efecto sobre el crimen est&aacute; contaminado por el confusor temperatura.';
+    document.getElementById('biasType').textContent = 'Exposici&oacute;n';
+   } else if (name === 'crimen') {
+    info.innerHTML = '<strong style="color:#14b8a6;">Outcome (Resultado):</strong> Tasa de crimen. Sin ajustar por confusores, parece que el helado aumenta el crimen, pero es la temperatura.';
+    document.getElementById('biasType').textContent = 'Outcome';
+   } else if (name === 'volume') {
+    info.innerHTML = '<strong style="color:#ffd700;">Colisionador potencial:</strong> &quot;Volume&quot; podr&iacute;a ser un colisionador si lo condicionamos incorrectamente. Cuidado con sesgos de selecci&oacute;n.';
+    document.getElementById('biasType').textContent = 'Colisionador';
+   }
   });
+ });
 
-  document.getElementById('estimateATEbtn').addEventListener('click', () => {
-    const trueATE = 0.02;
-    const noise = (Math.random() - 0.5) * 0.3;
-    const estimate = (trueATE + noise);
-    const se = 0.12;
-    const ciLo = (estimate - 1.96 * se).toFixed(2);
-    const ciHi = (estimate + 1.96 * se).toFixed(2);
-    const p = Math.random() * 0.8 + 0.1;
-    document.getElementById('ateVal').textContent = estimate.toFixed(2);
-    document.getElementById('ciVal').textContent = '[' + ciLo + ', ' + ciHi + ']';
-    document.getElementById('pCausal').textContent = p.toFixed(3);
-    if (!ateEstimated) {
-      document.getElementById('feedbackMsg').innerHTML = '<i class="fas fa-check-circle" style="color:#14b8a6"></i> ATE estimado por Double ML. El intervalo contiene el cero (no significativo), confirmando que helado no causa crimen.';
-    } else {
-      document.getElementById('feedbackMsg').innerHTML = '<i class="fas fa-sync" style="color:#14b8a6"></i> ATE re-estimado. El verdadero efecto es ~0 (no hay causalidad).';
-    }
-    ateEstimated = true;
-    document.getElementById('insigniaArea').classList.remove('hidden');
-    localStorage.setItem(STORAGE_KEY, 'done');
-    document.getElementById('nextLink11').classList.remove('disabled');
-  });
-
-  document.getElementById('resetCausalBtn').addEventListener('click', () => {
-    ateEstimated = false;
-    document.getElementById('ateVal').textContent = '?';
-    document.getElementById('ciVal').textContent = '-';
-    document.getElementById('pCausal').textContent = '-';
-    document.getElementById('biasType').textContent = '-';
-    document.getElementById('dagInfo').textContent = 'Haz clic en cualquier nodo para ver su rol causal';
-    document.querySelectorAll('.dag-node').forEach(n => n.classList.remove('selected'));
-    document.getElementById('feedbackMsg').innerHTML = '<i class="fas fa-lightbulb"></i> Panel reiniciado. Explora el DAG y estima el ATE.';
-  });
-
-  const saved = localStorage.getItem(STORAGE_KEY);
-  if (saved) {
-    document.getElementById('insigniaArea').classList.remove('hidden');
-    document.getElementById('nextLink11').classList.remove('disabled');
-    document.getElementById('feedbackMsg').innerHTML = '<i class="fas fa-check-circle" style="color:#14b8a6"></i> \u00a1M\u00f3dulo completado! Puedes seguir explorando la inferencia causal.';
+ document.getElementById('estimateATEbtn').addEventListener('click', () => {
+  const trueATE = 0.02;
+  const noise = (Math.random() - 0.5) * 0.3;
+  const estimate = (trueATE + noise);
+  const se = 0.12;
+  const ciLo = (estimate - 1.96 * se).toFixed(2);
+  const ciHi = (estimate + 1.96 * se).toFixed(2);
+  const p = Math.random() * 0.8 + 0.1;
+  document.getElementById('ateVal').textContent = estimate.toFixed(2);
+  document.getElementById('ciVal').textContent = '[' + ciLo + ', ' + ciHi + ']';
+  document.getElementById('pCausal').textContent = p.toFixed(3);
+  if (!ateEstimated) {
+   document.getElementById('feedbackMsg').innerHTML = '<i class="fas fa-check-circle" style="color:#14b8a6"></i> ATE estimado por Double ML. El intervalo contiene el cero (no significativo), confirmando que helado no causa crimen.';
+  } else {
+   document.getElementById('feedbackMsg').innerHTML = '<i class="fas fa-sync" style="color:#14b8a6"></i> ATE re-estimado. El verdadero efecto es ~0 (no hay causalidad).';
   }
+  ateEstimated = true;
+  document.getElementById('insigniaArea').classList.remove('hidden');
+  localStorage.setItem(STORAGE_KEY, 'done');
+  document.getElementById('nextLink11').classList.remove('disabled');
+ });
+
+ document.getElementById('resetCausalBtn').addEventListener('click', () => {
+  ateEstimated = false;
+  document.getElementById('ateVal').textContent = '?';
+  document.getElementById('ciVal').textContent = '-';
+  document.getElementById('pCausal').textContent = '-';
+  document.getElementById('biasType').textContent = '-';
+  document.getElementById('dagInfo').textContent = 'Haz clic en cualquier nodo para ver su rol causal';
+  document.querySelectorAll('.dag-node').forEach(n => n.classList.remove('selected'));
+  document.getElementById('feedbackMsg').innerHTML = '<i class="fas fa-lightbulb"></i> Panel reiniciado. Explora el DAG y estima el ATE.';
+ });
+
+ const saved = localStorage.getItem(STORAGE_KEY);
+ if (saved) {
+  document.getElementById('insigniaArea').classList.remove('hidden');
+  document.getElementById('nextLink11').classList.remove('disabled');
+  document.getElementById('feedbackMsg').innerHTML = '<i class="fas fa-check-circle" style="color:#14b8a6"></i> \u00a1M\u00f3dulo completado! Puedes seguir explorando la inferencia causal.';
+ }
 </script>
-  <script src="../../../assets/js/cookie-consent.js"></script>
-<script src="../../../assets/js/i18n.js"></script>  </body>
+ <script src="../../../assets/js/i18n.js"></script> </body>
 </html>

@@ -1,270 +1,270 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Estadística Inferencial | ANOVA de Dos Factores</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box;}
-    body{background:linear-gradient(135deg,#0a0f1e,#0c1222,#111a2e);background-size:200% 200%;animation:gradientShift 20s ease infinite;font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem;}
-    @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-    .modulo-container{max-width:1300px;width:100%;background:rgba(15,25,45,0.65);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(0,230,118,0.25);box-shadow:0 25px 45px rgba(0,0,0,0.5);overflow:hidden;}
-    .hero-header{background:linear-gradient(95deg,#0b1120,#111a2e);padding:2rem 2rem 1.5rem;text-align:center;border-bottom:2px solid #00e676;}
-    .hero-header h1{font-size:2.6rem;font-weight:800;background:linear-gradient(135deg,#FFF,#69f0ae,#00e676);-webkit-background-clip:text;background-clip:text;color:transparent;}
-    .hero-header p{font-size:1.1rem;color:#b9f5d8;margin-top:0.5rem;}
-    .badge-area{display:flex;justify-content:center;gap:1rem;margin-top:1.2rem;flex-wrap:wrap;}
-    .chip{background:rgba(0,230,118,0.15);border:1px solid #00e676;padding:0.4rem 1rem;border-radius:40px;font-size:0.8rem;font-weight:600;}
-    .analogy-card{background:#1e2a3acc;margin:1.5rem 2rem;padding:1.2rem 1.8rem;border-radius:2rem;border-left:8px solid #00e676;font-size:1rem;line-height:1.6;}
-    .main-area{padding:0 2rem 1rem;}
-    .panel-grid{display:flex;flex-wrap:wrap;gap:1.5rem;margin-bottom:1.5rem;}
-    .panel-card{flex:1;min-width:200px;background:#0f1a2be0;border-radius:1.5rem;padding:1.2rem;border:1px solid #334;text-align:center;}
-    .panel-card h3{color:#69f0ae;margin-bottom:0.5rem;}
-    .panel-card select,.panel-card input{background:#001e2f;border:1px solid #00e676;padding:0.5rem;border-radius:1rem;color:#fff;width:100%;margin:0.3rem 0;font-family:'Inter',sans-serif;}
-    .panel-card button{background:linear-gradient(95deg,#00e676,#00c853);border:none;padding:0.6rem 1.2rem;border-radius:2rem;font-weight:700;cursor:pointer;color:#0a0f1e;margin:0.3rem;transition:0.2s;}
-    .panel-card button:hover{transform:translateY(-2px);box-shadow:0 0 15px rgba(0,230,118,0.5);}
-    .results-area{background:#00000066;border-radius:1.5rem;padding:1.2rem;margin:1rem 0;}
-    .results-area table{width:100%;border-collapse:collapse;font-size:0.85rem;}
-    .results-area th,.results-area td{padding:0.5rem;text-align:center;border:1px solid #334;}
-    .results-area th{background:#0a1a2a;color:#69f0ae;}
-    .bar-chart{display:flex;align-items:flex-end;gap:0.5rem;height:120px;padding:0.5rem 0;justify-content:center;}
-    .bar{width:40px;border-radius:6px 6px 0 0;transition:height 0.5s ease;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;font-size:0.6rem;padding-bottom:4px;color:#000;font-weight:700;}
-    .bar-label{font-size:0.7rem;margin-top:4px;text-align:center;color:#b9f5d8;}
-    .feedback{background:#00000099;margin:0 2rem 1.5rem;padding:1rem;border-radius:1.5rem;text-align:center;font-weight:500;border-left:4px solid #00e676;}
-    .insignia{text-align:center;background:#0c1b2f;border-radius:2rem;margin:0 2rem 1.5rem;padding:1rem;border:1px dashed gold;}
-    .insignia i{font-size:2.5rem;color:gold;}
-    .hidden{display:none;}
-    .btn-action{background:linear-gradient(95deg,#f0a500,#ff6a00);border:none;padding:0.8rem 1.8rem;font-weight:700;border-radius:3rem;cursor:pointer;font-size:1rem;transition:0.2s;color:#1e1a0c;}
-    .btn-action:hover{transform:translateY(-2px);box-shadow:0 0 15px rgba(240,165,0,0.5);}
-    .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.5rem 2rem;}
-    .nav-link{background:#2c3e66;padding:0.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:0.5rem;transition:0.2s;}
-    .nav-link:hover{transform:translateY(-2px);box-shadow:0 0 10px rgba(0,224,255,0.4);}
-    .nav-link.next{background:linear-gradient(95deg,#f0a500,#ff6a00);color:#1e1a0c;}
-    .nav-link.menu{background:#1a2a4a;border:1px solid #3399ff;}
-    footer{text-align:center;padding:1.2rem;font-size:0.8rem;border-top:1px solid #2c3e66;}
-    @media(max-width:800px){.hero-header h1{font-size:1.9rem;}}
-  </style>
-  <link rel="stylesheet" href="../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>EstadÃ­stica Inferencial | ANOVA de Dos Factores</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:linear-gradient(135deg,#0a0f1e,#0c1222,#111a2e);background-size:200% 200%;animation:gradientShift 20s ease infinite;font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem;}
+  @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+  .modulo-container{max-width:1300px;width:100%;background:rgba(15,25,45,0.65);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(0,230,118,0.25);box-shadow:0 25px 45px rgba(0,0,0,0.5);overflow:hidden;}
+  .hero-header{background:linear-gradient(95deg,#0b1120,#111a2e);padding:2rem 2rem 1.5rem;text-align:center;border-bottom:2px solid #00e676;}
+  .hero-header h1{font-size:2.6rem;font-weight:800;background:linear-gradient(135deg,#FFF,#69f0ae,#00e676);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .hero-header p{font-size:1.1rem;color:#b9f5d8;margin-top:0.5rem;}
+  .badge-area{display:flex;justify-content:center;gap:1rem;margin-top:1.2rem;flex-wrap:wrap;}
+  .chip{background:rgba(0,230,118,0.15);border:1px solid #00e676;padding:0.4rem 1rem;border-radius:40px;font-size:0.8rem;font-weight:600;}
+  .analogy-card{background:#1e2a3acc;margin:1.5rem 2rem;padding:1.2rem 1.8rem;border-radius:2rem;border-left:8px solid #00e676;font-size:1rem;line-height:1.6;}
+  .main-area{padding:0 2rem 1rem;}
+  .panel-grid{display:flex;flex-wrap:wrap;gap:1.5rem;margin-bottom:1.5rem;}
+  .panel-card{flex:1;min-width:200px;background:#0f1a2be0;border-radius:1.5rem;padding:1.2rem;border:1px solid #334;text-align:center;}
+  .panel-card h3{color:#69f0ae;margin-bottom:0.5rem;}
+  .panel-card select,.panel-card input{background:#001e2f;border:1px solid #00e676;padding:0.5rem;border-radius:1rem;color:#fff;width:100%;margin:0.3rem 0;font-family:'Inter',sans-serif;}
+  .panel-card button{background:linear-gradient(95deg,#00e676,#00c853);border:none;padding:0.6rem 1.2rem;border-radius:2rem;font-weight:700;cursor:pointer;color:#0a0f1e;margin:0.3rem;transition:0.2s;}
+  .panel-card button:hover{transform:translateY(-2px);box-shadow:0 0 15px rgba(0,230,118,0.5);}
+  .results-area{background:#00000066;border-radius:1.5rem;padding:1.2rem;margin:1rem 0;}
+  .results-area table{width:100%;border-collapse:collapse;font-size:0.85rem;}
+  .results-area th,.results-area td{padding:0.5rem;text-align:center;border:1px solid #334;}
+  .results-area th{background:#0a1a2a;color:#69f0ae;}
+  .bar-chart{display:flex;align-items:flex-end;gap:0.5rem;height:120px;padding:0.5rem 0;justify-content:center;}
+  .bar{width:40px;border-radius:6px 6px 0 0;transition:height 0.5s ease;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;font-size:0.6rem;padding-bottom:4px;color:#000;font-weight:700;}
+  .bar-label{font-size:0.7rem;margin-top:4px;text-align:center;color:#b9f5d8;}
+  .feedback{background:#00000099;margin:0 2rem 1.5rem;padding:1rem;border-radius:1.5rem;text-align:center;font-weight:500;border-left:4px solid #00e676;}
+  .insignia{text-align:center;background:#0c1b2f;border-radius:2rem;margin:0 2rem 1.5rem;padding:1rem;border:1px dashed gold;}
+  .insignia i{font-size:2.5rem;color:gold;}
+  .hidden{display:none;}
+  .btn-action{background:linear-gradient(95deg,#f0a500,#ff6a00);border:none;padding:0.8rem 1.8rem;font-weight:700;border-radius:3rem;cursor:pointer;font-size:1rem;transition:0.2s;color:#1e1a0c;}
+  .btn-action:hover{transform:translateY(-2px);box-shadow:0 0 15px rgba(240,165,0,0.5);}
+  .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.5rem 2rem;}
+  .nav-link{background:#2c3e66;padding:0.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:0.5rem;transition:0.2s;}
+  .nav-link:hover{transform:translateY(-2px);box-shadow:0 0 10px rgba(0,224,255,0.4);}
+  .nav-link.next{background:linear-gradient(95deg,#f0a500,#ff6a00);color:#1e1a0c;}
+  .nav-link.menu{background:#1a2a4a;border:1px solid #3399ff;}
+  footer{text-align:center;padding:1.2rem;font-size:0.8rem;border-top:1px solid #2c3e66;}
+  @media(max-width:800px){.hero-header h1{font-size:1.9rem;}}
+ </style>
+ <link rel="stylesheet" href="../../assets/css/theme.css">
 </head>
 <body>
-  <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
-  <div class="modulo-container">
-    <div class="hero-header">
-      <h1><i class="fas fa-table-cells"></i> ANOVA de Dos Factores</h1>
-      <p>¿Cómo afectan dos variables simultáneamente a un resultado?</p>
-      <div class="badge-area">
-        <span class="chip"><i class="fas fa-flask"></i> Factorial</span>
-        <span class="chip"><i class="fas fa-arrow-right-arrow-left"></i> Interacción A×B</span>
-        <span class="chip"><i class="fas fa-chart-bar"></i> SS Decomposition</span>
-      </div>
-    </div>
-    <div class="analogy-card">
-      <strong><i class="fas fa-utensils"></i> Piénsalo así:</strong> ANOVA factorial es como una receta: el sabor del pastel depende del ingrediente A (azúcar), del B (harina) y de cómo se combinan (A×B). No basta probar cada ingrediente por separado; la magia está en la interacción.
-    </div>
-    <div class="main-area">
-      <div class="panel-grid">
-        <div class="panel-card">
-          <h3><i class="fas fa-list"></i> Factor A</h3>
-          <select id="factorALevels"><option value="2">2 niveles</option><option value="3" selected>3 niveles</option><option value="4">4 niveles</option></select>
-          <div style="font-size:0.8rem;color:#aaa;margin-top:0.3rem;">Ej: Tipo de fertilizante</div>
-        </div>
-        <div class="panel-card">
-          <h3><i class="fas fa-list"></i> Factor B</h3>
-          <select id="factorBLevels"><option value="2" selected>2 niveles</option><option value="3">3 niveles</option><option value="4">4 niveles</option></select>
-          <div style="font-size:0.8rem;color:#aaa;margin-top:0.3rem;">Ej: Riego (bajo/medio/alto)</div>
-        </div>
-        <div class="panel-card">
-          <h3><i class="fas fa-wave-square"></i> Efecto A</h3>
-          <input type="range" id="effectA" min="0" max="20" value="8" step="0.5">
-          <span id="effectAVal">8</span>
-        </div>
-        <div class="panel-card">
-          <h3><i class="fas fa-wave-square"></i> Efecto B</h3>
-          <input type="range" id="effectB" min="0" max="20" value="5" step="0.5">
-          <span id="effectBVal">5</span>
-        </div>
-        <div class="panel-card">
-          <h3><i class="fas fa-handshake"></i> Interacción A×B</h3>
-          <input type="range" id="interactionAB" min="-10" max="10" value="3" step="0.5">
-          <span id="interactionABVal">3</span>
-        </div>
-      </div>
-      <div style="text-align:center;margin-bottom:1rem;">
-        <button class="btn-action" id="runSimBtn"><i class="fas fa-play"></i> Simular ANOVA factorial</button>
-        <button class="btn-action" style="background:#2c3e66;color:#fff;" id="resetDataBtn"><i class="fas fa-undo"></i> Reiniciar</button>
-      </div>
-      <div class="results-area" id="resultsArea">
-        <h3 style="color:#69f0ae;margin-bottom:0.8rem;"><i class="fas fa-chart-simple"></i> Descomposición de Sumas de Cuadrados</h3>
-        <div class="bar-chart" id="barChart"></div>
-        <table id="anovaTable">
-          <thead><tr><th>Fuente</th><th>SS</th><th>gl</th><th>MS</th><th>F</th><th>p-valor</th></tr></thead>
-          <tbody id="anovaBody"></tbody>
-        </table>
-        <div style="margin-top:1rem;">
-          <canvas id="interactionPlot" width="600" height="300" style="width:100%;max-width:600px;background:#0a1520;border-radius:1rem;margin:0 auto;display:block;"></canvas>
-          <p style="font-size:0.8rem;color:#aaa;text-align:center;margin-top:0.3rem;">Gráfico de interacción A×B</p>
-        </div>
-      </div>
-    </div>
-    <div id="feedbackMsg" class="feedback"><i class="fas fa-comment-dots"></i> Ajusta los factores, elige los niveles y pulsa "Simular ANOVA factorial" para ver cómo se descomponen las varianzas.</div>
-    <div id="insigniaArea" class="insignia hidden">
-      <i class="fas fa-medal"></i>
-      <h3><i class="fas fa-certificate"></i> Maestro del Diseño Factorial</h3>
-      <p>¡Entiendes cómo dos factores interactúan! La combinación es más que la suma de las partes.</p>
-    </div>
-    <div class="nav-links">
-      <a href="10-anova-un-factor.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
-      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
-      <a href="12-anova-medidas-repetidas.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
-    </div>
-    <footer><i class="fas fa-crown"></i> Estadística Inferencial Interactiva · Diseños factoriales</footer>
+ <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+ <div class="modulo-container">
+  <div class="hero-header">
+   <h1><i class="fas fa-table-cells"></i> ANOVA de Dos Factores</h1>
+   <p>Â¿CÃ³mo afectan dos variables simultÃ¡neamente a un resultado?</p>
+   <div class="badge-area">
+    <span class="chip"><i class="fas fa-flask"></i> Factorial</span>
+    <span class="chip"><i class="fas fa-arrow-right-arrow-left"></i> InteracciÃ³n AÃ—B</span>
+    <span class="chip"><i class="fas fa-chart-bar"></i> SS Decomposition</span>
+   </div>
   </div>
-  <script>
-    const STORAGE_KEY='est_inf_lvl11';
-    function save(){localStorage.setItem(STORAGE_KEY,'1');}
-    function isCompleted(){return localStorage.getItem(STORAGE_KEY)==='1';}
-    const fALvl=document.getElementById('factorALevels');
-    const fBLvl=document.getElementById('factorBLevels');
-    const eA=document.getElementById('effectA');
-    const eB=document.getElementById('effectB');
-    const eAB=document.getElementById('interactionAB');
-    const eAVal=document.getElementById('effectAVal');
-    const eBVal=document.getElementById('effectBVal');
-    const eABVal=document.getElementById('interactionABVal');
-    const runBtn=document.getElementById('runSimBtn');
-    const resetBtn=document.getElementById('resetDataBtn');
-    const feed=document.getElementById('feedbackMsg');
-    const insignia=document.getElementById('insigniaArea');
-    const barChart=document.getElementById('barChart');
-    const anovaBody=document.getElementById('anovaBody');
-    const canvas=document.getElementById('interactionPlot');
-    const ctx=canvas.getContext('2d');
-    let completed=isCompleted();
-    if(completed)insignia.classList.remove('hidden');
-    eA.addEventListener('input',()=>{eAVal.textContent=eA.value;});
-    eB.addEventListener('input',()=>{eBVal.textContent=eB.value;});
-    eAB.addEventListener('input',()=>{eABVal.textContent=eAB.value;});
-    function simulate(){
-      const nA=parseInt(fALvl.value);
-      const nB=parseInt(fBLvl.value);
-      const aEff=parseFloat(eA.value);
-      const bEff=parseFloat(eB.value);
-      const abEff=parseFloat(eAB.value);
-      const n=5;
-      const total=n*nA*nB;
-      const grandMean=50;
-      const noise=2;
-      let cells=[];
-      for(let i=0;i<nA;i++){
-        for(let j=0;j<nB;j++){
-          let vals=[];
-          for(let k=0;k<n;k++){
-            let val=grandMean+(i-(nA-1)/2)*aEff/(nA-1)+(j-(nB-1)/2)*bEff/(nB-1)+((i-(nA-1)/2)*(j-(nB-1)/2))*abEff/((nA-1)*(nB-1))+(Math.random()-0.5)*noise;
-            vals.push(val);
-          }
-          cells.push({i,j,vals,mean:vals.reduce((a,b)=>a+b,0)/n});
-        }
-      }
-      let grandTotal=0;
-      cells.forEach(c=>c.vals.forEach(v=>grandTotal+=v));
-      const grandMeanActual=grandTotal/total;
-      let ssTotal=0;
-      cells.forEach(c=>c.vals.forEach(v=>ssTotal+=(v-grandMeanActual)**2));
-      let ssA=0;
-      for(let i=0;i<nA;i++){
-        let row=cells.filter(c=>c.i===i);
-        let rowMean=row.reduce((s,c)=>s+c.mean,0)/nB;
-        ssA+=(rowMean-grandMeanActual)**2*n*nB;
-      }
-      let ssB=0;
-      for(let j=0;j<nB;j++){
-        let col=cells.filter(c=>c.j===j);
-        let colMean=col.reduce((s,c)=>s+c.mean,0)/nA;
-        ssB+=(colMean-grandMeanActual)**2*n*nA;
-      }
-      let ssWithin=0;
-      cells.forEach(c=>{c.vals.forEach(v=>{ssWithin+=(v-c.mean)**2});});
-      let ssAB=ssTotal-ssA-ssB-ssWithin;
-      if(ssAB<0)ssAB=0;
-      const dfA=nA-1,dfB=nB-1,dfAB=dfA*dfB,dfE=total-nA*nB;
-      const msA=ssA/dfA,msB=ssB/dfB,msAB=ssAB/dfAB,msE=ssWithin/dfE;
-      const fA=msA/msE,fB=msB/msE,fAB=msAB/msE;
-      function betacf(x,a,b){
-        const MAX=100,EPS=3e-12;
-        let qab=a+b,qap=a+1,qam=a-1;
-        let c=1,d=1-qab*x/qap;
-        if(Math.abs(d)<1e-30)d=1e-30;
-        d=1/d;let h=d;
-        for(let m=1;m<=MAX;m++){
-          let m2=2*m;
-          let aa=m*(b-m)*x/((qam+m2)*(a+m2));
-          d=1+aa*d;if(Math.abs(d)<1e-30)d=1e-30;c=1+aa/c;if(Math.abs(c)<1e-30)c=1e-30;d=1/d;h*=d*c;
-          aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));
-          d=1+aa*d;if(Math.abs(d)<1e-30)d=1e-30;c=1+aa/c;if(Math.abs(c)<1e-30)c=1e-30;d=1/d;let del=d*c;h*=del;
-          if(Math.abs(del-1)<EPS)break;
-        }
-        return h;
-      }
-      function betainc(x,a,b){
-        if(x<0||x>1)return 0;
-        if(x===0||x===1)return x;
-        function lgamma(z){
-          if(z<0.5)return Math.PI/Math.sin(Math.PI*z)-lgamma(1-z);
-          z-=1;
-          const g=7,c=[0.99999999999980993,676.5203681218851,-1259.1392167224028,771.32342877765313,-176.61502916214059,12.507343278686905,-0.13857109526572012,9.9843695780195716e-6,1.5056327351493116e-7];
-          let x=c[0];
-          for(let i=1;i<g+2;i++)x+=c[i]/(z+i);
-          const t=z+g+0.5;
-          return 0.5*Math.log(2*Math.PI)+Math.log(x)-t+z*Math.log(t);
-        }
-        let bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));
-        if(x<(a+1)/(a+b+2))return bt*betacf(x,a,b)/a;
-        return 1-bt*betacf(1-x,b,a)/b;
-      }
-      function pval(f,df1,df2){
-        if(f<=0||df2<=0)return 1;
-        const x=df1*f/df2;
-        return 1-betainc(df2/(df2+df1*f),df2/2,df1/2);
-      }
-      const pA=pval(fA,dfA,dfE),pB=pval(fB,dfB,dfE),pAB=pval(fAB,dfAB,dfE);
-      anovaBody.innerHTML=`<tr><td>Factor A</td><td>${ssA.toFixed(2)}</td><td>${dfA}</td><td>${msA.toFixed(2)}</td><td>${fA.toFixed(2)}</td><td style="color:${pA<0.05?'#69f0ae':'#ff6b6b'}">${pA.toFixed(4)}</td></tr><tr><td>Factor B</td><td>${ssB.toFixed(2)}</td><td>${dfB}</td><td>${msB.toFixed(2)}</td><td>${fB.toFixed(2)}</td><td style="color:${pB<0.05?'#69f0ae':'#ff6b6b'}">${pB.toFixed(4)}</td></tr><tr><td>Interacción A×B</td><td>${ssAB.toFixed(2)}</td><td>${dfAB}</td><td>${msAB.toFixed(2)}</td><td>${fAB.toFixed(2)}</td><td style="color:${pAB<0.05?'#69f0ae':'#ff6b6b'}">${pAB.toFixed(4)}</td></tr><tr><td>Error</td><td>${ssWithin.toFixed(2)}</td><td>${dfE}</td><td>${msE.toFixed(2)}</td><td>-</td><td>-</td></tr><tr><td>Total</td><td>${ssTotal.toFixed(2)}</td><td>${total-1}</td><td>-</td><td>-</td><td>-</td></tr>`;
-      const maxSS=Math.max(ssA,ssB,ssAB,ssWithin,1);
-      barChart.innerHTML=`<div class="bar" style="height:${(ssA/maxSS*100).toFixed(0)}px;background:#00e676;">${ssA.toFixed(1)}</div><div class="bar-label">A</div><div class="bar" style="height:${(ssB/maxSS*100).toFixed(0)}px;background:#69f0ae;">${ssB.toFixed(1)}</div><div class="bar-label">B</div><div class="bar" style="height:${(ssAB/maxSS*100).toFixed(0)}px;background:#ffd740;">${ssAB.toFixed(1)}</div><div class="bar-label">A×B</div><div class="bar" style="height:${(ssWithin/maxSS*100).toFixed(0)}px;background:#ff6b6b;">${ssWithin.toFixed(1)}</div><div class="bar-label">Error</div>`;
-      ctx.clearRect(0,0,600,300);
-      ctx.strokeStyle='#334';ctx.lineWidth=1;
-      for(let i=0;i<=4;i++){let y=i*60+30;ctx.beginPath();ctx.moveTo(50,y);ctx.lineTo(550,y);ctx.stroke();ctx.fillStyle='#667';ctx.font='10px Inter';ctx.fillText((4-i)*10+'',10,y+4);}
-      const colors=['#00e676','#69f0ae','#ffd740','#ff6b6b','#9c64ff','#ff64dc'];
-      for(let i=0;i<nA;i++){
-        ctx.strokeStyle=colors[i%colors.length];ctx.lineWidth=2.5;ctx.beginPath();
-        for(let j=0;j<nB;j++){
-          let c=cells.find(c=>c.i===i&&c.j===j);if(!c)continue;
-          let x=80+j*(470/(nB-1||1)),y=260-(c.mean-grandMeanActual+30)*2.5;
-          if(j===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
-        }
-        ctx.stroke();
-        for(let j=0;j<nB;j++){
-          let c=cells.find(c=>c.i===i&&c.j===j);if(!c)continue;
-          let x=80+j*(470/(nB-1||1)),y=260-(c.mean-grandMeanActual+30)*2.5;
-          ctx.fillStyle=colors[i%colors.length];ctx.beginPath();ctx.arc(x,y,5,0,2*Math.PI);ctx.fill();
-        }
-      }
-      ctx.fillStyle='#b9f5d8';ctx.font='11px Inter';
-      for(let j=0;j<nB;j++){let x=80+j*(470/(nB-1||1));ctx.fillText('B'+j,x-6,285);}
-      ctx.fillStyle='#667';ctx.font='10px Inter';ctx.fillText('← Grand Mean',300,130);
-      const sig=[];if(pA<0.05)sig.push('A');if(pB<0.05)sig.push('B');if(pAB<0.05)sig.push('A×B');
-      let msg=sig.length?`Efectos significativos: ${sig.join(', ')}`:'Ningún efecto significativo (p>0.05)';
-      feed.innerHTML=`<i class="fas fa-comment-dots"></i> ${msg}. Observa cómo la interacción A×B modifica el patrón de medias.`;
-      if(!completed){completed=true;save();insignia.classList.remove('hidden');feed.innerHTML+=` <i class="fas fa-star" style="color:gold;"></i> ¡Has ganado la insignia!`;}
+  <div class="analogy-card">
+   <strong><i class="fas fa-utensils"></i> PiÃ©nsalo asÃ­:</strong> ANOVA factorial es como una receta: el sabor del pastel depende del ingrediente A (azÃºcar), del B (harina) y de cÃ³mo se combinan (AÃ—B). No basta probar cada ingrediente por separado; la magia estÃ¡ en la interacciÃ³n.
+  </div>
+  <div class="main-area">
+   <div class="panel-grid">
+    <div class="panel-card">
+     <h3><i class="fas fa-list"></i> Factor A</h3>
+     <select id="factorALevels"><option value="2">2 niveles</option><option value="3" selected>3 niveles</option><option value="4">4 niveles</option></select>
+     <div style="font-size:0.8rem;color:#aaa;margin-top:0.3rem;">Ej: Tipo de fertilizante</div>
+    </div>
+    <div class="panel-card">
+     <h3><i class="fas fa-list"></i> Factor B</h3>
+     <select id="factorBLevels"><option value="2" selected>2 niveles</option><option value="3">3 niveles</option><option value="4">4 niveles</option></select>
+     <div style="font-size:0.8rem;color:#aaa;margin-top:0.3rem;">Ej: Riego (bajo/medio/alto)</div>
+    </div>
+    <div class="panel-card">
+     <h3><i class="fas fa-wave-square"></i> Efecto A</h3>
+     <input type="range" id="effectA" min="0" max="20" value="8" step="0.5">
+     <span id="effectAVal">8</span>
+    </div>
+    <div class="panel-card">
+     <h3><i class="fas fa-wave-square"></i> Efecto B</h3>
+     <input type="range" id="effectB" min="0" max="20" value="5" step="0.5">
+     <span id="effectBVal">5</span>
+    </div>
+    <div class="panel-card">
+     <h3><i class="fas fa-handshake"></i> InteracciÃ³n AÃ—B</h3>
+     <input type="range" id="interactionAB" min="-10" max="10" value="3" step="0.5">
+     <span id="interactionABVal">3</span>
+    </div>
+   </div>
+   <div style="text-align:center;margin-bottom:1rem;">
+    <button class="btn-action" id="runSimBtn"><i class="fas fa-play"></i> Simular ANOVA factorial</button>
+    <button class="btn-action" style="background:#2c3e66;color:#fff;" id="resetDataBtn"><i class="fas fa-undo"></i> Reiniciar</button>
+   </div>
+   <div class="results-area" id="resultsArea">
+    <h3 style="color:#69f0ae;margin-bottom:0.8rem;"><i class="fas fa-chart-simple"></i> DescomposiciÃ³n de Sumas de Cuadrados</h3>
+    <div class="bar-chart" id="barChart"></div>
+    <table id="anovaTable">
+     <thead><tr><th>Fuente</th><th>SS</th><th>gl</th><th>MS</th><th>F</th><th>p-valor</th></tr></thead>
+     <tbody id="anovaBody"></tbody>
+    </table>
+    <div style="margin-top:1rem;">
+     <canvas id="interactionPlot" width="600" height="300" style="width:100%;max-width:600px;background:#0a1520;border-radius:1rem;margin:0 auto;display:block;"></canvas>
+     <p style="font-size:0.8rem;color:#aaa;text-align:center;margin-top:0.3rem;">GrÃ¡fico de interacciÃ³n AÃ—B</p>
+    </div>
+   </div>
+  </div>
+  <div id="feedbackMsg" class="feedback"><i class="fas fa-comment-dots"></i> Ajusta los factores, elige los niveles y pulsa "Simular ANOVA factorial" para ver cÃ³mo se descomponen las varianzas.</div>
+  <div id="insigniaArea" class="insignia hidden">
+   <i class="fas fa-medal"></i>
+   <h3><i class="fas fa-certificate"></i> Maestro del DiseÃ±o Factorial</h3>
+   <p>Â¡Entiendes cÃ³mo dos factores interactÃºan! La combinaciÃ³n es mÃ¡s que la suma de las partes.</p>
+  </div>
+  <div class="nav-links">
+   <a href="10-anova-un-factor.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+   <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> MenÃº</a>
+   <a href="12-anova-medidas-repetidas.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> EstadÃ­stica Inferencial Interactiva Â· DiseÃ±os factoriales</footer>
+ </div>
+ <script>
+  const STORAGE_KEY='est_inf_lvl11';
+  function save(){localStorage.setItem(STORAGE_KEY,'1');}
+  function isCompleted(){return localStorage.getItem(STORAGE_KEY)==='1';}
+  const fALvl=document.getElementById('factorALevels');
+  const fBLvl=document.getElementById('factorBLevels');
+  const eA=document.getElementById('effectA');
+  const eB=document.getElementById('effectB');
+  const eAB=document.getElementById('interactionAB');
+  const eAVal=document.getElementById('effectAVal');
+  const eBVal=document.getElementById('effectBVal');
+  const eABVal=document.getElementById('interactionABVal');
+  const runBtn=document.getElementById('runSimBtn');
+  const resetBtn=document.getElementById('resetDataBtn');
+  const feed=document.getElementById('feedbackMsg');
+  const insignia=document.getElementById('insigniaArea');
+  const barChart=document.getElementById('barChart');
+  const anovaBody=document.getElementById('anovaBody');
+  const canvas=document.getElementById('interactionPlot');
+  const ctx=canvas.getContext('2d');
+  let completed=isCompleted();
+  if(completed)insignia.classList.remove('hidden');
+  eA.addEventListener('input',()=>{eAVal.textContent=eA.value;});
+  eB.addEventListener('input',()=>{eBVal.textContent=eB.value;});
+  eAB.addEventListener('input',()=>{eABVal.textContent=eAB.value;});
+  function simulate(){
+   const nA=parseInt(fALvl.value);
+   const nB=parseInt(fBLvl.value);
+   const aEff=parseFloat(eA.value);
+   const bEff=parseFloat(eB.value);
+   const abEff=parseFloat(eAB.value);
+   const n=5;
+   const total=n*nA*nB;
+   const grandMean=50;
+   const noise=2;
+   let cells=[];
+   for(let i=0;i<nA;i++){
+    for(let j=0;j<nB;j++){
+     let vals=[];
+     for(let k=0;k<n;k++){
+      let val=grandMean+(i-(nA-1)/2)*aEff/(nA-1)+(j-(nB-1)/2)*bEff/(nB-1)+((i-(nA-1)/2)*(j-(nB-1)/2))*abEff/((nA-1)*(nB-1))+(Math.random()-0.5)*noise;
+      vals.push(val);
+     }
+     cells.push({i,j,vals,mean:vals.reduce((a,b)=>a+b,0)/n});
     }
-    resetBtn.addEventListener('click',()=>{fALvl.value='3';fBLvl.value='2';eA.value='8';eB.value='5';eAB.value='3';eAVal.textContent='8';eBVal.textContent='5';eABVal.textContent='3';anovaBody.innerHTML='';barChart.innerHTML='';ctx.clearRect(0,0,600,300);feed.innerHTML=I18N.t('fb_0');});
-    runBtn.addEventListener('click',simulate);
-  </script>
+   }
+   let grandTotal=0;
+   cells.forEach(c=>c.vals.forEach(v=>grandTotal+=v));
+   const grandMeanActual=grandTotal/total;
+   let ssTotal=0;
+   cells.forEach(c=>c.vals.forEach(v=>ssTotal+=(v-grandMeanActual)**2));
+   let ssA=0;
+   for(let i=0;i<nA;i++){
+    let row=cells.filter(c=>c.i===i);
+    let rowMean=row.reduce((s,c)=>s+c.mean,0)/nB;
+    ssA+=(rowMean-grandMeanActual)**2*n*nB;
+   }
+   let ssB=0;
+   for(let j=0;j<nB;j++){
+    let col=cells.filter(c=>c.j===j);
+    let colMean=col.reduce((s,c)=>s+c.mean,0)/nA;
+    ssB+=(colMean-grandMeanActual)**2*n*nA;
+   }
+   let ssWithin=0;
+   cells.forEach(c=>{c.vals.forEach(v=>{ssWithin+=(v-c.mean)**2});});
+   let ssAB=ssTotal-ssA-ssB-ssWithin;
+   if(ssAB<0)ssAB=0;
+   const dfA=nA-1,dfB=nB-1,dfAB=dfA*dfB,dfE=total-nA*nB;
+   const msA=ssA/dfA,msB=ssB/dfB,msAB=ssAB/dfAB,msE=ssWithin/dfE;
+   const fA=msA/msE,fB=msB/msE,fAB=msAB/msE;
+   function betacf(x,a,b){
+    const MAX=100,EPS=3e-12;
+    let qab=a+b,qap=a+1,qam=a-1;
+    let c=1,d=1-qab*x/qap;
+    if(Math.abs(d)<1e-30)d=1e-30;
+    d=1/d;let h=d;
+    for(let m=1;m<=MAX;m++){
+     let m2=2*m;
+     let aa=m*(b-m)*x/((qam+m2)*(a+m2));
+     d=1+aa*d;if(Math.abs(d)<1e-30)d=1e-30;c=1+aa/c;if(Math.abs(c)<1e-30)c=1e-30;d=1/d;h*=d*c;
+     aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));
+     d=1+aa*d;if(Math.abs(d)<1e-30)d=1e-30;c=1+aa/c;if(Math.abs(c)<1e-30)c=1e-30;d=1/d;let del=d*c;h*=del;
+     if(Math.abs(del-1)<EPS)break;
+    }
+    return h;
+   }
+   function betainc(x,a,b){
+    if(x<0||x>1)return 0;
+    if(x===0||x===1)return x;
+    function lgamma(z){
+     if(z<0.5)return Math.PI/Math.sin(Math.PI*z)-lgamma(1-z);
+     z-=1;
+     const g=7,c=[0.99999999999980993,676.5203681218851,-1259.1392167224028,771.32342877765313,-176.61502916214059,12.507343278686905,-0.13857109526572012,9.9843695780195716e-6,1.5056327351493116e-7];
+     let x=c[0];
+     for(let i=1;i<g+2;i++)x+=c[i]/(z+i);
+     const t=z+g+0.5;
+     return 0.5*Math.log(2*Math.PI)+Math.log(x)-t+z*Math.log(t);
+    }
+    let bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));
+    if(x<(a+1)/(a+b+2))return bt*betacf(x,a,b)/a;
+    return 1-bt*betacf(1-x,b,a)/b;
+   }
+   function pval(f,df1,df2){
+    if(f<=0||df2<=0)return 1;
+    const x=df1*f/df2;
+    return 1-betainc(df2/(df2+df1*f),df2/2,df1/2);
+   }
+   const pA=pval(fA,dfA,dfE),pB=pval(fB,dfB,dfE),pAB=pval(fAB,dfAB,dfE);
+   anovaBody.innerHTML=`<tr><td>Factor A</td><td>${ssA.toFixed(2)}</td><td>${dfA}</td><td>${msA.toFixed(2)}</td><td>${fA.toFixed(2)}</td><td style="color:${pA<0.05?'#69f0ae':'#ff6b6b'}">${pA.toFixed(4)}</td></tr><tr><td>Factor B</td><td>${ssB.toFixed(2)}</td><td>${dfB}</td><td>${msB.toFixed(2)}</td><td>${fB.toFixed(2)}</td><td style="color:${pB<0.05?'#69f0ae':'#ff6b6b'}">${pB.toFixed(4)}</td></tr><tr><td>InteracciÃ³n AÃ—B</td><td>${ssAB.toFixed(2)}</td><td>${dfAB}</td><td>${msAB.toFixed(2)}</td><td>${fAB.toFixed(2)}</td><td style="color:${pAB<0.05?'#69f0ae':'#ff6b6b'}">${pAB.toFixed(4)}</td></tr><tr><td>Error</td><td>${ssWithin.toFixed(2)}</td><td>${dfE}</td><td>${msE.toFixed(2)}</td><td>-</td><td>-</td></tr><tr><td>Total</td><td>${ssTotal.toFixed(2)}</td><td>${total-1}</td><td>-</td><td>-</td><td>-</td></tr>`;
+   const maxSS=Math.max(ssA,ssB,ssAB,ssWithin,1);
+   barChart.innerHTML=`<div class="bar" style="height:${(ssA/maxSS*100).toFixed(0)}px;background:#00e676;">${ssA.toFixed(1)}</div><div class="bar-label">A</div><div class="bar" style="height:${(ssB/maxSS*100).toFixed(0)}px;background:#69f0ae;">${ssB.toFixed(1)}</div><div class="bar-label">B</div><div class="bar" style="height:${(ssAB/maxSS*100).toFixed(0)}px;background:#ffd740;">${ssAB.toFixed(1)}</div><div class="bar-label">AÃ—B</div><div class="bar" style="height:${(ssWithin/maxSS*100).toFixed(0)}px;background:#ff6b6b;">${ssWithin.toFixed(1)}</div><div class="bar-label">Error</div>`;
+   ctx.clearRect(0,0,600,300);
+   ctx.strokeStyle='#334';ctx.lineWidth=1;
+   for(let i=0;i<=4;i++){let y=i*60+30;ctx.beginPath();ctx.moveTo(50,y);ctx.lineTo(550,y);ctx.stroke();ctx.fillStyle='#667';ctx.font='10px Inter';ctx.fillText((4-i)*10+'',10,y+4);}
+   const colors=['#00e676','#69f0ae','#ffd740','#ff6b6b','#9c64ff','#ff64dc'];
+   for(let i=0;i<nA;i++){
+    ctx.strokeStyle=colors[i%colors.length];ctx.lineWidth=2.5;ctx.beginPath();
+    for(let j=0;j<nB;j++){
+     let c=cells.find(c=>c.i===i&&c.j===j);if(!c)continue;
+     let x=80+j*(470/(nB-1||1)),y=260-(c.mean-grandMeanActual+30)*2.5;
+     if(j===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+    for(let j=0;j<nB;j++){
+     let c=cells.find(c=>c.i===i&&c.j===j);if(!c)continue;
+     let x=80+j*(470/(nB-1||1)),y=260-(c.mean-grandMeanActual+30)*2.5;
+     ctx.fillStyle=colors[i%colors.length];ctx.beginPath();ctx.arc(x,y,5,0,2*Math.PI);ctx.fill();
+    }
+   }
+   ctx.fillStyle='#b9f5d8';ctx.font='11px Inter';
+   for(let j=0;j<nB;j++){let x=80+j*(470/(nB-1||1));ctx.fillText('B'+j,x-6,285);}
+   ctx.fillStyle='#667';ctx.font='10px Inter';ctx.fillText('â† Grand Mean',300,130);
+   const sig=[];if(pA<0.05)sig.push('A');if(pB<0.05)sig.push('B');if(pAB<0.05)sig.push('AÃ—B');
+   let msg=sig.length?`Efectos significativos: ${sig.join(', ')}`:'NingÃºn efecto significativo (p>0.05)';
+   feed.innerHTML=`<i class="fas fa-comment-dots"></i> ${msg}. Observa cÃ³mo la interacciÃ³n AÃ—B modifica el patrÃ³n de medias.`;
+   if(!completed){completed=true;save();insignia.classList.remove('hidden');feed.innerHTML+=` <i class="fas fa-star" style="color:gold;"></i> Â¡Has ganado la insignia!`;}
+  }
+  resetBtn.addEventListener('click',()=>{fALvl.value='3';fBLvl.value='2';eA.value='8';eB.value='5';eAB.value='3';eAVal.textContent='8';eBVal.textContent='5';eABVal.textContent='3';anovaBody.innerHTML='';barChart.innerHTML='';ctx.clearRect(0,0,600,300);feed.innerHTML=I18N.t('fb_0');});
+  runBtn.addEventListener('click',simulate);
+ </script>
 
 <script>
 window.I18N_DATA={
-  'fb_0': { es: '<i class="fas fa-comment-dots"></i> Valores restablecidos. ¡Vuelve a simular!', en: '<i class="fas fa-comment-dots"></i> Valores restablecidos. ¡Vuelve a simular!' }
+ 'fb_0': { es: '<i class="fas fa-comment-dots"></i> Valores restablecidos. Â¡Vuelve a simular!', en: '<i class="fas fa-comment-dots"></i> Valores restablecidos. Â¡Vuelve a simular!' }
 };
 </script>
-</body>
+ </body>
 </html>

@@ -1,309 +1,309 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Estadística Inferencial | Regresión Logística</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box;}
-    body{background:linear-gradient(135deg,#0a0f1e,#0c1222,#111a2e);background-size:200% 200%;animation:gradientShift 20s ease infinite;font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem;}
-    @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-    .modulo-container{max-width:1300px;width:100%;background:rgba(15,25,45,0.65);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(156,100,255,0.25);box-shadow:0 25px 45px rgba(0,0,0,0.5);overflow:hidden;}
-    .hero-header{background:linear-gradient(95deg,#0b1120,#111a2e);padding:2rem 2rem 1.5rem;text-align:center;border-bottom:2px solid #9c64ff;}
-    .hero-header h1{font-size:2.6rem;font-weight:800;background:linear-gradient(135deg,#FFF,#c9a8ff,#9c64ff);-webkit-background-clip:text;background-clip:text;color:transparent;}
-    .hero-header p{font-size:1.1rem;color:#dcc8ff;margin-top:0.5rem;}
-    .badge-area{display:flex;justify-content:center;gap:1rem;margin-top:1.2rem;flex-wrap:wrap;}
-    .chip{background:rgba(156,100,255,0.15);border:1px solid #9c64ff;padding:0.4rem 1rem;border-radius:40px;font-size:0.8rem;font-weight:600;}
-    .analogy-card{background:#1e2a3acc;margin:1.5rem 2rem;padding:1.2rem 1.8rem;border-radius:2rem;border-left:8px solid #9c64ff;font-size:1rem;line-height:1.6;}
-    .main-area{padding:0 2rem 1rem;}
-    .panel-grid{display:flex;flex-wrap:wrap;gap:1.5rem;margin-bottom:1.5rem;}
-    .panel-card{flex:1;min-width:200px;background:#0f1a2be0;border-radius:1.5rem;padding:1.2rem;border:1px solid #334;text-align:center;}
-    .panel-card h3{color:#c9a8ff;margin-bottom:0.5rem;}
-    .panel-card select,.panel-card input{background:#001e2f;border:1px solid #9c64ff;padding:0.5rem;border-radius:1rem;color:#fff;width:100%;margin:0.3rem 0;font-family:'Inter',sans-serif;}
-    .panel-card button{background:linear-gradient(95deg,#9c64ff,#7c3aed);border:none;padding:0.6rem 1.2rem;border-radius:2rem;font-weight:700;cursor:pointer;color:#fff;margin:0.3rem;transition:0.2s;}
-    .panel-card button:hover{transform:translateY(-2px);box-shadow:0 0 15px rgba(156,100,255,0.5);}
-    .chart-area{background:#0a1520;border-radius:1.5rem;padding:1rem;margin:1rem 0;text-align:center;}
-    .chart-area canvas{width:100%;max-width:700px;height:280px;background:#0a1520;border-radius:1rem;margin:0 auto;display:block;}
-    .results-area{background:#00000066;border-radius:1.5rem;padding:1.2rem;margin:1rem 0;}
-    .results-area table{width:100%;border-collapse:collapse;font-size:0.85rem;}
-    .results-area th,.results-area td{padding:0.5rem;text-align:center;border:1px solid #334;}
-    .results-area th{background:#0a1a2a;color:#c9a8ff;}
-    .confusion-matrix{display:flex;flex-wrap:wrap;gap:0.5rem;justify-content:center;margin:1rem 0;}
-    .cm-cell{background:#0f1a2be0;border-radius:0.8rem;padding:0.5rem 1rem;text-align:center;min-width:100px;border:1px solid #555;}
-    .cm-cell .num{font-size:1.5rem;font-weight:700;}
-    .cm-cell.tp{color:#6f6;border-color:#6f6;}
-    .cm-cell.tn{color:#6f6;border-color:#6f6;}
-    .cm-cell.fp{color:#f66;border-color:#f66;}
-    .cm-cell.fn{color:#f66;border-color:#f66;}
-    .feedback{background:#00000099;margin:0 2rem 1.5rem;padding:1rem;border-radius:1.5rem;text-align:center;font-weight:500;border-left:4px solid #9c64ff;}
-    .insignia{text-align:center;background:#0c1b2f;border-radius:2rem;margin:0 2rem 1.5rem;padding:1rem;border:1px dashed gold;}
-    .insignia i{font-size:2.5rem;color:gold;}
-    .hidden{display:none;}
-    .btn-action{background:linear-gradient(95deg,#f0a500,#ff6a00);border:none;padding:0.8rem 1.8rem;font-weight:700;border-radius:3rem;cursor:pointer;font-size:1rem;transition:0.2s;color:#1e1a0c;}
-    .btn-action:hover{transform:translateY(-2px);box-shadow:0 0 15px rgba(240,165,0,0.5);}
-    .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.5rem 2rem;}
-    .nav-link{background:#2c3e66;padding:0.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:0.5rem;transition:0.2s;}
-    .nav-link:hover{transform:translateY(-2px);box-shadow:0 0 10px rgba(0,224,255,0.4);}
-    .nav-link.next{background:linear-gradient(95deg,#f0a500,#ff6a00);color:#1e1a0c;}
-    .nav-link.menu{background:#1a2a4a;border:1px solid #3399ff;}
-    footer{text-align:center;padding:1.2rem;font-size:0.8rem;border-top:1px solid #2c3e66;}
-    @media(max-width:800px){.hero-header h1{font-size:1.9rem;}}
-    .draggable-panel{background:#0f1a2be0;border-radius:1.5rem;padding:1rem;margin:1rem 0;text-align:center;cursor:grab;user-select:none;touch-action:none;}
-    .draggable-panel:active{cursor:grabbing;}
-  </style>
-  <link rel="stylesheet" href="../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>EstadÃ­stica Inferencial | RegresiÃ³n LogÃ­stica</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:linear-gradient(135deg,#0a0f1e,#0c1222,#111a2e);background-size:200% 200%;animation:gradientShift 20s ease infinite;font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem;}
+  @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+  .modulo-container{max-width:1300px;width:100%;background:rgba(15,25,45,0.65);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(156,100,255,0.25);box-shadow:0 25px 45px rgba(0,0,0,0.5);overflow:hidden;}
+  .hero-header{background:linear-gradient(95deg,#0b1120,#111a2e);padding:2rem 2rem 1.5rem;text-align:center;border-bottom:2px solid #9c64ff;}
+  .hero-header h1{font-size:2.6rem;font-weight:800;background:linear-gradient(135deg,#FFF,#c9a8ff,#9c64ff);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .hero-header p{font-size:1.1rem;color:#dcc8ff;margin-top:0.5rem;}
+  .badge-area{display:flex;justify-content:center;gap:1rem;margin-top:1.2rem;flex-wrap:wrap;}
+  .chip{background:rgba(156,100,255,0.15);border:1px solid #9c64ff;padding:0.4rem 1rem;border-radius:40px;font-size:0.8rem;font-weight:600;}
+  .analogy-card{background:#1e2a3acc;margin:1.5rem 2rem;padding:1.2rem 1.8rem;border-radius:2rem;border-left:8px solid #9c64ff;font-size:1rem;line-height:1.6;}
+  .main-area{padding:0 2rem 1rem;}
+  .panel-grid{display:flex;flex-wrap:wrap;gap:1.5rem;margin-bottom:1.5rem;}
+  .panel-card{flex:1;min-width:200px;background:#0f1a2be0;border-radius:1.5rem;padding:1.2rem;border:1px solid #334;text-align:center;}
+  .panel-card h3{color:#c9a8ff;margin-bottom:0.5rem;}
+  .panel-card select,.panel-card input{background:#001e2f;border:1px solid #9c64ff;padding:0.5rem;border-radius:1rem;color:#fff;width:100%;margin:0.3rem 0;font-family:'Inter',sans-serif;}
+  .panel-card button{background:linear-gradient(95deg,#9c64ff,#7c3aed);border:none;padding:0.6rem 1.2rem;border-radius:2rem;font-weight:700;cursor:pointer;color:#fff;margin:0.3rem;transition:0.2s;}
+  .panel-card button:hover{transform:translateY(-2px);box-shadow:0 0 15px rgba(156,100,255,0.5);}
+  .chart-area{background:#0a1520;border-radius:1.5rem;padding:1rem;margin:1rem 0;text-align:center;}
+  .chart-area canvas{width:100%;max-width:700px;height:280px;background:#0a1520;border-radius:1rem;margin:0 auto;display:block;}
+  .results-area{background:#00000066;border-radius:1.5rem;padding:1.2rem;margin:1rem 0;}
+  .results-area table{width:100%;border-collapse:collapse;font-size:0.85rem;}
+  .results-area th,.results-area td{padding:0.5rem;text-align:center;border:1px solid #334;}
+  .results-area th{background:#0a1a2a;color:#c9a8ff;}
+  .confusion-matrix{display:flex;flex-wrap:wrap;gap:0.5rem;justify-content:center;margin:1rem 0;}
+  .cm-cell{background:#0f1a2be0;border-radius:0.8rem;padding:0.5rem 1rem;text-align:center;min-width:100px;border:1px solid #555;}
+  .cm-cell .num{font-size:1.5rem;font-weight:700;}
+  .cm-cell.tp{color:#6f6;border-color:#6f6;}
+  .cm-cell.tn{color:#6f6;border-color:#6f6;}
+  .cm-cell.fp{color:#f66;border-color:#f66;}
+  .cm-cell.fn{color:#f66;border-color:#f66;}
+  .feedback{background:#00000099;margin:0 2rem 1.5rem;padding:1rem;border-radius:1.5rem;text-align:center;font-weight:500;border-left:4px solid #9c64ff;}
+  .insignia{text-align:center;background:#0c1b2f;border-radius:2rem;margin:0 2rem 1.5rem;padding:1rem;border:1px dashed gold;}
+  .insignia i{font-size:2.5rem;color:gold;}
+  .hidden{display:none;}
+  .btn-action{background:linear-gradient(95deg,#f0a500,#ff6a00);border:none;padding:0.8rem 1.8rem;font-weight:700;border-radius:3rem;cursor:pointer;font-size:1rem;transition:0.2s;color:#1e1a0c;}
+  .btn-action:hover{transform:translateY(-2px);box-shadow:0 0 15px rgba(240,165,0,0.5);}
+  .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.5rem 2rem;}
+  .nav-link{background:#2c3e66;padding:0.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:0.5rem;transition:0.2s;}
+  .nav-link:hover{transform:translateY(-2px);box-shadow:0 0 10px rgba(0,224,255,0.4);}
+  .nav-link.next{background:linear-gradient(95deg,#f0a500,#ff6a00);color:#1e1a0c;}
+  .nav-link.menu{background:#1a2a4a;border:1px solid #3399ff;}
+  footer{text-align:center;padding:1.2rem;font-size:0.8rem;border-top:1px solid #2c3e66;}
+  @media(max-width:800px){.hero-header h1{font-size:1.9rem;}}
+  .draggable-panel{background:#0f1a2be0;border-radius:1.5rem;padding:1rem;margin:1rem 0;text-align:center;cursor:grab;user-select:none;touch-action:none;}
+  .draggable-panel:active{cursor:grabbing;}
+ </style>
+ <link rel="stylesheet" href="../../assets/css/theme.css">
 </head>
 <body>
-  <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
-  <div class="modulo-container">
-    <div class="hero-header">
-      <h1><i class="fas fa-traffic-light"></i> Regresión Logística</h1>
-      <p>¿Éxito o fracaso? Modela resultados binarios con probabilidad</p>
-      <div class="badge-area">
-        <span class="chip"><i class="fas fa-s"></i> Logit</span>
-        <span class="chip"><i class="fas fa-phi"></i> Probit</span>
-        <span class="chip"><i class="fas fa-odds"></i> Odds Ratio</span>
-      </div>
-    </div>
-    <div class="analogy-card">
-      <strong><i class="fas fa-traffic-light"></i> Piénsalo así:</strong> La regresión logística es como un semáforo: no mide la velocidad del coche, decide si parar o seguir (0/1). La línea en forma de S nos da la probabilidad de pasar de rojo a verde según la distancia al semáforo. No es una recta, es una curva que siempre se queda entre 0 y 1.
-    </div>
-    <div class="main-area">
-      <div class="panel-grid">
-        <div class="panel-card">
-          <h3><i class="fas fa-dice-d6"></i> Puntos</h3>
-          <select id="numPoints"><option value="15">15</option><option value="30" selected>30</option><option value="60">60</option></select>
-        </div>
-        <div class="panel-card">
-          <h3><i class="fas fa-arrows-left-right"></i> Sep. grupos</h3>
-          <input type="range" id="separation" min="0.5" max="5" value="2" step="0.2">
-          <span id="separationVal">2.0</span>
-        </div>
-        <div class="panel-card">
-          <h3><i class="fas fa-bezier-curve"></i> Enlace</h3>
-          <select id="linkSelect"><option value="logit" selected>Logit</option><option value="probit">Probit</option></select>
-        </div>
-        <div class="panel-card">
-          <h3><i class="fas fa-shield"></i> Umbral</h3>
-          <input type="range" id="threshold" min="0.1" max="0.9" value="0.5" step="0.05">
-          <span id="thresholdVal">0.5</span>
-        </div>
-      </div>
-      <div class="draggable-panel" id="dragPanel">
-        <i class="fas fa-hand-pointer"></i> <strong>Arrastra los puntos 0/1</strong> para cambiar su clase y ver cómo se actualiza la curva
-        <div style="margin-top:0.5rem;font-size:0.75rem;color:#aaa;">Haz clic en cualquier punto para alternar entre 0 y 1</div>
-      </div>
-      <div class="chart-area">
-        <canvas id="logitChart" width="700" height="280"></canvas>
-      </div>
-      <div style="text-align:center;margin-bottom:1rem;">
-        <button class="btn-action" id="runBtn"><i class="fas fa-play"></i> Ajustar modelo</button>
-        <button class="btn-action" style="background:#2c3e66;color:#fff;" id="newDataBtn"><i class="fas fa-dice"></i> Nuevos datos</button>
-      </div>
-      <div class="results-area" id="resultsArea">
-        <table id="coeffTable">
-          <thead><tr><th>Coeficiente</th><th>Estimado</th><th>Error Est.</th><th>z</th><th>p-valor</th><th>OR (exp β)</th></tr></thead>
-          <tbody id="coeffBody"></tbody>
-        </table>
-        <div class="confusion-matrix" id="cmMatrix"></div>
-        <div style="display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;margin-top:0.5rem;">
-          <div id="accuracyBadge" style="background:#0f1a2be0;border-radius:1rem;padding:0.4rem 1rem;font-size:0.85rem;"></div>
-          <div id="sensitivityBadge" style="background:#0f1a2be0;border-radius:1rem;padding:0.4rem 1rem;font-size:0.85rem;"></div>
-          <div id="specificityBadge" style="background:#0f1a2be0;border-radius:1rem;padding:0.4rem 1rem;font-size:0.85rem;"></div>
-        </div>
-      </div>
-    </div>
-    <div id="feedbackMsg" class="feedback"><i class="fas fa-comment-dots"></i> Haz clic en la curva para arrastrar puntos y ver cómo cambia la regresión logística en tiempo real.</div>
-    <div id="insigniaArea" class="insignia hidden">
-      <i class="fas fa-medal"></i>
-      <h3><i class="fas fa-certificate"></i> Mago de la Logística</h3>
-      <p>¡Dominas la clasificación binaria! Sabes interpretar odds ratios y matrices de confusión.</p>
-    </div>
-    <div class="nav-links">
-      <a href="13-inferencia-regresion.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
-      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
-      <a href="15-bondad-ajuste.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
-    </div>
-    <footer><i class="fas fa-crown"></i> Estadística Inferencial Interactiva · Clasificación binaria</footer>
+ <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+ <div class="modulo-container">
+  <div class="hero-header">
+   <h1><i class="fas fa-traffic-light"></i> RegresiÃ³n LogÃ­stica</h1>
+   <p>Â¿Ã‰xito o fracaso? Modela resultados binarios con probabilidad</p>
+   <div class="badge-area">
+    <span class="chip"><i class="fas fa-s"></i> Logit</span>
+    <span class="chip"><i class="fas fa-phi"></i> Probit</span>
+    <span class="chip"><i class="fas fa-odds"></i> Odds Ratio</span>
+   </div>
   </div>
-  <script>
-    const STORAGE_KEY='est_inf_lvl14';
-    let completed=false;
-    function save(){localStorage.setItem(STORAGE_KEY,'1');completed=true;}
-    function load(){if(localStorage.getItem(STORAGE_KEY)==='1'){completed=true;document.getElementById('insigniaArea').classList.remove('hidden');}}
-    load();
-    const nPts=document.getElementById('numPoints'),sep=document.getElementById('separation'),sVal=document.getElementById('separationVal'),linkS=document.getElementById('linkSelect'),thresh=document.getElementById('threshold'),tVal=document.getElementById('thresholdVal'),runBtn=document.getElementById('runBtn'),newBtn=document.getElementById('newDataBtn'),feed=document.getElementById('feedbackMsg'),ins=document.getElementById('insigniaArea'),canvas=document.getElementById('logitChart'),ctx=canvas.getContext('2d'),coeffBody=document.getElementById('coeffBody'),cmMatrix=document.getElementById('cmMatrix'),accB=document.getElementById('accuracyBadge'),senB=document.getElementById('sensitivityBadge'),speB=document.getElementById('specificityBadge');
-    sep.addEventListener('input',()=>sVal.textContent=sep.value);
-    thresh.addEventListener('input',()=>tVal.textContent=thresh.value);
-    let data=null;
-    function genData(N,sep){
-      let x=[],y=[];
-      for(let i=0;i<N;i++){
-        let xi=Math.random()*10;
-        let logit=-3+sep*(xi-5);
-        let p=1/(1+Math.exp(-logit));
-        let yi=Math.random()<p?1:0;
-        x.push(Math.round(xi*10)/10);
-        y.push(yi);
-      }
-      return {x,y};
+  <div class="analogy-card">
+   <strong><i class="fas fa-traffic-light"></i> PiÃ©nsalo asÃ­:</strong> La regresiÃ³n logÃ­stica es como un semÃ¡foro: no mide la velocidad del coche, decide si parar o seguir (0/1). La lÃ­nea en forma de S nos da la probabilidad de pasar de rojo a verde segÃºn la distancia al semÃ¡foro. No es una recta, es una curva que siempre se queda entre 0 y 1.
+  </div>
+  <div class="main-area">
+   <div class="panel-grid">
+    <div class="panel-card">
+     <h3><i class="fas fa-dice-d6"></i> Puntos</h3>
+     <select id="numPoints"><option value="15">15</option><option value="30" selected>30</option><option value="60">60</option></select>
+    </div>
+    <div class="panel-card">
+     <h3><i class="fas fa-arrows-left-right"></i> Sep. grupos</h3>
+     <input type="range" id="separation" min="0.5" max="5" value="2" step="0.2">
+     <span id="separationVal">2.0</span>
+    </div>
+    <div class="panel-card">
+     <h3><i class="fas fa-bezier-curve"></i> Enlace</h3>
+     <select id="linkSelect"><option value="logit" selected>Logit</option><option value="probit">Probit</option></select>
+    </div>
+    <div class="panel-card">
+     <h3><i class="fas fa-shield"></i> Umbral</h3>
+     <input type="range" id="threshold" min="0.1" max="0.9" value="0.5" step="0.05">
+     <span id="thresholdVal">0.5</span>
+    </div>
+   </div>
+   <div class="draggable-panel" id="dragPanel">
+    <i class="fas fa-hand-pointer"></i> <strong>Arrastra los puntos 0/1</strong> para cambiar su clase y ver cÃ³mo se actualiza la curva
+    <div style="margin-top:0.5rem;font-size:0.75rem;color:#aaa;">Haz clic en cualquier punto para alternar entre 0 y 1</div>
+   </div>
+   <div class="chart-area">
+    <canvas id="logitChart" width="700" height="280"></canvas>
+   </div>
+   <div style="text-align:center;margin-bottom:1rem;">
+    <button class="btn-action" id="runBtn"><i class="fas fa-play"></i> Ajustar modelo</button>
+    <button class="btn-action" style="background:#2c3e66;color:#fff;" id="newDataBtn"><i class="fas fa-dice"></i> Nuevos datos</button>
+   </div>
+   <div class="results-area" id="resultsArea">
+    <table id="coeffTable">
+     <thead><tr><th>Coeficiente</th><th>Estimado</th><th>Error Est.</th><th>z</th><th>p-valor</th><th>OR (exp Î²)</th></tr></thead>
+     <tbody id="coeffBody"></tbody>
+    </table>
+    <div class="confusion-matrix" id="cmMatrix"></div>
+    <div style="display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;margin-top:0.5rem;">
+     <div id="accuracyBadge" style="background:#0f1a2be0;border-radius:1rem;padding:0.4rem 1rem;font-size:0.85rem;"></div>
+     <div id="sensitivityBadge" style="background:#0f1a2be0;border-radius:1rem;padding:0.4rem 1rem;font-size:0.85rem;"></div>
+     <div id="specificityBadge" style="background:#0f1a2be0;border-radius:1rem;padding:0.4rem 1rem;font-size:0.85rem;"></div>
+    </div>
+   </div>
+  </div>
+  <div id="feedbackMsg" class="feedback"><i class="fas fa-comment-dots"></i> Haz clic en la curva para arrastrar puntos y ver cÃ³mo cambia la regresiÃ³n logÃ­stica en tiempo real.</div>
+  <div id="insigniaArea" class="insignia hidden">
+   <i class="fas fa-medal"></i>
+   <h3><i class="fas fa-certificate"></i> Mago de la LogÃ­stica</h3>
+   <p>Â¡Dominas la clasificaciÃ³n binaria! Sabes interpretar odds ratios y matrices de confusiÃ³n.</p>
+  </div>
+  <div class="nav-links">
+   <a href="13-inferencia-regresion.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+   <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> MenÃº</a>
+   <a href="15-bondad-ajuste.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> EstadÃ­stica Inferencial Interactiva Â· ClasificaciÃ³n binaria</footer>
+ </div>
+ <script>
+  const STORAGE_KEY='est_inf_lvl14';
+  let completed=false;
+  function save(){localStorage.setItem(STORAGE_KEY,'1');completed=true;}
+  function load(){if(localStorage.getItem(STORAGE_KEY)==='1'){completed=true;document.getElementById('insigniaArea').classList.remove('hidden');}}
+  load();
+  const nPts=document.getElementById('numPoints'),sep=document.getElementById('separation'),sVal=document.getElementById('separationVal'),linkS=document.getElementById('linkSelect'),thresh=document.getElementById('threshold'),tVal=document.getElementById('thresholdVal'),runBtn=document.getElementById('runBtn'),newBtn=document.getElementById('newDataBtn'),feed=document.getElementById('feedbackMsg'),ins=document.getElementById('insigniaArea'),canvas=document.getElementById('logitChart'),ctx=canvas.getContext('2d'),coeffBody=document.getElementById('coeffBody'),cmMatrix=document.getElementById('cmMatrix'),accB=document.getElementById('accuracyBadge'),senB=document.getElementById('sensitivityBadge'),speB=document.getElementById('specificityBadge');
+  sep.addEventListener('input',()=>sVal.textContent=sep.value);
+  thresh.addEventListener('input',()=>tVal.textContent=thresh.value);
+  let data=null;
+  function genData(N,sep){
+   let x=[],y=[];
+   for(let i=0;i<N;i++){
+    let xi=Math.random()*10;
+    let logit=-3+sep*(xi-5);
+    let p=1/(1+Math.exp(-logit));
+    let yi=Math.random()<p?1:0;
+    x.push(Math.round(xi*10)/10);
+    y.push(yi);
+   }
+   return {x,y};
+  }
+  function sigmoid(t){return 1/(1+Math.exp(-t));}
+  function normCdf(t){return 0.5*(1+erf(t/Math.SQRT2));}
+  function erf(z){
+   let t=1/(1+0.3275911*Math.abs(z));
+   let p=1-(0.254829592*t-0.284496736*t*t+1.421413741*t*t*t-1.453152027*t*t*t*t+1.061405429*t*t*t*t*t)*Math.exp(-z*z);
+   return z>=0?p:-p;
+  }
+  function fitLogistic(x,y){
+   const n=x.length;
+   let b0=0,b1=0;
+   for(let iter=0;iter<50;iter++){
+    let grad0=0,grad1=0,h00=0,h01=0,h11=0;let ll=0;
+    for(let i=0;i<n;i++){
+     let lin=b0+b1*x[i];
+     let p=sigmoid(lin);
+     if(p<1e-15)p=1e-15;if(p>1-1e-15)p=1-1e-15;
+     ll+=y[i]*Math.log(p)+(1-y[i])*Math.log(1-p);
+     let r=y[i]-p;
+     grad0+=r;grad1+=r*x[i];
+     let w=p*(1-p);
+     h00+=w;h01+=w*x[i];h11+=w*x[i]*x[i];
     }
-    function sigmoid(t){return 1/(1+Math.exp(-t));}
-    function normCdf(t){return 0.5*(1+erf(t/Math.SQRT2));}
-    function erf(z){
-      let t=1/(1+0.3275911*Math.abs(z));
-      let p=1-(0.254829592*t-0.284496736*t*t+1.421413741*t*t*t-1.453152027*t*t*t*t+1.061405429*t*t*t*t*t)*Math.exp(-z*z);
-      return z>=0?p:-p;
+    let det=h00*h11-h01*h01;if(Math.abs(det)<1e-15)break;
+    b0+=(h11*grad0-h01*grad1)/det;
+    b1+=(h00*grad1-h01*grad0)/det;
+   }
+   let se0=0,se1=0;
+   {let h00=0,h01=0,h11=0;
+   for(let i=0;i<n;i++){
+    let lin=b0+b1*x[i],p=sigmoid(lin);
+    if(p<1e-15)p=1e-15;if(p>1-1e-15)p=1-1e-15;
+    let w=p*(1-p);h00+=w;h01+=w*x[i];h11+=w*x[i]*x[i];
+   }
+   let det=h00*h11-h01*h01;if(Math.abs(det)>1e-15){se0=Math.sqrt(h11/det);se1=Math.sqrt(h00/det);}}
+   const z0=se0>0?b0/se0:0,z1=se1>0?b1/se1:0;
+   function pval(z){let x=Math.abs(z)/Math.SQRT2;let p=1+erf(x);p=p/2;return 2*(1-p);}
+   const p0=pval(z0),p1=pval(z1);
+   const or=Math.exp(b1);
+   return {b0,b1,se0,se1,z0,z1,p0,p1,or};
+  }
+  function fitProbit(x,y){
+   const n=x.length;
+   let b0=0,b1=0;
+   for(let iter=0;iter<50;iter++){
+    let grad0=0,grad1=0,h00=0,h01=0,h11=0;
+    for(let i=0;i<n;i++){
+     let lin=b0+b1*x[i];
+     let p=normCdf(lin);
+     if(p<1e-15)p=1e-15;if(p>1-1e-15)p=1-1e-15;
+     let pdf=Math.exp(-lin*lin/2)/Math.SQRT2PI;
+     let w=pdf*pdf/(p*(1-p));
+     let r=y[i]-p;
+     let u=pdf*r/(p*(1-p));
+     grad0+=u;grad1+=u*x[i];
+     h00+=w;h01+=w*x[i];h11+=w*x[i]*x[i];
     }
-    function fitLogistic(x,y){
-      const n=x.length;
-      let b0=0,b1=0;
-      for(let iter=0;iter<50;iter++){
-        let grad0=0,grad1=0,h00=0,h01=0,h11=0;let ll=0;
-        for(let i=0;i<n;i++){
-          let lin=b0+b1*x[i];
-          let p=sigmoid(lin);
-          if(p<1e-15)p=1e-15;if(p>1-1e-15)p=1-1e-15;
-          ll+=y[i]*Math.log(p)+(1-y[i])*Math.log(1-p);
-          let r=y[i]-p;
-          grad0+=r;grad1+=r*x[i];
-          let w=p*(1-p);
-          h00+=w;h01+=w*x[i];h11+=w*x[i]*x[i];
-        }
-        let det=h00*h11-h01*h01;if(Math.abs(det)<1e-15)break;
-        b0+=(h11*grad0-h01*grad1)/det;
-        b1+=(h00*grad1-h01*grad0)/det;
-      }
-      let se0=0,se1=0;
-      {let h00=0,h01=0,h11=0;
-      for(let i=0;i<n;i++){
-        let lin=b0+b1*x[i],p=sigmoid(lin);
-        if(p<1e-15)p=1e-15;if(p>1-1e-15)p=1-1e-15;
-        let w=p*(1-p);h00+=w;h01+=w*x[i];h11+=w*x[i]*x[i];
-      }
-      let det=h00*h11-h01*h01;if(Math.abs(det)>1e-15){se0=Math.sqrt(h11/det);se1=Math.sqrt(h00/det);}}
-      const z0=se0>0?b0/se0:0,z1=se1>0?b1/se1:0;
-      function pval(z){let x=Math.abs(z)/Math.SQRT2;let p=1+erf(x);p=p/2;return 2*(1-p);}
-      const p0=pval(z0),p1=pval(z1);
-      const or=Math.exp(b1);
-      return {b0,b1,se0,se1,z0,z1,p0,p1,or};
-    }
-    function fitProbit(x,y){
-      const n=x.length;
-      let b0=0,b1=0;
-      for(let iter=0;iter<50;iter++){
-        let grad0=0,grad1=0,h00=0,h01=0,h11=0;
-        for(let i=0;i<n;i++){
-          let lin=b0+b1*x[i];
-          let p=normCdf(lin);
-          if(p<1e-15)p=1e-15;if(p>1-1e-15)p=1-1e-15;
-          let pdf=Math.exp(-lin*lin/2)/Math.SQRT2PI;
-          let w=pdf*pdf/(p*(1-p));
-          let r=y[i]-p;
-          let u=pdf*r/(p*(1-p));
-          grad0+=u;grad1+=u*x[i];
-          h00+=w;h01+=w*x[i];h11+=w*x[i]*x[i];
-        }
-        let det=h00*h11-h01*h01;if(Math.abs(det)<1e-15)break;
-        b0+=(h11*grad0-h01*grad1)/det;
-        b1+=(h00*grad1-h01*grad0)/det;
-      }
-      let se0=0,se1=0;
-      {let h00=0,h01=0,h11=0;
-      for(let i=0;i<n;i++){
-        let lin=b0+b1*x[i],p=normCdf(lin);
-        if(p<1e-15)p=1e-15;if(p>1-1e-15)p=1-1e-15;
-        let pdf=Math.exp(-lin*lin/2)/Math.SQRT2PI;
-        let w=pdf*pdf/(p*(1-p));h00+=w;h01+=w*x[i];h11+=w*x[i]*x[i];
-      }
-      let det=h00*h11-h01*h01;if(Math.abs(det)>1e-15){se0=Math.sqrt(h11/det);se1=Math.sqrt(h00/det);}}
-      const z0=se0>0?b0/se0:0,z1=se1>0?b1/se1:0;
-      function pval(z){let x=Math.abs(z)/Math.SQRT2;let p=1+erf(x);p=p/2;return 2*(1-p);}
-      const p0=pval(z0),p1=pval(z1);
-      const or=Math.exp(b1);
-      return {b0,b1,se0,se1,z0,z1,p0,p1,or};
-    }
-    function drawChart(x,y,model,linkSel,xRange){
-      const pad={t:20,b:35,l:45,r:20},w=canvas.width,h=canvas.height;
-      const pw=w-pad.l-pad.r,ph=h-pad.t-pad.b;
-      const xMin=Math.min(...x)-0.5,xMax=Math.max(...x)+0.5;
-      const yMin=-0.05,yMax=1.05;
-      function sx(v){return pad.l+(v-xMin)/(xMax-xMin)*pw;}
-      function sy(v){return pad.t+ph-(v-yMin)/(yMax-yMin)*ph;}
-      ctx.clearRect(0,0,w,h);
-      for(let i=0;i<=5;i++){let yi=i/5;ctx.strokeStyle='#1a2a4a';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pad.l,sy(yi));ctx.lineTo(w-pad.r,sy(yi));ctx.stroke();ctx.fillStyle='#446';ctx.font='10px Inter';ctx.fillText(yi.toFixed(1),5,sy(yi)+3);}
-      ctx.fillStyle='#446';ctx.font='10px Inter';ctx.fillText('0',pad.l-8,sy(0)+10);ctx.fillText('1',pad.l-8,sy(1)+10);
-      for(let i=0;i<=10;i++){let xi=xMin+i/10*(xMax-xMin);ctx.strokeStyle='#1a2a4a';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(sx(xi),pad.t);ctx.lineTo(sx(xi),h-pad.b);ctx.stroke();ctx.fillStyle='#446';ctx.font='9px Inter';ctx.fillText(xi.toFixed(1),sx(xi)-7,h-pad.b+15);}
-      for(let i=0;i<x.length;i++){
-        ctx.beginPath();ctx.arc(sx(x[i]),sy(y[i]),7,0,2*Math.PI);
-        ctx.fillStyle=y[i]===1?'#6f6':'#f66';
-        ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.fill();ctx.stroke();
-      }
-      ctx.strokeStyle='#9c64ff';ctx.lineWidth=3;
-      ctx.beginPath();
-      for(let i=0;i<=100;i++){
-        let xi=xMin+i/100*(xMax-xMin);
-        let lin=model.b0+model.b1*xi;
-        let p=linkSel==='logit'?sigmoid(lin):normCdf(lin);
-        if(i===0)ctx.moveTo(sx(xi),sy(p));else ctx.lineTo(sx(xi),sy(p));
-      }
-      ctx.stroke();
-      ctx.fillStyle='#c9a8ff';ctx.font='11px Inter';ctx.fillText(linkSel==='logit'?'Logit':'Probit',w-80,20);
-    }
-    function run(){
-      const N=parseInt(nPts.value),sepVal=parseFloat(sep.value),link=linkS.value,thr=parseFloat(thresh.value);
-      if(!data)data=genData(N,sepVal);
-      const model=link==='logit'?fitLogistic(data.x,data.y):fitProbit(data.x,data.y);
-      coeffBody.innerHTML=`<tr><td>β₀ (intercepto)</td><td>${model.b0.toFixed(3)}</td><td>${model.se0.toFixed(3)}</td><td>${model.z0.toFixed(2)}</td><td style="color:${model.p0<0.05?'#6f6':'#f66'}">${model.p0.toFixed(4)}</td><td>${Math.exp(model.b0).toFixed(3)}</td></tr><tr><td>β₁ (X)</td><td>${model.b1.toFixed(3)}</td><td>${model.se1.toFixed(3)}</td><td>${model.z1.toFixed(2)}</td><td style="color:${model.p1<0.05?'#6f6':'#f66'}">${model.p1.toFixed(4)}</td><td>${model.or.toFixed(3)}</td></tr>`;
-      let tp=0,tn=0,fp=0,fn=0;
-      for(let i=0;i<data.x.length;i++){
-        let lin=model.b0+model.b1*data.x[i];
-        let p=link==='logit'?sigmoid(lin):normCdf(lin);
-        let pred=p>=thr?1:0;
-        if(data.y[i]===1&&pred===1)tp++;
-        else if(data.y[i]===0&&pred===0)tn++;
-        else if(data.y[i]===0&&pred===1)fp++;
-        else if(data.y[i]===1&&pred===0)fn++;
-      }
-      const acc=(tp+tn)/(tp+tn+fp+fn)||0;
-      const sens=tp/(tp+fn)||0;
-      const spec=tn/(tn+fp)||0;
-      cmMatrix.innerHTML=`<div class="cm-cell tp"><div class="num">${tp}</div>TP (VP)</div><div class="cm-cell fp"><div class="num">${fp}</div>FP</div><div class="cm-cell fn"><div class="num">${fn}</div>FN</div><div class="cm-cell tn"><div class="num">${tn}</div>TN (VN)</div>`;
-      accB.innerHTML=`<strong>Exactitud:</strong> ${(acc*100).toFixed(1)}%`;
-      senB.innerHTML=`<strong>Sensibilidad:</strong> ${(sens*100).toFixed(1)}%`;
-      speB.innerHTML=`<strong>Especificidad:</strong> ${(spec*100).toFixed(1)}%`;
-      drawChart(data.x,data.y,model,link);
-      feed.innerHTML=`<i class="fas fa-comment-dots"></i> OR = ${model.or.toFixed(3)}. Por cada unidad en X, los odds se multiplican por ${model.or.toFixed(3)}.`;
-      if(!completed&&model.p1<0.05){completed=true;save();ins.classList.remove('hidden');feed.innerHTML+=` <i class="fas fa-star" style="color:gold;"></i> ¡Has ganado la insignia!`;}
-    }
-    function togglePoint(e){
-      const rect=canvas.getBoundingClientRect();
-      const mx=e.clientX-rect.left,my=e.clientY-rect.top;
-      const w=canvas.width,h=canvas.height;
-      const scaleX=w/rect.width,scaleY=h/rect.height;
-      const cx=mx*scaleX,cy=my*scaleY;
-      const xMin=Math.min(...data.x)-0.5,xMax=Math.max(...data.x)+0.5,yMin=-0.05,yMax=1.05;
-      const pad={t:20,b:35,l:45,r:20},pw=w-pad.l-pad.r,ph=h-pad.t-pad.b;
-      function sx(v){return pad.l+(v-xMin)/(xMax-xMin)*pw;}
-      function sy(v){return pad.t+ph-(v-yMin)/(yMax-yMin)*ph;}
-      let best=-1,bestD=20;
-      for(let i=0;i<data.x.length;i++){
-        let d=Math.sqrt((cx-sx(data.x[i]))**2+(cy-sy(data.y[i]))**2);
-        if(d<bestD){bestD=d;best=i;}
-      }
-      if(best>=0&&bestD<20){
-        data.y[best]=data.y[best]===1?0:1;
-        run();
-      }
-    }
-    newBtn.addEventListener('click',()=>{
-      data=genData(parseInt(nPts.value),parseFloat(sep.value));
-      run();
-    });
-    canvas.addEventListener('click',togglePoint);
-    runBtn.addEventListener('click',run);
-  </script>
-</body>
+    let det=h00*h11-h01*h01;if(Math.abs(det)<1e-15)break;
+    b0+=(h11*grad0-h01*grad1)/det;
+    b1+=(h00*grad1-h01*grad0)/det;
+   }
+   let se0=0,se1=0;
+   {let h00=0,h01=0,h11=0;
+   for(let i=0;i<n;i++){
+    let lin=b0+b1*x[i],p=normCdf(lin);
+    if(p<1e-15)p=1e-15;if(p>1-1e-15)p=1-1e-15;
+    let pdf=Math.exp(-lin*lin/2)/Math.SQRT2PI;
+    let w=pdf*pdf/(p*(1-p));h00+=w;h01+=w*x[i];h11+=w*x[i]*x[i];
+   }
+   let det=h00*h11-h01*h01;if(Math.abs(det)>1e-15){se0=Math.sqrt(h11/det);se1=Math.sqrt(h00/det);}}
+   const z0=se0>0?b0/se0:0,z1=se1>0?b1/se1:0;
+   function pval(z){let x=Math.abs(z)/Math.SQRT2;let p=1+erf(x);p=p/2;return 2*(1-p);}
+   const p0=pval(z0),p1=pval(z1);
+   const or=Math.exp(b1);
+   return {b0,b1,se0,se1,z0,z1,p0,p1,or};
+  }
+  function drawChart(x,y,model,linkSel,xRange){
+   const pad={t:20,b:35,l:45,r:20},w=canvas.width,h=canvas.height;
+   const pw=w-pad.l-pad.r,ph=h-pad.t-pad.b;
+   const xMin=Math.min(...x)-0.5,xMax=Math.max(...x)+0.5;
+   const yMin=-0.05,yMax=1.05;
+   function sx(v){return pad.l+(v-xMin)/(xMax-xMin)*pw;}
+   function sy(v){return pad.t+ph-(v-yMin)/(yMax-yMin)*ph;}
+   ctx.clearRect(0,0,w,h);
+   for(let i=0;i<=5;i++){let yi=i/5;ctx.strokeStyle='#1a2a4a';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pad.l,sy(yi));ctx.lineTo(w-pad.r,sy(yi));ctx.stroke();ctx.fillStyle='#446';ctx.font='10px Inter';ctx.fillText(yi.toFixed(1),5,sy(yi)+3);}
+   ctx.fillStyle='#446';ctx.font='10px Inter';ctx.fillText('0',pad.l-8,sy(0)+10);ctx.fillText('1',pad.l-8,sy(1)+10);
+   for(let i=0;i<=10;i++){let xi=xMin+i/10*(xMax-xMin);ctx.strokeStyle='#1a2a4a';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(sx(xi),pad.t);ctx.lineTo(sx(xi),h-pad.b);ctx.stroke();ctx.fillStyle='#446';ctx.font='9px Inter';ctx.fillText(xi.toFixed(1),sx(xi)-7,h-pad.b+15);}
+   for(let i=0;i<x.length;i++){
+    ctx.beginPath();ctx.arc(sx(x[i]),sy(y[i]),7,0,2*Math.PI);
+    ctx.fillStyle=y[i]===1?'#6f6':'#f66';
+    ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.fill();ctx.stroke();
+   }
+   ctx.strokeStyle='#9c64ff';ctx.lineWidth=3;
+   ctx.beginPath();
+   for(let i=0;i<=100;i++){
+    let xi=xMin+i/100*(xMax-xMin);
+    let lin=model.b0+model.b1*xi;
+    let p=linkSel==='logit'?sigmoid(lin):normCdf(lin);
+    if(i===0)ctx.moveTo(sx(xi),sy(p));else ctx.lineTo(sx(xi),sy(p));
+   }
+   ctx.stroke();
+   ctx.fillStyle='#c9a8ff';ctx.font='11px Inter';ctx.fillText(linkSel==='logit'?'Logit':'Probit',w-80,20);
+  }
+  function run(){
+   const N=parseInt(nPts.value),sepVal=parseFloat(sep.value),link=linkS.value,thr=parseFloat(thresh.value);
+   if(!data)data=genData(N,sepVal);
+   const model=link==='logit'?fitLogistic(data.x,data.y):fitProbit(data.x,data.y);
+   coeffBody.innerHTML=`<tr><td>Î²â‚€ (intercepto)</td><td>${model.b0.toFixed(3)}</td><td>${model.se0.toFixed(3)}</td><td>${model.z0.toFixed(2)}</td><td style="color:${model.p0<0.05?'#6f6':'#f66'}">${model.p0.toFixed(4)}</td><td>${Math.exp(model.b0).toFixed(3)}</td></tr><tr><td>Î²â‚ (X)</td><td>${model.b1.toFixed(3)}</td><td>${model.se1.toFixed(3)}</td><td>${model.z1.toFixed(2)}</td><td style="color:${model.p1<0.05?'#6f6':'#f66'}">${model.p1.toFixed(4)}</td><td>${model.or.toFixed(3)}</td></tr>`;
+   let tp=0,tn=0,fp=0,fn=0;
+   for(let i=0;i<data.x.length;i++){
+    let lin=model.b0+model.b1*data.x[i];
+    let p=link==='logit'?sigmoid(lin):normCdf(lin);
+    let pred=p>=thr?1:0;
+    if(data.y[i]===1&&pred===1)tp++;
+    else if(data.y[i]===0&&pred===0)tn++;
+    else if(data.y[i]===0&&pred===1)fp++;
+    else if(data.y[i]===1&&pred===0)fn++;
+   }
+   const acc=(tp+tn)/(tp+tn+fp+fn)||0;
+   const sens=tp/(tp+fn)||0;
+   const spec=tn/(tn+fp)||0;
+   cmMatrix.innerHTML=`<div class="cm-cell tp"><div class="num">${tp}</div>TP (VP)</div><div class="cm-cell fp"><div class="num">${fp}</div>FP</div><div class="cm-cell fn"><div class="num">${fn}</div>FN</div><div class="cm-cell tn"><div class="num">${tn}</div>TN (VN)</div>`;
+   accB.innerHTML=`<strong>Exactitud:</strong> ${(acc*100).toFixed(1)}%`;
+   senB.innerHTML=`<strong>Sensibilidad:</strong> ${(sens*100).toFixed(1)}%`;
+   speB.innerHTML=`<strong>Especificidad:</strong> ${(spec*100).toFixed(1)}%`;
+   drawChart(data.x,data.y,model,link);
+   feed.innerHTML=`<i class="fas fa-comment-dots"></i> OR = ${model.or.toFixed(3)}. Por cada unidad en X, los odds se multiplican por ${model.or.toFixed(3)}.`;
+   if(!completed&&model.p1<0.05){completed=true;save();ins.classList.remove('hidden');feed.innerHTML+=` <i class="fas fa-star" style="color:gold;"></i> Â¡Has ganado la insignia!`;}
+  }
+  function togglePoint(e){
+   const rect=canvas.getBoundingClientRect();
+   const mx=e.clientX-rect.left,my=e.clientY-rect.top;
+   const w=canvas.width,h=canvas.height;
+   const scaleX=w/rect.width,scaleY=h/rect.height;
+   const cx=mx*scaleX,cy=my*scaleY;
+   const xMin=Math.min(...data.x)-0.5,xMax=Math.max(...data.x)+0.5,yMin=-0.05,yMax=1.05;
+   const pad={t:20,b:35,l:45,r:20},pw=w-pad.l-pad.r,ph=h-pad.t-pad.b;
+   function sx(v){return pad.l+(v-xMin)/(xMax-xMin)*pw;}
+   function sy(v){return pad.t+ph-(v-yMin)/(yMax-yMin)*ph;}
+   let best=-1,bestD=20;
+   for(let i=0;i<data.x.length;i++){
+    let d=Math.sqrt((cx-sx(data.x[i]))**2+(cy-sy(data.y[i]))**2);
+    if(d<bestD){bestD=d;best=i;}
+   }
+   if(best>=0&&bestD<20){
+    data.y[best]=data.y[best]===1?0:1;
+    run();
+   }
+  }
+  newBtn.addEventListener('click',()=>{
+   data=genData(parseInt(nPts.value),parseFloat(sep.value));
+   run();
+  });
+  canvas.addEventListener('click',togglePoint);
+  runBtn.addEventListener('click',run);
+ </script>
+ </body>
 </html>

@@ -1,178 +1,176 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Probabilidades | Esperanza y Varianza</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #111a2e 100%);
-      background-size: 200% 200%;
-      animation: gradientShift 20s ease infinite;
-      font-family: 'Inter', sans-serif; color: #eef5ff;
-      min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem;
-    }
-    @keyframes gradientShift { 0%{background-position:0% 50%;} 50%{background-position:100% 50%;} 100%{background-position:0% 50%;} }
-    .mod-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(0,224,255,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
-    .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #00e0ff; }
-    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#7af2ff,#00e0ff); -webkit-background-clip:text; background-clip:text; color:transparent; }
-    .hero-header p { font-size:1.1rem; color:#7af2ff; margin-top:0.5rem; }
-    .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
-    .chip { background:rgba(0,224,255,0.15); border:1px solid #00e0ff; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
-    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #00e0ff; font-size:1rem; line-height:1.6; }
-    .main-flex { display:flex; flex-wrap:wrap; gap:2rem; padding:0 2rem 1.5rem; }
-    .theory-area { flex:1.2; min-width:260px; background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; border:1px solid rgba(0,224,255,0.2); }
-    .theory-area h3 { color:#00e0ff; margin:0.8rem 0 0.4rem; font-size:1.1rem; }
-    .theory-area p, .theory-area li { font-size:0.9rem; line-height:1.5; color:#d4dcec; }
-    .theory-area ul { padding-left:1.2rem; }
-    .interactive-area { flex:1.8; min-width:280px; background:rgba(20,20,30,0.8); border-radius:2rem; padding:1.5rem; text-align:center; border:1px solid #00e0ff; }
-    .interactive-area h3 { color:#00e0ff; margin-bottom:0.8rem; }
-    .calc-tabs { display:flex; gap:0.5rem; justify-content:center; flex-wrap:wrap; margin-bottom:1rem; }
-    .calc-tab { background:#2c3e66; border:none; padding:0.5rem 1rem; border-radius:2rem; cursor:pointer; font-weight:600; color:#eef5ff; transition:0.2s; }
-    .calc-tab.active { background:#00e0ff; color:#000; }
-    .calc-tab:hover { transform:translateY(-2px); }
-    .data-input-area { margin:0.8rem 0; }
-    .data-input-area textarea { width:100%; background:#0a0f1e; border:1px solid #00e0ff44; border-radius:1rem; padding:0.6rem; color:#eef5ff; font-family:monospace; font-size:0.85rem; resize:vertical; }
-    .calc-result { background:#00000066; border-radius:2rem; padding:0.8rem; margin:0.5rem 0; font-size:0.95rem; }
-    .calc-result span { color:#00e0ff; font-weight:700; font-size:1.2rem; }
-    .calc-row { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; margin:0.5rem 0; }
-    .calc-box { background:#0a0f1e; border-radius:1.5rem; padding:0.8rem; flex:1; min-width:120px; border:1px solid #00e0ff22; }
-    .calc-box .label { font-size:0.75rem; color:#7af2ff; }
-    .calc-box .value { font-size:1.4rem; font-weight:700; color:#00e0ff; }
-    .data-input-area input[type=text] { width:100%; background:#0a0f1e; border:1px solid #00e0ff44; border-radius:1rem; padding:0.5rem; color:#eef5ff; font-family:monospace; }
-    .btn-action { background:linear-gradient(95deg,#f0a500,#ff6a00); border:none; padding:0.8rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin:0.3rem; }
-    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(240,165,0,0.5); }
-    .btn-action.secondary { background:#2c3e66; color:#eef5ff; }
-    .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #00e0ff; }
-    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:0 2rem 1.5rem; padding:1rem; border:1px dashed #00e0ff; }
-    .insignia i { font-size:2.5rem; color:#00e0ff; }
-    .hidden { display:none; }
-    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
-    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
-    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(0,224,255,0.4); }
-    .nav-link.next { background:linear-gradient(95deg,#f0a500,#ff6a00); color:#1e1a0c; }
-    .nav-link.menu { background:#1a2a4a; border:1px solid #3399ff; }
-    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
-    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
-  </style>
-  <link rel="stylesheet" href="../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Probabilidades | Esperanza y Varianza</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+   background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #111a2e 100%);
+   background-size: 200% 200%;
+   animation: gradientShift 20s ease infinite;
+   font-family: 'Inter', sans-serif; color: #eef5ff;
+   min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem;
+  }
+  @keyframes gradientShift { 0%{background-position:0% 50%;} 50%{background-position:100% 50%;} 100%{background-position:0% 50%;} }
+  .mod-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(0,224,255,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+  .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #00e0ff; }
+  .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#7af2ff,#00e0ff); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero-header p { font-size:1.1rem; color:#7af2ff; margin-top:0.5rem; }
+  .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+  .chip { background:rgba(0,224,255,0.15); border:1px solid #00e0ff; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+  .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #00e0ff; font-size:1rem; line-height:1.6; }
+  .main-flex { display:flex; flex-wrap:wrap; gap:2rem; padding:0 2rem 1.5rem; }
+  .theory-area { flex:1.2; min-width:260px; background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; border:1px solid rgba(0,224,255,0.2); }
+  .theory-area h3 { color:#00e0ff; margin:0.8rem 0 0.4rem; font-size:1.1rem; }
+  .theory-area p, .theory-area li { font-size:0.9rem; line-height:1.5; color:#d4dcec; }
+  .theory-area ul { padding-left:1.2rem; }
+  .interactive-area { flex:1.8; min-width:280px; background:rgba(20,20,30,0.8); border-radius:2rem; padding:1.5rem; text-align:center; border:1px solid #00e0ff; }
+  .interactive-area h3 { color:#00e0ff; margin-bottom:0.8rem; }
+  .calc-tabs { display:flex; gap:0.5rem; justify-content:center; flex-wrap:wrap; margin-bottom:1rem; }
+  .calc-tab { background:#2c3e66; border:none; padding:0.5rem 1rem; border-radius:2rem; cursor:pointer; font-weight:600; color:#eef5ff; transition:0.2s; }
+  .calc-tab.active { background:#00e0ff; color:#000; }
+  .calc-tab:hover { transform:translateY(-2px); }
+  .data-input-area { margin:0.8rem 0; }
+  .data-input-area textarea { width:100%; background:#0a0f1e; border:1px solid #00e0ff44; border-radius:1rem; padding:0.6rem; color:#eef5ff; font-family:monospace; font-size:0.85rem; resize:vertical; }
+  .calc-result { background:#00000066; border-radius:2rem; padding:0.8rem; margin:0.5rem 0; font-size:0.95rem; }
+  .calc-result span { color:#00e0ff; font-weight:700; font-size:1.2rem; }
+  .calc-row { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; margin:0.5rem 0; }
+  .calc-box { background:#0a0f1e; border-radius:1.5rem; padding:0.8rem; flex:1; min-width:120px; border:1px solid #00e0ff22; }
+  .calc-box .label { font-size:0.75rem; color:#7af2ff; }
+  .calc-box .value { font-size:1.4rem; font-weight:700; color:#00e0ff; }
+  .data-input-area input[type=text] { width:100%; background:#0a0f1e; border:1px solid #00e0ff44; border-radius:1rem; padding:0.5rem; color:#eef5ff; font-family:monospace; }
+  .btn-action { background:linear-gradient(95deg,#f0a500,#ff6a00); border:none; padding:0.8rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin:0.3rem; }
+  .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(240,165,0,0.5); }
+  .btn-action.secondary { background:#2c3e66; color:#eef5ff; }
+  .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #00e0ff; }
+  .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:0 2rem 1.5rem; padding:1rem; border:1px dashed #00e0ff; }
+  .insignia i { font-size:2.5rem; color:#00e0ff; }
+  .hidden { display:none; }
+  .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+  .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+  .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(0,224,255,0.4); }
+  .nav-link.next { background:linear-gradient(95deg,#f0a500,#ff6a00); color:#1e1a0c; }
+  .nav-link.menu { background:#1a2a4a; border:1px solid #3399ff; }
+  footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
+ </style>
+ <link rel="stylesheet" href="../../assets/css/theme.css">
 </head>
 <body>
-  <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
-  <div class="mod-container">
-    <div class="hero-header">
-      <h1>⚖️ ESPERANZA Y VARIANZA ⚖️</h1>
-      <p>El centro de masa y la dispersión de la probabilidad — los dos pilares del análisis</p>
-      <div class="badge-area">
-        <span class="chip"><i class="fas fa-calculator"></i> Esperanza matemática</span>
-        <span class="chip"><i class="fas fa-chart-line"></i> Varianza</span>
-        <span class="chip"><i class="fas fa-gem"></i> Insignia Cian</span>
-      </div>
+ <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+ <div class="mod-container">
+  <div class="hero-header">
+   <h1>⚖️ ESPERANZA Y VARIANZA ⚖️</h1>
+   <p>El centro de masa y la dispersión de la probabilidad — los dos pilares del análisis</p>
+   <div class="badge-area">
+    <span class="chip"><i class="fas fa-calculator"></i> Esperanza matemática</span>
+    <span class="chip"><i class="fas fa-chart-line"></i> Varianza</span>
+    <span class="chip"><i class="fas fa-gem"></i> Insignia Cian</span>
+   </div>
+  </div>
+  <div class="analogy-card">
+   <strong>⚖️ Piénsalo así:</strong> La esperanza es el centro de masa de la probabilidad — el punto donde se equilibraría la distribución si fuera un objeto físico. La varianza mide qué tan dispersos están los valores alrededor de ese centro. Una distribución con poca varianza es como un alunizaje preciso; con mucha varianza, como lanzar dardos con los ojos vendados.
+  </div>
+  <div class="main-flex">
+   <div class="theory-area">
+    <h3><i class="fas fa-crosshairs"></i> Esperanza E[X]</h3><p>Discreta: E[X] = Σ x·P(x). Continua: E[X] = ∫ x·f(x)dx.</p>
+    <h3><i class="fas fa-magic"></i> Ley del Estadístico Inconsciente</h3><p>E[g(X)] = Σ g(x)·P(x). No necesitas la distribución de g(X), solo aplicar g a cada valor.</p>
+    <h3><i class="fas fa-expand-arrows-alt"></i> Varianza Var[X]</h3><p>Var[X] = E[X²] - (E[X])². Mide la dispersión al cuadrado.</p>
+    <h3><i class="fas fa-plus-circle"></i> Propiedades clave</h3>
+    <ul><li>E[aX + b] = a·E[X] + b (linealidad)</li><li>Var[aX + b] = a²·Var[X]</li><li>E[X + Y] = E[X] + E[Y] (siempre)</li></ul>
+    <h3><i class="fas fa-cube"></i> Momentos E[Xᵏ]</h3><p>El k-ésimo momento es E[Xᵏ]. El primer momento es la media; el segundo momento (centrado) es la varianza.</p>
+   </div>
+   <div class="interactive-area">
+    <h3><i class="fas fa-sliders-h"></i> Calculadora de Momentos</h3>
+    <div class="calc-tabs">
+     <button class="calc-tab active" data-calc="discrete">VA Discreta</button>
+     <button class="calc-tab" data-calc="transform">Transformación</button>
     </div>
-    <div class="analogy-card">
-      <strong>⚖️ Piénsalo así:</strong> La esperanza es el centro de masa de la probabilidad — el punto donde se equilibraría la distribución si fuera un objeto físico. La varianza mide qué tan dispersos están los valores alrededor de ese centro. Una distribución con poca varianza es como un alunizaje preciso; con mucha varianza, como lanzar dardos con los ojos vendados.
-    </div>
-    <div class="main-flex">
-      <div class="theory-area">
-        <h3><i class="fas fa-crosshairs"></i> Esperanza E[X]</h3><p>Discreta: E[X] = Σ x·P(x). Continua: E[X] = ∫ x·f(x)dx.</p>
-        <h3><i class="fas fa-magic"></i> Ley del Estadístico Inconsciente</h3><p>E[g(X)] = Σ g(x)·P(x). No necesitas la distribución de g(X), solo aplicar g a cada valor.</p>
-        <h3><i class="fas fa-expand-arrows-alt"></i> Varianza Var[X]</h3><p>Var[X] = E[X²] - (E[X])². Mide la dispersión al cuadrado.</p>
-        <h3><i class="fas fa-plus-circle"></i> Propiedades clave</h3>
-        <ul><li>E[aX + b] = a·E[X] + b (linealidad)</li><li>Var[aX + b] = a²·Var[X]</li><li>E[X + Y] = E[X] + E[Y] (siempre)</li></ul>
-        <h3><i class="fas fa-cube"></i> Momentos E[Xᵏ]</h3><p>El k-ésimo momento es E[Xᵏ]. El primer momento es la media; el segundo momento (centrado) es la varianza.</p>
-      </div>
-      <div class="interactive-area">
-        <h3><i class="fas fa-sliders-h"></i> Calculadora de Momentos</h3>
-        <div class="calc-tabs">
-          <button class="calc-tab active" data-calc="discrete">VA Discreta</button>
-          <button class="calc-tab" data-calc="transform">Transformación</button>
-        </div>
-        <div id="discreteCalc">
-          <div class="data-input-area">
-            <label style="font-size:0.85rem;color:#7af2ff;">Valores x y probabilidades P(x) (formato: x,p por línea)</label>
-            <textarea id="distInput" rows="4">1,0.2
+    <div id="discreteCalc">
+     <div class="data-input-area">
+      <label style="font-size:0.85rem;color:#7af2ff;">Valores x y probabilidades P(x) (formato: x,p por línea)</label>
+      <textarea id="distInput" rows="4">1,0.2
 2,0.3
 3,0.4
 4,0.1</textarea>
-          </div>
-          <button id="calcMomentsBtn" class="btn-action"><i class="fas fa-calculator"></i> Calcular</button>
-          <div class="calc-row">
-            <div class="calc-box"><div class="label">Esperanza E[X]</div><div class="value" id="eResult">2.40</div></div>
-            <div class="calc-box"><div class="label">Varianza Var[X]</div><div class="value" id="varResult">0.84</div></div>
-            <div class="calc-box"><div class="label">Desv. Est. σ</div><div class="value" id="stdResult">0.92</div></div>
-          </div>
-        </div>
-        <div id="transformCalc" style="display:none;">
-          <p style="font-size:0.85rem;color:#7af2ff;margin-bottom:0.5rem;">Aplica una transformación a la VA y calcula E[g(X)]</p>
-          <div class="data-input-area">
-            <label style="font-size:0.85rem;color:#7af2ff;">Misma distribución de arriba. g(x) =</label>
-            <input type="text" id="transformInput" value="x^2">
-          </div>
-          <button id="calcTransformBtn" class="btn-action secondary"><i class="fas fa-magic"></i> Calcular E[g(X)]</button>
-          <div class="calc-result">E[g(X)] = <span id="egResult">6.40</span></div>
-        </div>
-        <div id="momentDisplay" style="font-size:0.85rem;margin-top:0.5rem;color:#7af2ff;">
-          Momentos: E[X²] = <span id="ex2Result">6.40</span> · Var[X] = E[X²] - (E[X])²
-        </div>
-      </div>
+     </div>
+     <button id="calcMomentsBtn" class="btn-action"><i class="fas fa-calculator"></i> Calcular</button>
+     <div class="calc-row">
+      <div class="calc-box"><div class="label">Esperanza E[X]</div><div class="value" id="eResult">2.40</div></div>
+      <div class="calc-box"><div class="label">Varianza Var[X]</div><div class="value" id="varResult">0.84</div></div>
+      <div class="calc-box"><div class="label">Desv. Est. σ</div><div class="value" id="stdResult">0.92</div></div>
+     </div>
     </div>
-    <div id="feedbackMsg" class="feedback">💡 Ingresa valores de una VA discreta y calcula su esperanza, varianza y momentos. La varianza siempre es no negativa.</div>
-    <div id="insigniaArea" class="insignia hidden">
-      <i class="fas fa-medal"></i><h3>🏅 ¡MAESTRO DE LA ESPERANZA! 🏅</h3><p>Dominas la esperanza, la varianza y los momentos. ¡El centro de masa de la probabilidad te pertenece!</p>
+    <div id="transformCalc" style="display:none;">
+     <p style="font-size:0.85rem;color:#7af2ff;margin-bottom:0.5rem;">Aplica una transformación a la VA y calcula E[g(X)]</p>
+     <div class="data-input-area">
+      <label style="font-size:0.85rem;color:#7af2ff;">Misma distribución de arriba. g(x) =</label>
+      <input type="text" id="transformInput" value="x^2">
+     </div>
+     <button id="calcTransformBtn" class="btn-action secondary"><i class="fas fa-magic"></i> Calcular E[g(X)]</button>
+     <div class="calc-result">E[g(X)] = <span id="egResult">6.40</span></div>
     </div>
-    <div class="nav-links">
-      <a href="07-discretas2.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
-      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
-      <a href="09-continuas.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+    <div id="momentDisplay" style="font-size:0.85rem;margin-top:0.5rem;color:#7af2ff;">
+     Momentos: E[X²] = <span id="ex2Result">6.40</span> · Var[X] = E[X²] - (E[X])²
     </div>
-    <footer><i class="fas fa-crown"></i> Probabilidades Interactivas · La esperanza es el faro en la niebla de la aleatoriedad</footer>
+   </div>
   </div>
-  <script>
-    const STORAGE_KEY = 'prob_lvl8';
-    let calcDone = false;
-    function parseDist(text){const lines=text.trim().split('\n');const vals=[];for(const l of lines){const p=l.split(',').map(s=>parseFloat(s.trim()));if(p.length>=2&&!isNaN(p[0])&&!isNaN(p[1]))vals.push({x:p[0],p:p[1]});}return vals;}
-    function computeMoments(){
-      const dist=parseDist(document.getElementById('distInput').value);
-      if(dist.length===0){document.getElementById('feedbackMsg').innerHTML=I18N.t('fb_0');return;}
-      const totalP=dist.reduce((s,d)=>s+d.p,0);
-      if(Math.abs(totalP-1)>0.01){document.getElementById('feedbackMsg').innerHTML=I18N.t('fb_1')+totalP.toFixed(3)+'. Deben sumar ~1.';return;}
-      const eX=dist.reduce((s,d)=>s+d.x*d.p,0);const eX2=dist.reduce((s,d)=>s+d.x*d.x*d.p,0);
-      const varian=eX2-eX*eX;const std=Math.sqrt(Math.max(0,varian));
-      document.getElementById('eResult').textContent=eX.toFixed(4);document.getElementById('varResult').textContent=varian.toFixed(4);
-      document.getElementById('stdResult').textContent=std.toFixed(4);document.getElementById('ex2Result').textContent=eX2.toFixed(4);
-      document.getElementById('feedbackMsg').innerHTML=I18N.t('fb_2')+eX.toFixed(4)+', Var[X] = '+varian.toFixed(4)+'. ¡La varianza mide la dispersión!';
-      calcDone=true;checkInsignia();
-    }
-    function computeTransform(){
-      const dist=parseDist(document.getElementById('distInput').value);
-      if(dist.length===0)return;const t=document.getElementById('transformInput').value.trim();
-      try{const fn=new Function('x','return '+t+';');let egX=0;for(const d of dist){const gx=fn(d.x);if(isNaN(gx)||!isFinite(gx))throw Error();egX+=gx*d.p;}
-        document.getElementById('egResult').textContent=egX.toFixed(4);document.getElementById('feedbackMsg').innerHTML=I18N.t('fb_3')+egX.toFixed(4)+'. ¡Ley del Estadístico Inconsciente!';
-        calcDone=true;checkInsignia();
-      }catch(e){document.getElementById('feedbackMsg').innerHTML=I18N.t('fb_4');}
-    }
-    function checkInsignia(){if(calcDone&&!localStorage.getItem(STORAGE_KEY)){document.getElementById('insigniaArea').classList.remove('hidden');localStorage.setItem(STORAGE_KEY,'true');document.getElementById('feedbackMsg').innerHTML=I18N.t('fb_5');}}
-    document.getElementById('calcMomentsBtn').addEventListener('click',computeMoments);
-    document.getElementById('calcTransformBtn').addEventListener('click',computeTransform);
-    document.querySelectorAll('.calc-tab').forEach(tab=>tab.addEventListener('click',()=>{document.querySelectorAll('.calc-tab').forEach(t=>t.classList.remove('active'));tab.classList.add('active');const d=tab.dataset.calc==='discrete';document.getElementById('discreteCalc').style.display=d?'block':'none';document.getElementById('transformCalc').style.display=d?'none':'block';}));
-    if(localStorage.getItem(STORAGE_KEY)==='true'){document.getElementById('insigniaArea').classList.remove('hidden');document.getElementById('feedbackMsg').innerHTML=I18N.t('fb_6');}
-    computeMoments();
-  </script>
-  <script src="../../assets/js/cookie-consent.js"></script>
-
-<script>
+  <div id="feedbackMsg" class="feedback">💡 Ingresa valores de una VA discreta y calcula su esperanza, varianza y momentos. La varianza siempre es no negativa.</div>
+  <div id="insigniaArea" class="insignia hidden">
+   <i class="fas fa-medal"></i><h3>🏅 ¡MAESTRO DE LA ESPERANZA! 🏅</h3><p>Dominas la esperanza, la varianza y los momentos. ¡El centro de masa de la probabilidad te pertenece!</p>
+  </div>
+  <div class="nav-links">
+   <a href="07-discretas2.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+   <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+   <a href="09-continuas.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Probabilidades Interactivas · La esperanza es el faro en la niebla de la aleatoriedad</footer>
+ </div>
+ <script>
+  const STORAGE_KEY = 'prob_lvl8';
+  let calcDone = false;
+  function parseDist(text){const lines=text.trim().split('\n');const vals=[];for(const l of lines){const p=l.split(',').map(s=>parseFloat(s.trim()));if(p.length>=2&&!isNaN(p[0])&&!isNaN(p[1]))vals.push({x:p[0],p:p[1]});}return vals;}
+  function computeMoments(){
+   const dist=parseDist(document.getElementById('distInput').value);
+   if(dist.length===0){document.getElementById('feedbackMsg').innerHTML=I18N.t('fb_0');return;}
+   const totalP=dist.reduce((s,d)=>s+d.p,0);
+   if(Math.abs(totalP-1)>0.01){document.getElementById('feedbackMsg').innerHTML=I18N.t('fb_1')+totalP.toFixed(3)+'. Deben sumar ~1.';return;}
+   const eX=dist.reduce((s,d)=>s+d.x*d.p,0);const eX2=dist.reduce((s,d)=>s+d.x*d.x*d.p,0);
+   const varian=eX2-eX*eX;const std=Math.sqrt(Math.max(0,varian));
+   document.getElementById('eResult').textContent=eX.toFixed(4);document.getElementById('varResult').textContent=varian.toFixed(4);
+   document.getElementById('stdResult').textContent=std.toFixed(4);document.getElementById('ex2Result').textContent=eX2.toFixed(4);
+   document.getElementById('feedbackMsg').innerHTML=I18N.t('fb_2')+eX.toFixed(4)+', Var[X] = '+varian.toFixed(4)+'. ¡La varianza mide la dispersión!';
+   calcDone=true;checkInsignia();
+  }
+  function computeTransform(){
+   const dist=parseDist(document.getElementById('distInput').value);
+   if(dist.length===0)return;const t=document.getElementById('transformInput').value.trim();
+   try{const fn=new Function('x','return '+t+';');let egX=0;for(const d of dist){const gx=fn(d.x);if(isNaN(gx)||!isFinite(gx))throw Error();egX+=gx*d.p;}
+    document.getElementById('egResult').textContent=egX.toFixed(4);document.getElementById('feedbackMsg').innerHTML=I18N.t('fb_3')+egX.toFixed(4)+'. ¡Ley del Estadístico Inconsciente!';
+    calcDone=true;checkInsignia();
+   }catch(e){document.getElementById('feedbackMsg').innerHTML=I18N.t('fb_4');}
+  }
+  function checkInsignia(){if(calcDone&&!localStorage.getItem(STORAGE_KEY)){document.getElementById('insigniaArea').classList.remove('hidden');localStorage.setItem(STORAGE_KEY,'true');document.getElementById('feedbackMsg').innerHTML=I18N.t('fb_5');}}
+  document.getElementById('calcMomentsBtn').addEventListener('click',computeMoments);
+  document.getElementById('calcTransformBtn').addEventListener('click',computeTransform);
+  document.querySelectorAll('.calc-tab').forEach(tab=>tab.addEventListener('click',()=>{document.querySelectorAll('.calc-tab').forEach(t=>t.classList.remove('active'));tab.classList.add('active');const d=tab.dataset.calc==='discrete';document.getElementById('discreteCalc').style.display=d?'block':'none';document.getElementById('transformCalc').style.display=d?'none':'block';}));
+  if(localStorage.getItem(STORAGE_KEY)==='true'){document.getElementById('insigniaArea').classList.remove('hidden');document.getElementById('feedbackMsg').innerHTML=I18N.t('fb_6');}
+  computeMoments();
+ </script>
+ <script>
 window.I18N_DATA={
-  'fb_0': { es: '⚠️ Ingresa datos válidos', en: '⚠️ Ingresa datos válidos' },
-  'fb_1': { es: '⚠️ Las probabilidades suman ', en: '⚠️ Las probabilidades suman ' },
-  'fb_2': { es: '✅ E[X] = ', en: '✅ E[X] = ' },
-  'fb_3': { es: '✅ E[g(X)] = ', en: '✅ E[g(X)] = ' },
-  'fb_4': { es: '⚠️ Función inválida. Usa sintaxis JS (ej: x^2, 2*x+1, Math.exp(x))', en: '⚠️ Función inválida. Usa sintaxis JS (ej: x^2, 2*x+1, Math.exp(x))' },
-  'fb_5': { es: '🎉 ¡LO LOGRASTE! Has calculado esperanza y varianza.', en: '🎉 YOU DID IT! Has calculado esperanza y varianza.' },
-  'fb_6': { es: '🎉 ¡Ya dominas la esperanza y varianza!', en: '🎉 ¡Ya dominas la esperanza y varianza!' }
+ 'fb_0': { es: '⚠️ Ingresa datos válidos', en: '⚠️ Ingresa datos válidos' },
+ 'fb_1': { es: '⚠️ Las probabilidades suman ', en: '⚠️ Las probabilidades suman ' },
+ 'fb_2': { es: '✅ E[X] = ', en: '✅ E[X] = ' },
+ 'fb_3': { es: '✅ E[g(X)] = ', en: '✅ E[g(X)] = ' },
+ 'fb_4': { es: '⚠️ Función inválida. Usa sintaxis JS (ej: x^2, 2*x+1, Math.exp(x))', en: '⚠️ Función inválida. Usa sintaxis JS (ej: x^2, 2*x+1, Math.exp(x))' },
+ 'fb_5': { es: '🎉 ¡LO LOGRASTE! Has calculado esperanza y varianza.', en: '🎉 YOU DID IT! Has calculado esperanza y varianza.' },
+ 'fb_6': { es: '🎉 ¡Ya dominas la esperanza y varianza!', en: '🎉 ¡Ya dominas la esperanza y varianza!' }
 };
 </script>
 </body>

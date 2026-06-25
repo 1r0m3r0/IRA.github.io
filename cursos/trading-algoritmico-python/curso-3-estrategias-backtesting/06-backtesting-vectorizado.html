@@ -1,291 +1,291 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Estrategias y Backtesting | Backtesting Vectorizado</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #111a2e 100%);
-      background-size: 200% 200%; animation: gradientShift 20s ease infinite;
-      font-family: 'Inter', sans-serif; color: #eef5ff; min-height: 100vh;
-      display: flex; align-items: center; justify-content: center; padding: 2rem 1rem;
-    }
-    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-    .curso3-container {
-      max-width: 1300px; width: 100%;
-      background: rgba(15, 25, 45, 0.65); backdrop-filter: blur(12px);
-      border-radius: 3rem; border: 1px solid rgba(0, 224, 255, 0.25);
-      box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden;
-    }
-    .hero-header { background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%); padding: 2rem 2rem 1.5rem; text-align: center; border-bottom: 2px solid #00e0ff; }
-    .hero-header h1 { font-size: 2.6rem; font-weight: 800; background: linear-gradient(135deg, #FFF, #66eeff, #00e0ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
-    .hero-header p { font-size: 1.1rem; color: #b9e2ff; margin-top: 0.3rem; }
-    .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
-    .chip { background: rgba(0,224,255,0.15); border: 1px solid #00e0ff; padding: 0.3rem 1rem; border-radius: 40px; font-size: 0.8rem; font-weight: 600; }
-    .analogy-card { background: #1e2a3acc; margin: 1.5rem 2rem; padding: 1.2rem 1.8rem; border-radius: 2rem; border-left: 8px solid #00e0ff; font-size: 1rem; line-height: 1.6; }
-    .main-area { padding: 0.5rem 2rem; }
-    .feedback { background: #00000099; margin: 1.5rem 2rem; padding: 1rem; border-radius: 1.5rem; text-align: center; font-weight: 500; border-left: 4px solid #00e0ff; }
-    .insignia { text-align: center; background: #0c1b2f; border-radius: 2rem; margin: 0 2rem 1.5rem; padding: 1rem; border: 1px dashed gold; }
-    .insignia i { font-size: 2.5rem; color: gold; }
-    .hidden { display: none; }
-    .btn-action { background: linear-gradient(95deg, #f0a500, #ff6a00); border: none; padding: 0.8rem 1.8rem; font-weight: bold; border-radius: 3rem; cursor: pointer; font-size: 1rem; transition: 0.2s; color: #1e1a0c; }
-    .btn-action:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(240,165,0,0.5); }
-    .btn-action.small { padding: 0.4rem 1rem; font-size: 0.8rem; }
-    .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
-    .nav-link { background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem; font-weight: 600; text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; }
-    .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(0,224,255,0.4); }
-    .nav-link.next { background: linear-gradient(95deg, #f0a500, #ff6a00); color: #1e1a0c; }
-    .nav-link.menu { background: #1a2a4a; border: 1px solid #3399ff; }
-    footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
-    .step-area { background: #0c1222; border-radius: 1.5rem; padding: 1.5rem; margin: 1rem 0; border: 1px solid #2c3e66; min-height: 300px; }
-    .code-block { background: #080e1a; font-family: 'Courier New', monospace; padding: 1rem; border-radius: 1rem; font-size: 0.85rem; line-height: 1.6; overflow-x: auto; margin: 0.5rem 0; }
-    .code-block .comment { color: #8899bb; }
-    .code-block .keyword { color: #ff79c6; }
-    .code-block .func { color: #50fa7b; }
-    .code-block .string { color: #f1fa8c; }
-    .code-block .var { color: #8be9fd; }
-    .drag-zone { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; margin: 1rem 0; }
-    .drag-item { background: #1a2640; border: 2px solid #2c3e66; border-radius: 1rem; padding: 0.6rem 1.2rem; cursor: grab; font-size: 0.85rem; transition: 0.2s; user-select: none; }
-    .drag-item:hover { border-color: #00e0ff; }
-    .drag-item.placed { opacity: 0.5; cursor: default; border-color: #00ff8844; background: #0a2a1a; }
-    .drop-zone { display: flex; flex-direction: column; gap: 0.5rem; margin: 0.5rem 0; }
-    .drop-slot { background: #161e30; border: 2px dashed #2c3e66; border-radius: 1rem; padding: 0.8rem; min-height: 50px; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-    .drop-slot.filled { border-color: #00ff88; background: #0a2a1a33; }
-    .drop-slot.correct { border-color: #00ff88; background: #0a2a1a66; }
-    .drop-slot.wrong { border-color: #ff3030; background: #2a0a0a66; }
-    .vis-area { background: #0c1222; border-radius: 1.5rem; padding: 1rem; margin: 1rem 0; min-height: 150px; border: 1px solid #2c3e66; }
-    .vis-area canvas { width: 100% !important; height: auto !important; }
-    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
-  </style>
-  <link rel="stylesheet" href="../../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Estrategias y Backtesting | Backtesting Vectorizado</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+   background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #111a2e 100%);
+   background-size: 200% 200%; animation: gradientShift 20s ease infinite;
+   font-family: 'Inter', sans-serif; color: #eef5ff; min-height: 100vh;
+   display: flex; align-items: center; justify-content: center; padding: 2rem 1rem;
+  }
+  @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .curso3-container {
+   max-width: 1300px; width: 100%;
+   background: rgba(15, 25, 45, 0.65); backdrop-filter: blur(12px);
+   border-radius: 3rem; border: 1px solid rgba(0, 224, 255, 0.25);
+   box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden;
+  }
+  .hero-header { background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%); padding: 2rem 2rem 1.5rem; text-align: center; border-bottom: 2px solid #00e0ff; }
+  .hero-header h1 { font-size: 2.6rem; font-weight: 800; background: linear-gradient(135deg, #FFF, #66eeff, #00e0ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero-header p { font-size: 1.1rem; color: #b9e2ff; margin-top: 0.3rem; }
+  .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
+  .chip { background: rgba(0,224,255,0.15); border: 1px solid #00e0ff; padding: 0.3rem 1rem; border-radius: 40px; font-size: 0.8rem; font-weight: 600; }
+  .analogy-card { background: #1e2a3acc; margin: 1.5rem 2rem; padding: 1.2rem 1.8rem; border-radius: 2rem; border-left: 8px solid #00e0ff; font-size: 1rem; line-height: 1.6; }
+  .main-area { padding: 0.5rem 2rem; }
+  .feedback { background: #00000099; margin: 1.5rem 2rem; padding: 1rem; border-radius: 1.5rem; text-align: center; font-weight: 500; border-left: 4px solid #00e0ff; }
+  .insignia { text-align: center; background: #0c1b2f; border-radius: 2rem; margin: 0 2rem 1.5rem; padding: 1rem; border: 1px dashed gold; }
+  .insignia i { font-size: 2.5rem; color: gold; }
+  .hidden { display: none; }
+  .btn-action { background: linear-gradient(95deg, #f0a500, #ff6a00); border: none; padding: 0.8rem 1.8rem; font-weight: bold; border-radius: 3rem; cursor: pointer; font-size: 1rem; transition: 0.2s; color: #1e1a0c; }
+  .btn-action:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(240,165,0,0.5); }
+  .btn-action.small { padding: 0.4rem 1rem; font-size: 0.8rem; }
+  .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
+  .nav-link { background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem; font-weight: 600; text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; }
+  .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(0,224,255,0.4); }
+  .nav-link.next { background: linear-gradient(95deg, #f0a500, #ff6a00); color: #1e1a0c; }
+  .nav-link.menu { background: #1a2a4a; border: 1px solid #3399ff; }
+  footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
+  .step-area { background: #0c1222; border-radius: 1.5rem; padding: 1.5rem; margin: 1rem 0; border: 1px solid #2c3e66; min-height: 300px; }
+  .code-block { background: #080e1a; font-family: 'Courier New', monospace; padding: 1rem; border-radius: 1rem; font-size: 0.85rem; line-height: 1.6; overflow-x: auto; margin: 0.5rem 0; }
+  .code-block .comment { color: #8899bb; }
+  .code-block .keyword { color: #ff79c6; }
+  .code-block .func { color: #50fa7b; }
+  .code-block .string { color: #f1fa8c; }
+  .code-block .var { color: #8be9fd; }
+  .drag-zone { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; margin: 1rem 0; }
+  .drag-item { background: #1a2640; border: 2px solid #2c3e66; border-radius: 1rem; padding: 0.6rem 1.2rem; cursor: grab; font-size: 0.85rem; transition: 0.2s; user-select: none; }
+  .drag-item:hover { border-color: #00e0ff; }
+  .drag-item.placed { opacity: 0.5; cursor: default; border-color: #00ff8844; background: #0a2a1a; }
+  .drop-zone { display: flex; flex-direction: column; gap: 0.5rem; margin: 0.5rem 0; }
+  .drop-slot { background: #161e30; border: 2px dashed #2c3e66; border-radius: 1rem; padding: 0.8rem; min-height: 50px; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+  .drop-slot.filled { border-color: #00ff88; background: #0a2a1a33; }
+  .drop-slot.correct { border-color: #00ff88; background: #0a2a1a66; }
+  .drop-slot.wrong { border-color: #ff3030; background: #2a0a0a66; }
+  .vis-area { background: #0c1222; border-radius: 1.5rem; padding: 1rem; margin: 1rem 0; min-height: 150px; border: 1px solid #2c3e66; }
+  .vis-area canvas { width: 100% !important; height: auto !important; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
+ </style>
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
 </head>
 <body>
-  <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a></nav>
+ <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a></nav>
 
-  <div class="curso3-container">
-    <div class="hero-header">
-      <h1>⚙️ BACKTESTING VECTORIZADO</h1>
-      <p>Simulación rápida con pandas y NumPy</p>
-      <div class="badge-area">
-        <span class="chip"><i class="fas fa-code"></i> Código</span>
-        <span class="chip"><i class="fas fa-arrows-alt"></i> Drag & Drop</span>
-      </div>
-    </div>
-    <div class="analogy-card"><strong>⚙️ Piénsalo así:</strong> El backtesting vectorizado es como tener una fábrica en lugar de artesanos: en vez de evaluar trade por trade, procesas todo el histórico de una sola vez con operaciones de matrices.</div>
-    <div class="main-area">
-      <p style="text-align:center;margin:0.5rem 0;font-weight:600;">Arrastra los fragmentos en el orden correcto para construir el backtest:</p>
-      <div class="drag-zone" id="dragZone"></div>
-      <div class="drop-zone" id="dropZone">
-        <div class="drop-slot" data-step="0">Paso 1</div>
-        <div class="drop-slot" data-step="1">Paso 2</div>
-        <div class="drop-slot" data-step="2">Paso 3</div>
-        <div class="drop-slot" data-step="3">Paso 4</div>
-        <div class="drop-slot" data-step="4">Paso 5</div>
-      </div>
-      <button id="checkBtn" class="btn-action" style="display:block;margin:0.5rem auto;">Verificar orden</button>
-      <div class="vis-area">
-        <canvas id="chartCanvas" height="180"></canvas>
-      </div>
-    </div>
-    <div id="feedbackMsg" class="feedback">💡 Ordena los 5 pasos del backtest vectorizado y presiona "Verificar orden".</div>
-    <div id="insigniaArea" class="insignia hidden">
-      <i class="fas fa-medal"></i>
-      <h3>🏅 INGENIERO DE BACKTESTING 🏅</h3>
-      <p>¡Construiste el pipeline completo de backtesting vectorizado!</p>
-    </div>
-    <div class="nav-links">
-      <a href="05-volatilidad.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
-      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
-      <a href="07-backtesting-event-driven.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
-    </div>
-    <footer><i class="fas fa-crown"></i> Estrategias y Backtesting · Trading Algorítmico con Python</footer>
+ <div class="curso3-container">
+  <div class="hero-header">
+   <h1>âš™ï¸ BACKTESTING VECTORIZADO</h1>
+   <p>SimulaciÃ³n rÃ¡pida con pandas y NumPy</p>
+   <div class="badge-area">
+    <span class="chip"><i class="fas fa-code"></i> CÃ³digo</span>
+    <span class="chip"><i class="fas fa-arrows-alt"></i> Drag & Drop</span>
+   </div>
   </div>
+  <div class="analogy-card"><strong>âš™ï¸ PiÃ©nsalo asÃ­:</strong> El backtesting vectorizado es como tener una fÃ¡brica en lugar de artesanos: en vez de evaluar trade por trade, procesas todo el histÃ³rico de una sola vez con operaciones de matrices.</div>
+  <div class="main-area">
+   <p style="text-align:center;margin:0.5rem 0;font-weight:600;">Arrastra los fragmentos en el orden correcto para construir el backtest:</p>
+   <div class="drag-zone" id="dragZone"></div>
+   <div class="drop-zone" id="dropZone">
+    <div class="drop-slot" data-step="0">Paso 1</div>
+    <div class="drop-slot" data-step="1">Paso 2</div>
+    <div class="drop-slot" data-step="2">Paso 3</div>
+    <div class="drop-slot" data-step="3">Paso 4</div>
+    <div class="drop-slot" data-step="4">Paso 5</div>
+   </div>
+   <button id="checkBtn" class="btn-action" style="display:block;margin:0.5rem auto;">Verificar orden</button>
+   <div class="vis-area">
+    <canvas id="chartCanvas" height="180"></canvas>
+   </div>
+  </div>
+  <div id="feedbackMsg" class="feedback">ðŸ’¡ Ordena los 5 pasos del backtest vectorizado y presiona "Verificar orden".</div>
+  <div id="insigniaArea" class="insignia hidden">
+   <i class="fas fa-medal"></i>
+   <h3>ðŸ… INGENIERO DE BACKTESTING ðŸ…</h3>
+   <p>Â¡Construiste el pipeline completo de backtesting vectorizado!</p>
+  </div>
+  <div class="nav-links">
+   <a href="05-volatilidad.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
+   <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> MenÃº</a>
+   <a href="07-backtesting-event-driven.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Estrategias y Backtesting Â· Trading AlgorÃ­tmico con Python</footer>
+ </div>
 
-  <script>
-    const STORAGE_KEY = 'py_trade_3_06';
+ <script>
+  const STORAGE_KEY = 'py_trade_3_06';
 
-    const steps = [
-      { label: 'Cargar datos históricos', code: "df = pd.read_csv('datos.csv', index_col=0, parse_dates=True)" },
-      { label: 'Calcular señal (SMA crossover)', code: "df['señal'] = df['SMA_10'] > df['SMA_30']" },
-      { label: 'Calcular retornos diarios', code: "df['retorno'] = df['cierre'].pct_change()" },
-      { label: 'Calcular equity curve', code: "df['equity'] = (1 + df['retorno'] * df['señal'].shift(1)).cumprod()" },
-      { label: 'Calcular Sharpe ratio', code: "sharpe = df['equity'].pct_change().mean() / df['equity'].pct_change().std() * sqrt(252)" }
-    ];
+  const steps = [
+   { label: 'Cargar datos histÃ³ricos', code: "df = pd.read_csv('datos.csv', index_col=0, parse_dates=True)" },
+   { label: 'Calcular seÃ±al (SMA crossover)', code: "df['seÃ±al'] = df['SMA_10'] > df['SMA_30']" },
+   { label: 'Calcular retornos diarios', code: "df['retorno'] = df['cierre'].pct_change()" },
+   { label: 'Calcular equity curve', code: "df['equity'] = (1 + df['retorno'] * df['seÃ±al'].shift(1)).cumprod()" },
+   { label: 'Calcular Sharpe ratio', code: "sharpe = df['equity'].pct_change().mean() / df['equity'].pct_change().std() * sqrt(252)" }
+  ];
 
-    let currentOrder = [null, null, null, null, null];
-    let usedIndices = new Set();
-    let completed = false;
+  let currentOrder = [null, null, null, null, null];
+  let usedIndices = new Set();
+  let completed = false;
 
-    function renderDragZone() {
-      const zone = document.getElementById('dragZone');
-      zone.innerHTML = '';
-      steps.forEach((s, i) => {
-        if (usedIndices.has(i)) return;
-        const div = document.createElement('div');
-        div.className = 'drag-item';
-        div.textContent = s.label;
-        div.draggable = true;
-        div.dataset.idx = i;
-        div.addEventListener('dragstart', (e) => {
-          e.dataTransfer.setData('text/plain', i);
-        });
-        zone.appendChild(div);
-      });
-    }
-
-    function renderDropZone() {
-      const zone = document.getElementById('dropZone');
-      const slots = zone.querySelectorAll('.drop-slot');
-      slots.forEach((slot, i) => {
-        const idx = currentOrder[i];
-        if (idx !== null) {
-          slot.textContent = (i+1) + '. ' + steps[idx].label;
-          slot.classList.add('filled');
-        }
-      });
-    }
-
-    function setupDropSlots() {
-      const slots = document.querySelectorAll('.drop-slot');
-      slots.forEach(slot => {
-        slot.addEventListener('dragover', (e) => e.preventDefault());
-        slot.addEventListener('drop', (e) => {
-          e.preventDefault();
-          const step = parseInt(slot.dataset.step);
-          const dragIdx = parseInt(e.dataTransfer.getData('text/plain'));
-          if (currentOrder[step] !== null) return;
-          currentOrder[step] = dragIdx;
-          usedIndices.add(dragIdx);
-          slot.textContent = (step+1) + '. ' + steps[dragIdx].label;
-          slot.classList.add('filled');
-          slot.classList.remove('correct', 'wrong');
-          renderDragZone();
-          document.getElementById('feedbackMsg').textContent = I18N.t('fb_0');
-        });
-      });
-    }
-
-    function checkOrder() {
-      if (currentOrder.includes(null)) {
-        document.getElementById('feedbackMsg').textContent = I18N.t('fb_1');
-        return;
-      }
-      const correct = currentOrder.every((val, i) => val === i);
-      const slots = document.querySelectorAll('.drop-slot');
-      let anyCorrect = false;
-      currentOrder.forEach((val, i) => {
-        if (val === i) { slots[i].classList.add('correct'); slots[i].classList.remove('wrong'); anyCorrect = true; }
-        else { slots[i].classList.add('wrong'); slots[i].classList.remove('correct'); }
-      });
-      if (correct) {
-        document.getElementById('feedbackMsg').textContent = I18N.t('fb_2');
-        document.getElementById('insigniaArea').classList.remove('hidden');
-        localStorage.setItem(STORAGE_KEY, 'true');
-        completed = true;
-        drawEquityCurve();
-      } else {
-        document.getElementById('feedbackMsg').textContent = I18N.t('fb_3');
-      }
-    }
-
-    function drawEquityCurve() {
-      const canvas = document.getElementById('chartCanvas');
-      const ctx = canvas.getContext('2d');
-      const W = canvas.parentElement.clientWidth - 40;
-      canvas.width = W;
-      canvas.height = 180;
-      ctx.clearRect(0, 0, W, 180);
-      ctx.fillStyle = '#0c1222';
-      ctx.fillRect(0, 0, W, 180);
-
-      // Generate simulated equity curve
-      const eq = [1];
-      for (let i = 1; i < 252; i++) {
-        eq.push(eq[i-1] * (1 + (Math.random() - 0.48) * 0.02));
-      }
-      const pad = { top: 15, bottom: 20, left: 35, right: 15 };
-      const cw = W - pad.left - pad.right;
-      const ch = 180 - pad.top - pad.bottom;
-      const minE = Math.min(...eq) * 0.99;
-      const maxE = Math.max(...eq) * 1.01;
-
-      function xPos(i) { return pad.left + (i / (eq.length-1)) * cw; }
-      function yPos(v) { return pad.top + ch - ((v - minE) / (maxE - minE)) * ch; }
-
-      ctx.strokeStyle = '#2c3e66';
-      ctx.lineWidth = 0.5;
-      for (let i = 0; i < 4; i++) { const y = pad.top + (i/3)*ch; ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W-pad.right, y); ctx.stroke(); }
-
-      const gradient = ctx.createLinearGradient(0, pad.top, 0, pad.top+ch);
-      gradient.addColorStop(0, '#00e0ff44');
-      gradient.addColorStop(1, '#00e0ff00');
-      ctx.fillStyle = gradient;
-      ctx.beginPath();
-      ctx.moveTo(xPos(0), pad.top+ch);
-      eq.forEach((v, i) => ctx.lineTo(xPos(i), yPos(v)));
-      ctx.lineTo(xPos(eq.length-1), pad.top+ch);
-      ctx.closePath();
-      ctx.fill();
-
-      ctx.strokeStyle = '#00e0ff';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      eq.forEach((v, i) => { i === 0 ? ctx.moveTo(xPos(i), yPos(v)) : ctx.lineTo(xPos(i), yPos(v)); });
-      ctx.stroke();
-
-      ctx.fillStyle = '#8899bb';
-      ctx.font = '11px Inter';
-      ctx.fillText('Equity Curve Simulada', pad.left, 14);
-      ctx.fillText('↑ Sharpe ~0.85', W-pad.right-120, 14);
-    }
-
-    document.getElementById('checkBtn').addEventListener('click', checkOrder);
-
-    setupDropSlots();
-    renderDragZone();
-    renderDropZone();
-
-    // Make slots also clickable to remove placed items
-    document.querySelectorAll('.drop-slot').forEach(slot => {
-      slot.addEventListener('dblclick', function() {
-        const step = parseInt(this.dataset.step);
-        const idx = currentOrder[step];
-        if (idx === null) return;
-        usedIndices.delete(idx);
-        currentOrder[step] = null;
-        this.textContent = 'Paso ' + (step+1);
-        this.classList.remove('filled', 'correct', 'wrong');
-        renderDragZone();
-      });
+  function renderDragZone() {
+   const zone = document.getElementById('dragZone');
+   zone.innerHTML = '';
+   steps.forEach((s, i) => {
+    if (usedIndices.has(i)) return;
+    const div = document.createElement('div');
+    div.className = 'drag-item';
+    div.textContent = s.label;
+    div.draggable = true;
+    div.dataset.idx = i;
+    div.addEventListener('dragstart', (e) => {
+     e.dataTransfer.setData('text/plain', i);
     });
+    zone.appendChild(div);
+   });
+  }
 
+  function renderDropZone() {
+   const zone = document.getElementById('dropZone');
+   const slots = zone.querySelectorAll('.drop-slot');
+   slots.forEach((slot, i) => {
+    const idx = currentOrder[i];
+    if (idx !== null) {
+     slot.textContent = (i+1) + '. ' + steps[idx].label;
+     slot.classList.add('filled');
+    }
+   });
+  }
+
+  function setupDropSlots() {
+   const slots = document.querySelectorAll('.drop-slot');
+   slots.forEach(slot => {
+    slot.addEventListener('dragover', (e) => e.preventDefault());
+    slot.addEventListener('drop', (e) => {
+     e.preventDefault();
+     const step = parseInt(slot.dataset.step);
+     const dragIdx = parseInt(e.dataTransfer.getData('text/plain'));
+     if (currentOrder[step] !== null) return;
+     currentOrder[step] = dragIdx;
+     usedIndices.add(dragIdx);
+     slot.textContent = (step+1) + '. ' + steps[dragIdx].label;
+     slot.classList.add('filled');
+     slot.classList.remove('correct', 'wrong');
+     renderDragZone();
+     document.getElementById('feedbackMsg').textContent = I18N.t('fb_0');
+    });
+   });
+  }
+
+  function checkOrder() {
+   if (currentOrder.includes(null)) {
+    document.getElementById('feedbackMsg').textContent = I18N.t('fb_1');
+    return;
+   }
+   const correct = currentOrder.every((val, i) => val === i);
+   const slots = document.querySelectorAll('.drop-slot');
+   let anyCorrect = false;
+   currentOrder.forEach((val, i) => {
+    if (val === i) { slots[i].classList.add('correct'); slots[i].classList.remove('wrong'); anyCorrect = true; }
+    else { slots[i].classList.add('wrong'); slots[i].classList.remove('correct'); }
+   });
+   if (correct) {
+    document.getElementById('feedbackMsg').textContent = I18N.t('fb_2');
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    localStorage.setItem(STORAGE_KEY, 'true');
+    completed = true;
     drawEquityCurve();
-  </script>
+   } else {
+    document.getElementById('feedbackMsg').textContent = I18N.t('fb_3');
+   }
+  }
+
+  function drawEquityCurve() {
+   const canvas = document.getElementById('chartCanvas');
+   const ctx = canvas.getContext('2d');
+   const W = canvas.parentElement.clientWidth - 40;
+   canvas.width = W;
+   canvas.height = 180;
+   ctx.clearRect(0, 0, W, 180);
+   ctx.fillStyle = '#0c1222';
+   ctx.fillRect(0, 0, W, 180);
+
+   // Generate simulated equity curve
+   const eq = [1];
+   for (let i = 1; i < 252; i++) {
+    eq.push(eq[i-1] * (1 + (Math.random() - 0.48) * 0.02));
+   }
+   const pad = { top: 15, bottom: 20, left: 35, right: 15 };
+   const cw = W - pad.left - pad.right;
+   const ch = 180 - pad.top - pad.bottom;
+   const minE = Math.min(...eq) * 0.99;
+   const maxE = Math.max(...eq) * 1.01;
+
+   function xPos(i) { return pad.left + (i / (eq.length-1)) * cw; }
+   function yPos(v) { return pad.top + ch - ((v - minE) / (maxE - minE)) * ch; }
+
+   ctx.strokeStyle = '#2c3e66';
+   ctx.lineWidth = 0.5;
+   for (let i = 0; i < 4; i++) { const y = pad.top + (i/3)*ch; ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W-pad.right, y); ctx.stroke(); }
+
+   const gradient = ctx.createLinearGradient(0, pad.top, 0, pad.top+ch);
+   gradient.addColorStop(0, '#00e0ff44');
+   gradient.addColorStop(1, '#00e0ff00');
+   ctx.fillStyle = gradient;
+   ctx.beginPath();
+   ctx.moveTo(xPos(0), pad.top+ch);
+   eq.forEach((v, i) => ctx.lineTo(xPos(i), yPos(v)));
+   ctx.lineTo(xPos(eq.length-1), pad.top+ch);
+   ctx.closePath();
+   ctx.fill();
+
+   ctx.strokeStyle = '#00e0ff';
+   ctx.lineWidth = 2;
+   ctx.beginPath();
+   eq.forEach((v, i) => { i === 0 ? ctx.moveTo(xPos(i), yPos(v)) : ctx.lineTo(xPos(i), yPos(v)); });
+   ctx.stroke();
+
+   ctx.fillStyle = '#8899bb';
+   ctx.font = '11px Inter';
+   ctx.fillText('Equity Curve Simulada', pad.left, 14);
+   ctx.fillText('â†‘ Sharpe ~0.85', W-pad.right-120, 14);
+  }
+
+  document.getElementById('checkBtn').addEventListener('click', checkOrder);
+
+  setupDropSlots();
+  renderDragZone();
+  renderDropZone();
+
+  // Make slots also clickable to remove placed items
+  document.querySelectorAll('.drop-slot').forEach(slot => {
+   slot.addEventListener('dblclick', function() {
+    const step = parseInt(this.dataset.step);
+    const idx = currentOrder[step];
+    if (idx === null) return;
+    usedIndices.delete(idx);
+    currentOrder[step] = null;
+    this.textContent = 'Paso ' + (step+1);
+    this.classList.remove('filled', 'correct', 'wrong');
+    renderDragZone();
+   });
+  });
+
+  drawEquityCurve();
+ </script>
 <script>
 window.I18N_DATA={
-  "fb_0": {
-    "es": "💡 Fragmento colocado. Continúa o presiona \"Verificar orden\".",
-    "en": "💡 Fragmento colocado. Continúa o presiona \"Checkr orden\"."
-  },
-  "fb_1": {
-    "es": "⚠️ Coloca todos los fragmentos antes de verificar.",
-    "en": "⚠️ Coloca todos los fragmentos antes de verificar."
-  },
-  "fb_2": {
-    "es": "✅ ¡Orden correcto! Has construido el pipeline de backtesting vectorizado.",
-    "en": "✅ !Orden correct! Has construido el pipeline de backtesting vectorizado."
-  },
-  "fb_3": {
-    "es": "❌ Orden incorrecto. Revisa los pasos marcados en rojo y reordena.",
-    "en": "❌ Orden incorrect. Review los pasos marcados en rojo y reordena."
-  }
+ "fb_0": {
+  "es": "ðŸ’¡ Fragmento colocado. ContinÃºa o presiona \"Verificar orden\".",
+  "en": "ðŸ’¡ Fragmento colocado. ContinÃºa o presiona \"Checkr orden\"."
+ },
+ "fb_1": {
+  "es": "âš ï¸ Coloca todos los fragmentos antes de verificar.",
+  "en": "âš ï¸ Coloca todos los fragmentos antes de verificar."
+ },
+ "fb_2": {
+  "es": "âœ… Â¡Orden correcto! Has construido el pipeline de backtesting vectorizado.",
+  "en": "âœ… !Orden correct! Has construido el pipeline de backtesting vectorizado."
+ },
+ "fb_3": {
+  "es": "âŒ Orden incorrecto. Revisa los pasos marcados en rojo y reordena.",
+  "en": "âŒ Orden incorrect. Review los pasos marcados en rojo y reordena."
+ }
 };
 </script>
 <script src="../../../assets/js/i18n.js"></script>
-</body>
+ </body>
 </html>
 

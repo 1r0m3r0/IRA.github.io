@@ -1,316 +1,316 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mercados Financieros | M&oacute;dulo 12: Simulador Integrador</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <link rel="stylesheet" href="../../assets/css/theme.css">
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { background:linear-gradient(135deg,#0a0f1e,#0c1222,#1a1a2e); font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; padding:2rem 1rem; }
-    .course-container { max-width:960px; margin:2rem auto 0; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(251,191,36,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; padding:2rem; }
-    .progress-bar-outer { height:10px; background:rgba(251,191,36,0.1); border-radius:20px; overflow:hidden; margin-bottom:0.5rem; border:1px solid #2c3e66; }
-    .progress-bar-inner { height:100%; background:linear-gradient(90deg,#fbbf24,#f59e0b); border-radius:20px; transition:width 0.5s; width:0%; }
-    .progress-text { font-size:0.8rem; color:#8899bb; margin-bottom:1.5rem; }
-    .hero-header { text-align:center; margin-bottom:1.5rem; }
-    .hero-header h1 { font-size:2.2rem; font-weight:800; background:linear-gradient(135deg,#FFF,#fbbf24,#f59e0b); -webkit-background-clip:text; background-clip:text; color:transparent; }
-    .hero-header p { color:#fde68a; margin-top:0.5rem; }
-    .analogy-card { background:rgba(251,191,36,0.08); border-left:4px solid #fbbf24; padding:1rem 1.2rem; border-radius:0 1rem 1rem 0; margin-bottom:1.5rem; font-size:0.95rem; color:#b9ccee; }
-    .dashboard { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:0.5rem; margin-bottom:1rem; }
-    .dash-card { background:rgba(10,20,40,0.8); border:1px solid #2c3e66; border-radius:0.8rem; padding:0.6rem; text-align:center; }
-    .dash-card .val { font-size:1.3rem; font-weight:800; }
-    .dash-card .val.gold { color:#fbbf24; }
-    .dash-card .val.green { color:#22c55e; }
-    .dash-card .val.red { color:#ef4444; }
-    .dash-card .label { font-size:0.7rem; color:#8899bb; }
-    .market-timer { text-align:center; margin-bottom:1rem; font-size:0.85rem; }
-    .market-timer .day { font-size:1.2rem; font-weight:700; color:#fbbf24; }
-    .asset-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:0.6rem; margin-bottom:1rem; }
-    .asset-card { background:rgba(10,20,40,0.8); border:1px solid #2c3e66; border-radius:0.7rem; padding:0.7rem; }
-    .asset-card .aname { font-weight:700; font-size:0.9rem; }
-    .asset-card .atype { font-size:0.65rem; color:#8899bb; }
-    .asset-card .aprice { font-size:1.2rem; font-weight:800; margin:0.2rem 0; }
-    .asset-card .achange { font-size:0.75rem; }
-    .asset-card .achange.up { color:#22c55e; }
-    .asset-card .achange.down { color:#ef4444; }
-    .asset-card input { width:55px; padding:0.2rem; background:rgba(255,255,255,0.05); border:1px solid #2c3e66; border-radius:0.3rem; color:#fff; font-size:0.8rem; }
-    .asset-card .actions { display:flex; gap:0.3rem; margin-top:0.3rem; }
-    .asset-card .actions button { flex:1; padding:0.2rem; border:none; border-radius:0.3rem; font-weight:600; cursor:pointer; font-size:0.75rem; }
-    .btn-buy-sm { background:#22c55e; color:#000; }
-    .btn-sell-sm { background:#ef4444; color:#fff; }
-    .btn-controls { display:flex; gap:0.5rem; justify-content:center; margin-bottom:1rem; flex-wrap:wrap; }
-    .btn-controls button { padding:0.6rem 1.5rem; border:none; border-radius:0.6rem; font-weight:600; cursor:pointer; }
-    .btn-start { background:linear-gradient(135deg,#fbbf24,#f59e0b); color:#000; }
-    .btn-pause { background:linear-gradient(135deg,#f59e0b,#d97706); color:#fff; }
-    .btn-reset-g { background:#6b7280; color:#fff; }
-    .final-score { background:linear-gradient(135deg,rgba(251,191,36,0.1),rgba(245,158,11,0.05)); border:2px solid #fbbf24; border-radius:1.5rem; padding:1.5rem; text-align:center; margin-bottom:1.5rem; }
-    .final-score .big { font-size:2.5rem; font-weight:800; color:#fbbf24; }
-    .final-score .detail { color:#b9ccee; margin-top:0.5rem; }
-    .feedback { background:rgba(251,191,36,0.08); border-radius:1rem; padding:1rem; margin-bottom:1.5rem; font-size:0.9rem; color:#b9ccee; }
-    .insignia { background:linear-gradient(135deg,rgba(34,197,94,0.15),rgba(251,191,36,0.15)); border:2px solid #22c55e; border-radius:1.5rem; padding:1.5rem; text-align:center; margin-bottom:1.5rem; }
-    .insignia h3 { color:#22c55e; font-size:1.2rem; }
-    .hidden { display:none; }
-    .btn-next { width:100%; padding:1rem; font-size:1rem; font-weight:600; background:linear-gradient(135deg,#fbbf24,#f59e0b); border:none; border-radius:1rem; color:#000; cursor:pointer; }
-    footer { text-align:center; padding:1rem; font-size:0.8rem; border-top:1px solid #2c3e66; margin-top:1.5rem; color:#8899bb; }
-    @media (max-width:600px) { .dashboard { grid-template-columns:1fr 1fr; } .asset-grid { grid-template-columns:1fr; } }
-  </style>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Mercados Financieros | M&oacute;dulo 12: Simulador Integrador</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <link rel="stylesheet" href="../../assets/css/theme.css">
+ <style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:linear-gradient(135deg,#0a0f1e,#0c1222,#1a1a2e); font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; padding:2rem 1rem; }
+  .course-container { max-width:960px; margin:2rem auto 0; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(251,191,36,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; padding:2rem; }
+  .progress-bar-outer { height:10px; background:rgba(251,191,36,0.1); border-radius:20px; overflow:hidden; margin-bottom:0.5rem; border:1px solid #2c3e66; }
+  .progress-bar-inner { height:100%; background:linear-gradient(90deg,#fbbf24,#f59e0b); border-radius:20px; transition:width 0.5s; width:0%; }
+  .progress-text { font-size:0.8rem; color:#8899bb; margin-bottom:1.5rem; }
+  .hero-header { text-align:center; margin-bottom:1.5rem; }
+  .hero-header h1 { font-size:2.2rem; font-weight:800; background:linear-gradient(135deg,#FFF,#fbbf24,#f59e0b); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero-header p { color:#fde68a; margin-top:0.5rem; }
+  .analogy-card { background:rgba(251,191,36,0.08); border-left:4px solid #fbbf24; padding:1rem 1.2rem; border-radius:0 1rem 1rem 0; margin-bottom:1.5rem; font-size:0.95rem; color:#b9ccee; }
+  .dashboard { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:0.5rem; margin-bottom:1rem; }
+  .dash-card { background:rgba(10,20,40,0.8); border:1px solid #2c3e66; border-radius:0.8rem; padding:0.6rem; text-align:center; }
+  .dash-card .val { font-size:1.3rem; font-weight:800; }
+  .dash-card .val.gold { color:#fbbf24; }
+  .dash-card .val.green { color:#22c55e; }
+  .dash-card .val.red { color:#ef4444; }
+  .dash-card .label { font-size:0.7rem; color:#8899bb; }
+  .market-timer { text-align:center; margin-bottom:1rem; font-size:0.85rem; }
+  .market-timer .day { font-size:1.2rem; font-weight:700; color:#fbbf24; }
+  .asset-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:0.6rem; margin-bottom:1rem; }
+  .asset-card { background:rgba(10,20,40,0.8); border:1px solid #2c3e66; border-radius:0.7rem; padding:0.7rem; }
+  .asset-card .aname { font-weight:700; font-size:0.9rem; }
+  .asset-card .atype { font-size:0.65rem; color:#8899bb; }
+  .asset-card .aprice { font-size:1.2rem; font-weight:800; margin:0.2rem 0; }
+  .asset-card .achange { font-size:0.75rem; }
+  .asset-card .achange.up { color:#22c55e; }
+  .asset-card .achange.down { color:#ef4444; }
+  .asset-card input { width:55px; padding:0.2rem; background:rgba(255,255,255,0.05); border:1px solid #2c3e66; border-radius:0.3rem; color:#fff; font-size:0.8rem; }
+  .asset-card .actions { display:flex; gap:0.3rem; margin-top:0.3rem; }
+  .asset-card .actions button { flex:1; padding:0.2rem; border:none; border-radius:0.3rem; font-weight:600; cursor:pointer; font-size:0.75rem; }
+  .btn-buy-sm { background:#22c55e; color:#000; }
+  .btn-sell-sm { background:#ef4444; color:#fff; }
+  .btn-controls { display:flex; gap:0.5rem; justify-content:center; margin-bottom:1rem; flex-wrap:wrap; }
+  .btn-controls button { padding:0.6rem 1.5rem; border:none; border-radius:0.6rem; font-weight:600; cursor:pointer; }
+  .btn-start { background:linear-gradient(135deg,#fbbf24,#f59e0b); color:#000; }
+  .btn-pause { background:linear-gradient(135deg,#f59e0b,#d97706); color:#fff; }
+  .btn-reset-g { background:#6b7280; color:#fff; }
+  .final-score { background:linear-gradient(135deg,rgba(251,191,36,0.1),rgba(245,158,11,0.05)); border:2px solid #fbbf24; border-radius:1.5rem; padding:1.5rem; text-align:center; margin-bottom:1.5rem; }
+  .final-score .big { font-size:2.5rem; font-weight:800; color:#fbbf24; }
+  .final-score .detail { color:#b9ccee; margin-top:0.5rem; }
+  .feedback { background:rgba(251,191,36,0.08); border-radius:1rem; padding:1rem; margin-bottom:1.5rem; font-size:0.9rem; color:#b9ccee; }
+  .insignia { background:linear-gradient(135deg,rgba(34,197,94,0.15),rgba(251,191,36,0.15)); border:2px solid #22c55e; border-radius:1.5rem; padding:1.5rem; text-align:center; margin-bottom:1.5rem; }
+  .insignia h3 { color:#22c55e; font-size:1.2rem; }
+  .hidden { display:none; }
+  .btn-next { width:100%; padding:1rem; font-size:1rem; font-weight:600; background:linear-gradient(135deg,#fbbf24,#f59e0b); border:none; border-radius:1rem; color:#000; cursor:pointer; }
+  footer { text-align:center; padding:1rem; font-size:0.8rem; border-top:1px solid #2c3e66; margin-top:1.5rem; color:#8899bb; }
+  @media (max-width:600px) { .dashboard { grid-template-columns:1fr 1fr; } .asset-grid { grid-template-columns:1fr; } }
+ </style>
 </head>
 <body>
-  <nav class="brand-return-nav"><a href="../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa</a><a href="index.html">Curso 2</a></nav>
-  <div class="course-container">
-    <div class="progress-bar-outer"><div class="progress-bar-inner" id="progressBar"></div></div>
-    <div class="progress-text" id="progressText">M&oacute;dulo 12 de 72</div>
+ <nav class="brand-return-nav"><a href="../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa</a><a href="index.html">Curso 2</a></nav>
+ <div class="course-container">
+  <div class="progress-bar-outer"><div class="progress-bar-inner" id="progressBar"></div></div>
+  <div class="progress-text" id="progressText">M&oacute;dulo 12 de 72</div>
 
-    <div class="hero-header">
-      <h1><i class="fas fa-trophy"></i> Simulador Integrador</h1>
-      <p>Bolsa en Vivo — Trading Game Completo</p>
-    </div>
-
-    <div class="analogy-card">
-      <strong><i class="fas fa-lightbulb"></i> Piénsalo así:</strong> Este simulador es como un "vuelo simulado" para pilotos de inversi&oacute;n. Has aprendido teor&iacute;a en los 11 m&oacute;dulos anteriores. Ahora te ponen al mando de un portafolio real de $100,000 durante 30 d&iacute;as de mercado comprimidos en 5 minutos. &iquest;Ser&aacute;s capaz de navegar tormentas y maximizar retornos?
-    </div>
-
-    <div class="dashboard">
-      <div class="dash-card"><div class="val gold" id="dashCash">$100K</div><div class="label">Efectivo</div></div>
-      <div class="dash-card"><div class="val gold" id="dashPort">$0</div><div class="label">Portafolio</div></div>
-      <div class="dash-card"><div class="val green" id="dashTotal">$100K</div><div class="label">Total</div></div>
-      <div class="dash-card"><div class="val gold" id="dashReturn">0%</div><div class="label">Retorno</div></div>
-    </div>
-
-    <div class="market-timer">
-      <span class="day" id="dayDisplay">D&iacute;a 1 / 30</span> &middot; <span id="timerDisplay">00:00</span>
-    </div>
-
-    <div class="asset-grid" id="assetGrid"></div>
-
-    <div class="btn-controls">
-      <button class="btn-start" onclick="startGame()" id="btnStart"><i class="fas fa-play"></i> Iniciar Mercado</button>
-      <button class="btn-pause" onclick="togglePause()" id="btnPause" disabled><i class="fas fa-pause"></i> Pausa</button>
-      <button class="btn-reset-g" onclick="resetGame()" id="btnReset"><i class="fas fa-rotate"></i> Reiniciar</button>
-    </div>
-
-    <div id="gameOver" class="final-score hidden">
-      <div style="color:#8899bb;">Resultado Final</div>
-      <div class="big" id="finalReturn">+0%</div>
-      <div class="detail" id="finalDetail">Sharpe: 0.00 | Retorno Total: $0</div>
-    </div>
-
-    <div class="feedback" id="feedback"><i class="fas fa-info-circle"></i> &iexcl;Bienvenido al simulador integrador! Presiona "Iniciar Mercado" para empezar. Tienes $100,000 para invertir en 10 activos durante 30 d&iacute;as.</div>
-
-    <div id="insignia" class="insignia hidden">
-      <i class="fas fa-medal" style="font-size:2.5rem;color:#22c55e;"></i>
-      <h3><i class="fas fa-crown"></i> &iexcl;Maestro de los Mercados!</h3>
-      <p>Has completado el curso completo de Mercados Financieros e Instrumentos de Inversi&oacute;n. &iexcl;Felicidades!</p>
-    </div>
-
-    <button class="btn-next" onclick="alert('Curso completado! En un entorno real, esto te llevar&iacute;a de vuelta al portal del curso.')">Finalizar Curso <i class="fas fa-check-circle"></i></button>
-
-    <footer><i class="fas fa-graduation-cap"></i> Mercados Financieros &middot; M&oacute;dulo 12 &middot; Simulador Integrador</footer>
+  <div class="hero-header">
+   <h1><i class="fas fa-trophy"></i> Simulador Integrador</h1>
+   <p>Bolsa en Vivo — Trading Game Completo</p>
   </div>
 
-  <script>
-    const TOTAL = 72; const MODULE_ID = 'c2m12';
-    const assets = [
-      {id:'a1', name:'TechGlobal', type:'Acci&oacute;n', price:150, hist:[150]},
-      {id:'a2', name:'FinanceCorp', type:'Acci&oacute;n', price:85, hist:[85]},
-      {id:'a3', name:'GovBond10Y', type:'Bono', price:98, hist:[98]},
-      {id:'a4', name:'SP500 ETF', type:'ETF', price:480, hist:[480]},
-      {id:'a5', name:'Gold Trust', type:'Commodity', price:195, hist:[195]},
-      {id:'a6', name:'Oil ETF', type:'Commodity', price:76, hist:[76]},
-      {id:'a7', name:'EUR/USD', type:'Forex', price:1.085, hist:[1.085]},
-      {id:'a8', name:'BTC ETF', type:'ETF', price:52, hist:[52]},
-      {id:'a9', name:'HealthPlus', type:'Acci&oacute;n', price:210, hist:[210]},
-      {id:'a10', name:'Emerging Bond', type:'Bono', price:92, hist:[92]}
-    ];
+  <div class="analogy-card">
+   <strong><i class="fas fa-lightbulb"></i> Piénsalo así:</strong> Este simulador es como un "vuelo simulado" para pilotos de inversi&oacute;n. Has aprendido teor&iacute;a en los 11 m&oacute;dulos anteriores. Ahora te ponen al mando de un portafolio real de $100,000 durante 30 d&iacute;as de mercado comprimidos en 5 minutos. &iquest;Ser&aacute;s capaz de navegar tormentas y maximizar retornos?
+  </div>
 
-    let cash = 100000;
-    let holdings = {};
-    let day = 1;
-    let running = false;
-    let paused = false;
-    let interval = null;
-    let gameOver = false;
-    let timer = 0;
-    let returnsLog = [];
+  <div class="dashboard">
+   <div class="dash-card"><div class="val gold" id="dashCash">$100K</div><div class="label">Efectivo</div></div>
+   <div class="dash-card"><div class="val gold" id="dashPort">$0</div><div class="label">Portafolio</div></div>
+   <div class="dash-card"><div class="val green" id="dashTotal">$100K</div><div class="label">Total</div></div>
+   <div class="dash-card"><div class="val gold" id="dashReturn">0%</div><div class="label">Retorno</div></div>
+  </div>
 
-    function renderAssets() {
-      const grid = document.getElementById('assetGrid');
-      grid.innerHTML = assets.map(a => {
-        const h = holdings[a.id] || 0;
-        const chg = a.hist.length > 1 ? a.price - a.hist[a.hist.length - 2] : 0;
-        const chgPct = a.hist.length > 1 && a.hist[a.hist.length - 2] !== 0 ? (chg / a.hist[a.hist.length - 2]) * 100 : 0;
-        return `<div class="asset-card" style="border-color:${a.type==='Acci&oacute;n'?'#3b82f6':a.type==='Bono'?'#60a5fa':a.type==='ETF'?'#a855f7':a.type==='Commodity'?'#f97316':'#0ea5e9'}40">
-          <div class="aname" style="color:${a.type==='Acci&oacute;n'?'#6090ff':a.type==='Bono'?'#93c5fd':a.type==='ETF'?'#c084fc':a.type==='Commodity'?'#fb923c':'#38bdf8'}">${a.name}</div>
-          <div class="atype">${a.type}</div>
-          <div class="aprice">$${a.price.toFixed(a.type==='Forex'?3:2)}</div>
-          <div class="achange ${chg>=0?'up':'down'}">${chg>=0?'+':''}${chg.toFixed(2)} (${chgPct>=0?'+':''}${chgPct.toFixed(2)}%)</div>
-          <div style="font-size:0.7rem;color:#8899bb;margin:0.2rem 0;">Tienes: ${h} ${a.type==='Forex'?'lots':'shares'} = $${(h * a.price).toFixed(0)}</div>
-          <div class="actions">
-            <input type="number" id="qty_${a.id}" value="1" min="1" max="1000" style="width:45px;">
-            <button class="btn-buy-sm" onclick="buyAsset('${a.id}')" ${!running||paused||gameOver?'disabled':''}>Compra</button>
-            <button class="btn-sell-sm" onclick="sellAsset('${a.id}')" ${!running||paused||gameOver?'disabled':''}>Vende</button>
-          </div>
-        </div>`;
-      }).join('');
-    }
+  <div class="market-timer">
+   <span class="day" id="dayDisplay">D&iacute;a 1 / 30</span> &middot; <span id="timerDisplay">00:00</span>
+  </div>
 
-    function buyAsset(id) {
-      if (!running || paused || gameOver) return;
-      const a = assets.find(x => x.id === id);
-      const qty = parseInt(document.getElementById('qty_'+id).value) || 1;
-      const cost = qty * a.price;
-      if (cost > cash) { document.getElementById('feedback').innerHTML = '<i class="fas fa-times-circle" style="color:#ef4444"></i> Efectivo insuficiente.'; return; }
-      cash -= cost;
-      holdings[id] = (holdings[id] || 0) + qty;
-      updateDash();
-      renderAssets();
-      document.getElementById('feedback').innerHTML = '<i class="fas fa-check-circle" style="color:#22c55e"></i> Compraste ' + qty + ' de ' + a.name + ' a $' + a.price.toFixed(2);
-    }
+  <div class="asset-grid" id="assetGrid"></div>
 
-    function sellAsset(id) {
-      if (!running || paused || gameOver) return;
-      const a = assets.find(x => x.id === id);
-      const qty = parseInt(document.getElementById('qty_'+id).value) || 1;
-      const h = holdings[id] || 0;
-      if (qty > h) { document.getElementById('feedback').innerHTML = '<i class="fas fa-times-circle" style="color:#ef4444"></i> No tienes suficientes.'; return; }
-      cash += qty * a.price;
-      holdings[id] = h - qty;
-      updateDash();
-      renderAssets();
-      document.getElementById('feedback').innerHTML = '<i class="fas fa-check-circle" style="color:#22c55e"></i> Vendiste ' + qty + ' de ' + a.name + ' a $' + a.price.toFixed(2);
-    }
+  <div class="btn-controls">
+   <button class="btn-start" onclick="startGame()" id="btnStart"><i class="fas fa-play"></i> Iniciar Mercado</button>
+   <button class="btn-pause" onclick="togglePause()" id="btnPause" disabled><i class="fas fa-pause"></i> Pausa</button>
+   <button class="btn-reset-g" onclick="resetGame()" id="btnReset"><i class="fas fa-rotate"></i> Reiniciar</button>
+  </div>
 
-    function simulateDay() {
-      if (paused || gameOver) return;
-      if (day > 30) {
-        endGame();
-        return;
-      }
-      assets.forEach(a => {
-        const drift = (Math.random() - 0.48) * (a.type === 'Bono' ? 0.8 : a.type === 'Forex' ? 0.6 : 2);
-        const vol = a.type === 'Acci&oacute;n' ? 3 : a.type === 'Commodity' ? 2.5 : a.type === 'Forex' ? 0.5 : 1;
-        const shock = (Math.random() - 0.5) * vol;
-        const trend = (day > 15 && day < 25) ? -0.5 : 0.2; // mid-game correction
-        const change = drift + shock + trend;
-        a.price = Math.max(a.price * 0.5, a.price + change);
-        a.hist.push(a.price);
-      });
-      day++;
-      timer = Math.floor(((day - 1) / 30) * 300);
-      const portVal = calcPortfolio();
-      const total = cash + portVal;
-      const ret = ((total / 100000) - 1) * 100;
-      returnsLog.push(ret);
-      document.getElementById('dayDisplay').textContent = 'D&iacute;a ' + day + ' / 30';
-      document.getElementById('timerDisplay').textContent = Math.floor(timer/60) + ':' + (timer%60).toString().padStart(2,'0');
-      updateDash();
-      renderAssets();
-    }
+  <div id="gameOver" class="final-score hidden">
+   <div style="color:#8899bb;">Resultado Final</div>
+   <div class="big" id="finalReturn">+0%</div>
+   <div class="detail" id="finalDetail">Sharpe: 0.00 | Retorno Total: $0</div>
+  </div>
 
-    function calcPortfolio() {
-      return assets.reduce((sum, a) => sum + ((holdings[a.id] || 0) * a.price), 0);
-    }
+  <div class="feedback" id="feedback"><i class="fas fa-info-circle"></i> &iexcl;Bienvenido al simulador integrador! Presiona "Iniciar Mercado" para empezar. Tienes $100,000 para invertir en 10 activos durante 30 d&iacute;as.</div>
 
-    function updateDash() {
-      const portVal = calcPortfolio();
-      const total = cash + portVal;
-      const ret = ((total / 100000) - 1) * 100;
-      document.getElementById('dashCash').textContent = '$' + (cash/1000).toFixed(1) + 'K';
-      document.getElementById('dashPort').textContent = '$' + (portVal/1000).toFixed(1) + 'K';
-      document.getElementById('dashTotal').textContent = '$' + (total/1000).toFixed(1) + 'K';
-      document.getElementById('dashReturn').textContent = (ret >= 0 ? '+' : '') + ret.toFixed(2) + '%';
-      document.getElementById('dashReturn').className = 'val ' + (ret >= 0 ? 'green' : 'red');
-    }
+  <div id="insignia" class="insignia hidden">
+   <i class="fas fa-medal" style="font-size:2.5rem;color:#22c55e;"></i>
+   <h3><i class="fas fa-crown"></i> &iexcl;Maestro de los Mercados!</h3>
+   <p>Has completado el curso completo de Mercados Financieros e Instrumentos de Inversi&oacute;n. &iexcl;Felicidades!</p>
+  </div>
 
-    function startGame() {
-      if (gameOver) resetGame();
-      running = true;
-      paused = false;
-      gameOver = false;
-      document.getElementById('btnStart').disabled = true;
-      document.getElementById('btnPause').disabled = false;
-      interval = setInterval(simulateDay, 10000 / 30); // 30 days in 10 sec
-      document.getElementById('feedback').innerHTML = '<i class="fas fa-play" style="color:#22c55e"></i> &iexcl;Mercado abierto! 30 d&iacute;as en 10 segundos.';
-    }
+  <a href="index.html" class="btn-next">Finalizar Curso <i class="fas fa-check-circle"></i></a>
 
-    function togglePause() {
-      paused = !paused;
-      document.getElementById('btnPause').innerHTML = paused ? '<i class="fas fa-play"></i> Reanudar' : '<i class="fas fa-pause"></i> Pausa';
-      document.getElementById('feedback').innerHTML = paused ? '<i class="fas fa-pause" style="color:#f59e0b"></i> Mercado en pausa.' : '<i class="fas fa-play" style="color:#22c55e"></i> Mercado reanudado.';
-    }
+  <footer><i class="fas fa-graduation-cap"></i> Mercados Financieros &middot; M&oacute;dulo 12 &middot; Simulador Integrador</footer>
+ </div>
 
-    function endGame() {
-      gameOver = true;
-      running = false;
-      if (interval) clearInterval(interval);
-      document.getElementById('btnStart').disabled = false;
-      document.getElementById('btnPause').disabled = true;
+ <script>
+  const TOTAL = 72; const MODULE_ID = 'c2m12';
+  const assets = [
+   {id:'a1', name:'TechGlobal', type:'Acci&oacute;n', price:150, hist:[150]},
+   {id:'a2', name:'FinanceCorp', type:'Acci&oacute;n', price:85, hist:[85]},
+   {id:'a3', name:'GovBond10Y', type:'Bono', price:98, hist:[98]},
+   {id:'a4', name:'SP500 ETF', type:'ETF', price:480, hist:[480]},
+   {id:'a5', name:'Gold Trust', type:'Commodity', price:195, hist:[195]},
+   {id:'a6', name:'Oil ETF', type:'Commodity', price:76, hist:[76]},
+   {id:'a7', name:'EUR/USD', type:'Forex', price:1.085, hist:[1.085]},
+   {id:'a8', name:'BTC ETF', type:'ETF', price:52, hist:[52]},
+   {id:'a9', name:'HealthPlus', type:'Acci&oacute;n', price:210, hist:[210]},
+   {id:'a10', name:'Emerging Bond', type:'Bono', price:92, hist:[92]}
+  ];
 
-      const portVal = calcPortfolio();
-      const total = cash + portVal;
-      const ret = ((total / 100000) - 1) * 100;
+  let cash = 100000;
+  let holdings = {};
+  let day = 1;
+  let running = false;
+  let paused = false;
+  let interval = null;
+  let gameOver = false;
+  let timer = 0;
+  let returnsLog = [];
 
-      // Calculate Sharpe ratio (simplified)
-      const avgRet = returnsLog.length > 0 ? returnsLog.reduce((s, r) => s + r, 0) / returnsLog.length : 0;
-      const std = returnsLog.length > 1 ? Math.sqrt(returnsLog.reduce((s, r) => s + (r - avgRet) ** 2, 0) / (returnsLog.length - 1)) : 1;
-      const sharpe = std > 0 ? (avgRet / std) * Math.sqrt(252/30) : 0;
+  function renderAssets() {
+   const grid = document.getElementById('assetGrid');
+   grid.innerHTML = assets.map(a => {
+    const h = holdings[a.id] || 0;
+    const chg = a.hist.length > 1 ? a.price - a.hist[a.hist.length - 2] : 0;
+    const chgPct = a.hist.length > 1 && a.hist[a.hist.length - 2] !== 0 ? (chg / a.hist[a.hist.length - 2]) * 100 : 0;
+    return `<div class="asset-card" style="border-color:${a.type==='Acci&oacute;n'?'#3b82f6':a.type==='Bono'?'#60a5fa':a.type==='ETF'?'#a855f7':a.type==='Commodity'?'#f97316':'#0ea5e9'}40">
+     <div class="aname" style="color:${a.type==='Acci&oacute;n'?'#6090ff':a.type==='Bono'?'#93c5fd':a.type==='ETF'?'#c084fc':a.type==='Commodity'?'#fb923c':'#38bdf8'}">${a.name}</div>
+     <div class="atype">${a.type}</div>
+     <div class="aprice">$${a.price.toFixed(a.type==='Forex'?3:2)}</div>
+     <div class="achange ${chg>=0?'up':'down'}">${chg>=0?'+':''}${chg.toFixed(2)} (${chgPct>=0?'+':''}${chgPct.toFixed(2)}%)</div>
+     <div style="font-size:0.7rem;color:#8899bb;margin:0.2rem 0;">Tienes: ${h} ${a.type==='Forex'?'lots':'shares'} = $${(h * a.price).toFixed(0)}</div>
+     <div class="actions">
+      <input type="number" id="qty_${a.id}" value="1" min="1" max="1000" style="width:45px;">
+      <button class="btn-buy-sm" onclick="buyAsset('${a.id}')" ${!running||paused||gameOver?'disabled':''}>Compra</button>
+      <button class="btn-sell-sm" onclick="sellAsset('${a.id}')" ${!running||paused||gameOver?'disabled':''}>Vende</button>
+     </div>
+    </div>`;
+   }).join('');
+  }
 
-      document.getElementById('finalReturn').textContent = (ret >= 0 ? '+' : '') + ret.toFixed(2) + '%';
-      document.getElementById('finalReturn').style.color = ret >= 0 ? '#22c55e' : '#ef4444';
-      document.getElementById('finalDetail').textContent = 'Sharpe: ' + sharpe.toFixed(2) + ' | Retorno Total: $' + (total - 100000).toFixed(0);
-      document.getElementById('gameOver').classList.remove('hidden');
-      document.getElementById('gameOver').style.display = 'block';
+  function buyAsset(id) {
+   if (!running || paused || gameOver) return;
+   const a = assets.find(x => x.id === id);
+   const qty = parseInt(document.getElementById('qty_'+id).value) || 1;
+   const cost = qty * a.price;
+   if (cost > cash) { document.getElementById('feedback').innerHTML = '<i class="fas fa-times-circle" style="color:#ef4444"></i> Efectivo insuficiente.'; return; }
+   cash -= cost;
+   holdings[id] = (holdings[id] || 0) + qty;
+   updateDash();
+   renderAssets();
+   document.getElementById('feedback').innerHTML = '<i class="fas fa-check-circle" style="color:#22c55e"></i> Compraste ' + qty + ' de ' + a.name + ' a $' + a.price.toFixed(2);
+  }
 
-      document.getElementById('feedback').innerHTML = '<i class="fas fa-trophy" style="color:#fbbf24"></i> &iexcl;Juego terminado! Retorno: ' + (ret >= 0 ? '+' : '') + ret.toFixed(2) + '% | Sharpe: ' + sharpe.toFixed(2);
+  function sellAsset(id) {
+   if (!running || paused || gameOver) return;
+   const a = assets.find(x => x.id === id);
+   const qty = parseInt(document.getElementById('qty_'+id).value) || 1;
+   const h = holdings[id] || 0;
+   if (qty > h) { document.getElementById('feedback').innerHTML = '<i class="fas fa-times-circle" style="color:#ef4444"></i> No tienes suficientes.'; return; }
+   cash += qty * a.price;
+   holdings[id] = h - qty;
+   updateDash();
+   renderAssets();
+   document.getElementById('feedback').innerHTML = '<i class="fas fa-check-circle" style="color:#22c55e"></i> Vendiste ' + qty + ' de ' + a.name + ' a $' + a.price.toFixed(2);
+  }
 
-      document.getElementById('insignia').classList.remove('hidden');
-      document.getElementById('insignia').style.display = 'block';
-      awardBadge();
-    }
+  function simulateDay() {
+   if (paused || gameOver) return;
+   if (day > 30) {
+    endGame();
+    return;
+   }
+   assets.forEach(a => {
+    const drift = (Math.random() - 0.48) * (a.type === 'Bono' ? 0.8 : a.type === 'Forex' ? 0.6 : 2);
+    const vol = a.type === 'Acci&oacute;n' ? 3 : a.type === 'Commodity' ? 2.5 : a.type === 'Forex' ? 0.5 : 1;
+    const shock = (Math.random() - 0.5) * vol;
+    const trend = (day > 15 && day < 25) ? -0.5 : 0.2; // mid-game correction
+    const change = drift + shock + trend;
+    a.price = Math.max(a.price * 0.5, a.price + change);
+    a.hist.push(a.price);
+   });
+   day++;
+   timer = Math.floor(((day - 1) / 30) * 300);
+   const portVal = calcPortfolio();
+   const total = cash + portVal;
+   const ret = ((total / 100000) - 1) * 100;
+   returnsLog.push(ret);
+   document.getElementById('dayDisplay').textContent = 'D&iacute;a ' + day + ' / 30';
+   document.getElementById('timerDisplay').textContent = Math.floor(timer/60) + ':' + (timer%60).toString().padStart(2,'0');
+   updateDash();
+   renderAssets();
+  }
 
-    function resetGame() {
-      if (interval) clearInterval(interval);
-      running = false; paused = false; gameOver = false; day = 1; timer = 0;
-      cash = 100000; holdings = {}; returnsLog = [];
-      assets.forEach(a => { a.price = a.hist[0]; a.hist = [a.hist[0]]; });
-      document.getElementById('btnStart').disabled = false;
-      document.getElementById('btnPause').disabled = true;
-      document.getElementById('btnPause').innerHTML = '<i class="fas fa-pause"></i> Pausa';
-      document.getElementById('dayDisplay').textContent = 'D&iacute;a 1 / 30';
-      document.getElementById('timerDisplay').textContent = '00:00';
-      document.getElementById('gameOver').classList.add('hidden');
-      document.getElementById('gameOver').style.display = 'none';
-      updateDash();
-      renderAssets();
-      document.getElementById('feedback').innerHTML = '<i class="fas fa-rotate"></i> Juego reiniciado. Presiona "Iniciar Mercado".';
-    }
+  function calcPortfolio() {
+   return assets.reduce((sum, a) => sum + ((holdings[a.id] || 0) * a.price), 0);
+  }
 
-    function awardBadge() {
-      let badges = JSON.parse(localStorage.getItem('finanzas_badges')) || [];
-      if (!badges.includes(MODULE_ID)) {
-        badges.push(MODULE_ID);
-        localStorage.setItem('finanzas_badges', JSON.stringify(badges));
-      }
-    }
+  function updateDash() {
+   const portVal = calcPortfolio();
+   const total = cash + portVal;
+   const ret = ((total / 100000) - 1) * 100;
+   document.getElementById('dashCash').textContent = '$' + (cash/1000).toFixed(1) + 'K';
+   document.getElementById('dashPort').textContent = '$' + (portVal/1000).toFixed(1) + 'K';
+   document.getElementById('dashTotal').textContent = '$' + (total/1000).toFixed(1) + 'K';
+   document.getElementById('dashReturn').textContent = (ret >= 0 ? '+' : '') + ret.toFixed(2) + '%';
+   document.getElementById('dashReturn').className = 'val ' + (ret >= 0 ? 'green' : 'red');
+  }
 
-    function updateProgress() {
-      let progress = JSON.parse(localStorage.getItem('finanzas_progress')) || [];
-      if (!progress.includes(MODULE_ID)) {
-        progress.push(MODULE_ID);
-        localStorage.setItem('finanzas_progress', JSON.stringify(progress));
-      }
-      const pct = Math.round((progress.length / TOTAL) * 100);
-      document.getElementById('progressBar').style.width = pct + '%';
-      document.getElementById('progressText').textContent = 'M\u00f3dulo 12 de ' + TOTAL + ' (' + pct + '% completo)';
-    }
+  function startGame() {
+   if (gameOver) resetGame();
+   running = true;
+   paused = false;
+   gameOver = false;
+   document.getElementById('btnStart').disabled = true;
+   document.getElementById('btnPause').disabled = false;
+   interval = setInterval(simulateDay, 10000 / 30); // 30 days in 10 sec
+   document.getElementById('feedback').innerHTML = '<i class="fas fa-play" style="color:#22c55e"></i> &iexcl;Mercado abierto! 30 d&iacute;as en 10 segundos.';
+  }
 
-    (function init() {
-      renderAssets();
-      updateDash();
-      updateProgress();
-    })();
-  </script>
+  function togglePause() {
+   paused = !paused;
+   document.getElementById('btnPause').innerHTML = paused ? '<i class="fas fa-play"></i> Reanudar' : '<i class="fas fa-pause"></i> Pausa';
+   document.getElementById('feedback').innerHTML = paused ? '<i class="fas fa-pause" style="color:#f59e0b"></i> Mercado en pausa.' : '<i class="fas fa-play" style="color:#22c55e"></i> Mercado reanudado.';
+  }
+
+  function endGame() {
+   gameOver = true;
+   running = false;
+   if (interval) clearInterval(interval);
+   document.getElementById('btnStart').disabled = false;
+   document.getElementById('btnPause').disabled = true;
+
+   const portVal = calcPortfolio();
+   const total = cash + portVal;
+   const ret = ((total / 100000) - 1) * 100;
+
+   // Calculate Sharpe ratio (simplified)
+   const avgRet = returnsLog.length > 0 ? returnsLog.reduce((s, r) => s + r, 0) / returnsLog.length : 0;
+   const std = returnsLog.length > 1 ? Math.sqrt(returnsLog.reduce((s, r) => s + (r - avgRet) ** 2, 0) / (returnsLog.length - 1)) : 1;
+   const sharpe = std > 0 ? (avgRet / std) * Math.sqrt(252/30) : 0;
+
+   document.getElementById('finalReturn').textContent = (ret >= 0 ? '+' : '') + ret.toFixed(2) + '%';
+   document.getElementById('finalReturn').style.color = ret >= 0 ? '#22c55e' : '#ef4444';
+   document.getElementById('finalDetail').textContent = 'Sharpe: ' + sharpe.toFixed(2) + ' | Retorno Total: $' + (total - 100000).toFixed(0);
+   document.getElementById('gameOver').classList.remove('hidden');
+   document.getElementById('gameOver').style.display = 'block';
+
+   document.getElementById('feedback').innerHTML = '<i class="fas fa-trophy" style="color:#fbbf24"></i> &iexcl;Juego terminado! Retorno: ' + (ret >= 0 ? '+' : '') + ret.toFixed(2) + '% | Sharpe: ' + sharpe.toFixed(2);
+
+   document.getElementById('insignia').classList.remove('hidden');
+   document.getElementById('insignia').style.display = 'block';
+   awardBadge();
+  }
+
+  function resetGame() {
+   if (interval) clearInterval(interval);
+   running = false; paused = false; gameOver = false; day = 1; timer = 0;
+   cash = 100000; holdings = {}; returnsLog = [];
+   assets.forEach(a => { a.price = a.hist[0]; a.hist = [a.hist[0]]; });
+   document.getElementById('btnStart').disabled = false;
+   document.getElementById('btnPause').disabled = true;
+   document.getElementById('btnPause').innerHTML = '<i class="fas fa-pause"></i> Pausa';
+   document.getElementById('dayDisplay').textContent = 'D&iacute;a 1 / 30';
+   document.getElementById('timerDisplay').textContent = '00:00';
+   document.getElementById('gameOver').classList.add('hidden');
+   document.getElementById('gameOver').style.display = 'none';
+   updateDash();
+   renderAssets();
+   document.getElementById('feedback').innerHTML = '<i class="fas fa-rotate"></i> Juego reiniciado. Presiona "Iniciar Mercado".';
+  }
+
+  function awardBadge() {
+   let badges = JSON.parse(localStorage.getItem('finanzas_badges')) || [];
+   if (!badges.includes(MODULE_ID)) {
+    badges.push(MODULE_ID);
+    localStorage.setItem('finanzas_badges', JSON.stringify(badges));
+   }
+  }
+
+  function updateProgress() {
+   let progress = JSON.parse(localStorage.getItem('finanzas_progress')) || [];
+   if (!progress.includes(MODULE_ID)) {
+    progress.push(MODULE_ID);
+    localStorage.setItem('finanzas_progress', JSON.stringify(progress));
+   }
+   const pct = Math.round((progress.length / TOTAL) * 100);
+   document.getElementById('progressBar').style.width = pct + '%';
+   document.getElementById('progressText').textContent = 'M\u00f3dulo 12 de ' + TOTAL + ' (' + pct + '% completo)';
+  }
+
+  (function init() {
+   renderAssets();
+   updateDash();
+   updateProgress();
+  })();
+ </script>
 <script src="../../../assets/js/i18n.js"></script>  </body>
 </html>

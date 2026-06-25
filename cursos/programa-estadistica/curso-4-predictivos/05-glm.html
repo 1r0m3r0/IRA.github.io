@@ -1,296 +1,295 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Modelos Predictivos | 📐 Modelos Lineales Generalizados</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { background:linear-gradient(135deg,#0a0f1e,#0c1222 50%,#111a2e); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
-    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-    .course-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,100,220,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
-    .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #ff64dc; }
-    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#ff9cf0,#ff64dc); -webkit-background-clip:text; background-clip:text; color:transparent; }
-    .hero-header p { font-size:1.1rem; color:#e2b9ff; margin-top:0.5rem; font-weight:500; }
-    .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
-    .chip { background:rgba(255,100,220,0.15); border:1px solid #ff64dc; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
-    .progress-section { padding:1.2rem 2rem; border-bottom:1px solid #1a2a4a; }
-    .progress-bar-outer { background:#1a2a4a; border-radius:20px; height:16px; overflow:hidden; }
-    .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#ff64dc,#cc44bb); border-radius:20px; transition:width 0.5s ease; }
-    .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
-    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ff64dc; font-size:1rem; line-height:1.6; }
-    .main-area { padding:1.5rem 2rem; }
-    .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#ff64dc; }
-    .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
-    .info-panel { background:rgba(10,20,40,0.7); border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
-    .info-panel h3 { color:#ff9cf0; font-size:1rem; margin-bottom:0.5rem; }
-    .info-panel p { font-size:0.85rem; color:#b9ccee; line-height:1.6; }
-    .sim-box { background:#0f1a2c; border-radius:1.5rem; padding:1.5rem; margin-bottom:1.5rem; border:1px solid #2c3e66; text-align:center; }
-    .sim-btn { background:linear-gradient(95deg,#ff64dc,#cc44bb); border:none; padding:0.6rem 1.5rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:0.95rem; color:#fff; transition:0.2s; margin:0.3rem; }
-    .sim-btn:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(255,100,220,0.4); }
-    .sim-btn.secondary { background:#2c3e66; }
-    .quiz-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #ff64dc; margin-bottom:1.5rem; }
-    .quiz-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#ff64dc; }
-    .question { background:#0f1a2c; margin:0.8rem 0; padding:0.8rem 1rem; border-radius:1.2rem; }
-    .question p { font-weight:600; margin-bottom:0.5rem; font-size:0.95rem; }
-    .options { display:flex; flex-wrap:wrap; gap:0.6rem; }
-    .opt { background:#1e2a3e; padding:0.3rem 0.9rem; border-radius:2rem; cursor:pointer; transition:0.2s; font-size:0.85rem; }
-    .opt:hover { background:#2c3e66; transform:translateY(-2px); }
-    .opt.selected { background:#ff64dc; color:#000; font-weight:bold; box-shadow:0 0 8px #ff64dc; }
-    .opt.correct { background:#00cc88; color:#000; }
-    .opt.wrong { background:#ff4455; color:#fff; }
-    .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #ff64dc; }
-    .btn-action { background:linear-gradient(95deg,#ff64dc,#cc44bb); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#fff; margin-top:1rem; }
-    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(255,100,220,0.5); }
-    .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
-    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin-top:1.5rem; padding:1rem; border:1px dashed gold; }
-    .insignia i { font-size:2.5rem; color:gold; }
-    .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
-    .hidden { display:none; }
-    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
-    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
-    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(255,100,220,0.4); }
-    .nav-link.next { background:linear-gradient(95deg,#ff64dc,#cc44bb); color:#fff; }
-    .nav-link.menu { background:#1a2a4a; border:1px solid #ff64dc; }
-    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
-    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .info-grid { grid-template-columns:1fr; } }
-  </style>
-  <link rel="stylesheet" href="../../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Modelos Predictivos | 📐 Modelos Lineales Generalizados</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:linear-gradient(135deg,#0a0f1e,#0c1222 50%,#111a2e); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+  @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .course-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,100,220,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+  .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #ff64dc; }
+  .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#ff9cf0,#ff64dc); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero-header p { font-size:1.1rem; color:#e2b9ff; margin-top:0.5rem; font-weight:500; }
+  .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+  .chip { background:rgba(255,100,220,0.15); border:1px solid #ff64dc; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+  .progress-section { padding:1.2rem 2rem; border-bottom:1px solid #1a2a4a; }
+  .progress-bar-outer { background:#1a2a4a; border-radius:20px; height:16px; overflow:hidden; }
+  .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#ff64dc,#cc44bb); border-radius:20px; transition:width 0.5s ease; }
+  .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
+  .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ff64dc; font-size:1rem; line-height:1.6; }
+  .main-area { padding:1.5rem 2rem; }
+  .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#ff64dc; }
+  .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
+  .info-panel { background:rgba(10,20,40,0.7); border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
+  .info-panel h3 { color:#ff9cf0; font-size:1rem; margin-bottom:0.5rem; }
+  .info-panel p { font-size:0.85rem; color:#b9ccee; line-height:1.6; }
+  .sim-box { background:#0f1a2c; border-radius:1.5rem; padding:1.5rem; margin-bottom:1.5rem; border:1px solid #2c3e66; text-align:center; }
+  .sim-btn { background:linear-gradient(95deg,#ff64dc,#cc44bb); border:none; padding:0.6rem 1.5rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:0.95rem; color:#fff; transition:0.2s; margin:0.3rem; }
+  .sim-btn:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(255,100,220,0.4); }
+  .sim-btn.secondary { background:#2c3e66; }
+  .quiz-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #ff64dc; margin-bottom:1.5rem; }
+  .quiz-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#ff64dc; }
+  .question { background:#0f1a2c; margin:0.8rem 0; padding:0.8rem 1rem; border-radius:1.2rem; }
+  .question p { font-weight:600; margin-bottom:0.5rem; font-size:0.95rem; }
+  .options { display:flex; flex-wrap:wrap; gap:0.6rem; }
+  .opt { background:#1e2a3e; padding:0.3rem 0.9rem; border-radius:2rem; cursor:pointer; transition:0.2s; font-size:0.85rem; }
+  .opt:hover { background:#2c3e66; transform:translateY(-2px); }
+  .opt.selected { background:#ff64dc; color:#000; font-weight:bold; box-shadow:0 0 8px #ff64dc; }
+  .opt.correct { background:#00cc88; color:#000; }
+  .opt.wrong { background:#ff4455; color:#fff; }
+  .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #ff64dc; }
+  .btn-action { background:linear-gradient(95deg,#ff64dc,#cc44bb); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#fff; margin-top:1rem; }
+  .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(255,100,220,0.5); }
+  .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
+  .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin-top:1.5rem; padding:1rem; border:1px dashed gold; }
+  .insignia i { font-size:2.5rem; color:gold; }
+  .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
+  .hidden { display:none; }
+  .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+  .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+  .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(255,100,220,0.4); }
+  .nav-link.next { background:linear-gradient(95deg,#ff64dc,#cc44bb); color:#fff; }
+  .nav-link.menu { background:#1a2a4a; border:1px solid #ff64dc; }
+  footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .info-grid { grid-template-columns:1fr; } }
+ </style>
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
 </head>
 <body>
-  <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Estadística</a></nav>
-  <div class="course-container" id="app">
-    <div class="hero-header">
-      <h1>📐 Modelos Lineales Generalizados</h1>
-      <p>GLM, link functions, Poisson, Binomial, Deviance</p>
-      <div class="badge-area">
-        <span class="chip"><i class="fas fa-link"></i> Link Functions</span>
-        <span class="chip"><i class="fas fa-chart-bar"></i> Poisson</span>
-        <span class="chip"><i class="fas fa-check-circle"></i> Binomial</span>
-      </div>
+ <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Estadística</a></nav>
+ <div class="course-container" id="app">
+  <div class="hero-header">
+   <h1>📐 Modelos Lineales Generalizados</h1>
+   <p>GLM, link functions, Poisson, Binomial, Deviance</p>
+   <div class="badge-area">
+    <span class="chip"><i class="fas fa-link"></i> Link Functions</span>
+    <span class="chip"><i class="fas fa-chart-bar"></i> Poisson</span>
+    <span class="chip"><i class="fas fa-check-circle"></i> Binomial</span>
+   </div>
+  </div>
+  <div class="progress-section">
+   <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+   <span class="progress-text" id="progressText">Módulo 5 de 12</span>
+  </div>
+  <div class="analogy-card">
+   <strong>💡 Piénsalo así:</strong> La regresión lineal es como un destornillador de punta plana. Los GLM son un juego de destornilladores con diferentes puntas: Phillips (logit), hexagonal (Poisson), etc. Todos funcionan igual: predictor lineal + función link + distribución de error. Cambias la punta según el tipo de dato que tengas.
+  </div>
+  <div class="main-area">
+   <div class="section-title"><i class="fas fa-cubes"></i> Componentes de un GLM</div>
+   <div class="info-grid">
+    <div class="info-panel">
+     <h3>🔗 Función Link</h3>
+     <p>Conecta el predictor lineal (η = Xβ) con la media de la variable respuesta. Link logit para binomial, log para Poisson, identity para normal. Transforma la relación no lineal en lineal.</p>
     </div>
-    <div class="progress-section">
-      <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
-      <span class="progress-text" id="progressText">Módulo 5 de 12</span>
+    <div class="info-panel">
+     <h3>📊 Distribución de Error (Familia)</h3>
+     <p>La familia describe la distribución de la variable respuesta: Normal (regresión lineal), Binomial (logística), Poisson (conteo), Gamma (tiempos), Inverse Gaussian. Cada familia tiene su función de varianza.</p>
     </div>
-    <div class="analogy-card">
-      <strong>💡 Piénsalo así:</strong> La regresión lineal es como un destornillador de punta plana. Los GLM son un juego de destornilladores con diferentes puntas: Phillips (logit), hexagonal (Poisson), etc. Todos funcionan igual: predictor lineal + función link + distribución de error. Cambias la punta según el tipo de dato que tengas.
+    <div class="info-panel">
+     <h3>📏 Deviance</h3>
+     <p>Métrica de bondad de ajuste en GLM, análoga a la suma de cuadrados residual en regresión lineal. Compara el modelo ajustado contra el modelo saturado (perfecto). Se usa para test de hipótesis y comparación de modelos.</p>
     </div>
-    <div class="main-area">
-      <div class="section-title"><i class="fas fa-cubes"></i> Componentes de un GLM</div>
-      <div class="info-grid">
-        <div class="info-panel">
-          <h3>🔗 Función Link</h3>
-          <p>Conecta el predictor lineal (η = Xβ) con la media de la variable respuesta. Link logit para binomial, log para Poisson, identity para normal. Transforma la relación no lineal en lineal.</p>
-        </div>
-        <div class="info-panel">
-          <h3>📊 Distribución de Error (Familia)</h3>
-          <p>La familia describe la distribución de la variable respuesta: Normal (regresión lineal), Binomial (logística), Poisson (conteo), Gamma (tiempos), Inverse Gaussian. Cada familia tiene su función de varianza.</p>
-        </div>
-        <div class="info-panel">
-          <h3>📏 Deviance</h3>
-          <p>Métrica de bondad de ajuste en GLM, análoga a la suma de cuadrados residual en regresión lineal. Compara el modelo ajustado contra el modelo saturado (perfecto). Se usa para test de hipótesis y comparación de modelos.</p>
-        </div>
-        <div class="info-panel">
-          <h3>🧪 Overdispersión</h3>
-          <p>Cuando la varianza observada excede la varianza teórica de la distribución. Común en Poisson con datos de conteo muy variables. Se corrige con quasipoisson, binomial negativa o modelos de dispersión adicional.</p>
-        </div>
-      </div>
+    <div class="info-panel">
+     <h3>🧪 Overdispersión</h3>
+     <p>Cuando la varianza observada excede la varianza teórica de la distribución. Común en Poisson con datos de conteo muy variables. Se corrige con quasipoisson, binomial negativa o modelos de dispersión adicional.</p>
+    </div>
+   </div>
 
-      <div class="sim-box">
-        <p style="margin-bottom:0.8rem;color:#b9ccee;">🔄 <strong>Simulador de GLM: Elige tu familia</strong></p>
-        <p style="font-size:0.85rem;color:#8899bb;">Genera datos de diferentes tipos y observa cómo el GLM ajusta la curva correcta según la familia.</p>
-        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;justify-content:center;margin:0.8rem 0;">
-          <button class="sim-btn" onclick="setGLM('normal')">📈 Normal</button>
-          <button class="sim-btn secondary" onclick="setGLM('poisson')">📊 Poisson</button>
-          <button class="sim-btn secondary" onclick="setGLM('binomial')">✅ Binomial</button>
-        </div>
-        <canvas id="glmCanvas" width="500" height="250"></canvas>
-        <p id="glmInfo" style="font-size:0.85rem;color:#b9ccee;margin-top:0.5rem;"></p>
-      </div>
-
-      <div class="quiz-area">
-        <div class="quiz-title"><i class="fas fa-question-circle"></i> Mini Quiz: Modelos Lineales Generalizados</div>
-        <div id="quizContainer"></div>
-        <button id="submitQuizBtn" class="btn-action">✅ Verificar respuestas</button>
-        <div id="insigniaArea" class="insignia hidden">
-          <i class="fas fa-medal"></i>
-          <h3>🏅 Generalizador/a 🏅</h3>
-          <p>Has dominado los GLM, link functions y familias de distribución. ¡Un paso más cerca de la maestría!</p>
-        </div>
-      </div>
+   <div class="sim-box">
+    <p style="margin-bottom:0.8rem;color:#b9ccee;">🔄 <strong>Simulador de GLM: Elige tu familia</strong></p>
+    <p style="font-size:0.85rem;color:#8899bb;">Genera datos de diferentes tipos y observa cómo el GLM ajusta la curva correcta según la familia.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:0.5rem;justify-content:center;margin:0.8rem 0;">
+     <button class="sim-btn" onclick="setGLM('normal')">📈 Normal</button>
+     <button class="sim-btn secondary" onclick="setGLM('poisson')">📊 Poisson</button>
+     <button class="sim-btn secondary" onclick="setGLM('binomial')">✅ Binomial</button>
     </div>
+    <canvas id="glmCanvas" width="500" height="250"></canvas>
+    <p id="glmInfo" style="font-size:0.85rem;color:#b9ccee;margin-top:0.5rem;"></p>
+   </div>
 
-    <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre Modelos Lineales Generalizados.</div>
-
-    <div class="nav-links">
-      <a href="04-logistica-multinomial.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
-      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
-      <a href="06-modelos-mixtos.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+   <div class="quiz-area">
+    <div class="quiz-title"><i class="fas fa-question-circle"></i> Mini Quiz: Modelos Lineales Generalizados</div>
+    <div id="quizContainer"></div>
+    <button id="submitQuizBtn" class="btn-action">✅ Verificar respuestas</button>
+    <div id="insigniaArea" class="insignia hidden">
+     <i class="fas fa-medal"></i>
+     <h3>🏅 Generalizador/a 🏅</h3>
+     <p>Has dominado los GLM, link functions y familias de distribución. ¡Un paso más cerca de la maestría!</p>
     </div>
-    <footer><i class="fas fa-chart-line"></i> Curso 4: Modelos Predictivos · GLM</footer>
+   </div>
   </div>
 
-  <script>
-    const STORAGE_KEY = 'prog_est_4_05';
-    const PROGRESS_KEY = 'prog_est_4_progress';
-    const questions = [
-      { text: "¿Qué hace la función link en un GLM?", options: ["Conecta el predictor lineal con la media", "Conecta los datos con el modelo", "Calcula la deviance"], correct: 0 },
-      { text: "¿Qué familia usarías para datos de conteo (nº de eventos)?", options: ["Poisson", "Binomial", "Normal", "Gamma"], correct: 0 },
-      { text: "¿Qué familia usarías para datos binarios (sí/no)?", options: ["Binomial", "Poisson", "Normal", "Gamma"], correct: 0 },
-      { text: "¿Qué es la deviance en un GLM?", options: ["Medida de discrepancia del modelo", "La varianza de los residuos", "El R² del modelo"], correct: 0 },
-      { text: "¿Cuál es la función link canónica para la familia Poisson?", options: ["Log", "Logit", "Identity", "Inverse"], correct: 0 }
-    ];
-    let userAnswers = new Array(questions.length).fill(null);
-    let quizCompleted = false;
-    let glmMode = 'normal';
-    let glmData = [];
+  <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre Modelos Lineales Generalizados.</div>
 
-    function saveProgress() {
-      let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
-      if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
-      localStorage.setItem(STORAGE_KEY, 'true');
-    }
+  <div class="nav-links">
+   <a href="04-logistica-multinomial.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+   <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+   <a href="06-modelos-mixtos.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-chart-line"></i> Curso 4: Modelos Predictivos · GLM</footer>
+ </div>
 
-    function updateProgress() {
-      let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
-      document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
-      document.getElementById('progressText').textContent = 'M\u00f3dulo '+(p.length || 5)+' de 12';
-    }
+ <script>
+  const STORAGE_KEY = 'prog_est_4_05';
+  const PROGRESS_KEY = 'prog_est_4_progress';
+  const questions = [
+   { text: "¿Qué hace la función link en un GLM?", options: ["Conecta el predictor lineal con la media", "Conecta los datos con el modelo", "Calcula la deviance"], correct: 0 },
+   { text: "¿Qué familia usarías para datos de conteo (nº de eventos)?", options: ["Poisson", "Binomial", "Normal", "Gamma"], correct: 0 },
+   { text: "¿Qué familia usarías para datos binarios (sí/no)?", options: ["Binomial", "Poisson", "Normal", "Gamma"], correct: 0 },
+   { text: "¿Qué es la deviance en un GLM?", options: ["Medida de discrepancia del modelo", "La varianza de los residuos", "El R² del modelo"], correct: 0 },
+   { text: "¿Cuál es la función link canónica para la familia Poisson?", options: ["Log", "Logit", "Identity", "Inverse"], correct: 0 }
+  ];
+  let userAnswers = new Array(questions.length).fill(null);
+  let quizCompleted = false;
+  let glmMode = 'normal';
+  let glmData = [];
 
-    function renderQuestions() {
-      const container = document.getElementById('quizContainer');
-      container.innerHTML = '';
-      questions.forEach((q, idx) => {
-        const qDiv = document.createElement('div'); qDiv.classList.add('question');
-        qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
-        const optsDiv = qDiv.querySelector('.options');
-        q.options.forEach((opt, optIdx) => {
-          const span = document.createElement('div'); span.classList.add('opt');
-          span.textContent = opt; span.dataset.qIdx = idx; span.dataset.optIdx = optIdx;
-          span.addEventListener('click', function() {
-            if (quizCompleted) return;
-            this.parentElement.querySelectorAll('.opt').forEach(c => c.classList.remove('selected'));
-            this.classList.add('selected'); userAnswers[idx] = optIdx; updateBtnState();
-          });
-          optsDiv.appendChild(span);
-        });
-        container.appendChild(qDiv);
-      });
-    }
-
-    function updateBtnState() {
-      document.getElementById('submitQuizBtn').disabled = userAnswers.some(a => a === null) || quizCompleted;
-    }
-
-    function handleSubmit() {
-      if (quizCompleted) return;
-      if (userAnswers.some(a => a === null)) { document.getElementById('feedbackMsg').textContent = I18N.t('fb_0'); return; }
-      let correct = 0;
-      questions.forEach((q, i) => { if (userAnswers[i] === q.correct) correct++; });
-      const total = questions.length; const passed = correct >= Math.ceil(total * 0.6);
-      document.querySelectorAll('.question').forEach((qDiv, idx) => {
-        const opts = qDiv.querySelectorAll('.opt');
-        opts.forEach((o, oi) => {
-          o.classList.remove('selected');
-          if (oi === questions[idx].correct) o.classList.add('correct');
-          else if (oi === userAnswers[idx]) o.classList.add('wrong');
-        });
-      });
-      if (passed) {
-        quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
-        document.getElementById('insigniaArea').classList.remove('hidden');
-        document.getElementById('feedbackMsg').textContent = I18N.t('fb_1');
-        saveProgress(); updateProgress();
-      } else {
-        document.getElementById('feedbackMsg').textContent = '❌ ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. ¡Reintenta!';
-      }
-    }
-
-    function restoreProgress() {
-      const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
-      if (p.includes(STORAGE_KEY)) {
-        quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
-        document.getElementById('insigniaArea').classList.remove('hidden');
-        document.getElementById('feedbackMsg').textContent = I18N.t('fb_2');
-        document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
-      }
-    }
-
-    function setGLM(mode) {
-      glmMode = mode;
-      document.querySelectorAll('.sim-box .sim-btn').forEach(b => b.className = 'sim-btn secondary');
-      if(mode==='normal') document.querySelectorAll('.sim-box .sim-btn')[0].className = 'sim-btn';
-      else if(mode==='poisson') document.querySelectorAll('.sim-box .sim-btn')[1].className = 'sim-btn';
-      else document.querySelectorAll('.sim-box .sim-btn')[2].className = 'sim-btn';
-      drawGLM();
-    }
-
-    function drawGLM() {
-      const canvas = document.getElementById('glmCanvas');
-      const ctx = canvas.getContext('2d');
-      ctx.clearRect(0,0,canvas.width,canvas.height);
-      const pad = 40; const w = canvas.width-pad*2; const h = canvas.height-pad*2;
-
-      glmData = [];
-      for(let i=0;i<15;i++){
-        const x = i/14;
-        let y;
-        if(glmMode==='normal'){
-          y = 2 + 3*x + (Math.random()-0.5)*0.8;
-        } else if(glmMode==='poisson'){
-          y = Math.round(Math.exp(0.5 + 2*x) + (Math.random()-0.5)*0.5);
-          if(y<0) y=0;
-        } else {
-          const p = 1/(1+Math.exp(-(-2 + 5*x)));
-          y = Math.random() < p ? 1 : 0;
-        }
-        glmData.push({x,y});
-      }
-
-      glmData.forEach(d => {
-        const px = pad + d.x*w;
-        const py = pad + h - (d.y/(glmMode==='normal'?6:glmMode==='poisson'?15:1))*h;
-        ctx.beginPath(); ctx.arc(px, py, 4, 0, Math.PI*2);
-        ctx.fillStyle = '#ff64dc'; ctx.fill();
-      });
-
-      ctx.strokeStyle = '#ff9cf0'; ctx.lineWidth = 2;
-      ctx.beginPath();
-      glmData.forEach((d,i) => {
-        const px = pad + d.x*w;
-        const py = pad + h - (d.y/(glmMode==='normal'?6:glmMode==='poisson'?15:1))*h;
-        i===0 ? ctx.moveTo(px,py) : ctx.lineTo(px,py);
-      });
-      ctx.stroke();
-
-      ctx.fillStyle = '#8899bb'; ctx.font='11px Inter'; ctx.textAlign='center';
-      ctx.fillText('X (predictor)', pad+w/2, canvas.height-8);
-      ctx.save(); ctx.translate(12, pad+h/2); ctx.rotate(-Math.PI/2); ctx.fillText('Y (respuesta)', 0, 0); ctx.restore();
-      document.getElementById('glmInfo').innerHTML = 'Familia: <strong>' + glmMode.charAt(0).toUpperCase()+glmMode.slice(1) + '</strong> | Link: ' + (glmMode==='normal'?'Identity':glmMode==='poisson'?'Log':'Logit') + ' | ' + glmData.length + ' puntos';
-    }
-
-    document.getElementById('submitQuizBtn').addEventListener('click', handleSubmit);
-    renderQuestions(); updateBtnState(); restoreProgress(); updateProgress(); drawGLM();
-  </script>
-  <script src="../../../assets/js/cookie-consent.js"></script>
-<script>
-window.I18N_DATA={
-  "fb_0": {
-    "es": "⚠️ Responde todas las preguntas primero.",
-    "en": "⚠️ Answer todas las preguntas primero."
-  },
-  "fb_1": {
-    "es": "🎉 ¡Excelente! Has dominado los GLM.",
-    "en": "🎉 !Excellent! Has dominado los GLM."
-  },
-  "fb_2": {
-    "es": "🏆 Ya completaste este módulo.",
-    "en": "🏆 Ya completaste este module."
+  function saveProgress() {
+   let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
+   localStorage.setItem(STORAGE_KEY, 'true');
   }
+
+  function updateProgress() {
+   let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
+   document.getElementById('progressText').textContent = 'M\u00f3dulo '+(p.length || 5)+' de 12';
+  }
+
+  function renderQuestions() {
+   const container = document.getElementById('quizContainer');
+   container.innerHTML = '';
+   questions.forEach((q, idx) => {
+    const qDiv = document.createElement('div'); qDiv.classList.add('question');
+    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
+    const optsDiv = qDiv.querySelector('.options');
+    q.options.forEach((opt, optIdx) => {
+     const span = document.createElement('div'); span.classList.add('opt');
+     span.textContent = opt; span.dataset.qIdx = idx; span.dataset.optIdx = optIdx;
+     span.addEventListener('click', function() {
+      if (quizCompleted) return;
+      this.parentElement.querySelectorAll('.opt').forEach(c => c.classList.remove('selected'));
+      this.classList.add('selected'); userAnswers[idx] = optIdx; updateBtnState();
+     });
+     optsDiv.appendChild(span);
+    });
+    container.appendChild(qDiv);
+   });
+  }
+
+  function updateBtnState() {
+   document.getElementById('submitQuizBtn').disabled = userAnswers.some(a => a === null) || quizCompleted;
+  }
+
+  function handleSubmit() {
+   if (quizCompleted) return;
+   if (userAnswers.some(a => a === null)) { document.getElementById('feedbackMsg').textContent = I18N.t('fb_0'); return; }
+   let correct = 0;
+   questions.forEach((q, i) => { if (userAnswers[i] === q.correct) correct++; });
+   const total = questions.length; const passed = correct >= Math.ceil(total * 0.6);
+   document.querySelectorAll('.question').forEach((qDiv, idx) => {
+    const opts = qDiv.querySelectorAll('.opt');
+    opts.forEach((o, oi) => {
+     o.classList.remove('selected');
+     if (oi === questions[idx].correct) o.classList.add('correct');
+     else if (oi === userAnswers[idx]) o.classList.add('wrong');
+    });
+   });
+   if (passed) {
+    quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').textContent = I18N.t('fb_1');
+    saveProgress(); updateProgress();
+   } else {
+    document.getElementById('feedbackMsg').textContent = '❌ ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. ¡Reintenta!';
+   }
+  }
+
+  function restoreProgress() {
+   const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   if (p.includes(STORAGE_KEY)) {
+    quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').textContent = I18N.t('fb_2');
+    document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
+   }
+  }
+
+  function setGLM(mode) {
+   glmMode = mode;
+   document.querySelectorAll('.sim-box .sim-btn').forEach(b => b.className = 'sim-btn secondary');
+   if(mode==='normal') document.querySelectorAll('.sim-box .sim-btn')[0].className = 'sim-btn';
+   else if(mode==='poisson') document.querySelectorAll('.sim-box .sim-btn')[1].className = 'sim-btn';
+   else document.querySelectorAll('.sim-box .sim-btn')[2].className = 'sim-btn';
+   drawGLM();
+  }
+
+  function drawGLM() {
+   const canvas = document.getElementById('glmCanvas');
+   const ctx = canvas.getContext('2d');
+   ctx.clearRect(0,0,canvas.width,canvas.height);
+   const pad = 40; const w = canvas.width-pad*2; const h = canvas.height-pad*2;
+
+   glmData = [];
+   for(let i=0;i<15;i++){
+    const x = i/14;
+    let y;
+    if(glmMode==='normal'){
+     y = 2 + 3*x + (Math.random()-0.5)*0.8;
+    } else if(glmMode==='poisson'){
+     y = Math.round(Math.exp(0.5 + 2*x) + (Math.random()-0.5)*0.5);
+     if(y<0) y=0;
+    } else {
+     const p = 1/(1+Math.exp(-(-2 + 5*x)));
+     y = Math.random() < p ? 1 : 0;
+    }
+    glmData.push({x,y});
+   }
+
+   glmData.forEach(d => {
+    const px = pad + d.x*w;
+    const py = pad + h - (d.y/(glmMode==='normal'?6:glmMode==='poisson'?15:1))*h;
+    ctx.beginPath(); ctx.arc(px, py, 4, 0, Math.PI*2);
+    ctx.fillStyle = '#ff64dc'; ctx.fill();
+   });
+
+   ctx.strokeStyle = '#ff9cf0'; ctx.lineWidth = 2;
+   ctx.beginPath();
+   glmData.forEach((d,i) => {
+    const px = pad + d.x*w;
+    const py = pad + h - (d.y/(glmMode==='normal'?6:glmMode==='poisson'?15:1))*h;
+    i===0 ? ctx.moveTo(px,py) : ctx.lineTo(px,py);
+   });
+   ctx.stroke();
+
+   ctx.fillStyle = '#8899bb'; ctx.font='11px Inter'; ctx.textAlign='center';
+   ctx.fillText('X (predictor)', pad+w/2, canvas.height-8);
+   ctx.save(); ctx.translate(12, pad+h/2); ctx.rotate(-Math.PI/2); ctx.fillText('Y (respuesta)', 0, 0); ctx.restore();
+   document.getElementById('glmInfo').innerHTML = 'Familia: <strong>' + glmMode.charAt(0).toUpperCase()+glmMode.slice(1) + '</strong> | Link: ' + (glmMode==='normal'?'Identity':glmMode==='poisson'?'Log':'Logit') + ' | ' + glmData.length + ' puntos';
+  }
+
+  document.getElementById('submitQuizBtn').addEventListener('click', handleSubmit);
+  renderQuestions(); updateBtnState(); restoreProgress(); updateProgress(); drawGLM();
+ </script>
+ <script>
+window.I18N_DATA={
+ "fb_0": {
+  "es": "⚠️ Responde todas las preguntas primero.",
+  "en": "⚠️ Answer todas las preguntas primero."
+ },
+ "fb_1": {
+  "es": "🎉 ¡Excelente! Has dominado los GLM.",
+  "en": "🎉 !Excellent! Has dominado los GLM."
+ },
+ "fb_2": {
+  "es": "🏆 Ya completaste este módulo.",
+  "en": "🏆 Ya completaste este module."
+ }
 };
 </script>
-<script src="../../../assets/js/i18n.js"></script>  </body>
+<script src="../../../assets/js/i18n.js"></script> </body>
 </html>

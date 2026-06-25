@@ -1,337 +1,336 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Análisis Técnico — Charts y Patrones | Curso 5</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    :root { --accent: #2b9eff; --accent-rgb: 43,158,255; }
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 100%); font-family: 'Inter', sans-serif; color: #eef5ff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; }
-    .modulo-container { max-width: 1100px; width: 100%; background: rgba(15,25,45,0.65); backdrop-filter: blur(12px); border-radius: 3rem; border: 1px solid rgba(var(--accent-rgb),0.25); box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden; }
-    .hero-header { background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%); padding: 1.5rem 2rem; text-align: center; border-bottom: 2px solid var(--accent); }
-    .hero-header h1 { font-size: 2rem; font-weight: 800; background: linear-gradient(135deg, #FFF, #7af2ff, var(--accent)); -webkit-background-clip: text; background-clip: text; color: transparent; }
-    .hero-header p { font-size: 1rem; color: #b9e2ff; margin-top: 0.2rem; }
-    .progress-bar { margin: 0.8rem 2rem; padding: 0.5rem 1rem; background: #00000055; border-radius: 2rem; display: flex; align-items: center; gap: 1rem; border: 1px solid var(--accent); }
-    .progress-fill-bg { flex:1; height:8px; background:#ffffff15; border-radius:8px; overflow:hidden; }
-    .progress-fill { height:100%; width:8%; background:linear-gradient(90deg,var(--accent),#00e0ff); border-radius:8px; transition:width 0.5s ease; }
-    .progress-text { font-size:0.75rem; color:#b9e2ff; white-space:nowrap; }
-    .analogy-card { background: #1e2a3acc; margin: 1rem 2rem; padding: 1rem 1.5rem; border-radius: 1.5rem; border-left: 6px solid var(--accent); font-size: 0.95rem; }
-    .analogy-card i { color: var(--accent); margin-right: 0.5rem; }
-    .main-area { padding: 1rem 2rem 1.5rem; }
-    .chart-container { background: rgba(0,10,25,0.8); border-radius: 1.5rem; padding: 1rem; border: 1px solid var(--accent); margin-bottom: 1rem; text-align: center; }
-    .chart-container canvas { background: #0a0f1e; border-radius: 0.8rem; width: 100%; max-width: 700px; height: 320px; }
-    .pattern-quiz { background: rgba(0,10,25,0.7); border-radius: 1.5rem; padding: 1.2rem; border: 1px solid var(--accent); }
-    .pattern-q { background: #0f1a2c; border-radius: 1rem; padding: 0.8rem 1rem; margin: 0.5rem 0; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
-    .pattern-q p { font-weight: 600; font-size: 0.9rem; flex: 1; }
-    .pattern-options { display: flex; gap: 0.4rem; flex-wrap: wrap; }
-    .pattern-opt { background: #1e2a3e; padding: 0.3rem 0.8rem; border-radius: 2rem; cursor: pointer; font-size: 0.8rem; transition: 0.2s; }
-    .pattern-opt:hover { background: #2c3e66; }
-    .pattern-opt.selected { background: var(--accent); color: #000; font-weight: bold; }
-    .pattern-opt.correct { background: #00ffc8; color: #000; }
-    .pattern-opt.wrong { background: #ff5050; color: #fff; }
-    .btn-action { background: linear-gradient(95deg, var(--accent), #00e0ff); border: none; padding: 0.7rem 1.5rem; font-weight: 700; border-radius: 2rem; cursor: pointer; font-size: 0.95rem; color: #000; transition: 0.2s; font-family: 'Inter', sans-serif; }
-    .btn-action:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(var(--accent-rgb),0.4); }
-    .btn-action:disabled { opacity: 0.5; cursor: not-allowed; }
-    .draw-tools { display: flex; gap: 0.5rem; margin: 0.5rem 0; flex-wrap: wrap; justify-content: center; }
-    .tool-btn { background: #1e2a3e; border: 1px solid #2c3e66; padding: 0.4rem 0.8rem; border-radius: 2rem; cursor: pointer; font-size: 0.8rem; transition: 0.2s; color: #b9e2ff; }
-    .tool-btn:hover { border-color: var(--accent); }
-    .tool-btn.active { background: var(--accent); color: #000; border-color: var(--accent); font-weight: bold; }
-    .feedback { background: #00000099; margin: 0.5rem 2rem 1rem; padding: 0.8rem; border-radius: 1rem; text-align: center; font-weight: 500; border-left: 4px solid var(--accent); font-size: 0.9rem; }
-    .insignia { text-align: center; background: #0c1b2f; border-radius: 1.5rem; margin: 0.8rem 2rem; padding: 0.8rem; border: 2px solid gold; }
-    .insignia i { font-size: 2rem; color: gold; }
-    .hidden { display: none; }
-    .nav-links { display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap; padding: 1rem 2rem; }
-    .nav-link { background: #2c3e66; padding: 0.6rem 1.2rem; border-radius: 2rem; font-weight: 600; cursor: pointer; text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; font-size: 0.85rem; }
-    .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(var(--accent-rgb),0.4); }
-    .nav-link.next { background: linear-gradient(95deg, var(--accent), #00e0ff); color: #000; }
-    footer { text-align: center; padding: 1rem; font-size: 0.75rem; border-top: 1px solid #2c3e66; }
-    @media (max-width:800px) { .hero-header h1 { font-size:1.5rem; } }
-  </style>
-  <link rel="stylesheet" href="../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Análisis Técnico — Charts y Patrones | Curso 5</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  :root { --accent: #2b9eff; --accent-rgb: 43,158,255; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 100%); font-family: 'Inter', sans-serif; color: #eef5ff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; }
+  .modulo-container { max-width: 1100px; width: 100%; background: rgba(15,25,45,0.65); backdrop-filter: blur(12px); border-radius: 3rem; border: 1px solid rgba(var(--accent-rgb),0.25); box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden; }
+  .hero-header { background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%); padding: 1.5rem 2rem; text-align: center; border-bottom: 2px solid var(--accent); }
+  .hero-header h1 { font-size: 2rem; font-weight: 800; background: linear-gradient(135deg, #FFF, #7af2ff, var(--accent)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero-header p { font-size: 1rem; color: #b9e2ff; margin-top: 0.2rem; }
+  .progress-bar { margin: 0.8rem 2rem; padding: 0.5rem 1rem; background: #00000055; border-radius: 2rem; display: flex; align-items: center; gap: 1rem; border: 1px solid var(--accent); }
+  .progress-fill-bg { flex:1; height:8px; background:#ffffff15; border-radius:8px; overflow:hidden; }
+  .progress-fill { height:100%; width:8%; background:linear-gradient(90deg,var(--accent),#00e0ff); border-radius:8px; transition:width 0.5s ease; }
+  .progress-text { font-size:0.75rem; color:#b9e2ff; white-space:nowrap; }
+  .analogy-card { background: #1e2a3acc; margin: 1rem 2rem; padding: 1rem 1.5rem; border-radius: 1.5rem; border-left: 6px solid var(--accent); font-size: 0.95rem; }
+  .analogy-card i { color: var(--accent); margin-right: 0.5rem; }
+  .main-area { padding: 1rem 2rem 1.5rem; }
+  .chart-container { background: rgba(0,10,25,0.8); border-radius: 1.5rem; padding: 1rem; border: 1px solid var(--accent); margin-bottom: 1rem; text-align: center; }
+  .chart-container canvas { background: #0a0f1e; border-radius: 0.8rem; width: 100%; max-width: 700px; height: 320px; }
+  .pattern-quiz { background: rgba(0,10,25,0.7); border-radius: 1.5rem; padding: 1.2rem; border: 1px solid var(--accent); }
+  .pattern-q { background: #0f1a2c; border-radius: 1rem; padding: 0.8rem 1rem; margin: 0.5rem 0; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+  .pattern-q p { font-weight: 600; font-size: 0.9rem; flex: 1; }
+  .pattern-options { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+  .pattern-opt { background: #1e2a3e; padding: 0.3rem 0.8rem; border-radius: 2rem; cursor: pointer; font-size: 0.8rem; transition: 0.2s; }
+  .pattern-opt:hover { background: #2c3e66; }
+  .pattern-opt.selected { background: var(--accent); color: #000; font-weight: bold; }
+  .pattern-opt.correct { background: #00ffc8; color: #000; }
+  .pattern-opt.wrong { background: #ff5050; color: #fff; }
+  .btn-action { background: linear-gradient(95deg, var(--accent), #00e0ff); border: none; padding: 0.7rem 1.5rem; font-weight: 700; border-radius: 2rem; cursor: pointer; font-size: 0.95rem; color: #000; transition: 0.2s; font-family: 'Inter', sans-serif; }
+  .btn-action:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(var(--accent-rgb),0.4); }
+  .btn-action:disabled { opacity: 0.5; cursor: not-allowed; }
+  .draw-tools { display: flex; gap: 0.5rem; margin: 0.5rem 0; flex-wrap: wrap; justify-content: center; }
+  .tool-btn { background: #1e2a3e; border: 1px solid #2c3e66; padding: 0.4rem 0.8rem; border-radius: 2rem; cursor: pointer; font-size: 0.8rem; transition: 0.2s; color: #b9e2ff; }
+  .tool-btn:hover { border-color: var(--accent); }
+  .tool-btn.active { background: var(--accent); color: #000; border-color: var(--accent); font-weight: bold; }
+  .feedback { background: #00000099; margin: 0.5rem 2rem 1rem; padding: 0.8rem; border-radius: 1rem; text-align: center; font-weight: 500; border-left: 4px solid var(--accent); font-size: 0.9rem; }
+  .insignia { text-align: center; background: #0c1b2f; border-radius: 1.5rem; margin: 0.8rem 2rem; padding: 0.8rem; border: 2px solid gold; }
+  .insignia i { font-size: 2rem; color: gold; }
+  .hidden { display: none; }
+  .nav-links { display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap; padding: 1rem 2rem; }
+  .nav-link { background: #2c3e66; padding: 0.6rem 1.2rem; border-radius: 2rem; font-weight: 600; cursor: pointer; text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; font-size: 0.85rem; }
+  .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(var(--accent-rgb),0.4); }
+  .nav-link.next { background: linear-gradient(95deg, var(--accent), #00e0ff); color: #000; }
+  footer { text-align: center; padding: 1rem; font-size: 0.75rem; border-top: 1px solid #2c3e66; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.5rem; } }
+ </style>
+ <link rel="stylesheet" href="../../assets/css/theme.css">
 </head>
 <body>
-  <nav class="brand-return-nav"><a href="../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa</a><a href="index.html">Curso 5</a></nav>
+ <nav class="brand-return-nav"><a href="../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa</a><a href="index.html">Curso 5</a></nav>
 
 <div class="modulo-container">
-  <div class="hero-header">
-    <h1><i class="fas fa-chart-bar"></i> Análisis Técnico — Charts y Patrones</h1>
-    <p>Módulo 3 · El arte de leer el mercado</p>
+ <div class="hero-header">
+  <h1><i class="fas fa-chart-bar"></i> Análisis Técnico — Charts y Patrones</h1>
+  <p>Módulo 3 · El arte de leer el mercado</p>
+ </div>
+
+ <div class="progress-bar">
+  <span>📊 Curso 5</span>
+  <div class="progress-fill-bg"><div class="progress-fill" id="progressFill"></div></div>
+  <span class="progress-text" id="progressText">0%</span>
+ </div>
+
+ <div class="analogy-card">
+  <i class="fas fa-map"></i> <strong>Leer un mapa topográfico:</strong> Un chart de velas es como un mapa. Las montañas (resistencia), los valles (soporte), los patrones como H&S son formaciones rocosas que te dicen si hay una avalancha (caída) o un sendero seguro (subida). Los traders leen estos mapas para no perderse.
+ </div>
+
+ <div class="main-area">
+  <div class="chart-container">
+   <p style="font-size:0.85rem;color:#8899bb;margin-bottom:0.3rem;"><i class="fas fa-chart-simple"></i> Gráfico de Velas Simulado — Identifica patrones</p>
+   <canvas id="chartCanvas" width="700" height="320"></canvas>
+   <div class="draw-tools">
+    <button class="tool-btn active" id="panTool">🖐️ Pan</button>
+    <button class="tool-btn" id="lineTool">📏 Trendline</button>
+    <button class="tool-btn" id="supTool">🛡️ Soporte/Resistencia</button>
+    <button class="tool-btn" id="resetTool">🔄 Reset</button>
+   </div>
   </div>
 
-  <div class="progress-bar">
-    <span>📊 Curso 5</span>
-    <div class="progress-fill-bg"><div class="progress-fill" id="progressFill"></div></div>
-    <span class="progress-text" id="progressText">0%</span>
-  </div>
-
-  <div class="analogy-card">
-    <i class="fas fa-map"></i> <strong>Leer un mapa topográfico:</strong> Un chart de velas es como un mapa. Las montañas (resistencia), los valles (soporte), los patrones como H&S son formaciones rocosas que te dicen si hay una avalancha (caída) o un sendero seguro (subida). Los traders leen estos mapas para no perderse.
-  </div>
-
-  <div class="main-area">
-    <div class="chart-container">
-      <p style="font-size:0.85rem;color:#8899bb;margin-bottom:0.3rem;"><i class="fas fa-chart-simple"></i> Gráfico de Velas Simulado — Identifica patrones</p>
-      <canvas id="chartCanvas" width="700" height="320"></canvas>
-      <div class="draw-tools">
-        <button class="tool-btn active" id="panTool">🖐️ Pan</button>
-        <button class="tool-btn" id="lineTool">📏 Trendline</button>
-        <button class="tool-btn" id="supTool">🛡️ Soporte/Resistencia</button>
-        <button class="tool-btn" id="resetTool">🔄 Reset</button>
-      </div>
+  <div class="pattern-quiz">
+   <p style="font-weight:700;color:var(--accent);margin-bottom:0.5rem;"><i class="fas fa-question-circle"></i> Identifica el patrón en el gráfico:</p>
+   <div class="pattern-q">
+    <p>🔍 ¿Qué patrón ves en el gráfico?</p>
+    <div class="pattern-options" id="patternOpts">
+     <span class="pattern-opt" data-correct="true">Head & Shoulders</span>
+     <span class="pattern-opt" data-correct="false">Double Top</span>
+     <span class="pattern-opt" data-correct="false">Triángulo Ascendente</span>
+     <span class="pattern-opt" data-correct="false">Copa y Asa</span>
     </div>
-
-    <div class="pattern-quiz">
-      <p style="font-weight:700;color:var(--accent);margin-bottom:0.5rem;"><i class="fas fa-question-circle"></i> Identifica el patrón en el gráfico:</p>
-      <div class="pattern-q">
-        <p>🔍 ¿Qué patrón ves en el gráfico?</p>
-        <div class="pattern-options" id="patternOpts">
-          <span class="pattern-opt" data-correct="true">Head & Shoulders</span>
-          <span class="pattern-opt" data-correct="false">Double Top</span>
-          <span class="pattern-opt" data-correct="false">Triángulo Ascendente</span>
-          <span class="pattern-opt" data-correct="false">Copa y Asa</span>
-        </div>
-      </div>
-      <button class="btn-action" id="checkPatternBtn"><i class="fas fa-check"></i> Verificar</button>
-    </div>
+   </div>
+   <button class="btn-action" id="checkPatternBtn"><i class="fas fa-check"></i> Verificar</button>
   </div>
+ </div>
 
-  <div id="feedback" class="feedback">
-    💡 Observa el gráfico de velas. Usa las herramientas de dibujo para marcar tendencias e identifica el patrón.
-  </div>
+ <div id="feedback" class="feedback">
+  💡 Observa el gráfico de velas. Usa las herramientas de dibujo para marcar tendencias e identifica el patrón.
+ </div>
 
-  <div id="insignia" class="insignia hidden">
-    <i class="fas fa-medal"></i>
-    <h3>🏅 ¡CHARTISTA PRO! 🏅</h3>
-    <p>Sabes leer patrones de velas y dibujar niveles clave. ¡El mercado te habla y tú lo entiendes!</p>
-  </div>
+ <div id="insignia" class="insignia hidden">
+  <i class="fas fa-medal"></i>
+  <h3>🏅 ¡CHARTISTA PRO! 🏅</h3>
+  <p>Sabes leer patrones de velas y dibujar niveles clave. ¡El mercado te habla y tú lo entiendes!</p>
+ </div>
 
-  <div class="nav-links">
-    <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Menú</a>
-    <button id="nextBtn" class="nav-link next hidden">Siguiente <i class="fas fa-arrow-right"></i></button>
-  </div>
-  <footer>
-    <i class="fas fa-chart-bar"></i> Mercados Globales · Módulo 3 · Análisis Técnico
-  </footer>
+ <div class="nav-links">
+  <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Menú</a>
+  <button id="nextBtn" class="nav-link next hidden">Siguiente <i class="fas fa-arrow-right"></i></button>
+ </div>
+ <footer>
+  <i class="fas fa-chart-bar"></i> Mercados Globales · Módulo 3 · Análisis Técnico
+ </footer>
 </div>
 
 <script>
-  const MODULE_ID = 'c5m3';
-  const PROGRESS_KEY = 'finanzas_progress';
-  const BADGE_KEY = 'finanzas_c5m3';
-  const TOTAL_MODULES = 72;
+ const MODULE_ID = 'c5m3';
+ const PROGRESS_KEY = 'finanzas_progress';
+ const BADGE_KEY = 'finanzas_c5m3';
+ const TOTAL_MODULES = 72;
 
-  let patternAnswered = false;
-  let patternCorrect = false;
+ let patternAnswered = false;
+ let patternCorrect = false;
 
-  function getProgress() { return JSON.parse(localStorage.getItem(PROGRESS_KEY)) || []; }
-  function saveProgress() {
-    let p = getProgress();
-    if (!p.includes(MODULE_ID)) { p.push(MODULE_ID); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
-    let pct = Math.round((p.length / TOTAL_MODULES) * 100);
-    document.getElementById('progressFill').style.width = pct + '%';
-    document.getElementById('progressText').textContent = pct + '% (progr. global)';
+ function getProgress() { return JSON.parse(localStorage.getItem(PROGRESS_KEY)) || []; }
+ function saveProgress() {
+  let p = getProgress();
+  if (!p.includes(MODULE_ID)) { p.push(MODULE_ID); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
+  let pct = Math.round((p.length / TOTAL_MODULES) * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = pct + '% (progr. global)';
+ }
+ function getBadge() { return localStorage.getItem(BADGE_KEY) === 'true'; }
+ function setBadge() { localStorage.setItem(BADGE_KEY, 'true'); }
+
+ // Chart rendering
+ var canvas = document.getElementById('chartCanvas');
+ var ctx = canvas.getContext('2d');
+ var W = 700, H = 320;
+
+ // Head & Shoulders data
+ var candleData = [];
+ function generateHSCandles() {
+  candleData = [];
+  for (var i = 0; i < 60; i++) {
+   var base = 100;
+   // Head & shoulders pattern
+   if (i < 15) base = 100 + i * 2; // left shoulder up
+   else if (i < 18) base = 100 + 30 - (i-15) * 2; // left shoulder down
+   else if (i < 28) base = 100 + 20 + (i-18) * 3; // head up
+   else if (i < 32) base = 100 + 50 - (i-28) * 3; // head down
+   else if (i < 42) base = 100 + 26 + (i-32) * 1.5; // right shoulder up
+   else if (i < 46) base = 100 + 41 - (i-42) * 3; // right shoulder down
+   else base = 100 + 29 - (i-46) * 1.5; // neckline break
+
+   var noise = (Math.random() - 0.5) * 6;
+   var open = base + noise;
+   var close = base + noise + (Math.random() - 0.5) * 4;
+   var high = Math.max(open, close) + Math.random() * 3;
+   var low = Math.min(open, close) - Math.random() * 3;
+   candleData.push({ open: open, close: close, high: high, low: low });
   }
-  function getBadge() { return localStorage.getItem(BADGE_KEY) === 'true'; }
-  function setBadge() { localStorage.setItem(BADGE_KEY, 'true'); }
+ }
+ generateHSCandles();
 
-  // Chart rendering
-  var canvas = document.getElementById('chartCanvas');
-  var ctx = canvas.getContext('2d');
-  var W = 700, H = 320;
+ function drawChart() {
+  ctx.clearRect(0, 0, W, H);
+  var pad = 30, chartW = W - pad * 2, chartH = H - pad * 2;
+  var minP = 80, maxP = 175;
+  var range = maxP - minP;
 
-  // Head & Shoulders data
-  var candleData = [];
-  function generateHSCandles() {
-    candleData = [];
-    for (var i = 0; i < 60; i++) {
-      var base = 100;
-      // Head & shoulders pattern
-      if (i < 15) base = 100 + i * 2; // left shoulder up
-      else if (i < 18) base = 100 + 30 - (i-15) * 2; // left shoulder down
-      else if (i < 28) base = 100 + 20 + (i-18) * 3; // head up
-      else if (i < 32) base = 100 + 50 - (i-28) * 3; // head down
-      else if (i < 42) base = 100 + 26 + (i-32) * 1.5; // right shoulder up
-      else if (i < 46) base = 100 + 41 - (i-42) * 3; // right shoulder down
-      else base = 100 + 29 - (i-46) * 1.5; // neckline break
-
-      var noise = (Math.random() - 0.5) * 6;
-      var open = base + noise;
-      var close = base + noise + (Math.random() - 0.5) * 4;
-      var high = Math.max(open, close) + Math.random() * 3;
-      var low = Math.min(open, close) - Math.random() * 3;
-      candleData.push({ open: open, close: close, high: high, low: low });
-    }
-  }
-  generateHSCandles();
-
-  function drawChart() {
-    ctx.clearRect(0, 0, W, H);
-    var pad = 30, chartW = W - pad * 2, chartH = H - pad * 2;
-    var minP = 80, maxP = 175;
-    var range = maxP - minP;
-
-    // Grid
-    ctx.strokeStyle = '#1e2a3e';
-    ctx.lineWidth = 0.5;
-    for (var i = 0; i <= 4; i++) {
-      var y = pad + (chartH / 4) * i;
-      ctx.beginPath(); ctx.moveTo(pad, y); ctx.lineTo(W - pad, y); ctx.stroke();
-      ctx.fillStyle = '#4a5a7a'; ctx.font = '10px Inter'; ctx.fillText((maxP - (range / 4) * i).toFixed(0), 2, y + 3);
-    }
-
-    var candleW = (chartW / candleData.length) * 0.6;
-    var spacing = chartW / candleData.length;
-
-    candleData.forEach(function(c, idx) {
-      var x = pad + idx * spacing;
-      var yOpen = pad + chartH - ((c.open - minP) / range) * chartH;
-      var yClose = pad + chartH - ((c.close - minP) / range) * chartH;
-      var yHigh = pad + chartH - ((c.high - minP) / range) * chartH;
-      var yLow = pad + chartH - ((c.low - minP) / range) * chartH;
-
-      var bullish = c.close >= c.open;
-      ctx.fillStyle = bullish ? '#00ffc8' : '#ff5050';
-      ctx.strokeStyle = bullish ? '#00ffc8' : '#ff5050';
-      ctx.lineWidth = 1;
-
-      // Wick
-      ctx.beginPath(); ctx.moveTo(x + candleW / 2, yHigh); ctx.lineTo(x + candleW / 2, yLow); ctx.stroke();
-
-      // Body
-      var bodyTop = Math.min(yOpen, yClose);
-      var bodyH = Math.abs(yClose - yOpen) || 1;
-      ctx.fillRect(x + (candleW < 2 ? 0 : candleW * 0.1), bodyTop, Math.max(candleW * 0.8, 1), bodyH);
-    });
-
-    // Draw neckline
-    ctx.strokeStyle = '#f59e0b';
-    ctx.lineWidth = 2;
-    ctx.setLineDash([5, 3]);
-    var neckY1 = pad + chartH - ((100 + 25 - minP) / range) * chartH;
-    var neckY2 = pad + chartH - ((100 + 23 - minP) / range) * chartH;
-    ctx.beginPath(); ctx.moveTo(pad, neckY1); ctx.lineTo(W - pad, neckY2); ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.fillStyle = '#f59e0b'; ctx.font = '11px Inter'; ctx.fillText('Neckline', pad + 10, neckY1 - 5);
-
-    // Annotations
-    ctx.fillStyle = '#ffffff44';
-    ctx.font = '11px Inter';
-    ctx.fillText('← Hombro Izq', pad + 20, pad + 30);
-    ctx.fillText('← Cabeza', pad + spacing * 23, pad + 10);
-    ctx.fillText('Hombro Der →', pad + spacing * 38, pad + 30);
-    ctx.fillText('Ruptura →', pad + spacing * 52, pad + chartH - 10);
+  // Grid
+  ctx.strokeStyle = '#1e2a3e';
+  ctx.lineWidth = 0.5;
+  for (var i = 0; i <= 4; i++) {
+   var y = pad + (chartH / 4) * i;
+   ctx.beginPath(); ctx.moveTo(pad, y); ctx.lineTo(W - pad, y); ctx.stroke();
+   ctx.fillStyle = '#4a5a7a'; ctx.font = '10px Inter'; ctx.fillText((maxP - (range / 4) * i).toFixed(0), 2, y + 3);
   }
 
+  var candleW = (chartW / candleData.length) * 0.6;
+  var spacing = chartW / candleData.length;
+
+  candleData.forEach(function(c, idx) {
+   var x = pad + idx * spacing;
+   var yOpen = pad + chartH - ((c.open - minP) / range) * chartH;
+   var yClose = pad + chartH - ((c.close - minP) / range) * chartH;
+   var yHigh = pad + chartH - ((c.high - minP) / range) * chartH;
+   var yLow = pad + chartH - ((c.low - minP) / range) * chartH;
+
+   var bullish = c.close >= c.open;
+   ctx.fillStyle = bullish ? '#00ffc8' : '#ff5050';
+   ctx.strokeStyle = bullish ? '#00ffc8' : '#ff5050';
+   ctx.lineWidth = 1;
+
+   // Wick
+   ctx.beginPath(); ctx.moveTo(x + candleW / 2, yHigh); ctx.lineTo(x + candleW / 2, yLow); ctx.stroke();
+
+   // Body
+   var bodyTop = Math.min(yOpen, yClose);
+   var bodyH = Math.abs(yClose - yOpen) || 1;
+   ctx.fillRect(x + (candleW < 2 ? 0 : candleW * 0.1), bodyTop, Math.max(candleW * 0.8, 1), bodyH);
+  });
+
+  // Draw neckline
+  ctx.strokeStyle = '#f59e0b';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([5, 3]);
+  var neckY1 = pad + chartH - ((100 + 25 - minP) / range) * chartH;
+  var neckY2 = pad + chartH - ((100 + 23 - minP) / range) * chartH;
+  ctx.beginPath(); ctx.moveTo(pad, neckY1); ctx.lineTo(W - pad, neckY2); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = '#f59e0b'; ctx.font = '11px Inter'; ctx.fillText('Neckline', pad + 10, neckY1 - 5);
+
+  // Annotations
+  ctx.fillStyle = '#ffffff44';
+  ctx.font = '11px Inter';
+  ctx.fillText('← Hombro Izq', pad + 20, pad + 30);
+  ctx.fillText('← Cabeza', pad + spacing * 23, pad + 10);
+  ctx.fillText('Hombro Der →', pad + spacing * 38, pad + 30);
+  ctx.fillText('Ruptura →', pad + spacing * 52, pad + chartH - 10);
+ }
+
+ drawChart();
+
+ // Drawing tools
+ var currentTool = 'pan';
+ document.querySelectorAll('.tool-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+   document.querySelectorAll('.tool-btn').forEach(function(b) { b.classList.remove('active'); });
+   this.classList.add('active');
+   currentTool = this.id.replace('Tool', '');
+   if (currentTool === 'pan') { canvas.style.cursor = 'default'; }
+   else { canvas.style.cursor = 'crosshair'; }
+  });
+ });
+
+ document.getElementById('resetTool').addEventListener('click', function() {
   drawChart();
+  document.getElementById('feedback').textContent = I18N.t('fb_0');
+ });
 
-  // Drawing tools
-  var currentTool = 'pan';
-  document.querySelectorAll('.tool-btn').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      document.querySelectorAll('.tool-btn').forEach(function(b) { b.classList.remove('active'); });
-      this.classList.add('active');
-      currentTool = this.id.replace('Tool', '');
-      if (currentTool === 'pan') { canvas.style.cursor = 'default'; }
-      else { canvas.style.cursor = 'crosshair'; }
-    });
+ // Pattern quiz
+ document.querySelectorAll('.pattern-opt').forEach(function(opt) {
+  opt.addEventListener('click', function() {
+   if (patternAnswered) return;
+   document.querySelectorAll('.pattern-opt').forEach(function(o) { o.classList.remove('selected'); });
+   this.classList.add('selected');
   });
+ });
 
-  document.getElementById('resetTool').addEventListener('click', function() {
-    drawChart();
-    document.getElementById('feedback').textContent = I18N.t('fb_0');
-  });
-
-  // Pattern quiz
-  document.querySelectorAll('.pattern-opt').forEach(function(opt) {
-    opt.addEventListener('click', function() {
-      if (patternAnswered) return;
-      document.querySelectorAll('.pattern-opt').forEach(function(o) { o.classList.remove('selected'); });
-      this.classList.add('selected');
-    });
-  });
-
-  document.getElementById('checkPatternBtn').addEventListener('click', function() {
-    var selected = document.querySelector('.pattern-opt.selected');
-    if (!selected) {
-      document.getElementById('feedback').textContent = I18N.t('fb_1');
-      return;
-    }
-    if (patternAnswered) {
-      document.getElementById('feedback').textContent = I18N.t('fb_2');
-      return;
-    }
-    var isCorrect = selected.dataset.correct === 'true';
-    patternAnswered = true;
-    if (isCorrect) {
-      selected.classList.add('correct');
-      patternCorrect = true;
-      document.getElementById('feedback').textContent = I18N.t('fb_3');
-      document.getElementById('insignia').classList.remove('hidden');
-      document.getElementById('nextBtn').classList.remove('hidden');
-      if (!getBadge()) { setBadge(); saveProgress(); }
-      document.getElementById('feedback').textContent = I18N.t('fb_4') + document.getElementById('feedback').textContent;
-    } else {
-      selected.classList.add('wrong');
-      document.getElementById('feedback').textContent = I18N.t('fb_5');
-    }
-  });
-
-  document.getElementById('nextBtn').addEventListener('click', function() {
-    alert('🔄 Transición al Módulo 4: Trading Algorítmico y Sistemático');
-    window.location.href = '04-trading-algoritmico.html';
-  });
-
-  (function restore() {
-    if (getBadge()) {
-      document.getElementById('insignia').classList.remove('hidden');
-      document.getElementById('nextBtn').classList.remove('hidden');
-      document.getElementById('feedback').textContent = I18N.t('fb_6');
-      patternAnswered = true;
-    }
-    let p = getProgress();
-    if (p.includes(MODULE_ID)) {
-      let pct = Math.round((p.length / TOTAL_MODULES) * 100);
-      document.getElementById('progressFill').style.width = pct + '%';
-      document.getElementById('progressText').textContent = pct + '% (progr. global)';
-    }
-  })();
-</script>
-  <script src="../../assets/js/cookie-consent.js"></script>
-<script>
-window.I18N_DATA={
-  "fb_0": {
-    "es": "🔄 Gráfico restaurado. Vuelve a intentar la identificación del patrón.",
-    "en": "🔄 Gráfico restaurado. Vuelve a intentar la identificación del patrón."
-  },
-  "fb_1": {
-    "es": "⚠️ Selecciona un patrón primero.",
-    "en": "⚠️ Selecciona un patrón primero."
-  },
-  "fb_2": {
-    "es": "✅ Ya respondiste este patrón. ¡Continúa!",
-    "en": "✅ Ya respondiste este patrón. !Continúa!"
-  },
-  "fb_3": {
-    "es": "✅ ¡CORRECTO! El patrón Head & Shoulders es una señal de reversión bajista. La ruptura del neckline confirma la tendencia.",
-    "en": "✅ !CORRECTO! El patrón Head & Shoulders es una señal de reversión bajista. La ruptura del neckline confirma la tendencia."
-  },
-  "fb_4": {
-    "es": "🏅 ¡IDENTIFICACIÓN EXITOSA! ",
-    "en": "🏅 !IDENTIFICACIÓN EXITOSA! "
-  },
-  "fb_5": {
-    "es": "❌ No es correcto. El patrón es Head & Shoulders: tres picos, el del medio más alto, con neckline (soporte) que se rompe a la baja. ¡Intenta de nuevo con Reset!",
-    "en": "❌ No es correct. El patrón es Head & Shoulders: tres picos, el del medio más alto, con neckline (soporte) que se rompe a la baja. !Try again con Reset!"
-  },
-  "fb_6": {
-    "es": "✅ Ya completaste este módulo. ¡Eres un chartista experto!",
-    "en": "✅ Ya completaste este module. !Eres un chartista experto!"
+ document.getElementById('checkPatternBtn').addEventListener('click', function() {
+  var selected = document.querySelector('.pattern-opt.selected');
+  if (!selected) {
+   document.getElementById('feedback').textContent = I18N.t('fb_1');
+   return;
   }
+  if (patternAnswered) {
+   document.getElementById('feedback').textContent = I18N.t('fb_2');
+   return;
+  }
+  var isCorrect = selected.dataset.correct === 'true';
+  patternAnswered = true;
+  if (isCorrect) {
+   selected.classList.add('correct');
+   patternCorrect = true;
+   document.getElementById('feedback').textContent = I18N.t('fb_3');
+   document.getElementById('insignia').classList.remove('hidden');
+   document.getElementById('nextBtn').classList.remove('hidden');
+   if (!getBadge()) { setBadge(); saveProgress(); }
+   document.getElementById('feedback').textContent = I18N.t('fb_4') + document.getElementById('feedback').textContent;
+  } else {
+   selected.classList.add('wrong');
+   document.getElementById('feedback').textContent = I18N.t('fb_5');
+  }
+ });
+
+ document.getElementById('nextBtn').addEventListener('click', function() {
+  alert('🔄 Transición al Módulo 4: Trading Algorítmico y Sistemático');
+  window.location.href = '04-trading-algoritmico.html';
+ });
+
+ (function restore() {
+  if (getBadge()) {
+   document.getElementById('insignia').classList.remove('hidden');
+   document.getElementById('nextBtn').classList.remove('hidden');
+   document.getElementById('feedback').textContent = I18N.t('fb_6');
+   patternAnswered = true;
+  }
+  let p = getProgress();
+  if (p.includes(MODULE_ID)) {
+   let pct = Math.round((p.length / TOTAL_MODULES) * 100);
+   document.getElementById('progressFill').style.width = pct + '%';
+   document.getElementById('progressText').textContent = pct + '% (progr. global)';
+  }
+ })();
+</script>
+ <script>
+window.I18N_DATA={
+ "fb_0": {
+  "es": "🔄 Gráfico restaurado. Vuelve a intentar la identificación del patrón.",
+  "en": "🔄 Gráfico restaurado. Vuelve a intentar la identificación del patrón."
+ },
+ "fb_1": {
+  "es": "⚠️ Selecciona un patrón primero.",
+  "en": "⚠️ Selecciona un patrón primero."
+ },
+ "fb_2": {
+  "es": "✅ Ya respondiste este patrón. ¡Continúa!",
+  "en": "✅ Ya respondiste este patrón. !Continúa!"
+ },
+ "fb_3": {
+  "es": "✅ ¡CORRECTO! El patrón Head & Shoulders es una señal de reversión bajista. La ruptura del neckline confirma la tendencia.",
+  "en": "✅ !CORRECTO! El patrón Head & Shoulders es una señal de reversión bajista. La ruptura del neckline confirma la tendencia."
+ },
+ "fb_4": {
+  "es": "🏅 ¡IDENTIFICACIÓN EXITOSA! ",
+  "en": "🏅 !IDENTIFICACIÓN EXITOSA! "
+ },
+ "fb_5": {
+  "es": "❌ No es correcto. El patrón es Head & Shoulders: tres picos, el del medio más alto, con neckline (soporte) que se rompe a la baja. ¡Intenta de nuevo con Reset!",
+  "en": "❌ No es correct. El patrón es Head & Shoulders: tres picos, el del medio más alto, con neckline (soporte) que se rompe a la baja. !Try again con Reset!"
+ },
+ "fb_6": {
+  "es": "✅ Ya completaste este módulo. ¡Eres un chartista experto!",
+  "en": "✅ Ya completaste este module. !Eres un chartista experto!"
+ }
 };
 </script>
-<script src="../../../assets/js/i18n.js"></script>  </body>
+<script src="../../../assets/js/i18n.js"></script> </body>
 </html>

@@ -1,243 +1,243 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>El Trilema de Escalabilidad | Curso 3</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { background:linear-gradient(135deg,#0a0f1e,#0c1222 100%); font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
-    .course-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(0,82,255,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
-    .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #0052ff; }
-    .hero-header h1 { font-size:2.8rem; font-weight:800; background:linear-gradient(135deg,#FFF,#5588ff,#0052ff); -webkit-background-clip:text; background-clip:text; color:transparent; }
-    .hero-header p { font-size:1.2rem; color:#b9d4ff; margin-top:0.5rem; }
-    .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
-    .chip { background:rgba(0,82,255,0.15); border:1px solid #0052ff; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
-    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #0052ff; font-size:1rem; line-height:1.6; }
-    .main-area { padding:0 2rem 2rem; }
-    .trilema-visual { display:flex; justify-content:center; margin:1.5rem 0; position:relative; }
-    .trilema-triangle { width:400px; height:350px; position:relative; }
-    .trilema-triangle svg { width:100%; height:100%; }
-    .trilema-point { position:absolute; width:14px; height:14px; border-radius:50%; background:#0052ff; transform:translate(-50%,-50%); transition:all 0.3s; box-shadow:0 0 12px #0052ff; }
-    .trilema-point-label { position:absolute; font-size:0.75rem; color:#8899bb; transform:translate(-50%,-50%); white-space:nowrap; }
-    .slider-area { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem; margin:1.5rem 0; }
-    .slider-group { text-align:center; background:rgba(0,10,25,0.6); border-radius:1.5rem; padding:1rem; border:1px solid #2c3e66; }
-    .slider-group label { display:block; font-weight:600; margin-bottom:0.5rem; font-size:0.9rem; }
-    .slider-group input { width:100%; accent-color:#0052ff; }
-    .slider-group .val { font-size:1.2rem; font-weight:bold; color:#5588ff; }
-    .chains-display { display:flex; gap:0.5rem; flex-wrap:wrap; justify-content:center; margin:1rem 0; }
-    .chain-dot { padding:0.3rem 0.8rem; border-radius:20px; font-size:0.75rem; font-weight:600; background:rgba(0,82,255,0.12); border:1px solid #0052ff; }
-    .info-cards { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin:1.5rem 0; }
-    .info-card { background:#0f1a2c; border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
-    .info-card h4 { color:#5588ff; margin-bottom:0.5rem; }
-    .info-card p { font-size:0.9rem; line-height:1.6; color:#b9ccee; }
-    .quiz-embedded { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; border:1px solid #0052ff; margin:1.5rem 0; }
-    .quiz-embedded h3 { margin-bottom:0.5rem; }
-    .question { background:#0f1a2c; margin:1rem 0; padding:1rem; border-radius:1.2rem; }
-    .question p { font-weight:600; margin-bottom:0.5rem; }
-    .options { display:flex; flex-wrap:wrap; gap:1rem; }
-    .opt { background:#1e2a3e; padding:0.4rem 1rem; border-radius:2rem; cursor:pointer; transition:0.2s; font-size:0.9rem; }
-    .opt:hover { background:#2c3e66; transform:translateY(-2px); }
-    .opt.selected { background:#0052ff; color:#fff; font-weight:bold; }
-    .btn-action { background:linear-gradient(95deg,#0052ff,#5588ff); border:none; padding:0.7rem 1.5rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:0.95rem; transition:0.2s; color:#fff; margin-top:0.5rem; }
-    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(0,82,255,0.4); }
-    .feedback { background:#00000099; margin:1rem 0; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #0052ff; }
-    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:1rem 0; padding:1rem; border:1px dashed gold; }
-    .insignia i { font-size:2.5rem; color:gold; }
-    .hidden { display:none; }
-    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
-    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; font-size:0.95rem; }
-    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(0,82,255,0.4); }
-    .nav-link.next { background:linear-gradient(95deg,#0052ff,#5588ff); color:#fff; }
-    .nav-link.menu { background:#1a2a4a; border:1px solid #0052ff; }
-    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
-    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .slider-area { grid-template-columns:1fr; } .info-cards { grid-template-columns:1fr; } }
-  </style>
-  <link rel="stylesheet" href="../../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>El Trilema de Escalabilidad | Curso 3</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:linear-gradient(135deg,#0a0f1e,#0c1222 100%); font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+  .course-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(0,82,255,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+  .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #0052ff; }
+  .hero-header h1 { font-size:2.8rem; font-weight:800; background:linear-gradient(135deg,#FFF,#5588ff,#0052ff); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero-header p { font-size:1.2rem; color:#b9d4ff; margin-top:0.5rem; }
+  .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+  .chip { background:rgba(0,82,255,0.15); border:1px solid #0052ff; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+  .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #0052ff; font-size:1rem; line-height:1.6; }
+  .main-area { padding:0 2rem 2rem; }
+  .trilema-visual { display:flex; justify-content:center; margin:1.5rem 0; position:relative; }
+  .trilema-triangle { width:400px; height:350px; position:relative; }
+  .trilema-triangle svg { width:100%; height:100%; }
+  .trilema-point { position:absolute; width:14px; height:14px; border-radius:50%; background:#0052ff; transform:translate(-50%,-50%); transition:all 0.3s; box-shadow:0 0 12px #0052ff; }
+  .trilema-point-label { position:absolute; font-size:0.75rem; color:#8899bb; transform:translate(-50%,-50%); white-space:nowrap; }
+  .slider-area { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem; margin:1.5rem 0; }
+  .slider-group { text-align:center; background:rgba(0,10,25,0.6); border-radius:1.5rem; padding:1rem; border:1px solid #2c3e66; }
+  .slider-group label { display:block; font-weight:600; margin-bottom:0.5rem; font-size:0.9rem; }
+  .slider-group input { width:100%; accent-color:#0052ff; }
+  .slider-group .val { font-size:1.2rem; font-weight:bold; color:#5588ff; }
+  .chains-display { display:flex; gap:0.5rem; flex-wrap:wrap; justify-content:center; margin:1rem 0; }
+  .chain-dot { padding:0.3rem 0.8rem; border-radius:20px; font-size:0.75rem; font-weight:600; background:rgba(0,82,255,0.12); border:1px solid #0052ff; }
+  .info-cards { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin:1.5rem 0; }
+  .info-card { background:#0f1a2c; border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
+  .info-card h4 { color:#5588ff; margin-bottom:0.5rem; }
+  .info-card p { font-size:0.9rem; line-height:1.6; color:#b9ccee; }
+  .quiz-embedded { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; border:1px solid #0052ff; margin:1.5rem 0; }
+  .quiz-embedded h3 { margin-bottom:0.5rem; }
+  .question { background:#0f1a2c; margin:1rem 0; padding:1rem; border-radius:1.2rem; }
+  .question p { font-weight:600; margin-bottom:0.5rem; }
+  .options { display:flex; flex-wrap:wrap; gap:1rem; }
+  .opt { background:#1e2a3e; padding:0.4rem 1rem; border-radius:2rem; cursor:pointer; transition:0.2s; font-size:0.9rem; }
+  .opt:hover { background:#2c3e66; transform:translateY(-2px); }
+  .opt.selected { background:#0052ff; color:#fff; font-weight:bold; }
+  .btn-action { background:linear-gradient(95deg,#0052ff,#5588ff); border:none; padding:0.7rem 1.5rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:0.95rem; transition:0.2s; color:#fff; margin-top:0.5rem; }
+  .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(0,82,255,0.4); }
+  .feedback { background:#00000099; margin:1rem 0; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #0052ff; }
+  .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:1rem 0; padding:1rem; border:1px dashed gold; }
+  .insignia i { font-size:2.5rem; color:gold; }
+  .hidden { display:none; }
+  .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+  .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; font-size:0.95rem; }
+  .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(0,82,255,0.4); }
+  .nav-link.next { background:linear-gradient(95deg,#0052ff,#5588ff); color:#fff; }
+  .nav-link.menu { background:#1a2a4a; border:1px solid #0052ff; }
+  footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .slider-area { grid-template-columns:1fr; } .info-cards { grid-template-columns:1fr; } }
+ </style>
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
 </head>
 <body>
-  <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Blockchain</a></nav>
+ <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Blockchain</a></nav>
 <div class="course-container">
-  <div class="hero-header">
-    <h1> EL TRILEMA DE ESCALABILIDAD</h1>
-    <p>Seguridad, escalabilidad, descentralizaci&oacute;n: elige dos</p>
-    <div class="badge-area">
-      <span class="chip"><i class="fas fa-project-diagram"></i> Blockchain Trilemma</span>
-      <span class="chip"><i class="fas fa-sliders-h"></i> Simulaci&oacute;n interactiva</span>
-    </div>
+ <div class="hero-header">
+  <h1> EL TRILEMA DE ESCALABILIDAD</h1>
+  <p>Seguridad, escalabilidad, descentralizaci&oacute;n: elige dos</p>
+  <div class="badge-area">
+   <span class="chip"><i class="fas fa-project-diagram"></i> Blockchain Trilemma</span>
+   <span class="chip"><i class="fas fa-sliders-h"></i> Simulaci&oacute;n interactiva</span>
   </div>
-  <div class="analogy-card">
-    <strong> Piénsalo as&iacute;:</strong> Es como una base de datos que no puede ser al mismo tiempo r&aacute;pida, barata y descentralizada — hay que elegir dos de tres. Si quieres m&aacute;xima seguridad (como Bitcoin) sacrificas velocidad. Si quieres m&aacute;xima velocidad (como Solana) sacrificas descentralizaci&oacute;n. Las L2 intentan romper este trilema.
+ </div>
+ <div class="analogy-card">
+  <strong> Piénsalo as&iacute;:</strong> Es como una base de datos que no puede ser al mismo tiempo r&aacute;pida, barata y descentralizada — hay que elegir dos de tres. Si quieres m&aacute;xima seguridad (como Bitcoin) sacrificas velocidad. Si quieres m&aacute;xima velocidad (como Solana) sacrificas descentralizaci&oacute;n. Las L2 intentan romper este trilema.
+ </div>
+ <div class="main-area">
+  <div class="trilema-visual">
+   <div class="trilema-triangle" id="trilemaTriangle">
+    <svg viewBox="0 0 400 350">
+     <polygon points="200,20 50,330 350,330" fill="none" stroke="#2c3e66" stroke-width="2" stroke-dasharray="6,4"/>
+     <line x1="200" y1="20" x2="200" y2="330" stroke="#2c3e66" stroke-width="1" stroke-dasharray="4,4"/>
+     <line x1="125" y1="175" x2="275" y2="175" stroke="#2c3e66" stroke-width="1" stroke-dasharray="4,4"/>
+     <text x="200" y="15" text-anchor="middle" fill="#00e0ff" font-size="0.9rem" font-weight="bold">SEGURIDAD</text>
+     <text x="50" y="345" text-anchor="middle" fill="#ffb347" font-size="0.9rem" font-weight="bold">ESCALABILIDAD</text>
+     <text x="350" y="345" text-anchor="middle" fill="#2b9eff" font-size="0.9rem" font-weight="bold">DESCENTRALIZACI&Oacute;N</text>
+     <circle id="dotDisplay" cx="200" cy="175" r="8" fill="#0052ff" opacity="0.9"/>
+     <text id="dotLabel" x="200" y="165" text-anchor="middle" fill="#fff" font-size="0.7rem" font-weight="bold">T&uacute;</text>
+    </svg>
+   </div>
   </div>
-  <div class="main-area">
-    <div class="trilema-visual">
-      <div class="trilema-triangle" id="trilemaTriangle">
-        <svg viewBox="0 0 400 350">
-          <polygon points="200,20 50,330 350,330" fill="none" stroke="#2c3e66" stroke-width="2" stroke-dasharray="6,4"/>
-          <line x1="200" y1="20" x2="200" y2="330" stroke="#2c3e66" stroke-width="1" stroke-dasharray="4,4"/>
-          <line x1="125" y1="175" x2="275" y2="175" stroke="#2c3e66" stroke-width="1" stroke-dasharray="4,4"/>
-          <text x="200" y="15" text-anchor="middle" fill="#00e0ff" font-size="0.9rem" font-weight="bold">SEGURIDAD</text>
-          <text x="50" y="345" text-anchor="middle" fill="#ffb347" font-size="0.9rem" font-weight="bold">ESCALABILIDAD</text>
-          <text x="350" y="345" text-anchor="middle" fill="#2b9eff" font-size="0.9rem" font-weight="bold">DESCENTRALIZACI&Oacute;N</text>
-          <circle id="dotDisplay" cx="200" cy="175" r="8" fill="#0052ff" opacity="0.9"/>
-          <text id="dotLabel" x="200" y="165" text-anchor="middle" fill="#fff" font-size="0.7rem" font-weight="bold">T&uacute;</text>
-        </svg>
-      </div>
-    </div>
-    <div class="slider-area">
-      <div class="slider-group">
-        <label><i class="fas fa-shield-alt" style="color:#00e0ff"></i> Seguridad</label>
-        <input type="range" id="secSlider" min="0" max="100" value="60">
-        <div class="val" id="secVal">60%</div>
-      </div>
-      <div class="slider-group">
-        <label><i class="fas fa-tachometer-alt" style="color:#ffb347"></i> Escalabilidad</label>
-        <input type="range" id="scalSlider" min="0" max="100" value="50">
-        <div class="val" id="scalVal">50%</div>
-      </div>
-      <div class="slider-group">
-        <label><i class="fas fa-users" style="color:#2b9eff"></i> Descentralizaci&oacute;n</label>
-        <input type="range" id="decSlider" min="0" max="100" value="40">
-        <div class="val" id="decVal">40%</div>
-      </div>
-    </div>
-    <div class="chains-display">
-      <span class="chain-dot" style="border-color:#f7931a;color:#fbbf6a;"><i class="fab fa-bitcoin"></i> Bitcoin</span>
-      <span class="chain-dot" style="border-color:#627eea;color:#8099f0;"><i class="fab fa-ethereum"></i> Ethereum</span>
-      <span class="chain-dot" style="border-color:#00e0ff;color:#7af2ff;"><i class="fas fa-bolt"></i> Solana</span>
-      <span class="chain-dot" style="border-color:#0052ff;color:#5588ff;"><i class="fas fa-layer-group"></i> L2s</span>
-    </div>
-    <div class="info-cards">
-      <div class="info-card">
-        <h4> El Trilema Explicado</h4>
-        <p>Propuesto por Vitalik Buterin, el trilema plantea que una blockchain no puede maximizar simult&aacute;neamente seguridad (resistencia a ataques), escalabilidad (transacciones por segundo) y descentralizaci&oacute;n (nodos independientes). Bitcoin prioriza seguridad y descentralizaci&oacute;n (~7 TPS). Solana prioriza escalabilidad con nodos m&aacute;s exigentes (~2000 TPS). Las L2 intentan escalar sin sacrificar las otras dos.</p>
-      </div>
-      <div class="info-card">
-        <h4> C&oacute;mo lo Resuelven las L2</h4>
-        <p>Los rollups ejecutan transacciones fuera de la capa base (L1) pero publican datos comprimidos en ella, heredando su seguridad. Esto permite escalar a miles de TPS manteniendo la descentralizaci&oacute;n de L1. En 2026, las L2 procesan m&aacute;s del 90% de las transacciones de Ethereum.</p>
-      </div>
-    </div>
-    <div class="quiz-embedded">
-      <h3><i class="fas fa-question-circle"></i> Mini-quiz: El Trilema</h3>
-      <div id="quizContainer"></div>
-      <button id="submitQuizBtn" class="btn-action"> Validar respuestas</button>
-      <div id="feedbackMsg" class="feedback"> Ajusta los sliders y observa c&oacute;mo se mueve el punto en el tri&aacute;ngulo.</div>
-      <div id="insigniaArea" class="insignia hidden">
-        <i class="fas fa-medal"></i>
-        <h3> INSIGNIA TRILEMA DESCIFRADO </h3>
-        <p>&iexcl;Entiendes las compensaciones fundamentales de la arquitectura blockchain!</p>
-      </div>
-    </div>
+  <div class="slider-area">
+   <div class="slider-group">
+    <label><i class="fas fa-shield-alt" style="color:#00e0ff"></i> Seguridad</label>
+    <input type="range" id="secSlider" min="0" max="100" value="60">
+    <div class="val" id="secVal">60%</div>
+   </div>
+   <div class="slider-group">
+    <label><i class="fas fa-tachometer-alt" style="color:#ffb347"></i> Escalabilidad</label>
+    <input type="range" id="scalSlider" min="0" max="100" value="50">
+    <div class="val" id="scalVal">50%</div>
+   </div>
+   <div class="slider-group">
+    <label><i class="fas fa-users" style="color:#2b9eff"></i> Descentralizaci&oacute;n</label>
+    <input type="range" id="decSlider" min="0" max="100" value="40">
+    <div class="val" id="decVal">40%</div>
+   </div>
   </div>
-  <div class="nav-links">
-    <a href="01-portal.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
-    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
-    <a href="03-optimistic-rollups.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  <div class="chains-display">
+   <span class="chain-dot" style="border-color:#f7931a;color:#fbbf6a;"><i class="fab fa-bitcoin"></i> Bitcoin</span>
+   <span class="chain-dot" style="border-color:#627eea;color:#8099f0;"><i class="fab fa-ethereum"></i> Ethereum</span>
+   <span class="chain-dot" style="border-color:#00e0ff;color:#7af2ff;"><i class="fas fa-bolt"></i> Solana</span>
+   <span class="chain-dot" style="border-color:#0052ff;color:#5588ff;"><i class="fas fa-layer-group"></i> L2s</span>
   </div>
-  <footer><i class="fas fa-crown"></i> Programa Blockchain &middot; Curso 3: Escalabilidad, L2s y Nueva Arquitectura &middot; M&oacute;dulo 2</footer>
+  <div class="info-cards">
+   <div class="info-card">
+    <h4> El Trilema Explicado</h4>
+    <p>Propuesto por Vitalik Buterin, el trilema plantea que una blockchain no puede maximizar simult&aacute;neamente seguridad (resistencia a ataques), escalabilidad (transacciones por segundo) y descentralizaci&oacute;n (nodos independientes). Bitcoin prioriza seguridad y descentralizaci&oacute;n (~7 TPS). Solana prioriza escalabilidad con nodos m&aacute;s exigentes (~2000 TPS). Las L2 intentan escalar sin sacrificar las otras dos.</p>
+   </div>
+   <div class="info-card">
+    <h4> C&oacute;mo lo Resuelven las L2</h4>
+    <p>Los rollups ejecutan transacciones fuera de la capa base (L1) pero publican datos comprimidos en ella, heredando su seguridad. Esto permite escalar a miles de TPS manteniendo la descentralizaci&oacute;n de L1. En 2026, las L2 procesan m&aacute;s del 90% de las transacciones de Ethereum.</p>
+   </div>
+  </div>
+  <div class="quiz-embedded">
+   <h3><i class="fas fa-question-circle"></i> Mini-quiz: El Trilema</h3>
+   <div id="quizContainer"></div>
+   <button id="submitQuizBtn" class="btn-action"> Validar respuestas</button>
+   <div id="feedbackMsg" class="feedback"> Ajusta los sliders y observa c&oacute;mo se mueve el punto en el tri&aacute;ngulo.</div>
+   <div id="insigniaArea" class="insignia hidden">
+    <i class="fas fa-medal"></i>
+    <h3> INSIGNIA TRILEMA DESCIFRADO </h3>
+    <p>&iexcl;Entiendes las compensaciones fundamentales de la arquitectura blockchain!</p>
+   </div>
+  </div>
+ </div>
+ <div class="nav-links">
+  <a href="01-portal.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
+  <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
+  <a href="03-optimistic-rollups.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+ </div>
+ <footer><i class="fas fa-crown"></i> Programa Blockchain &middot; Curso 3: Escalabilidad, L2s y Nueva Arquitectura &middot; M&oacute;dulo 2</footer>
 </div>
 <script>
-  const STORAGE_KEY = 'block_3_02';
-  const SEC_LABEL = { x: 200, y: 20 }; const ESC_LABEL = { x: 50, y: 330 }; const DESC_LABEL = { x: 350, y: 330 };
-  const secSlider = document.getElementById('secSlider');
-  const scalSlider = document.getElementById('scalSlider');
-  const decSlider = document.getElementById('decSlider');
-  const dotDisplay = document.getElementById('dotDisplay');
-  const dotLabel = document.getElementById('dotLabel');
-  function updateTrilema() {
-    var s = parseFloat(secSlider.value) / 100;
-    var c = parseFloat(scalSlider.value) / 100;
-    var d = parseFloat(decSlider.value) / 100;
-    var total = s + c + d;
-    if (total === 0) total = 1;
-    var cx = (SEC_LABEL.x * s + ESC_LABEL.x * c + DESC_LABEL.x * d) / total;
-    var cy = (SEC_LABEL.y * s + ESC_LABEL.y * c + DESC_LABEL.y * d) / total;
-    dotDisplay.setAttribute('cx', cx);
-    dotDisplay.setAttribute('cy', cy);
-    dotLabel.setAttribute('x', cx);
-    dotLabel.setAttribute('y', cy - 12);
-    document.getElementById('secVal').textContent = secSlider.value + '%';
-    document.getElementById('scalVal').textContent = scalSlider.value + '%';
-    document.getElementById('decVal').textContent = decSlider.value + '%';
-  }
-  secSlider.addEventListener('input', updateTrilema);
-  scalSlider.addEventListener('input', updateTrilema);
-  decSlider.addEventListener('input', updateTrilema);
-  const questions = [
-    { text: "&iquest;Cu&aacute;les son las tres propiedades del trilema de blockchain?", options: ["Velocidad, costo, privacidad", "Seguridad, escalabilidad, descentralizaci&oacute;n", "Anonimato, transparencia, inmutabilidad", "Consenso, mining, staking"], correct: 1 },
-    { text: "&iquest;Qu&eacute; prioriza Bitcoin del trilema?", options: ["Escalabilidad y velocidad", "Seguridad y descentralizaci&oacute;n", "Escalabilidad y descentralizaci&oacute;n", "Ninguna de las anteriores"], correct: 1 },
-    { text: "&iquest;C&oacute;mo intentan los rollups resolver el trilema?", options: ["Creando una blockchain completamente nueva", "Ejecutando transacciones fuera de L1 pero heredando su seguridad", "Eliminando la descentralizaci&oacute;n", "Usando un consenso diferente"], correct: 1 }
-  ];
-  let userAnswers = new Array(questions.length).fill(null);
-  let quizCompleted = false;
-  const quizContainer = document.getElementById('quizContainer');
-  const submitBtn = document.getElementById('submitQuizBtn');
-  const insigniaDiv = document.getElementById('insigniaArea');
-  const feedbackMsg = document.getElementById('feedbackMsg');
-  function renderQuestions() {
-    quizContainer.innerHTML = '';
-    questions.forEach(function(q, idx) {
-      var qDiv = document.createElement('div');
-      qDiv.classList.add('question');
-      qDiv.innerHTML = '<p>' + q.text + '</p><div class="options" id="qopt-' + idx + '"></div>';
-      var optionsDiv = qDiv.querySelector('.options');
-      q.options.forEach(function(opt, optIdx) {
-        var optSpan = document.createElement('div');
-        optSpan.classList.add('opt');
-        optSpan.textContent = opt;
-        optSpan.dataset.qIdx = idx;
-        optSpan.dataset.optIdx = optIdx;
-        optSpan.addEventListener('click', function(e) {
-          if (quizCompleted) return;
-          var parent = optSpan.parentElement;
-          Array.from(parent.children).forEach(function(c) { c.classList.remove('selected'); });
-          optSpan.classList.add('selected');
-          userAnswers[idx] = optIdx;
-        });
-        optionsDiv.appendChild(optSpan);
-      });
-      quizContainer.appendChild(qDiv);
+ const STORAGE_KEY = 'block_3_02';
+ const SEC_LABEL = { x: 200, y: 20 }; const ESC_LABEL = { x: 50, y: 330 }; const DESC_LABEL = { x: 350, y: 330 };
+ const secSlider = document.getElementById('secSlider');
+ const scalSlider = document.getElementById('scalSlider');
+ const decSlider = document.getElementById('decSlider');
+ const dotDisplay = document.getElementById('dotDisplay');
+ const dotLabel = document.getElementById('dotLabel');
+ function updateTrilema() {
+  var s = parseFloat(secSlider.value) / 100;
+  var c = parseFloat(scalSlider.value) / 100;
+  var d = parseFloat(decSlider.value) / 100;
+  var total = s + c + d;
+  if (total === 0) total = 1;
+  var cx = (SEC_LABEL.x * s + ESC_LABEL.x * c + DESC_LABEL.x * d) / total;
+  var cy = (SEC_LABEL.y * s + ESC_LABEL.y * c + DESC_LABEL.y * d) / total;
+  dotDisplay.setAttribute('cx', cx);
+  dotDisplay.setAttribute('cy', cy);
+  dotLabel.setAttribute('x', cx);
+  dotLabel.setAttribute('y', cy - 12);
+  document.getElementById('secVal').textContent = secSlider.value + '%';
+  document.getElementById('scalVal').textContent = scalSlider.value + '%';
+  document.getElementById('decVal').textContent = decSlider.value + '%';
+ }
+ secSlider.addEventListener('input', updateTrilema);
+ scalSlider.addEventListener('input', updateTrilema);
+ decSlider.addEventListener('input', updateTrilema);
+ const questions = [
+  { text: "&iquest;Cu&aacute;les son las tres propiedades del trilema de blockchain?", options: ["Velocidad, costo, privacidad", "Seguridad, escalabilidad, descentralizaci&oacute;n", "Anonimato, transparencia, inmutabilidad", "Consenso, mining, staking"], correct: 1 },
+  { text: "&iquest;Qu&eacute; prioriza Bitcoin del trilema?", options: ["Escalabilidad y velocidad", "Seguridad y descentralizaci&oacute;n", "Escalabilidad y descentralizaci&oacute;n", "Ninguna de las anteriores"], correct: 1 },
+  { text: "&iquest;C&oacute;mo intentan los rollups resolver el trilema?", options: ["Creando una blockchain completamente nueva", "Ejecutando transacciones fuera de L1 pero heredando su seguridad", "Eliminando la descentralizaci&oacute;n", "Usando un consenso diferente"], correct: 1 }
+ ];
+ let userAnswers = new Array(questions.length).fill(null);
+ let quizCompleted = false;
+ const quizContainer = document.getElementById('quizContainer');
+ const submitBtn = document.getElementById('submitQuizBtn');
+ const insigniaDiv = document.getElementById('insigniaArea');
+ const feedbackMsg = document.getElementById('feedbackMsg');
+ function renderQuestions() {
+  quizContainer.innerHTML = '';
+  questions.forEach(function(q, idx) {
+   var qDiv = document.createElement('div');
+   qDiv.classList.add('question');
+   qDiv.innerHTML = '<p>' + q.text + '</p><div class="options" id="qopt-' + idx + '"></div>';
+   var optionsDiv = qDiv.querySelector('.options');
+   q.options.forEach(function(opt, optIdx) {
+    var optSpan = document.createElement('div');
+    optSpan.classList.add('opt');
+    optSpan.textContent = opt;
+    optSpan.dataset.qIdx = idx;
+    optSpan.dataset.optIdx = optIdx;
+    optSpan.addEventListener('click', function(e) {
+     if (quizCompleted) return;
+     var parent = optSpan.parentElement;
+     Array.from(parent.children).forEach(function(c) { c.classList.remove('selected'); });
+     optSpan.classList.add('selected');
+     userAnswers[idx] = optIdx;
     });
+    optionsDiv.appendChild(optSpan);
+   });
+   quizContainer.appendChild(qDiv);
+  });
+ }
+ function evaluateQuiz() {
+  var c = 0;
+  for (var i = 0; i < questions.length; i++) { if (userAnswers[i] === questions[i].correct) c++; }
+  return c;
+ }
+ function handleSubmit() {
+  if (quizCompleted) { feedbackMsg.textContent = ' Ya tienes la insignia!'; return; }
+  var allAnswered = userAnswers.every(function(a) { return a !== null; });
+  if (!allAnswered) { feedbackMsg.textContent = ' Responde todas las preguntas primero.'; return; }
+  var correct = evaluateQuiz();
+  if (correct >= 2) {
+   quizCompleted = true;
+   insigniaDiv.classList.remove('hidden');
+   localStorage.setItem(STORAGE_KEY, 'true');
+   feedbackMsg.textContent = ' &iexcl;Excelente! ' + correct + '/3 correctas. Has dominado el trilema.';
+   var allOpts = document.querySelectorAll('.opt');
+   allOpts.forEach(function(o) { o.style.pointerEvents = 'none'; });
+   submitBtn.disabled = true;
+  } else {
+   feedbackMsg.textContent = ' Obtuviste ' + correct + '/3. Sigue ajustando los sliders y vuelve a intentarlo.';
   }
-  function evaluateQuiz() {
-    var c = 0;
-    for (var i = 0; i < questions.length; i++) { if (userAnswers[i] === questions[i].correct) c++; }
-    return c;
+ }
+ function restoreProgress() {
+  var completed = localStorage.getItem(STORAGE_KEY);
+  if (completed === 'true') {
+   quizCompleted = true;
+   insigniaDiv.classList.remove('hidden');
+   submitBtn.disabled = true;
+   feedbackMsg.textContent = ' M&oacute;dulo completado! Ajusta los sliders libremente.';
+   var allOpts = document.querySelectorAll('.opt');
+   allOpts.forEach(function(o) { o.style.pointerEvents = 'none'; });
   }
-  function handleSubmit() {
-    if (quizCompleted) { feedbackMsg.textContent = ' Ya tienes la insignia!'; return; }
-    var allAnswered = userAnswers.every(function(a) { return a !== null; });
-    if (!allAnswered) { feedbackMsg.textContent = ' Responde todas las preguntas primero.'; return; }
-    var correct = evaluateQuiz();
-    if (correct >= 2) {
-      quizCompleted = true;
-      insigniaDiv.classList.remove('hidden');
-      localStorage.setItem(STORAGE_KEY, 'true');
-      feedbackMsg.textContent = ' &iexcl;Excelente! ' + correct + '/3 correctas. Has dominado el trilema.';
-      var allOpts = document.querySelectorAll('.opt');
-      allOpts.forEach(function(o) { o.style.pointerEvents = 'none'; });
-      submitBtn.disabled = true;
-    } else {
-      feedbackMsg.textContent = ' Obtuviste ' + correct + '/3. Sigue ajustando los sliders y vuelve a intentarlo.';
-    }
-  }
-  function restoreProgress() {
-    var completed = localStorage.getItem(STORAGE_KEY);
-    if (completed === 'true') {
-      quizCompleted = true;
-      insigniaDiv.classList.remove('hidden');
-      submitBtn.disabled = true;
-      feedbackMsg.textContent = ' M&oacute;dulo completado! Ajusta los sliders libremente.';
-      var allOpts = document.querySelectorAll('.opt');
-      allOpts.forEach(function(o) { o.style.pointerEvents = 'none'; });
-    }
-  }
-  renderQuestions();
-  submitBtn.addEventListener('click', handleSubmit);
-  restoreProgress();
-  updateTrilema();
+ }
+ renderQuestions();
+ submitBtn.addEventListener('click', handleSubmit);
+ restoreProgress();
+ updateTrilema();
 </script>
-<script src="../../../assets/js/cookie-consent.js"></script><script src="../../../assets/js/i18n.js"></script>  </body>
+<script src="../../../assets/js/i18n.js"></script> </body>
 </html>

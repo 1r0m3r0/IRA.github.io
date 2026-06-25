@@ -1,164 +1,164 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bot Trader | Visualización con Matplotlib y Plotly</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700;14..32,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-    body{background:linear-gradient(145deg,#0a001a,#12002a);font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:2rem 1rem}
-    .container{max-width:1300px;width:100%;background:rgba(12,0,30,.88);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(180,100,255,.25);box-shadow:0 25px 55px rgba(0,0,0,.65);overflow:hidden}
-    .hero{background:linear-gradient(95deg,#080014,#10001e);padding:1.8rem 2rem;text-align:center;border-bottom:2px solid #b464ff}
-    .hero h1{font-size:1.9rem;font-weight:800;background:linear-gradient(135deg,#e8ccff,#cc88ff,#b464ff);-webkit-background-clip:text;background-clip:text;color:transparent}
-    .hero p{margin-top:.5rem;font-size:.95rem;color:#9966bb}
-    .chips{display:flex;justify-content:center;gap:.6rem;flex-wrap:wrap;margin-top:.7rem}
-    .chip{background:rgba(180,100,255,.1);border:1px solid rgba(180,100,255,.3);color:#9966cc;font-size:.72rem;padding:.25rem .8rem;border-radius:2rem}
-    .week-badge{display:inline-block;background:rgba(180,100,255,.2);border:1px solid #b464ff;color:#b464ff;font-size:.75rem;font-weight:700;padding:.3rem 1rem;border-radius:2rem;margin-top:.5rem}
-    .analogy{background:#0c001ecc;margin:1.4rem 2rem;padding:1.1rem 1.7rem;border-radius:2rem;border-left:7px solid #b464ff;font-size:.9rem;line-height:1.65}
-    .analogy strong{color:#cc88ff}
+ <meta charset="UTF-8">
+ <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Bot Trader | VisualizaciÃ³n con Matplotlib y Plotly</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700;14..32,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+  body{background:linear-gradient(145deg,#0a001a,#12002a);font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:2rem 1rem}
+  .container{max-width:1300px;width:100%;background:rgba(12,0,30,.88);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(180,100,255,.25);box-shadow:0 25px 55px rgba(0,0,0,.65);overflow:hidden}
+  .hero{background:linear-gradient(95deg,#080014,#10001e);padding:1.8rem 2rem;text-align:center;border-bottom:2px solid #b464ff}
+  .hero h1{font-size:1.9rem;font-weight:800;background:linear-gradient(135deg,#e8ccff,#cc88ff,#b464ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p{margin-top:.5rem;font-size:.95rem;color:#9966bb}
+  .chips{display:flex;justify-content:center;gap:.6rem;flex-wrap:wrap;margin-top:.7rem}
+  .chip{background:rgba(180,100,255,.1);border:1px solid rgba(180,100,255,.3);color:#9966cc;font-size:.72rem;padding:.25rem .8rem;border-radius:2rem}
+  .week-badge{display:inline-block;background:rgba(180,100,255,.2);border:1px solid #b464ff;color:#b464ff;font-size:.75rem;font-weight:700;padding:.3rem 1rem;border-radius:2rem;margin-top:.5rem}
+  .analogy{background:#0c001ecc;margin:1.4rem 2rem;padding:1.1rem 1.7rem;border-radius:2rem;border-left:7px solid #b464ff;font-size:.9rem;line-height:1.65}
+  .analogy strong{color:#cc88ff}
 
-    .lab{display:flex;flex-wrap:wrap;gap:1.4rem;padding:0 1.8rem 1.5rem}
-    .left{flex:0 0 270px;display:flex;flex-direction:column;gap:.9rem}
-    .right{flex:1;min-width:300px;display:flex;flex-direction:column;gap:.9rem}
-    .panel{background:#0c001edd;border-radius:1.8rem;padding:1.2rem 1.3rem;border:1px solid rgba(180,100,255,.18)}
-    .panel h3{font-size:.88rem;font-weight:700;color:#cc88ff;margin-bottom:.7rem}
-    label{font-size:.72rem;color:#8855aa;text-transform:uppercase;letter-spacing:.06rem;display:block;margin-bottom:.3rem;margin-top:.5rem}
-    select{width:100%;background:#0c0018;border:1px solid rgba(180,100,255,.2);color:#eef5ff;padding:.45rem .7rem;border-radius:.75rem;font-size:.82rem;font-family:'Inter',sans-serif}
-    .color-picker-row{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.3rem}
-    .color-swatch{width:24px;height:24px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:.15s}
-    .color-swatch.selected{border-color:#fff;transform:scale(1.2)}
+  .lab{display:flex;flex-wrap:wrap;gap:1.4rem;padding:0 1.8rem 1.5rem}
+  .left{flex:0 0 270px;display:flex;flex-direction:column;gap:.9rem}
+  .right{flex:1;min-width:300px;display:flex;flex-direction:column;gap:.9rem}
+  .panel{background:#0c001edd;border-radius:1.8rem;padding:1.2rem 1.3rem;border:1px solid rgba(180,100,255,.18)}
+  .panel h3{font-size:.88rem;font-weight:700;color:#cc88ff;margin-bottom:.7rem}
+  label{font-size:.72rem;color:#8855aa;text-transform:uppercase;letter-spacing:.06rem;display:block;margin-bottom:.3rem;margin-top:.5rem}
+  select{width:100%;background:#0c0018;border:1px solid rgba(180,100,255,.2);color:#eef5ff;padding:.45rem .7rem;border-radius:.75rem;font-size:.82rem;font-family:'Inter',sans-serif}
+  .color-picker-row{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.3rem}
+  .color-swatch{width:24px;height:24px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:.15s}
+  .color-swatch.selected{border-color:#fff;transform:scale(1.2)}
 
-    .chart-type-grid{display:grid;grid-template-columns:1fr 1fr;gap:.4rem}
-    .ct-btn{background:#120022;border:1px solid rgba(180,100,255,.25);color:#cc88ff;padding:.5rem .4rem;border-radius:1rem;cursor:pointer;font-size:.75rem;font-weight:600;text-align:center;transition:.15s}
-    .ct-btn:hover,.ct-btn.active{background:#1e003a;border-color:#b464ff;box-shadow:0 0 8px rgba(180,100,255,.3)}
+  .chart-type-grid{display:grid;grid-template-columns:1fr 1fr;gap:.4rem}
+  .ct-btn{background:#120022;border:1px solid rgba(180,100,255,.25);color:#cc88ff;padding:.5rem .4rem;border-radius:1rem;cursor:pointer;font-size:.75rem;font-weight:600;text-align:center;transition:.15s}
+  .ct-btn:hover,.ct-btn.active{background:#1e003a;border-color:#b464ff;box-shadow:0 0 8px rgba(180,100,255,.3)}
 
-    .btn{background:linear-gradient(95deg,#b464ff,#7722cc);border:none;padding:.75rem 1.4rem;font-weight:700;border-radius:2rem;cursor:pointer;color:#fff;font-size:.88rem;width:100%;margin-top:.4rem;transition:.2s;display:flex;align-items:center;justify-content:center;gap:.5rem}
-    .btn:hover{transform:translateY(-2px);box-shadow:0 0 20px rgba(180,100,255,.4)}
+  .btn{background:linear-gradient(95deg,#b464ff,#7722cc);border:none;padding:.75rem 1.4rem;font-weight:700;border-radius:2rem;cursor:pointer;color:#fff;font-size:.88rem;width:100%;margin-top:.4rem;transition:.2s;display:flex;align-items:center;justify-content:center;gap:.5rem}
+  .btn:hover{transform:translateY(-2px);box-shadow:0 0 20px rgba(180,100,255,.4)}
 
-    canvas{border-radius:1rem;display:block}
-    pre{background:#060010;border-radius:1rem;padding:1rem;font-family:'JetBrains Mono',monospace;font-size:.73rem;line-height:1.7;overflow-x:auto;color:#e8ccff;border:1px solid rgba(180,100,255,.12)}
-    .kw{color:#b464ff}.fn{color:#cc88ff}.cm{color:#6644aa}.str{color:#80eeaa}.num{color:#ffd070}
+  canvas{border-radius:1rem;display:block}
+  pre{background:#060010;border-radius:1rem;padding:1rem;font-family:'JetBrains Mono',monospace;font-size:.73rem;line-height:1.7;overflow-x:auto;color:#e8ccff;border:1px solid rgba(180,100,255,.12)}
+  .kw{color:#b464ff}.fn{color:#cc88ff}.cm{color:#6644aa}.str{color:#80eeaa}.num{color:#ffd070}
 
-    .chart-tabs{display:flex;gap:.4rem;margin-bottom:.7rem;flex-wrap:wrap}
-    .chart-tab{background:#120022;border:1px solid rgba(180,100,255,.2);color:#9966cc;padding:.35rem .9rem;border-radius:2rem;cursor:pointer;font-size:.78rem;font-weight:600;transition:.15s}
-    .chart-tab.active{background:#1e003a;border-color:#b464ff;color:#cc88ff}
+  .chart-tabs{display:flex;gap:.4rem;margin-bottom:.7rem;flex-wrap:wrap}
+  .chart-tab{background:#120022;border:1px solid rgba(180,100,255,.2);color:#9966cc;padding:.35rem .9rem;border-radius:2rem;cursor:pointer;font-size:.78rem;font-weight:600;transition:.15s}
+  .chart-tab.active{background:#1e003a;border-color:#b464ff;color:#cc88ff}
 
-    .feedback{background:#00000088;margin:0 1.8rem 1rem;padding:.85rem 1.2rem;border-radius:1.5rem;text-align:center;border-left:4px solid #b464ff;font-size:.88rem;line-height:1.55}
-    .insignia{text-align:center;background:#0c0018;border-radius:2rem;margin:0 1.8rem 1.5rem;padding:1rem;border:1px dashed gold}
-    .insignia i{font-size:2.4rem;color:gold}
-    .hidden{display:none}
-    .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.4rem 2rem}
-    .nav-link{background:#1a1a3a;padding:.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:.5rem;font-size:.88rem;transition:.2s}
-    .nav-link:hover{transform:translateY(-2px)}
-    .nav-link.next{background:linear-gradient(95deg,#f0a500,#ff6a00);color:#1e1a0c}
-    footer{text-align:center;padding:1rem;font-size:.72rem;border-top:1px solid #0c0018;color:#6644aa}
-    @media(max-width:860px){.hero h1{font-size:1.4rem}.left{flex:1;min-width:100%}}
-  </style>
-  <link rel="stylesheet" href="../../assets/css/theme.css">
+  .feedback{background:#00000088;margin:0 1.8rem 1rem;padding:.85rem 1.2rem;border-radius:1.5rem;text-align:center;border-left:4px solid #b464ff;font-size:.88rem;line-height:1.55}
+  .insignia{text-align:center;background:#0c0018;border-radius:2rem;margin:0 1.8rem 1.5rem;padding:1rem;border:1px dashed gold}
+  .insignia i{font-size:2.4rem;color:gold}
+  .hidden{display:none}
+  .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.4rem 2rem}
+  .nav-link{background:#1a1a3a;padding:.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:.5rem;font-size:.88rem;transition:.2s}
+  .nav-link:hover{transform:translateY(-2px)}
+  .nav-link.next{background:linear-gradient(95deg,#f0a500,#ff6a00);color:#1e1a0c}
+  footer{text-align:center;padding:1rem;font-size:.72rem;border-top:1px solid #0c0018;color:#6644aa}
+  @media(max-width:860px){.hero h1{font-size:1.4rem}.left{flex:1;min-width:100%}}
+ </style>
+ <link rel="stylesheet" href="../../assets/css/theme.css">
 </head>
 <body>
 <nav class="brand-return-nav">
-  <a href="../../index.html">&larr; Portfolio</a>
-  <a href="../../cursos/index.html">Cursos</a>
+ <a href="../../index.html">&larr; Portfolio</a>
+ <a href="../../cursos/index.html">Cursos</a>
 </nav>
 <div class="container">
-  <div class="hero">
-    <h1>📈 VISUALIZACIÓN: Matplotlib & Plotly para Trading</h1>
-    <p>Los gráficos que convencen a inversores, detectan patrones y monitoran tu bot en tiempo real</p>
-    <div class="week-badge"><i class="fas fa-calendar-week"></i> Semanas 1-2: Python para Trading</div>
-    <div class="chips">
-      <span class="chip">Candlestick charts</span>
-      <span class="chip">Subplots con indicadores</span>
-      <span class="chip">Heatmaps de correlación</span>
-      <span class="chip">Dashboard en tiempo real</span>
+ <div class="hero">
+  <h1>ðŸ“ˆ VISUALIZACIÃ“N: Matplotlib & Plotly para Trading</h1>
+  <p>Los grÃ¡ficos que convencen a inversores, detectan patrones y monitoran tu bot en tiempo real</p>
+  <div class="week-badge"><i class="fas fa-calendar-week"></i> Semanas 1-2: Python para Trading</div>
+  <div class="chips">
+   <span class="chip">Candlestick charts</span>
+   <span class="chip">Subplots con indicadores</span>
+   <span class="chip">Heatmaps de correlaciÃ³n</span>
+   <span class="chip">Dashboard en tiempo real</span>
+  </div>
+ </div>
+
+ <div class="analogy">
+  <strong>ðŸŽ¨ PiÃ©nsalo asÃ­:</strong> Los datos sin grÃ¡ficos son como GPS sin mapa: tienes toda la informaciÃ³n pero no puedes orientarte. Un buen trader puede leer un grÃ¡fico en segundos y detectar patrones que tomarÃ­an horas en tablas. <strong>Matplotlib</strong> es la herramienta de producciÃ³n (artesanal, controlable), <strong>Plotly</strong> es la versiÃ³n interactiva que puedes embeber en dashboards web. En tu bot real usarÃ¡s ambas: Matplotlib para anÃ¡lisis offline, Plotly para el dashboard de monitoreo.
+  <div style="margin-top:.5rem;font-size:.78rem;color:#6644aa"><strong>ðŸ“š Fuentes:</strong> Hunter, J.D. (2007) â€” <em>"Matplotlib: A 2D graphics environment"</em>. Computing in Science & Engineering. / Plotly docs: plotly.com/python</div>
+ </div>
+
+ <div class="lab">
+  <div class="left">
+   <div class="panel">
+    <h3><i class="fas fa-chart-bar"></i> Tipo de GrÃ¡fico</h3>
+    <div class="chart-type-grid">
+     <div class="ct-btn active" id="ct-candle" onclick="setType('candle')">ðŸ•¯ï¸ Candlestick</div>
+     <div class="ct-btn" id="ct-line" onclick="setType('line')">ðŸ“ˆ LÃ­nea</div>
+     <div class="ct-btn" id="ct-volume" onclick="setType('volume')">ðŸ“Š Barras Vol.</div>
+     <div class="ct-btn" id="ct-returns" onclick="setType('returns')">ðŸ“‰ Retornos</div>
+     <div class="ct-btn" id="ct-bb" onclick="setType('bb')">ã€°ï¸ Bollinger</div>
+     <div class="ct-btn" id="ct-scatter" onclick="setType('scatter')">âš« Scatter</div>
+     <div class="ct-btn" id="ct-heatmap" onclick="setType('heatmap')">ðŸŸ© Heatmap</div>
+     <div class="ct-btn" id="ct-subplot" onclick="setType('subplot')">ðŸ”² Multi-panel</div>
     </div>
-  </div>
+   </div>
 
-  <div class="analogy">
-    <strong>🎨 Piénsalo así:</strong> Los datos sin gráficos son como GPS sin mapa: tienes toda la información pero no puedes orientarte. Un buen trader puede leer un gráfico en segundos y detectar patrones que tomarían horas en tablas. <strong>Matplotlib</strong> es la herramienta de producción (artesanal, controlable), <strong>Plotly</strong> es la versión interactiva que puedes embeber en dashboards web. En tu bot real usarás ambas: Matplotlib para análisis offline, Plotly para el dashboard de monitoreo.
-    <div style="margin-top:.5rem;font-size:.78rem;color:#6644aa"><strong>📚 Fuentes:</strong> Hunter, J.D. (2007) — <em>"Matplotlib: A 2D graphics environment"</em>. Computing in Science & Engineering. / Plotly docs: plotly.com/python</div>
-  </div>
-
-  <div class="lab">
-    <div class="left">
-      <div class="panel">
-        <h3><i class="fas fa-chart-bar"></i> Tipo de Gráfico</h3>
-        <div class="chart-type-grid">
-          <div class="ct-btn active" id="ct-candle" onclick="setType('candle')">🕯️ Candlestick</div>
-          <div class="ct-btn" id="ct-line" onclick="setType('line')">📈 Línea</div>
-          <div class="ct-btn" id="ct-volume" onclick="setType('volume')">📊 Barras Vol.</div>
-          <div class="ct-btn" id="ct-returns" onclick="setType('returns')">📉 Retornos</div>
-          <div class="ct-btn" id="ct-bb" onclick="setType('bb')">〰️ Bollinger</div>
-          <div class="ct-btn" id="ct-scatter" onclick="setType('scatter')">⚫ Scatter</div>
-          <div class="ct-btn" id="ct-heatmap" onclick="setType('heatmap')">🟩 Heatmap</div>
-          <div class="ct-btn" id="ct-subplot" onclick="setType('subplot')">🔲 Multi-panel</div>
-        </div>
-      </div>
-
-      <div class="panel">
-        <h3><i class="fas fa-palette"></i> Estilo</h3>
-        <label>Tema</label>
-        <select id="theme" onchange="renderChart()">
-          <option value="dark">Dark (trading terminal)</option>
-          <option value="light">Light (report mode)</option>
-          <option value="neon">Neon (dashboard)</option>
-        </select>
-        <label>Color línea</label>
-        <div class="color-picker-row">
-          <div class="color-swatch selected" style="background:#00ff88" onclick="selectColor('#00ff88',this)"></div>
-          <div class="color-swatch" style="background:#00b4ff" onclick="selectColor('#00b4ff',this)"></div>
-          <div class="color-swatch" style="background:#b464ff" onclick="selectColor('#b464ff',this)"></div>
-          <div class="color-swatch" style="background:#ffd700" onclick="selectColor('#ffd700',this)"></div>
-          <div class="color-swatch" style="background:#ff6644" onclick="selectColor('#ff6644',this)"></div>
-        </div>
-        <label>Períodos MA</label>
-        <select id="maPeriod" onchange="renderChart()">
-          <option value="0">Sin MA</option>
-          <option value="10">MA 10</option>
-          <option value="20" selected>MA 20</option>
-          <option value="50">MA 50</option>
-        </select>
-        <button class="btn" onclick="renderChart()"><i class="fas fa-sync"></i> Renderizar</button>
-      </div>
+   <div class="panel">
+    <h3><i class="fas fa-palette"></i> Estilo</h3>
+    <label>Tema</label>
+    <select id="theme" onchange="renderChart()">
+     <option value="dark">Dark (trading terminal)</option>
+     <option value="light">Light (report mode)</option>
+     <option value="neon">Neon (dashboard)</option>
+    </select>
+    <label>Color lÃ­nea</label>
+    <div class="color-picker-row">
+     <div class="color-swatch selected" style="background:#00ff88" onclick="selectColor('#00ff88',this)"></div>
+     <div class="color-swatch" style="background:#00b4ff" onclick="selectColor('#00b4ff',this)"></div>
+     <div class="color-swatch" style="background:#b464ff" onclick="selectColor('#b464ff',this)"></div>
+     <div class="color-swatch" style="background:#ffd700" onclick="selectColor('#ffd700',this)"></div>
+     <div class="color-swatch" style="background:#ff6644" onclick="selectColor('#ff6644',this)"></div>
     </div>
+    <label>PerÃ­odos MA</label>
+    <select id="maPeriod" onchange="renderChart()">
+     <option value="0">Sin MA</option>
+     <option value="10">MA 10</option>
+     <option value="20" selected>MA 20</option>
+     <option value="50">MA 50</option>
+    </select>
+    <button class="btn" onclick="renderChart()"><i class="fas fa-sync"></i> Renderizar</button>
+   </div>
+  </div>
 
-    <div class="right">
-      <div class="panel" style="position:relative">
-        <h3 id="chartTitle"><i class="fas fa-chart-line"></i> Candlestick Chart — BTC/USDT</h3>
-        <canvas id="mainCanvas"></canvas>
-      </div>
+  <div class="right">
+   <div class="panel" style="position:relative">
+    <h3 id="chartTitle"><i class="fas fa-chart-line"></i> Candlestick Chart â€” BTC/USDT</h3>
+    <canvas id="mainCanvas"></canvas>
+   </div>
 
-      <div class="panel">
-        <h3><i class="fas fa-terminal"></i> Código Python equivalente</h3>
-        <div class="chart-tabs">
-          <div class="chart-tab active" onclick="showLib('mpl',this)">Matplotlib</div>
-          <div class="chart-tab" onclick="showLib('plotly',this)">Plotly</div>
-          <div class="chart-tab" onclick="showLib('dash',this)">Dash Dashboard</div>
-        </div>
-        <pre id="codeBox"></pre>
-      </div>
+   <div class="panel">
+    <h3><i class="fas fa-terminal"></i> CÃ³digo Python equivalente</h3>
+    <div class="chart-tabs">
+     <div class="chart-tab active" onclick="showLib('mpl',this)">Matplotlib</div>
+     <div class="chart-tab" onclick="showLib('plotly',this)">Plotly</div>
+     <div class="chart-tab" onclick="showLib('dash',this)">Dash Dashboard</div>
     </div>
+    <pre id="codeBox"></pre>
+   </div>
   </div>
+ </div>
 
-  <div class="feedback" id="feedbackMsg">
-    🎨 Selecciona un tipo de gráfico para ver la visualización y el código Python que la genera. Prueba el modo <strong>Multi-panel</strong> para ver precio + volumen + indicador simultáneamente.
-  </div>
+ <div class="feedback" id="feedbackMsg">
+  ðŸŽ¨ Selecciona un tipo de grÃ¡fico para ver la visualizaciÃ³n y el cÃ³digo Python que la genera. Prueba el modo <strong>Multi-panel</strong> para ver precio + volumen + indicador simultÃ¡neamente.
+ </div>
 
-  <div class="insignia hidden" id="insigniaArea">
-    <i class="fas fa-palette"></i>
-    <h3 style="margin:.4rem 0;color:#ffd700">🏅 ¡INSIGNIA CHART WIZARD!</h3>
-    <p style="font-size:.85rem;color:#cc88ff">Has dominado 5+ tipos de gráficos. ¡Un trader que visualiza bien, decide mejor!</p>
-  </div>
+ <div class="insignia hidden" id="insigniaArea">
+  <i class="fas fa-palette"></i>
+  <h3 style="margin:.4rem 0;color:#ffd700">ðŸ… Â¡INSIGNIA CHART WIZARD!</h3>
+  <p style="font-size:.85rem;color:#cc88ff">Has dominado 5+ tipos de grÃ¡ficos. Â¡Un trader que visualiza bien, decide mejor!</p>
+ </div>
 
-  <div class="nav-links">
-    <a href="nivel3-01-pandas-numpy.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
-    <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Menú</a>
-    <a href="nivel3-03-base-datos.html" class="nav-link next">Base de Datos <i class="fas fa-arrow-right"></i></a>
-  </div>
-  <footer><i class="fas fa-crown"></i> Bot Trader Adventure · Semana 1-2 · Matplotlib & Plotly Python</footer>
+ <div class="nav-links">
+  <a href="nivel3-01-pandas-numpy.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
+  <a href="index.html" class="nav-link"><i class="fas fa-home"></i> MenÃº</a>
+  <a href="nivel3-03-base-datos.html" class="nav-link next">Base de Datos <i class="fas fa-arrow-right"></i></a>
+ </div>
+ <footer><i class="fas fa-crown"></i> Bot Trader Adventure Â· Semana 1-2 Â· Matplotlib & Plotly Python</footer>
 </div>
 
 <script>
@@ -170,261 +170,261 @@ const N = 120;
 const mockData = [];
 let price = 42000;
 for (let i = 0; i < N; i++) {
-  const ret = (Math.random() - 0.49) * 0.04;
-  const open = price;
-  price *= (1 + ret);
-  const high = Math.max(open, price) * (1 + Math.random() * .015);
-  const low  = Math.min(open, price) * (1 - Math.random() * .015);
-  const d = new Date(); d.setDate(d.getDate() - (N - i));
-  mockData.push({ date: d.toISOString().slice(5,10), open, high, low, close: price, volume: 1e6 * (0.5 + Math.random()) });
+ const ret = (Math.random() - 0.49) * 0.04;
+ const open = price;
+ price *= (1 + ret);
+ const high = Math.max(open, price) * (1 + Math.random() * .015);
+ const low = Math.min(open, price) * (1 - Math.random() * .015);
+ const d = new Date(); d.setDate(d.getDate() - (N - i));
+ mockData.push({ date: d.toISOString().slice(5,10), open, high, low, close: price, volume: 1e6 * (0.5 + Math.random()) });
 }
 
 const CODE_MPL = {
-  candle: `<span class="kw">import</span> mplfinance <span class="kw">as</span> mpf\n<span class="kw">import</span> pandas <span class="kw">as</span> pd\n\ndf = pd.<span class="fn">read_csv</span>(<span class="str">'btc_ohlcv.csv'</span>, index_col=<span class="str">'date'</span>, parse_dates=<span class="kw">True</span>)\n\nmpf.<span class="fn">plot</span>(df, type=<span class="str">'candle'</span>, style=<span class="str">'nightclouds'</span>,\n       title=<span class="str">'BTC/USDT - Candlestick'</span>,\n       volume=<span class="kw">True</span>, mav=(<span class="num">20</span>, <span class="num">50</span>))`,
-  line: `<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt\n\nfig, ax = plt.<span class="fn">subplots</span>(figsize=(<span class="num">14</span>, <span class="num">5</span>))\nax.<span class="fn">plot</span>(df.index, df[<span class="str">'close'</span>], color=<span class="str">'#00ff88'</span>, lw=<span class="num">1.5</span>)\nax.<span class="fn">fill_between</span>(df.index, df[<span class="str">'close'</span>], alpha=<span class="num">0.1</span>, color=<span class="str">'#00ff88'</span>)\nplt.<span class="fn">tight_layout</span>(); plt.<span class="fn">show</span>()`,
-  volume: `<span class="cm"># Bar chart de volumen con colores alcista/bajista</span>\ncolors = [<span class="str">'green'</span> <span class="kw">if</span> c >= o <span class="kw">else</span> <span class="str">'red'</span>\n          <span class="kw">for</span> c, o <span class="kw">in</span> <span class="fn">zip</span>(df[<span class="str">'close'</span>], df[<span class="str">'open'</span>])]\nax.<span class="fn">bar</span>(df.index, df[<span class="str">'volume'</span>], color=colors, alpha=<span class="num">0.7</span>)`,
-  returns: `<span class="cm"># Distribución de retornos diarios</span>\ndf[<span class="str">'ret'</span>] = df[<span class="str">'close'</span>].<span class="fn">pct_change</span>() * <span class="num">100</span>\nax.<span class="fn">hist</span>(df[<span class="str">'ret'</span>].<span class="fn">dropna</span>(), bins=<span class="num">50</span>,\n       color=<span class="str">'#00ff88'</span>, edgecolor=<span class="str">'black'</span>, alpha=<span class="num">0.8</span>)\nax.<span class="fn">axvline</span>(<span class="num">0</span>, color=<span class="str">'red'</span>, linestyle=<span class="str">'--'</span>)`,
-  bb: `<span class="cm"># Bollinger Bands</span>\ndf[<span class="str">'ma20'</span>] = df[<span class="str">'close'</span>].<span class="fn">rolling</span>(<span class="num">20</span>).<span class="fn">mean</span>()\ndf[<span class="str">'std'</span>]  = df[<span class="str">'close'</span>].<span class="fn">rolling</span>(<span class="num">20</span>).<span class="fn">std</span>()\ndf[<span class="str">'upper'</span>] = df[<span class="str">'ma20'</span>] + <span class="num">2</span> * df[<span class="str">'std'</span>]\ndf[<span class="str">'lower'</span>] = df[<span class="str">'ma20'</span>] - <span class="num">2</span> * df[<span class="str">'std'</span>]\nax.<span class="fn">fill_between</span>(df.index, df[<span class="str">'upper'</span>], df[<span class="str">'lower'</span>], alpha=<span class="num">0.15</span>)`,
-  scatter: `<span class="cm"># Retorno día t vs día t+1 (autocorrelación)</span>\ndf[<span class="str">'ret'</span>]   = df[<span class="str">'close'</span>].<span class="fn">pct_change</span>()\ndf[<span class="str">'ret_1'</span>] = df[<span class="str">'ret'</span>].<span class="fn">shift</span>(-<span class="num">1</span>)\nax.<span class="fn">scatter</span>(df[<span class="str">'ret'</span>], df[<span class="str">'ret_1'</span>],\n          alpha=<span class="num">0.4</span>, color=<span class="str">'#b464ff'</span>, s=<span class="num">20</span>)`,
-  heatmap: `<span class="kw">import</span> seaborn <span class="kw">as</span> sns\n\ncorr = prices.<span class="fn">pct_change</span>().<span class="fn">corr</span>()\nsns.<span class="fn">heatmap</span>(corr, annot=<span class="kw">True</span>, cmap=<span class="str">'RdYlGn'</span>,\n            vmin=-<span class="num">1</span>, vmax=<span class="num">1</span>, center=<span class="num">0</span>)`,
-  subplot: `<span class="cm"># Dashboard multi-panel</span>\nfig, (ax1, ax2, ax3) = plt.<span class="fn">subplots</span>(<span class="num">3</span>, <span class="num">1</span>, figsize=(<span class="num">14</span>,<span class="num">10</span>),\n                        gridspec_kw={<span class="str">'height_ratios'</span>:[<span class="num">3</span>,<span class="num">1</span>,<span class="num">1</span>]})\nax1.<span class="fn">plot</span>(df[<span class="str">'close'</span>])   <span class="cm"># Precio</span>\nax2.<span class="fn">bar</span>(df.index, df[<span class="str">'volume'</span>])  <span class="cm"># Volumen</span>\nax3.<span class="fn">plot</span>(df[<span class="str">'rsi'</span>])    <span class="cm"># RSI</span>`
+ candle: `<span class="kw">import</span> mplfinance <span class="kw">as</span> mpf\n<span class="kw">import</span> pandas <span class="kw">as</span> pd\n\ndf = pd.<span class="fn">read_csv</span>(<span class="str">'btc_ohlcv.csv'</span>, index_col=<span class="str">'date'</span>, parse_dates=<span class="kw">True</span>)\n\nmpf.<span class="fn">plot</span>(df, type=<span class="str">'candle'</span>, style=<span class="str">'nightclouds'</span>,\n    title=<span class="str">'BTC/USDT - Candlestick'</span>,\n    volume=<span class="kw">True</span>, mav=(<span class="num">20</span>, <span class="num">50</span>))`,
+ line: `<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt\n\nfig, ax = plt.<span class="fn">subplots</span>(figsize=(<span class="num">14</span>, <span class="num">5</span>))\nax.<span class="fn">plot</span>(df.index, df[<span class="str">'close'</span>], color=<span class="str">'#00ff88'</span>, lw=<span class="num">1.5</span>)\nax.<span class="fn">fill_between</span>(df.index, df[<span class="str">'close'</span>], alpha=<span class="num">0.1</span>, color=<span class="str">'#00ff88'</span>)\nplt.<span class="fn">tight_layout</span>(); plt.<span class="fn">show</span>()`,
+ volume: `<span class="cm"># Bar chart de volumen con colores alcista/bajista</span>\ncolors = [<span class="str">'green'</span> <span class="kw">if</span> c >= o <span class="kw">else</span> <span class="str">'red'</span>\n     <span class="kw">for</span> c, o <span class="kw">in</span> <span class="fn">zip</span>(df[<span class="str">'close'</span>], df[<span class="str">'open'</span>])]\nax.<span class="fn">bar</span>(df.index, df[<span class="str">'volume'</span>], color=colors, alpha=<span class="num">0.7</span>)`,
+ returns: `<span class="cm"># DistribuciÃ³n de retornos diarios</span>\ndf[<span class="str">'ret'</span>] = df[<span class="str">'close'</span>].<span class="fn">pct_change</span>() * <span class="num">100</span>\nax.<span class="fn">hist</span>(df[<span class="str">'ret'</span>].<span class="fn">dropna</span>(), bins=<span class="num">50</span>,\n    color=<span class="str">'#00ff88'</span>, edgecolor=<span class="str">'black'</span>, alpha=<span class="num">0.8</span>)\nax.<span class="fn">axvline</span>(<span class="num">0</span>, color=<span class="str">'red'</span>, linestyle=<span class="str">'--'</span>)`,
+ bb: `<span class="cm"># Bollinger Bands</span>\ndf[<span class="str">'ma20'</span>] = df[<span class="str">'close'</span>].<span class="fn">rolling</span>(<span class="num">20</span>).<span class="fn">mean</span>()\ndf[<span class="str">'std'</span>] = df[<span class="str">'close'</span>].<span class="fn">rolling</span>(<span class="num">20</span>).<span class="fn">std</span>()\ndf[<span class="str">'upper'</span>] = df[<span class="str">'ma20'</span>] + <span class="num">2</span> * df[<span class="str">'std'</span>]\ndf[<span class="str">'lower'</span>] = df[<span class="str">'ma20'</span>] - <span class="num">2</span> * df[<span class="str">'std'</span>]\nax.<span class="fn">fill_between</span>(df.index, df[<span class="str">'upper'</span>], df[<span class="str">'lower'</span>], alpha=<span class="num">0.15</span>)`,
+ scatter: `<span class="cm"># Retorno dÃ­a t vs dÃ­a t+1 (autocorrelaciÃ³n)</span>\ndf[<span class="str">'ret'</span>]  = df[<span class="str">'close'</span>].<span class="fn">pct_change</span>()\ndf[<span class="str">'ret_1'</span>] = df[<span class="str">'ret'</span>].<span class="fn">shift</span>(-<span class="num">1</span>)\nax.<span class="fn">scatter</span>(df[<span class="str">'ret'</span>], df[<span class="str">'ret_1'</span>],\n     alpha=<span class="num">0.4</span>, color=<span class="str">'#b464ff'</span>, s=<span class="num">20</span>)`,
+ heatmap: `<span class="kw">import</span> seaborn <span class="kw">as</span> sns\n\ncorr = prices.<span class="fn">pct_change</span>().<span class="fn">corr</span>()\nsns.<span class="fn">heatmap</span>(corr, annot=<span class="kw">True</span>, cmap=<span class="str">'RdYlGn'</span>,\n      vmin=-<span class="num">1</span>, vmax=<span class="num">1</span>, center=<span class="num">0</span>)`,
+ subplot: `<span class="cm"># Dashboard multi-panel</span>\nfig, (ax1, ax2, ax3) = plt.<span class="fn">subplots</span>(<span class="num">3</span>, <span class="num">1</span>, figsize=(<span class="num">14</span>,<span class="num">10</span>),\n            gridspec_kw={<span class="str">'height_ratios'</span>:[<span class="num">3</span>,<span class="num">1</span>,<span class="num">1</span>]})\nax1.<span class="fn">plot</span>(df[<span class="str">'close'</span>])  <span class="cm"># Precio</span>\nax2.<span class="fn">bar</span>(df.index, df[<span class="str">'volume'</span>]) <span class="cm"># Volumen</span>\nax3.<span class="fn">plot</span>(df[<span class="str">'rsi'</span>])  <span class="cm"># RSI</span>`
 };
 
 const CODE_PLOTLY = {
-  candle: `<span class="kw">import</span> plotly.graph_objects <span class="kw">as</span> go\n\nfig = go.<span class="fn">Figure</span>(go.<span class="fn">Candlestick</span>(\n    x=df.index, open=df[<span class="str">'open'</span>], high=df[<span class="str">'high'</span>],\n    low=df[<span class="str">'low'</span>], close=df[<span class="str">'close'</span>]\n))\nfig.<span class="fn">update_layout</span>(title=<span class="str">'BTC/USDT'</span>, xaxis_rangeslider_visible=<span class="kw">False</span>)\nfig.<span class="fn">show</span>()`,
-  line: `<span class="kw">import</span> plotly.express <span class="kw">as</span> px\n\nfig = px.<span class="fn">line</span>(df, y=<span class="str">'close'</span>, title=<span class="str">'BTC Precio de Cierre'</span>)\nfig.<span class="fn">update_traces</span>(line_color=<span class="str">'#00ff88'</span>)\nfig.<span class="fn">show</span>()`,
-  subplot: `<span class="kw">from</span> plotly.subplots <span class="kw">import</span> make_subplots\n\nfig = <span class="fn">make_subplots</span>(rows=<span class="num">3</span>, cols=<span class="num">1</span>,\n    shared_xaxes=<span class="kw">True</span>,\n    row_heights=[<span class="num">0.6</span>, <span class="num">0.2</span>, <span class="num">0.2</span>])\nfig.<span class="fn">add_trace</span>(go.<span class="fn">Candlestick</span>(...), row=<span class="num">1</span>, col=<span class="num">1</span>)\nfig.<span class="fn">add_trace</span>(go.<span class="fn">Bar</span>(...), row=<span class="num">2</span>, col=<span class="num">1</span>)\nfig.<span class="fn">add_trace</span>(go.<span class="fn">Scatter</span>(...), row=<span class="num">3</span>, col=<span class="num">1</span>)`,
-  heatmap: `fig = go.<span class="fn">Figure</span>(go.<span class="fn">Heatmap</span>(\n    z=corr.values,\n    x=corr.columns, y=corr.columns,\n    colorscale=<span class="str">'RdYlGn'</span>,\n    zmin=-<span class="num">1</span>, zmax=<span class="num">1</span>\n))`
+ candle: `<span class="kw">import</span> plotly.graph_objects <span class="kw">as</span> go\n\nfig = go.<span class="fn">Figure</span>(go.<span class="fn">Candlestick</span>(\n  x=df.index, open=df[<span class="str">'open'</span>], high=df[<span class="str">'high'</span>],\n  low=df[<span class="str">'low'</span>], close=df[<span class="str">'close'</span>]\n))\nfig.<span class="fn">update_layout</span>(title=<span class="str">'BTC/USDT'</span>, xaxis_rangeslider_visible=<span class="kw">False</span>)\nfig.<span class="fn">show</span>()`,
+ line: `<span class="kw">import</span> plotly.express <span class="kw">as</span> px\n\nfig = px.<span class="fn">line</span>(df, y=<span class="str">'close'</span>, title=<span class="str">'BTC Precio de Cierre'</span>)\nfig.<span class="fn">update_traces</span>(line_color=<span class="str">'#00ff88'</span>)\nfig.<span class="fn">show</span>()`,
+ subplot: `<span class="kw">from</span> plotly.subplots <span class="kw">import</span> make_subplots\n\nfig = <span class="fn">make_subplots</span>(rows=<span class="num">3</span>, cols=<span class="num">1</span>,\n  shared_xaxes=<span class="kw">True</span>,\n  row_heights=[<span class="num">0.6</span>, <span class="num">0.2</span>, <span class="num">0.2</span>])\nfig.<span class="fn">add_trace</span>(go.<span class="fn">Candlestick</span>(...), row=<span class="num">1</span>, col=<span class="num">1</span>)\nfig.<span class="fn">add_trace</span>(go.<span class="fn">Bar</span>(...), row=<span class="num">2</span>, col=<span class="num">1</span>)\nfig.<span class="fn">add_trace</span>(go.<span class="fn">Scatter</span>(...), row=<span class="num">3</span>, col=<span class="num">1</span>)`,
+ heatmap: `fig = go.<span class="fn">Figure</span>(go.<span class="fn">Heatmap</span>(\n  z=corr.values,\n  x=corr.columns, y=corr.columns,\n  colorscale=<span class="str">'RdYlGn'</span>,\n  zmin=-<span class="num">1</span>, zmax=<span class="num">1</span>\n))`
 };
 
 const CODE_DASH = {
-  candle: `<span class="cm"># Dashboard en tiempo real con Dash</span>\n<span class="kw">from</span> dash <span class="kw">import</span> Dash, dcc, html, Input, Output\n<span class="kw">import</span> plotly.graph_objects <span class="kw">as</span> go\n\napp = <span class="fn">Dash</span>(__name__)\napp.layout = html.<span class="fn">Div</span>([\n    dcc.<span class="fn">Graph</span>(id=<span class="str">'live-chart'</span>),\n    dcc.<span class="fn">Interval</span>(id=<span class="str">'timer'</span>, interval=<span class="num">5000</span>)\n])\n\n@app.callback(Output(<span class="str">'live-chart'</span>,<span class="str">'figure'</span>),\n              Input(<span class="str">'timer'</span>,<span class="str">'n_intervals'</span>))\n<span class="kw">def</span> <span class="fn">update</span>(n):\n    df = <span class="fn">fetch_latest_data</span>()  <span class="cm"># tu función</span>\n    fig = go.<span class="fn">Figure</span>(go.<span class="fn">Candlestick</span>(...))\n    <span class="kw">return</span> fig\n\n<span class="kw">if</span> __name__ == <span class="str">'__main__'</span>:\n    app.<span class="fn">run_server</span>(debug=<span class="kw">True</span>)`
+ candle: `<span class="cm"># Dashboard en tiempo real con Dash</span>\n<span class="kw">from</span> dash <span class="kw">import</span> Dash, dcc, html, Input, Output\n<span class="kw">import</span> plotly.graph_objects <span class="kw">as</span> go\n\napp = <span class="fn">Dash</span>(__name__)\napp.layout = html.<span class="fn">Div</span>([\n  dcc.<span class="fn">Graph</span>(id=<span class="str">'live-chart'</span>),\n  dcc.<span class="fn">Interval</span>(id=<span class="str">'timer'</span>, interval=<span class="num">5000</span>)\n])\n\n@app.callback(Output(<span class="str">'live-chart'</span>,<span class="str">'figure'</span>),\n       Input(<span class="str">'timer'</span>,<span class="str">'n_intervals'</span>))\n<span class="kw">def</span> <span class="fn">update</span>(n):\n  df = <span class="fn">fetch_latest_data</span>() <span class="cm"># tu funciÃ³n</span>\n  fig = go.<span class="fn">Figure</span>(go.<span class="fn">Candlestick</span>(...))\n  <span class="kw">return</span> fig\n\n<span class="kw">if</span> __name__ == <span class="str">'__main__'</span>:\n  app.<span class="fn">run_server</span>(debug=<span class="kw">True</span>)`
 };
 
 function setType(t) {
-  chartType = t;
-  document.querySelectorAll('.ct-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('ct-'+t).classList.add('active');
-  typesViewed.add(t);
-  renderChart();
-  checkCompletion();
+ chartType = t;
+ document.querySelectorAll('.ct-btn').forEach(b=>b.classList.remove('active'));
+ document.getElementById('ct-'+t).classList.add('active');
+ typesViewed.add(t);
+ renderChart();
+ checkCompletion();
 }
 
 function selectColor(c, el) {
-  lineColor = c;
-  document.querySelectorAll('.color-swatch').forEach(s=>s.classList.remove('selected'));
-  el.classList.add('selected');
-  renderChart();
+ lineColor = c;
+ document.querySelectorAll('.color-swatch').forEach(s=>s.classList.remove('selected'));
+ el.classList.add('selected');
+ renderChart();
 }
 
 function showLib(lib, el) {
-  libMode = lib;
-  document.querySelectorAll('.chart-tab').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active');
-  updateCode();
+ libMode = lib;
+ document.querySelectorAll('.chart-tab').forEach(t=>t.classList.remove('active'));
+ el.classList.add('active');
+ updateCode();
 }
 
 function updateCode() {
-  const src = libMode==='mpl' ? CODE_MPL : libMode==='plotly' ? CODE_PLOTLY : CODE_DASH;
-  document.getElementById('codeBox').innerHTML = src[chartType] || src['candle'] || '<span class="cm"># Ver en modo Matplotlib</span>';
+ const src = libMode==='mpl' ? CODE_MPL : libMode==='plotly' ? CODE_PLOTLY : CODE_DASH;
+ document.getElementById('codeBox').innerHTML = src[chartType] || src['candle'] || '<span class="cm"># Ver en modo Matplotlib</span>';
 }
 
 function renderChart() {
-  updateCode();
-  const canvas = document.getElementById('mainCanvas');
-  const W = canvas.parentElement.clientWidth - 30;
-  canvas.width = W; canvas.height = 260;
-  const ctx = canvas.getContext('2d');
+ updateCode();
+ const canvas = document.getElementById('mainCanvas');
+ const W = canvas.parentElement.clientWidth - 30;
+ canvas.width = W; canvas.height = 260;
+ const ctx = canvas.getContext('2d');
 
-  const theme = document.getElementById('theme').value;
-  const bg = theme==='light'?'#f8f8f8':theme==='neon'?'#050010':'#070012';
-  ctx.fillStyle = bg; ctx.fillRect(0,0,W,260);
+ const theme = document.getElementById('theme').value;
+ const bg = theme==='light'?'#f8f8f8':theme==='neon'?'#050010':'#070012';
+ ctx.fillStyle = bg; ctx.fillRect(0,0,W,260);
 
-  const n = mockData.length;
-  const xS = i => 10 + i * (W-20)/n;
-  const closes = mockData.map(d=>d.close);
-  const mn = Math.min(...closes)*.99, mx = Math.max(...closes)*1.01;
-  const yS = v => 240 - ((v-mn)/(mx-mn))*220;
+ const n = mockData.length;
+ const xS = i => 10 + i * (W-20)/n;
+ const closes = mockData.map(d=>d.close);
+ const mn = Math.min(...closes)*.99, mx = Math.max(...closes)*1.01;
+ const yS = v => 240 - ((v-mn)/(mx-mn))*220;
 
-  const maPer = +document.getElementById('maPeriod').value;
+ const maPer = +document.getElementById('maPeriod').value;
 
-  if (chartType === 'candle') {
-    document.getElementById('chartTitle').innerHTML = '<i class="fas fa-chart-candlestick"></i> Candlestick Chart — BTC/USDT';
-    const cw = Math.max(2, (W-20)/n - 1);
-    mockData.forEach((d,i) => {
-      const x = xS(i) + cw/2;
-      const bull = d.close >= d.open;
-      ctx.strokeStyle = bull ? '#00ff88' : '#ff5566';
-      ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.moveTo(x, yS(d.high)); ctx.lineTo(x, yS(d.low)); ctx.stroke();
-      ctx.fillStyle = bull ? '#00ff88' : '#ff5566';
-      const cy = yS(Math.max(d.open,d.close)), ch = Math.max(1, Math.abs(yS(d.open)-yS(d.close)));
-      ctx.fillRect(xS(i), cy, cw, ch);
-    });
-  } else if (chartType === 'line') {
-    document.getElementById('chartTitle').innerHTML = '<i class="fas fa-chart-line"></i> Line Chart — Precio de Cierre';
-    const grad = ctx.createLinearGradient(0,0,0,260);
-    grad.addColorStop(0, lineColor+'44'); grad.addColorStop(1, 'transparent');
-    ctx.beginPath();
-    closes.forEach((v,i)=>i===0?ctx.moveTo(xS(i),yS(v)):ctx.lineTo(xS(i),yS(v)));
-    ctx.lineTo(xS(n-1),260);ctx.lineTo(xS(0),260);ctx.closePath();
-    ctx.fillStyle=grad;ctx.fill();
-    ctx.beginPath();ctx.strokeStyle=lineColor;ctx.lineWidth=1.8;
-    closes.forEach((v,i)=>i===0?ctx.moveTo(xS(i),yS(v)):ctx.lineTo(xS(i),yS(v)));
-    ctx.stroke();
-  } else if (chartType === 'volume') {
-    document.getElementById('chartTitle').innerHTML = '<i class="fas fa-chart-bar"></i> Volume Bars';
-    const vols = mockData.map(d=>d.volume);
-    const maxV = Math.max(...vols);
-    mockData.forEach((d,i)=>{
-      const bull = d.close >= d.open;
-      ctx.fillStyle = bull ? 'rgba(0,255,136,.7)' : 'rgba(255,85,102,.7)';
-      const h = (d.volume/maxV)*220;
-      ctx.fillRect(xS(i),260-h,(W-20)/n-1,h);
-    });
-  } else if (chartType === 'returns') {
-    document.getElementById('chartTitle').innerHTML = I18N.t('fb_0');
-    const rets = closes.slice(1).map((v,i)=>(v-closes[i])/closes[i]*100);
-    const bins = 30; const minR = Math.min(...rets), maxR = Math.max(...rets);
-    const binW = (maxR-minR)/bins;
-    const hist = new Array(bins).fill(0);
-    rets.forEach(r => { const b = Math.min(bins-1, Math.floor((r-minR)/binW)); hist[b]++; });
-    const maxH = Math.max(...hist);
-    const bw = (W-20)/bins;
-    hist.forEach((h,i)=>{
-      const rv = minR + i*binW + binW/2;
-      ctx.fillStyle = rv>=0 ? 'rgba(0,255,136,.7)' : 'rgba(255,85,102,.7)';
-      const bh = (h/maxH)*210;
-      ctx.fillRect(10+i*bw,250-bh,bw-1,bh);
-    });
-    ctx.strokeStyle='#ffffff44';ctx.lineWidth=1;
-    const zeroX = 10 + (-minR/((maxR-minR))*(W-20));
-    ctx.beginPath();ctx.moveTo(zeroX,0);ctx.lineTo(zeroX,260);ctx.setLineDash([4,4]);ctx.stroke();
-    ctx.setLineDash([]);
-  } else if (chartType === 'bb') {
-    document.getElementById('chartTitle').innerHTML = I18N.t('fb_1');
-    const mas = [], stds = [], ups = [], lows2 = [];
-    for (let i=19;i<n;i++) {
-      const sl = closes.slice(i-19,i+1);
-      const m = sl.reduce((a,b)=>a+b,0)/20;
-      const s = Math.sqrt(sl.reduce((a,b)=>a+(b-m)**2,0)/20);
-      mas.push({i,v:m});stds.push(s);ups.push({i,v:m+2*s});lows2.push({i,v:m-2*s});
-    }
-    ctx.beginPath();ups.forEach((p,j)=>j===0?ctx.moveTo(xS(p.i),yS(p.v)):ctx.lineTo(xS(p.i),yS(p.v)));
-    lows2.slice().reverse().forEach(p=>ctx.lineTo(xS(p.i),yS(p.v)));
-    ctx.closePath();ctx.fillStyle='rgba(180,100,255,.12)';ctx.fill();
-    [[ups,'#6633aa',1],[lows2,'#6633aa',1],[mas,'#b464ff',1.5]].forEach(([pts,col,lw])=>{
-      ctx.beginPath();ctx.strokeStyle=col;ctx.lineWidth=lw;
-      pts.forEach((p,j)=>j===0?ctx.moveTo(xS(p.i),yS(p.v)):ctx.lineTo(xS(p.i),yS(p.v)));ctx.stroke();
-    });
-    ctx.beginPath();ctx.strokeStyle=lineColor;ctx.lineWidth=1.2;
-    closes.forEach((v,i)=>i===0?ctx.moveTo(xS(i),yS(v)):ctx.lineTo(xS(i),yS(v)));ctx.stroke();
-  } else if (chartType === 'scatter') {
-    document.getElementById('chartTitle').innerHTML = I18N.t('fb_2');
-    const rets = closes.slice(1).map((v,i)=>(v-closes[i])/closes[i]*100);
-    const minR = Math.min(...rets), maxR = Math.max(...rets);
-    const xsS = v => 20 + ((v-minR)/(maxR-minR))*(W-40);
-    const ysS = v => 240 - ((v-minR)/(maxR-minR))*220;
-    rets.slice(0,-1).forEach((r,i)=>{
-      const r2 = rets[i+1];
-      ctx.beginPath();ctx.arc(xsS(r),ysS(r2),2.5,0,Math.PI*2);
-      ctx.fillStyle = r>=0&&r2>=0?'#00ff8888':r<0&&r2<0?'#ff556688':'#b464ff66';
-      ctx.fill();
-    });
-    ctx.strokeStyle='#ffffff22';ctx.lineWidth=1;ctx.setLineDash([4,4]);
-    const mid = xsS(0);ctx.beginPath();ctx.moveTo(mid,0);ctx.lineTo(mid,260);ctx.stroke();
-    const midY = ysS(0);ctx.beginPath();ctx.moveTo(0,midY);ctx.lineTo(W,midY);ctx.stroke();
-    ctx.setLineDash([]);
-  } else if (chartType === 'heatmap') {
-    document.getElementById('chartTitle').innerHTML = I18N.t('fb_3');
-    const assets = ['BTC','ETH','SPY','EUR','ADA','SOL'];
-    const corr = [
-      [1,.82,.35,.05,.72,.78],
-      [.82,1,.28,.04,.68,.72],
-      [.35,.28,1,.12,.22,.30],
-      [.05,.04,.12,1,.08,.06],
-      [.72,.68,.22,.08,1,.65],
-      [.78,.72,.30,.06,.65,1]
-    ];
-    const m = assets.length;
-    const cw2 = (W-60)/m, ch2 = 200/m;
-    corr.forEach((row,i)=>row.forEach((v,j)=>{
-      const a = Math.abs(v);
-      let c;
-      if(v>0) c=`rgba(0,${Math.round(100+155*a)},${Math.round(100*a)},${.3+a*.6})`;
-      else c=`rgba(${Math.round(100+155*a)},0,0,${.3+a*.6})`;
-      ctx.fillStyle=c;ctx.fillRect(30+j*cw2,20+i*ch2,cw2-2,ch2-2);
-      ctx.fillStyle=a>.5?'#000':'#fff';ctx.font='10px Inter';ctx.textAlign='center';
-      ctx.fillText(v.toFixed(2),30+j*cw2+cw2/2,20+i*ch2+ch2/2+4);
-    }));
-    ctx.fillStyle='#9966cc';ctx.font='10px Inter';
-    assets.forEach((a,i)=>{
-      ctx.textAlign='right';ctx.fillText(a,26,20+i*ch2+ch2/2+4);
-      ctx.textAlign='center';ctx.fillText(a,30+i*cw2+cw2/2,16);
-    });
-  } else if (chartType === 'subplot') {
-    document.getElementById('chartTitle').innerHTML = I18N.t('fb_4');
-    const h1=140,h2=50,h3=60;
-    // Price
-    ctx.beginPath();ctx.strokeStyle=lineColor;ctx.lineWidth=1.5;
-    closes.forEach((v,i)=>i===0?ctx.moveTo(xS(i),10+((mx-v)/(mx-mn))*125):ctx.lineTo(xS(i),10+((mx-v)/(mx-mn))*125));
-    ctx.stroke();
-    // Volume divider
-    ctx.strokeStyle='#33334455';ctx.lineWidth=1;
-    ctx.beginPath();ctx.moveTo(0,h1);ctx.lineTo(W,h1);ctx.stroke();
-    ctx.beginPath();ctx.moveTo(0,h1+h2);ctx.lineTo(W,h1+h2);ctx.stroke();
-    // Volume bars
-    const vols=mockData.map(d=>d.volume),maxV=Math.max(...vols);
-    mockData.forEach((d,i)=>{
-      const bull=d.close>=d.open;ctx.fillStyle=bull?'rgba(0,255,136,.6)':'rgba(255,85,102,.6)';
-      const bh=(d.volume/maxV)*44;ctx.fillRect(xS(i),h1+h2-bh,(W-20)/n-1,bh);
-    });
-    // RSI (simulated)
-    let rsi=50;ctx.beginPath();ctx.strokeStyle='#ffd700';ctx.lineWidth=1.2;
-    closes.forEach((v,i)=>{
-      rsi=Math.max(10,Math.min(90,rsi+(Math.random()-.5)*8));
-      const ry=h1+h2+5+(1-rsi/100)*52;
-      i===0?ctx.moveTo(xS(i),ry):ctx.lineTo(xS(i),ry);
-    });ctx.stroke();
-    // RSI 70/30 lines
-    ctx.strokeStyle='#ff556633';ctx.setLineDash([2,3]);
-    ctx.beginPath();ctx.moveTo(0,h1+h2+5+30*52/100);ctx.lineTo(W,h1+h2+5+30*52/100);ctx.stroke();
-    ctx.setLineDash([]);
-    // Labels
-    ctx.fillStyle='#9966cc';ctx.font='9px Inter';ctx.textAlign='left';
-    ctx.fillText('PRECIO',4,20);ctx.fillText('VOL',4,h1+12);ctx.fillText('RSI',4,h1+h2+14);
+ if (chartType === 'candle') {
+  document.getElementById('chartTitle').innerHTML = '<i class="fas fa-chart-candlestick"></i> Candlestick Chart â€” BTC/USDT';
+  const cw = Math.max(2, (W-20)/n - 1);
+  mockData.forEach((d,i) => {
+   const x = xS(i) + cw/2;
+   const bull = d.close >= d.open;
+   ctx.strokeStyle = bull ? '#00ff88' : '#ff5566';
+   ctx.lineWidth = 1;
+   ctx.beginPath(); ctx.moveTo(x, yS(d.high)); ctx.lineTo(x, yS(d.low)); ctx.stroke();
+   ctx.fillStyle = bull ? '#00ff88' : '#ff5566';
+   const cy = yS(Math.max(d.open,d.close)), ch = Math.max(1, Math.abs(yS(d.open)-yS(d.close)));
+   ctx.fillRect(xS(i), cy, cw, ch);
+  });
+ } else if (chartType === 'line') {
+  document.getElementById('chartTitle').innerHTML = '<i class="fas fa-chart-line"></i> Line Chart â€” Precio de Cierre';
+  const grad = ctx.createLinearGradient(0,0,0,260);
+  grad.addColorStop(0, lineColor+'44'); grad.addColorStop(1, 'transparent');
+  ctx.beginPath();
+  closes.forEach((v,i)=>i===0?ctx.moveTo(xS(i),yS(v)):ctx.lineTo(xS(i),yS(v)));
+  ctx.lineTo(xS(n-1),260);ctx.lineTo(xS(0),260);ctx.closePath();
+  ctx.fillStyle=grad;ctx.fill();
+  ctx.beginPath();ctx.strokeStyle=lineColor;ctx.lineWidth=1.8;
+  closes.forEach((v,i)=>i===0?ctx.moveTo(xS(i),yS(v)):ctx.lineTo(xS(i),yS(v)));
+  ctx.stroke();
+ } else if (chartType === 'volume') {
+  document.getElementById('chartTitle').innerHTML = '<i class="fas fa-chart-bar"></i> Volume Bars';
+  const vols = mockData.map(d=>d.volume);
+  const maxV = Math.max(...vols);
+  mockData.forEach((d,i)=>{
+   const bull = d.close >= d.open;
+   ctx.fillStyle = bull ? 'rgba(0,255,136,.7)' : 'rgba(255,85,102,.7)';
+   const h = (d.volume/maxV)*220;
+   ctx.fillRect(xS(i),260-h,(W-20)/n-1,h);
+  });
+ } else if (chartType === 'returns') {
+  document.getElementById('chartTitle').innerHTML = I18N.t('fb_0');
+  const rets = closes.slice(1).map((v,i)=>(v-closes[i])/closes[i]*100);
+  const bins = 30; const minR = Math.min(...rets), maxR = Math.max(...rets);
+  const binW = (maxR-minR)/bins;
+  const hist = new Array(bins).fill(0);
+  rets.forEach(r => { const b = Math.min(bins-1, Math.floor((r-minR)/binW)); hist[b]++; });
+  const maxH = Math.max(...hist);
+  const bw = (W-20)/bins;
+  hist.forEach((h,i)=>{
+   const rv = minR + i*binW + binW/2;
+   ctx.fillStyle = rv>=0 ? 'rgba(0,255,136,.7)' : 'rgba(255,85,102,.7)';
+   const bh = (h/maxH)*210;
+   ctx.fillRect(10+i*bw,250-bh,bw-1,bh);
+  });
+  ctx.strokeStyle='#ffffff44';ctx.lineWidth=1;
+  const zeroX = 10 + (-minR/((maxR-minR))*(W-20));
+  ctx.beginPath();ctx.moveTo(zeroX,0);ctx.lineTo(zeroX,260);ctx.setLineDash([4,4]);ctx.stroke();
+  ctx.setLineDash([]);
+ } else if (chartType === 'bb') {
+  document.getElementById('chartTitle').innerHTML = I18N.t('fb_1');
+  const mas = [], stds = [], ups = [], lows2 = [];
+  for (let i=19;i<n;i++) {
+   const sl = closes.slice(i-19,i+1);
+   const m = sl.reduce((a,b)=>a+b,0)/20;
+   const s = Math.sqrt(sl.reduce((a,b)=>a+(b-m)**2,0)/20);
+   mas.push({i,v:m});stds.push(s);ups.push({i,v:m+2*s});lows2.push({i,v:m-2*s});
   }
+  ctx.beginPath();ups.forEach((p,j)=>j===0?ctx.moveTo(xS(p.i),yS(p.v)):ctx.lineTo(xS(p.i),yS(p.v)));
+  lows2.slice().reverse().forEach(p=>ctx.lineTo(xS(p.i),yS(p.v)));
+  ctx.closePath();ctx.fillStyle='rgba(180,100,255,.12)';ctx.fill();
+  [[ups,'#6633aa',1],[lows2,'#6633aa',1],[mas,'#b464ff',1.5]].forEach(([pts,col,lw])=>{
+   ctx.beginPath();ctx.strokeStyle=col;ctx.lineWidth=lw;
+   pts.forEach((p,j)=>j===0?ctx.moveTo(xS(p.i),yS(p.v)):ctx.lineTo(xS(p.i),yS(p.v)));ctx.stroke();
+  });
+  ctx.beginPath();ctx.strokeStyle=lineColor;ctx.lineWidth=1.2;
+  closes.forEach((v,i)=>i===0?ctx.moveTo(xS(i),yS(v)):ctx.lineTo(xS(i),yS(v)));ctx.stroke();
+ } else if (chartType === 'scatter') {
+  document.getElementById('chartTitle').innerHTML = I18N.t('fb_2');
+  const rets = closes.slice(1).map((v,i)=>(v-closes[i])/closes[i]*100);
+  const minR = Math.min(...rets), maxR = Math.max(...rets);
+  const xsS = v => 20 + ((v-minR)/(maxR-minR))*(W-40);
+  const ysS = v => 240 - ((v-minR)/(maxR-minR))*220;
+  rets.slice(0,-1).forEach((r,i)=>{
+   const r2 = rets[i+1];
+   ctx.beginPath();ctx.arc(xsS(r),ysS(r2),2.5,0,Math.PI*2);
+   ctx.fillStyle = r>=0&&r2>=0?'#00ff8888':r<0&&r2<0?'#ff556688':'#b464ff66';
+   ctx.fill();
+  });
+  ctx.strokeStyle='#ffffff22';ctx.lineWidth=1;ctx.setLineDash([4,4]);
+  const mid = xsS(0);ctx.beginPath();ctx.moveTo(mid,0);ctx.lineTo(mid,260);ctx.stroke();
+  const midY = ysS(0);ctx.beginPath();ctx.moveTo(0,midY);ctx.lineTo(W,midY);ctx.stroke();
+  ctx.setLineDash([]);
+ } else if (chartType === 'heatmap') {
+  document.getElementById('chartTitle').innerHTML = I18N.t('fb_3');
+  const assets = ['BTC','ETH','SPY','EUR','ADA','SOL'];
+  const corr = [
+   [1,.82,.35,.05,.72,.78],
+   [.82,1,.28,.04,.68,.72],
+   [.35,.28,1,.12,.22,.30],
+   [.05,.04,.12,1,.08,.06],
+   [.72,.68,.22,.08,1,.65],
+   [.78,.72,.30,.06,.65,1]
+  ];
+  const m = assets.length;
+  const cw2 = (W-60)/m, ch2 = 200/m;
+  corr.forEach((row,i)=>row.forEach((v,j)=>{
+   const a = Math.abs(v);
+   let c;
+   if(v>0) c=`rgba(0,${Math.round(100+155*a)},${Math.round(100*a)},${.3+a*.6})`;
+   else c=`rgba(${Math.round(100+155*a)},0,0,${.3+a*.6})`;
+   ctx.fillStyle=c;ctx.fillRect(30+j*cw2,20+i*ch2,cw2-2,ch2-2);
+   ctx.fillStyle=a>.5?'#000':'#fff';ctx.font='10px Inter';ctx.textAlign='center';
+   ctx.fillText(v.toFixed(2),30+j*cw2+cw2/2,20+i*ch2+ch2/2+4);
+  }));
+  ctx.fillStyle='#9966cc';ctx.font='10px Inter';
+  assets.forEach((a,i)=>{
+   ctx.textAlign='right';ctx.fillText(a,26,20+i*ch2+ch2/2+4);
+   ctx.textAlign='center';ctx.fillText(a,30+i*cw2+cw2/2,16);
+  });
+ } else if (chartType === 'subplot') {
+  document.getElementById('chartTitle').innerHTML = I18N.t('fb_4');
+  const h1=140,h2=50,h3=60;
+  // Price
+  ctx.beginPath();ctx.strokeStyle=lineColor;ctx.lineWidth=1.5;
+  closes.forEach((v,i)=>i===0?ctx.moveTo(xS(i),10+((mx-v)/(mx-mn))*125):ctx.lineTo(xS(i),10+((mx-v)/(mx-mn))*125));
+  ctx.stroke();
+  // Volume divider
+  ctx.strokeStyle='#33334455';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(0,h1);ctx.lineTo(W,h1);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(0,h1+h2);ctx.lineTo(W,h1+h2);ctx.stroke();
+  // Volume bars
+  const vols=mockData.map(d=>d.volume),maxV=Math.max(...vols);
+  mockData.forEach((d,i)=>{
+   const bull=d.close>=d.open;ctx.fillStyle=bull?'rgba(0,255,136,.6)':'rgba(255,85,102,.6)';
+   const bh=(d.volume/maxV)*44;ctx.fillRect(xS(i),h1+h2-bh,(W-20)/n-1,bh);
+  });
+  // RSI (simulated)
+  let rsi=50;ctx.beginPath();ctx.strokeStyle='#ffd700';ctx.lineWidth=1.2;
+  closes.forEach((v,i)=>{
+   rsi=Math.max(10,Math.min(90,rsi+(Math.random()-.5)*8));
+   const ry=h1+h2+5+(1-rsi/100)*52;
+   i===0?ctx.moveTo(xS(i),ry):ctx.lineTo(xS(i),ry);
+  });ctx.stroke();
+  // RSI 70/30 lines
+  ctx.strokeStyle='#ff556633';ctx.setLineDash([2,3]);
+  ctx.beginPath();ctx.moveTo(0,h1+h2+5+30*52/100);ctx.lineTo(W,h1+h2+5+30*52/100);ctx.stroke();
+  ctx.setLineDash([]);
+  // Labels
+  ctx.fillStyle='#9966cc';ctx.font='9px Inter';ctx.textAlign='left';
+  ctx.fillText('PRECIO',4,20);ctx.fillText('VOL',4,h1+12);ctx.fillText('RSI',4,h1+h2+14);
+ }
 
-  // MA overlay
-  if (maPer > 0 && ['line','candle','bb'].includes(chartType)) {
-    const mas = [];
-    for (let i=maPer-1;i<n;i++) {
-      const s=closes.slice(i-maPer+1,i+1).reduce((a,b)=>a+b,0)/maPer;
-      mas.push({i,v:s});
-    }
-    ctx.beginPath();ctx.strokeStyle='#ffd700aa';ctx.lineWidth=1.2;ctx.setLineDash([4,3]);
-    mas.forEach((p,j)=>j===0?ctx.moveTo(xS(p.i),yS(p.v)):ctx.lineTo(xS(p.i),yS(p.v)));
-    ctx.stroke();ctx.setLineDash([]);
+ // MA overlay
+ if (maPer > 0 && ['line','candle','bb'].includes(chartType)) {
+  const mas = [];
+  for (let i=maPer-1;i<n;i++) {
+   const s=closes.slice(i-maPer+1,i+1).reduce((a,b)=>a+b,0)/maPer;
+   mas.push({i,v:s});
   }
+  ctx.beginPath();ctx.strokeStyle='#ffd700aa';ctx.lineWidth=1.2;ctx.setLineDash([4,3]);
+  mas.forEach((p,j)=>j===0?ctx.moveTo(xS(p.i),yS(p.v)):ctx.lineTo(xS(p.i),yS(p.v)));
+  ctx.stroke();ctx.setLineDash([]);
+ }
 
-  const messages = {
-    candle:'🕯️ Candlestick: cada vela muestra Open, High, Low, Close. Verde = precio subió; Roja = bajó.',
-    line:'📈 Line Chart: ideal para ver tendencias de largo plazo. Combínalo con MAs para señales.',
-    volume:'📊 Volume Analysis: el volumen confirma los movimientos. Alto volumen = movimiento confiable.',
-    returns:'📉 Distribución de retornos: muestra si el activo tiene fat tails (colas gruesas = más riesgo extremo).',
-    bb:'〰️ Bollinger Bands: precio fuera de las bandas = posible sobrecompra/sobreventa. Potencial señal.',
-    scatter:'⚫ Scatter de autocorrelación: si los puntos son aleatorios → mercado eficiente. Patrones → estrategia.',
-    heatmap:'🟩 Heatmap: verde = activos correlacionados (no diversifican). Busca activos con baja correlación.',
-    subplot:'🔲 Multi-panel: dashboard profesional. Siempre analiza precio, volumen y oscilador juntos.'
-  };
-  document.getElementById('feedbackMsg').innerHTML = messages[chartType] || '🎨 Renderizando gráfico...';
+ const messages = {
+  candle:'ðŸ•¯ï¸ Candlestick: cada vela muestra Open, High, Low, Close. Verde = precio subiÃ³; Roja = bajÃ³.',
+  line:'ðŸ“ˆ Line Chart: ideal para ver tendencias de largo plazo. CombÃ­nalo con MAs para seÃ±ales.',
+  volume:'ðŸ“Š Volume Analysis: el volumen confirma los movimientos. Alto volumen = movimiento confiable.',
+  returns:'ðŸ“‰ DistribuciÃ³n de retornos: muestra si el activo tiene fat tails (colas gruesas = mÃ¡s riesgo extremo).',
+  bb:'ã€°ï¸ Bollinger Bands: precio fuera de las bandas = posible sobrecompra/sobreventa. Potencial seÃ±al.',
+  scatter:'âš« Scatter de autocorrelaciÃ³n: si los puntos son aleatorios â†’ mercado eficiente. Patrones â†’ estrategia.',
+  heatmap:'ðŸŸ© Heatmap: verde = activos correlacionados (no diversifican). Busca activos con baja correlaciÃ³n.',
+  subplot:'ðŸ”² Multi-panel: dashboard profesional. Siempre analiza precio, volumen y oscilador juntos.'
+ };
+ document.getElementById('feedbackMsg').innerHTML = messages[chartType] || 'ðŸŽ¨ Renderizando grÃ¡fico...';
 }
 
 function checkCompletion() {
-  if (typesViewed.size >= 5 && !localStorage.getItem(STORAGE_KEY)) {
-    localStorage.setItem(STORAGE_KEY, 'true');
-    document.getElementById('insigniaArea').classList.remove('hidden');
-  }
+ if (typesViewed.size >= 5 && !localStorage.getItem(STORAGE_KEY)) {
+  localStorage.setItem(STORAGE_KEY, 'true');
+  document.getElementById('insigniaArea').classList.remove('hidden');
+ }
 }
 
 if (localStorage.getItem(STORAGE_KEY)) document.getElementById('insigniaArea').classList.remove('hidden');
@@ -433,12 +433,12 @@ renderChart();
 
 <script>
 window.I18N_DATA={
-  'fb_0': { es: '<i class="fas fa-chart-bar"></i> Distribución de Retornos Diarios', en: '<i class="fas fa-chart-bar"></i> Distribución de Retornos Diarios' },
-  'fb_1': { es: '〰️ Bollinger Bands (20,2)', en: '〰️ Bollinger Bands (20,2)' },
-  'fb_2': { es: '⚫ Scatter — Autocorrelación de Retornos', en: '⚫ Scatter — Autocorrelación de Retornos' },
-  'fb_3': { es: '🟩 Heatmap de Correlación entre Activos', en: '🟩 Heatmap de Correlación entre Activos' },
-  'fb_4': { es: '🔲 Multi-panel: Precio + Volumen + RSI', en: '🔲 Multi-panel: Precio + Volumen + RSI' }
+ 'fb_0': { es: '<i class="fas fa-chart-bar"></i> DistribuciÃ³n de Retornos Diarios', en: '<i class="fas fa-chart-bar"></i> DistribuciÃ³n de Retornos Diarios' },
+ 'fb_1': { es: 'ã€°ï¸ Bollinger Bands (20,2)', en: 'ã€°ï¸ Bollinger Bands (20,2)' },
+ 'fb_2': { es: 'âš« Scatter â€” AutocorrelaciÃ³n de Retornos', en: 'âš« Scatter â€” AutocorrelaciÃ³n de Retornos' },
+ 'fb_3': { es: 'ðŸŸ© Heatmap de CorrelaciÃ³n entre Activos', en: 'ðŸŸ© Heatmap de CorrelaciÃ³n entre Activos' },
+ 'fb_4': { es: 'ðŸ”² Multi-panel: Precio + Volumen + RSI', en: 'ðŸ”² Multi-panel: Precio + Volumen + RSI' }
 };
 </script>
-</body>
+ </body>
 </html>

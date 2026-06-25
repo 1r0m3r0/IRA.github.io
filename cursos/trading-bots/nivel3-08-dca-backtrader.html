@@ -1,228 +1,228 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bot Trader | DCA Bot & Backtrader</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700;14..32,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-    body{background:linear-gradient(145deg,#100a00,#1e1200);font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:2rem 1rem}
-    .container{max-width:1300px;width:100%;background:rgba(18,10,0,.88);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(255,180,0,.22);box-shadow:0 25px 55px rgba(0,0,0,.65);overflow:hidden}
-    .hero{background:linear-gradient(95deg,#0c0800,#160e00);padding:1.8rem 2rem;text-align:center;border-bottom:2px solid #ffb400}
-    .hero h1{font-size:1.9rem;font-weight:800;background:linear-gradient(135deg,#fff3cc,#ffdd66,#ffb400);-webkit-background-clip:text;background-clip:text;color:transparent}
-    .hero p{margin-top:.5rem;font-size:.95rem;color:#997722}
-    .chips{display:flex;justify-content:center;gap:.6rem;flex-wrap:wrap;margin-top:.7rem}
-    .chip{background:rgba(255,180,0,.1);border:1px solid rgba(255,180,0,.3);color:#997722;font-size:.72rem;padding:.25rem .8rem;border-radius:2rem}
-    .week-badge{display:inline-block;background:rgba(255,180,0,.15);border:1px solid #ffb400;color:#ffb400;font-size:.75rem;font-weight:700;padding:.3rem 1rem;border-radius:2rem;margin-top:.5rem}
-    .analogy{background:#120a00cc;margin:1.4rem 2rem;padding:1.1rem 1.7rem;border-radius:2rem;border-left:7px solid #ffb400;font-size:.9rem;line-height:1.65}
-    .analogy strong{color:#ffdd66}
-    .tabs{display:flex;gap:.5rem;padding:0 1.8rem .5rem;flex-wrap:wrap}
-    .tab{background:#100a00;border:1px solid rgba(255,180,0,.2);color:#997722;padding:.5rem 1.4rem;border-radius:2rem;cursor:pointer;font-size:.82rem;font-weight:600;transition:.15s}
-    .tab.active{background:#1e1400;border-color:#ffb400;color:#ffb400}
-    .tab-content{display:none;padding:0 1.8rem 1.5rem}
-    .tab-content.active{display:block}
-    .panel{background:#120a00dd;border-radius:1.8rem;padding:1.2rem 1.3rem;border:1px solid rgba(255,180,0,.15);margin-bottom:1rem}
-    .panel h3{font-size:.88rem;font-weight:700;color:#ffdd66;margin-bottom:.7rem}
-    .two-col{display:flex;gap:1rem;flex-wrap:wrap}
-    .two-col > *{flex:1;min-width:260px}
-    label{font-size:.72rem;color:#776622;text-transform:uppercase;letter-spacing:.06rem;display:block;margin-bottom:.3rem;margin-top:.5rem}
-    select,input[type=number]{background:#0c0600;border:1px solid rgba(255,180,0,.2);color:#eef5ff;padding:.45rem .7rem;border-radius:.75rem;font-size:.82rem;font-family:'Inter',sans-serif;width:100%}
-    .slider-row{display:flex;align-items:center;gap:.4rem;margin:.25rem 0}
-    .slider-row label{min-width:120px;margin:0}
-    .slider-row input[type=range]{flex:1;accent-color:#ffb400}
-    .slider-row span{font-size:.75rem;color:#ffdd66;font-family:'JetBrains Mono',monospace;min-width:52px;text-align:right}
-    .btn{background:linear-gradient(95deg,#ffb400,#cc8800);border:none;padding:.7rem 1.4rem;font-weight:700;border-radius:2rem;cursor:pointer;color:#0c0600;font-size:.88rem;transition:.2s;display:inline-flex;align-items:center;gap:.5rem;margin-top:.4rem}
-    .btn:hover{transform:translateY(-2px);box-shadow:0 0 18px rgba(255,180,0,.4)}
-    pre{background:#080400;border-radius:1rem;padding:1rem;font-family:'JetBrains Mono',monospace;font-size:.73rem;line-height:1.7;overflow-x:auto;color:#fff3cc;border:1px solid rgba(255,180,0,.12)}
-    .kw{color:#ffb400}.fn{color:#ffdd66}.cm{color:#776622}.str{color:#80eeaa}.num{color:#ff9944}
-    canvas{border-radius:1rem;display:block}
-    .stat-row{display:flex;gap:.5rem;flex-wrap:wrap}
-    .stat-mini{flex:1;min-width:88px;background:#0c0800;border-radius:1rem;padding:.55rem;text-align:center;border:1px solid rgba(255,180,0,.12)}
-    .stat-mini .sv{font-size:1rem;font-weight:800;font-family:monospace;color:#ffb400}
-    .stat-mini .sl{font-size:.6rem;color:#776622;margin-top:.1rem}
-    table{width:100%;border-collapse:collapse;font-size:.72rem;font-family:'JetBrains Mono',monospace}
-    th{background:#160e00;color:#ffb400;padding:.4rem .5rem;text-align:right;border-bottom:1px solid rgba(255,180,0,.2)}
-    th:first-child{text-align:left}
-    td{padding:.28rem .5rem;text-align:right;border-bottom:1px solid rgba(255,180,0,.07);color:#fff3cc}
-    td:first-child{text-align:left;color:#997722}
-    .pos{color:#00ff88;font-weight:700}.neg{color:#ff5566;font-weight:700}
-    .feedback{background:#00000088;margin:0 1.8rem 1rem;padding:.85rem 1.2rem;border-radius:1.5rem;text-align:center;border-left:4px solid #ffb400;font-size:.88rem;line-height:1.55}
-    .insignia{text-align:center;background:#120a00;border-radius:2rem;margin:0 1.8rem 1.5rem;padding:1rem;border:1px dashed gold}
-    .insignia i{font-size:2.4rem;color:gold}
-    .hidden{display:none}
-    .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.4rem 2rem}
-    .nav-link{background:#1a1000;padding:.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:.5rem;font-size:.88rem;transition:.2s}
-    .nav-link:hover{transform:translateY(-2px)}
-    .nav-link.next{background:linear-gradient(95deg,#f0a500,#ff6a00);color:#1e1a0c}
-    footer{text-align:center;padding:1rem;font-size:.72rem;border-top:1px solid #120a00;color:#776622}
-    @media(max-width:860px){.hero h1{font-size:1.4rem}}
-  </style>
-  <link rel="stylesheet" href="../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Bot Trader | DCA Bot & Backtrader</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700;14..32,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+  body{background:linear-gradient(145deg,#100a00,#1e1200);font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:2rem 1rem}
+  .container{max-width:1300px;width:100%;background:rgba(18,10,0,.88);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(255,180,0,.22);box-shadow:0 25px 55px rgba(0,0,0,.65);overflow:hidden}
+  .hero{background:linear-gradient(95deg,#0c0800,#160e00);padding:1.8rem 2rem;text-align:center;border-bottom:2px solid #ffb400}
+  .hero h1{font-size:1.9rem;font-weight:800;background:linear-gradient(135deg,#fff3cc,#ffdd66,#ffb400);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p{margin-top:.5rem;font-size:.95rem;color:#997722}
+  .chips{display:flex;justify-content:center;gap:.6rem;flex-wrap:wrap;margin-top:.7rem}
+  .chip{background:rgba(255,180,0,.1);border:1px solid rgba(255,180,0,.3);color:#997722;font-size:.72rem;padding:.25rem .8rem;border-radius:2rem}
+  .week-badge{display:inline-block;background:rgba(255,180,0,.15);border:1px solid #ffb400;color:#ffb400;font-size:.75rem;font-weight:700;padding:.3rem 1rem;border-radius:2rem;margin-top:.5rem}
+  .analogy{background:#120a00cc;margin:1.4rem 2rem;padding:1.1rem 1.7rem;border-radius:2rem;border-left:7px solid #ffb400;font-size:.9rem;line-height:1.65}
+  .analogy strong{color:#ffdd66}
+  .tabs{display:flex;gap:.5rem;padding:0 1.8rem .5rem;flex-wrap:wrap}
+  .tab{background:#100a00;border:1px solid rgba(255,180,0,.2);color:#997722;padding:.5rem 1.4rem;border-radius:2rem;cursor:pointer;font-size:.82rem;font-weight:600;transition:.15s}
+  .tab.active{background:#1e1400;border-color:#ffb400;color:#ffb400}
+  .tab-content{display:none;padding:0 1.8rem 1.5rem}
+  .tab-content.active{display:block}
+  .panel{background:#120a00dd;border-radius:1.8rem;padding:1.2rem 1.3rem;border:1px solid rgba(255,180,0,.15);margin-bottom:1rem}
+  .panel h3{font-size:.88rem;font-weight:700;color:#ffdd66;margin-bottom:.7rem}
+  .two-col{display:flex;gap:1rem;flex-wrap:wrap}
+  .two-col > *{flex:1;min-width:260px}
+  label{font-size:.72rem;color:#776622;text-transform:uppercase;letter-spacing:.06rem;display:block;margin-bottom:.3rem;margin-top:.5rem}
+  select,input[type=number]{background:#0c0600;border:1px solid rgba(255,180,0,.2);color:#eef5ff;padding:.45rem .7rem;border-radius:.75rem;font-size:.82rem;font-family:'Inter',sans-serif;width:100%}
+  .slider-row{display:flex;align-items:center;gap:.4rem;margin:.25rem 0}
+  .slider-row label{min-width:120px;margin:0}
+  .slider-row input[type=range]{flex:1;accent-color:#ffb400}
+  .slider-row span{font-size:.75rem;color:#ffdd66;font-family:'JetBrains Mono',monospace;min-width:52px;text-align:right}
+  .btn{background:linear-gradient(95deg,#ffb400,#cc8800);border:none;padding:.7rem 1.4rem;font-weight:700;border-radius:2rem;cursor:pointer;color:#0c0600;font-size:.88rem;transition:.2s;display:inline-flex;align-items:center;gap:.5rem;margin-top:.4rem}
+  .btn:hover{transform:translateY(-2px);box-shadow:0 0 18px rgba(255,180,0,.4)}
+  pre{background:#080400;border-radius:1rem;padding:1rem;font-family:'JetBrains Mono',monospace;font-size:.73rem;line-height:1.7;overflow-x:auto;color:#fff3cc;border:1px solid rgba(255,180,0,.12)}
+  .kw{color:#ffb400}.fn{color:#ffdd66}.cm{color:#776622}.str{color:#80eeaa}.num{color:#ff9944}
+  canvas{border-radius:1rem;display:block}
+  .stat-row{display:flex;gap:.5rem;flex-wrap:wrap}
+  .stat-mini{flex:1;min-width:88px;background:#0c0800;border-radius:1rem;padding:.55rem;text-align:center;border:1px solid rgba(255,180,0,.12)}
+  .stat-mini .sv{font-size:1rem;font-weight:800;font-family:monospace;color:#ffb400}
+  .stat-mini .sl{font-size:.6rem;color:#776622;margin-top:.1rem}
+  table{width:100%;border-collapse:collapse;font-size:.72rem;font-family:'JetBrains Mono',monospace}
+  th{background:#160e00;color:#ffb400;padding:.4rem .5rem;text-align:right;border-bottom:1px solid rgba(255,180,0,.2)}
+  th:first-child{text-align:left}
+  td{padding:.28rem .5rem;text-align:right;border-bottom:1px solid rgba(255,180,0,.07);color:#fff3cc}
+  td:first-child{text-align:left;color:#997722}
+  .pos{color:#00ff88;font-weight:700}.neg{color:#ff5566;font-weight:700}
+  .feedback{background:#00000088;margin:0 1.8rem 1rem;padding:.85rem 1.2rem;border-radius:1.5rem;text-align:center;border-left:4px solid #ffb400;font-size:.88rem;line-height:1.55}
+  .insignia{text-align:center;background:#120a00;border-radius:2rem;margin:0 1.8rem 1.5rem;padding:1rem;border:1px dashed gold}
+  .insignia i{font-size:2.4rem;color:gold}
+  .hidden{display:none}
+  .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.4rem 2rem}
+  .nav-link{background:#1a1000;padding:.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:.5rem;font-size:.88rem;transition:.2s}
+  .nav-link:hover{transform:translateY(-2px)}
+  .nav-link.next{background:linear-gradient(95deg,#f0a500,#ff6a00);color:#1e1a0c}
+  footer{text-align:center;padding:1rem;font-size:.72rem;border-top:1px solid #120a00;color:#776622}
+  @media(max-width:860px){.hero h1{font-size:1.4rem}}
+ </style>
+ <link rel="stylesheet" href="../../assets/css/theme.css">
 </head>
 <body>
 <nav class="brand-return-nav">
-  <a href="../../index.html">&larr; Portfolio</a>
-  <a href="../../cursos/index.html">Cursos</a>
+ <a href="../../index.html">&larr; Portfolio</a>
+ <a href="../../cursos/index.html">Cursos</a>
 </nav>
 <div class="container">
-  <div class="hero">
-    <h1>🏦 DCA BOT & BACKTRADER: Acumula con Sistema</h1>
-    <p>Dollar Cost Averaging automatizado + Backtrader para testear cualquier estrategia con datos reales</p>
-    <div class="week-badge"><i class="fas fa-calendar-week"></i> Semanas 7-8: Estrategias Algorítmicas</div>
-    <div class="chips">
-      <span class="chip">DCA vs Lump Sum</span>
-      <span class="chip">Backtrader framework</span>
-      <span class="chip">Custom strategy</span>
-      <span class="chip">Analyzers integrados</span>
+ <div class="hero">
+  <h1>ðŸ¦ DCA BOT & BACKTRADER: Acumula con Sistema</h1>
+  <p>Dollar Cost Averaging automatizado + Backtrader para testear cualquier estrategia con datos reales</p>
+  <div class="week-badge"><i class="fas fa-calendar-week"></i> Semanas 7-8: Estrategias AlgorÃ­tmicas</div>
+  <div class="chips">
+   <span class="chip">DCA vs Lump Sum</span>
+   <span class="chip">Backtrader framework</span>
+   <span class="chip">Custom strategy</span>
+   <span class="chip">Analyzers integrados</span>
+  </div>
+ </div>
+
+ <div class="analogy">
+  <strong>ðŸ¦ PiÃ©nsalo asÃ­:</strong> El <strong>DCA (Dollar Cost Averaging)</strong> es como pagar la Netflix: no importa si el precio de la acciÃ³n subiÃ³ o bajÃ³ este mes â€” inviertes $100 fijos cada mes. Si el precio baja, compras mÃ¡s unidades. Si sube, compras menos. Al final, tu precio promedio es mejor que quien invirtiÃ³ todo de golpe en el momento equivocado. <strong>Backtrader</strong> es el laboratorio de estrategias mÃ¡s popular en Python: tiene feeds de datos, broker simulado, comisiones reales y mÃ¡s de 30 indicadores incorporados.
+  <div style="margin-top:.5rem;font-size:.78rem;color:#776622"><strong>ðŸ“š Fuentes:</strong> Backtrader docs: backtrader.com Â· Malkiel, B.G. (2019) â€” <em>"A Random Walk Down Wall Street"</em>. Norton. (DCA como estrategia pasiva) Â· Tharp, V. (2008) â€” <em>"Trade Your Way to Financial Freedom"</em></div>
+ </div>
+
+ <div class="tabs">
+  <div class="tab active" onclick="switchTab('dca',this)">ðŸ¦ DCA Simulator</div>
+  <div class="tab" onclick="switchTab('bt',this)">âš™ï¸ Backtrader</div>
+ </div>
+
+ <!-- DCA TAB -->
+ <div class="tab-content active" id="tab-dca">
+  <div class="two-col">
+   <div class="panel">
+    <h3><i class="fas fa-sliders-h"></i> ConfiguraciÃ³n DCA</h3>
+    <label>Activo</label>
+    <select id="dcaAsset" onchange="runDCA()">
+     <option value="btc">Bitcoin (BTC)</option>
+     <option value="eth">Ethereum (ETH)</option>
+     <option value="spy">S&P 500 (SPY)</option>
+    </select>
+    <label>PerÃ­odo total (meses)</label>
+    <div class="slider-row"><label>Meses</label><input type="range" id="dcaMonths" min="12" max="60" value="24" oninput="document.getElementById('dcaMonthsV').textContent=this.value+' meses';runDCA()"><span id="dcaMonthsV">24 meses</span></div>
+    <label>InversiÃ³n por perÃ­odo ($)</label>
+    <div class="slider-row"><label>$ / perÃ­odo</label><input type="range" id="dcaAmount" min="50" max="2000" value="500" step="50" oninput="document.getElementById('dcaAmountV').textContent='$'+this.value;runDCA()"><span id="dcaAmountV">$500</span></div>
+    <label>Frecuencia</label>
+    <select id="dcaFreq" onchange="runDCA()">
+     <option value="monthly">Mensual</option>
+     <option value="weekly">Semanal</option>
+     <option value="daily">Diaria</option>
+    </select>
+    <button class="btn" onclick="runDCA()"><i class="fas fa-play"></i> Simular DCA</button>
+   </div>
+
+   <div class="panel">
+    <h3><i class="fas fa-chart-bar"></i> Resultados DCA</h3>
+    <div class="stat-row" id="dcaStats">
+     <div class="stat-mini"><div class="sv" id="dTotal">â€”</div><div class="sl">Total invertido</div></div>
+     <div class="stat-mini"><div class="sv" id="dFinalVal">â€”</div><div class="sl">Valor final</div></div>
+     <div class="stat-mini"><div class="sv" id="dReturn">â€”</div><div class="sl">Retorno %</div></div>
+     <div class="stat-mini"><div class="sv" id="dAvgCost">â€”</div><div class="sl">Precio promedio</div></div>
+     <div class="stat-mini"><div class="sv" id="dVsLump">â€”</div><div class="sl">vs Lump Sum</div></div>
+     <div class="stat-mini"><div class="sv" id="dUnits">â€”</div><div class="sl">Unidades totales</div></div>
     </div>
+   </div>
   </div>
 
-  <div class="analogy">
-    <strong>🏦 Piénsalo así:</strong> El <strong>DCA (Dollar Cost Averaging)</strong> es como pagar la Netflix: no importa si el precio de la acción subió o bajó este mes — inviertes $100 fijos cada mes. Si el precio baja, compras más unidades. Si sube, compras menos. Al final, tu precio promedio es mejor que quien invirtió todo de golpe en el momento equivocado. <strong>Backtrader</strong> es el laboratorio de estrategias más popular en Python: tiene feeds de datos, broker simulado, comisiones reales y más de 30 indicadores incorporados.
-    <div style="margin-top:.5rem;font-size:.78rem;color:#776622"><strong>📚 Fuentes:</strong> Backtrader docs: backtrader.com · Malkiel, B.G. (2019) — <em>"A Random Walk Down Wall Street"</em>. Norton. (DCA como estrategia pasiva) · Tharp, V. (2008) — <em>"Trade Your Way to Financial Freedom"</em></div>
+  <div class="panel">
+   <h3><i class="fas fa-chart-line"></i> DCA vs Lump Sum vs HODL</h3>
+   <canvas id="dcaCanvas"></canvas>
   </div>
 
-  <div class="tabs">
-    <div class="tab active" onclick="switchTab('dca',this)">🏦 DCA Simulator</div>
-    <div class="tab" onclick="switchTab('bt',this)">⚙️ Backtrader</div>
-  </div>
-
-  <!-- DCA TAB -->
-  <div class="tab-content active" id="tab-dca">
-    <div class="two-col">
-      <div class="panel">
-        <h3><i class="fas fa-sliders-h"></i> Configuración DCA</h3>
-        <label>Activo</label>
-        <select id="dcaAsset" onchange="runDCA()">
-          <option value="btc">Bitcoin (BTC)</option>
-          <option value="eth">Ethereum (ETH)</option>
-          <option value="spy">S&P 500 (SPY)</option>
-        </select>
-        <label>Período total (meses)</label>
-        <div class="slider-row"><label>Meses</label><input type="range" id="dcaMonths" min="12" max="60" value="24" oninput="document.getElementById('dcaMonthsV').textContent=this.value+' meses';runDCA()"><span id="dcaMonthsV">24 meses</span></div>
-        <label>Inversión por período ($)</label>
-        <div class="slider-row"><label>$ / período</label><input type="range" id="dcaAmount" min="50" max="2000" value="500" step="50" oninput="document.getElementById('dcaAmountV').textContent='$'+this.value;runDCA()"><span id="dcaAmountV">$500</span></div>
-        <label>Frecuencia</label>
-        <select id="dcaFreq" onchange="runDCA()">
-          <option value="monthly">Mensual</option>
-          <option value="weekly">Semanal</option>
-          <option value="daily">Diaria</option>
-        </select>
-        <button class="btn" onclick="runDCA()"><i class="fas fa-play"></i> Simular DCA</button>
-      </div>
-
-      <div class="panel">
-        <h3><i class="fas fa-chart-bar"></i> Resultados DCA</h3>
-        <div class="stat-row" id="dcaStats">
-          <div class="stat-mini"><div class="sv" id="dTotal">—</div><div class="sl">Total invertido</div></div>
-          <div class="stat-mini"><div class="sv" id="dFinalVal">—</div><div class="sl">Valor final</div></div>
-          <div class="stat-mini"><div class="sv" id="dReturn">—</div><div class="sl">Retorno %</div></div>
-          <div class="stat-mini"><div class="sv" id="dAvgCost">—</div><div class="sl">Precio promedio</div></div>
-          <div class="stat-mini"><div class="sv" id="dVsLump">—</div><div class="sl">vs Lump Sum</div></div>
-          <div class="stat-mini"><div class="sv" id="dUnits">—</div><div class="sl">Unidades totales</div></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="panel">
-      <h3><i class="fas fa-chart-line"></i> DCA vs Lump Sum vs HODL</h3>
-      <canvas id="dcaCanvas"></canvas>
-    </div>
-
-    <div class="panel">
-      <h3><i class="fas fa-code"></i> Python — DCA Automation</h3>
-      <pre><span class="kw">import</span> schedule, time
+  <div class="panel">
+   <h3><i class="fas fa-code"></i> Python â€” DCA Automation</h3>
+   <pre><span class="kw">import</span> schedule, time
 <span class="kw">import</span> ccxt
 
 exchange = ccxt.<span class="fn">binance</span>({<span class="str">'apiKey'</span>: API_KEY, <span class="str">'secret'</span>: SECRET})
 
 <span class="kw">def</span> <span class="fn">dca_buy</span>(symbol=<span class="str">'BTC/USDT'</span>, usd_amount=<span class="num">500</span>):
-    <span class="cm"># Obtener precio actual</span>
-    ticker = exchange.<span class="fn">fetch_ticker</span>(symbol)
-    price = ticker[<span class="str">'last'</span>]
-    qty = usd_amount / price
+  <span class="cm"># Obtener precio actual</span>
+  ticker = exchange.<span class="fn">fetch_ticker</span>(symbol)
+  price = ticker[<span class="str">'last'</span>]
+  qty = usd_amount / price
 
-    <span class="cm"># Redondear al mínimo del exchange</span>
-    market = exchange.markets[symbol]
-    qty = exchange.<span class="fn">amount_to_precision</span>(symbol, qty)
+  <span class="cm"># Redondear al mÃ­nimo del exchange</span>
+  market = exchange.markets[symbol]
+  qty = exchange.<span class="fn">amount_to_precision</span>(symbol, qty)
 
-    <span class="cm"># Ejecutar orden de mercado</span>
-    order = exchange.<span class="fn">create_market_buy_order</span>(symbol, qty)
-    <span class="fn">log_trade</span>(symbol, price, qty, usd_amount)
-    <span class="fn">send_telegram</span>(f<span class="str">"✅ DCA: {qty} BTC @ ${price:,.0f}"</span>)
-    <span class="kw">return</span> order
+  <span class="cm"># Ejecutar orden de mercado</span>
+  order = exchange.<span class="fn">create_market_buy_order</span>(symbol, qty)
+  <span class="fn">log_trade</span>(symbol, price, qty, usd_amount)
+  <span class="fn">send_telegram</span>(f<span class="str">"âœ… DCA: {qty} BTC @ ${price:,.0f}"</span>)
+  <span class="kw">return</span> order
 
-<span class="cm"># Ejecutar cada primer día del mes a las 9:00 AM</span>
+<span class="cm"># Ejecutar cada primer dÃ­a del mes a las 9:00 AM</span>
 schedule.every().month.at(<span class="str">"09:00"</span>).<span class="fn">do</span>(<span class="fn">dca_buy</span>)
 
 <span class="kw">while</span> <span class="kw">True</span>:
-    schedule.<span class="fn">run_pending</span>()
-    time.<span class="fn">sleep</span>(<span class="num">60</span>)</pre>
+  schedule.<span class="fn">run_pending</span>()
+  time.<span class="fn">sleep</span>(<span class="num">60</span>)</pre>
+  </div>
+ </div>
+
+ <!-- BACKTRADER TAB -->
+ <div class="tab-content" id="tab-bt">
+  <div class="two-col">
+   <div class="panel">
+    <h3><i class="fas fa-cogs"></i> Configurar Estrategia Backtrader</h3>
+    <label>Estrategia base</label>
+    <select id="btStrat" onchange="runBT()">
+     <option value="sma">SMA Crossover (clÃ¡sico)</option>
+     <option value="rsi">RSI Oversold/Overbought</option>
+     <option value="macd">MACD Signal</option>
+     <option value="bband">Bollinger Band Squeeze</option>
+    </select>
+    <div class="slider-row"><label>Fast period</label><input type="range" id="btFast" min="5" max="25" value="10" oninput="document.getElementById('btFastV').textContent=this.value;runBT()"><span id="btFastV">10</span></div>
+    <div class="slider-row"><label>Slow period</label><input type="range" id="btSlow" min="20" max="100" value="30" oninput="document.getElementById('btSlowV').textContent=this.value;runBT()"><span id="btSlowV">30</span></div>
+    <div class="slider-row"><label>Commission (%)</label><input type="range" id="btComm" min="0.02" max="0.2" value="0.1" step="0.01" oninput="document.getElementById('btCommV').textContent=this.value+'%';runBT()"><span id="btCommV">0.1%</span></div>
+    <div class="slider-row"><label>Stake size (%)</label><input type="range" id="btStake" min="10" max="100" value="95" oninput="document.getElementById('btStakeV').textContent=this.value+'%';runBT()"><span id="btStakeV">95%</span></div>
+    <button class="btn" onclick="runBT()"><i class="fas fa-play"></i> Run Backtest</button>
+   </div>
+
+   <div class="panel">
+    <h3><i class="fas fa-tachometer-alt"></i> Resultados Backtrader</h3>
+    <div class="stat-row">
+     <div class="stat-mini"><div class="sv" id="btReturn">â€”</div><div class="sl">Total Return</div></div>
+     <div class="stat-mini"><div class="sv" id="btSharpe">â€”</div><div class="sl">Sharpe</div></div>
+     <div class="stat-mini"><div class="sv" id="btDD">â€”</div><div class="sl">Max Drawdown</div></div>
+     <div class="stat-mini"><div class="sv" id="btWR">â€”</div><div class="sl">Win Rate</div></div>
+     <div class="stat-mini"><div class="sv" id="btTrades">â€”</div><div class="sl">Trades</div></div>
+     <div class="stat-mini"><div class="sv" id="btPF">â€”</div><div class="sl">Profit Factor</div></div>
     </div>
+   </div>
   </div>
 
-  <!-- BACKTRADER TAB -->
-  <div class="tab-content" id="tab-bt">
-    <div class="two-col">
-      <div class="panel">
-        <h3><i class="fas fa-cogs"></i> Configurar Estrategia Backtrader</h3>
-        <label>Estrategia base</label>
-        <select id="btStrat" onchange="runBT()">
-          <option value="sma">SMA Crossover (clásico)</option>
-          <option value="rsi">RSI Oversold/Overbought</option>
-          <option value="macd">MACD Signal</option>
-          <option value="bband">Bollinger Band Squeeze</option>
-        </select>
-        <div class="slider-row"><label>Fast period</label><input type="range" id="btFast" min="5" max="25" value="10" oninput="document.getElementById('btFastV').textContent=this.value;runBT()"><span id="btFastV">10</span></div>
-        <div class="slider-row"><label>Slow period</label><input type="range" id="btSlow" min="20" max="100" value="30" oninput="document.getElementById('btSlowV').textContent=this.value;runBT()"><span id="btSlowV">30</span></div>
-        <div class="slider-row"><label>Commission (%)</label><input type="range" id="btComm" min="0.02" max="0.2" value="0.1" step="0.01" oninput="document.getElementById('btCommV').textContent=this.value+'%';runBT()"><span id="btCommV">0.1%</span></div>
-        <div class="slider-row"><label>Stake size (%)</label><input type="range" id="btStake" min="10" max="100" value="95" oninput="document.getElementById('btStakeV').textContent=this.value+'%';runBT()"><span id="btStakeV">95%</span></div>
-        <button class="btn" onclick="runBT()"><i class="fas fa-play"></i> Run Backtest</button>
-      </div>
-
-      <div class="panel">
-        <h3><i class="fas fa-tachometer-alt"></i> Resultados Backtrader</h3>
-        <div class="stat-row">
-          <div class="stat-mini"><div class="sv" id="btReturn">—</div><div class="sl">Total Return</div></div>
-          <div class="stat-mini"><div class="sv" id="btSharpe">—</div><div class="sl">Sharpe</div></div>
-          <div class="stat-mini"><div class="sv" id="btDD">—</div><div class="sl">Max Drawdown</div></div>
-          <div class="stat-mini"><div class="sv" id="btWR">—</div><div class="sl">Win Rate</div></div>
-          <div class="stat-mini"><div class="sv" id="btTrades">—</div><div class="sl">Trades</div></div>
-          <div class="stat-mini"><div class="sv" id="btPF">—</div><div class="sl">Profit Factor</div></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="panel">
-      <h3><i class="fas fa-chart-area"></i> Equity Curve</h3>
-      <canvas id="btCanvas"></canvas>
-    </div>
-
-    <div class="panel">
-      <h3><i class="fas fa-code"></i> Python — Backtrader Strategy</h3>
-      <pre id="btCode"></pre>
-    </div>
+  <div class="panel">
+   <h3><i class="fas fa-chart-area"></i> Equity Curve</h3>
+   <canvas id="btCanvas"></canvas>
   </div>
 
-  <div class="feedback" id="feedbackMsg">
-    🏦 El DCA funciona mejor en activos con tendencia alcista de largo plazo. Configura tu estrategia y observa cómo el precio promedio se suaviza en mercados volátiles.
+  <div class="panel">
+   <h3><i class="fas fa-code"></i> Python â€” Backtrader Strategy</h3>
+   <pre id="btCode"></pre>
   </div>
+ </div>
 
-  <div class="insignia hidden" id="insigniaArea">
-    <i class="fas fa-coins"></i>
-    <h3 style="margin:.4rem 0;color:#ffd700">🏅 ¡INSIGNIA SYSTEMATIC INVESTOR!</h3>
-    <p style="font-size:.85rem;color:#ffdd66">Dominaste DCA y Backtrader. ¡La disciplina sistemática supera la intuición!</p>
-  </div>
+ <div class="feedback" id="feedbackMsg">
+  ðŸ¦ El DCA funciona mejor en activos con tendencia alcista de largo plazo. Configura tu estrategia y observa cÃ³mo el precio promedio se suaviza en mercados volÃ¡tiles.
+ </div>
 
-  <div class="nav-links">
-    <a href="nivel3-07-arbitraje-grid.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
-    <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Menú</a>
-    <a href="nivel3-09-feature-engineering.html" class="nav-link next">Feature Engineering <i class="fas fa-arrow-right"></i></a>
-  </div>
-  <footer><i class="fas fa-crown"></i> Bot Trader Adventure · Semana 7-8 · backtrader.com · Malkiel (2019) "A Random Walk Down Wall Street"</footer>
+ <div class="insignia hidden" id="insigniaArea">
+  <i class="fas fa-coins"></i>
+  <h3 style="margin:.4rem 0;color:#ffd700">ðŸ… Â¡INSIGNIA SYSTEMATIC INVESTOR!</h3>
+  <p style="font-size:.85rem;color:#ffdd66">Dominaste DCA y Backtrader. Â¡La disciplina sistemÃ¡tica supera la intuiciÃ³n!</p>
+ </div>
+
+ <div class="nav-links">
+  <a href="nivel3-07-arbitraje-grid.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
+  <a href="index.html" class="nav-link"><i class="fas fa-home"></i> MenÃº</a>
+  <a href="nivel3-09-feature-engineering.html" class="nav-link next">Feature Engineering <i class="fas fa-arrow-right"></i></a>
+ </div>
+ <footer><i class="fas fa-crown"></i> Bot Trader Adventure Â· Semana 7-8 Â· backtrader.com Â· Malkiel (2019) "A Random Walk Down Wall Street"</footer>
 </div>
 
 <script>
@@ -230,164 +230,164 @@ const STORAGE_KEY = 'tbot_dca';
 let tabsVisited = new Set(['dca']);
 
 const BT_CODES = {
-  sma:`<span class="kw">import</span> backtrader <span class="kw">as</span> bt\n\n<span class="kw">class</span> <span class="fn">SmaCrossStrategy</span>(bt.Strategy):\n    params = ((<span class="str">'fast'</span>,<span class="num">10</span>),(<span class="str">'slow'</span>,<span class="num">30</span>),)\n\n    <span class="kw">def</span> <span class="fn">__init__</span>(self):\n        self.ma_fast = bt.indicators.<span class="fn">SMA</span>(period=self.p.fast)\n        self.ma_slow = bt.indicators.<span class="fn">SMA</span>(period=self.p.slow)\n        self.crossover = bt.indicators.<span class="fn">CrossOver</span>(self.ma_fast, self.ma_slow)\n\n    <span class="kw">def</span> <span class="fn">next</span>(self):\n        <span class="kw">if</span> self.crossover > <span class="num">0</span>: self.<span class="fn">buy</span>()\n        <span class="kw">elif</span> self.crossover < <span class="num">0</span>: self.<span class="fn">sell</span>()\n\ncerebrorun = bt.<span class="fn">Cerebro</span>()\ncerebrorun.<span class="fn">addstrategy</span>(SmaCrossStrategy)\ncerebrorun.<span class="fn">broker.setcommission</span>(commission=<span class="num">0.001</span>)\ncerebrorun.<span class="fn">broker.setcash</span>(<span class="num">10000</span>)\ncerebrorun.<span class="fn">adddata</span>(data_feed)\ncerebrorun.<span class="fn">addanalyzer</span>(bt.analyzers.SharpeRatio)\ncerebrorun.<span class="fn">addanalyzer</span>(bt.analyzers.DrawDown)\nresults = cerebrorun.<span class="fn">run</span>()`,
-  rsi:`<span class="kw">class</span> <span class="fn">RsiStrategy</span>(bt.Strategy):\n    params=((<span class="str">'rsi_period'</span>,<span class="num">14</span>),(<span class="str">'oversold'</span>,<span class="num">30</span>),(<span class="str">'overbought'</span>,<span class="num">70</span>),)\n\n    <span class="kw">def</span> <span class="fn">__init__</span>(self):\n        self.rsi = bt.indicators.<span class="fn">RSI</span>(period=self.p.rsi_period)\n\n    <span class="kw">def</span> <span class="fn">next</span>(self):\n        <span class="kw">if</span> self.rsi < self.p.oversold <span class="kw">and not</span> self.position:\n            self.<span class="fn">buy</span>()\n        <span class="kw">elif</span> self.rsi > self.p.overbought <span class="kw">and</span> self.position:\n            self.<span class="fn">sell</span>()`,
-  macd:`<span class="kw">class</span> <span class="fn">MacdStrategy</span>(bt.Strategy):\n    <span class="kw">def</span> <span class="fn">__init__</span>(self):\n        self.macd = bt.indicators.<span class="fn">MACDHisto</span>(\n            period1=<span class="num">12</span>, period2=<span class="num">26</span>, period_signal=<span class="num">9</span>)\n\n    <span class="kw">def</span> <span class="fn">next</span>(self):\n        <span class="kw">if</span> self.macd.histo[<span class="num">0</span>] > <span class="num">0</span> <span class="kw">and</span> self.macd.histo[-<span class="num">1</span>] < <span class="num">0</span>:\n            self.<span class="fn">buy</span>()  <span class="cm"># MACD crossover positivo</span>\n        <span class="kw">elif</span> self.macd.histo[<span class="num">0</span>] < <span class="num">0</span> <span class="kw">and</span> self.macd.histo[-<span class="num">1</span>] > <span class="num">0</span>:\n            self.<span class="fn">sell</span>()`,
-  bband:`<span class="kw">class</span> <span class="fn">BBandStrategy</span>(bt.Strategy):\n    <span class="kw">def</span> <span class="fn">__init__</span>(self):\n        self.bband = bt.indicators.<span class="fn">BollingerBands</span>(\n            period=<span class="num">20</span>, devfactor=<span class="num">2.0</span>)\n\n    <span class="kw">def</span> <span class="fn">next</span>(self):\n        <span class="kw">if</span> self.data < self.bband.lines.bot <span class="kw">and not</span> self.position:\n            self.<span class="fn">buy</span>()\n        <span class="kw">elif</span> self.data > self.bband.lines.top <span class="kw">and</span> self.position:\n            self.<span class="fn">sell</span>()`
+ sma:`<span class="kw">import</span> backtrader <span class="kw">as</span> bt\n\n<span class="kw">class</span> <span class="fn">SmaCrossStrategy</span>(bt.Strategy):\n  params = ((<span class="str">'fast'</span>,<span class="num">10</span>),(<span class="str">'slow'</span>,<span class="num">30</span>),)\n\n  <span class="kw">def</span> <span class="fn">__init__</span>(self):\n    self.ma_fast = bt.indicators.<span class="fn">SMA</span>(period=self.p.fast)\n    self.ma_slow = bt.indicators.<span class="fn">SMA</span>(period=self.p.slow)\n    self.crossover = bt.indicators.<span class="fn">CrossOver</span>(self.ma_fast, self.ma_slow)\n\n  <span class="kw">def</span> <span class="fn">next</span>(self):\n    <span class="kw">if</span> self.crossover > <span class="num">0</span>: self.<span class="fn">buy</span>()\n    <span class="kw">elif</span> self.crossover < <span class="num">0</span>: self.<span class="fn">sell</span>()\n\ncerebrorun = bt.<span class="fn">Cerebro</span>()\ncerebrorun.<span class="fn">addstrategy</span>(SmaCrossStrategy)\ncerebrorun.<span class="fn">broker.setcommission</span>(commission=<span class="num">0.001</span>)\ncerebrorun.<span class="fn">broker.setcash</span>(<span class="num">10000</span>)\ncerebrorun.<span class="fn">adddata</span>(data_feed)\ncerebrorun.<span class="fn">addanalyzer</span>(bt.analyzers.SharpeRatio)\ncerebrorun.<span class="fn">addanalyzer</span>(bt.analyzers.DrawDown)\nresults = cerebrorun.<span class="fn">run</span>()`,
+ rsi:`<span class="kw">class</span> <span class="fn">RsiStrategy</span>(bt.Strategy):\n  params=((<span class="str">'rsi_period'</span>,<span class="num">14</span>),(<span class="str">'oversold'</span>,<span class="num">30</span>),(<span class="str">'overbought'</span>,<span class="num">70</span>),)\n\n  <span class="kw">def</span> <span class="fn">__init__</span>(self):\n    self.rsi = bt.indicators.<span class="fn">RSI</span>(period=self.p.rsi_period)\n\n  <span class="kw">def</span> <span class="fn">next</span>(self):\n    <span class="kw">if</span> self.rsi < self.p.oversold <span class="kw">and not</span> self.position:\n      self.<span class="fn">buy</span>()\n    <span class="kw">elif</span> self.rsi > self.p.overbought <span class="kw">and</span> self.position:\n      self.<span class="fn">sell</span>()`,
+ macd:`<span class="kw">class</span> <span class="fn">MacdStrategy</span>(bt.Strategy):\n  <span class="kw">def</span> <span class="fn">__init__</span>(self):\n    self.macd = bt.indicators.<span class="fn">MACDHisto</span>(\n      period1=<span class="num">12</span>, period2=<span class="num">26</span>, period_signal=<span class="num">9</span>)\n\n  <span class="kw">def</span> <span class="fn">next</span>(self):\n    <span class="kw">if</span> self.macd.histo[<span class="num">0</span>] > <span class="num">0</span> <span class="kw">and</span> self.macd.histo[-<span class="num">1</span>] < <span class="num">0</span>:\n      self.<span class="fn">buy</span>() <span class="cm"># MACD crossover positivo</span>\n    <span class="kw">elif</span> self.macd.histo[<span class="num">0</span>] < <span class="num">0</span> <span class="kw">and</span> self.macd.histo[-<span class="num">1</span>] > <span class="num">0</span>:\n      self.<span class="fn">sell</span>()`,
+ bband:`<span class="kw">class</span> <span class="fn">BBandStrategy</span>(bt.Strategy):\n  <span class="kw">def</span> <span class="fn">__init__</span>(self):\n    self.bband = bt.indicators.<span class="fn">BollingerBands</span>(\n      period=<span class="num">20</span>, devfactor=<span class="num">2.0</span>)\n\n  <span class="kw">def</span> <span class="fn">next</span>(self):\n    <span class="kw">if</span> self.data < self.bband.lines.bot <span class="kw">and not</span> self.position:\n      self.<span class="fn">buy</span>()\n    <span class="kw">elif</span> self.data > self.bband.lines.top <span class="kw">and</span> self.position:\n      self.<span class="fn">sell</span>()`
 };
 
 function switchTab(tab,el) {
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('tab-'+tab).classList.add('active');
-  tabsVisited.add(tab);
-  if(tab==='bt') runBT();
-  checkCompletion();
+ document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+ document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+ el.classList.add('active');
+ document.getElementById('tab-'+tab).classList.add('active');
+ tabsVisited.add(tab);
+ if(tab==='bt') runBT();
+ checkCompletion();
 }
 
 // DCA Simulation
 function runDCA() {
-  const asset = document.getElementById('dcaAsset').value;
-  const months = +document.getElementById('dcaMonths').value;
-  const amount = +document.getElementById('dcaAmount').value;
-  const freq = document.getElementById('dcaFreq').value;
-  const periods = freq==='monthly'?months:freq==='weekly'?months*4:months*30;
-  const vol = asset==='btc'?0.08:asset==='eth'?0.09:0.04;
+ const asset = document.getElementById('dcaAsset').value;
+ const months = +document.getElementById('dcaMonths').value;
+ const amount = +document.getElementById('dcaAmount').value;
+ const freq = document.getElementById('dcaFreq').value;
+ const periods = freq==='monthly'?months:freq==='weekly'?months*4:months*30;
+ const vol = asset==='btc'?0.08:asset==='eth'?0.09:0.04;
 
-  let price = asset==='btc'?40000:asset==='eth'?2500:420;
-  const prices = [price];
-  for(let i=1;i<=periods;i++){
-    price*=(1+(Math.random()-.47)*vol);
-    prices.push(Math.max(price*.5,price));
-  }
+ let price = asset==='btc'?40000:asset==='eth'?2500:420;
+ const prices = [price];
+ for(let i=1;i<=periods;i++){
+  price*=(1+(Math.random()-.47)*vol);
+  prices.push(Math.max(price*.5,price));
+ }
 
-  // DCA
-  let totalInvested=0,totalUnits=0;
-  const dcaEquity=[0];
-  prices.forEach((p,i)=>{
-    if(i>0&&i%1===0){totalInvested+=amount;totalUnits+=amount/p;}
-    dcaEquity.push(totalUnits*p);
-  });
+ // DCA
+ let totalInvested=0,totalUnits=0;
+ const dcaEquity=[0];
+ prices.forEach((p,i)=>{
+  if(i>0&&i%1===0){totalInvested+=amount;totalUnits+=amount/p;}
+  dcaEquity.push(totalUnits*p);
+ });
 
-  // Lump sum
-  const lumpUnits = (amount*periods)/prices[0];
-  const lumpEquity = prices.map(p=>lumpUnits*p);
+ // Lump sum
+ const lumpUnits = (amount*periods)/prices[0];
+ const lumpEquity = prices.map(p=>lumpUnits*p);
 
-  const finalVal = totalUnits*prices[prices.length-1];
-  const ret = (finalVal-totalInvested)/totalInvested*100;
-  const avgCost = totalInvested/totalUnits;
-  const lumpFinal = lumpEquity[lumpEquity.length-1];
-  const vsLump = finalVal-lumpFinal;
+ const finalVal = totalUnits*prices[prices.length-1];
+ const ret = (finalVal-totalInvested)/totalInvested*100;
+ const avgCost = totalInvested/totalUnits;
+ const lumpFinal = lumpEquity[lumpEquity.length-1];
+ const vsLump = finalVal-lumpFinal;
 
-  document.getElementById('dTotal').textContent='$'+totalInvested.toLocaleString();
-  document.getElementById('dFinalVal').textContent='$'+Math.round(finalVal).toLocaleString();
-  document.getElementById('dReturn').textContent=(ret>=0?'+':'')+ret.toFixed(1)+'%';
-  document.getElementById('dReturn').style.color=ret>=0?'#00ff88':'#ff5566';
-  document.getElementById('dAvgCost').textContent='$'+avgCost.toFixed(0);
-  document.getElementById('dVsLump').textContent=(vsLump>=0?'+$':'-$')+Math.abs(Math.round(vsLump)).toLocaleString();
-  document.getElementById('dVsLump').style.color=vsLump>=0?'#00ff88':'#ff9966';
-  document.getElementById('dUnits').textContent=totalUnits.toFixed(4);
+ document.getElementById('dTotal').textContent='$'+totalInvested.toLocaleString();
+ document.getElementById('dFinalVal').textContent='$'+Math.round(finalVal).toLocaleString();
+ document.getElementById('dReturn').textContent=(ret>=0?'+':'')+ret.toFixed(1)+'%';
+ document.getElementById('dReturn').style.color=ret>=0?'#00ff88':'#ff5566';
+ document.getElementById('dAvgCost').textContent='$'+avgCost.toFixed(0);
+ document.getElementById('dVsLump').textContent=(vsLump>=0?'+$':'-$')+Math.abs(Math.round(vsLump)).toLocaleString();
+ document.getElementById('dVsLump').style.color=vsLump>=0?'#00ff88':'#ff9966';
+ document.getElementById('dUnits').textContent=totalUnits.toFixed(4);
 
-  // Draw
-  const canvas=document.getElementById('dcaCanvas');
-  const W=canvas.parentElement.clientWidth-30;
-  canvas.width=W;canvas.height=200;
-  const ctx=canvas.getContext('2d');
-  ctx.fillStyle='#080400';ctx.fillRect(0,0,W,200);
-  const allVals=[...dcaEquity,...lumpEquity,totalInvested];
-  const mn=0,mx=Math.max(...allVals)*1.05;
-  const xS=i=>(i/(periods))*(W-16)+8;
-  const yS=v=>188-((v-mn)/(mx-mn))*176;
+ // Draw
+ const canvas=document.getElementById('dcaCanvas');
+ const W=canvas.parentElement.clientWidth-30;
+ canvas.width=W;canvas.height=200;
+ const ctx=canvas.getContext('2d');
+ ctx.fillStyle='#080400';ctx.fillRect(0,0,W,200);
+ const allVals=[...dcaEquity,...lumpEquity,totalInvested];
+ const mn=0,mx=Math.max(...allVals)*1.05;
+ const xS=i=>(i/(periods))*(W-16)+8;
+ const yS=v=>188-((v-mn)/(mx-mn))*176;
 
-  // Total invested line
-  ctx.beginPath();ctx.strokeStyle='#ffffff22';ctx.lineWidth=1;ctx.setLineDash([3,3]);
-  const invPerPeriod=totalInvested/periods;
-  prices.forEach((_,i)=>{ctx.lineTo(xS(i),yS(invPerPeriod*(i+1)));});
-  ctx.stroke();ctx.setLineDash([]);
+ // Total invested line
+ ctx.beginPath();ctx.strokeStyle='#ffffff22';ctx.lineWidth=1;ctx.setLineDash([3,3]);
+ const invPerPeriod=totalInvested/periods;
+ prices.forEach((_,i)=>{ctx.lineTo(xS(i),yS(invPerPeriod*(i+1)));});
+ ctx.stroke();ctx.setLineDash([]);
 
-  // Lump sum
-  ctx.beginPath();ctx.strokeStyle='#999999aa';ctx.lineWidth=1.2;
-  lumpEquity.forEach((v,i)=>i===0?ctx.moveTo(xS(i),yS(v)):ctx.lineTo(xS(i),yS(v)));
-  ctx.stroke();
+ // Lump sum
+ ctx.beginPath();ctx.strokeStyle='#999999aa';ctx.lineWidth=1.2;
+ lumpEquity.forEach((v,i)=>i===0?ctx.moveTo(xS(i),yS(v)):ctx.lineTo(xS(i),yS(v)));
+ ctx.stroke();
 
-  // DCA
-  ctx.beginPath();ctx.strokeStyle='#ffb400';ctx.lineWidth=2;
-  dcaEquity.forEach((v,i)=>i===0?ctx.moveTo(xS(i),yS(v)):ctx.lineTo(xS(i),yS(v)));
-  ctx.stroke();
+ // DCA
+ ctx.beginPath();ctx.strokeStyle='#ffb400';ctx.lineWidth=2;
+ dcaEquity.forEach((v,i)=>i===0?ctx.moveTo(xS(i),yS(v)):ctx.lineTo(xS(i),yS(v)));
+ ctx.stroke();
 
-  ctx.font='10px Inter';ctx.textAlign='right';
-  ctx.fillStyle='#ffb400';ctx.fillText('DCA',W-4,yS(finalVal)+4);
-  ctx.fillStyle='#999';ctx.fillText('Lump Sum',W-4,yS(lumpFinal)+4);
+ ctx.font='10px Inter';ctx.textAlign='right';
+ ctx.fillStyle='#ffb400';ctx.fillText('DCA',W-4,yS(finalVal)+4);
+ ctx.fillStyle='#999';ctx.fillText('Lump Sum',W-4,yS(lumpFinal)+4);
 
-  document.getElementById('feedbackMsg').innerHTML=`🏦 <strong>DCA (${freq})</strong> en ${asset.toUpperCase()} — ${periods} períodos. Total invertido: $${totalInvested.toLocaleString()}, valor final: $${Math.round(finalVal).toLocaleString()}, retorno: <strong>${ret.toFixed(1)}%</strong>. ${vsLump>=0?'El DCA superó al Lump Sum':'El Lump Sum superó al DCA'} por $${Math.abs(Math.round(vsLump)).toLocaleString()}.`;
+ document.getElementById('feedbackMsg').innerHTML=`ðŸ¦ <strong>DCA (${freq})</strong> en ${asset.toUpperCase()} â€” ${periods} perÃ­odos. Total invertido: $${totalInvested.toLocaleString()}, valor final: $${Math.round(finalVal).toLocaleString()}, retorno: <strong>${ret.toFixed(1)}%</strong>. ${vsLump>=0?'El DCA superÃ³ al Lump Sum':'El Lump Sum superÃ³ al DCA'} por $${Math.abs(Math.round(vsLump)).toLocaleString()}.`;
 }
 
 // Backtrader simulation
 function runBT() {
-  const strat = document.getElementById('btStrat').value;
-  document.getElementById('btCode').innerHTML = BT_CODES[strat];
+ const strat = document.getElementById('btStrat').value;
+ document.getElementById('btCode').innerHTML = BT_CODES[strat];
 
-  const n=365;let eq=10000;const equity=[10000];
-  const wr = strat==='sma'?.48:strat==='rsi'?.54:strat==='macd'?.50:.52;
-  const rr = strat==='sma'?1.5:strat==='rsi'?1.2:strat==='macd'?1.4:1.3;
-  const freq = strat==='sma'?0.08:strat==='rsi'?0.14:strat==='macd'?0.09:0.11;
-  let trades=0,wins=0,maxEq=10000,maxDD=0,gW=0,gL=0;
+ const n=365;let eq=10000;const equity=[10000];
+ const wr = strat==='sma'?.48:strat==='rsi'?.54:strat==='macd'?.50:.52;
+ const rr = strat==='sma'?1.5:strat==='rsi'?1.2:strat==='macd'?1.4:1.3;
+ const freq = strat==='sma'?0.08:strat==='rsi'?0.14:strat==='macd'?0.09:0.11;
+ let trades=0,wins=0,maxEq=10000,maxDD=0,gW=0,gL=0;
 
-  for(let i=0;i<n;i++){
-    if(Math.random()<freq){
-      trades++;
-      const win=Math.random()<wr;
-      const chg=win?(Math.random()*.03*rr):-(Math.random()*.02);
-      eq*=(1+chg);
-      if(win){wins++;gW+=eq*Math.abs(chg);}else{gL+=eq*Math.abs(chg);}
-      if(eq>maxEq)maxEq=eq;
-      const dd=(maxEq-eq)/maxEq;
-      if(dd>maxDD)maxDD=dd;
-    } else eq*=(1+(Math.random()-.5)*0.008);
-    equity.push(eq);
-  }
+ for(let i=0;i<n;i++){
+  if(Math.random()<freq){
+   trades++;
+   const win=Math.random()<wr;
+   const chg=win?(Math.random()*.03*rr):-(Math.random()*.02);
+   eq*=(1+chg);
+   if(win){wins++;gW+=eq*Math.abs(chg);}else{gL+=eq*Math.abs(chg);}
+   if(eq>maxEq)maxEq=eq;
+   const dd=(maxEq-eq)/maxEq;
+   if(dd>maxDD)maxDD=dd;
+  } else eq*=(1+(Math.random()-.5)*0.008);
+  equity.push(eq);
+ }
 
-  const ret=(eq-10000)/10000*100;
-  const sharpe=Math.sqrt(252)*ret/n/(Math.sqrt(equity.map((v,i)=>i>0?(v-equity[i-1])/equity[i-1]:0).filter((_,i)=>i>0).reduce((a,b)=>a+b**2,0)/n)*100);
-  document.getElementById('btReturn').textContent=(ret>=0?'+':'')+ret.toFixed(1)+'%';
-  document.getElementById('btReturn').style.color=ret>=0?'#00ff88':'#ff5566';
-  document.getElementById('btSharpe').textContent=Math.abs(sharpe).toFixed(2);
-  document.getElementById('btDD').textContent=(maxDD*100).toFixed(1)+'%';
-  document.getElementById('btWR').textContent=(wins/trades*100).toFixed(0)+'%';
-  document.getElementById('btTrades').textContent=trades;
-  document.getElementById('btPF').textContent=(gL>0?gW/gL:0).toFixed(2);
+ const ret=(eq-10000)/10000*100;
+ const sharpe=Math.sqrt(252)*ret/n/(Math.sqrt(equity.map((v,i)=>i>0?(v-equity[i-1])/equity[i-1]:0).filter((_,i)=>i>0).reduce((a,b)=>a+b**2,0)/n)*100);
+ document.getElementById('btReturn').textContent=(ret>=0?'+':'')+ret.toFixed(1)+'%';
+ document.getElementById('btReturn').style.color=ret>=0?'#00ff88':'#ff5566';
+ document.getElementById('btSharpe').textContent=Math.abs(sharpe).toFixed(2);
+ document.getElementById('btDD').textContent=(maxDD*100).toFixed(1)+'%';
+ document.getElementById('btWR').textContent=(wins/trades*100).toFixed(0)+'%';
+ document.getElementById('btTrades').textContent=trades;
+ document.getElementById('btPF').textContent=(gL>0?gW/gL:0).toFixed(2);
 
-  const canvas=document.getElementById('btCanvas');
-  const W=canvas.parentElement.clientWidth-30;
-  canvas.width=W;canvas.height=180;
-  const ctx=canvas.getContext('2d');
-  ctx.fillStyle='#080400';ctx.fillRect(0,0,W,180);
-  const mn=Math.min(...equity)*.99,mx=Math.max(...equity)*1.01;
-  const xS=i=>(i/(n))*(W-16)+8;
-  const yS=v=>168-((v-mn)/(mx-mn))*156;
-  const grad=ctx.createLinearGradient(0,0,0,180);
-  grad.addColorStop(0,'rgba(255,180,0,.18)');grad.addColorStop(1,'transparent');
-  ctx.beginPath();equity.forEach((v,i)=>i===0?ctx.moveTo(xS(i),yS(v)):ctx.lineTo(xS(i),yS(v)));
-  ctx.lineTo(xS(n),180);ctx.lineTo(xS(0),180);ctx.closePath();
-  ctx.fillStyle=grad;ctx.fill();
-  ctx.beginPath();ctx.strokeStyle='#ffb400';ctx.lineWidth=1.8;
-  equity.forEach((v,i)=>i===0?ctx.moveTo(xS(i),yS(v)):ctx.lineTo(xS(i),yS(v)));ctx.stroke();
-  ctx.strokeStyle='#ffffff22';ctx.lineWidth=1;ctx.setLineDash([4,4]);
-  ctx.beginPath();ctx.moveTo(8,yS(10000));ctx.lineTo(W-8,yS(10000));ctx.stroke();ctx.setLineDash([]);
+ const canvas=document.getElementById('btCanvas');
+ const W=canvas.parentElement.clientWidth-30;
+ canvas.width=W;canvas.height=180;
+ const ctx=canvas.getContext('2d');
+ ctx.fillStyle='#080400';ctx.fillRect(0,0,W,180);
+ const mn=Math.min(...equity)*.99,mx=Math.max(...equity)*1.01;
+ const xS=i=>(i/(n))*(W-16)+8;
+ const yS=v=>168-((v-mn)/(mx-mn))*156;
+ const grad=ctx.createLinearGradient(0,0,0,180);
+ grad.addColorStop(0,'rgba(255,180,0,.18)');grad.addColorStop(1,'transparent');
+ ctx.beginPath();equity.forEach((v,i)=>i===0?ctx.moveTo(xS(i),yS(v)):ctx.lineTo(xS(i),yS(v)));
+ ctx.lineTo(xS(n),180);ctx.lineTo(xS(0),180);ctx.closePath();
+ ctx.fillStyle=grad;ctx.fill();
+ ctx.beginPath();ctx.strokeStyle='#ffb400';ctx.lineWidth=1.8;
+ equity.forEach((v,i)=>i===0?ctx.moveTo(xS(i),yS(v)):ctx.lineTo(xS(i),yS(v)));ctx.stroke();
+ ctx.strokeStyle='#ffffff22';ctx.lineWidth=1;ctx.setLineDash([4,4]);
+ ctx.beginPath();ctx.moveTo(8,yS(10000));ctx.lineTo(W-8,yS(10000));ctx.stroke();ctx.setLineDash([]);
 
-  checkCompletion();
+ checkCompletion();
 }
 
 function checkCompletion() {
-  if(tabsVisited.size>=2&&!localStorage.getItem(STORAGE_KEY)){
-    localStorage.setItem(STORAGE_KEY,'true');
-    document.getElementById('insigniaArea').classList.remove('hidden');
-  }
+ if(tabsVisited.size>=2&&!localStorage.getItem(STORAGE_KEY)){
+  localStorage.setItem(STORAGE_KEY,'true');
+  document.getElementById('insigniaArea').classList.remove('hidden');
+ }
 }
 
 runDCA();
 if(localStorage.getItem(STORAGE_KEY))document.getElementById('insigniaArea').classList.remove('hidden');
 </script>
-</body>
+ </body>
 </html>

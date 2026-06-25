@@ -1,259 +1,257 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Producción | Integración con Python</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
-    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-    .mod-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,215,0,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
-    .hero-header { background:linear-gradient(95deg,#0b1120 0%,#111a2e 100%); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #ffd700; }
-    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#ffe87c,#ffd700); -webkit-background-clip:text; background-clip:text; color:transparent; }
-    .hero-header p { font-size:1.1rem; color:#ffe87c; margin-top:0.5rem; }
-    .badge-area { display:flex; justify-content:center; gap:1rem; margin:1.2rem 0 0.5rem; flex-wrap:wrap; }
-    .chip { background:rgba(255,215,0,0.15); border:1px solid #ffd700; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
-    .progress-section { padding:1.2rem 2rem; border-bottom:1px solid #2a2a1a; }
-    .progress-bar-outer { background:#2a2a1a; border-radius:20px; height:16px; overflow:hidden; }
-    .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#ffd700,#ffaa00); border-radius:20px; transition:width 0.5s ease; }
-    .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#aa9944; }
-    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ffd700; font-size:1rem; line-height:1.6; }
-    .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #ffd700; }
-    .btn-action { background:linear-gradient(95deg,#ffd700,#ffaa00); border:none; padding:0.8rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; display:inline-flex; align-items:center; gap:0.5rem; }
-    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(255,215,0,0.5); }
-    .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
-    .section-title { font-size:1.3rem; font-weight:700; color:#ffd700; margin:1.5rem 2rem 1rem; display:flex; align-items:center; gap:0.6rem; }
-    .code-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.2rem; margin:0 2rem 1.5rem; }
-    .code-panel { background:#0d1117; border-radius:1.2rem; overflow:hidden; border:1px solid #2c3e66; }
-    .code-panel .code-header { background:#1a2332; padding:0.5rem 1rem; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #2c3e66; }
-    .code-panel .code-header span { font-weight:600; font-size:0.85rem; }
-    .code-panel pre { margin:0; padding:1rem; font-size:0.75rem; line-height:1.5; overflow-x:auto; color:#c9d1d9; font-family:'Consolas','Courier New',monospace; }
-    .config-panel { background:rgba(0,10,25,0.7); border-radius:1.5rem; margin:0 2rem 1.5rem; padding:1.2rem; border:1px solid #ffd700; }
-    .config-row { display:flex; flex-wrap:wrap; gap:1rem; align-items:center; margin:0.6rem 0; }
-    .config-row label { font-weight:600; min-width:120px; }
-    .config-row input, .config-row select { background:#1a2a4a; border:1px solid #2c3e66; padding:0.4rem 0.8rem; border-radius:0.8rem; color:#eef5ff; flex:1; min-width:150px; }
-    .config-row input:focus { outline:none; border-color:#ffd700; }
-    .sim-status { display:flex; align-items:center; gap:0.5rem; padding:0.6rem; background:#0f1a2c; border-radius:1rem; margin:0.5rem 0; }
-    .sim-status .dot { width:10px; height:10px; border-radius:50%; }
-    .dot.green { background:#00ff88; box-shadow:0 0 6px #00ff88; }
-    .dot.red { background:#ff4455; box-shadow:0 0 6px #ff4455; }
-    .dot.yellow { background:#ffd700; box-shadow:0 0 6px #ffd700; }
-    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:0 2rem 1.5rem; padding:1rem; border:1px dashed gold; }
-    .insignia i { font-size:2.5rem; color:gold; }
-    .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
-    .hidden { display:none; }
-    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
-    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
-    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(255,215,0,0.4); }
-    .nav-link.next { background:linear-gradient(95deg,#ffd700,#ffaa00); color:#1e1a0c; }
-    .nav-link.menu { background:#1a2a4a; border:1px solid #ffd700; }
-    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
-    .explorer-panel { background:rgba(0,10,25,0.7); border-radius:1.5rem; margin:0 2rem 1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
-    .explorer-tree { font-family:'Consolas',monospace; font-size:0.85rem; line-height:1.8; }
-    .explorer-tree .folder { color:#ffd700; }
-    .explorer-tree .file { color:#8899bb; margin-left:1.5rem; cursor:pointer; }
-    .explorer-tree .file:hover { color:#eef5ff; }
-    .explorer-tree .active { color:#00ff88; font-weight:600; }
-    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .code-grid { grid-template-columns:1fr; } .config-row { flex-direction:column; align-items:stretch; } }
-  </style>
-  <link rel="stylesheet" href="../../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Producción | Integración con Python</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+  @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .mod-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,215,0,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+  .hero-header { background:linear-gradient(95deg,#0b1120 0%,#111a2e 100%); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #ffd700; }
+  .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#ffe87c,#ffd700); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero-header p { font-size:1.1rem; color:#ffe87c; margin-top:0.5rem; }
+  .badge-area { display:flex; justify-content:center; gap:1rem; margin:1.2rem 0 0.5rem; flex-wrap:wrap; }
+  .chip { background:rgba(255,215,0,0.15); border:1px solid #ffd700; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+  .progress-section { padding:1.2rem 2rem; border-bottom:1px solid #2a2a1a; }
+  .progress-bar-outer { background:#2a2a1a; border-radius:20px; height:16px; overflow:hidden; }
+  .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#ffd700,#ffaa00); border-radius:20px; transition:width 0.5s ease; }
+  .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#aa9944; }
+  .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ffd700; font-size:1rem; line-height:1.6; }
+  .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #ffd700; }
+  .btn-action { background:linear-gradient(95deg,#ffd700,#ffaa00); border:none; padding:0.8rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; display:inline-flex; align-items:center; gap:0.5rem; }
+  .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(255,215,0,0.5); }
+  .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
+  .section-title { font-size:1.3rem; font-weight:700; color:#ffd700; margin:1.5rem 2rem 1rem; display:flex; align-items:center; gap:0.6rem; }
+  .code-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.2rem; margin:0 2rem 1.5rem; }
+  .code-panel { background:#0d1117; border-radius:1.2rem; overflow:hidden; border:1px solid #2c3e66; }
+  .code-panel .code-header { background:#1a2332; padding:0.5rem 1rem; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #2c3e66; }
+  .code-panel .code-header span { font-weight:600; font-size:0.85rem; }
+  .code-panel pre { margin:0; padding:1rem; font-size:0.75rem; line-height:1.5; overflow-x:auto; color:#c9d1d9; font-family:'Consolas','Courier New',monospace; }
+  .config-panel { background:rgba(0,10,25,0.7); border-radius:1.5rem; margin:0 2rem 1.5rem; padding:1.2rem; border:1px solid #ffd700; }
+  .config-row { display:flex; flex-wrap:wrap; gap:1rem; align-items:center; margin:0.6rem 0; }
+  .config-row label { font-weight:600; min-width:120px; }
+  .config-row input, .config-row select { background:#1a2a4a; border:1px solid #2c3e66; padding:0.4rem 0.8rem; border-radius:0.8rem; color:#eef5ff; flex:1; min-width:150px; }
+  .config-row input:focus { outline:none; border-color:#ffd700; }
+  .sim-status { display:flex; align-items:center; gap:0.5rem; padding:0.6rem; background:#0f1a2c; border-radius:1rem; margin:0.5rem 0; }
+  .sim-status .dot { width:10px; height:10px; border-radius:50%; }
+  .dot.green { background:#00ff88; box-shadow:0 0 6px #00ff88; }
+  .dot.red { background:#ff4455; box-shadow:0 0 6px #ff4455; }
+  .dot.yellow { background:#ffd700; box-shadow:0 0 6px #ffd700; }
+  .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:0 2rem 1.5rem; padding:1rem; border:1px dashed gold; }
+  .insignia i { font-size:2.5rem; color:gold; }
+  .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
+  .hidden { display:none; }
+  .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+  .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+  .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(255,215,0,0.4); }
+  .nav-link.next { background:linear-gradient(95deg,#ffd700,#ffaa00); color:#1e1a0c; }
+  .nav-link.menu { background:#1a2a4a; border:1px solid #ffd700; }
+  footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+  .explorer-panel { background:rgba(0,10,25,0.7); border-radius:1.5rem; margin:0 2rem 1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
+  .explorer-tree { font-family:'Consolas',monospace; font-size:0.85rem; line-height:1.8; }
+  .explorer-tree .folder { color:#ffd700; }
+  .explorer-tree .file { color:#8899bb; margin-left:1.5rem; cursor:pointer; }
+  .explorer-tree .file:hover { color:#eef5ff; }
+  .explorer-tree .active { color:#00ff88; font-weight:600; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .code-grid { grid-template-columns:1fr; } .config-row { flex-direction:column; align-items:stretch; } }
+ </style>
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
 </head>
 <body>
-  <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a><a href="../index.html">Programa MQL5</a></nav>
-  <div class="mod-container" id="app">
-    <div class="hero-header">
-      <h1>Integración con Python</h1>
-      <p>Puente entre MQL5 y el ecosistema Python</p>
-      <div class="badge-area">
-        <span class="chip"><i class="fab fa-python"></i> Python</span>
-        <span class="chip"><i class="fas fa-code"></i> Código Dual</span>
-        <span class="chip"><i class="fas fa-exchange-alt"></i> WebRequest</span>
-      </div>
-    </div>
-    <div class="progress-section">
-      <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
-      <span class="progress-text" id="progressText">Módulo 2 de 12</span>
-    </div>
-    <div class="analogy-card">
-      <strong>Piensa así:</strong> MQL5 y Python son como dos cocineros en distintas cocinas. El bridge es el mensajero que lleva ingredientes (datos) de una cocina a otra. WebRequest es el teléfono, FILE_COMMON es la bandeja de documentos compartidos, y PythonNET es tener al segundo chef trabajando dentro de tu propia cocina.
-    </div>
+ <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a><a href="../index.html">Programa MQL5</a></nav>
+ <div class="mod-container" id="app">
+  <div class="hero-header">
+   <h1>Integración con Python</h1>
+   <p>Puente entre MQL5 y el ecosistema Python</p>
+   <div class="badge-area">
+    <span class="chip"><i class="fab fa-python"></i> Python</span>
+    <span class="chip"><i class="fas fa-code"></i> Código Dual</span>
+    <span class="chip"><i class="fas fa-exchange-alt"></i> WebRequest</span>
+   </div>
+  </div>
+  <div class="progress-section">
+   <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+   <span class="progress-text" id="progressText">Módulo 2 de 12</span>
+  </div>
+  <div class="analogy-card">
+   <strong>Piensa así:</strong> MQL5 y Python son como dos cocineros en distintas cocinas. El bridge es el mensajero que lleva ingredientes (datos) de una cocina a otra. WebRequest es el teléfono, FILE_COMMON es la bandeja de documentos compartidos, y PythonNET es tener al segundo chef trabajando dentro de tu propia cocina.
+  </div>
 
-    <div class="section-title"><i class="fas fa-code-branch"></i> Código lado a lado: EA escribe, Python lee</div>
-    <div class="code-grid">
-      <div class="code-panel">
-        <div class="code-header"><span><i class="fas fa-file-code"></i> EA MQL5 (escritura)</span><span style="color:#ffd700;">Files/</span></div>
-        <pre><span style="color:#569cd6;">//+------------------------------------------------------------------+
-//| ExportTradeData.mq5                                             |
+  <div class="section-title"><i class="fas fa-code-branch"></i> Código lado a lado: EA escribe, Python lee</div>
+  <div class="code-grid">
+   <div class="code-panel">
+    <div class="code-header"><span><i class="fas fa-file-code"></i> EA MQL5 (escritura)</span><span style="color:#ffd700;">Files/</span></div>
+    <pre><span style="color:#569cd6;">//+------------------------------------------------------------------+
+//| ExportTradeData.mq5                       |
 //+------------------------------------------------------------------+
 </span><span style="color:#c9d1d9;">#property copyright "AlgoForge"
-#property version   "1.00"
+#property version  "1.00"
 input string FILE_NAME = "trade_data.csv";
 </span><span style="color:#569cd6;">void</span><span style="color:#c9d1d9;"> OnTick() {
-   </span><span style="color:#569cd6;">int</span><span style="color:#c9d1d9;"> handle = FileOpen(
-      FILE_NAME, FILE_WRITE|FILE_CSV|FILE_COMMON, ','
-   );
-   </span><span style="color:#569cd6;">if</span><span style="color:#c9d1d9;">(handle != INVALID_HANDLE) {
-      FileWrite(handle, Symbol(), TimeCurrent(),
-                Bid, Ask, PositionSelect(Symbol()));
-      FileClose(handle);
-   }
-   WebRequest("POST", "http://127.0.0.1:5000/signal",
-              "", NULL, 5000, data, 0, result, headers);
+  </span><span style="color:#569cd6;">int</span><span style="color:#c9d1d9;"> handle = FileOpen(
+   FILE_NAME, FILE_WRITE|FILE_CSV|FILE_COMMON, ','
+  );
+  </span><span style="color:#569cd6;">if</span><span style="color:#c9d1d9;">(handle != INVALID_HANDLE) {
+   FileWrite(handle, Symbol(), TimeCurrent(),
+        Bid, Ask, PositionSelect(Symbol()));
+   FileClose(handle);
+  }
+  WebRequest("POST", "http://127.0.0.1:5000/signal",
+       "", NULL, 5000, data, 0, result, headers);
 }</span></pre>
-      </div>
-      <div class="code-panel">
-        <div class="code-header"><span><i class="fab fa-python"></i> Python (lectura + API)</span><span style="color:#ffd700;">Python 3.10+</span></div>
-        <pre><span style="color:#569cd6;">import</span><span style="color:#c9d1d9;"> pandas </span><span style="color:#569cd6;">as</span><span style="color:#c9d1d9;"> pd
+   </div>
+   <div class="code-panel">
+    <div class="code-header"><span><i class="fab fa-python"></i> Python (lectura + API)</span><span style="color:#ffd700;">Python 3.10+</span></div>
+    <pre><span style="color:#569cd6;">import</span><span style="color:#c9d1d9;"> pandas </span><span style="color:#569cd6;">as</span><span style="color:#c9d1d9;"> pd
 </span><span style="color:#569cd6;">from</span><span style="color:#c9d1d9;"> flask </span><span style="color:#569cd6;">import</span><span style="color:#c9d1d9;"> Flask, request, jsonify
 
 app = Flask(__name__)
 
 </span><span style="color:#6a9955;"># Leer datos compartidos</span><span style="color:#c9d1d9;">
 df = pd.read_csv(
-   </span><span style="color:#ce9178;">"Common/trade_data.csv"</span><span style="color:#c9d1d9;">
+  </span><span style="color:#ce9178;">"Common/trade_data.csv"</span><span style="color:#c9d1d9;">
 )
 </span><span style="color:#6a9955;"># Calcular señal con ML</span><span style="color:#c9d1d9;">
 signal = predict_signal(df)
 
 </span><span style="color:#569cd6;">@app</span><span style="color:#c9d1d9;">.route(</span><span style="color:#ce9178;">"/signal"</span><span style="color:#c9d1d9;">, methods=[</span><span style="color:#ce9178;">"POST"</span><span style="color:#c9d1d9;">])
 </span><span style="color:#569cd6;">def</span><span style="color:#569cd6;"> receive_signal</span><span style="color:#c9d1d9;">():
-   data = request.json
-   decision = model.predict(data)
-   </span><span style="color:#569cd6;">return</span><span style="color:#c9d1d9;"> jsonify({</span><span style="color:#ce9178;">"action"</span><span style="color:#c9d1d9;">: decision})</span></pre>
-      </div>
-    </div>
-
-    <div class="section-title"><i class="fas fa-sliders-h"></i> WebRequest Config Panel</div>
-    <div class="config-panel">
-      <div class="config-row">
-        <label><i class="fas fa-globe"></i> URL Permitida</label>
-        <input type="text" id="webURL" value="http://127.0.0.1:5000/signal">
-      </div>
-      <div class="config-row">
-        <label><i class="fas fa-code"></i> Headers</label>
-        <input type="text" id="webHeaders" value="Content-Type: application/json">
-      </div>
-      <div class="config-row">
-        <label><i class="fas fa-hourglass"></i> Timeout (ms)</label>
-        <input type="number" id="webTimeout" value="5000" min="1000" max="30000">
-      </div>
-      <div class="config-row">
-        <label><i class="fas fa-cog"></i> Modo</label>
-        <select id="webMode">
-          <option value="POST">POST</option>
-          <option value="GET">GET</option>
-        </select>
-      </div>
-      <div style="text-align:center;margin-top:1rem;">
-        <button class="btn-action" id="testRequestBtn"><i class="fas fa-plug"></i> Probar Conexión</button>
-      </div>
-      <div id="requestResult" class="sim-status" style="margin-top:1rem;">
-        <span class="dot yellow"></span>
-        <span>Listo para conectar. Simula una petición.</span>
-      </div>
-    </div>
-
-    <div class="section-title"><i class="fas fa-folder-open"></i> FILE_COMMON Path Explorer</div>
-    <div class="explorer-panel">
-      <div class="explorer-tree">
-        <div><span class="folder">📁 Terminal Common</span></div>
-        <div><span class="folder">  📁 Files/</span></div>
-        <div><span class="file" onclick="selectFile(this)">    📄 trade_data.csv</span></div>
-        <div><span class="file" onclick="selectFile(this)">    📄 config.json</span></div>
-        <div><span class="file" onclick="selectFile(this)">    📄 signals_log.txt</span></div>
-        <div><span class="folder">  📁 Market/</span></div>
-        <div><span class="file" onclick="selectFile(this)">    📄 prices_cache.bin</span></div>
-        <div><span class="folder">  📁 Logs/</span></div>
-        <div><span class="file" onclick="selectFile(this)">    📄 ea-2026-06.log</span></div>
-      </div>
-      <div id="fileInfo" style="margin-top:0.8rem;padding:0.6rem;background:#0f1a2c;border-radius:0.8rem;font-size:0.85rem;color:#8899bb;">
-        Haz clic en un archivo para ver detalles
-      </div>
-    </div>
-
-    <div class="section-title"><i class="fas fa-check-circle"></i> Tu Progreso</div>
-    <div id="feedbackMsg" class="feedback">Prueba la conexión WebRequest y explora los archivos compartidos para completar el módulo.</div>
-    <div id="insigniaArea" class="insignia hidden">
-      <i class="fas fa-medal"></i>
-      <h3>Python Bridge Constructor</h3>
-      <p>Dominas el puente MQL5-Python. ¡Machine Learning en tu EA ya es posible!</p>
-    </div>
-    <div class="nav-links">
-      <a href="01-portal.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
-      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
-      <a href="03-calendario-eventos.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
-    </div>
-    <footer><i class="fas fa-cloud-upload-alt"></i> Curso 6: Producción y Publicación Profesional · Automatiza. Publica. Escala.</footer>
+  data = request.json
+  decision = model.predict(data)
+  </span><span style="color:#569cd6;">return</span><span style="color:#c9d1d9;"> jsonify({</span><span style="color:#ce9178;">"action"</span><span style="color:#c9d1d9;">: decision})</span></pre>
+   </div>
   </div>
 
-  <script>
-    const STORAGE_KEY = 'mql5_6_02';
-    const PROGRESS_KEY = 'mql5_6_progress';
-    let completed = false;
+  <div class="section-title"><i class="fas fa-sliders-h"></i> WebRequest Config Panel</div>
+  <div class="config-panel">
+   <div class="config-row">
+    <label><i class="fas fa-globe"></i> URL Permitida</label>
+    <input type="text" id="webURL" value="http://127.0.0.1:5000/signal">
+   </div>
+   <div class="config-row">
+    <label><i class="fas fa-code"></i> Headers</label>
+    <input type="text" id="webHeaders" value="Content-Type: application/json">
+   </div>
+   <div class="config-row">
+    <label><i class="fas fa-hourglass"></i> Timeout (ms)</label>
+    <input type="number" id="webTimeout" value="5000" min="1000" max="30000">
+   </div>
+   <div class="config-row">
+    <label><i class="fas fa-cog"></i> Modo</label>
+    <select id="webMode">
+     <option value="POST">POST</option>
+     <option value="GET">GET</option>
+    </select>
+   </div>
+   <div style="text-align:center;margin-top:1rem;">
+    <button class="btn-action" id="testRequestBtn"><i class="fas fa-plug"></i> Probar Conexión</button>
+   </div>
+   <div id="requestResult" class="sim-status" style="margin-top:1rem;">
+    <span class="dot yellow"></span>
+    <span>Listo para conectar. Simula una petición.</span>
+   </div>
+  </div>
 
-    function updateProgress() {
-      const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
-      document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
-      document.getElementById('progressText').textContent = 'M\u00f3dulo '+(p.length+1)+' de 12';
-    }
+  <div class="section-title"><i class="fas fa-folder-open"></i> FILE_COMMON Path Explorer</div>
+  <div class="explorer-panel">
+   <div class="explorer-tree">
+    <div><span class="folder">📁 Terminal Common</span></div>
+    <div><span class="folder"> 📁 Files/</span></div>
+    <div><span class="file" onclick="selectFile(this)">  📄 trade_data.csv</span></div>
+    <div><span class="file" onclick="selectFile(this)">  📄 config.json</span></div>
+    <div><span class="file" onclick="selectFile(this)">  📄 signals_log.txt</span></div>
+    <div><span class="folder"> 📁 Market/</span></div>
+    <div><span class="file" onclick="selectFile(this)">  📄 prices_cache.bin</span></div>
+    <div><span class="folder"> 📁 Logs/</span></div>
+    <div><span class="file" onclick="selectFile(this)">  📄 ea-2026-06.log</span></div>
+   </div>
+   <div id="fileInfo" style="margin-top:0.8rem;padding:0.6rem;background:#0f1a2c;border-radius:0.8rem;font-size:0.85rem;color:#8899bb;">
+    Haz clic en un archivo para ver detalles
+   </div>
+  </div>
 
-    function saveProgress() {
-      let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
-      if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
-      localStorage.setItem(STORAGE_KEY, 'true');
-    }
+  <div class="section-title"><i class="fas fa-check-circle"></i> Tu Progreso</div>
+  <div id="feedbackMsg" class="feedback">Prueba la conexión WebRequest y explora los archivos compartidos para completar el módulo.</div>
+  <div id="insigniaArea" class="insignia hidden">
+   <i class="fas fa-medal"></i>
+   <h3>Python Bridge Constructor</h3>
+   <p>Dominas el puente MQL5-Python. ¡Machine Learning en tu EA ya es posible!</p>
+  </div>
+  <div class="nav-links">
+   <a href="01-portal.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+   <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+   <a href="03-calendario-eventos.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-cloud-upload-alt"></i> Curso 6: Producción y Publicación Profesional · Automatiza. Publica. Escala.</footer>
+ </div>
 
-    function completeModule() {
-      if (completed) return;
-      completed = true;
-      document.getElementById('insigniaArea').classList.remove('hidden');
-      document.getElementById('feedbackMsg').textContent = 'Puente MQL5-Python establecido. ¡Siguiente módulo!';
-      saveProgress(); updateProgress();
-    }
+ <script>
+  const STORAGE_KEY = 'mql5_6_02';
+  const PROGRESS_KEY = 'mql5_6_progress';
+  let completed = false;
 
-    function selectFile(el) {
-      document.querySelectorAll('.explorer-tree .file').forEach(f => f.classList.remove('active'));
-      el.classList.add('active');
-      const name = el.textContent.trim().replace('📄','').trim();
-      const info = {
-        'trade_data.csv': 'Archivo CSV con datos de trades. Columnas: Symbol, Time, Bid, Ask, InPosition. Tamaño: 2.3 KB',
-        'config.json': 'Configuración JSON del bridge. Puerto 5000, endpoint /signal, timeout 5000ms. Tamaño: 0.8 KB',
-        'signals_log.txt': 'Log de señales recibidas de Python. Timestamp + acción (buy/sell/hold). Tamaño: 15.1 KB',
-        'prices_cache.bin': 'Cache binario de precios para backtesting acelerado. Tamaño: 45.6 MB',
-        'ea-2026-06.log': 'Log del EA con timestamps y errores. Tamaño: 128.4 KB'
-      };
-      document.getElementById('fileInfo').innerHTML = '<strong>' + name + '</strong><br>' + (info[name] || 'Archivo compartido en /Files/');
-      completeModule();
-    }
+  function updateProgress() {
+   const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
+   document.getElementById('progressText').textContent = 'M\u00f3dulo '+(p.length+1)+' de 12';
+  }
 
-    document.getElementById('testRequestBtn').addEventListener('click', function() {
-      const url = document.getElementById('webURL').value;
-      const el = document.getElementById('requestResult');
-      el.innerHTML = I18N.t('fb_0') + url + '...</span>';
-      setTimeout(() => {
-        el.innerHTML = '<span class="dot green"></span> <span>Respuesta 200 OK: {"action": "buy", "confidence": 0.87, "model": "xgboost_v2"}</span>';
-        completeModule();
-      }, 1500);
-    });
+  function saveProgress() {
+   let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
+   localStorage.setItem(STORAGE_KEY, 'true');
+  }
 
-    function restoreProgress() {
-      const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
-      if (p.includes(STORAGE_KEY)) {
-        completed = true;
-        document.getElementById('insigniaArea').classList.remove('hidden');
-        document.getElementById('feedbackMsg').textContent = 'Ya completaste este módulo. Continúa al siguiente.';
-      }
-    }
-    restoreProgress(); updateProgress();
-  </script>
-  <script src="../../../assets/js/cookie-consent.js"></script>
+  function completeModule() {
+   if (completed) return;
+   completed = true;
+   document.getElementById('insigniaArea').classList.remove('hidden');
+   document.getElementById('feedbackMsg').textContent = 'Puente MQL5-Python establecido. ¡Siguiente módulo!';
+   saveProgress(); updateProgress();
+  }
 
-<script>
+  function selectFile(el) {
+   document.querySelectorAll('.explorer-tree .file').forEach(f => f.classList.remove('active'));
+   el.classList.add('active');
+   const name = el.textContent.trim().replace('📄','').trim();
+   const info = {
+    'trade_data.csv': 'Archivo CSV con datos de trades. Columnas: Symbol, Time, Bid, Ask, InPosition. Tamaño: 2.3 KB',
+    'config.json': 'Configuración JSON del bridge. Puerto 5000, endpoint /signal, timeout 5000ms. Tamaño: 0.8 KB',
+    'signals_log.txt': 'Log de señales recibidas de Python. Timestamp + acción (buy/sell/hold). Tamaño: 15.1 KB',
+    'prices_cache.bin': 'Cache binario de precios para backtesting acelerado. Tamaño: 45.6 MB',
+    'ea-2026-06.log': 'Log del EA con timestamps y errores. Tamaño: 128.4 KB'
+   };
+   document.getElementById('fileInfo').innerHTML = '<strong>' + name + '</strong><br>' + (info[name] || 'Archivo compartido en /Files/');
+   completeModule();
+  }
+
+  document.getElementById('testRequestBtn').addEventListener('click', function() {
+   const url = document.getElementById('webURL').value;
+   const el = document.getElementById('requestResult');
+   el.innerHTML = I18N.t('fb_0') + url + '...</span>';
+   setTimeout(() => {
+    el.innerHTML = '<span class="dot green"></span> <span>Respuesta 200 OK: {"action": "buy", "confidence": 0.87, "model": "xgboost_v2"}</span>';
+    completeModule();
+   }, 1500);
+  });
+
+  function restoreProgress() {
+   const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   if (p.includes(STORAGE_KEY)) {
+    completed = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').textContent = 'Ya completaste este módulo. Continúa al siguiente.';
+   }
+  }
+  restoreProgress(); updateProgress();
+ </script>
+ <script>
 window.I18N_DATA={
-  'fb_0': { es: '<span class="dot yellow"></span> <span>Enviando petición a ', en: '<span class="dot yellow"></span> <span>Enviando petición a ' }
+ 'fb_0': { es: '<span class="dot yellow"></span> <span>Enviando petición a ', en: '<span class="dot yellow"></span> <span>Enviando petición a ' }
 };
 </script>
 </body>

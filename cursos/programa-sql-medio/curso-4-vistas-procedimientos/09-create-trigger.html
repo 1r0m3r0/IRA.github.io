@@ -1,158 +1,158 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>09. CREATE TRIGGER | Curso 4</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <link rel="stylesheet" href="../../../assets/css/theme.css">
-  <style>
-    :root{--c-accent:#9c64ff;--c-hue:264;--c-glow:hsla(264,90%,55%,0.15);--c-gradient:linear-gradient(135deg,#fff,#9c64ff)}
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:'Inter',sans-serif;background:#0a0e0f;color:#e8edee;min-height:100vh}
-    .tech-grid{position:fixed;inset:0;background-image:linear-gradient(rgba(255,255,255,0.02)1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.02)1px,transparent 1px);background-size:60px 60px;z-index:0;pointer-events:none}
-    .gradient-orb{position:fixed;border-radius:50%;filter:blur(120px);z-index:0;pointer-events:none}
-    .orb-1{width:600px;height:600px;background:hsla(264,70%,40%,0.12);top:-200px;right:-200px}
-    .orb-2{width:500px;height:500px;background:hsla(220,70%,40%,0.10);bottom:-150px;left:-150px}
-    .container{max-width:1000px;margin:0 auto;padding:0 20px;position:relative;z-index:1}
-    .hero{padding:130px 0 20px;text-align:center}
-    .hero h1{font-size:clamp(1.6rem,4vw,2.4rem);font-weight:800;background:var(--c-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-    .hero-emoji{font-size:2.5rem;display:block;margin-bottom:6px}
-    .hero .badge-row{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:10px}
-    .hero .badge-row span{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);padding:4px 14px;border-radius:20px;font-size:.75rem;color:#aabbcc}
-    .progress-strip{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:14px 18px;margin-bottom:24px;backdrop-filter:blur(8px)}
-    .progress-strip .row{display:flex;justify-content:space-between;align-items:center;font-size:.8rem;color:#8899aa;margin-bottom:6px}
-    .progress-strip .row .pct{color:var(--c-accent);font-weight:700}
-    .progress-strip .track{height:5px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden}
-    .progress-strip .track .fill{height:100%;background:var(--c-gradient);border-radius:3px;width:0%;transition:width .5s ease}
-    .content-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:24px;margin-bottom:20px;backdrop-filter:blur(8px)}
-    .content-card h2{font-size:1.2rem;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
-    .content-card h2 i{color:var(--c-accent)}
-    .content-card p,.content-card li{color:#ccd8e0;line-height:1.7;font-size:.95rem}
-    .content-card ul{padding-left:20px}
-    .content-card ul li{margin-bottom:6px}
-    .sql-code{background:#0a0e12;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:14px;font-family:'Courier New',monospace;font-size:.85rem;color:#b8d4f0;overflow-x:auto;margin:10px 0;white-space:pre-wrap}
-    .analogy-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-left:4px solid var(--c-accent);border-radius:12px;padding:18px;margin-bottom:20px;backdrop-filter:blur(8px)}
-    .analogy-card h3{font-size:.95rem;font-weight:700;color:var(--c-accent);margin-bottom:6px;display:flex;align-items:center;gap:8px}
-    .analogy-card p{color:#ccd8e0;font-size:.9rem;line-height:1.6}
-    .activity-area{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:24px;margin-bottom:20px;backdrop-filter:blur(8px)}
-    .activity-area h2{font-size:1.1rem;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
-    .activity-area h2 i{color:var(--c-accent)}
-    .opt-btn{background:#1e2a3e;border:none;color:#e8edee;padding:8px 18px;border-radius:20px;cursor:pointer;font-size:.85rem;font-family:'Inter',sans-serif;transition:all .2s;margin:4px}
-    .opt-btn:hover{transform:translateY(-2px);box-shadow:0 0 12px var(--c-glow)}
-    .btn-primary{background:var(--c-accent);color:#000;border:none;padding:10px 24px;border-radius:24px;font-weight:700;cursor:pointer;font-size:.9rem;font-family:'Inter',sans-serif;transition:all .2s;margin-top:10px}
-    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 4px 16px var(--c-glow)}
-    .btn-primary:disabled{opacity:.4;cursor:not-allowed}
-    .feedback{background:rgba(255,255,255,0.03);border-radius:12px;padding:14px;margin-top:12px;display:none;font-size:.9rem}
-    .feedback.success{border-left:4px solid #22c55e;display:block}
-    .feedback.error{border-left:4px solid #ef4444;display:block}
-    .badge-earned{text-align:center;background:rgba(255,215,0,0.06);border:1px dashed rgba(255,215,0,0.4);border-radius:16px;padding:20px;margin:20px 0;display:none}
-    .badge-earned.show{display:block}
-    .badge-earned .badge-icon{font-size:3rem}
-    .badge-earned h3{color:gold;font-size:1.1rem;margin:8px 0}
-    .nav-links{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:10px 0 30px}
-    .nav-link{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#e8edee;padding:10px 22px;border-radius:24px;text-decoration:none;font-size:.85rem;font-weight:600;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
-    .nav-link:hover{transform:translateY(-2px);border-color:var(--c-accent)}
-    .nav-link.next{background:var(--c-accent);color:#000}
-    footer{text-align:center;padding:24px 0;color:#556677;font-size:.8rem;border-top:1px solid rgba(255,255,255,0.06)}
-    @media(max-width:600px){.hero{padding-top:100px}.content-card,.activity-area,.analogy-card{padding:16px}}
-    input[type=text],input[type=number],select{background:#1a1e28;border:1px solid rgba(255,255,255,0.1);color:#e8edee;padding:8px 14px;border-radius:8px;font-family:'Inter',sans-serif;font-size:.9rem;margin:4px}
-    select:focus{outline:none;border-color:var(--c-accent)}
-    .result-display{background:#0a0e12;border-radius:10px;padding:12px;margin:10px 0;font-family:'Courier New',monospace;font-size:.8rem;color:#b8d4f0;white-space:pre-wrap;min-height:40px}
-  </style>
+ <meta charset="UTF-8">
+ <link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>09. CREATE TRIGGER | Curso 4</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
+ <style>
+  :root{--c-accent:#9c64ff;--c-hue:264;--c-glow:hsla(264,90%,55%,0.15);--c-gradient:linear-gradient(135deg,#fff,#9c64ff)}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:#0a0e0f;color:#e8edee;min-height:100vh}
+  .tech-grid{position:fixed;inset:0;background-image:linear-gradient(rgba(255,255,255,0.02)1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.02)1px,transparent 1px);background-size:60px 60px;z-index:0;pointer-events:none}
+  .gradient-orb{position:fixed;border-radius:50%;filter:blur(120px);z-index:0;pointer-events:none}
+  .orb-1{width:600px;height:600px;background:hsla(264,70%,40%,0.12);top:-200px;right:-200px}
+  .orb-2{width:500px;height:500px;background:hsla(220,70%,40%,0.10);bottom:-150px;left:-150px}
+  .container{max-width:1000px;margin:0 auto;padding:0 20px;position:relative;z-index:1}
+  .hero{padding:130px 0 20px;text-align:center}
+  .hero h1{font-size:clamp(1.6rem,4vw,2.4rem);font-weight:800;background:var(--c-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .hero-emoji{font-size:2.5rem;display:block;margin-bottom:6px}
+  .hero .badge-row{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:10px}
+  .hero .badge-row span{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);padding:4px 14px;border-radius:20px;font-size:.75rem;color:#aabbcc}
+  .progress-strip{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:14px 18px;margin-bottom:24px;backdrop-filter:blur(8px)}
+  .progress-strip .row{display:flex;justify-content:space-between;align-items:center;font-size:.8rem;color:#8899aa;margin-bottom:6px}
+  .progress-strip .row .pct{color:var(--c-accent);font-weight:700}
+  .progress-strip .track{height:5px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden}
+  .progress-strip .track .fill{height:100%;background:var(--c-gradient);border-radius:3px;width:0%;transition:width .5s ease}
+  .content-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:24px;margin-bottom:20px;backdrop-filter:blur(8px)}
+  .content-card h2{font-size:1.2rem;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+  .content-card h2 i{color:var(--c-accent)}
+  .content-card p,.content-card li{color:#ccd8e0;line-height:1.7;font-size:.95rem}
+  .content-card ul{padding-left:20px}
+  .content-card ul li{margin-bottom:6px}
+  .sql-code{background:#0a0e12;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:14px;font-family:'Courier New',monospace;font-size:.85rem;color:#b8d4f0;overflow-x:auto;margin:10px 0;white-space:pre-wrap}
+  .analogy-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-left:4px solid var(--c-accent);border-radius:12px;padding:18px;margin-bottom:20px;backdrop-filter:blur(8px)}
+  .analogy-card h3{font-size:.95rem;font-weight:700;color:var(--c-accent);margin-bottom:6px;display:flex;align-items:center;gap:8px}
+  .analogy-card p{color:#ccd8e0;font-size:.9rem;line-height:1.6}
+  .activity-area{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:24px;margin-bottom:20px;backdrop-filter:blur(8px)}
+  .activity-area h2{font-size:1.1rem;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+  .activity-area h2 i{color:var(--c-accent)}
+  .opt-btn{background:#1e2a3e;border:none;color:#e8edee;padding:8px 18px;border-radius:20px;cursor:pointer;font-size:.85rem;font-family:'Inter',sans-serif;transition:all .2s;margin:4px}
+  .opt-btn:hover{transform:translateY(-2px);box-shadow:0 0 12px var(--c-glow)}
+  .btn-primary{background:var(--c-accent);color:#000;border:none;padding:10px 24px;border-radius:24px;font-weight:700;cursor:pointer;font-size:.9rem;font-family:'Inter',sans-serif;transition:all .2s;margin-top:10px}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 4px 16px var(--c-glow)}
+  .btn-primary:disabled{opacity:.4;cursor:not-allowed}
+  .feedback{background:rgba(255,255,255,0.03);border-radius:12px;padding:14px;margin-top:12px;display:none;font-size:.9rem}
+  .feedback.success{border-left:4px solid #22c55e;display:block}
+  .feedback.error{border-left:4px solid #ef4444;display:block}
+  .badge-earned{text-align:center;background:rgba(255,215,0,0.06);border:1px dashed rgba(255,215,0,0.4);border-radius:16px;padding:20px;margin:20px 0;display:none}
+  .badge-earned.show{display:block}
+  .badge-earned .badge-icon{font-size:3rem}
+  .badge-earned h3{color:gold;font-size:1.1rem;margin:8px 0}
+  .nav-links{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:10px 0 30px}
+  .nav-link{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#e8edee;padding:10px 22px;border-radius:24px;text-decoration:none;font-size:.85rem;font-weight:600;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+  .nav-link:hover{transform:translateY(-2px);border-color:var(--c-accent)}
+  .nav-link.next{background:var(--c-accent);color:#000}
+  footer{text-align:center;padding:24px 0;color:#556677;font-size:.8rem;border-top:1px solid rgba(255,255,255,0.06)}
+  @media(max-width:600px){.hero{padding-top:100px}.content-card,.activity-area,.analogy-card{padding:16px}}
+  input[type=text],input[type=number],select{background:#1a1e28;border:1px solid rgba(255,255,255,0.1);color:#e8edee;padding:8px 14px;border-radius:8px;font-family:'Inter',sans-serif;font-size:.9rem;margin:4px}
+  select:focus{outline:none;border-color:var(--c-accent)}
+  .result-display{background:#0a0e12;border-radius:10px;padding:12px;margin:10px 0;font-family:'Courier New',monospace;font-size:.8rem;color:#b8d4f0;white-space:pre-wrap;min-height:40px}
+ </style>
 </head>
 <body>
-  <div class="tech-grid"></div>
-  <div class="gradient-orb orb-1"></div>
-  <div class="gradient-orb orb-2"></div>
-  <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../../index.html">Programa SQL Medio</a><a href="../index.html">Curso 4</a></nav>
-  <div class="container">
-    <div class="hero">
-      <span class="hero-emoji">⚡</span>
-      <h1>09. CREATE TRIGGER</h1>
-      <div class="badge-row">
-        <span><i class="fas fa-book"></i> Curso 4</span>
-        <span><i class="fas fa-cube"></i> Modulo 9/12</span>
-        <span><i class="fas fa-database"></i> PostgreSQL 19</span>
-      </div>
-    </div>
-    <div class="progress-strip">
-      <div class="row">
-        <span><i class="fas fa-tasks"></i> Progreso del curso</span>
-        <span class="pct" id="coursePct">0/12</span>
-      </div>
-      <div class="track"><div class="fill" id="courseBar"></div></div>
-      <div class="row" style="margin-top:8px;font-size:.75rem">
-        <span><i class="fas fa-chart-line"></i> Programa SQL Medio</span>
-        <span id="progInfo">0/72 - 0%</span>
-      </div>
-      <div class="track" style="margin-top:4px"><div class="fill" id="progBar"></div></div>
-    </div>
-    <div class="content-card">
-      <h2><i class="fas fa-graduation-cap"></i> Automatiza acciones con disparadores</h2>
-      <p>Los <strong>TRIGGERs</strong> ejecutan funciones automaticamente. Pueden ser BEFORE, AFTER o INSTEAD OF.</p><div class="sql-code">CREATE TRIGGER actualizar_timestamp
+ <div class="tech-grid"></div>
+ <div class="gradient-orb orb-1"></div>
+ <div class="gradient-orb orb-2"></div>
+ <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../../index.html">Programa SQL Medio</a><a href="../index.html">Curso 4</a></nav>
+ <div class="container">
+  <div class="hero">
+   <span class="hero-emoji">âš¡</span>
+   <h1>09. CREATE TRIGGER</h1>
+   <div class="badge-row">
+    <span><i class="fas fa-book"></i> Curso 4</span>
+    <span><i class="fas fa-cube"></i> Modulo 9/12</span>
+    <span><i class="fas fa-database"></i> PostgreSQL 19</span>
+   </div>
+  </div>
+  <div class="progress-strip">
+   <div class="row">
+    <span><i class="fas fa-tasks"></i> Progreso del curso</span>
+    <span class="pct" id="coursePct">0/12</span>
+   </div>
+   <div class="track"><div class="fill" id="courseBar"></div></div>
+   <div class="row" style="margin-top:8px;font-size:.75rem">
+    <span><i class="fas fa-chart-line"></i> Programa SQL Medio</span>
+    <span id="progInfo">0/72 - 0%</span>
+   </div>
+   <div class="track" style="margin-top:4px"><div class="fill" id="progBar"></div></div>
+  </div>
+  <div class="content-card">
+   <h2><i class="fas fa-graduation-cap"></i> Automatiza acciones con disparadores</h2>
+   <p>Los <strong>TRIGGERs</strong> ejecutan funciones automaticamente. Pueden ser BEFORE, AFTER o INSTEAD OF.</p><div class="sql-code">CREATE TRIGGER actualizar_timestamp
 BEFORE UPDATE ON empleados
 FOR EACH ROW
 EXECUTE FUNCTION set_fecha_modificacion();</div><p>FOR EACH ROW: por cada fila. FOR EACH STATEMENT: por sentencia.</p>
-    </div>
-    <div class="analogy-card">
-      <h3><i class="fas fa-lightbulb"></i> 💡 Sensor de movimiento</h3>
-      <p>Un TRIGGER se activa automaticamente ante eventos INSERT/UPDATE/DELETE. Como una luz que se enciende al entrar.</p>
-    </div>
-    <div class="activity-area">
-      <h2><i class="fas fa-gamepad"></i> 🎲 Constructor de Triggers</h2>
-      <div id="activityContainer"><p style="color:#8899aa;margin-bottom:10px">Configura cada parte del TRIGGER:</p><div style="display:flex;flex-direction:column;gap:6px"><select id="tgT" style="padding:8px;border-radius:8px;background:#1a1e28;color:#e8edee;border:1px solid rgba(255,255,255,0.1)"><option value="">Momento</option><option value="BEFORE">BEFORE</option><option value="AFTER">AFTER</option></select><select id="tgE" style="padding:8px;border-radius:8px;background:#1a1e28;color:#e8edee;border:1px solid rgba(255,255,255,0.1)"><option value="">Evento</option><option value="INSERT">INSERT</option><option value="UPDATE">UPDATE</option></select><select id="tgTbl" style="padding:8px;border-radius:8px;background:#1a1e28;color:#e8edee;border:1px solid rgba(255,255,255,0.1)"><option value="">Tabla</option><option value="pedidos">pedidos</option><option value="usuarios">usuarios</option></select><select id="tgFn" style="padding:8px;border-radius:8px;background:#1a1e28;color:#e8edee;border:1px solid rgba(255,255,255,0.1)"><option value="">Funcion</option><option value="validar_pedido()">validar_pedido()</option><option value="log_auditoria()">log_auditoria()</option></select></div><div class="result-display" id="tgResult">CREATE TRIGGER ________
+  </div>
+  <div class="analogy-card">
+   <h3><i class="fas fa-lightbulb"></i> ðŸ’¡ Sensor de movimiento</h3>
+   <p>Un TRIGGER se activa automaticamente ante eventos INSERT/UPDATE/DELETE. Como una luz que se enciende al entrar.</p>
+  </div>
+  <div class="activity-area">
+   <h2><i class="fas fa-gamepad"></i> ðŸŽ² Constructor de Triggers</h2>
+   <div id="activityContainer"><p style="color:#8899aa;margin-bottom:10px">Configura cada parte del TRIGGER:</p><div style="display:flex;flex-direction:column;gap:6px"><select id="tgT" style="padding:8px;border-radius:8px;background:#1a1e28;color:#e8edee;border:1px solid rgba(255,255,255,0.1)"><option value="">Momento</option><option value="BEFORE">BEFORE</option><option value="AFTER">AFTER</option></select><select id="tgE" style="padding:8px;border-radius:8px;background:#1a1e28;color:#e8edee;border:1px solid rgba(255,255,255,0.1)"><option value="">Evento</option><option value="INSERT">INSERT</option><option value="UPDATE">UPDATE</option></select><select id="tgTbl" style="padding:8px;border-radius:8px;background:#1a1e28;color:#e8edee;border:1px solid rgba(255,255,255,0.1)"><option value="">Tabla</option><option value="pedidos">pedidos</option><option value="usuarios">usuarios</option></select><select id="tgFn" style="padding:8px;border-radius:8px;background:#1a1e28;color:#e8edee;border:1px solid rgba(255,255,255,0.1)"><option value="">Funcion</option><option value="validar_pedido()">validar_pedido()</option><option value="log_auditoria()">log_auditoria()</option></select></div><div class="result-display" id="tgResult">CREATE TRIGGER ________
 ________ ________ ON ________
 FOR EACH ROW
 EXECUTE FUNCTION ________;</div></div>
-      <div id="feedbackArea" class="feedback"></div>
-      <button class="btn-primary" id="checkBtn">Verificar</button>
-      <div id="badgeArea" class="badge-earned">
-        <div class="badge-icon">⚡</div>
-        <h3>⚡ Arquitecto de Disparadores</h3>
-        <p style="color:#ccd8e0;font-size:.9rem">Has creado tu primer trigger</p>
-        <span style="font-family:monospace;font-size:.75rem;color:gold">c4m09</span>
-      </div>
-    </div>
-    <div class="nav-links">
-      <a href="08-security-definer-invoker.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
-      <a href="../index.html" class="nav-link"><i class="fas fa-th"></i> Menu</a>
-      <a href="__NEXT_LINK__" class="nav-link next" id="nextBtn">Siguiente <i class="fas fa-arrow-right"></i></a>
-    </div>
-    <footer><i class="fas fa-database"></i> Curso 4 - 09. CREATE TRIGGER - PostgreSQL 19</footer>
+   <div id="feedbackArea" class="feedback"></div>
+   <button class="btn-primary" id="checkBtn">Verificar</button>
+   <div id="badgeArea" class="badge-earned">
+    <div class="badge-icon">âš¡</div>
+    <h3>âš¡ Arquitecto de Disparadores</h3>
+    <p style="color:#ccd8e0;font-size:.9rem">Has creado tu primer trigger</p>
+    <span style="font-family:monospace;font-size:.75rem;color:gold">c4m09</span>
+   </div>
   </div>
-  <script>
-  (function(){
-    var P='sqlmedio',THIS_MOD=45,CSTART=37,CEND=49;
-    function u(){
-      var d=JSON.parse(localStorage.getItem(P+'_progress'))||[];
-      var cm=d.filter(function(m){return m>=CSTART&&m<CEND});
-      document.getElementById('coursePct').textContent=cm.length+'/12';
-      document.getElementById('courseBar').style.width=Math.round(cm.length/12*100)+'%';
-      var tp=Math.round(d.length/72*100);
-      document.getElementById('progInfo').textContent=d.length+'/72 - '+tp+'%';
-      document.getElementById('progBar').style.width=tp+'%';
-    }
-    u(); setInterval(u,3000);
-    var done=false;
-    var st=JSON.parse(localStorage.getItem(P+'_progress'))||[];
-    if(st.indexOf(THIS_MOD)>=0) done=true;
-    var cb=document.getElementById('checkBtn');
-    var fb=document.getElementById('feedbackArea');
-    var ba=document.getElementById('badgeArea');
-    function mc(){
-      if(done) return;
-      var d=JSON.parse(localStorage.getItem(P+'_progress'))||[];
-      if(d.indexOf(THIS_MOD)<0){d.push(THIS_MOD);localStorage.setItem(P+'_progress',JSON.stringify(d));}
-      var b=JSON.parse(localStorage.getItem(P+'_badges'))||[];
-      if(b.indexOf('c4m09')<0){b.push('c4m09');localStorage.setItem(P+'_badges',JSON.stringify(b));}
-      done=true; ba.classList.add('show'); u();
-    }
-    cb.addEventListener('click',function(){ var t=document.getElementById("tgT").value;var e=document.getElementById("tgE").value;var b=document.getElementById("tgTbl").value;var f=document.getElementById("tgFn").value;if(!t||!e||!b||!f){fb.className="feedback error";fb.innerHTML="<i class=\"fas fa-times\"></i> Completa todo";return;}document.getElementById("tgResult").innerHTML="CREATE TRIGGER trg_"+e.toLowerCase()+"_"+b+"\n"+t+" "+e+" ON "+b+"\nFOR EACH ROW\nEXECUTE FUNCTION "+f+";";fb.className="feedback success";fb.innerHTML="<i class=\"fas fa-check\"></i> Trigger creado!";mc(); });
-    if(done){ba.classList.add('show');cb.disabled=true;cb.textContent='Completado';}
-  })();
-  </script>
+  <div class="nav-links">
+   <a href="08-security-definer-invoker.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
+   <a href="../index.html" class="nav-link"><i class="fas fa-th"></i> Menu</a>
+   <a href="__NEXT_LINK__" class="nav-link next" id="nextBtn">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-database"></i> Curso 4 - 09. CREATE TRIGGER - PostgreSQL 19</footer>
+ </div>
+ <script>
+ (function(){
+  var P='sqlmedio',THIS_MOD=45,CSTART=37,CEND=49;
+  function u(){
+   var d=JSON.parse(localStorage.getItem(P+'_progress'))||[];
+   var cm=d.filter(function(m){return m>=CSTART&&m<CEND});
+   document.getElementById('coursePct').textContent=cm.length+'/12';
+   document.getElementById('courseBar').style.width=Math.round(cm.length/12*100)+'%';
+   var tp=Math.round(d.length/72*100);
+   document.getElementById('progInfo').textContent=d.length+'/72 - '+tp+'%';
+   document.getElementById('progBar').style.width=tp+'%';
+  }
+  u(); setInterval(u,3000);
+  var done=false;
+  var st=JSON.parse(localStorage.getItem(P+'_progress'))||[];
+  if(st.indexOf(THIS_MOD)>=0) done=true;
+  var cb=document.getElementById('checkBtn');
+  var fb=document.getElementById('feedbackArea');
+  var ba=document.getElementById('badgeArea');
+  function mc(){
+   if(done) return;
+   var d=JSON.parse(localStorage.getItem(P+'_progress'))||[];
+   if(d.indexOf(THIS_MOD)<0){d.push(THIS_MOD);localStorage.setItem(P+'_progress',JSON.stringify(d));}
+   var b=JSON.parse(localStorage.getItem(P+'_badges'))||[];
+   if(b.indexOf('c4m09')<0){b.push('c4m09');localStorage.setItem(P+'_badges',JSON.stringify(b));}
+   done=true; ba.classList.add('show'); u();
+  }
+  cb.addEventListener('click',function(){ var t=document.getElementById("tgT").value;var e=document.getElementById("tgE").value;var b=document.getElementById("tgTbl").value;var f=document.getElementById("tgFn").value;if(!t||!e||!b||!f){fb.className="feedback error";fb.innerHTML="<i class=\"fas fa-times\"></i> Completa todo";return;}document.getElementById("tgResult").innerHTML="CREATE TRIGGER trg_"+e.toLowerCase()+"_"+b+"\n"+t+" "+e+" ON "+b+"\nFOR EACH ROW\nEXECUTE FUNCTION "+f+";";fb.className="feedback success";fb.innerHTML="<i class=\"fas fa-check\"></i> Trigger creado!";mc(); });
+  if(done){ba.classList.add('show');cb.disabled=true;cb.textContent='Completado';}
+ })();
+ </script>
 <script src="../../../assets/js/i18n.js"></script>  </body>
 </html>

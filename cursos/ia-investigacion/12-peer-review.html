@@ -1,435 +1,435 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🔬 Peer Review y Rebuttal con IA · Curso IA en Investigación</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Inter', sans-serif; min-height: 100vh; background: #0a0a0f; color: #e0e0e0; line-height: 1.6; display: flex; flex-direction: column; align-items: center; position: relative; overflow-x: hidden; }
-    .animated-bg { position: fixed; inset: 0; z-index: 0; background: linear-gradient(135deg, #0a0a1a 0%, #0d0d24 25%, #0a0a1a 50%, #0d0d24 75%, #0a0a1a 100%); background-size: 400% 400%; animation: gradShift 18s ease infinite; }
-    @keyframes gradShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-    .bg-orbs { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
-    .bg-orbs span { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.15; animation: orbFloat 20s infinite alternate ease-in-out; }
-    .bg-orbs span:nth-child(1) { width: 500px; height: 500px; background: #ff5050; top: -10%; left: -10%; animation-duration: 25s; }
-    .bg-orbs span:nth-child(2) { width: 400px; height: 400px; background: #7b2ff7; bottom: -10%; right: -10%; animation-duration: 20s; animation-delay: -5s; }
-    .bg-orbs span:nth-child(3) { width: 300px; height: 300px; background: #ff5050; top: 50%; left: 50%; transform: translate(-50%, -50%); animation-duration: 22s; animation-delay: -10s; }
-    @keyframes orbFloat { 0% { transform: translate(0, 0) scale(1); } 33% { transform: translate(60px, -40px) scale(1.1); } 66% { transform: translate(-30px, 60px) scale(0.9); } 100% { transform: translate(40px, -20px) scale(1.05); } }
-    .container { position: relative; z-index: 1; width: 100%; max-width: 880px; padding: 20px; margin: 0 auto; }
-    .glass { background: rgba(255,255,255,0.04); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1px solid rgba(255,255,255,0.07); border-radius: 24px; padding: 32px; margin-bottom: 24px; box-shadow: 0 8px 40px rgba(0,0,0,0.4); }
-    .brand-return-nav { background: rgba(0,0,0,0.6); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.06); padding: 10px 24px; display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; font-size: 0.85rem; position: sticky; top: 0; z-index: 100; }
-    .brand-return-nav a { color: #888; text-decoration: none; transition: color 0.2s; display: flex; align-items: center; gap: 6px; }
-    .brand-return-nav a:hover { color: #ff5050; }
-    .brand-return-nav a i { font-size: 0.75rem; }
-    .hero { text-align: center; padding: 40px 20px 30px; }
-    .hero h1 { font-size: clamp(1.8rem,5vw,2.8rem); font-weight: 800; background: linear-gradient(135deg,#ff5050,#7b2ff7,#ff5050); background-size: 200% 200%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: gradShift 6s ease infinite; margin-bottom: 8px; line-height: 1.2; }
-    .hero .subtitle { font-size: clamp(1rem,2vw,1.2rem); color: #aaa; font-weight: 400; }
-    .section-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 18px; display: flex; align-items: center; gap: 10px; }
-    .section-title i { color: #ff5050; }
-    .analogy-card { background: rgba(255,80,80,0.05); border-left: 8px solid #ff5050; border-radius: 14px; padding: 22px 26px; margin-bottom: 28px; }
-    .analogy-card p { font-size: 0.98rem; color: #ccc; line-height: 1.7; }
-    .analogy-card i { color: #ff5050; margin-right: 8px; }
-    .feedback-area { background: rgba(255,80,80,0.03); border: 1px solid rgba(255,80,80,0.15); border-radius: 14px; padding: 18px 22px; margin: 20px 0; font-size: 0.92rem; min-height: 50px; color: #b0b0b0; }
-    .feedback-area.success { border-color: #00e88f; color: #8fecb5; background: rgba(0,232,143,0.06); }
-    .feedback-area.error { border-color: #ff5050; color: #ff9090; background: rgba(255,80,80,0.06); }
-    .insignia { display: none; border: 2px dashed #ffd700; border-radius: 16px; padding: 18px 24px; text-align: center; font-size: 1.2rem; font-weight: 700; color: #ffd700; background: rgba(255,215,0,0.06); margin-bottom: 24px; animation: fadeIn 0.6s ease; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 22px; border: none; border-radius: 10px; font-family: 'Inter', sans-serif; font-size: 0.92rem; font-weight: 600; cursor: pointer; transition: all 0.25s; text-decoration: none; }
-    .btn-primary { background: linear-gradient(135deg,#ff5050,#cc3030); color: #fff; }
-    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(255,80,80,0.3); }
-    .btn-secondary { background: rgba(255,255,255,0.07); color: #ccc; border: 1px solid rgba(255,255,255,0.1); }
-    .btn-secondary:hover { background: rgba(255,255,255,0.12); }
-    .btn-success { background: linear-gradient(135deg,#00e88f,#00b86e); color: #fff; }
-    .btn-success:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,232,143,0.3); }
-    .progress-section { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
-    .progress-bar-outer { flex: 1; height: 8px; background: rgba(255,255,255,0.08); border-radius: 100px; overflow: hidden; }
-    .progress-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg,#ff5050,#7b2ff7); border-radius: 100px; transition: width 0.6s ease; }
-    .progress-text { font-size: 0.82rem; color: #888; white-space: nowrap; }
-    .nav-links { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin: 28px 0 10px; }
-    .nav-links a { display: inline-flex; align-items: center; gap: 8px; padding: 10px 22px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); border-radius: 100px; color: #ccc; text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: all 0.25s; }
-    .nav-links a:hover { background: rgba(255,80,80,0.12); border-color: #ff5050; color: #fff; transform: translateY(-2px); }
-    .nav-links a i { font-size: 0.8rem; }
-    footer { text-align: center; color: #555; font-size: 0.78rem; padding: 22px 0 30px; border-top: 1px solid rgba(255,255,255,0.04); margin-top: 20px; }
-    footer a { color: #ff5050; text-decoration: none; }
-    footer a:hover { text-decoration: underline; }
-    .badge { display: inline-block; padding: 3px 10px; border-radius: 100px; font-size: 0.72rem; font-weight: 600; }
-    .badge-red { background: rgba(255,80,80,0.12); color: #ff5050; }
-    .badge-green { background: rgba(0,232,143,0.12); color: #00e88f; }
-    .badge-yellow { background: rgba(255,215,0,0.12); color: #ffd700; }
-    .review-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 18px 20px; margin-bottom: 14px; }
-    .review-card .comment { color: #ccc; font-size: 0.92rem; margin-bottom: 10px; }
-    .review-card .meta { display: flex; gap: 10px; flex-wrap: wrap; font-size: 0.8rem; color: #888; }
-    .review-card .meta .tag { padding: 2px 8px; border-radius: 6px; font-size: 0.7rem; }
-    .text-input { width: 100%; padding: 12px 16px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: #e0e0e0; font-family: 'Inter', sans-serif; font-size: 0.92rem; outline: none; transition: border-color 0.2s; }
-    .text-input:focus { border-color: #ff5050; }
-    textarea.text-input { min-height: 80px; resize: vertical; }
-    .mt-12 { margin-top: 12px; }
-    .mt-18 { margin-top: 18px; }
-    .mb-12 { margin-bottom: 12px; }
-    .flex-between { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-    .text-center { text-align: center; }
-    .hidden { display: none !important; }
-    .reviewer-tab { display: inline-flex; align-items: center; gap: 6px; padding: 8px 18px; border-radius: 100px; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); }
-    .reviewer-tab.active { background: rgba(255,80,80,0.1); border-color: #ff5050; color: #ff9090; }
-    .reviewer-tab:hover { background: rgba(255,80,80,0.06); }
-    .quiz-option { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px 16px; cursor: pointer; transition: all 0.25s; font-size: 0.9rem; }
-    .quiz-option:hover { border-color: #ff5050; background: rgba(255,80,80,0.05); }
-    .quiz-option.correct { border-color: #00e88f; background: rgba(0,232,143,0.08); color: #8fecb5; }
-    .quiz-option.wrong { border-color: #ff5050; background: rgba(255,80,80,0.08); color: #ff9090; }
-    .score-bar { display: flex; gap: 4px; margin: 8px 0; }
-    .score-bar span { width: 24px; height: 8px; border-radius: 4px; background: rgba(255,255,255,0.06); }
-    .score-bar span.filled { background: #ff5050; }
-    .score-bar span.filled.good { background: #00e88f; }
-    @media(max-width:640px) { .glass { padding: 20px; } .nav-links a { padding: 8px 16px; font-size: 0.82rem; } }
-  </style>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>ðŸ”¬ Peer Review y Rebuttal con IA Â· Curso IA en InvestigaciÃ³n</title>
+ <link rel="preconnect" href="https://fonts.googleapis.com">
+ <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; min-height: 100vh; background: #0a0a0f; color: #e0e0e0; line-height: 1.6; display: flex; flex-direction: column; align-items: center; position: relative; overflow-x: hidden; }
+  .animated-bg { position: fixed; inset: 0; z-index: 0; background: linear-gradient(135deg, #0a0a1a 0%, #0d0d24 25%, #0a0a1a 50%, #0d0d24 75%, #0a0a1a 100%); background-size: 400% 400%; animation: gradShift 18s ease infinite; }
+  @keyframes gradShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+  .bg-orbs { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+  .bg-orbs span { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.15; animation: orbFloat 20s infinite alternate ease-in-out; }
+  .bg-orbs span:nth-child(1) { width: 500px; height: 500px; background: #ff5050; top: -10%; left: -10%; animation-duration: 25s; }
+  .bg-orbs span:nth-child(2) { width: 400px; height: 400px; background: #7b2ff7; bottom: -10%; right: -10%; animation-duration: 20s; animation-delay: -5s; }
+  .bg-orbs span:nth-child(3) { width: 300px; height: 300px; background: #ff5050; top: 50%; left: 50%; transform: translate(-50%, -50%); animation-duration: 22s; animation-delay: -10s; }
+  @keyframes orbFloat { 0% { transform: translate(0, 0) scale(1); } 33% { transform: translate(60px, -40px) scale(1.1); } 66% { transform: translate(-30px, 60px) scale(0.9); } 100% { transform: translate(40px, -20px) scale(1.05); } }
+  .container { position: relative; z-index: 1; width: 100%; max-width: 880px; padding: 20px; margin: 0 auto; }
+  .glass { background: rgba(255,255,255,0.04); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1px solid rgba(255,255,255,0.07); border-radius: 24px; padding: 32px; margin-bottom: 24px; box-shadow: 0 8px 40px rgba(0,0,0,0.4); }
+  .brand-return-nav { background: rgba(0,0,0,0.6); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.06); padding: 10px 24px; display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; font-size: 0.85rem; position: sticky; top: 0; z-index: 100; }
+  .brand-return-nav a { color: #888; text-decoration: none; transition: color 0.2s; display: flex; align-items: center; gap: 6px; }
+  .brand-return-nav a:hover { color: #ff5050; }
+  .brand-return-nav a i { font-size: 0.75rem; }
+  .hero { text-align: center; padding: 40px 20px 30px; }
+  .hero h1 { font-size: clamp(1.8rem,5vw,2.8rem); font-weight: 800; background: linear-gradient(135deg,#ff5050,#7b2ff7,#ff5050); background-size: 200% 200%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: gradShift 6s ease infinite; margin-bottom: 8px; line-height: 1.2; }
+  .hero .subtitle { font-size: clamp(1rem,2vw,1.2rem); color: #aaa; font-weight: 400; }
+  .section-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 18px; display: flex; align-items: center; gap: 10px; }
+  .section-title i { color: #ff5050; }
+  .analogy-card { background: rgba(255,80,80,0.05); border-left: 8px solid #ff5050; border-radius: 14px; padding: 22px 26px; margin-bottom: 28px; }
+  .analogy-card p { font-size: 0.98rem; color: #ccc; line-height: 1.7; }
+  .analogy-card i { color: #ff5050; margin-right: 8px; }
+  .feedback-area { background: rgba(255,80,80,0.03); border: 1px solid rgba(255,80,80,0.15); border-radius: 14px; padding: 18px 22px; margin: 20px 0; font-size: 0.92rem; min-height: 50px; color: #b0b0b0; }
+  .feedback-area.success { border-color: #00e88f; color: #8fecb5; background: rgba(0,232,143,0.06); }
+  .feedback-area.error { border-color: #ff5050; color: #ff9090; background: rgba(255,80,80,0.06); }
+  .insignia { display: none; border: 2px dashed #ffd700; border-radius: 16px; padding: 18px 24px; text-align: center; font-size: 1.2rem; font-weight: 700; color: #ffd700; background: rgba(255,215,0,0.06); margin-bottom: 24px; animation: fadeIn 0.6s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 22px; border: none; border-radius: 10px; font-family: 'Inter', sans-serif; font-size: 0.92rem; font-weight: 600; cursor: pointer; transition: all 0.25s; text-decoration: none; }
+  .btn-primary { background: linear-gradient(135deg,#ff5050,#cc3030); color: #fff; }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(255,80,80,0.3); }
+  .btn-secondary { background: rgba(255,255,255,0.07); color: #ccc; border: 1px solid rgba(255,255,255,0.1); }
+  .btn-secondary:hover { background: rgba(255,255,255,0.12); }
+  .btn-success { background: linear-gradient(135deg,#00e88f,#00b86e); color: #fff; }
+  .btn-success:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,232,143,0.3); }
+  .progress-section { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+  .progress-bar-outer { flex: 1; height: 8px; background: rgba(255,255,255,0.08); border-radius: 100px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg,#ff5050,#7b2ff7); border-radius: 100px; transition: width 0.6s ease; }
+  .progress-text { font-size: 0.82rem; color: #888; white-space: nowrap; }
+  .nav-links { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin: 28px 0 10px; }
+  .nav-links a { display: inline-flex; align-items: center; gap: 8px; padding: 10px 22px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); border-radius: 100px; color: #ccc; text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: all 0.25s; }
+  .nav-links a:hover { background: rgba(255,80,80,0.12); border-color: #ff5050; color: #fff; transform: translateY(-2px); }
+  .nav-links a i { font-size: 0.8rem; }
+  footer { text-align: center; color: #555; font-size: 0.78rem; padding: 22px 0 30px; border-top: 1px solid rgba(255,255,255,0.04); margin-top: 20px; }
+  footer a { color: #ff5050; text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 100px; font-size: 0.72rem; font-weight: 600; }
+  .badge-red { background: rgba(255,80,80,0.12); color: #ff5050; }
+  .badge-green { background: rgba(0,232,143,0.12); color: #00e88f; }
+  .badge-yellow { background: rgba(255,215,0,0.12); color: #ffd700; }
+  .review-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 18px 20px; margin-bottom: 14px; }
+  .review-card .comment { color: #ccc; font-size: 0.92rem; margin-bottom: 10px; }
+  .review-card .meta { display: flex; gap: 10px; flex-wrap: wrap; font-size: 0.8rem; color: #888; }
+  .review-card .meta .tag { padding: 2px 8px; border-radius: 6px; font-size: 0.7rem; }
+  .text-input { width: 100%; padding: 12px 16px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: #e0e0e0; font-family: 'Inter', sans-serif; font-size: 0.92rem; outline: none; transition: border-color 0.2s; }
+  .text-input:focus { border-color: #ff5050; }
+  textarea.text-input { min-height: 80px; resize: vertical; }
+  .mt-12 { margin-top: 12px; }
+  .mt-18 { margin-top: 18px; }
+  .mb-12 { margin-bottom: 12px; }
+  .flex-between { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+  .text-center { text-align: center; }
+  .hidden { display: none !important; }
+  .reviewer-tab { display: inline-flex; align-items: center; gap: 6px; padding: 8px 18px; border-radius: 100px; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); }
+  .reviewer-tab.active { background: rgba(255,80,80,0.1); border-color: #ff5050; color: #ff9090; }
+  .reviewer-tab:hover { background: rgba(255,80,80,0.06); }
+  .quiz-option { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px 16px; cursor: pointer; transition: all 0.25s; font-size: 0.9rem; }
+  .quiz-option:hover { border-color: #ff5050; background: rgba(255,80,80,0.05); }
+  .quiz-option.correct { border-color: #00e88f; background: rgba(0,232,143,0.08); color: #8fecb5; }
+  .quiz-option.wrong { border-color: #ff5050; background: rgba(255,80,80,0.08); color: #ff9090; }
+  .score-bar { display: flex; gap: 4px; margin: 8px 0; }
+  .score-bar span { width: 24px; height: 8px; border-radius: 4px; background: rgba(255,255,255,0.06); }
+  .score-bar span.filled { background: #ff5050; }
+  .score-bar span.filled.good { background: #00e88f; }
+  @media(max-width:640px) { .glass { padding: 20px; } .nav-links a { padding: 8px 16px; font-size: 0.82rem; } }
+ </style>
 </head>
 <body>
 <div class="animated-bg"></div>
 <div class="bg-orbs"><span></span><span></span><span></span></div>
 
 <nav class="brand-return-nav">
-  <a href="../../index.html"><i class="fas fa-home"></i> Portfolio</a>
-  <a href="../../cursos/index.html"><i class="fas fa-graduation-cap"></i> Cursos</a>
+ <a href="../../index.html"><i class="fas fa-home"></i> Portfolio</a>
+ <a href="../../cursos/index.html"><i class="fas fa-graduation-cap"></i> Cursos</a>
 </nav>
 
 <div class="container">
-  <div class="glass hero">
-    <h1>🔬 Peer Review y Rebuttal con IA</h1>
-    <p class="subtitle">"Prepara tu paper para los revisores más exigentes"</p>
+ <div class="glass hero">
+  <h1>ðŸ”¬ Peer Review y Rebuttal con IA</h1>
+  <p class="subtitle">"Prepara tu paper para los revisores mÃ¡s exigentes"</p>
+ </div>
+
+ <div class="progress-section glass" style="padding:14px 20px;">
+  <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+  <span class="progress-text" id="progressText">MÃ³dulo 12 de 25</span>
+ </div>
+
+ <div id="insignia" class="insignia">ðŸ… Revisor Ã‰tico ðŸ…</div>
+
+ <div class="glass">
+  <div class="analogy-card">
+   <i class="fas fa-lightbulb"></i>
+   <p>La IA para peer review es como tener un sparring de boxeo antes de la pelea real: identificas tus puntos dÃ©biles, practicas tus respuestas y llegas preparado al ring de la revisiÃ³n por pares.</p>
   </div>
+ </div>
 
-  <div class="progress-section glass" style="padding:14px 20px;">
-    <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
-    <span class="progress-text" id="progressText">Módulo 12 de 25</span>
+ <div class="glass" id="stepPaper">
+  <div class="section-title"><i class="fas fa-file-alt"></i> 1. Manuscrito para RevisiÃ³n</div>
+  <div class="review-card">
+   <div style="font-weight:700;color:#ff9090;margin-bottom:4px;">Abstract</div>
+   <p style="color:#bbb;font-size:0.9rem;">We investigated the effect of Machine Learning-driven personalized learning paths on student performance in online STEM courses. A randomized controlled trial (n=342) compared AI-personalized vs. traditional fixed curriculum over one semester. Results show a 23% improvement in final grades (p<0.01) and 18% higher retention. However, effect size varied significantly by prior GPA (Î·Â²=0.12). We discuss implications for adaptive learning platforms.</p>
   </div>
-
-  <div id="insignia" class="insignia">🏅 Revisor Ético 🏅</div>
-
-  <div class="glass">
-    <div class="analogy-card">
-      <i class="fas fa-lightbulb"></i>
-      <p>La IA para peer review es como tener un sparring de boxeo antes de la pelea real: identificas tus puntos débiles, practicas tus respuestas y llegas preparado al ring de la revisión por pares.</p>
-    </div>
+  <div class="review-card">
+   <div style="font-weight:700;color:#ff9090;margin-bottom:4px;">Methodology</div>
+   <p style="color:#bbb;font-size:0.9rem;">Participants were randomly assigned to control (n=171) and experimental (n=171) groups. The AI system used a deep reinforcement learning model to adapt content difficulty. Learning outcomes were measured through standardized tests. Data was analyzed using mixed-effects models controlling for demographics, prior GPA, and course discipline.</p>
   </div>
+ </div>
 
-  <div class="glass" id="stepPaper">
-    <div class="section-title"><i class="fas fa-file-alt"></i> 1. Manuscrito para Revisión</div>
-    <div class="review-card">
-      <div style="font-weight:700;color:#ff9090;margin-bottom:4px;">Abstract</div>
-      <p style="color:#bbb;font-size:0.9rem;">We investigated the effect of Machine Learning-driven personalized learning paths on student performance in online STEM courses. A randomized controlled trial (n=342) compared AI-personalized vs. traditional fixed curriculum over one semester. Results show a 23% improvement in final grades (p<0.01) and 18% higher retention. However, effect size varied significantly by prior GPA (η²=0.12). We discuss implications for adaptive learning platforms.</p>
-    </div>
-    <div class="review-card">
-      <div style="font-weight:700;color:#ff9090;margin-bottom:4px;">Methodology</div>
-      <p style="color:#bbb;font-size:0.9rem;">Participants were randomly assigned to control (n=171) and experimental (n=171) groups. The AI system used a deep reinforcement learning model to adapt content difficulty. Learning outcomes were measured through standardized tests. Data was analyzed using mixed-effects models controlling for demographics, prior GPA, and course discipline.</p>
-    </div>
+ <div class="glass" id="stepReviewGen">
+  <div class="section-title"><i class="fas fa-robot"></i> 2. Revisor IA</div>
+  <button class="btn btn-primary mb-12" id="genReviewBtn"><i class="fas fa-wand-magic-sparkles"></i> Generar Review</button>
+  <div id="reviewComments" class="hidden"></div>
+  <div id="responseSection" class="hidden mt-12">
+   <p style="color:#999;font-size:0.9rem;margin-bottom:10px;">Responde a cada comentario del revisor:</p>
+   <div id="responseFields"></div>
+   <button class="btn btn-success mt-12" id="submitResponses"><i class="fas fa-check"></i> Enviar Respuestas</button>
+   <div id="responseScore" class="hidden mt-12 feedback-area success"></div>
   </div>
+ </div>
 
-  <div class="glass" id="stepReviewGen">
-    <div class="section-title"><i class="fas fa-robot"></i> 2. Revisor IA</div>
-    <button class="btn btn-primary mb-12" id="genReviewBtn"><i class="fas fa-wand-magic-sparkles"></i> Generar Review</button>
-    <div id="reviewComments" class="hidden"></div>
-    <div id="responseSection" class="hidden mt-12">
-      <p style="color:#999;font-size:0.9rem;margin-bottom:10px;">Responde a cada comentario del revisor:</p>
-      <div id="responseFields"></div>
-      <button class="btn btn-success mt-12" id="submitResponses"><i class="fas fa-check"></i> Enviar Respuestas</button>
-      <div id="responseScore" class="hidden mt-12 feedback-area success"></div>
-    </div>
+ <div class="glass hidden" id="stepAdversarial">
+  <div class="section-title"><i class="fas fa-users"></i> 3. RevisiÃ³n Adversarial</div>
+  <p style="color:#999;font-size:0.9rem;margin-bottom:12px;">Dos revisores con perspectivas diferentes evalÃºan tu manuscrito:</p>
+  <div style="display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap;">
+   <span class="reviewer-tab active" id="rev1Tab"><i class="fas fa-user"></i> Revisor 1 - MetodolÃ³gico</span>
+   <span class="reviewer-tab" id="rev2Tab"><i class="fas fa-user"></i> Revisor 2 - EstadÃ­stico</span>
   </div>
-
-  <div class="glass hidden" id="stepAdversarial">
-    <div class="section-title"><i class="fas fa-users"></i> 3. Revisión Adversarial</div>
-    <p style="color:#999;font-size:0.9rem;margin-bottom:12px;">Dos revisores con perspectivas diferentes evalúan tu manuscrito:</p>
-    <div style="display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap;">
-      <span class="reviewer-tab active" id="rev1Tab"><i class="fas fa-user"></i> Revisor 1 - Metodológico</span>
-      <span class="reviewer-tab" id="rev2Tab"><i class="fas fa-user"></i> Revisor 2 - Estadístico</span>
-    </div>
-    <div id="adversarialContent">
-      <div class="review-card" id="rev1Content">
-        <div class="comment">"The sample size appears adequate, but I have concerns about the randomization procedure. How was allocation concealment ensured? Additionally, the 23% improvement may be inflated due to regression to the mean."</div>
-        <div class="meta"><span class="tag badge-yellow">Clarity: 8/10</span><span class="tag badge-red">Severity: Major</span></div>
-      </div>
-      <div class="review-card hidden" id="rev2Content">
-        <div class="comment">"The mixed-effects model selection is appropriate, but I noticed the authors didn't report effect sizes for all covariates. Also, the η²=0.12 for prior GPA suggests a meaningful interaction that deserves deeper exploration."</div>
-        <div class="meta"><span class="tag badge-yellow">Clarity: 9/10</span><span class="tag badge-red">Severity: Minor</span></div>
-      </div>
-    </div>
-    <button class="btn btn-secondary mt-12" id="adversarialDone"><i class="fas fa-check"></i> Revisión Completa</button>
+  <div id="adversarialContent">
+   <div class="review-card" id="rev1Content">
+    <div class="comment">"The sample size appears adequate, but I have concerns about the randomization procedure. How was allocation concealment ensured? Additionally, the 23% improvement may be inflated due to regression to the mean."</div>
+    <div class="meta"><span class="tag badge-yellow">Clarity: 8/10</span><span class="tag badge-red">Severity: Major</span></div>
+   </div>
+   <div class="review-card hidden" id="rev2Content">
+    <div class="comment">"The mixed-effects model selection is appropriate, but I noticed the authors didn't report effect sizes for all covariates. Also, the Î·Â²=0.12 for prior GPA suggests a meaningful interaction that deserves deeper exploration."</div>
+    <div class="meta"><span class="tag badge-yellow">Clarity: 9/10</span><span class="tag badge-red">Severity: Minor</span></div>
+   </div>
   </div>
+  <button class="btn btn-secondary mt-12" id="adversarialDone"><i class="fas fa-check"></i> RevisiÃ³n Completa</button>
+ </div>
 
-  <div class="glass hidden" id="stepRebuttal">
-    <div class="section-title"><i class="fas fa-envelope-open-text"></i> 4. Constructor de Réplica</div>
-    <p style="color:#999;font-size:0.9rem;margin-bottom:12px;">Arrastra comentarios a las áreas de respuesta. La IA sugerirá réplicas.</p>
-    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;" id="rebuttalComments">
-      <div class="drag-element" draggable="true" data-comment="Sample size justification">📋 Muestra insuficiente</div>
-      <div class="drag-element" draggable="true" data-comment="Statistical method concern">📊 Método estadístico</div>
-      <div class="drag-element" draggable="true" data-comment="Literature gap">📚 Literatura faltante</div>
-      <div class="drag-element" draggable="true" data-comment="Reproducibility">🔬 Reproducibilidad</div>
-    </div>
-    <div class="drag-zone" id="rebuttalZone" style="min-height:100px;background:rgba(255,255,255,0.02);border:2px dashed rgba(255,255,255,0.1);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:8px;">
-      <span style="color:#555;font-size:0.85rem;text-align:center;">Arrastra aquí los comentarios que responderás</span>
-    </div>
-    <button class="btn btn-primary mt-12" id="suggestRebuttal"><i class="fas fa-wand-magic-sparkles"></i> Sugerir Réplicas</button>
-    <div id="rebuttalResult" class="hidden mt-12 feedback-area success"></div>
+ <div class="glass hidden" id="stepRebuttal">
+  <div class="section-title"><i class="fas fa-envelope-open-text"></i> 4. Constructor de RÃ©plica</div>
+  <p style="color:#999;font-size:0.9rem;margin-bottom:12px;">Arrastra comentarios a las Ã¡reas de respuesta. La IA sugerirÃ¡ rÃ©plicas.</p>
+  <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;" id="rebuttalComments">
+   <div class="drag-element" draggable="true" data-comment="Sample size justification">ðŸ“‹ Muestra insuficiente</div>
+   <div class="drag-element" draggable="true" data-comment="Statistical method concern">ðŸ“Š MÃ©todo estadÃ­stico</div>
+   <div class="drag-element" draggable="true" data-comment="Literature gap">ðŸ“š Literatura faltante</div>
+   <div class="drag-element" draggable="true" data-comment="Reproducibility">ðŸ”¬ Reproducibilidad</div>
   </div>
-
-  <div class="glass hidden" id="stepEthicalReview">
-    <div class="section-title"><i class="fas fa-shield-alt"></i> 5. Detector de Sesgos Éticos</div>
-    <p style="color:#999;font-size:0.9rem;margin-bottom:12px;">¿Cuál de estos comentarios de revisión es éticamente problemático?</p>
-    <div id="ethicalQuiz"></div>
+  <div class="drag-zone" id="rebuttalZone" style="min-height:100px;background:rgba(255,255,255,0.02);border:2px dashed rgba(255,255,255,0.1);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:8px;">
+   <span style="color:#555;font-size:0.85rem;text-align:center;">Arrastra aquÃ­ los comentarios que responderÃ¡s</span>
   </div>
+  <button class="btn btn-primary mt-12" id="suggestRebuttal"><i class="fas fa-wand-magic-sparkles"></i> Sugerir RÃ©plicas</button>
+  <div id="rebuttalResult" class="hidden mt-12 feedback-area success"></div>
+ </div>
 
-  <div class="glass" id="stepQuiz12">
-    <div class="section-title"><i class="fas fa-question-circle"></i> 6. Quiz: Peer Review</div>
-    <div id="quizContainer12">
-      <p style="color:#999;font-size:0.9rem;" id="quizQuestion12">Cargando...</p>
-      <div id="quizOptions12" class="mt-12" style="display:flex;flex-direction:column;gap:8px;"></div>
-      <div class="flex-between mt-12">
-        <span style="color:#666;font-size:0.85rem;" id="quizScore12">Aciertos: 0/5</span>
-      </div>
-    </div>
-    <div id="quizComplete12" class="hidden text-center mt-18">
-      <p style="font-size:1.1rem;color:#8fecb5;">🎉 ¡Peer Review dominado!</p>
-    </div>
+ <div class="glass hidden" id="stepEthicalReview">
+  <div class="section-title"><i class="fas fa-shield-alt"></i> 5. Detector de Sesgos Ã‰ticos</div>
+  <p style="color:#999;font-size:0.9rem;margin-bottom:12px;">Â¿CuÃ¡l de estos comentarios de revisiÃ³n es Ã©ticamente problemÃ¡tico?</p>
+  <div id="ethicalQuiz"></div>
+ </div>
+
+ <div class="glass" id="stepQuiz12">
+  <div class="section-title"><i class="fas fa-question-circle"></i> 6. Quiz: Peer Review</div>
+  <div id="quizContainer12">
+   <p style="color:#999;font-size:0.9rem;" id="quizQuestion12">Cargando...</p>
+   <div id="quizOptions12" class="mt-12" style="display:flex;flex-direction:column;gap:8px;"></div>
+   <div class="flex-between mt-12">
+    <span style="color:#666;font-size:0.85rem;" id="quizScore12">Aciertos: 0/5</span>
+   </div>
   </div>
-
-  <div class="nav-links">
-    <a href="11-visualizacion.html"><i class="fas fa-arrow-left"></i> Anterior</a>
-    <a href="index.html"><i class="fas fa-th-large"></i> Menú</a>
-    <a href="13-gestion-conocimiento.html">Siguiente <i class="fas fa-arrow-right"></i></a>
+  <div id="quizComplete12" class="hidden text-center mt-18">
+   <p style="font-size:1.1rem;color:#8fecb5;">ðŸŽ‰ Â¡Peer Review dominado!</p>
   </div>
+ </div>
 
-  <footer>
-    <p>Curso <a href="index.html">IA Aplicada a la Investigación</a> · Israel Romero · Módulo 12 de 25</p>
-  </footer>
+ <div class="nav-links">
+  <a href="11-visualizacion.html"><i class="fas fa-arrow-left"></i> Anterior</a>
+  <a href="index.html"><i class="fas fa-th-large"></i> MenÃº</a>
+  <a href="13-gestion-conocimiento.html">Siguiente <i class="fas fa-arrow-right"></i></a>
+ </div>
+
+ <footer>
+  <p>Curso <a href="index.html">IA Aplicada a la InvestigaciÃ³n</a> Â· Israel Romero Â· MÃ³dulo 12 de 25</p>
+ </footer>
 </div>
 
 <script>
 const STORAGE_KEY = 'ia_inv_12';
 
 (function(){
-  const progress = JSON.parse(localStorage.getItem('ia_inv_progress') || '[]');
-  if(progress.includes(STORAGE_KEY)) document.getElementById('insignia').style.display = 'block';
-  updateProgress();
+ const progress = JSON.parse(localStorage.getItem('ia_inv_progress') || '[]');
+ if(progress.includes(STORAGE_KEY)) document.getElementById('insignia').style.display = 'block';
+ updateProgress();
 })();
 
 function updateProgress() {
-  let p = JSON.parse(localStorage.getItem('ia_inv_progress') || '[]');
-  if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem('ia_inv_progress', JSON.stringify(p)); }
-  const pf = document.getElementById('progressFill');
-  const pt = document.getElementById('progressText');
-  if(pf) pf.style.width = Math.round((p.length/25)*100)+'%';
-  if(pt) pt.textContent = p.length+' de 25 módulos';
+ let p = JSON.parse(localStorage.getItem('ia_inv_progress') || '[]');
+ if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem('ia_inv_progress', JSON.stringify(p)); }
+ const pf = document.getElementById('progressFill');
+ const pt = document.getElementById('progressText');
+ if(pf) pf.style.width = Math.round((p.length/25)*100)+'%';
+ if(pt) pt.textContent = p.length+' de 25 mÃ³dulos';
 }
 
 // Step 2: AI Reviewer
 const reviewComments = [
-  { text: "The sample size (n=342) is adequate but a power analysis should be reported to justify it.", type: "weakness", severity: "Major" },
-  { text: "How was allocation concealment ensured in the randomization process?", type: "question", severity: "Major" },
-  { text: "The 23% improvement is impressive, but the authors should discuss regression to the mean.", type: "suggestion", severity: "Minor" },
-  { text: "The mixed-effects model is appropriate, but effect sizes for all covariates should be reported.", type: "weakness", severity: "Minor" },
-  { text: "The study addresses a timely and relevant research question with robust methodology.", type: "strength", severity: "Positive" }
+ { text: "The sample size (n=342) is adequate but a power analysis should be reported to justify it.", type: "weakness", severity: "Major" },
+ { text: "How was allocation concealment ensured in the randomization process?", type: "question", severity: "Major" },
+ { text: "The 23% improvement is impressive, but the authors should discuss regression to the mean.", type: "suggestion", severity: "Minor" },
+ { text: "The mixed-effects model is appropriate, but effect sizes for all covariates should be reported.", type: "weakness", severity: "Minor" },
+ { text: "The study addresses a timely and relevant research question with robust methodology.", type: "strength", severity: "Positive" }
 ];
 
 document.getElementById('genReviewBtn').addEventListener('click', function(){
-  const container = document.getElementById('reviewComments');
-  container.innerHTML = '';
-  container.classList.remove('hidden');
-  reviewComments.forEach((c, i) => {
-    const div = document.createElement('div');
-    div.className = 'review-card';
-    const severityColor = c.severity === 'Major' ? 'badge-red' : c.severity === 'Minor' ? 'badge-yellow' : 'badge-green';
-    const icon = c.type === 'strength' ? '✅' : c.type === 'weakness' ? '❌' : '❓';
-    div.innerHTML = `<div class="comment">${icon} ${c.text}</div><div class="meta"><span class="tag ${severityColor}">${c.severity}</span><span class="tag" style="background:rgba(255,255,255,0.05);">${c.type}</span></div>`;
-    container.appendChild(div);
-  });
-  document.getElementById('responseSection').classList.remove('hidden');
-  buildResponseFields();
-  this.textContent = '✅ Review Generado';
-  this.disabled = true;
-  this.style.opacity = '0.5';
-  setFeedback('Review generado. Responde a cada comentario.', 'success');
-  // Unlock next
-  document.getElementById('stepAdversarial').classList.remove('hidden');
+ const container = document.getElementById('reviewComments');
+ container.innerHTML = '';
+ container.classList.remove('hidden');
+ reviewComments.forEach((c, i) => {
+  const div = document.createElement('div');
+  div.className = 'review-card';
+  const severityColor = c.severity === 'Major' ? 'badge-red' : c.severity === 'Minor' ? 'badge-yellow' : 'badge-green';
+  const icon = c.type === 'strength' ? 'âœ…' : c.type === 'weakness' ? 'âŒ' : 'â“';
+  div.innerHTML = `<div class="comment">${icon} ${c.text}</div><div class="meta"><span class="tag ${severityColor}">${c.severity}</span><span class="tag" style="background:rgba(255,255,255,0.05);">${c.type}</span></div>`;
+  container.appendChild(div);
+ });
+ document.getElementById('responseSection').classList.remove('hidden');
+ buildResponseFields();
+ this.textContent = 'âœ… Review Generado';
+ this.disabled = true;
+ this.style.opacity = '0.5';
+ setFeedback('Review generado. Responde a cada comentario.', 'success');
+ // Unlock next
+ document.getElementById('stepAdversarial').classList.remove('hidden');
 });
 
 function buildResponseFields() {
-  const container = document.getElementById('responseFields');
-  container.innerHTML = '';
-  reviewComments.forEach((c, i) => {
-    const div = document.createElement('div');
-    div.style.marginBottom = '12px';
-    div.innerHTML = `<label style="font-size:0.85rem;color:#999;display:block;margin-bottom:4px;">${i+1}. ${c.text.substring(0,60)}...</label><textarea class="text-input response-field" data-idx="${i}" placeholder="Escribe tu respuesta..." style="min-height:50px;"></textarea>`;
-    container.appendChild(div);
-  });
+ const container = document.getElementById('responseFields');
+ container.innerHTML = '';
+ reviewComments.forEach((c, i) => {
+  const div = document.createElement('div');
+  div.style.marginBottom = '12px';
+  div.innerHTML = `<label style="font-size:0.85rem;color:#999;display:block;margin-bottom:4px;">${i+1}. ${c.text.substring(0,60)}...</label><textarea class="text-input response-field" data-idx="${i}" placeholder="Escribe tu respuesta..." style="min-height:50px;"></textarea>`;
+  container.appendChild(div);
+ });
 }
 
 document.getElementById('submitResponses').addEventListener('click', function(){
-  const fields = document.querySelectorAll('.response-field');
-  let filled = 0, total = fields.length;
-  fields.forEach(f => { if(f.value.trim().length > 10) filled++; });
-  const score = Math.round((filled/total)*100);
-  const el = document.getElementById('responseScore');
-  el.classList.remove('hidden');
-  let grade = '';
-  if(score >= 80) { grade = '¡Excelente! Respuestas claras y completas.'; el.className = 'feedback-area success mt-12'; }
-  else if(score >= 50) { grade = 'Bien, pero algunas respuestas necesitan más detalle.'; el.className = 'feedback-area mt-12'; }
-  else { grade = 'Tus respuestas son demasiado breves. Sé más específico.'; el.className = 'feedback-area error mt-12'; }
-  el.innerHTML = `Puntuación: ${score}% — ${grade}`;
-  setFeedback('Respuestas evaluadas. Revisa tu puntuación.', 'success');
-  document.getElementById('stepRebuttal').classList.remove('hidden');
+ const fields = document.querySelectorAll('.response-field');
+ let filled = 0, total = fields.length;
+ fields.forEach(f => { if(f.value.trim().length > 10) filled++; });
+ const score = Math.round((filled/total)*100);
+ const el = document.getElementById('responseScore');
+ el.classList.remove('hidden');
+ let grade = '';
+ if(score >= 80) { grade = 'Â¡Excelente! Respuestas claras y completas.'; el.className = 'feedback-area success mt-12'; }
+ else if(score >= 50) { grade = 'Bien, pero algunas respuestas necesitan mÃ¡s detalle.'; el.className = 'feedback-area mt-12'; }
+ else { grade = 'Tus respuestas son demasiado breves. SÃ© mÃ¡s especÃ­fico.'; el.className = 'feedback-area error mt-12'; }
+ el.innerHTML = `PuntuaciÃ³n: ${score}% â€” ${grade}`;
+ setFeedback('Respuestas evaluadas. Revisa tu puntuaciÃ³n.', 'success');
+ document.getElementById('stepRebuttal').classList.remove('hidden');
 });
 
 // Step 3: Adversarial Review
 document.getElementById('rev1Tab').addEventListener('click', function(){
-  document.getElementById('rev1Tab').classList.add('active');
-  document.getElementById('rev2Tab').classList.remove('active');
-  document.getElementById('rev1Content').classList.remove('hidden');
-  document.getElementById('rev2Content').classList.add('hidden');
+ document.getElementById('rev1Tab').classList.add('active');
+ document.getElementById('rev2Tab').classList.remove('active');
+ document.getElementById('rev1Content').classList.remove('hidden');
+ document.getElementById('rev2Content').classList.add('hidden');
 });
 document.getElementById('rev2Tab').addEventListener('click', function(){
-  document.getElementById('rev2Tab').classList.add('active');
-  document.getElementById('rev1Tab').classList.remove('active');
-  document.getElementById('rev2Content').classList.remove('hidden');
-  document.getElementById('rev1Content').classList.add('hidden');
+ document.getElementById('rev2Tab').classList.add('active');
+ document.getElementById('rev1Tab').classList.remove('active');
+ document.getElementById('rev2Content').classList.remove('hidden');
+ document.getElementById('rev1Content').classList.add('hidden');
 });
 document.getElementById('adversarialDone').addEventListener('click', function(){
-  setFeedback('Revisión adversarial completada. Has visto dos perspectivas diferentes.', 'success');
+ setFeedback('RevisiÃ³n adversarial completada. Has visto dos perspectivas diferentes.', 'success');
 });
 
 // Step 4: Rebuttal Builder
 const rebuttalZone = document.getElementById('rebuttalZone');
 document.querySelectorAll('#rebuttalComments .drag-element').forEach(el => {
-  el.addEventListener('dragstart', function(e){
-    e.dataTransfer.setData('text/plain', this.dataset.comment);
-  });
+ el.addEventListener('dragstart', function(e){
+  e.dataTransfer.setData('text/plain', this.dataset.comment);
+ });
 });
 rebuttalZone.addEventListener('dragover', function(e){ e.preventDefault(); this.style.borderColor = '#ff5050'; });
 rebuttalZone.addEventListener('dragleave', function(){ this.style.borderColor = 'rgba(255,255,255,0.1)'; });
 rebuttalZone.addEventListener('drop', function(e){
-  e.preventDefault(); this.style.borderColor = 'rgba(255,255,255,0.1)';
-  const comment = e.dataTransfer.getData('text/plain');
-  const el = document.createElement('div');
-  el.className = 'drag-element placed';
-  el.textContent = '📌 ' + comment;
-  el.style.cursor = 'default';
-  this.appendChild(el);
-  const ph = this.querySelector('span');
-  if(ph) ph.remove();
+ e.preventDefault(); this.style.borderColor = 'rgba(255,255,255,0.1)';
+ const comment = e.dataTransfer.getData('text/plain');
+ const el = document.createElement('div');
+ el.className = 'drag-element placed';
+ el.textContent = 'ðŸ“Œ ' + comment;
+ el.style.cursor = 'default';
+ this.appendChild(el);
+ const ph = this.querySelector('span');
+ if(ph) ph.remove();
 });
 document.getElementById('suggestRebuttal').addEventListener('click', function(){
-  const rebuttals = [
-    'Agradecemos la observación. Hemos añadido un análisis de poder post-hoc (1-β = 0.89) que confirma la adecuación de la muestra.',
-    'Reconocemos la limitación. Hemos incluido una discusión detallada sobre la aleatorización y el cegamiento en la sección de limitaciones.',
-    'Hemos realizado un análisis de sensibilidad adicional que respalda nuestros hallazgos principales (ver Material Suplementario).',
-    'Gracias por la sugerencia. Hemos añadido los tamaños de efecto faltantes en la Tabla 2.'
-  ];
-  const result = document.getElementById('rebuttalResult');
-  result.innerHTML = I18N.t('fb_0') + rebuttals.map((r,i) => `${i+1}. ${r}`).join('<br>');
-  result.classList.remove('hidden');
-  setFeedback('Réplicas generadas. Revisa y adapta al estilo de tu respuesta.', 'success');
-  document.getElementById('stepEthicalReview').classList.remove('hidden');
+ const rebuttals = [
+  'Agradecemos la observaciÃ³n. Hemos aÃ±adido un anÃ¡lisis de poder post-hoc (1-Î² = 0.89) que confirma la adecuaciÃ³n de la muestra.',
+  'Reconocemos la limitaciÃ³n. Hemos incluido una discusiÃ³n detallada sobre la aleatorizaciÃ³n y el cegamiento en la secciÃ³n de limitaciones.',
+  'Hemos realizado un anÃ¡lisis de sensibilidad adicional que respalda nuestros hallazgos principales (ver Material Suplementario).',
+  'Gracias por la sugerencia. Hemos aÃ±adido los tamaÃ±os de efecto faltantes en la Tabla 2.'
+ ];
+ const result = document.getElementById('rebuttalResult');
+ result.innerHTML = I18N.t('fb_0') + rebuttals.map((r,i) => `${i+1}. ${r}`).join('<br>');
+ result.classList.remove('hidden');
+ setFeedback('RÃ©plicas generadas. Revisa y adapta al estilo de tu respuesta.', 'success');
+ document.getElementById('stepEthicalReview').classList.remove('hidden');
 });
 
 // Step 5: Ethical Review Spotter
 const ethicalItems = [
-  { text: '"The authors should cite my previous work on this topic."', problematic: true },
-  { text: '"The methodology is sound, but the discussion section could be expanded."', problematic: false },
-  { text: '"This paper would be stronger with additional statistical analysis of the interaction effects."', problematic: false },
-  { text: '"The English needs improvement; consider hiring a native speaker."', problematic: true },
-  { text: '"I recommend acceptance after minor revisions addressing the sample size concern."', problematic: false }
+ { text: '"The authors should cite my previous work on this topic."', problematic: true },
+ { text: '"The methodology is sound, but the discussion section could be expanded."', problematic: false },
+ { text: '"This paper would be stronger with additional statistical analysis of the interaction effects."', problematic: false },
+ { text: '"The English needs improvement; consider hiring a native speaker."', problematic: true },
+ { text: '"I recommend acceptance after minor revisions addressing the sample size concern."', problematic: false }
 ];
 
 const ethicalContainer = document.getElementById('ethicalQuiz');
 ethicalItems.forEach((item, idx) => {
-  const div = document.createElement('div');
-  div.className = 'review-card';
-  div.innerHTML = `<div class="comment">"${item.text}"</div>
-    <div style="display:flex;gap:10px;margin-top:8px;">
-      <button class="btn btn-secondary ethical-btn" data-idx="${idx}" data-answer="problematic" style="padding:6px 14px;font-size:0.82rem;">⚠️ Problemático</button>
-      <button class="btn btn-secondary ethical-btn" data-idx="${idx}" data-answer="ok" style="padding:6px 14px;font-size:0.82rem;">✅ Aceptable</button>
-    </div>
-    <div class="ethical-feedback hidden" style="margin-top:8px;font-size:0.85rem;"></div>`;
-  ethicalContainer.appendChild(div);
+ const div = document.createElement('div');
+ div.className = 'review-card';
+ div.innerHTML = `<div class="comment">"${item.text}"</div>
+  <div style="display:flex;gap:10px;margin-top:8px;">
+   <button class="btn btn-secondary ethical-btn" data-idx="${idx}" data-answer="problematic" style="padding:6px 14px;font-size:0.82rem;">âš ï¸ ProblemÃ¡tico</button>
+   <button class="btn btn-secondary ethical-btn" data-idx="${idx}" data-answer="ok" style="padding:6px 14px;font-size:0.82rem;">âœ… Aceptable</button>
+  </div>
+  <div class="ethical-feedback hidden" style="margin-top:8px;font-size:0.85rem;"></div>`;
+ ethicalContainer.appendChild(div);
 });
 
 document.querySelectorAll('.ethical-btn').forEach(btn => {
-  btn.addEventListener('click', function(){
-    const idx = parseInt(this.dataset.idx);
-    const answer = this.dataset.answer;
-    const card = this.closest('.review-card');
-    const fb = card.querySelector('.ethical-feedback');
-    fb.classList.remove('hidden');
-    const isProblematic = ethicalItems[idx].problematic;
-    if((answer === 'problematic' && isProblematic) || (answer === 'ok' && !isProblematic)) {
-      fb.innerHTML = I18N.t('fb_1');
-      fb.style.color = '#8fecb5';
-    } else {
-      fb.innerHTML = I18N.t('fb_2') + (isProblematic ? 'SÍ' : 'NO') + ' es éticamente problemático.';
-      fb.style.color = '#ff9090';
-    }
-    card.querySelectorAll('.ethical-btn').forEach(b => b.disabled = true);
-  });
+ btn.addEventListener('click', function(){
+  const idx = parseInt(this.dataset.idx);
+  const answer = this.dataset.answer;
+  const card = this.closest('.review-card');
+  const fb = card.querySelector('.ethical-feedback');
+  fb.classList.remove('hidden');
+  const isProblematic = ethicalItems[idx].problematic;
+  if((answer === 'problematic' && isProblematic) || (answer === 'ok' && !isProblematic)) {
+   fb.innerHTML = I18N.t('fb_1');
+   fb.style.color = '#8fecb5';
+  } else {
+   fb.innerHTML = I18N.t('fb_2') + (isProblematic ? 'SÃ' : 'NO') + ' es Ã©ticamente problemÃ¡tico.';
+   fb.style.color = '#ff9090';
+  }
+  card.querySelectorAll('.ethical-btn').forEach(b => b.disabled = true);
+ });
 });
 
 // Quiz
 const quizData12 = [
-  { q: '¿Cuál es el objetivo principal de una carta de réplica (rebuttal letter)?', options: ['Responder a cada comentario punto por punto', 'Ignorar los comentarios menores', 'Reescribir el paper completo', 'Solicitar nuevos revisores'], answer: 0 },
-  { q: '¿Qué característica define un comentario de revisión constructivo?', options: ['Es breve y vago', 'Especifica el problema y sugiere una mejora', 'Solo critica sin sugerencias', 'Usa lenguaje despectivo'], answer: 1 },
-  { q: '¿Cuándo es apropiado no estar de acuerdo con un revisor?', options: ['Nunca, siempre tienen razón', 'Solo si puedes respaldar tu posición con evidencia', 'Siempre, el autor sabe más', 'Depende del editor'], answer: 1 },
-  { q: '¿Qué tipo de sesgo ocurre cuando un revisor pide citar sus propios trabajos?', options: ['Sesgo de publicación', 'Sesgo de confirmación', 'Conflicto de interés', 'Sesgo de selección'], answer: 2 },
-  { q: '¿Qué debes hacer si un revisor señala un error real en tu paper?', options: ['Ignorarlo', 'Defender tu posición aunque sea incorrecta', 'Agradecer y corregir el error', 'Rechazar la revisión'], answer: 2 }
+ { q: 'Â¿CuÃ¡l es el objetivo principal de una carta de rÃ©plica (rebuttal letter)?', options: ['Responder a cada comentario punto por punto', 'Ignorar los comentarios menores', 'Reescribir el paper completo', 'Solicitar nuevos revisores'], answer: 0 },
+ { q: 'Â¿QuÃ© caracterÃ­stica define un comentario de revisiÃ³n constructivo?', options: ['Es breve y vago', 'Especifica el problema y sugiere una mejora', 'Solo critica sin sugerencias', 'Usa lenguaje despectivo'], answer: 1 },
+ { q: 'Â¿CuÃ¡ndo es apropiado no estar de acuerdo con un revisor?', options: ['Nunca, siempre tienen razÃ³n', 'Solo si puedes respaldar tu posiciÃ³n con evidencia', 'Siempre, el autor sabe mÃ¡s', 'Depende del editor'], answer: 1 },
+ { q: 'Â¿QuÃ© tipo de sesgo ocurre cuando un revisor pide citar sus propios trabajos?', options: ['Sesgo de publicaciÃ³n', 'Sesgo de confirmaciÃ³n', 'Conflicto de interÃ©s', 'Sesgo de selecciÃ³n'], answer: 2 },
+ { q: 'Â¿QuÃ© debes hacer si un revisor seÃ±ala un error real en tu paper?', options: ['Ignorarlo', 'Defender tu posiciÃ³n aunque sea incorrecta', 'Agradecer y corregir el error', 'Rechazar la revisiÃ³n'], answer: 2 }
 ];
 let qIdx = 0, qScore = 0;
 
 function loadQuiz12() {
-  if(qIdx >= quizData12.length) {
-    document.getElementById('quizContainer12').classList.add('hidden');
-    document.getElementById('quizComplete12').classList.remove('hidden');
-    return;
-  }
-  const q = quizData12[qIdx];
-  document.getElementById('quizQuestion12').textContent = `(${qIdx+1}/5) ${q.q}`;
-  const c = document.getElementById('quizOptions12');
-  c.innerHTML = '';
-  q.options.forEach((opt,i) => {
-    const div = document.createElement('div');
-    div.className = 'quiz-option';
-    div.textContent = opt;
-    div.addEventListener('click', function(){
-      if(this.classList.contains('correct')||this.classList.contains('wrong')) return;
-      const btns = c.querySelectorAll('.quiz-option');
-      btns.forEach(b => b.style.pointerEvents = 'none');
-      if(i===q.answer) { this.classList.add('correct'); qScore++; setFeedback('✅ Correcto','success'); }
-      else { this.classList.add('wrong'); btns[q.answer].classList.add('correct'); setFeedback('❌ La respuesta era: '+q.options[q.answer],'error'); }
-      document.getElementById('quizScore12').textContent = `Aciertos: ${qScore}/5`;
-      setTimeout(()=>{qIdx++;loadQuiz12();},1500);
-    });
-    c.appendChild(div);
+ if(qIdx >= quizData12.length) {
+  document.getElementById('quizContainer12').classList.add('hidden');
+  document.getElementById('quizComplete12').classList.remove('hidden');
+  return;
+ }
+ const q = quizData12[qIdx];
+ document.getElementById('quizQuestion12').textContent = `(${qIdx+1}/5) ${q.q}`;
+ const c = document.getElementById('quizOptions12');
+ c.innerHTML = '';
+ q.options.forEach((opt,i) => {
+  const div = document.createElement('div');
+  div.className = 'quiz-option';
+  div.textContent = opt;
+  div.addEventListener('click', function(){
+   if(this.classList.contains('correct')||this.classList.contains('wrong')) return;
+   const btns = c.querySelectorAll('.quiz-option');
+   btns.forEach(b => b.style.pointerEvents = 'none');
+   if(i===q.answer) { this.classList.add('correct'); qScore++; setFeedback('âœ… Correcto','success'); }
+   else { this.classList.add('wrong'); btns[q.answer].classList.add('correct'); setFeedback('âŒ La respuesta era: '+q.options[q.answer],'error'); }
+   document.getElementById('quizScore12').textContent = `Aciertos: ${qScore}/5`;
+   setTimeout(()=>{qIdx++;loadQuiz12();},1500);
   });
+  c.appendChild(div);
+ });
 }
 loadQuiz12();
 
 function setFeedback(msg, type) {
-  let fb = document.getElementById('feedbackArea');
-  if(!fb) {
-    fb = document.createElement('div'); fb.id='feedbackArea'; fb.className='feedback-area';
-    const nav = document.querySelector('.nav-links');
-    document.querySelector('.container').insertBefore(fb, nav);
-  }
-  fb.textContent = msg; fb.className = 'feedback-area ' + (type||'');
+ let fb = document.getElementById('feedbackArea');
+ if(!fb) {
+  fb = document.createElement('div'); fb.id='feedbackArea'; fb.className='feedback-area';
+  const nav = document.querySelector('.nav-links');
+  document.querySelector('.container').insertBefore(fb, nav);
+ }
+ fb.textContent = msg; fb.className = 'feedback-area ' + (type||'');
 }
 </script>
 
 <script>
 window.I18N_DATA={
-  'fb_0': { es: '<strong>Réplicas sugeridas:</strong><br>', en: '<strong>Réplicas sugeridas:</strong><br>' },
-  'fb_1': { es: '✅ Correcto', en: '✅ Correcto' },
-  'fb_2': { es: '❌ Incorrecto. Este comentario ', en: '❌ Incorrect. Este comentario ' }
+ 'fb_0': { es: '<strong>RÃ©plicas sugeridas:</strong><br>', en: '<strong>RÃ©plicas sugeridas:</strong><br>' },
+ 'fb_1': { es: 'âœ… Correcto', en: 'âœ… Correcto' },
+ 'fb_2': { es: 'âŒ Incorrecto. Este comentario ', en: 'âŒ Incorrect. Este comentario ' }
 };
 </script>
-</body>
+ </body>
 </html>

@@ -1,255 +1,254 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Curso 1 | Bitcoin: PoW, Miner&iacute;a y Halving</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 100%); font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
-    .modulo-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(247,147,26,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
-    .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #f7931a; }
-    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#fbbf6a,#f7931a); -webkit-background-clip:text; background-clip:text; color:transparent; }
-    .hero-header p { font-size:1.1rem; color:#fde8c8; margin-top:0.5rem; }
-    .badge-area { display:flex; justify-content:center; gap:1rem; margin:1.2rem 0 0; flex-wrap:wrap; }
-    .chip { background:rgba(247,147,26,0.15); border:1px solid #f7931a; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
-    .progress-bar-top { background:#00000044; padding:0.6rem 2rem; text-align:center; font-size:0.85rem; border-bottom:1px solid #2c3e66; }
-    .progress-bar-top span { color:#fbbf6a; font-weight:600; }
-    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #f7931a; font-size:1rem; line-height:1.6; }
-    .main-area { padding:0 2rem 1.5rem; display:flex; flex-direction:column; gap:1.5rem; }
-    .demo-card { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; border:1px solid #f7931a; }
-    .demo-card h3 { color:#fbbf6a; margin-bottom:0.8rem; }
-    .demo-card p { font-size:0.85rem; color:#8899bb; margin-bottom:0.8rem; }
-    .mining-area { display:flex; gap:1rem; flex-wrap:wrap; align-items:flex-start; }
-    .mining-controls { flex:1; min-width:200px; }
-    .mining-controls label { font-size:0.85rem; }
-    .mining-controls input[type=range] { width:100%; accent-color:#f7931a; margin:0.5rem 0; }
-    .mining-result { flex:1; min-width:200px; background:#0f1a2c; border-radius:1rem; padding:1rem; }
-    .mining-result .stat { display:flex; justify-content:space-between; margin:0.3rem 0; font-size:0.85rem; }
-    .stat-value { color:#fbbf6a; font-weight:700; }
-    .btn-action { background:linear-gradient(95deg,#fbbf6a,#f7931a); border:none; padding:0.7rem 1.5rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:0.95rem; transition:0.2s; color:#1e1a0c; margin-top:0.5rem; }
-    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(247,147,26,0.5); }
-    .btn-reset { background:#2c3e66; border:none; padding:0.7rem 1.5rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:0.95rem; color:#eef5ff; margin-top:0.5rem; margin-left:0.5rem; }
-    .halving-chart { background:#0f1a2c; border-radius:1rem; padding:1rem; margin-top:0.5rem; overflow-x:auto; }
-    .halving-chart table { width:100%; border-collapse:collapse; font-size:0.8rem; }
-    .halving-chart th { color:#fbbf6a; text-align:left; padding:0.3rem; border-bottom:1px solid #2c3e66; }
-    .halving-chart td { padding:0.3rem; border-bottom:1px solid #111a2e; }
-    .halving-chart .highlight { color:#f7931a; font-weight:700; }
-    .quiz-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; border:1px solid #f7931a; }
-    .question { background:#0f1a2c; margin:0.8rem 0; padding:0.8rem; border-radius:1rem; }
-    .question p { font-weight:600; margin-bottom:0.4rem; font-size:0.9rem; }
-    .options { display:flex; flex-wrap:wrap; gap:0.6rem; }
-    .opt { background:#1e2a3e; padding:0.3rem 0.8rem; border-radius:2rem; cursor:pointer; transition:0.2s; font-size:0.85rem; }
-    .opt:hover { background:#2c3e66; }
-    .opt.selected { background:#f7931a; color:#000; font-weight:bold; }
-    .opt.correct { background:#22c55e; color:#000; }
-    .opt.wrong { background:#ef4444; color:#fff; }
-    .feedback { background:#00000099; margin:1.5rem 2rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #f7931a; }
-    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:1.5rem 2rem; padding:1rem; border:1px dashed gold; }
-    .insignia i { font-size:2.5rem; color:gold; }
-    .hidden { display:none; }
-    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
-    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; font-size:0.95rem; }
-    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(247,147,26,0.4); }
-    .nav-link.next { background:linear-gradient(95deg,#fbbf6a,#f7931a); color:#1e1a0c; }
-    .nav-link.menu { background:#1a2a4a; border:1px solid #3399ff; }
-    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
-    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
-  </style>
-  <link rel="stylesheet" href="../../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Curso 1 | Bitcoin: PoW, Miner&iacute;a y Halving</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 100%); font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+  .modulo-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(247,147,26,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+  .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #f7931a; }
+  .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#fbbf6a,#f7931a); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero-header p { font-size:1.1rem; color:#fde8c8; margin-top:0.5rem; }
+  .badge-area { display:flex; justify-content:center; gap:1rem; margin:1.2rem 0 0; flex-wrap:wrap; }
+  .chip { background:rgba(247,147,26,0.15); border:1px solid #f7931a; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+  .progress-bar-top { background:#00000044; padding:0.6rem 2rem; text-align:center; font-size:0.85rem; border-bottom:1px solid #2c3e66; }
+  .progress-bar-top span { color:#fbbf6a; font-weight:600; }
+  .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #f7931a; font-size:1rem; line-height:1.6; }
+  .main-area { padding:0 2rem 1.5rem; display:flex; flex-direction:column; gap:1.5rem; }
+  .demo-card { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; border:1px solid #f7931a; }
+  .demo-card h3 { color:#fbbf6a; margin-bottom:0.8rem; }
+  .demo-card p { font-size:0.85rem; color:#8899bb; margin-bottom:0.8rem; }
+  .mining-area { display:flex; gap:1rem; flex-wrap:wrap; align-items:flex-start; }
+  .mining-controls { flex:1; min-width:200px; }
+  .mining-controls label { font-size:0.85rem; }
+  .mining-controls input[type=range] { width:100%; accent-color:#f7931a; margin:0.5rem 0; }
+  .mining-result { flex:1; min-width:200px; background:#0f1a2c; border-radius:1rem; padding:1rem; }
+  .mining-result .stat { display:flex; justify-content:space-between; margin:0.3rem 0; font-size:0.85rem; }
+  .stat-value { color:#fbbf6a; font-weight:700; }
+  .btn-action { background:linear-gradient(95deg,#fbbf6a,#f7931a); border:none; padding:0.7rem 1.5rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:0.95rem; transition:0.2s; color:#1e1a0c; margin-top:0.5rem; }
+  .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(247,147,26,0.5); }
+  .btn-reset { background:#2c3e66; border:none; padding:0.7rem 1.5rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:0.95rem; color:#eef5ff; margin-top:0.5rem; margin-left:0.5rem; }
+  .halving-chart { background:#0f1a2c; border-radius:1rem; padding:1rem; margin-top:0.5rem; overflow-x:auto; }
+  .halving-chart table { width:100%; border-collapse:collapse; font-size:0.8rem; }
+  .halving-chart th { color:#fbbf6a; text-align:left; padding:0.3rem; border-bottom:1px solid #2c3e66; }
+  .halving-chart td { padding:0.3rem; border-bottom:1px solid #111a2e; }
+  .halving-chart .highlight { color:#f7931a; font-weight:700; }
+  .quiz-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; border:1px solid #f7931a; }
+  .question { background:#0f1a2c; margin:0.8rem 0; padding:0.8rem; border-radius:1rem; }
+  .question p { font-weight:600; margin-bottom:0.4rem; font-size:0.9rem; }
+  .options { display:flex; flex-wrap:wrap; gap:0.6rem; }
+  .opt { background:#1e2a3e; padding:0.3rem 0.8rem; border-radius:2rem; cursor:pointer; transition:0.2s; font-size:0.85rem; }
+  .opt:hover { background:#2c3e66; }
+  .opt.selected { background:#f7931a; color:#000; font-weight:bold; }
+  .opt.correct { background:#22c55e; color:#000; }
+  .opt.wrong { background:#ef4444; color:#fff; }
+  .feedback { background:#00000099; margin:1.5rem 2rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #f7931a; }
+  .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:1.5rem 2rem; padding:1rem; border:1px dashed gold; }
+  .insignia i { font-size:2.5rem; color:gold; }
+  .hidden { display:none; }
+  .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+  .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; font-size:0.95rem; }
+  .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(247,147,26,0.4); }
+  .nav-link.next { background:linear-gradient(95deg,#fbbf6a,#f7931a); color:#1e1a0c; }
+  .nav-link.menu { background:#1a2a4a; border:1px solid #3399ff; }
+  footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
+ </style>
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
 </head>
 <body>
-  <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Blockchain</a></nav>
-  <div class="modulo-container">
-    <div class="progress-bar-top"><i class="fas fa-cube"></i> Curso 1: Fundamentos de Blockchain y Bitcoin <span>| M&oacute;dulo 4 de 12</span></div>
-    <div class="hero-header">
-      <h1><i class="fas fa-pick"></i> Bitcoin: PoW, Miner&iacute;a y Halving</h1>
-      <p>El coraz&oacute;n de Bitcoin: prueba de trabajo, mineros y emisi&oacute;n deflacionaria</p>
-      <div class="badge-area"><span class="chip"><i class="fas fa-cog"></i> Proof of Work</span><span class="chip"><i class="fas fa-chart-bar"></i> Halving</span><span class="chip"><i class="fas fa-hashtag"></i> 21M supply</span></div>
-    </div>
-    <div class="analogy-card"><i class="fas fa-puzzle-piece" style="color:#f7931a;margin-right:0.5rem;"></i> <strong>Piensa en una competencia de acertijos:</strong> Los mineros compiten para resolver un dif&iacute;cil acertijo matem&aacute;tico. El primero en resolverlo escribe la p&aacute;gina (bloque) en el libro compartido y recibe bitcoins como recompensa. Cada 4 a&ntilde;os, la recompensa se reduce a la mitad (halving).</div>
-    <div class="main-area">
-      <div class="demo-card">
-        <h3><i class="fas fa-microchip"></i> Simulador de Miner&iacute;a PoW</h3>
-        <p>Ajusta la dificultad (n&uacute;mero de ceros iniciales requeridos) y mina bloques.</p>
-        <div class="mining-area">
-          <div class="mining-controls">
-            <label>Dificultad (ceros iniciales): <strong id="diffLabel">3</strong></label>
-            <input type="range" id="diffSlider" min="1" max="6" value="3">
-            <button id="mineBtn" class="btn-action"><i class="fas fa-pick"></i> Minar bloque</button>
-            <button id="resetMiningBtn" class="btn-reset"><i class="fas fa-sync-alt"></i> Reiniciar</button>
-          </div>
-          <div class="mining-result">
-            <div class="stat">Bloques minados: <span class="stat-value" id="blocksMined">0</span></div>
-            <div class="stat">Tiempo &uacute;ltimo: <span class="stat-value" id="lastTime">0ms</span></div>
-            <div class="stat">Total intentos: <span class="stat-value" id="totalAttempts">0</span></div>
-            <div class="stat">Hash rate: <span class="stat-value" id="hashRate">0</span> hash/s</div>
-            <div style="margin-top:0.5rem;font-family:monospace;font-size:0.7rem;color:#8899bb;word-break:break-all;" id="blockHashDisplay">&nbsp;</div>
-          </div>
-        </div>
-      </div>
-      <div class="demo-card">
-        <h3><i class="fas fa-chart-line"></i> Halving y Oferta de Bitcoin</h3>
-        <p>Bitcoin tiene un suministro m&aacute;ximo de 21M. Cada ~210,000 bloques (~4 a&ntilde;os), la recompensa por bloque se reduce a la mitad.</p>
-        <div class="halving-chart">
-          <table>
-            <tr><th>Evento</th><th>A&ntilde;o</th><th>Recompensa</th><th>Oferta total</th></tr>
-            <tr><td>G&eacute;nesis</td><td>2009</td><td class="highlight">50 BTC</td><td>0</td></tr>
-            <tr><td>Halving 1</td><td>2012</td><td class="highlight">25 BTC</td><td>10.5M</td></tr>
-            <tr><td>Halving 2</td><td>2016</td><td class="highlight">12.5 BTC</td><td>15.75M</td></tr>
-            <tr><td>Halving 3</td><td>2020</td><td class="highlight">6.25 BTC</td><td>18.375M</td></tr>
-            <tr><td>Halving 4</td><td>2024</td><td class="highlight">3.125 BTC</td><td>19.6875M</td></tr>
-            <tr><td>Halving 5</td><td>2028</td><td class="highlight">1.5625 BTC</td><td>~20.34M</td></tr>
-          </table>
-        </div>
-        <p style="font-size:0.8rem;color:#8899bb;margin-top:0.5rem;">La dificultad se ajusta cada 2,016 bloques (~2 semanas) para que el tiempo entre bloques sea ~10 minutos. La oferta final se acercar&aacute; a 21M hacia 2140.</p>
-      </div>
-      <div class="quiz-area">
-        <h3><i class="fas fa-question-circle"></i> Comprueba lo aprendido</h3>
-        <div id="quizContainer"></div>
-        <button id="submitQuizBtn" class="btn-action" disabled>Validar respuestas</button>
-        <div id="quizFeedback" style="margin-top:0.5rem;font-size:0.85rem;"></div>
-      </div>
-    </div>
-    <div id="feedbackMsg" class="feedback">Minera bloques, explora el halving y responde el quiz para ganar tu insignia.</div>
-    <div id="insigniaArea" class="insignia hidden"><i class="fas fa-medal"></i><h3>INSIGNIA: MINERO BITCOIN</h3><p>Entiendes PoW, miner&iacute;a y el suministro deflacionario de Bitcoin.</p></div>
-    <div class="nav-links">
-      <a href="03-criptografia.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
-      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
-      <a href="05-utxo-wallets.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
-    </div>
-    <footer><i class="fas fa-crown"></i> Curso 1: Fundamentos de Blockchain y Bitcoin &middot; Bitcoin: PoW, Miner&iacute;a y Halving</footer>
+ <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Blockchain</a></nav>
+ <div class="modulo-container">
+  <div class="progress-bar-top"><i class="fas fa-cube"></i> Curso 1: Fundamentos de Blockchain y Bitcoin <span>| M&oacute;dulo 4 de 12</span></div>
+  <div class="hero-header">
+   <h1><i class="fas fa-pick"></i> Bitcoin: PoW, Miner&iacute;a y Halving</h1>
+   <p>El coraz&oacute;n de Bitcoin: prueba de trabajo, mineros y emisi&oacute;n deflacionaria</p>
+   <div class="badge-area"><span class="chip"><i class="fas fa-cog"></i> Proof of Work</span><span class="chip"><i class="fas fa-chart-bar"></i> Halving</span><span class="chip"><i class="fas fa-hashtag"></i> 21M supply</span></div>
   </div>
-  <script>
-    const STORAGE_KEY = 'block_1_04';
-    var difficulty = 3;
-    var stats = { blocksMined: 0, totalAttempts: 0, lastTime: 0 };
-    function simpleHash(str) { var h=0; for(var i=0;i<str.length;i++){h=((h<<5)-h)+str.charCodeAt(i);h|=0;} return (h>>>0).toString(16); }
-    function mineBlock(diff) {
-      var target = '';
-      for (var i=0;i<diff;i++) target += '0';
-      var nonce = 0;
-      var start = performance.now();
-      var data = 'Bloque ' + (stats.blocksMined + 1) + '|' + Date.now();
-      while (true) {
-        var hash = simpleHash(data + nonce);
-        nonce++;
-        if (nonce > 500000) return null;
-        if (hash.startsWith(target)) {
-          var elapsed = performance.now() - start;
-          return { hash: hash, nonce: nonce, time: elapsed };
-        }
-      }
+  <div class="analogy-card"><i class="fas fa-puzzle-piece" style="color:#f7931a;margin-right:0.5rem;"></i> <strong>Piensa en una competencia de acertijos:</strong> Los mineros compiten para resolver un dif&iacute;cil acertijo matem&aacute;tico. El primero en resolverlo escribe la p&aacute;gina (bloque) en el libro compartido y recibe bitcoins como recompensa. Cada 4 a&ntilde;os, la recompensa se reduce a la mitad (halving).</div>
+  <div class="main-area">
+   <div class="demo-card">
+    <h3><i class="fas fa-microchip"></i> Simulador de Miner&iacute;a PoW</h3>
+    <p>Ajusta la dificultad (n&uacute;mero de ceros iniciales requeridos) y mina bloques.</p>
+    <div class="mining-area">
+     <div class="mining-controls">
+      <label>Dificultad (ceros iniciales): <strong id="diffLabel">3</strong></label>
+      <input type="range" id="diffSlider" min="1" max="6" value="3">
+      <button id="mineBtn" class="btn-action"><i class="fas fa-pick"></i> Minar bloque</button>
+      <button id="resetMiningBtn" class="btn-reset"><i class="fas fa-sync-alt"></i> Reiniciar</button>
+     </div>
+     <div class="mining-result">
+      <div class="stat">Bloques minados: <span class="stat-value" id="blocksMined">0</span></div>
+      <div class="stat">Tiempo &uacute;ltimo: <span class="stat-value" id="lastTime">0ms</span></div>
+      <div class="stat">Total intentos: <span class="stat-value" id="totalAttempts">0</span></div>
+      <div class="stat">Hash rate: <span class="stat-value" id="hashRate">0</span> hash/s</div>
+      <div style="margin-top:0.5rem;font-family:monospace;font-size:0.7rem;color:#8899bb;word-break:break-all;" id="blockHashDisplay">&nbsp;</div>
+     </div>
+    </div>
+   </div>
+   <div class="demo-card">
+    <h3><i class="fas fa-chart-line"></i> Halving y Oferta de Bitcoin</h3>
+    <p>Bitcoin tiene un suministro m&aacute;ximo de 21M. Cada ~210,000 bloques (~4 a&ntilde;os), la recompensa por bloque se reduce a la mitad.</p>
+    <div class="halving-chart">
+     <table>
+      <tr><th>Evento</th><th>A&ntilde;o</th><th>Recompensa</th><th>Oferta total</th></tr>
+      <tr><td>G&eacute;nesis</td><td>2009</td><td class="highlight">50 BTC</td><td>0</td></tr>
+      <tr><td>Halving 1</td><td>2012</td><td class="highlight">25 BTC</td><td>10.5M</td></tr>
+      <tr><td>Halving 2</td><td>2016</td><td class="highlight">12.5 BTC</td><td>15.75M</td></tr>
+      <tr><td>Halving 3</td><td>2020</td><td class="highlight">6.25 BTC</td><td>18.375M</td></tr>
+      <tr><td>Halving 4</td><td>2024</td><td class="highlight">3.125 BTC</td><td>19.6875M</td></tr>
+      <tr><td>Halving 5</td><td>2028</td><td class="highlight">1.5625 BTC</td><td>~20.34M</td></tr>
+     </table>
+    </div>
+    <p style="font-size:0.8rem;color:#8899bb;margin-top:0.5rem;">La dificultad se ajusta cada 2,016 bloques (~2 semanas) para que el tiempo entre bloques sea ~10 minutos. La oferta final se acercar&aacute; a 21M hacia 2140.</p>
+   </div>
+   <div class="quiz-area">
+    <h3><i class="fas fa-question-circle"></i> Comprueba lo aprendido</h3>
+    <div id="quizContainer"></div>
+    <button id="submitQuizBtn" class="btn-action" disabled>Validar respuestas</button>
+    <div id="quizFeedback" style="margin-top:0.5rem;font-size:0.85rem;"></div>
+   </div>
+  </div>
+  <div id="feedbackMsg" class="feedback">Minera bloques, explora el halving y responde el quiz para ganar tu insignia.</div>
+  <div id="insigniaArea" class="insignia hidden"><i class="fas fa-medal"></i><h3>INSIGNIA: MINERO BITCOIN</h3><p>Entiendes PoW, miner&iacute;a y el suministro deflacionario de Bitcoin.</p></div>
+  <div class="nav-links">
+   <a href="03-criptografia.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+   <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
+   <a href="05-utxo-wallets.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Curso 1: Fundamentos de Blockchain y Bitcoin &middot; Bitcoin: PoW, Miner&iacute;a y Halving</footer>
+ </div>
+ <script>
+  const STORAGE_KEY = 'block_1_04';
+  var difficulty = 3;
+  var stats = { blocksMined: 0, totalAttempts: 0, lastTime: 0 };
+  function simpleHash(str) { var h=0; for(var i=0;i<str.length;i++){h=((h<<5)-h)+str.charCodeAt(i);h|=0;} return (h>>>0).toString(16); }
+  function mineBlock(diff) {
+   var target = '';
+   for (var i=0;i<diff;i++) target += '0';
+   var nonce = 0;
+   var start = performance.now();
+   var data = 'Bloque ' + (stats.blocksMined + 1) + '|' + Date.now();
+   while (true) {
+    var hash = simpleHash(data + nonce);
+    nonce++;
+    if (nonce > 500000) return null;
+    if (hash.startsWith(target)) {
+     var elapsed = performance.now() - start;
+     return { hash: hash, nonce: nonce, time: elapsed };
     }
-    function updateDisplay() {
-      document.getElementById('blocksMined').textContent = stats.blocksMined;
-      document.getElementById('totalAttempts').textContent = stats.totalAttempts;
-      document.getElementById('lastTime').textContent = Math.round(stats.lastTime) + 'ms';
-      var rate = stats.lastTime > 0 ? Math.round(stats.totalAttempts / (stats.lastTime / 1000)) : 0;
-      document.getElementById('hashRate').textContent = rate;
-    }
-    function mine() {
-      var result = mineBlock(difficulty);
-      if (!result) {
-        alert('No se encontr&oacute; un hash v&aacute;lido en 500k intentos. Reduce la dificultad.');
-        return;
-      }
-      stats.blocksMined++;
-      stats.totalAttempts += result.nonce;
-      stats.lastTime = result.time;
-      document.getElementById('blockHashDisplay').textContent = 'Bloque #' + stats.blocksMined + ' | Nonce: ' + result.nonce + ' | Hash: ' + result.hash;
-      updateDisplay();
-      saveStats();
-    }
-    function saveStats() { try { localStorage.setItem('block_1_04_stats', JSON.stringify(stats)); } catch(e) {} }
-    function loadStats() {
-      try { var r = localStorage.getItem('block_1_04_stats'); if (r) { stats = JSON.parse(r); updateDisplay(); } } catch(e) {}
-    }
-    function resetMining() {
-      stats = { blocksMined: 0, totalAttempts: 0, lastTime: 0 };
-      document.getElementById('blockHashDisplay').textContent = '';
-      updateDisplay();
-      localStorage.removeItem('block_1_04_stats');
-    }
-    document.getElementById('diffSlider').addEventListener('input', function() {
-      difficulty = parseInt(this.value);
-      document.getElementById('diffLabel').textContent = difficulty;
-    });
-    document.getElementById('mineBtn').addEventListener('click', mine);
-    document.getElementById('resetMiningBtn').addEventListener('click', resetMining);
-    loadStats();
-    var quizQuestions = [
-      { text: "&iquest;En qu&eacute; consiste la Prueba de Trabajo (PoW)?", options: ["Mineros resuelven acertijos computacionales para validar bloques", "Los usuarios votan para validar", "Un algoritmo de cifrado", "Un sistema de reputaci&oacute;n"], correct: 0 },
-      { text: "&iquest;Qu&eacute; ocurre en un halving de Bitcoin?", options: ["El precio se reduce a la mitad", "La recompensa por bloque se reduce a la mitad", "Se minan el doble de bloques", "Desaparecen bitcoins"], correct: 1 },
-      { text: "&iquest;Cu&aacute;l es el suministro m&aacute;ximo de Bitcoin?", options: ["100 millones", "21 millones", "210 millones", "Ilimitado"], correct: 1 }
-    ];
-    var quizAnswers = new Array(quizQuestions.length).fill(null);
-    var quizCompleted = false;
-    function renderQuiz() {
-      var container = document.getElementById('quizContainer');
-      container.innerHTML = '';
-      quizQuestions.forEach(function(q, idx) {
-        var qDiv = document.createElement('div');
-        qDiv.classList.add('question');
-        qDiv.innerHTML = '<p>' + q.text + '</p><div class="options" id="dqopt-' + idx + '"></div>';
-        var optDiv = qDiv.querySelector('.options');
-        q.options.forEach(function(opt, oi) {
-          var o = document.createElement('span');
-          o.classList.add('opt');
-          o.textContent = opt;
-          o.addEventListener('click', function() {
-            if (quizCompleted) return;
-            var parent = this.parentElement;
-            Array.from(parent.children).forEach(function(c) { c.classList.remove('selected'); });
-            this.classList.add('selected');
-            quizAnswers[idx] = oi;
-            var all = quizAnswers.every(function(a) { return a !== null; });
-            document.getElementById('submitQuizBtn').disabled = !all;
-          });
-          optDiv.appendChild(o);
-        });
-        container.appendChild(qDiv);
-      });
-    }
-    function submitQuiz() {
+   }
+  }
+  function updateDisplay() {
+   document.getElementById('blocksMined').textContent = stats.blocksMined;
+   document.getElementById('totalAttempts').textContent = stats.totalAttempts;
+   document.getElementById('lastTime').textContent = Math.round(stats.lastTime) + 'ms';
+   var rate = stats.lastTime > 0 ? Math.round(stats.totalAttempts / (stats.lastTime / 1000)) : 0;
+   document.getElementById('hashRate').textContent = rate;
+  }
+  function mine() {
+   var result = mineBlock(difficulty);
+   if (!result) {
+    alert('No se encontr&oacute; un hash v&aacute;lido en 500k intentos. Reduce la dificultad.');
+    return;
+   }
+   stats.blocksMined++;
+   stats.totalAttempts += result.nonce;
+   stats.lastTime = result.time;
+   document.getElementById('blockHashDisplay').textContent = 'Bloque #' + stats.blocksMined + ' | Nonce: ' + result.nonce + ' | Hash: ' + result.hash;
+   updateDisplay();
+   saveStats();
+  }
+  function saveStats() { try { localStorage.setItem('block_1_04_stats', JSON.stringify(stats)); } catch(e) {} }
+  function loadStats() {
+   try { var r = localStorage.getItem('block_1_04_stats'); if (r) { stats = JSON.parse(r); updateDisplay(); } } catch(e) {}
+  }
+  function resetMining() {
+   stats = { blocksMined: 0, totalAttempts: 0, lastTime: 0 };
+   document.getElementById('blockHashDisplay').textContent = '';
+   updateDisplay();
+   localStorage.removeItem('block_1_04_stats');
+  }
+  document.getElementById('diffSlider').addEventListener('input', function() {
+   difficulty = parseInt(this.value);
+   document.getElementById('diffLabel').textContent = difficulty;
+  });
+  document.getElementById('mineBtn').addEventListener('click', mine);
+  document.getElementById('resetMiningBtn').addEventListener('click', resetMining);
+  loadStats();
+  var quizQuestions = [
+   { text: "&iquest;En qu&eacute; consiste la Prueba de Trabajo (PoW)?", options: ["Mineros resuelven acertijos computacionales para validar bloques", "Los usuarios votan para validar", "Un algoritmo de cifrado", "Un sistema de reputaci&oacute;n"], correct: 0 },
+   { text: "&iquest;Qu&eacute; ocurre en un halving de Bitcoin?", options: ["El precio se reduce a la mitad", "La recompensa por bloque se reduce a la mitad", "Se minan el doble de bloques", "Desaparecen bitcoins"], correct: 1 },
+   { text: "&iquest;Cu&aacute;l es el suministro m&aacute;ximo de Bitcoin?", options: ["100 millones", "21 millones", "210 millones", "Ilimitado"], correct: 1 }
+  ];
+  var quizAnswers = new Array(quizQuestions.length).fill(null);
+  var quizCompleted = false;
+  function renderQuiz() {
+   var container = document.getElementById('quizContainer');
+   container.innerHTML = '';
+   quizQuestions.forEach(function(q, idx) {
+    var qDiv = document.createElement('div');
+    qDiv.classList.add('question');
+    qDiv.innerHTML = '<p>' + q.text + '</p><div class="options" id="dqopt-' + idx + '"></div>';
+    var optDiv = qDiv.querySelector('.options');
+    q.options.forEach(function(opt, oi) {
+     var o = document.createElement('span');
+     o.classList.add('opt');
+     o.textContent = opt;
+     o.addEventListener('click', function() {
       if (quizCompleted) return;
-      var correct = 0;
-      quizQuestions.forEach(function(q, idx) { if (quizAnswers[idx] === q.correct) correct++; });
-      var fb = document.getElementById('quizFeedback');
-      if (correct >= 2) {
-        quizCompleted = true;
-        localStorage.setItem(STORAGE_KEY, 'true');
-        document.getElementById('insigniaArea').classList.remove('hidden');
-        document.getElementById('feedbackMsg').innerHTML = 'M&oacute;dulo completado. &iexcl;Insignia de minero!';
-        fb.innerHTML = I18N.t('feedback_acertaste_success').replace('{0}', correct).replace('{1}', '');
-        quizQuestions.forEach(function(q, idx) {
-          var opts = document.querySelectorAll('#dqopt-' + idx + ' .opt');
-          opts.forEach(function(o, oi) {
-            o.style.pointerEvents = 'none';
-            if (oi === q.correct) o.classList.add('correct');
-            else if (oi === quizAnswers[idx] && oi !== q.correct) o.classList.add('wrong');
-          });
-        });
-        document.getElementById('submitQuizBtn').disabled = true;
-      } else {
-        fb.innerHTML = I18N.t('feedback_acertaste_error').replace('{0}', correct).replace('{1}', '').replace('{2}', '');
-      }
-    }
-    document.getElementById('submitQuizBtn').addEventListener('click', submitQuiz);
-    renderQuiz();
-    if (localStorage.getItem(STORAGE_KEY) === 'true') {
-      quizCompleted = true;
-      document.getElementById('insigniaArea').classList.remove('hidden');
-      document.getElementById('feedbackMsg').innerHTML = 'M&oacute;dulo completado';
-      document.getElementById('submitQuizBtn').disabled = true;
-      quizQuestions.forEach(function(q, idx) {
-        var opts = document.querySelectorAll('#dqopt-' + idx + ' .opt');
-        opts.forEach(function(o) { o.style.pointerEvents = 'none'; });
-      });
-    }
-  </script>
-  <script src="../../../assets/js/cookie-consent.js"></script>
-<script src="../../../assets/js/i18n.js"></script>  </body>
+      var parent = this.parentElement;
+      Array.from(parent.children).forEach(function(c) { c.classList.remove('selected'); });
+      this.classList.add('selected');
+      quizAnswers[idx] = oi;
+      var all = quizAnswers.every(function(a) { return a !== null; });
+      document.getElementById('submitQuizBtn').disabled = !all;
+     });
+     optDiv.appendChild(o);
+    });
+    container.appendChild(qDiv);
+   });
+  }
+  function submitQuiz() {
+   if (quizCompleted) return;
+   var correct = 0;
+   quizQuestions.forEach(function(q, idx) { if (quizAnswers[idx] === q.correct) correct++; });
+   var fb = document.getElementById('quizFeedback');
+   if (correct >= 2) {
+    quizCompleted = true;
+    localStorage.setItem(STORAGE_KEY, 'true');
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').innerHTML = 'M&oacute;dulo completado. &iexcl;Insignia de minero!';
+    fb.innerHTML = I18N.t('feedback_acertaste_success').replace('{0}', correct).replace('{1}', '');
+    quizQuestions.forEach(function(q, idx) {
+     var opts = document.querySelectorAll('#dqopt-' + idx + ' .opt');
+     opts.forEach(function(o, oi) {
+      o.style.pointerEvents = 'none';
+      if (oi === q.correct) o.classList.add('correct');
+      else if (oi === quizAnswers[idx] && oi !== q.correct) o.classList.add('wrong');
+     });
+    });
+    document.getElementById('submitQuizBtn').disabled = true;
+   } else {
+    fb.innerHTML = I18N.t('feedback_acertaste_error').replace('{0}', correct).replace('{1}', '').replace('{2}', '');
+   }
+  }
+  document.getElementById('submitQuizBtn').addEventListener('click', submitQuiz);
+  renderQuiz();
+  if (localStorage.getItem(STORAGE_KEY) === 'true') {
+   quizCompleted = true;
+   document.getElementById('insigniaArea').classList.remove('hidden');
+   document.getElementById('feedbackMsg').innerHTML = 'M&oacute;dulo completado';
+   document.getElementById('submitQuizBtn').disabled = true;
+   quizQuestions.forEach(function(q, idx) {
+    var opts = document.querySelectorAll('#dqopt-' + idx + ' .opt');
+    opts.forEach(function(o) { o.style.pointerEvents = 'none'; });
+   });
+  }
+ </script>
+ <script src="../../../assets/js/i18n.js"></script> </body>
 </html>

@@ -1,93 +1,93 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Curso 6 | Subinterpreters (PEP 734)</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { background:linear-gradient(135deg,#0a0f1e,#0c1222); font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
-    .modulo-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(245,158,11,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
-    .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #f59e0b; }
-    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#fbbf24,#f59e0b); -webkit-background-clip:text; background-clip:text; color:transparent; }
-    .hero-header p { font-size:1.1rem; color:#fbbf24; margin-top:0.5rem; }
-    .chip { background:rgba(245,158,11,0.15); border:1px solid #f59e0b; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; display:inline-block; margin:0.3rem; }
-    .progress-bar-top { background:#00000044; padding:0.6rem 2rem; text-align:center; font-size:0.85rem; border-bottom:1px solid #2c3e66; }
-    .progress-bar-top span { color:#fbbf24; font-weight:600; }
-    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #f59e0b; font-size:1rem; line-height:1.6; }
-    .main-area { padding:0 2rem 1.5rem; }
-    .simulador { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; border:1px solid #f59e0b; }
-    .simulador h3 { margin-bottom:1rem; color:#fbbf24; }
-    .btn-action { background:linear-gradient(95deg,#fbbf24,#f59e0b); border:none; padding:0.8rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin:0.3rem; }
-    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(245,158,11,0.5); }
-    .btn-reset { background:#2c3e66; border:none; padding:0.8rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; color:#eef5ff; margin:0.3rem; }
-    .btn-reset:hover { background:#3a4e7a; }
-    .grid-resp { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:0.8rem; margin:1rem 0; }
-    .card-opt { background:#0f1a2c; border:1px solid #2c3e66; border-radius:1rem; padding:1rem; text-align:center; cursor:default; }
-    .card-opt .val { font-size:1.6rem; font-weight:800; }
-    .speed-bars { display:flex; gap:1rem; justify-content:center; align-items:flex-end; margin:1rem 0; min-height:120px; }
-    .speed-bars .sb { width:100px; text-align:center; }
-    .speed-bars .sb .fill { background:linear-gradient(180deg,#fbbf24,#f59e0b); border-radius:6px 6px 0 0; margin:auto; transition:height 0.5s; }
-    .result-box { background:#0f1a2c; border:1px solid #2c3e66; border-radius:1rem; padding:1.2rem; margin:0.8rem 0; text-align:center; }
-    .feedback { background:#00000099; margin:1.5rem 2rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #f59e0b; }
-    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:1.5rem 2rem; padding:1rem; border:1px dashed gold; }
-    .insignia i { font-size:2.5rem; color:gold; }
-    .hidden { display:none; }
-    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
-    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; font-size:0.95rem; }
-    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(245,158,11,0.4); }
-    .nav-link.next { background:linear-gradient(95deg,#fbbf24,#f59e0b); color:#1e1a0c; }
-    .nav-link.menu { background:#1a2a4a; border:1px solid #3399ff; }
-    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
-    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
-  </style>
-  <link rel="stylesheet" href="../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Curso 6 | Subinterpreters (PEP 734)</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:linear-gradient(135deg,#0a0f1e,#0c1222); font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+  .modulo-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(245,158,11,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+  .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #f59e0b; }
+  .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#fbbf24,#f59e0b); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero-header p { font-size:1.1rem; color:#fbbf24; margin-top:0.5rem; }
+  .chip { background:rgba(245,158,11,0.15); border:1px solid #f59e0b; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; display:inline-block; margin:0.3rem; }
+  .progress-bar-top { background:#00000044; padding:0.6rem 2rem; text-align:center; font-size:0.85rem; border-bottom:1px solid #2c3e66; }
+  .progress-bar-top span { color:#fbbf24; font-weight:600; }
+  .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #f59e0b; font-size:1rem; line-height:1.6; }
+  .main-area { padding:0 2rem 1.5rem; }
+  .simulador { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; border:1px solid #f59e0b; }
+  .simulador h3 { margin-bottom:1rem; color:#fbbf24; }
+  .btn-action { background:linear-gradient(95deg,#fbbf24,#f59e0b); border:none; padding:0.8rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin:0.3rem; }
+  .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(245,158,11,0.5); }
+  .btn-reset { background:#2c3e66; border:none; padding:0.8rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; color:#eef5ff; margin:0.3rem; }
+  .btn-reset:hover { background:#3a4e7a; }
+  .grid-resp { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:0.8rem; margin:1rem 0; }
+  .card-opt { background:#0f1a2c; border:1px solid #2c3e66; border-radius:1rem; padding:1rem; text-align:center; cursor:default; }
+  .card-opt .val { font-size:1.6rem; font-weight:800; }
+  .speed-bars { display:flex; gap:1rem; justify-content:center; align-items:flex-end; margin:1rem 0; min-height:120px; }
+  .speed-bars .sb { width:100px; text-align:center; }
+  .speed-bars .sb .fill { background:linear-gradient(180deg,#fbbf24,#f59e0b); border-radius:6px 6px 0 0; margin:auto; transition:height 0.5s; }
+  .result-box { background:#0f1a2c; border:1px solid #2c3e66; border-radius:1rem; padding:1.2rem; margin:0.8rem 0; text-align:center; }
+  .feedback { background:#00000099; margin:1.5rem 2rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #f59e0b; }
+  .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:1.5rem 2rem; padding:1rem; border:1px dashed gold; }
+  .insignia i { font-size:2.5rem; color:gold; }
+  .hidden { display:none; }
+  .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+  .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; font-size:0.95rem; }
+  .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(245,158,11,0.4); }
+  .nav-link.next { background:linear-gradient(95deg,#fbbf24,#f59e0b); color:#1e1a0c; }
+  .nav-link.menu { background:#1a2a4a; border:1px solid #3399ff; }
+  footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
+ </style>
+ <link rel="stylesheet" href="../../assets/css/theme.css">
 </head>
 <body>
-  <nav class="brand-return-nav"><a href="../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Python Avanzado</a></nav>
-  <div class="modulo-container">
-    <div class="progress-bar-top"><i class="fas fa-tasks"></i> Curso 6: Temas Avanzados <span>| M&oacute;dulo 6 de 12</span></div>
-    <div class="hero-header">
-      <h1><i class="fas fa-layer-group"></i> Subinterpreters (PEP 734)</h1>
-      <p>Simulador sub-interpreters: estado aislado, comparaci&oacute;n con threads.</p>
-    </div>
-    <div class="analogy-card"><i class="fas fa-lightbulb" style="color:#f59e0b;margin-right:0.5rem;"></i> <strong>Como tener cocinas separadas:</strong> Los threads son como varios chefs en una sola cocina compartiendo ingredientes y utensilios (GIL, estado global). Los subinterpreters son como tener cocinas completamente separadas, cada una con sus propios ingredientes (estado aislado, sin GIL compartido). Pueden cocinar en paralelo real sin estorbarse. PEP 734 los hace mucho m&aacute;s pr&aacute;cticos.</div>
-    <div class="main-area">
-      <div class="simulador">
-        <h3><i class="fas fa-layer-group"></i> Simulador Subinterpreters vs Threads</h3>
-        <p style="font-size:0.85rem;color:#8899bb;margin-bottom:0.8rem;">Ejecuta tareas con threads y subinterpreters para ver la diferencia de rendimiento.</p>
-        <div style="display:flex;flex-wrap:wrap;gap:1rem;">
-          <div><label style="font-size:0.8rem;color:#8899bb;">Tareas:</label><br><select id="taskCount"><option value="2">2</option><option value="4" selected>4</option><option value="8">8</option></select></div>
-          <div><label style="font-size:0.8rem;color:#8899bb;">Carga:</label><br><select id="loadSub"><option value="cpu">CPU-bound</option><option value="io" selected>I/O-bound</option></select></div>
-        </div>
-        <div class="speed-bars" id="subBars">
-          <div class="sb"><div class="fill" style="width:60px;height:100px;"></div><div class="label">Threads</div></div>
-          <div class="sb"><div class="fill" style="width:60px;height:60px;"></div><div class="label">Subinterpreters</div></div>
-        </div>
-        <div class="grid-resp" style="grid-template-columns:repeat(2,1fr);">
-          <div class="card-opt"><div class="val" style="color:#fbbf24;" id="thTime">0s</div><div>Tiempo Threads</div></div>
-          <div class="card-opt"><div class="val" style="color:#22c55e;" id="siTime">0s</div><div>Tiempo SubIs</div></div>
-        </div>
-        <div style="margin-top:0.5rem;display:flex;gap:0.5rem;">
-          <button id="runSubBtn" class="btn-action"><i class="fas fa-play"></i> Ejecutar Benchmark</button>
-        </div>
-        <div id="subResult" class="result-box"></div>
-      </div>
-    </div>
-    <div id="feedbackMsg" class="feedback">Ejecuta el benchmark y observa la ventaja de subinterpreters para CPU-bound.</div>
-    <div id="insigniaArea" class="insignia hidden"><i class="fas fa-medal"></i><h3>INSIGNIA: EXPERTO EN SUBINTERPRETERS</h3><p>&iexcl;Dominas PEP 734 y el paralelismo con subinterpreters!</p></div>
-    <div class="nav-links">
-      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
-      <a href="07-free-threaded-avanzado.html" class="nav-link next">Siguiente: Free-threaded <i class="fas fa-arrow-right"></i></a>
-    </div>
-    <footer><i class="fas fa-crown"></i> Curso 6: Temas Avanzados &middot; Subinterpreters</footer>
+ <nav class="brand-return-nav"><a href="../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Python Avanzado</a></nav>
+ <div class="modulo-container">
+  <div class="progress-bar-top"><i class="fas fa-tasks"></i> Curso 6: Temas Avanzados <span>| M&oacute;dulo 6 de 12</span></div>
+  <div class="hero-header">
+   <h1><i class="fas fa-layer-group"></i> Subinterpreters (PEP 734)</h1>
+   <p>Simulador sub-interpreters: estado aislado, comparaci&oacute;n con threads.</p>
   </div>
-  <script>
-    const STORAGE_KEY='c6m6';
-    document.getElementById('runSubBtn').addEventListener('click',function(){const n=parseInt(document.getElementById('taskCount').value);const load=document.getElementById('loadSub').value;let thTime,siTime;if(load==='cpu'){thTime=n*(0.5+Math.random()*0.3);siTime=n*(0.1+Math.random()*0.1);}else{thTime=n*(0.15+Math.random()*0.1);siTime=n*(0.12+Math.random()*0.08);}const maxH=Math.max(thTime,siTime);const fills=document.querySelectorAll('#subBars .fill');fills[0].style.height=(thTime/maxH*100)+'px';fills[1].style.height=(siTime/maxH*100)+'px';document.getElementById('thTime').textContent=thTime.toFixed(2)+'s';document.getElementById('siTime').textContent=siTime.toFixed(2)+'s';const speedup=thTime/siTime;document.getElementById('subResult').innerHTML='<span style="color:#22c55e;">Subinterpreters: '+(load==='cpu'?'CPU':'I/O')+' | Speedup: '+speedup.toFixed(1)+'x sobre threads</span>';localStorage.setItem(STORAGE_KEY,'true');document.getElementById('insigniaArea').classList.remove('hidden');document.getElementById('feedbackMsg').innerHTML='&iexcl;Benchmark completado! Subinterpreters son '+speedup.toFixed(1)+'x m&aacute;s r&aacute;pidos.';});
-    if(localStorage.getItem(STORAGE_KEY)==='true'){document.getElementById('insigniaArea').classList.remove('hidden');document.getElementById('feedbackMsg').innerHTML='M&oacute;dulo completado';}
-  </script>
+  <div class="analogy-card"><i class="fas fa-lightbulb" style="color:#f59e0b;margin-right:0.5rem;"></i> <strong>Como tener cocinas separadas:</strong> Los threads son como varios chefs en una sola cocina compartiendo ingredientes y utensilios (GIL, estado global). Los subinterpreters son como tener cocinas completamente separadas, cada una con sus propios ingredientes (estado aislado, sin GIL compartido). Pueden cocinar en paralelo real sin estorbarse. PEP 734 los hace mucho m&aacute;s pr&aacute;cticos.</div>
+  <div class="main-area">
+   <div class="simulador">
+    <h3><i class="fas fa-layer-group"></i> Simulador Subinterpreters vs Threads</h3>
+    <p style="font-size:0.85rem;color:#8899bb;margin-bottom:0.8rem;">Ejecuta tareas con threads y subinterpreters para ver la diferencia de rendimiento.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:1rem;">
+     <div><label style="font-size:0.8rem;color:#8899bb;">Tareas:</label><br><select id="taskCount"><option value="2">2</option><option value="4" selected>4</option><option value="8">8</option></select></div>
+     <div><label style="font-size:0.8rem;color:#8899bb;">Carga:</label><br><select id="loadSub"><option value="cpu">CPU-bound</option><option value="io" selected>I/O-bound</option></select></div>
+    </div>
+    <div class="speed-bars" id="subBars">
+     <div class="sb"><div class="fill" style="width:60px;height:100px;"></div><div class="label">Threads</div></div>
+     <div class="sb"><div class="fill" style="width:60px;height:60px;"></div><div class="label">Subinterpreters</div></div>
+    </div>
+    <div class="grid-resp" style="grid-template-columns:repeat(2,1fr);">
+     <div class="card-opt"><div class="val" style="color:#fbbf24;" id="thTime">0s</div><div>Tiempo Threads</div></div>
+     <div class="card-opt"><div class="val" style="color:#22c55e;" id="siTime">0s</div><div>Tiempo SubIs</div></div>
+    </div>
+    <div style="margin-top:0.5rem;display:flex;gap:0.5rem;">
+     <button id="runSubBtn" class="btn-action"><i class="fas fa-play"></i> Ejecutar Benchmark</button>
+    </div>
+    <div id="subResult" class="result-box"></div>
+   </div>
+  </div>
+  <div id="feedbackMsg" class="feedback">Ejecuta el benchmark y observa la ventaja de subinterpreters para CPU-bound.</div>
+  <div id="insigniaArea" class="insignia hidden"><i class="fas fa-medal"></i><h3>INSIGNIA: EXPERTO EN SUBINTERPRETERS</h3><p>&iexcl;Dominas PEP 734 y el paralelismo con subinterpreters!</p></div>
+  <div class="nav-links">
+   <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
+   <a href="07-free-threaded-avanzado.html" class="nav-link next">Siguiente: Free-threaded <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Curso 6: Temas Avanzados &middot; Subinterpreters</footer>
+ </div>
+ <script>
+  const STORAGE_KEY='c6m6';
+  document.getElementById('runSubBtn').addEventListener('click',function(){const n=parseInt(document.getElementById('taskCount').value);const load=document.getElementById('loadSub').value;let thTime,siTime;if(load==='cpu'){thTime=n*(0.5+Math.random()*0.3);siTime=n*(0.1+Math.random()*0.1);}else{thTime=n*(0.15+Math.random()*0.1);siTime=n*(0.12+Math.random()*0.08);}const maxH=Math.max(thTime,siTime);const fills=document.querySelectorAll('#subBars .fill');fills[0].style.height=(thTime/maxH*100)+'px';fills[1].style.height=(siTime/maxH*100)+'px';document.getElementById('thTime').textContent=thTime.toFixed(2)+'s';document.getElementById('siTime').textContent=siTime.toFixed(2)+'s';const speedup=thTime/siTime;document.getElementById('subResult').innerHTML='<span style="color:#22c55e;">Subinterpreters: '+(load==='cpu'?'CPU':'I/O')+' | Speedup: '+speedup.toFixed(1)+'x sobre threads</span>';localStorage.setItem(STORAGE_KEY,'true');document.getElementById('insigniaArea').classList.remove('hidden');document.getElementById('feedbackMsg').innerHTML='&iexcl;Benchmark completado! Subinterpreters son '+speedup.toFixed(1)+'x m&aacute;s r&aacute;pidos.';});
+  if(localStorage.getItem(STORAGE_KEY)==='true'){document.getElementById('insigniaArea').classList.remove('hidden');document.getElementById('feedbackMsg').innerHTML='M&oacute;dulo completado';}
+ </script>
 <script src="../../../assets/js/i18n.js"></script>  </body>
 </html>

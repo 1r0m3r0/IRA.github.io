@@ -1,220 +1,218 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Curso 6 | Dashboards DeFi</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 100%); font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
-    .course-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(245,158,11,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
-    .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #f59e0b; }
-    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#f7c948,#f59e0b); -webkit-background-clip:text; background-clip:text; color:transparent; }
-    .hero-header p { font-size:1.1rem; color:#fde8c8; margin-top:0.5rem; }
-    .badge-area { display:flex; justify-content:center; gap:1rem; margin:1.2rem 0 0; flex-wrap:wrap; }
-    .chip { background:rgba(245,158,11,0.15); border:1px solid #f59e0b; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
-    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #f59e0b; font-size:1rem; line-height:1.6; }
-    .dashboard-builder { display:flex; flex-wrap:wrap; gap:1rem; padding:0 2rem; }
-    .selection-panel { flex:1; min-width:280px; background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.2rem; border:1px solid #2c3e66; }
-    .selection-panel h4 { color:#f7c948; margin-bottom:0.8rem; }
-    .check-item { display:flex; align-items:center; gap:0.5rem; margin:0.4rem 0; cursor:pointer; }
-    .check-item input { accent-color:#f59e0b; width:1.1rem; height:1.1rem; cursor:pointer; }
-    .metrics-panel { flex:2; min-width:300px; display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:0.8rem; }
-    .metric-tile { background:#0f1a2c; border-radius:1.5rem; padding:1rem; text-align:center; border:1px solid #2c3e66; }
-    .metric-tile .num { font-size:1.3rem; font-weight:800; color:#f7c948; }
-    .metric-tile .label { font-size:0.75rem; color:#b9ccee; }
-    .btn-action { background:linear-gradient(95deg,#f7c948,#f59e0b); border:none; padding:0.8rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin:0.5rem 0; }
-    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(245,158,11,0.5); }
-    .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
-    .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #f59e0b; }
-    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:0 2rem 1.5rem; padding:1rem; border:1px dashed gold; }
-    .insignia i { font-size:2.5rem; color:gold; }
-    .hidden { display:none; }
-    .quiz-section { background:rgba(0,10,25,0.7); border-radius:2rem; margin:0 2rem 1.5rem; padding:1.5rem; border:1px solid #f59e0b; }
-    .quiz-section h3 { margin-bottom:0.8rem; color:#f7c948; }
-    .question-block { background:#0f1a2c; margin:0.8rem 0; padding:1rem; border-radius:1.2rem; }
-    .question-block p { font-weight:600; margin-bottom:0.5rem; }
-    .qoptions { display:flex; flex-wrap:wrap; gap:0.8rem; }
-    .qopt { background:#1e2a3e; padding:0.4rem 1rem; border-radius:2rem; cursor:pointer; transition:0.2s; font-size:0.9rem; }
-    .qopt:hover { background:#2c3e66; }
-    .qopt.selected { background:#f59e0b; color:#000; font-weight:bold; }
-    .qopt.correct { background:#22c55e; color:#000; }
-    .qopt.wrong { background:#ef4444; color:#fff; }
-    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
-    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; font-size:0.95rem; }
-    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(245,158,11,0.4); }
-    .nav-link.next { background:linear-gradient(95deg,#f7c948,#f59e0b); color:#1e1a0c; }
-    .nav-link.menu { background:#1a2a4a; border:1px solid #3399ff; }
-    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
-    .progress-bar-top { background:#00000044; padding:0.6rem 2rem; text-align:center; font-size:0.85rem; border-bottom:1px solid #2c3e66; }
-    .progress-bar-top span { color:#f7c948; font-weight:600; }
-    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
-  </style>
-  <link rel="stylesheet" href="../../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Curso 6 | Dashboards DeFi</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 100%); font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+  .course-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(245,158,11,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+  .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #f59e0b; }
+  .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#f7c948,#f59e0b); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero-header p { font-size:1.1rem; color:#fde8c8; margin-top:0.5rem; }
+  .badge-area { display:flex; justify-content:center; gap:1rem; margin:1.2rem 0 0; flex-wrap:wrap; }
+  .chip { background:rgba(245,158,11,0.15); border:1px solid #f59e0b; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+  .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #f59e0b; font-size:1rem; line-height:1.6; }
+  .dashboard-builder { display:flex; flex-wrap:wrap; gap:1rem; padding:0 2rem; }
+  .selection-panel { flex:1; min-width:280px; background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.2rem; border:1px solid #2c3e66; }
+  .selection-panel h4 { color:#f7c948; margin-bottom:0.8rem; }
+  .check-item { display:flex; align-items:center; gap:0.5rem; margin:0.4rem 0; cursor:pointer; }
+  .check-item input { accent-color:#f59e0b; width:1.1rem; height:1.1rem; cursor:pointer; }
+  .metrics-panel { flex:2; min-width:300px; display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:0.8rem; }
+  .metric-tile { background:#0f1a2c; border-radius:1.5rem; padding:1rem; text-align:center; border:1px solid #2c3e66; }
+  .metric-tile .num { font-size:1.3rem; font-weight:800; color:#f7c948; }
+  .metric-tile .label { font-size:0.75rem; color:#b9ccee; }
+  .btn-action { background:linear-gradient(95deg,#f7c948,#f59e0b); border:none; padding:0.8rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin:0.5rem 0; }
+  .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(245,158,11,0.5); }
+  .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
+  .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #f59e0b; }
+  .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:0 2rem 1.5rem; padding:1rem; border:1px dashed gold; }
+  .insignia i { font-size:2.5rem; color:gold; }
+  .hidden { display:none; }
+  .quiz-section { background:rgba(0,10,25,0.7); border-radius:2rem; margin:0 2rem 1.5rem; padding:1.5rem; border:1px solid #f59e0b; }
+  .quiz-section h3 { margin-bottom:0.8rem; color:#f7c948; }
+  .question-block { background:#0f1a2c; margin:0.8rem 0; padding:1rem; border-radius:1.2rem; }
+  .question-block p { font-weight:600; margin-bottom:0.5rem; }
+  .qoptions { display:flex; flex-wrap:wrap; gap:0.8rem; }
+  .qopt { background:#1e2a3e; padding:0.4rem 1rem; border-radius:2rem; cursor:pointer; transition:0.2s; font-size:0.9rem; }
+  .qopt:hover { background:#2c3e66; }
+  .qopt.selected { background:#f59e0b; color:#000; font-weight:bold; }
+  .qopt.correct { background:#22c55e; color:#000; }
+  .qopt.wrong { background:#ef4444; color:#fff; }
+  .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+  .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; font-size:0.95rem; }
+  .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(245,158,11,0.4); }
+  .nav-link.next { background:linear-gradient(95deg,#f7c948,#f59e0b); color:#1e1a0c; }
+  .nav-link.menu { background:#1a2a4a; border:1px solid #3399ff; }
+  footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+  .progress-bar-top { background:#00000044; padding:0.6rem 2rem; text-align:center; font-size:0.85rem; border-bottom:1px solid #2c3e66; }
+  .progress-bar-top span { color:#f7c948; font-weight:600; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
+ </style>
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
 </head>
 <body>
-  <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Blockchain</a></nav>
-  <div class="course-container" id="app">
-    <div class="progress-bar-top"><i class="fas fa-rocket"></i> Curso 6: Producci&oacute;n, DeFi y Futuro <span>| M&oacute;dulo 6 de 12</span></div>
-    <div class="hero-header">
-      <h1><i class="fas fa-chart-bar"></i> Dashboards DeFi: TVL, Yield, Riesgo</h1>
-      <p>Construye tu propio dashboard para monitorear el ecosistema DeFi</p>
-      <div class="badge-area"><span class="chip"><i class="fas fa-chart-line"></i> TVL</span><span class="chip"><i class="fas fa-percent"></i> Yield</span></div>
-    </div>
-    <div class="analogy-card">
-      <strong><i class="fas fa-industry"></i> Piénsalo así:</strong> Un dashboard DeFi es como el panel de control de una central el&eacute;ctrica — monitoreas flujos, detectas anomal&iacute;as y optimizas rendimiento en tiempo real. Sin &eacute;l, operas a ciegas.
-    </div>
-    <div class="dashboard-builder">
-      <div class="selection-panel">
-        <h4><i class="fas fa-check-double"></i> Selecciona Protocolos</h4>
-        <label class="check-item"><input type="checkbox" class="protoCheck" value="Uniswap"> Uniswap (DEX)</label>
-        <label class="check-item"><input type="checkbox" class="protoCheck" value="Aave"> Aave (Lending)</label>
-        <label class="check-item"><input type="checkbox" class="protoCheck" value="Lido"> Lido (Staking)</label>
-        <label class="check-item"><input type="checkbox" class="protoCheck" value="Curve"> Curve (StableSwap)</label>
-        <label class="check-item"><input type="checkbox" class="protoCheck" value="MakerDAO"> MakerDAO (Stablecoin)</label>
-        <h4 style="margin-top:1rem;"><i class="fas fa-link"></i> Cadenas</h4>
-        <label class="check-item"><input type="checkbox" class="chainCheck" value="Ethereum" checked> Ethereum</label>
-        <label class="check-item"><input type="checkbox" class="chainCheck" value="Arbitrum"> Arbitrum</label>
-        <label class="check-item"><input type="checkbox" class="chainCheck" value="Optimism"> Optimism</label>
-        <label class="check-item"><input type="checkbox" class="chainCheck" value="Base"> Base</label>
-        <button id="buildDashboardBtn" class="btn-action" style="width:100%;margin-top:1rem;"><i class="fas fa-sync"></i> Construir Dashboard</button>
-      </div>
-      <div class="metrics-panel" id="metricsPanel">
-        <div class="metric-tile"><div class="num" id="tvlDisplay">$0</div><div class="label">TVL Total</div></div>
-        <div class="metric-tile"><div class="num" id="feesDisplay">$0</div><div class="label">Fees 24h</div></div>
-        <div class="metric-tile"><div class="num" id="yieldDisplay">0%</div><div class="label">Yield Promedio</div></div>
-        <div class="metric-tile"><div class="num" id="peDisplay">0</div><div class="label">P/E Ratio</div></div>
-        <div class="metric-tile"><div class="num" id="usersDisplay">0</div><div class="label">Usuarios Activos</div></div>
-        <div class="metric-tile"><div class="num" id="riskScore">Bajo</div><div class="label">Riesgo</div></div>
-      </div>
-    </div>
-    <div id="feedbackMsg" class="feedback" style="margin-top:1rem;">Selecciona protocolos y cadenas, luego presiona "Construir Dashboard" para ver m&eacute;tricas simuladas.</div>
-    <div id="insigniaArea" class="insignia hidden">
-      <i class="fas fa-medal"></i>
-      <h3>INSIGNIA DE DATA ANALYST DEFI</h3>
-      <p>Sabes construir y leer dashboards DeFi. &iexcl;Los datos on-chain no tienen secretos para ti!</p>
-    </div>
-    <div class="quiz-section" id="quizSection">
-      <h3><i class="fas fa-question-circle"></i> Mini Quiz: Dashboards DeFi</h3>
-      <div id="defiQuizQuestions"></div>
-      <button id="evalDefiBtn" class="btn-action" disabled>Validar respuestas</button>
-      <div id="quizFeedback" class="feedback" style="margin:0.8rem 0 0;"></div>
-    </div>
-    <div class="nav-links">
-      <a href="05-web3-frontend.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
-      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
-      <a href="07-cross-chain.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
-    </div>
-    <footer><i class="fas fa-crown"></i> Curso 6: Producci&oacute;n, DeFi y Futuro &middot; Dashboards DeFi</footer>
+ <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Blockchain</a></nav>
+ <div class="course-container" id="app">
+  <div class="progress-bar-top"><i class="fas fa-rocket"></i> Curso 6: Producci&oacute;n, DeFi y Futuro <span>| M&oacute;dulo 6 de 12</span></div>
+  <div class="hero-header">
+   <h1><i class="fas fa-chart-bar"></i> Dashboards DeFi: TVL, Yield, Riesgo</h1>
+   <p>Construye tu propio dashboard para monitorear el ecosistema DeFi</p>
+   <div class="badge-area"><span class="chip"><i class="fas fa-chart-line"></i> TVL</span><span class="chip"><i class="fas fa-percent"></i> Yield</span></div>
   </div>
-  <script>
-    const STORAGE_KEY = 'block_6_06';
-    function simulateDashboard() {
-      var protos = document.querySelectorAll('.protoCheck:checked');
-      var chains = document.querySelectorAll('.chainCheck:checked');
-      var protoCount = Math.max(protos.length, 1);
-      var chainCount = Math.max(chains.length, 1);
-      var tvlBase = protoCount * chainCount * Math.floor(Math.random() * 500 + 100);
-      var tvl = '$' + (tvlBase * 1000000).toLocaleString();
-      var fees = '$' + (Math.floor(Math.random() * tvlBase * 5000 + 10000)).toLocaleString();
-      var yieldVal = (Math.random() * 8 + 2).toFixed(1) + '%';
-      var pe = Math.floor(Math.random() * 30 + 5);
-      var users = (Math.floor(Math.random() * protoCount * 50000 + 10000)).toLocaleString();
-      var risks = ['Bajo', 'Medio', 'Alto'];
-      var risk = risks[Math.floor(Math.random() * (protoCount > 3 ? 3 : 2))];
-      document.getElementById('tvlDisplay').textContent = tvl;
-      document.getElementById('feesDisplay').textContent = fees;
-      document.getElementById('yieldDisplay').textContent = yieldVal;
-      document.getElementById('peDisplay').textContent = pe;
-      document.getElementById('usersDisplay').textContent = users;
-      document.getElementById('riskScore').textContent = risk;
-      document.getElementById('feedbackMsg').innerHTML = 'Dashboard construido: <strong>' + protoCount + '</strong> protocolos en <strong>' + chainCount + '</strong> cadenas. TVL: ' + tvl + ' | Fees: ' + fees;
-      if (!localStorage.getItem(STORAGE_KEY)) {
-        document.getElementById('insigniaArea').classList.remove('hidden');
-      }
-    }
-    document.getElementById('buildDashboardBtn').addEventListener('click', simulateDashboard);
-    var defiQuestions = [
-      { text: "&iquest;Qu&eacute; mide el TVL en DeFi?", options: ["El valor total bloqueado en smart contracts", "El volumen de trading diario", "El n&uacute;mero de usuarios", "El precio del token"], correct: 0 },
-      { text: "&iquest;Para qu&eacute; sirve Dune Analytics?", options: ["Para crear dashboards con datos on-chain", "Para minar Ethereum", "Para hacer trading automatizado", "Para lanzar tokens"], correct: 0 },
-      { text: "&iquest;Qu&eacute; indica un P/E ratio bajo en un protocolo DeFi?", options: ["Que est&aacute; infravalorado respecto a sus ingresos", "Que tiene muchos usuarios", "Que el TVL es alto", "Que el riesgo es bajo"], correct: 0 }
-    ];
-    var dAnswers = new Array(defiQuestions.length).fill(null);
-    var dPassed = false;
-    function renderDefiQuiz() {
-      var c = document.getElementById('defiQuizQuestions');
-      c.innerHTML = '';
-      defiQuestions.forEach(function(q, idx) {
-        var d = document.createElement('div');
-        d.classList.add('question-block');
-        d.innerHTML = '<p>' + q.text + '</p><div class="qoptions" id="dopts-' + idx + '"></div>';
-        var optsDiv = d.querySelector('.qoptions');
-        q.options.forEach(function(o, oi) {
-          var s = document.createElement('span');
-          s.classList.add('qopt');
-          s.textContent = o;
-          s.dataset.idx = idx;
-          s.dataset.opt = oi;
-          s.addEventListener('click', function() {
-            if (dPassed) return;
-            var parent = this.parentElement;
-            Array.from(parent.children).forEach(function(c) { c.classList.remove('selected'); });
-            this.classList.add('selected');
-            dAnswers[idx] = oi;
-            var allFilled = dAnswers.every(function(a) { return a !== null; });
-            document.getElementById('evalDefiBtn').disabled = !allFilled;
-          });
-          optsDiv.appendChild(s);
-        });
-        c.appendChild(d);
-      });
-    }
-    function evalDefi() {
-      if (dPassed) { alert('Ya superaste el quiz.'); return; }
-      var correct = 0;
-      defiQuestions.forEach(function(q, idx) {
-        if (dAnswers[idx] === q.correct) correct++;
-      });
-      var fb = document.getElementById('quizFeedback');
-      if (correct >= 2) {
-        dPassed = true;
-        localStorage.setItem(STORAGE_KEY, 'true');
-        fb.innerHTML = I18N.t('fb_0') + correct + '/3 correctas. Dominas las m&eacute;tricas DeFi.';
-        defiQuestions.forEach(function(q, idx) {
-          var opts = document.querySelectorAll('#dopts-' + idx + ' .qopt');
-          opts.forEach(function(o, oi) {
-            o.style.pointerEvents = 'none';
-            if (oi === q.correct) o.classList.add('correct');
-            else if (oi === dAnswers[idx] && oi !== q.correct) o.classList.add('wrong');
-          });
-        });
-        document.getElementById('insigniaArea').classList.remove('hidden');
-        document.getElementById('evalDefiBtn').disabled = true;
-      } else {
-        fb.innerHTML = 'Obtuviste ' + correct + '/3. Necesitas al menos 2 correctas. &iexcl;Revisa e int&eacute;ntalo de nuevo!';
-      }
-    }
-    document.getElementById('evalDefiBtn').addEventListener('click', evalDefi);
-    function restore() {
-      var completed = localStorage.getItem(STORAGE_KEY);
-      if (completed === 'true') {
-        dPassed = true;
-        document.getElementById('insigniaArea').classList.remove('hidden');
-        document.getElementById('evalDefiBtn').disabled = true;
-        document.getElementById('evalDefiBtn').textContent = 'Completado';
-      }
-    }
-    renderDefiQuiz();
-    restore();
-  </script>
-  <script src="../../../assets/js/cookie-consent.js"></script>
-
-<script>
+  <div class="analogy-card">
+   <strong><i class="fas fa-industry"></i> Piénsalo así:</strong> Un dashboard DeFi es como el panel de control de una central el&eacute;ctrica — monitoreas flujos, detectas anomal&iacute;as y optimizas rendimiento en tiempo real. Sin &eacute;l, operas a ciegas.
+  </div>
+  <div class="dashboard-builder">
+   <div class="selection-panel">
+    <h4><i class="fas fa-check-double"></i> Selecciona Protocolos</h4>
+    <label class="check-item"><input type="checkbox" class="protoCheck" value="Uniswap"> Uniswap (DEX)</label>
+    <label class="check-item"><input type="checkbox" class="protoCheck" value="Aave"> Aave (Lending)</label>
+    <label class="check-item"><input type="checkbox" class="protoCheck" value="Lido"> Lido (Staking)</label>
+    <label class="check-item"><input type="checkbox" class="protoCheck" value="Curve"> Curve (StableSwap)</label>
+    <label class="check-item"><input type="checkbox" class="protoCheck" value="MakerDAO"> MakerDAO (Stablecoin)</label>
+    <h4 style="margin-top:1rem;"><i class="fas fa-link"></i> Cadenas</h4>
+    <label class="check-item"><input type="checkbox" class="chainCheck" value="Ethereum" checked> Ethereum</label>
+    <label class="check-item"><input type="checkbox" class="chainCheck" value="Arbitrum"> Arbitrum</label>
+    <label class="check-item"><input type="checkbox" class="chainCheck" value="Optimism"> Optimism</label>
+    <label class="check-item"><input type="checkbox" class="chainCheck" value="Base"> Base</label>
+    <button id="buildDashboardBtn" class="btn-action" style="width:100%;margin-top:1rem;"><i class="fas fa-sync"></i> Construir Dashboard</button>
+   </div>
+   <div class="metrics-panel" id="metricsPanel">
+    <div class="metric-tile"><div class="num" id="tvlDisplay">$0</div><div class="label">TVL Total</div></div>
+    <div class="metric-tile"><div class="num" id="feesDisplay">$0</div><div class="label">Fees 24h</div></div>
+    <div class="metric-tile"><div class="num" id="yieldDisplay">0%</div><div class="label">Yield Promedio</div></div>
+    <div class="metric-tile"><div class="num" id="peDisplay">0</div><div class="label">P/E Ratio</div></div>
+    <div class="metric-tile"><div class="num" id="usersDisplay">0</div><div class="label">Usuarios Activos</div></div>
+    <div class="metric-tile"><div class="num" id="riskScore">Bajo</div><div class="label">Riesgo</div></div>
+   </div>
+  </div>
+  <div id="feedbackMsg" class="feedback" style="margin-top:1rem;">Selecciona protocolos y cadenas, luego presiona "Construir Dashboard" para ver m&eacute;tricas simuladas.</div>
+  <div id="insigniaArea" class="insignia hidden">
+   <i class="fas fa-medal"></i>
+   <h3>INSIGNIA DE DATA ANALYST DEFI</h3>
+   <p>Sabes construir y leer dashboards DeFi. &iexcl;Los datos on-chain no tienen secretos para ti!</p>
+  </div>
+  <div class="quiz-section" id="quizSection">
+   <h3><i class="fas fa-question-circle"></i> Mini Quiz: Dashboards DeFi</h3>
+   <div id="defiQuizQuestions"></div>
+   <button id="evalDefiBtn" class="btn-action" disabled>Validar respuestas</button>
+   <div id="quizFeedback" class="feedback" style="margin:0.8rem 0 0;"></div>
+  </div>
+  <div class="nav-links">
+   <a href="05-web3-frontend.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
+   <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
+   <a href="07-cross-chain.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Curso 6: Producci&oacute;n, DeFi y Futuro &middot; Dashboards DeFi</footer>
+ </div>
+ <script>
+  const STORAGE_KEY = 'block_6_06';
+  function simulateDashboard() {
+   var protos = document.querySelectorAll('.protoCheck:checked');
+   var chains = document.querySelectorAll('.chainCheck:checked');
+   var protoCount = Math.max(protos.length, 1);
+   var chainCount = Math.max(chains.length, 1);
+   var tvlBase = protoCount * chainCount * Math.floor(Math.random() * 500 + 100);
+   var tvl = '$' + (tvlBase * 1000000).toLocaleString();
+   var fees = '$' + (Math.floor(Math.random() * tvlBase * 5000 + 10000)).toLocaleString();
+   var yieldVal = (Math.random() * 8 + 2).toFixed(1) + '%';
+   var pe = Math.floor(Math.random() * 30 + 5);
+   var users = (Math.floor(Math.random() * protoCount * 50000 + 10000)).toLocaleString();
+   var risks = ['Bajo', 'Medio', 'Alto'];
+   var risk = risks[Math.floor(Math.random() * (protoCount > 3 ? 3 : 2))];
+   document.getElementById('tvlDisplay').textContent = tvl;
+   document.getElementById('feesDisplay').textContent = fees;
+   document.getElementById('yieldDisplay').textContent = yieldVal;
+   document.getElementById('peDisplay').textContent = pe;
+   document.getElementById('usersDisplay').textContent = users;
+   document.getElementById('riskScore').textContent = risk;
+   document.getElementById('feedbackMsg').innerHTML = 'Dashboard construido: <strong>' + protoCount + '</strong> protocolos en <strong>' + chainCount + '</strong> cadenas. TVL: ' + tvl + ' | Fees: ' + fees;
+   if (!localStorage.getItem(STORAGE_KEY)) {
+    document.getElementById('insigniaArea').classList.remove('hidden');
+   }
+  }
+  document.getElementById('buildDashboardBtn').addEventListener('click', simulateDashboard);
+  var defiQuestions = [
+   { text: "&iquest;Qu&eacute; mide el TVL en DeFi?", options: ["El valor total bloqueado en smart contracts", "El volumen de trading diario", "El n&uacute;mero de usuarios", "El precio del token"], correct: 0 },
+   { text: "&iquest;Para qu&eacute; sirve Dune Analytics?", options: ["Para crear dashboards con datos on-chain", "Para minar Ethereum", "Para hacer trading automatizado", "Para lanzar tokens"], correct: 0 },
+   { text: "&iquest;Qu&eacute; indica un P/E ratio bajo en un protocolo DeFi?", options: ["Que est&aacute; infravalorado respecto a sus ingresos", "Que tiene muchos usuarios", "Que el TVL es alto", "Que el riesgo es bajo"], correct: 0 }
+  ];
+  var dAnswers = new Array(defiQuestions.length).fill(null);
+  var dPassed = false;
+  function renderDefiQuiz() {
+   var c = document.getElementById('defiQuizQuestions');
+   c.innerHTML = '';
+   defiQuestions.forEach(function(q, idx) {
+    var d = document.createElement('div');
+    d.classList.add('question-block');
+    d.innerHTML = '<p>' + q.text + '</p><div class="qoptions" id="dopts-' + idx + '"></div>';
+    var optsDiv = d.querySelector('.qoptions');
+    q.options.forEach(function(o, oi) {
+     var s = document.createElement('span');
+     s.classList.add('qopt');
+     s.textContent = o;
+     s.dataset.idx = idx;
+     s.dataset.opt = oi;
+     s.addEventListener('click', function() {
+      if (dPassed) return;
+      var parent = this.parentElement;
+      Array.from(parent.children).forEach(function(c) { c.classList.remove('selected'); });
+      this.classList.add('selected');
+      dAnswers[idx] = oi;
+      var allFilled = dAnswers.every(function(a) { return a !== null; });
+      document.getElementById('evalDefiBtn').disabled = !allFilled;
+     });
+     optsDiv.appendChild(s);
+    });
+    c.appendChild(d);
+   });
+  }
+  function evalDefi() {
+   if (dPassed) { alert('Ya superaste el quiz.'); return; }
+   var correct = 0;
+   defiQuestions.forEach(function(q, idx) {
+    if (dAnswers[idx] === q.correct) correct++;
+   });
+   var fb = document.getElementById('quizFeedback');
+   if (correct >= 2) {
+    dPassed = true;
+    localStorage.setItem(STORAGE_KEY, 'true');
+    fb.innerHTML = I18N.t('fb_0') + correct + '/3 correctas. Dominas las m&eacute;tricas DeFi.';
+    defiQuestions.forEach(function(q, idx) {
+     var opts = document.querySelectorAll('#dopts-' + idx + ' .qopt');
+     opts.forEach(function(o, oi) {
+      o.style.pointerEvents = 'none';
+      if (oi === q.correct) o.classList.add('correct');
+      else if (oi === dAnswers[idx] && oi !== q.correct) o.classList.add('wrong');
+     });
+    });
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('evalDefiBtn').disabled = true;
+   } else {
+    fb.innerHTML = 'Obtuviste ' + correct + '/3. Necesitas al menos 2 correctas. &iexcl;Revisa e int&eacute;ntalo de nuevo!';
+   }
+  }
+  document.getElementById('evalDefiBtn').addEventListener('click', evalDefi);
+  function restore() {
+   var completed = localStorage.getItem(STORAGE_KEY);
+   if (completed === 'true') {
+    dPassed = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('evalDefiBtn').disabled = true;
+    document.getElementById('evalDefiBtn').textContent = 'Completado';
+   }
+  }
+  renderDefiQuiz();
+  restore();
+ </script>
+ <script>
 window.I18N_DATA={
-  'fb_0': { es: '&iexcl;Excelente! ', en: '&iexcl;Excelente! ' }
+ 'fb_0': { es: '&iexcl;Excelente! ', en: '&iexcl;Excelente! ' }
 };
 </script>
-<script src="../../../assets/js/i18n.js"></script>  </body>
+<script src="../../../assets/js/i18n.js"></script> </body>
 </html>

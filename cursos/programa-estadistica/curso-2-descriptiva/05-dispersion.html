@@ -1,314 +1,313 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Est. Descriptiva | 📏 Medidas de Dispersión</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { background:linear-gradient(135deg,#0a0f1e,#0c1222 50%,#111a2e); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
-    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-    .course-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(0,224,255,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
-    .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #00e0ff; }
-    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#7af2ff,#00e0ff); -webkit-background-clip:text; background-clip:text; color:transparent; }
-    .hero-header p { font-size:1.1rem; color:#b9e2ff; margin-top:0.5rem; font-weight:500; }
-    .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
-    .chip { background:rgba(0,224,255,0.15); border:1px solid #00e0ff; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
-    .progress-section { padding:1.2rem 2rem; border-bottom:1px solid #1a2a4a; }
-    .progress-bar-outer { background:#1a2a4a; border-radius:20px; height:16px; overflow:hidden; }
-    .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#00e0ff,#0088ff); border-radius:20px; transition:width 0.5s ease; }
-    .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
-    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #00e0ff; font-size:1rem; line-height:1.6; }
-    .main-area { padding:1.5rem 2rem; }
-    .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#00e0ff; }
-    .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
-    .info-panel { background:rgba(10,20,40,0.7); border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
-    .info-panel h3 { color:#7af2ff; font-size:1rem; margin-bottom:0.5rem; }
-    .info-panel p { font-size:0.85rem; color:#b9ccee; line-height:1.6; }
-    .info-panel .formula { font-size:1.1rem; font-weight:700; color:#00e0ff; text-align:center; margin:0.5rem 0; font-family:monospace; }
-    .sim-area { background:rgba(0,10,25,0.5); border-radius:2rem; padding:1.5rem; margin-bottom:1.5rem; border:1px solid #2c3e66; }
-    .sim-area h3 { color:#00e0ff; margin-bottom:1rem; }
-    .scatter-viz { display:flex; align-items:flex-end; gap:4px; height:160px; margin:1rem 0; padding:0.5rem; background:#0a0f1e; border-radius:1rem; border:1px solid #2c3e66; }
-    .scatter-bar { width:20px; background:linear-gradient(0deg,#00e0ff,#0088ff); border-radius:3px 3px 0 0; transition:height 0.3s; }
-    .disp-result { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; margin:1rem 0; }
-    .disp-item { background:#0f1a2c; padding:0.5rem 1rem; border-radius:1rem; text-align:center; min-width:100px; }
-    .disp-item .label { font-size:0.7rem; color:#8899cc; }
-    .disp-item .num { font-size:1.2rem; font-weight:700; color:#00e0ff; }
-    .quiz-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #3399ff; margin-bottom:1.5rem; }
-    .quiz-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#00e0ff; }
-    .question { background:#0f1a2c; margin:0.8rem 0; padding:0.8rem 1rem; border-radius:1.2rem; }
-    .question p { font-weight:600; margin-bottom:0.5rem; font-size:0.95rem; }
-    .options { display:flex; flex-wrap:wrap; gap:0.6rem; }
-    .opt { background:#1e2a3e; padding:0.3rem 0.9rem; border-radius:2rem; cursor:pointer; transition:0.2s; font-size:0.85rem; }
-    .opt:hover { background:#2c3e66; transform:translateY(-2px); }
-    .opt.selected { background:#00e0ff; color:#000; font-weight:bold; box-shadow:0 0 8px cyan; }
-    .opt.correct { background:#00cc88; color:#000; }
-    .opt.wrong { background:#ff4455; color:#fff; }
-    .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #00e0ff; }
-    .btn-action { background:linear-gradient(95deg,#f0a500,#ff6a00); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin-top:1rem; }
-    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(240,165,0,0.5); }
-    .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
-    .btn-action.secondary { background:#2c3e66; color:#eef5ff; }
-    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin-top:1.5rem; padding:1rem; border:1px dashed gold; }
-    .insignia i { font-size:2.5rem; color:gold; }
-    .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
-    .hidden { display:none; }
-    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
-    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
-    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(0,224,255,0.4); }
-    .nav-link.next { background:linear-gradient(95deg,#f0a500,#ff6a00); color:#1e1a0c; }
-    .nav-link.menu { background:#1a2a4a; border:1px solid #3399ff; }
-    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
-    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .info-grid { grid-template-columns:1fr; } }
-  </style>
-  <link rel="stylesheet" href="../../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Est. Descriptiva | 📏 Medidas de Dispersión</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:linear-gradient(135deg,#0a0f1e,#0c1222 50%,#111a2e); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+  @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .course-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(0,224,255,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+  .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #00e0ff; }
+  .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#7af2ff,#00e0ff); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero-header p { font-size:1.1rem; color:#b9e2ff; margin-top:0.5rem; font-weight:500; }
+  .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+  .chip { background:rgba(0,224,255,0.15); border:1px solid #00e0ff; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+  .progress-section { padding:1.2rem 2rem; border-bottom:1px solid #1a2a4a; }
+  .progress-bar-outer { background:#1a2a4a; border-radius:20px; height:16px; overflow:hidden; }
+  .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#00e0ff,#0088ff); border-radius:20px; transition:width 0.5s ease; }
+  .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
+  .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #00e0ff; font-size:1rem; line-height:1.6; }
+  .main-area { padding:1.5rem 2rem; }
+  .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#00e0ff; }
+  .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
+  .info-panel { background:rgba(10,20,40,0.7); border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
+  .info-panel h3 { color:#7af2ff; font-size:1rem; margin-bottom:0.5rem; }
+  .info-panel p { font-size:0.85rem; color:#b9ccee; line-height:1.6; }
+  .info-panel .formula { font-size:1.1rem; font-weight:700; color:#00e0ff; text-align:center; margin:0.5rem 0; font-family:monospace; }
+  .sim-area { background:rgba(0,10,25,0.5); border-radius:2rem; padding:1.5rem; margin-bottom:1.5rem; border:1px solid #2c3e66; }
+  .sim-area h3 { color:#00e0ff; margin-bottom:1rem; }
+  .scatter-viz { display:flex; align-items:flex-end; gap:4px; height:160px; margin:1rem 0; padding:0.5rem; background:#0a0f1e; border-radius:1rem; border:1px solid #2c3e66; }
+  .scatter-bar { width:20px; background:linear-gradient(0deg,#00e0ff,#0088ff); border-radius:3px 3px 0 0; transition:height 0.3s; }
+  .disp-result { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; margin:1rem 0; }
+  .disp-item { background:#0f1a2c; padding:0.5rem 1rem; border-radius:1rem; text-align:center; min-width:100px; }
+  .disp-item .label { font-size:0.7rem; color:#8899cc; }
+  .disp-item .num { font-size:1.2rem; font-weight:700; color:#00e0ff; }
+  .quiz-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #3399ff; margin-bottom:1.5rem; }
+  .quiz-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#00e0ff; }
+  .question { background:#0f1a2c; margin:0.8rem 0; padding:0.8rem 1rem; border-radius:1.2rem; }
+  .question p { font-weight:600; margin-bottom:0.5rem; font-size:0.95rem; }
+  .options { display:flex; flex-wrap:wrap; gap:0.6rem; }
+  .opt { background:#1e2a3e; padding:0.3rem 0.9rem; border-radius:2rem; cursor:pointer; transition:0.2s; font-size:0.85rem; }
+  .opt:hover { background:#2c3e66; transform:translateY(-2px); }
+  .opt.selected { background:#00e0ff; color:#000; font-weight:bold; box-shadow:0 0 8px cyan; }
+  .opt.correct { background:#00cc88; color:#000; }
+  .opt.wrong { background:#ff4455; color:#fff; }
+  .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #00e0ff; }
+  .btn-action { background:linear-gradient(95deg,#f0a500,#ff6a00); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin-top:1rem; }
+  .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(240,165,0,0.5); }
+  .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
+  .btn-action.secondary { background:#2c3e66; color:#eef5ff; }
+  .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin-top:1.5rem; padding:1rem; border:1px dashed gold; }
+  .insignia i { font-size:2.5rem; color:gold; }
+  .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
+  .hidden { display:none; }
+  .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+  .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+  .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(0,224,255,0.4); }
+  .nav-link.next { background:linear-gradient(95deg,#f0a500,#ff6a00); color:#1e1a0c; }
+  .nav-link.menu { background:#1a2a4a; border:1px solid #3399ff; }
+  footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .info-grid { grid-template-columns:1fr; } }
+ </style>
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
 </head>
 <body>
-  <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Estadística</a></nav>
-  <div class="course-container" id="app">
-    <div class="hero-header">
-      <h1>📏 Medidas de Dispersión</h1>
-      <p>¿Qué tanto se esparcen tus datos? La variabilidad lo dice todo</p>
-      <div class="badge-area">
-        <span class="chip"><i class="fas fa-arrows-alt-h"></i> Rango</span>
-        <span class="chip"><i class="fas fa-square-root-alt"></i> Varianza</span>
-        <span class="chip"><i class="fas fa-sigma"></i> Desv. Estándar</span>
-        <span class="chip"><i class="fas fa-percent"></i> CV</span>
-      </div>
+ <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Estadística</a></nav>
+ <div class="course-container" id="app">
+  <div class="hero-header">
+   <h1>📏 Medidas de Dispersión</h1>
+   <p>¿Qué tanto se esparcen tus datos? La variabilidad lo dice todo</p>
+   <div class="badge-area">
+    <span class="chip"><i class="fas fa-arrows-alt-h"></i> Rango</span>
+    <span class="chip"><i class="fas fa-square-root-alt"></i> Varianza</span>
+    <span class="chip"><i class="fas fa-sigma"></i> Desv. Estándar</span>
+    <span class="chip"><i class="fas fa-percent"></i> CV</span>
+   </div>
+  </div>
+  <div class="progress-section">
+   <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+   <span class="progress-text" id="progressText">Módulo 5 de 12</span>
+  </div>
+  <div class="analogy-card">
+   <strong>💡 Piénsalo así:</strong> La dispersión es como la puntería de dos arqueros. Ambos pueden tener el mismo promedio de aciertos (tendencia central), pero uno agrupa sus flechas en el centro y el otro las esparce por todo el blanco. La desviación estándar te dice qué tan preciso es cada arquero.
+  </div>
+  <div class="main-area">
+   <div class="section-title"><i class="fas fa-ruler-combined"></i> Medidas de Dispersión</div>
+   <div class="info-grid">
+    <div class="info-panel">
+     <h3>📏 Rango</h3>
+     <p>Diferencia entre el valor máximo y mínimo. Simple pero sensible a outliers.</p>
+     <div class="formula">R = máx - mín</div>
     </div>
-    <div class="progress-section">
-      <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
-      <span class="progress-text" id="progressText">Módulo 5 de 12</span>
+    <div class="info-panel">
+     <h3>📐 Varianza (σ²)</h3>
+     <p>Promedio de las desviaciones al cuadrado respecto a la media. Unidades al cuadrado.</p>
+     <div class="formula">σ² = Σ(x-μ)²/n</div>
     </div>
-    <div class="analogy-card">
-      <strong>💡 Piénsalo así:</strong> La dispersión es como la puntería de dos arqueros. Ambos pueden tener el mismo promedio de aciertos (tendencia central), pero uno agrupa sus flechas en el centro y el otro las esparce por todo el blanco. La desviación estándar te dice qué tan preciso es cada arquero.
+    <div class="info-panel">
+     <h3>📊 Desviación Estándar (σ)</h3>
+     <p>Raíz cuadrada de la varianza. Misma unidad que los datos originales. La medida más usada.</p>
+     <div class="formula">σ = √σ²</div>
     </div>
-    <div class="main-area">
-      <div class="section-title"><i class="fas fa-ruler-combined"></i> Medidas de Dispersión</div>
-      <div class="info-grid">
-        <div class="info-panel">
-          <h3>📏 Rango</h3>
-          <p>Diferencia entre el valor máximo y mínimo. Simple pero sensible a outliers.</p>
-          <div class="formula">R = máx - mín</div>
-        </div>
-        <div class="info-panel">
-          <h3>📐 Varianza (σ²)</h3>
-          <p>Promedio de las desviaciones al cuadrado respecto a la media. Unidades al cuadrado.</p>
-          <div class="formula">σ² = Σ(x-μ)²/n</div>
-        </div>
-        <div class="info-panel">
-          <h3>📊 Desviación Estándar (σ)</h3>
-          <p>Raíz cuadrada de la varianza. Misma unidad que los datos originales. La medida más usada.</p>
-          <div class="formula">σ = √σ²</div>
-        </div>
-        <div class="info-panel">
-          <h3>📈 Coef. Variación (CV)</h3>
-          <p>Desviación estándar relativa a la media. Permite comparar dispersión entre escalas distintas.</p>
-          <div class="formula">CV = σ/μ × 100%</div>
-        </div>
-      </div>
+    <div class="info-panel">
+     <h3>📈 Coef. Variación (CV)</h3>
+     <p>Desviación estándar relativa a la media. Permite comparar dispersión entre escalas distintas.</p>
+     <div class="formula">CV = σ/μ × 100%</div>
+    </div>
+   </div>
 
-      <div class="section-title"><i class="fas fa-wave-square"></i> Visualizador de Dispersión</div>
-      <div class="sim-area">
-        <h3><i class="fas fa-chart-line"></i> ¿Datos concentrados o dispersos?</h3>
-        <p style="font-size:0.85rem;color:#8899cc;margin-bottom:1rem;">Arrastra los puntos para cambiar los valores y ve cómo se actualizan las medidas</p>
-        <div class="scatter-viz" id="barChart"></div>
-        <div class="disp-result">
-          <div class="disp-item"><div class="label">Media</div><div class="num" id="dMean">0</div></div>
-          <div class="disp-item"><div class="label">Rango</div><div class="num" id="dRange">0</div></div>
-          <div class="disp-item"><div class="label">Varianza</div><div class="num" id="dVar">0</div></div>
-          <div class="disp-item"><div class="label">Desv. Est.</div><div class="num" id="dStd">0</div></div>
-          <div class="disp-item"><div class="label">CV (%)</div><div class="num" id="dCV">0</div></div>
-        </div>
-        <button id="randomizeBtn" class="btn-action secondary" style="font-size:0.85rem;padding:0.5rem 1.2rem;">🎲 Datos aleatorios</button>
-      </div>
-
-      <div class="quiz-area">
-        <div class="quiz-title"><i class="fas fa-question-circle"></i> Mini Quiz: Dispersión</div>
-        <div id="quizContainer"></div>
-        <button id="submitQuizBtn" class="btn-action">✅ Verificar respuestas</button>
-        <div id="insigniaArea" class="insignia hidden">
-          <i class="fas fa-medal"></i>
-          <h3>📏 Medidor de Variabilidad 📏</h3>
-          <p>Comprendes la dispersión y sabes interpretar la desviación estándar. ¡Excelente trabajo!</p>
-        </div>
-      </div>
+   <div class="section-title"><i class="fas fa-wave-square"></i> Visualizador de Dispersión</div>
+   <div class="sim-area">
+    <h3><i class="fas fa-chart-line"></i> ¿Datos concentrados o dispersos?</h3>
+    <p style="font-size:0.85rem;color:#8899cc;margin-bottom:1rem;">Arrastra los puntos para cambiar los valores y ve cómo se actualizan las medidas</p>
+    <div class="scatter-viz" id="barChart"></div>
+    <div class="disp-result">
+     <div class="disp-item"><div class="label">Media</div><div class="num" id="dMean">0</div></div>
+     <div class="disp-item"><div class="label">Rango</div><div class="num" id="dRange">0</div></div>
+     <div class="disp-item"><div class="label">Varianza</div><div class="num" id="dVar">0</div></div>
+     <div class="disp-item"><div class="label">Desv. Est.</div><div class="num" id="dStd">0</div></div>
+     <div class="disp-item"><div class="label">CV (%)</div><div class="num" id="dCV">0</div></div>
     </div>
+    <button id="randomizeBtn" class="btn-action secondary" style="font-size:0.85rem;padding:0.5rem 1.2rem;">🎲 Datos aleatorios</button>
+   </div>
 
-    <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre medidas de dispersión.</div>
-
-    <div class="nav-links">
-      <a href="04-tendencia-central.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
-      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
-      <a href="06-posicion-forma.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+   <div class="quiz-area">
+    <div class="quiz-title"><i class="fas fa-question-circle"></i> Mini Quiz: Dispersión</div>
+    <div id="quizContainer"></div>
+    <button id="submitQuizBtn" class="btn-action">✅ Verificar respuestas</button>
+    <div id="insigniaArea" class="insignia hidden">
+     <i class="fas fa-medal"></i>
+     <h3>📏 Medidor de Variabilidad 📏</h3>
+     <p>Comprendes la dispersión y sabes interpretar la desviación estándar. ¡Excelente trabajo!</p>
     </div>
-    <footer><i class="fas fa-chart-bar"></i> Curso 2: Estadística Descriptiva · Módulo 5 de 12</footer>
+   </div>
   </div>
 
-  <script>
-    const STORAGE_KEY = 'prog_est_2_05';
-    const PROGRESS_KEY = 'prog_est_2_progress';
-    const questions = [
-      { text: "¿Qué mide la desviación estándar?", options: ["La tendencia central", "La dispersión promedio", "La forma de la distribución", "La asimetría"], correct: 1 },
-      { text: "Si todos los datos son iguales, la desviación estándar es:", options: ["1", "Igual a la media", "Cero", "No se puede calcular"], correct: 2 },
-      { text: "¿Para qué sirve el coeficiente de variación?", options: ["Comparar dispersión entre conjuntos con diferentes escalas", "Medir la tendencia central", "Calcular la moda", "Identificar outliers"], correct: 0 },
-      { text: "La varianza se expresa en:", options: ["Las mismas unidades que los datos", "Unidades al cuadrado", "Porcentaje", "Adimensional"], correct: 1 },
-      { text: "¿Qué medida de dispersión es más resistente a valores extremos?", options: ["Rango", "Varianza", "Desviación estándar", "Rango intercuartílico (IQR)"], correct: 3 }
-    ];
-    let userAnswers = new Array(questions.length).fill(null);
-    let quizCompleted = false;
-    let dataPoints = [4,7,5,9,6,8,3,10];
-    const NUM_POINTS = 8;
+  <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre medidas de dispersión.</div>
 
-    function saveProgress() {
-      let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
-      if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
-      localStorage.setItem(STORAGE_KEY, 'true');
-    }
+  <div class="nav-links">
+   <a href="04-tendencia-central.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+   <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+   <a href="06-posicion-forma.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-chart-bar"></i> Curso 2: Estadística Descriptiva · Módulo 5 de 12</footer>
+ </div>
 
-    function updateProgress() {
-      let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
-      document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
-      document.getElementById('progressText').textContent = 'M\u00f3dulo '+(p.length || 1)+' de 12';
-    }
+ <script>
+  const STORAGE_KEY = 'prog_est_2_05';
+  const PROGRESS_KEY = 'prog_est_2_progress';
+  const questions = [
+   { text: "¿Qué mide la desviación estándar?", options: ["La tendencia central", "La dispersión promedio", "La forma de la distribución", "La asimetría"], correct: 1 },
+   { text: "Si todos los datos son iguales, la desviación estándar es:", options: ["1", "Igual a la media", "Cero", "No se puede calcular"], correct: 2 },
+   { text: "¿Para qué sirve el coeficiente de variación?", options: ["Comparar dispersión entre conjuntos con diferentes escalas", "Medir la tendencia central", "Calcular la moda", "Identificar outliers"], correct: 0 },
+   { text: "La varianza se expresa en:", options: ["Las mismas unidades que los datos", "Unidades al cuadrado", "Porcentaje", "Adimensional"], correct: 1 },
+   { text: "¿Qué medida de dispersión es más resistente a valores extremos?", options: ["Rango", "Varianza", "Desviación estándar", "Rango intercuartílico (IQR)"], correct: 3 }
+  ];
+  let userAnswers = new Array(questions.length).fill(null);
+  let quizCompleted = false;
+  let dataPoints = [4,7,5,9,6,8,3,10];
+  const NUM_POINTS = 8;
 
-    function renderBars() {
-      const container = document.getElementById('barChart');
-      container.innerHTML = '';
-      const max = Math.max(...dataPoints, 1);
-      dataPoints.forEach((val, idx) => {
-        const bar = document.createElement('div'); bar.classList.add('scatter-bar');
-        const h = Math.max(4, (val/max)*140);
-        bar.style.height = h+'px';
-        bar.title = val;
-        bar.draggable = false;
-        bar.addEventListener('click', function(e) {
-          const rect = this.getBoundingClientRect();
-          const containerRect = container.getBoundingClientRect();
-          const relY = e.clientY - containerRect.top;
-          const newH = Math.max(4, Math.min(140, containerRect.height - relY));
-          dataPoints[idx] = Math.round((newH/140)*max);
-          if (dataPoints[idx] < 1) dataPoints[idx] = 1;
-          updateDispersion();
-        });
-        container.appendChild(bar);
-      });
-      updateDispersion();
-    }
-
-    function updateDispersion() {
-      renderBarsStatic();
-    }
-
-    function renderBarsStatic() {
-      const container = document.getElementById('barChart');
-      const bars = container.querySelectorAll('.scatter-bar');
-      const max = Math.max(...dataPoints, 1);
-      bars.forEach((bar, idx) => {
-        const h = Math.max(4, (dataPoints[idx]/max)*140);
-        bar.style.height = h+'px';
-        bar.title = dataPoints[idx];
-      });
-      const mean = dataPoints.reduce((a,b)=>a+b,0)/dataPoints.length;
-      const sorted = [...dataPoints].sort((a,b)=>a-b);
-      const min = sorted[0]; const maxVal = sorted[sorted.length-1];
-      const range = maxVal - min;
-      const variance = dataPoints.reduce((acc,v)=>acc+(v-mean)**2,0)/dataPoints.length;
-      const std = Math.sqrt(variance);
-      const cv = mean ? (std/mean)*100 : 0;
-      document.getElementById('dMean').textContent = mean.toFixed(2);
-      document.getElementById('dRange').textContent = range;
-      document.getElementById('dVar').textContent = variance.toFixed(2);
-      document.getElementById('dStd').textContent = std.toFixed(2);
-      document.getElementById('dCV').textContent = cv.toFixed(1)+'%';
-    }
-
-    function randomizeData() {
-      dataPoints = Array.from({length:NUM_POINTS}, ()=>Math.floor(Math.random()*15)+2);
-      renderBars();
-    }
-
-    function renderQuestions() {
-      const container = document.getElementById('quizContainer');
-      container.innerHTML = '';
-      questions.forEach((q, idx) => {
-        const qDiv = document.createElement('div'); qDiv.classList.add('question');
-        qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
-        const optsDiv = qDiv.querySelector('.options');
-        q.options.forEach((opt, optIdx) => {
-          const span = document.createElement('div'); span.classList.add('opt');
-          span.textContent = opt; span.dataset.qIdx = idx; span.dataset.optIdx = optIdx;
-          span.addEventListener('click', function() {
-            if (quizCompleted) return;
-            this.parentElement.querySelectorAll('.opt').forEach(c => c.classList.remove('selected'));
-            this.classList.add('selected'); userAnswers[idx] = optIdx; updateBtnState();
-          });
-          optsDiv.appendChild(span);
-        });
-        container.appendChild(qDiv);
-      });
-    }
-
-    function updateBtnState() {
-      document.getElementById('submitQuizBtn').disabled = userAnswers.some(a => a === null) || quizCompleted;
-    }
-
-    function handleSubmit() {
-      if (quizCompleted) return;
-      if (userAnswers.some(a => a === null)) { document.getElementById('feedbackMsg').textContent = I18N.t('fb_0'); return; }
-      let correct = 0;
-      questions.forEach((q, i) => { if (userAnswers[i] === q.correct) correct++; });
-      const total = questions.length; const passed = correct >= Math.ceil(total * 0.6);
-      document.querySelectorAll('.question').forEach((qDiv, idx) => {
-        const opts = qDiv.querySelectorAll('.opt');
-        opts.forEach((o, oi) => {
-          o.classList.remove('selected');
-          if (oi === questions[idx].correct) o.classList.add('correct');
-          else if (oi === userAnswers[idx]) o.classList.add('wrong');
-        });
-      });
-      if (passed) {
-        quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
-        document.getElementById('insigniaArea').classList.remove('hidden');
-        document.getElementById('feedbackMsg').textContent = I18N.t('fb_1');
-        saveProgress(); updateProgress();
-      } else {
-        document.getElementById('feedbackMsg').textContent = '❌ ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. ¡Reintenta!';
-      }
-    }
-
-    function restoreProgress() {
-      const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
-      if (p.includes(STORAGE_KEY)) {
-        quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
-        document.getElementById('insigniaArea').classList.remove('hidden');
-        document.getElementById('feedbackMsg').textContent = I18N.t('fb_2');
-        document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
-      }
-    }
-
-    document.getElementById('submitQuizBtn').addEventListener('click', handleSubmit);
-    document.getElementById('randomizeBtn').addEventListener('click', randomizeData);
-    renderBars(); renderQuestions(); updateBtnState(); restoreProgress(); updateProgress();
-  </script>
-  <script src="../../../assets/js/cookie-consent.js"></script>
-<script>
-window.I18N_DATA={
-  "fb_0": {
-    "es": "⚠️ Responde todas las preguntas primero.",
-    "en": "⚠️ Answer todas las preguntas primero."
-  },
-  "fb_1": {
-    "es": "🎉 ¡Excelente! Dominas las medidas de dispersión.",
-    "en": "🎉 !Excellent! Dominas las medidas de dispersión."
-  },
-  "fb_2": {
-    "es": "🏆 Ya completaste este módulo.",
-    "en": "🏆 Ya completaste este module."
+  function saveProgress() {
+   let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
+   localStorage.setItem(STORAGE_KEY, 'true');
   }
+
+  function updateProgress() {
+   let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
+   document.getElementById('progressText').textContent = 'M\u00f3dulo '+(p.length || 1)+' de 12';
+  }
+
+  function renderBars() {
+   const container = document.getElementById('barChart');
+   container.innerHTML = '';
+   const max = Math.max(...dataPoints, 1);
+   dataPoints.forEach((val, idx) => {
+    const bar = document.createElement('div'); bar.classList.add('scatter-bar');
+    const h = Math.max(4, (val/max)*140);
+    bar.style.height = h+'px';
+    bar.title = val;
+    bar.draggable = false;
+    bar.addEventListener('click', function(e) {
+     const rect = this.getBoundingClientRect();
+     const containerRect = container.getBoundingClientRect();
+     const relY = e.clientY - containerRect.top;
+     const newH = Math.max(4, Math.min(140, containerRect.height - relY));
+     dataPoints[idx] = Math.round((newH/140)*max);
+     if (dataPoints[idx] < 1) dataPoints[idx] = 1;
+     updateDispersion();
+    });
+    container.appendChild(bar);
+   });
+   updateDispersion();
+  }
+
+  function updateDispersion() {
+   renderBarsStatic();
+  }
+
+  function renderBarsStatic() {
+   const container = document.getElementById('barChart');
+   const bars = container.querySelectorAll('.scatter-bar');
+   const max = Math.max(...dataPoints, 1);
+   bars.forEach((bar, idx) => {
+    const h = Math.max(4, (dataPoints[idx]/max)*140);
+    bar.style.height = h+'px';
+    bar.title = dataPoints[idx];
+   });
+   const mean = dataPoints.reduce((a,b)=>a+b,0)/dataPoints.length;
+   const sorted = [...dataPoints].sort((a,b)=>a-b);
+   const min = sorted[0]; const maxVal = sorted[sorted.length-1];
+   const range = maxVal - min;
+   const variance = dataPoints.reduce((acc,v)=>acc+(v-mean)**2,0)/dataPoints.length;
+   const std = Math.sqrt(variance);
+   const cv = mean ? (std/mean)*100 : 0;
+   document.getElementById('dMean').textContent = mean.toFixed(2);
+   document.getElementById('dRange').textContent = range;
+   document.getElementById('dVar').textContent = variance.toFixed(2);
+   document.getElementById('dStd').textContent = std.toFixed(2);
+   document.getElementById('dCV').textContent = cv.toFixed(1)+'%';
+  }
+
+  function randomizeData() {
+   dataPoints = Array.from({length:NUM_POINTS}, ()=>Math.floor(Math.random()*15)+2);
+   renderBars();
+  }
+
+  function renderQuestions() {
+   const container = document.getElementById('quizContainer');
+   container.innerHTML = '';
+   questions.forEach((q, idx) => {
+    const qDiv = document.createElement('div'); qDiv.classList.add('question');
+    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
+    const optsDiv = qDiv.querySelector('.options');
+    q.options.forEach((opt, optIdx) => {
+     const span = document.createElement('div'); span.classList.add('opt');
+     span.textContent = opt; span.dataset.qIdx = idx; span.dataset.optIdx = optIdx;
+     span.addEventListener('click', function() {
+      if (quizCompleted) return;
+      this.parentElement.querySelectorAll('.opt').forEach(c => c.classList.remove('selected'));
+      this.classList.add('selected'); userAnswers[idx] = optIdx; updateBtnState();
+     });
+     optsDiv.appendChild(span);
+    });
+    container.appendChild(qDiv);
+   });
+  }
+
+  function updateBtnState() {
+   document.getElementById('submitQuizBtn').disabled = userAnswers.some(a => a === null) || quizCompleted;
+  }
+
+  function handleSubmit() {
+   if (quizCompleted) return;
+   if (userAnswers.some(a => a === null)) { document.getElementById('feedbackMsg').textContent = I18N.t('fb_0'); return; }
+   let correct = 0;
+   questions.forEach((q, i) => { if (userAnswers[i] === q.correct) correct++; });
+   const total = questions.length; const passed = correct >= Math.ceil(total * 0.6);
+   document.querySelectorAll('.question').forEach((qDiv, idx) => {
+    const opts = qDiv.querySelectorAll('.opt');
+    opts.forEach((o, oi) => {
+     o.classList.remove('selected');
+     if (oi === questions[idx].correct) o.classList.add('correct');
+     else if (oi === userAnswers[idx]) o.classList.add('wrong');
+    });
+   });
+   if (passed) {
+    quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').textContent = I18N.t('fb_1');
+    saveProgress(); updateProgress();
+   } else {
+    document.getElementById('feedbackMsg').textContent = '❌ ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. ¡Reintenta!';
+   }
+  }
+
+  function restoreProgress() {
+   const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   if (p.includes(STORAGE_KEY)) {
+    quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').textContent = I18N.t('fb_2');
+    document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
+   }
+  }
+
+  document.getElementById('submitQuizBtn').addEventListener('click', handleSubmit);
+  document.getElementById('randomizeBtn').addEventListener('click', randomizeData);
+  renderBars(); renderQuestions(); updateBtnState(); restoreProgress(); updateProgress();
+ </script>
+ <script>
+window.I18N_DATA={
+ "fb_0": {
+  "es": "⚠️ Responde todas las preguntas primero.",
+  "en": "⚠️ Answer todas las preguntas primero."
+ },
+ "fb_1": {
+  "es": "🎉 ¡Excelente! Dominas las medidas de dispersión.",
+  "en": "🎉 !Excellent! Dominas las medidas de dispersión."
+ },
+ "fb_2": {
+  "es": "🏆 Ya completaste este módulo.",
+  "en": "🏆 Ya completaste este module."
+ }
 };
 </script>
-<script src="../../../assets/js/i18n.js"></script>  </body>
+<script src="../../../assets/js/i18n.js"></script> </body>
 </html>

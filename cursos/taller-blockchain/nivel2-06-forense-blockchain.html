@@ -1,503 +1,501 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Blockchain Adventure | Forense - Rastreando transacciones</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Press+Start+2P&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+ <meta charset="UTF-8">
+ <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Blockchain Adventure | Forense - Rastreando transacciones</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Press+Start+2P&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    body {
-      background: linear-gradient(145deg, #1a2a2a 0%, #0a1515 100%);
-      font-family: 'Inter', sans-serif;
-      color: #eef5ff;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem 1rem;
-    }
+  body {
+   background: linear-gradient(145deg, #1a2a2a 0%, #0a1515 100%);
+   font-family: 'Inter', sans-serif;
+   color: #eef5ff;
+   min-height: 100vh;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   padding: 2rem 1rem;
+  }
 
-    .forensic-container {
-      max-width: 1400px;
-      width: 100%;
-      background: rgba(20, 35, 35, 0.85);
-      backdrop-filter: blur(12px);
-      border-radius: 3rem;
-      border: 1px solid #33ffcc;
-      box-shadow: 0 25px 45px rgba(0, 0, 0, 0.5);
-      overflow: hidden;
-    }
+  .forensic-container {
+   max-width: 1400px;
+   width: 100%;
+   background: rgba(20, 35, 35, 0.85);
+   backdrop-filter: blur(12px);
+   border-radius: 3rem;
+   border: 1px solid #33ffcc;
+   box-shadow: 0 25px 45px rgba(0, 0, 0, 0.5);
+   overflow: hidden;
+  }
 
-    .hero {
-      background: linear-gradient(95deg, #1a3a3a, #0f2a2a);
-      padding: 1.5rem 2rem;
-      text-align: center;
-      border-bottom: 3px solid #33ffcc;
-    }
+  .hero {
+   background: linear-gradient(95deg, #1a3a3a, #0f2a2a);
+   padding: 1.5rem 2rem;
+   text-align: center;
+   border-bottom: 3px solid #33ffcc;
+  }
 
-    .hero h1 {
-      font-size: 2rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, #ccffee, #33ffcc);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
+  .hero h1 {
+   font-size: 2rem;
+   font-weight: 800;
+   background: linear-gradient(135deg, #ccffee, #33ffcc);
+   -webkit-background-clip: text;
+   background-clip: text;
+   color: transparent;
+  }
 
-    .hero p {
-      margin-top: 0.5rem;
-      font-size: 1rem;
-      color: #ccffee;
-    }
+  .hero p {
+   margin-top: 0.5rem;
+   font-size: 1rem;
+   color: #ccffee;
+  }
 
-    .two-columns {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1.5rem;
-      padding: 1.5rem 2rem;
-    }
+  .two-columns {
+   display: flex;
+   flex-wrap: wrap;
+   gap: 1.5rem;
+   padding: 1.5rem 2rem;
+  }
 
-    .explanation {
-      flex: 1;
-      background: #1a2a2ad9;
-      border-radius: 2rem;
-      padding: 1.2rem;
-      border: 1px solid #33ffcc;
-    }
+  .explanation {
+   flex: 1;
+   background: #1a2a2ad9;
+   border-radius: 2rem;
+   padding: 1.2rem;
+   border: 1px solid #33ffcc;
+  }
 
-    .explanation h3 {
-      color: #88ffdd;
-      margin: 0.8rem 0 0.5rem;
-    }
+  .explanation h3 {
+   color: #88ffdd;
+   margin: 0.8rem 0 0.5rem;
+  }
 
-    .game-area {
-      flex: 1.5;
-      background: #0f1f1fcc;
-      border-radius: 2rem;
-      padding: 1.5rem;
-      border: 1px solid #33ffcc;
-    }
+  .game-area {
+   flex: 1.5;
+   background: #0f1f1fcc;
+   border-radius: 2rem;
+   padding: 1.5rem;
+   border: 1px solid #33ffcc;
+  }
 
-    .explorer-sim {
-      background: #00000066;
-      border-radius: 1.5rem;
-      padding: 1rem;
-      margin-bottom: 1rem;
-    }
+  .explorer-sim {
+   background: #00000066;
+   border-radius: 1.5rem;
+   padding: 1rem;
+   margin-bottom: 1rem;
+  }
 
-    .address-display {
-      font-family: monospace;
-      background: #0a1a1a;
-      padding: 0.5rem;
-      border-radius: 1rem;
-      word-break: break-all;
-      transition: all 0.3s;
-    }
+  .address-display {
+   font-family: monospace;
+   background: #0a1a1a;
+   padding: 0.5rem;
+   border-radius: 1rem;
+   word-break: break-all;
+   transition: all 0.3s;
+  }
 
-    .address-display.highlight {
-      border-left: 4px solid #ffcc00;
-      background: #1a2a0a;
-    }
+  .address-display.highlight {
+   border-left: 4px solid #ffcc00;
+   background: #1a2a0a;
+  }
 
-    .transaction-list {
-      margin: 1rem 0;
-      max-height: 280px;
-      overflow-y: auto;
-    }
+  .transaction-list {
+   margin: 1rem 0;
+   max-height: 280px;
+   overflow-y: auto;
+  }
 
-    .tx-item {
-      background: #1a2a2a;
-      border-radius: 1rem;
-      padding: 0.6rem 0.8rem;
-      margin: 0.4rem 0;
-      cursor: pointer;
-      transition: all 0.2s;
-      border-left: 3px solid transparent;
-    }
+  .tx-item {
+   background: #1a2a2a;
+   border-radius: 1rem;
+   padding: 0.6rem 0.8rem;
+   margin: 0.4rem 0;
+   cursor: pointer;
+   transition: all 0.2s;
+   border-left: 3px solid transparent;
+  }
 
-    .tx-item:hover {
-      background: #2a4a4a;
-      border-left-color: #33ffcc;
-      transform: translateX(4px);
-    }
+  .tx-item:hover {
+   background: #2a4a4a;
+   border-left-color: #33ffcc;
+   transform: translateX(4px);
+  }
 
-    .tx-item.tx-danger {
-      border-left-color: #ff6644;
-    }
+  .tx-item.tx-danger {
+   border-left-color: #ff6644;
+  }
 
-    .tx-item.tx-safe {
-      border-left-color: #33ffcc;
-    }
+  .tx-item.tx-safe {
+   border-left-color: #33ffcc;
+  }
 
-    .tx-item.tx-decoy {
-      border-left-color: #ffaa00;
-      opacity: 0.7;
-    }
+  .tx-item.tx-decoy {
+   border-left-color: #ffaa00;
+   opacity: 0.7;
+  }
 
-    .tx-item.tx-decoy:hover {
-      opacity: 1;
-    }
+  .tx-item.tx-decoy:hover {
+   opacity: 1;
+  }
 
-    .challenge-box {
-      background: #1a3a3a;
-      border-radius: 1.5rem;
-      padding: 1rem;
-      margin-top: 1rem;
-    }
+  .challenge-box {
+   background: #1a3a3a;
+   border-radius: 1.5rem;
+   padding: 1rem;
+   margin-top: 1rem;
+  }
 
-    .progress-bar {
-      display: flex;
-      align-items: center;
-      gap: 0.3rem;
-      margin: 0.8rem 0;
-      justify-content: center;
-    }
+  .progress-bar {
+   display: flex;
+   align-items: center;
+   gap: 0.3rem;
+   margin: 0.8rem 0;
+   justify-content: center;
+  }
 
-    .progress-dot {
-      width: 32px; height: 32px;
-      border-radius: 50%;
-      background: #0a2a2a;
-      border: 2px solid #2a6a6a;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.7rem; color: #5a9a9a;
-      transition: all 0.4s;
-    }
+  .progress-dot {
+   width: 32px; height: 32px;
+   border-radius: 50%;
+   background: #0a2a2a;
+   border: 2px solid #2a6a6a;
+   display: flex; align-items: center; justify-content: center;
+   font-size: 0.7rem; color: #5a9a9a;
+   transition: all 0.4s;
+  }
 
-    .progress-dot.visited {
-      background: #1a5a3a;
-      border-color: #33ff99;
-      color: #ccffee;
-    }
+  .progress-dot.visited {
+   background: #1a5a3a;
+   border-color: #33ff99;
+   color: #ccffee;
+  }
 
-    .progress-dot.current {
-      background: #2a7a4a;
-      border-color: #ffcc00;
-      color: #fff;
-      box-shadow: 0 0 12px rgba(255,204,0,0.4);
-    }
+  .progress-dot.current {
+   background: #2a7a4a;
+   border-color: #ffcc00;
+   color: #fff;
+   box-shadow: 0 0 12px rgba(255,204,0,0.4);
+  }
 
-    .progress-dot.target {
-      background: #5a2a2a;
-      border-color: #ff6644;
-      color: #ff8866;
-    }
+  .progress-dot.target {
+   background: #5a2a2a;
+   border-color: #ff6644;
+   color: #ff8866;
+  }
 
-    .progress-line {
-      width: 20px; height: 2px;
-      background: #2a6a6a;
-    }
+  .progress-line {
+   width: 20px; height: 2px;
+   background: #2a6a6a;
+  }
 
-    .progress-line.visited {
-      background: #33ff99;
-    }
+  .progress-line.visited {
+   background: #33ff99;
+  }
 
-    .feedback {
-      background: #00000099;
-      border-radius: 1.5rem;
-      padding: 0.8rem;
-    }
+  .feedback {
+   background: #00000099;
+   border-radius: 1.5rem;
+   padding: 0.8rem;
+  }
 
-    .feedback.success {
-      border-left: 4px solid #33ff99;
-    }
+  .feedback.success {
+   border-left: 4px solid #33ff99;
+  }
 
-    .feedback.error {
-      border-left: 4px solid #ff6644;
-    }
+  .feedback.error {
+   border-left: 4px solid #ff6644;
+  }
 
-    .btn-restart {
-      background: #2c3e66;
-      border: none;
-      padding: 0.6rem 1.2rem;
-      border-radius: 3rem;
-      color: #eef5ff;
-      cursor: pointer;
-      font-weight: 600;
-      transition: 0.2s;
-      margin-top: 0.5rem;
-    }
+  .btn-restart {
+   background: #2c3e66;
+   border: none;
+   padding: 0.6rem 1.2rem;
+   border-radius: 3rem;
+   color: #eef5ff;
+   cursor: pointer;
+   font-weight: 600;
+   transition: 0.2s;
+   margin-top: 0.5rem;
+  }
 
-    .btn-restart:hover {
-      background: #3a5a88;
-      transform: translateY(-2px);
-    }
+  .btn-restart:hover {
+   background: #3a5a88;
+   transform: translateY(-2px);
+  }
 
-    .nav-links {
-      display: flex;
-      justify-content: center;
-      gap: 1rem;
-      flex-wrap: wrap;
-      padding: 1.5rem 2rem;
-    }
-    .nav-link {
-      background: #2c3e66;
-      border: none;
-      padding: 0.7rem 1.5rem;
-      border-radius: 3rem;
-      font-weight: 600;
-      cursor: pointer;
-      text-decoration: none;
-      color: #eef5ff;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      transition: 0.2s;
-      font-size: 0.95rem;
-    }
-    .nav-link:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 0 10px rgba(0, 224, 255, 0.4);
-    }
-    .nav-link.next { background: linear-gradient(95deg, #f0a500, #ff6a00); color: #1e1a0c; }
-    .nav-link.menu { background: #1a2a4a; border: 1px solid #3399ff; }
-  </style>
-  <link rel="stylesheet" href="../../assets/css/theme.css">
+  .nav-links {
+   display: flex;
+   justify-content: center;
+   gap: 1rem;
+   flex-wrap: wrap;
+   padding: 1.5rem 2rem;
+  }
+  .nav-link {
+   background: #2c3e66;
+   border: none;
+   padding: 0.7rem 1.5rem;
+   border-radius: 3rem;
+   font-weight: 600;
+   cursor: pointer;
+   text-decoration: none;
+   color: #eef5ff;
+   display: inline-flex;
+   align-items: center;
+   gap: 0.5rem;
+   transition: 0.2s;
+   font-size: 0.95rem;
+  }
+  .nav-link:hover {
+   transform: translateY(-2px);
+   box-shadow: 0 0 10px rgba(0, 224, 255, 0.4);
+  }
+  .nav-link.next { background: linear-gradient(95deg, #f0a500, #ff6a00); color: #1e1a0c; }
+  .nav-link.menu { background: #1a2a4a; border: 1px solid #3399ff; }
+ </style>
+ <link rel="stylesheet" href="../../assets/css/theme.css">
 </head>
 <body>
-  <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+ <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
 
 <div class="forensic-container">
-  <div class="hero">
-    <h1><i class="fas fa-search"></i> Blockchain Forense</h1>
-    <p>Rastreando transacciones como un detective on-chain</p>
+ <div class="hero">
+  <h1><i class="fas fa-search"></i> Blockchain Forense</h1>
+  <p>Rastreando transacciones como un detective on-chain</p>
+ </div>
+
+ <div class="two-columns">
+  <div class="explanation">
+   <i class="fas fa-eye" style="font-size: 2rem; color: #33ffcc;"></i>
+   <h3>🕵️ Transparencia total</h3>
+   <p>Todas las transacciones en blockchains públicas son visibles para cualquiera. Exploradores como Etherscan o Blockchain.com permiten ver el historial de cualquier dirección.</p>
+   <h3>🔎 ¿Qué se puede rastrear?</h3>
+   <p>Direcciones, montos, fechas, y el flujo de fondos entre cuentas. Aunque las direcciones son pseudónimas, el análisis de patrones puede revelar conexiones.</p>
+   <h3>🎯 El desafío</h3>
+   <p>Sigue la pista del dinero malicioso a través de varios saltos. Aprende cómo los investigadores rastrean transacciones ilícitas.</p>
+   <hr style="border-color:#2a5a5a; margin:1rem 0;">
+   <div id="pathDisplay">
+    <strong>🔗 Tu rastro:</strong>
+    <div id="breadcrumb" style="margin-top:0.5rem; display:flex; flex-direction:column; gap:0.3rem;"></div>
+   </div>
   </div>
 
-  <div class="two-columns">
-    <div class="explanation">
-      <i class="fas fa-eye" style="font-size: 2rem; color: #33ffcc;"></i>
-      <h3>🕵️ Transparencia total</h3>
-      <p>Todas las transacciones en blockchains públicas son visibles para cualquiera. Exploradores como Etherscan o Blockchain.com permiten ver el historial de cualquier dirección.</p>
-      <h3>🔎 ¿Qué se puede rastrear?</h3>
-      <p>Direcciones, montos, fechas, y el flujo de fondos entre cuentas. Aunque las direcciones son pseudónimas, el análisis de patrones puede revelar conexiones.</p>
-      <h3>🎯 El desafío</h3>
-      <p>Sigue la pista del dinero malicioso a través de varios saltos. Aprende cómo los investigadores rastrean transacciones ilícitas.</p>
-      <hr style="border-color:#2a5a5a; margin:1rem 0;">
-      <div id="pathDisplay">
-        <strong>🔗 Tu rastro:</strong>
-        <div id="breadcrumb" style="margin-top:0.5rem; display:flex; flex-direction:column; gap:0.3rem;"></div>
-      </div>
-    </div>
-
-    <div class="game-area">
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
-        <h3><i class="fas fa-chart-line"></i> Explorador de Bloques</h3>
-        <span id="stepCounter" style="font-size:0.85rem; color:#88ddff;">Paso 0/4</span>
-      </div>
-      <div class="progress-bar" id="progressBar"></div>
-      <div class="explorer-sim">
-        <div><i class="fas fa-address-card"></i> Dirección actual:</div>
-        <div class="address-display" id="currentAddress">0xStart... (dirección inicial)</div>
-        <div class="transaction-list" id="txList"></div>
-      </div>
-      <div class="challenge-box">
-        <strong>🎯 Misión:</strong> <span id="missionText">Sigue los fondos desde la dirección inicial hasta la billetera del estafador.</span>
-        <div id="challengeFeedback" class="feedback success" style="margin-top:0.5rem;">💡 Haz clic en las transacciones de salida (<span style="color:#ffaa00;">naranja = señuelo</span>) para seguir el rastro.</div>
-      </div>
-      <div id="gameFeedback" class="feedback success" style="margin-top:0.5rem;"></div>
-      <button id="restartGameBtn" class="btn-restart" style="display:none;"><i class="fas fa-redo-alt"></i> Reiniciar misión</button>
-      <button id="resetGameBtn" class="btn-restart" style="background:linear-gradient(95deg, #ff5555, #aa3333);"><i class="fas fa-trash-alt"></i> Reiniciar</button>
-    </div>
+  <div class="game-area">
+   <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
+    <h3><i class="fas fa-chart-line"></i> Explorador de Bloques</h3>
+    <span id="stepCounter" style="font-size:0.85rem; color:#88ddff;">Paso 0/4</span>
+   </div>
+   <div class="progress-bar" id="progressBar"></div>
+   <div class="explorer-sim">
+    <div><i class="fas fa-address-card"></i> Dirección actual:</div>
+    <div class="address-display" id="currentAddress">0xStart... (dirección inicial)</div>
+    <div class="transaction-list" id="txList"></div>
+   </div>
+   <div class="challenge-box">
+    <strong>🎯 Misión:</strong> <span id="missionText">Sigue los fondos desde la dirección inicial hasta la billetera del estafador.</span>
+    <div id="challengeFeedback" class="feedback success" style="margin-top:0.5rem;">💡 Haz clic en las transacciones de salida (<span style="color:#ffaa00;">naranja = señuelo</span>) para seguir el rastro.</div>
+   </div>
+   <div id="gameFeedback" class="feedback success" style="margin-top:0.5rem;"></div>
+   <button id="restartGameBtn" class="btn-restart" style="display:none;"><i class="fas fa-redo-alt"></i> Reiniciar misión</button>
+   <button id="resetGameBtn" class="btn-restart" style="background:linear-gradient(95deg, #ff5555, #aa3333);"><i class="fas fa-trash-alt"></i> Reiniciar</button>
   </div>
+ </div>
 
-  <div class="nav-links">
-    <a href="../../cursos/taller-blockchain/nivel2-05-crea-tu-token.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
-    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
-    <a href="../../cursos/taller-blockchain/nivel2-07-carreras-blockchain.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
-  </div>
+ <div class="nav-links">
+  <a href="../../cursos/taller-blockchain/nivel2-05-crea-tu-token.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+  <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+  <a href="../../cursos/taller-blockchain/nivel2-07-carreras-blockchain.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+ </div>
 </div>
 
 <script>
-  const addresses = {
-    "0xStart_badguy": {
-      name: "Origen (estafador)",
-      outgoing: [{ to: "0xIntermediate1", amount: 50, txid: "0xa1b2c3" }],
-      incoming: []
-    },
-    "0xIntermediate1": {
-      name: "Mezclador 1",
-      outgoing: [
-        { to: "0xIntermediate2", amount: 30, txid: "0xd4e5f6" },
-        { to: "0xOther", amount: 20, txid: "0xgh789" }
-      ],
-      incoming: [{ from: "0xStart_badguy", amount: 50 }]
-    },
-    "0xIntermediate2": {
-      name: "Mezclador 2",
-      outgoing: [{ to: "0xFinal_scammer", amount: 25, txid: "0xabc123" }],
-      incoming: [{ from: "0xIntermediate1", amount: 30 }]
-    },
-    "0xFinal_scammer": {
-      name: "¡Billetera del estafador! 🎯",
-      outgoing: [],
-      incoming: [{ from: "0xIntermediate2", amount: 25 }]
-    },
-    "0xOther": {
-      name: "Billetera inocente (señuelo)",
-      outgoing: [],
-      incoming: [{ from: "0xIntermediate1", amount: 20 }]
-    }
-  };
+ const addresses = {
+  "0xStart_badguy": {
+   name: "Origen (estafador)",
+   outgoing: [{ to: "0xIntermediate1", amount: 50, txid: "0xa1b2c3" }],
+   incoming: []
+  },
+  "0xIntermediate1": {
+   name: "Mezclador 1",
+   outgoing: [
+    { to: "0xIntermediate2", amount: 30, txid: "0xd4e5f6" },
+    { to: "0xOther", amount: 20, txid: "0xgh789" }
+   ],
+   incoming: [{ from: "0xStart_badguy", amount: 50 }]
+  },
+  "0xIntermediate2": {
+   name: "Mezclador 2",
+   outgoing: [{ to: "0xFinal_scammer", amount: 25, txid: "0xabc123" }],
+   incoming: [{ from: "0xIntermediate1", amount: 30 }]
+  },
+  "0xFinal_scammer": {
+   name: "¡Billetera del estafador! 🎯",
+   outgoing: [],
+   incoming: [{ from: "0xIntermediate2", amount: 25 }]
+  },
+  "0xOther": {
+   name: "Billetera inocente (señuelo)",
+   outgoing: [],
+   incoming: [{ from: "0xIntermediate1", amount: 20 }]
+  }
+ };
 
-  const PATH_ORDER = ["0xStart_badguy", "0xIntermediate1", "0xIntermediate2", "0xFinal_scammer"];
+ const PATH_ORDER = ["0xStart_badguy", "0xIntermediate1", "0xIntermediate2", "0xFinal_scammer"];
 
-  let currentAddress = "0xStart_badguy";
-  let path = [currentAddress];
-  let gameCompleted = false;
+ let currentAddress = "0xStart_badguy";
+ let path = [currentAddress];
+ let gameCompleted = false;
 
-  function renderProgressBar() {
-    const bar = document.getElementById('progressBar');
-    bar.innerHTML = '';
-    PATH_ORDER.forEach((addr, i) => {
-      const dot = document.createElement('div');
-      dot.className = 'progress-dot';
-      if (addr === "0xFinal_scammer") dot.classList.add('target');
-      if (path.includes(addr)) dot.classList.add('visited');
-      if (addr === currentAddress) dot.classList.add('current');
-      dot.textContent = i + 1;
-      bar.appendChild(dot);
-      if (i < PATH_ORDER.length - 1) {
-        const line = document.createElement('div');
-        line.className = 'progress-line';
-        if (path.includes(addr)) line.classList.add('visited');
-        bar.appendChild(line);
-      }
+ function renderProgressBar() {
+  const bar = document.getElementById('progressBar');
+  bar.innerHTML = '';
+  PATH_ORDER.forEach((addr, i) => {
+   const dot = document.createElement('div');
+   dot.className = 'progress-dot';
+   if (addr === "0xFinal_scammer") dot.classList.add('target');
+   if (path.includes(addr)) dot.classList.add('visited');
+   if (addr === currentAddress) dot.classList.add('current');
+   dot.textContent = i + 1;
+   bar.appendChild(dot);
+   if (i < PATH_ORDER.length - 1) {
+    const line = document.createElement('div');
+    line.className = 'progress-line';
+    if (path.includes(addr)) line.classList.add('visited');
+    bar.appendChild(line);
+   }
+  });
+  const step = path.indexOf(currentAddress);
+  document.getElementById('stepCounter').textContent = `Paso ${Math.max(0, step)}/4`;
+ }
+
+ function renderBreadcrumb() {
+  const bc = document.getElementById('breadcrumb');
+  bc.innerHTML = '';
+  path.forEach((addr, i) => {
+   const info = addresses[addr];
+   const isLast = i === path.length - 1;
+   const item = document.createElement('div');
+   item.style.cssText = `display:flex; align-items:center; gap:0.3rem;
+    font-size:0.8rem; padding:0.3rem 0.6rem;
+    border-radius:0.5rem;
+    background:${isLast ? '#1a4a3a' : '#0a2a2a'};
+    border-left: 3px solid ${isLast ? '#33ff99' : '#2a6a6a'};
+    animation: fadeIn 0.3s ease;`;
+   item.innerHTML = `
+    <span style="color:${isLast ? '#33ff99' : '#6aaaaa'}; font-weight:700;">#${i+1}</span>
+    <span style="font-size:0.7rem; color:#88ddff;">${addr.slice(0,16)}...</span>
+    <span style="color:#aaddcc; font-size:0.75rem;">(${info.name.slice(0,20)})</span>
+    ${isLast ? '<span style="color:#ffcc00;">◀ AQUÍ</span>' : ''}
+   `;
+   bc.appendChild(item);
+  });
+ }
+
+ function renderExplorer() {
+  const addressInfo = addresses[currentAddress];
+  if (!addressInfo) return;
+  const addrDisplay = document.getElementById('currentAddress');
+  addrDisplay.innerHTML = `${currentAddress} <span style="color:#33ffcc;">(${addressInfo.name})</span>`;
+  addrDisplay.className = 'address-display';
+  if (gameCompleted) addrDisplay.classList.add('highlight');
+
+  const txContainer = document.getElementById('txList');
+  if (addressInfo.outgoing.length === 0 && addressInfo.incoming.length === 0) {
+   txContainer.innerHTML = I18N.t('fb_0');
+  } else {
+   let html = '<strong style="color:#33ffcc;">📤 Salidas:</strong>';
+   if (addressInfo.outgoing.length === 0) html += '<div style="color:#6a9a9a;">Ninguna</div>';
+   else {
+    addressInfo.outgoing.forEach(tx => {
+     const isCorrectPath = PATH_ORDER.indexOf(tx.to) > PATH_ORDER.indexOf(currentAddress);
+     const txClass = isCorrectPath ? 'tx-danger' : 'tx-decoy';
+     html += `<div class="tx-item ${txClass}" data-to="${tx.to}">
+      <i class="fas fa-arrow-right"></i> <strong>${tx.amount} tokens</strong> → ${tx.to}<br>
+      <span style="font-size:0.7rem; color:#6a9a9a;">TX: ${tx.txid} ${isCorrectPath ? '' : '⚠ señuelo'}</span>
+     </div>`;
     });
-    const step = path.indexOf(currentAddress);
-    document.getElementById('stepCounter').textContent = `Paso ${Math.max(0, step)}/4`;
-  }
-
-  function renderBreadcrumb() {
-    const bc = document.getElementById('breadcrumb');
-    bc.innerHTML = '';
-    path.forEach((addr, i) => {
-      const info = addresses[addr];
-      const isLast = i === path.length - 1;
-      const item = document.createElement('div');
-      item.style.cssText = `display:flex; align-items:center; gap:0.3rem;
-        font-size:0.8rem; padding:0.3rem 0.6rem;
-        border-radius:0.5rem;
-        background:${isLast ? '#1a4a3a' : '#0a2a2a'};
-        border-left: 3px solid ${isLast ? '#33ff99' : '#2a6a6a'};
-        animation: fadeIn 0.3s ease;`;
-      item.innerHTML = `
-        <span style="color:${isLast ? '#33ff99' : '#6aaaaa'}; font-weight:700;">#${i+1}</span>
-        <span style="font-size:0.7rem; color:#88ddff;">${addr.slice(0,16)}...</span>
-        <span style="color:#aaddcc; font-size:0.75rem;">(${info.name.slice(0,20)})</span>
-        ${isLast ? '<span style="color:#ffcc00;">◀ AQUÍ</span>' : ''}
-      `;
-      bc.appendChild(item);
+   }
+   html += '<strong style="color:#88ddff;">📥 Entradas:</strong>';
+   if (addressInfo.incoming.length === 0) html += '<div style="color:#6a9a9a;">Ninguna</div>';
+   else {
+    addressInfo.incoming.forEach(tx => {
+     html += `<div class="tx-item tx-safe">
+      <i class="fas fa-arrow-left"></i> <strong>${tx.amount} tokens</strong> de ${tx.from}
+     </div>`;
     });
+   }
+   txContainer.innerHTML = html;
   }
 
-  function renderExplorer() {
-    const addressInfo = addresses[currentAddress];
-    if (!addressInfo) return;
-    const addrDisplay = document.getElementById('currentAddress');
-    addrDisplay.innerHTML = `${currentAddress} <span style="color:#33ffcc;">(${addressInfo.name})</span>`;
-    addrDisplay.className = 'address-display';
-    if (gameCompleted) addrDisplay.classList.add('highlight');
-
-    const txContainer = document.getElementById('txList');
-    if (addressInfo.outgoing.length === 0 && addressInfo.incoming.length === 0) {
-      txContainer.innerHTML = I18N.t('fb_0');
-    } else {
-      let html = '<strong style="color:#33ffcc;">📤 Salidas:</strong>';
-      if (addressInfo.outgoing.length === 0) html += '<div style="color:#6a9a9a;">Ninguna</div>';
-      else {
-        addressInfo.outgoing.forEach(tx => {
-          const isCorrectPath = PATH_ORDER.indexOf(tx.to) > PATH_ORDER.indexOf(currentAddress);
-          const txClass = isCorrectPath ? 'tx-danger' : 'tx-decoy';
-          html += `<div class="tx-item ${txClass}" data-to="${tx.to}">
-            <i class="fas fa-arrow-right"></i> <strong>${tx.amount} tokens</strong> → ${tx.to}<br>
-            <span style="font-size:0.7rem; color:#6a9a9a;">TX: ${tx.txid} ${isCorrectPath ? '' : '⚠ señuelo'}</span>
-          </div>`;
-        });
-      }
-      html += '<strong style="color:#88ddff;">📥 Entradas:</strong>';
-      if (addressInfo.incoming.length === 0) html += '<div style="color:#6a9a9a;">Ninguna</div>';
-      else {
-        addressInfo.incoming.forEach(tx => {
-          html += `<div class="tx-item tx-safe">
-            <i class="fas fa-arrow-left"></i> <strong>${tx.amount} tokens</strong> de ${tx.from}
-          </div>`;
-        });
-      }
-      txContainer.innerHTML = html;
+  document.querySelectorAll('.tx-item[data-to]').forEach(el => {
+   el.addEventListener('click', () => {
+    if (gameCompleted) return;
+    const toAddr = el.dataset.to;
+    if (addresses[toAddr]) {
+     currentAddress = toAddr;
+     path.push(currentAddress);
+     renderExplorer();
+     renderProgressBar();
+     renderBreadcrumb();
+     checkMissionComplete();
     }
+   });
+  });
 
-    document.querySelectorAll('.tx-item[data-to]').forEach(el => {
-      el.addEventListener('click', () => {
-        if (gameCompleted) return;
-        const toAddr = el.dataset.to;
-        if (addresses[toAddr]) {
-          currentAddress = toAddr;
-          path.push(currentAddress);
-          renderExplorer();
-          renderProgressBar();
-          renderBreadcrumb();
-          checkMissionComplete();
-        }
-      });
-    });
+  renderProgressBar();
+  renderBreadcrumb();
+ }
 
-    renderProgressBar();
-    renderBreadcrumb();
+ function checkMissionComplete() {
+  const gameFeedback = document.getElementById('gameFeedback');
+  const challengeFeedback = document.getElementById('challengeFeedback');
+  const restartBtn = document.getElementById('restartGameBtn');
+
+  if (currentAddress === "0xFinal_scammer") {
+   gameCompleted = true;
+   gameFeedback.innerHTML = I18N.t('fb_1');
+   gameFeedback.className = 'feedback success';
+   challengeFeedback.innerHTML = I18N.t('fb_2');
+   restartBtn.style.display = 'inline-block';
+  } else if (currentAddress === "0xOther") {
+   gameFeedback.innerHTML = I18N.t('fb_3');
+   gameFeedback.className = 'feedback error';
+   challengeFeedback.innerHTML = I18N.t('fb_4');
+  } else {
+   gameFeedback.innerHTML = `🔍 Rastreando... Has seguido <strong>${path.length} saltos</strong>. Sigue las transacciones de salida.`;
+   gameFeedback.className = 'feedback success';
   }
-
-  function checkMissionComplete() {
-    const gameFeedback = document.getElementById('gameFeedback');
-    const challengeFeedback = document.getElementById('challengeFeedback');
-    const restartBtn = document.getElementById('restartGameBtn');
-
-    if (currentAddress === "0xFinal_scammer") {
-      gameCompleted = true;
-      gameFeedback.innerHTML = I18N.t('fb_1');
-      gameFeedback.className = 'feedback success';
-      challengeFeedback.innerHTML = I18N.t('fb_2');
-      restartBtn.style.display = 'inline-block';
-    } else if (currentAddress === "0xOther") {
-      gameFeedback.innerHTML = I18N.t('fb_3');
-      gameFeedback.className = 'feedback error';
-      challengeFeedback.innerHTML = I18N.t('fb_4');
-    } else {
-      gameFeedback.innerHTML = `🔍 Rastreando... Has seguido <strong>${path.length} saltos</strong>. Sigue las transacciones de salida.`;
-      gameFeedback.className = 'feedback success';
-    }
-    if (path.length > 4 && currentAddress !== "0xFinal_scammer") {
-      challengeFeedback.innerHTML = I18N.t('fb_5');
-    }
+  if (path.length > 4 && currentAddress !== "0xFinal_scammer") {
+   challengeFeedback.innerHTML = I18N.t('fb_5');
   }
+ }
 
-  function resetGame() {
-    currentAddress = "0xStart_badguy";
-    path = [currentAddress];
-    gameCompleted = false;
-    document.getElementById('restartGameBtn').style.display = 'none';
-    document.getElementById('gameFeedback').className = 'feedback success';
-    document.getElementById('challengeFeedback').innerHTML = I18N.t('fb_6');
-    renderExplorer();
-  }
-
-  document.getElementById('restartGameBtn').addEventListener('click', resetGame);
-  document.getElementById('resetGameBtn').addEventListener('click', resetGame);
-
+ function resetGame() {
+  currentAddress = "0xStart_badguy";
+  path = [currentAddress];
+  gameCompleted = false;
+  document.getElementById('restartGameBtn').style.display = 'none';
+  document.getElementById('gameFeedback').className = 'feedback success';
+  document.getElementById('challengeFeedback').innerHTML = I18N.t('fb_6');
   renderExplorer();
-</script>
-  <script src="../../assets/js/cookie-consent.js"></script>
+ }
 
-<script>
+ document.getElementById('restartGameBtn').addEventListener('click', resetGame);
+ document.getElementById('resetGameBtn').addEventListener('click', resetGame);
+
+ renderExplorer();
+</script>
+ <script>
 window.I18N_DATA={
-  'fb_0': { es: '<div style="text-align:center; padding:0.5rem;">📭 Sin transacciones</div>', en: '<div style="text-align:center; padding:0.5rem;">📭 Sin transacciones</div>' },
-  'fb_1': { es: '🎉 <strong>¡MISIÓN COMPLETADA!</strong> Has rastreado los fondos hasta el estafador. ¡Eres un detective on-chain!', en: '🎉 <strong>¡MISIÓN COMPLETADA!</strong> Has rastreado los fondos hasta el estafador. ¡Eres un detective on-chain!' },
-  'fb_2': { es: '✅ Excelente. La transparencia de blockchain permite seguir el dinero, aunque las direcciones sean pseudónimas.', en: '✅ Excelente. La transparencia de blockchain permite seguir el dinero, aunque las direcciones sean pseudónimas.' },
-  'fb_3': { es: '⚠️ <strong>¡Señuelo!</strong> Esta dirección es de una billetera inocente. Los fondos maliciosos no llegaron aquí. Vuelve atrás y sigue la pista correcta.', en: '⚠️ <strong>¡Señuelo!</strong> Esta dirección es de una billetera inocente. Los fondos maliciosos no llegaron aquí. Vuelve atrás y sigue la pista correcta.' },
-  'fb_4': { es: '💡 Pista: busca la transacción que continúa el flujo de fondos ilícitos, no la que se desvía.', en: '💡 Pista: busca la transacción que continúa el flujo de fondos ilícitos, no la que se desvía.' },
-  'fb_5': { es: '⚠️ Parece que te desviaste. Haz clic en "Reiniciar misión" para volver a empezar.', en: '⚠️ Parece que te desviaste. Haz clic en "Reiniciar misión" para volver a empezar.' },
-  'fb_6': { es: '💡 Haz clic en las transacciones de salida (<span style="color:#ffaa00;">naranja = señuelo</span>) para seguir el rastro.', en: '💡 Haz clic en las transacciones de salida (<span style="color:#ffaa00;">naranja = señuelo</span>) para seguir el rastro.' }
+ 'fb_0': { es: '<div style="text-align:center; padding:0.5rem;">📭 Sin transacciones</div>', en: '<div style="text-align:center; padding:0.5rem;">📭 Sin transacciones</div>' },
+ 'fb_1': { es: '🎉 <strong>¡MISIÓN COMPLETADA!</strong> Has rastreado los fondos hasta el estafador. ¡Eres un detective on-chain!', en: '🎉 <strong>¡MISIÓN COMPLETADA!</strong> Has rastreado los fondos hasta el estafador. ¡Eres un detective on-chain!' },
+ 'fb_2': { es: '✅ Excelente. La transparencia de blockchain permite seguir el dinero, aunque las direcciones sean pseudónimas.', en: '✅ Excelente. La transparencia de blockchain permite seguir el dinero, aunque las direcciones sean pseudónimas.' },
+ 'fb_3': { es: '⚠️ <strong>¡Señuelo!</strong> Esta dirección es de una billetera inocente. Los fondos maliciosos no llegaron aquí. Vuelve atrás y sigue la pista correcta.', en: '⚠️ <strong>¡Señuelo!</strong> Esta dirección es de una billetera inocente. Los fondos maliciosos no llegaron aquí. Vuelve atrás y sigue la pista correcta.' },
+ 'fb_4': { es: '💡 Pista: busca la transacción que continúa el flujo de fondos ilícitos, no la que se desvía.', en: '💡 Pista: busca la transacción que continúa el flujo de fondos ilícitos, no la que se desvía.' },
+ 'fb_5': { es: '⚠️ Parece que te desviaste. Haz clic en "Reiniciar misión" para volver a empezar.', en: '⚠️ Parece que te desviaste. Haz clic en "Reiniciar misión" para volver a empezar.' },
+ 'fb_6': { es: '💡 Haz clic en las transacciones de salida (<span style="color:#ffaa00;">naranja = señuelo</span>) para seguir el rastro.', en: '💡 Haz clic en las transacciones de salida (<span style="color:#ffaa00;">naranja = señuelo</span>) para seguir el rastro.' }
 };
 </script>
 </body>

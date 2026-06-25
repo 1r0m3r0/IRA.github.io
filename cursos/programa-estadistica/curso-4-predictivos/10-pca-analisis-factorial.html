@@ -1,313 +1,311 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Modelos Predictivos | 🔄 PCA y Análisis Factorial</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { background:linear-gradient(135deg,#0a0f1e,#0c1222 50%,#111a2e); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
-    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-    .course-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,100,220,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
-    .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #ff64dc; }
-    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#ff9cf0,#ff64dc); -webkit-background-clip:text; background-clip:text; color:transparent; }
-    .hero-header p { font-size:1.1rem; color:#e2b9ff; margin-top:0.5rem; font-weight:500; }
-    .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
-    .chip { background:rgba(255,100,220,0.15); border:1px solid #ff64dc; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
-    .progress-section { padding:1.2rem 2rem; border-bottom:1px solid #1a2a4a; }
-    .progress-bar-outer { background:#1a2a4a; border-radius:20px; height:16px; overflow:hidden; }
-    .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#ff64dc,#cc44bb); border-radius:20px; transition:width 0.5s ease; }
-    .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
-    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ff64dc; font-size:1rem; line-height:1.6; }
-    .main-area { padding:1.5rem 2rem; }
-    .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#ff64dc; }
-    .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
-    .info-panel { background:rgba(10,20,40,0.7); border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
-    .info-panel h3 { color:#ff9cf0; font-size:1rem; margin-bottom:0.5rem; }
-    .info-panel p { font-size:0.85rem; color:#b9ccee; line-height:1.6; }
-    .sim-box { background:#0f1a2c; border-radius:1.5rem; padding:1.5rem; margin-bottom:1.5rem; border:1px solid #2c3e66; text-align:center; }
-    .sim-box canvas { max-width:100%; border-radius:1rem; background:#080e1a; margin:1rem auto; display:block; }
-    .sim-btn { background:linear-gradient(95deg,#ff64dc,#cc44bb); border:none; padding:0.6rem 1.5rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:0.95rem; color:#fff; transition:0.2s; margin:0.3rem; }
-    .sim-btn:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(255,100,220,0.4); }
-    .sim-btn.secondary { background:#2c3e66; }
-    .quiz-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #ff64dc; margin-bottom:1.5rem; }
-    .quiz-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#ff64dc; }
-    .question { background:#0f1a2c; margin:0.8rem 0; padding:0.8rem 1rem; border-radius:1.2rem; }
-    .question p { font-weight:600; margin-bottom:0.5rem; font-size:0.95rem; }
-    .options { display:flex; flex-wrap:wrap; gap:0.6rem; }
-    .opt { background:#1e2a3e; padding:0.3rem 0.9rem; border-radius:2rem; cursor:pointer; transition:0.2s; font-size:0.85rem; }
-    .opt:hover { background:#2c3e66; transform:translateY(-2px); }
-    .opt.selected { background:#ff64dc; color:#000; font-weight:bold; box-shadow:0 0 8px #ff64dc; }
-    .opt.correct { background:#00cc88; color:#000; }
-    .opt.wrong { background:#ff4455; color:#fff; }
-    .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #ff64dc; }
-    .btn-action { background:linear-gradient(95deg,#ff64dc,#cc44bb); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#fff; margin-top:1rem; }
-    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(255,100,220,0.5); }
-    .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
-    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin-top:1.5rem; padding:1rem; border:1px dashed gold; }
-    .insignia i { font-size:2.5rem; color:gold; }
-    .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
-    .hidden { display:none; }
-    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
-    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
-    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(255,100,220,0.4); }
-    .nav-link.next { background:linear-gradient(95deg,#ff64dc,#cc44bb); color:#fff; }
-    .nav-link.menu { background:#1a2a4a; border:1px solid #ff64dc; }
-    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
-    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .info-grid { grid-template-columns:1fr; } }
-  </style>
-  <link rel="stylesheet" href="../../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Modelos Predictivos | 🔄 PCA y Análisis Factorial</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:linear-gradient(135deg,#0a0f1e,#0c1222 50%,#111a2e); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+  @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .course-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,100,220,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+  .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #ff64dc; }
+  .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#ff9cf0,#ff64dc); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero-header p { font-size:1.1rem; color:#e2b9ff; margin-top:0.5rem; font-weight:500; }
+  .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+  .chip { background:rgba(255,100,220,0.15); border:1px solid #ff64dc; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+  .progress-section { padding:1.2rem 2rem; border-bottom:1px solid #1a2a4a; }
+  .progress-bar-outer { background:#1a2a4a; border-radius:20px; height:16px; overflow:hidden; }
+  .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#ff64dc,#cc44bb); border-radius:20px; transition:width 0.5s ease; }
+  .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
+  .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ff64dc; font-size:1rem; line-height:1.6; }
+  .main-area { padding:1.5rem 2rem; }
+  .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#ff64dc; }
+  .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
+  .info-panel { background:rgba(10,20,40,0.7); border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
+  .info-panel h3 { color:#ff9cf0; font-size:1rem; margin-bottom:0.5rem; }
+  .info-panel p { font-size:0.85rem; color:#b9ccee; line-height:1.6; }
+  .sim-box { background:#0f1a2c; border-radius:1.5rem; padding:1.5rem; margin-bottom:1.5rem; border:1px solid #2c3e66; text-align:center; }
+  .sim-box canvas { max-width:100%; border-radius:1rem; background:#080e1a; margin:1rem auto; display:block; }
+  .sim-btn { background:linear-gradient(95deg,#ff64dc,#cc44bb); border:none; padding:0.6rem 1.5rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:0.95rem; color:#fff; transition:0.2s; margin:0.3rem; }
+  .sim-btn:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(255,100,220,0.4); }
+  .sim-btn.secondary { background:#2c3e66; }
+  .quiz-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #ff64dc; margin-bottom:1.5rem; }
+  .quiz-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#ff64dc; }
+  .question { background:#0f1a2c; margin:0.8rem 0; padding:0.8rem 1rem; border-radius:1.2rem; }
+  .question p { font-weight:600; margin-bottom:0.5rem; font-size:0.95rem; }
+  .options { display:flex; flex-wrap:wrap; gap:0.6rem; }
+  .opt { background:#1e2a3e; padding:0.3rem 0.9rem; border-radius:2rem; cursor:pointer; transition:0.2s; font-size:0.85rem; }
+  .opt:hover { background:#2c3e66; transform:translateY(-2px); }
+  .opt.selected { background:#ff64dc; color:#000; font-weight:bold; box-shadow:0 0 8px #ff64dc; }
+  .opt.correct { background:#00cc88; color:#000; }
+  .opt.wrong { background:#ff4455; color:#fff; }
+  .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #ff64dc; }
+  .btn-action { background:linear-gradient(95deg,#ff64dc,#cc44bb); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#fff; margin-top:1rem; }
+  .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(255,100,220,0.5); }
+  .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
+  .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin-top:1.5rem; padding:1rem; border:1px dashed gold; }
+  .insignia i { font-size:2.5rem; color:gold; }
+  .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
+  .hidden { display:none; }
+  .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+  .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+  .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(255,100,220,0.4); }
+  .nav-link.next { background:linear-gradient(95deg,#ff64dc,#cc44bb); color:#fff; }
+  .nav-link.menu { background:#1a2a4a; border:1px solid #ff64dc; }
+  footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .info-grid { grid-template-columns:1fr; } }
+ </style>
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
 </head>
 <body>
-  <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Estadística</a></nav>
-  <div class="course-container" id="app">
-    <div class="hero-header">
-      <h1>🔄 PCA y Análisis Factorial</h1>
-      <p>Componentes principales, scree plot, varianza explicada, rotación</p>
-      <div class="badge-area">
-        <span class="chip"><i class="fas fa-compress-alt"></i> PCA</span>
-        <span class="chip"><i class="fas fa-chart-bar"></i> Scree Plot</span>
-        <span class="chip"><i class="fas fa-sync-alt"></i> Rotación</span>
-      </div>
+ <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Estadística</a></nav>
+ <div class="course-container" id="app">
+  <div class="hero-header">
+   <h1>🔄 PCA y Análisis Factorial</h1>
+   <p>Componentes principales, scree plot, varianza explicada, rotación</p>
+   <div class="badge-area">
+    <span class="chip"><i class="fas fa-compress-alt"></i> PCA</span>
+    <span class="chip"><i class="fas fa-chart-bar"></i> Scree Plot</span>
+    <span class="chip"><i class="fas fa-sync-alt"></i> Rotación</span>
+   </div>
+  </div>
+  <div class="progress-section">
+   <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+   <span class="progress-text" id="progressText">Módulo 10 de 12</span>
+  </div>
+  <div class="analogy-card">
+   <strong>💡 Piénsalo así:</strong> PCA es como hacer una radiografía de tus datos. Imagina que tienes 30 variables (presión, temperatura, humedad...). PCA encuentra las 2 o 3 "sombras" (componentes) que capturan la mayor parte de la información. El scree plot es como la radiografía: ves qué sombras son importantes y cuáles son solo ruido.
+  </div>
+  <div class="main-area">
+   <div class="section-title"><i class="fas fa-cubes"></i> Conceptos de PCA y AF</div>
+   <div class="info-grid">
+    <div class="info-panel">
+     <h3>🔄 Componentes Principales</h3>
+     <p>Combinaciones lineales de las variables originales que maximizan la varianza. PC₁ captura la máxima varianza posible, PC₂ la máxima varianza no correlacionada con PC₁, etc. Los loadings indican la contribución de cada variable al componente.</p>
     </div>
-    <div class="progress-section">
-      <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
-      <span class="progress-text" id="progressText">Módulo 10 de 12</span>
+    <div class="info-panel">
+     <h3>📊 Scree Plot y Varianza Explicada</h3>
+     <p>Gráfico de valores propios (eigenvalues) vs número de componente. El "codo" indica cuántos componentes retener. La varianza explicada acumulada ayuda a decidir: típicamente se busca >70-80%. Regla de Kaiser: eigenvalues > 1.</p>
     </div>
-    <div class="analogy-card">
-      <strong>💡 Piénsalo así:</strong> PCA es como hacer una radiografía de tus datos. Imagina que tienes 30 variables (presión, temperatura, humedad...). PCA encuentra las 2 o 3 "sombras" (componentes) que capturan la mayor parte de la información. El scree plot es como la radiografía: ves qué sombras son importantes y cuáles son solo ruido.
+    <div class="info-panel">
+     <h3>🔄 Rotación (Varimax, Oblimin)</h3>
+     <p>En análisis factorial, la rotación simplifica la interpretación. Varimax (ortogonal): maximiza varianza de loadings por factor. Oblimin (oblicua): permite factores correlacionados. La rotación no mejora el ajuste, solo la interpretabilidad.</p>
     </div>
-    <div class="main-area">
-      <div class="section-title"><i class="fas fa-cubes"></i> Conceptos de PCA y AF</div>
-      <div class="info-grid">
-        <div class="info-panel">
-          <h3>🔄 Componentes Principales</h3>
-          <p>Combinaciones lineales de las variables originales que maximizan la varianza. PC₁ captura la máxima varianza posible, PC₂ la máxima varianza no correlacionada con PC₁, etc. Los loadings indican la contribución de cada variable al componente.</p>
-        </div>
-        <div class="info-panel">
-          <h3>📊 Scree Plot y Varianza Explicada</h3>
-          <p>Gráfico de valores propios (eigenvalues) vs número de componente. El "codo" indica cuántos componentes retener. La varianza explicada acumulada ayuda a decidir: típicamente se busca >70-80%. Regla de Kaiser: eigenvalues > 1.</p>
-        </div>
-        <div class="info-panel">
-          <h3>🔄 Rotación (Varimax, Oblimin)</h3>
-          <p>En análisis factorial, la rotación simplifica la interpretación. Varimax (ortogonal): maximiza varianza de loadings por factor. Oblimin (oblicua): permite factores correlacionados. La rotación no mejora el ajuste, solo la interpretabilidad.</p>
-        </div>
-        <div class="info-panel">
-          <h3>📐 PCA vs Análisis Factorial</h3>
-          <p>PCA maximiza varianza explicada; AF modela la estructura de covarianzas. PCA no tiene error específico; AF sí (comunalidades). PCA es para reducción de datos; AF para descubrir constructos latentes. En la práctica se usan de forma complementaria.</p>
-        </div>
-      </div>
+    <div class="info-panel">
+     <h3>📐 PCA vs Análisis Factorial</h3>
+     <p>PCA maximiza varianza explicada; AF modela la estructura de covarianzas. PCA no tiene error específico; AF sí (comunalidades). PCA es para reducción de datos; AF para descubrir constructos latentes. En la práctica se usan de forma complementaria.</p>
+    </div>
+   </div>
 
-      <div class="sim-box">
-        <p style="margin-bottom:0.8rem;color:#b9ccee;">🔮 <strong>Simulador de PCA</strong></p>
-        <p style="font-size:0.85rem;color:#8899bb;">Visualiza cómo PCA encuentra las direcciones principales en datos 2D.</p>
-        <canvas id="pcaCanvas" width="500" height="300"></canvas>
-        <div style="margin-top:0.5rem;">
-          <button class="sim-btn" onclick="runPCA()">🔮 Ejecutar PCA</button>
-          <button class="sim-btn secondary" onclick="generatePCAData()">🎲 Nuevos datos</button>
-        </div>
-        <p id="pcaInfo" style="font-size:0.85rem;color:#b9ccee;margin-top:0.5rem;"></p>
-      </div>
-
-      <div class="quiz-area">
-        <div class="quiz-title"><i class="fas fa-question-circle"></i> Mini Quiz: PCA y Análisis Factorial</div>
-        <div id="quizContainer"></div>
-        <button id="submitQuizBtn" class="btn-action">✅ Verificar respuestas</button>
-        <div id="insigniaArea" class="insignia hidden">
-          <i class="fas fa-medal"></i>
-          <h3>🏅 Reductor/a de Dimensionalidad 🏅</h3>
-          <p>Has dominado PCA, scree plots y análisis factorial. ¡Excelente!</p>
-        </div>
-      </div>
+   <div class="sim-box">
+    <p style="margin-bottom:0.8rem;color:#b9ccee;">🔮 <strong>Simulador de PCA</strong></p>
+    <p style="font-size:0.85rem;color:#8899bb;">Visualiza cómo PCA encuentra las direcciones principales en datos 2D.</p>
+    <canvas id="pcaCanvas" width="500" height="300"></canvas>
+    <div style="margin-top:0.5rem;">
+     <button class="sim-btn" onclick="runPCA()">🔮 Ejecutar PCA</button>
+     <button class="sim-btn secondary" onclick="generatePCAData()">🎲 Nuevos datos</button>
     </div>
+    <p id="pcaInfo" style="font-size:0.85rem;color:#b9ccee;margin-top:0.5rem;"></p>
+   </div>
 
-    <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre PCA y análisis factorial.</div>
-
-    <div class="nav-links">
-      <a href="09-supervivencia.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
-      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
-      <a href="11-validacion-modelos.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+   <div class="quiz-area">
+    <div class="quiz-title"><i class="fas fa-question-circle"></i> Mini Quiz: PCA y Análisis Factorial</div>
+    <div id="quizContainer"></div>
+    <button id="submitQuizBtn" class="btn-action">✅ Verificar respuestas</button>
+    <div id="insigniaArea" class="insignia hidden">
+     <i class="fas fa-medal"></i>
+     <h3>🏅 Reductor/a de Dimensionalidad 🏅</h3>
+     <p>Has dominado PCA, scree plots y análisis factorial. ¡Excelente!</p>
     </div>
-    <footer><i class="fas fa-chart-line"></i> Curso 4: Modelos Predictivos · PCA y AF</footer>
+   </div>
   </div>
 
-  <script>
-    const STORAGE_KEY = 'prog_est_4_10';
-    const PROGRESS_KEY = 'prog_est_4_progress';
-    const questions = [
-      { text: "¿Qué maximiza el primer componente principal (PC₁)?", options: ["La varianza de los datos proyectada", "La correlación con Y", "La media de los datos"], correct: 0 },
-      { text: "¿Qué muestra un scree plot?", options: ["Eigenvalues vs número de componente", "Loadings de cada variable", "Puntuaciones de los sujetos"], correct: 0 },
-      { text: "¿Qué regla se usa para retener componentes con eigenvalues > 1?", options: ["Regla de Kaiser", "Regla de Cattell", "Regla de Bartlett"], correct: 0 },
-      { text: "¿Para qué sirve la rotación Varimax?", options: ["Simplificar la interpretación de los factores", "Aumentar la varianza explicada", "Reducir el número de factores"], correct: 0 },
-      { text: "¿Cuál es la principal diferencia entre PCA y AF?", options: ["PCA maximiza varianza; AF modela covarianzas", "PCA usa rotación; AF no", "PCA es no lineal; AF es lineal"], correct: 0 }
-    ];
-    let userAnswers = new Array(questions.length).fill(null);
-    let quizCompleted = false;
-    let pcaPoints = [];
+  <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre PCA y análisis factorial.</div>
 
-    function saveProgress() {
-      let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
-      if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
-      localStorage.setItem(STORAGE_KEY, 'true');
-    }
+  <div class="nav-links">
+   <a href="09-supervivencia.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+   <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+   <a href="11-validacion-modelos.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-chart-line"></i> Curso 4: Modelos Predictivos · PCA y AF</footer>
+ </div>
 
-    function updateProgress() {
-      let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
-      document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
-      document.getElementById('progressText').textContent = 'M\u00f3dulo '+(p.length || 10)+' de 12';
-    }
+ <script>
+  const STORAGE_KEY = 'prog_est_4_10';
+  const PROGRESS_KEY = 'prog_est_4_progress';
+  const questions = [
+   { text: "¿Qué maximiza el primer componente principal (PC₁)?", options: ["La varianza de los datos proyectada", "La correlación con Y", "La media de los datos"], correct: 0 },
+   { text: "¿Qué muestra un scree plot?", options: ["Eigenvalues vs número de componente", "Loadings de cada variable", "Puntuaciones de los sujetos"], correct: 0 },
+   { text: "¿Qué regla se usa para retener componentes con eigenvalues > 1?", options: ["Regla de Kaiser", "Regla de Cattell", "Regla de Bartlett"], correct: 0 },
+   { text: "¿Para qué sirve la rotación Varimax?", options: ["Simplificar la interpretación de los factores", "Aumentar la varianza explicada", "Reducir el número de factores"], correct: 0 },
+   { text: "¿Cuál es la principal diferencia entre PCA y AF?", options: ["PCA maximiza varianza; AF modela covarianzas", "PCA usa rotación; AF no", "PCA es no lineal; AF es lineal"], correct: 0 }
+  ];
+  let userAnswers = new Array(questions.length).fill(null);
+  let quizCompleted = false;
+  let pcaPoints = [];
 
-    function renderQuestions() {
-      const container = document.getElementById('quizContainer');
-      container.innerHTML = '';
-      questions.forEach((q, idx) => {
-        const qDiv = document.createElement('div'); qDiv.classList.add('question');
-        qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
-        const optsDiv = qDiv.querySelector('.options');
-        q.options.forEach((opt, optIdx) => {
-          const span = document.createElement('div'); span.classList.add('opt');
-          span.textContent = opt; span.dataset.qIdx = idx; span.dataset.optIdx = optIdx;
-          span.addEventListener('click', function() {
-            if (quizCompleted) return;
-            this.parentElement.querySelectorAll('.opt').forEach(c => c.classList.remove('selected'));
-            this.classList.add('selected'); userAnswers[idx] = optIdx; updateBtnState();
-          });
-          optsDiv.appendChild(span);
-        });
-        container.appendChild(qDiv);
-      });
-    }
+  function saveProgress() {
+   let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
+   localStorage.setItem(STORAGE_KEY, 'true');
+  }
 
-    function updateBtnState() {
-      document.getElementById('submitQuizBtn').disabled = userAnswers.some(a => a === null) || quizCompleted;
-    }
+  function updateProgress() {
+   let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
+   document.getElementById('progressText').textContent = 'M\u00f3dulo '+(p.length || 10)+' de 12';
+  }
 
-    function handleSubmit() {
+  function renderQuestions() {
+   const container = document.getElementById('quizContainer');
+   container.innerHTML = '';
+   questions.forEach((q, idx) => {
+    const qDiv = document.createElement('div'); qDiv.classList.add('question');
+    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
+    const optsDiv = qDiv.querySelector('.options');
+    q.options.forEach((opt, optIdx) => {
+     const span = document.createElement('div'); span.classList.add('opt');
+     span.textContent = opt; span.dataset.qIdx = idx; span.dataset.optIdx = optIdx;
+     span.addEventListener('click', function() {
       if (quizCompleted) return;
-      if (userAnswers.some(a => a === null)) { document.getElementById('feedbackMsg').textContent = '⚠️ Responde todas las preguntas primero.'; return; }
-      let correct = 0;
-      questions.forEach((q, i) => { if (userAnswers[i] === q.correct) correct++; });
-      const total = questions.length; const passed = correct >= Math.ceil(total * 0.6);
-      document.querySelectorAll('.question').forEach((qDiv, idx) => {
-        const opts = qDiv.querySelectorAll('.opt');
-        opts.forEach((o, oi) => {
-          o.classList.remove('selected');
-          if (oi === questions[idx].correct) o.classList.add('correct');
-          else if (oi === userAnswers[idx]) o.classList.add('wrong');
-        });
-      });
-      if (passed) {
-        quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
-        document.getElementById('insigniaArea').classList.remove('hidden');
-        document.getElementById('feedbackMsg').textContent = '🎉 ¡Excelente! Has dominado PCA y AF.';
-        saveProgress(); updateProgress();
-      } else {
-        document.getElementById('feedbackMsg').textContent = '❌ ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. ¡Reintenta!';
-      }
-    }
+      this.parentElement.querySelectorAll('.opt').forEach(c => c.classList.remove('selected'));
+      this.classList.add('selected'); userAnswers[idx] = optIdx; updateBtnState();
+     });
+     optsDiv.appendChild(span);
+    });
+    container.appendChild(qDiv);
+   });
+  }
 
-    function restoreProgress() {
-      const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
-      if (p.includes(STORAGE_KEY)) {
-        quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
-        document.getElementById('insigniaArea').classList.remove('hidden');
-        document.getElementById('feedbackMsg').textContent = '🏆 Ya completaste este módulo.';
-        document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
-      }
-    }
+  function updateBtnState() {
+   document.getElementById('submitQuizBtn').disabled = userAnswers.some(a => a === null) || quizCompleted;
+  }
 
-    function generatePCAData() {
-      pcaPoints = [];
-      const angle = Math.PI/4;
-      for(let i=0;i<50;i++){
-        const x = (Math.random()-0.5)*4;
-        const y = (Math.random()-0.5)*4;
-        const rotX = x*Math.cos(angle) - y*Math.sin(angle) * 0.3;
-        const rotY = x*Math.sin(angle) + y*Math.cos(angle) * 0.3;
-        pcaPoints.push({x: rotX, y: rotY});
-      }
-      drawPCAPoints();
-      document.getElementById('pcaInfo').innerHTML = I18N.t('fb_0') + pcaPoints.length + ' puntos generados';
-    }
+  function handleSubmit() {
+   if (quizCompleted) return;
+   if (userAnswers.some(a => a === null)) { document.getElementById('feedbackMsg').textContent = '⚠️ Responde todas las preguntas primero.'; return; }
+   let correct = 0;
+   questions.forEach((q, i) => { if (userAnswers[i] === q.correct) correct++; });
+   const total = questions.length; const passed = correct >= Math.ceil(total * 0.6);
+   document.querySelectorAll('.question').forEach((qDiv, idx) => {
+    const opts = qDiv.querySelectorAll('.opt');
+    opts.forEach((o, oi) => {
+     o.classList.remove('selected');
+     if (oi === questions[idx].correct) o.classList.add('correct');
+     else if (oi === userAnswers[idx]) o.classList.add('wrong');
+    });
+   });
+   if (passed) {
+    quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').textContent = '🎉 ¡Excelente! Has dominado PCA y AF.';
+    saveProgress(); updateProgress();
+   } else {
+    document.getElementById('feedbackMsg').textContent = '❌ ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. ¡Reintenta!';
+   }
+  }
 
-    function drawPCAPoints() {
-      const canvas = document.getElementById('pcaCanvas');
-      const ctx = canvas.getContext('2d');
-      ctx.clearRect(0,0,canvas.width,canvas.height);
-      const pad = 50; const w = canvas.width-pad*2; const h = canvas.height-pad*2;
-      const cx = pad + w/2, cy = pad + h/2;
-      const scale = 50;
+  function restoreProgress() {
+   const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   if (p.includes(STORAGE_KEY)) {
+    quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').textContent = '🏆 Ya completaste este módulo.';
+    document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
+   }
+  }
 
-      pcaPoints.forEach(p => {
-        const px = cx + p.x*scale;
-        const py = cy - p.y*scale;
-        ctx.beginPath(); ctx.arc(px, py, 3, 0, Math.PI*2);
-        ctx.fillStyle = '#8899bb'; ctx.fill();
-      });
+  function generatePCAData() {
+   pcaPoints = [];
+   const angle = Math.PI/4;
+   for(let i=0;i<50;i++){
+    const x = (Math.random()-0.5)*4;
+    const y = (Math.random()-0.5)*4;
+    const rotX = x*Math.cos(angle) - y*Math.sin(angle) * 0.3;
+    const rotY = x*Math.sin(angle) + y*Math.cos(angle) * 0.3;
+    pcaPoints.push({x: rotX, y: rotY});
+   }
+   drawPCAPoints();
+   document.getElementById('pcaInfo').innerHTML = I18N.t('fb_0') + pcaPoints.length + ' puntos generados';
+  }
 
-      ctx.fillStyle = '#8899bb'; ctx.font='10px Inter'; ctx.textAlign='center';
-      ctx.fillText('Variable 1', pad+w/2, canvas.height-5);
-      ctx.save(); ctx.translate(12, pad+h/2); ctx.rotate(-Math.PI/2); ctx.fillText('Variable 2', 0, 0); ctx.restore();
-    }
+  function drawPCAPoints() {
+   const canvas = document.getElementById('pcaCanvas');
+   const ctx = canvas.getContext('2d');
+   ctx.clearRect(0,0,canvas.width,canvas.height);
+   const pad = 50; const w = canvas.width-pad*2; const h = canvas.height-pad*2;
+   const cx = pad + w/2, cy = pad + h/2;
+   const scale = 50;
 
-    function runPCA() {
-      if(pcaPoints.length===0) generatePCAData();
-      const canvas = document.getElementById('pcaCanvas');
-      const ctx = canvas.getContext('2d');
-      const pad = 50; const w = canvas.width-pad*2; const h = canvas.height-pad*2;
-      const cx = pad + w/2, cy = pad + h/2;
-      const scale = 50;
+   pcaPoints.forEach(p => {
+    const px = cx + p.x*scale;
+    const py = cy - p.y*scale;
+    ctx.beginPath(); ctx.arc(px, py, 3, 0, Math.PI*2);
+    ctx.fillStyle = '#8899bb'; ctx.fill();
+   });
 
-      let meanX=0, meanY=0;
-      pcaPoints.forEach(p => { meanX+=p.x; meanY+=p.y; });
-      meanX/=pcaPoints.length; meanY/=pcaPoints.length;
+   ctx.fillStyle = '#8899bb'; ctx.font='10px Inter'; ctx.textAlign='center';
+   ctx.fillText('Variable 1', pad+w/2, canvas.height-5);
+   ctx.save(); ctx.translate(12, pad+h/2); ctx.rotate(-Math.PI/2); ctx.fillText('Variable 2', 0, 0); ctx.restore();
+  }
 
-      let varX=0, varY=0, covXY=0;
-      pcaPoints.forEach(p => { varX+=(p.x-meanX)**2; varY+=(p.y-meanY)**2; covXY+=(p.x-meanX)*(p.y-meanY); });
-      varX/=pcaPoints.length; varY/=pcaPoints.length; covXY/=pcaPoints.length;
+  function runPCA() {
+   if(pcaPoints.length===0) generatePCAData();
+   const canvas = document.getElementById('pcaCanvas');
+   const ctx = canvas.getContext('2d');
+   const pad = 50; const w = canvas.width-pad*2; const h = canvas.height-pad*2;
+   const cx = pad + w/2, cy = pad + h/2;
+   const scale = 50;
 
-      const trace = varX + varY;
-      const disc = Math.sqrt((varX-varY)**2 + 4*covXY*covXY);
-      const eig1 = (trace + disc)/2;
-      const eig2 = (trace - disc)/2;
-      const prop1 = eig1/trace;
+   let meanX=0, meanY=0;
+   pcaPoints.forEach(p => { meanX+=p.x; meanY+=p.y; });
+   meanX/=pcaPoints.length; meanY/=pcaPoints.length;
 
-      let angle = 0.5 * Math.atan2(2*covXY, varX-varY);
+   let varX=0, varY=0, covXY=0;
+   pcaPoints.forEach(p => { varX+=(p.x-meanX)**2; varY+=(p.y-meanY)**2; covXY+=(p.x-meanX)*(p.y-meanY); });
+   varX/=pcaPoints.length; varY/=pcaPoints.length; covXY/=pcaPoints.length;
 
-      ctx.strokeStyle = '#ff64dc'; ctx.lineWidth = 3;
-      ctx.beginPath();
-      const len = Math.sqrt(eig1)*2;
-      ctx.moveTo(cx - Math.cos(angle)*len*scale/2, cy + Math.sin(angle)*len*scale/2);
-      ctx.lineTo(cx + Math.cos(angle)*len*scale/2, cy - Math.sin(angle)*len*scale/2);
-      ctx.stroke();
+   const trace = varX + varY;
+   const disc = Math.sqrt((varX-varY)**2 + 4*covXY*covXY);
+   const eig1 = (trace + disc)/2;
+   const eig2 = (trace - disc)/2;
+   const prop1 = eig1/trace;
 
-      ctx.strokeStyle = '#ff9cf0'; ctx.lineWidth = 3;
-      ctx.beginPath();
-      const len2 = Math.sqrt(eig2)*2;
-      const angle2 = angle + Math.PI/2;
-      ctx.moveTo(cx - Math.cos(angle2)*len2*scale/2, cy + Math.sin(angle2)*len2*scale/2);
-      ctx.lineTo(cx + Math.cos(angle2)*len2*scale/2, cy - Math.sin(angle2)*len2*scale/2);
-      ctx.stroke();
+   let angle = 0.5 * Math.atan2(2*covXY, varX-varY);
 
-      ctx.fillStyle = '#ff64dc'; ctx.font='bold 12px Inter'; ctx.textAlign='left';
-      ctx.fillText('PC₁ ('+(prop1*100).toFixed(1)+'%)', cx + Math.cos(angle)*len*scale/2 + 5, cy - Math.sin(angle)*len*scale/2 + 5);
-      ctx.fillStyle = '#ff9cf0';
-      ctx.fillText('PC₂ ('+((1-prop1)*100).toFixed(1)+'%)', cx + Math.cos(angle2)*len2*scale/2 + 5, cy - Math.sin(angle2)*len2*scale/2 + 5);
+   ctx.strokeStyle = '#ff64dc'; ctx.lineWidth = 3;
+   ctx.beginPath();
+   const len = Math.sqrt(eig1)*2;
+   ctx.moveTo(cx - Math.cos(angle)*len*scale/2, cy + Math.sin(angle)*len*scale/2);
+   ctx.lineTo(cx + Math.cos(angle)*len*scale/2, cy - Math.sin(angle)*len*scale/2);
+   ctx.stroke();
 
-      document.getElementById('pcaInfo').innerHTML = 'PC₁ explica <strong>'+(prop1*100).toFixed(1)+'%</strong> de la varianza | PC₂ explica <strong>'+((1-prop1)*100).toFixed(1)+'%</strong> | Línea magenta = PC₁, rosa = PC₂';
-    }
+   ctx.strokeStyle = '#ff9cf0'; ctx.lineWidth = 3;
+   ctx.beginPath();
+   const len2 = Math.sqrt(eig2)*2;
+   const angle2 = angle + Math.PI/2;
+   ctx.moveTo(cx - Math.cos(angle2)*len2*scale/2, cy + Math.sin(angle2)*len2*scale/2);
+   ctx.lineTo(cx + Math.cos(angle2)*len2*scale/2, cy - Math.sin(angle2)*len2*scale/2);
+   ctx.stroke();
 
-    document.getElementById('submitQuizBtn').addEventListener('click', handleSubmit);
-    renderQuestions(); updateBtnState(); restoreProgress(); updateProgress(); generatePCAData();
-  </script>
-  <script src="../../../assets/js/cookie-consent.js"></script>
+   ctx.fillStyle = '#ff64dc'; ctx.font='bold 12px Inter'; ctx.textAlign='left';
+   ctx.fillText('PC₁ ('+(prop1*100).toFixed(1)+'%)', cx + Math.cos(angle)*len*scale/2 + 5, cy - Math.sin(angle)*len*scale/2 + 5);
+   ctx.fillStyle = '#ff9cf0';
+   ctx.fillText('PC₂ ('+((1-prop1)*100).toFixed(1)+'%)', cx + Math.cos(angle2)*len2*scale/2 + 5, cy - Math.sin(angle2)*len2*scale/2 + 5);
 
-<script>
+   document.getElementById('pcaInfo').innerHTML = 'PC₁ explica <strong>'+(prop1*100).toFixed(1)+'%</strong> de la varianza | PC₂ explica <strong>'+((1-prop1)*100).toFixed(1)+'%</strong> | Línea magenta = PC₁, rosa = PC₂';
+  }
+
+  document.getElementById('submitQuizBtn').addEventListener('click', handleSubmit);
+  renderQuestions(); updateBtnState(); restoreProgress(); updateProgress(); generatePCAData();
+ </script>
+ <script>
 window.I18N_DATA={
-  'fb_0': { es: '📊 ', en: '📊 ' }
+ 'fb_0': { es: '📊 ', en: '📊 ' }
 };
 </script>
-<script src="../../../assets/js/i18n.js"></script>  </body>
+<script src="../../../assets/js/i18n.js"></script> </body>
 </html>

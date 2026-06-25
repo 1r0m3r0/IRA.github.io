@@ -1,288 +1,287 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Modelos Predictivos | 🎯 Regularización</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { background:linear-gradient(135deg,#0a0f1e,#0c1222 50%,#111a2e); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
-    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-    .course-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,100,220,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
-    .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #ff64dc; }
-    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#ff9cf0,#ff64dc); -webkit-background-clip:text; background-clip:text; color:transparent; }
-    .hero-header p { font-size:1.1rem; color:#e2b9ff; margin-top:0.5rem; font-weight:500; }
-    .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
-    .chip { background:rgba(255,100,220,0.15); border:1px solid #ff64dc; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
-    .progress-section { padding:1.2rem 2rem; border-bottom:1px solid #1a2a4a; }
-    .progress-bar-outer { background:#1a2a4a; border-radius:20px; height:16px; overflow:hidden; }
-    .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#ff64dc,#cc44bb); border-radius:20px; transition:width 0.5s ease; }
-    .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
-    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ff64dc; font-size:1rem; line-height:1.6; }
-    .main-area { padding:1.5rem 2rem; }
-    .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#ff64dc; }
-    .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
-    .info-panel { background:rgba(10,20,40,0.7); border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
-    .info-panel h3 { color:#ff9cf0; font-size:1rem; margin-bottom:0.5rem; }
-    .info-panel p { font-size:0.85rem; color:#b9ccee; line-height:1.6; }
-    .sim-box { background:#0f1a2c; border-radius:1.5rem; padding:1.5rem; margin-bottom:1.5rem; border:1px solid #2c3e66; text-align:center; }
-    .sim-btn { background:linear-gradient(95deg,#ff64dc,#cc44bb); border:none; padding:0.6rem 1.5rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:0.95rem; color:#fff; transition:0.2s; margin:0.3rem; }
-    .sim-btn:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(255,100,220,0.4); }
-    .sim-btn.secondary { background:#2c3e66; }
-    .quiz-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #ff64dc; margin-bottom:1.5rem; }
-    .quiz-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#ff64dc; }
-    .question { background:#0f1a2c; margin:0.8rem 0; padding:0.8rem 1rem; border-radius:1.2rem; }
-    .question p { font-weight:600; margin-bottom:0.5rem; font-size:0.95rem; }
-    .options { display:flex; flex-wrap:wrap; gap:0.6rem; }
-    .opt { background:#1e2a3e; padding:0.3rem 0.9rem; border-radius:2rem; cursor:pointer; transition:0.2s; font-size:0.85rem; }
-    .opt:hover { background:#2c3e66; transform:translateY(-2px); }
-    .opt.selected { background:#ff64dc; color:#000; font-weight:bold; box-shadow:0 0 8px #ff64dc; }
-    .opt.correct { background:#00cc88; color:#000; }
-    .opt.wrong { background:#ff4455; color:#fff; }
-    .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #ff64dc; }
-    .btn-action { background:linear-gradient(95deg,#ff64dc,#cc44bb); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#fff; margin-top:1rem; }
-    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(255,100,220,0.5); }
-    .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
-    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin-top:1.5rem; padding:1rem; border:1px dashed gold; }
-    .insignia i { font-size:2.5rem; color:gold; }
-    .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
-    .hidden { display:none; }
-    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
-    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
-    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(255,100,220,0.4); }
-    .nav-link.next { background:linear-gradient(95deg,#ff64dc,#cc44bb); color:#fff; }
-    .nav-link.menu { background:#1a2a4a; border:1px solid #ff64dc; }
-    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
-    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .info-grid { grid-template-columns:1fr; } }
-  </style>
-  <link rel="stylesheet" href="../../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Modelos Predictivos | 🎯 Regularización</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:linear-gradient(135deg,#0a0f1e,#0c1222 50%,#111a2e); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+  @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .course-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,100,220,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+  .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #ff64dc; }
+  .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#ff9cf0,#ff64dc); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero-header p { font-size:1.1rem; color:#e2b9ff; margin-top:0.5rem; font-weight:500; }
+  .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+  .chip { background:rgba(255,100,220,0.15); border:1px solid #ff64dc; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+  .progress-section { padding:1.2rem 2rem; border-bottom:1px solid #1a2a4a; }
+  .progress-bar-outer { background:#1a2a4a; border-radius:20px; height:16px; overflow:hidden; }
+  .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#ff64dc,#cc44bb); border-radius:20px; transition:width 0.5s ease; }
+  .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
+  .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ff64dc; font-size:1rem; line-height:1.6; }
+  .main-area { padding:1.5rem 2rem; }
+  .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#ff64dc; }
+  .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
+  .info-panel { background:rgba(10,20,40,0.7); border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
+  .info-panel h3 { color:#ff9cf0; font-size:1rem; margin-bottom:0.5rem; }
+  .info-panel p { font-size:0.85rem; color:#b9ccee; line-height:1.6; }
+  .sim-box { background:#0f1a2c; border-radius:1.5rem; padding:1.5rem; margin-bottom:1.5rem; border:1px solid #2c3e66; text-align:center; }
+  .sim-btn { background:linear-gradient(95deg,#ff64dc,#cc44bb); border:none; padding:0.6rem 1.5rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:0.95rem; color:#fff; transition:0.2s; margin:0.3rem; }
+  .sim-btn:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(255,100,220,0.4); }
+  .sim-btn.secondary { background:#2c3e66; }
+  .quiz-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #ff64dc; margin-bottom:1.5rem; }
+  .quiz-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#ff64dc; }
+  .question { background:#0f1a2c; margin:0.8rem 0; padding:0.8rem 1rem; border-radius:1.2rem; }
+  .question p { font-weight:600; margin-bottom:0.5rem; font-size:0.95rem; }
+  .options { display:flex; flex-wrap:wrap; gap:0.6rem; }
+  .opt { background:#1e2a3e; padding:0.3rem 0.9rem; border-radius:2rem; cursor:pointer; transition:0.2s; font-size:0.85rem; }
+  .opt:hover { background:#2c3e66; transform:translateY(-2px); }
+  .opt.selected { background:#ff64dc; color:#000; font-weight:bold; box-shadow:0 0 8px #ff64dc; }
+  .opt.correct { background:#00cc88; color:#000; }
+  .opt.wrong { background:#ff4455; color:#fff; }
+  .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #ff64dc; }
+  .btn-action { background:linear-gradient(95deg,#ff64dc,#cc44bb); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#fff; margin-top:1rem; }
+  .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(255,100,220,0.5); }
+  .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
+  .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin-top:1.5rem; padding:1rem; border:1px dashed gold; }
+  .insignia i { font-size:2.5rem; color:gold; }
+  .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
+  .hidden { display:none; }
+  .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+  .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+  .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(255,100,220,0.4); }
+  .nav-link.next { background:linear-gradient(95deg,#ff64dc,#cc44bb); color:#fff; }
+  .nav-link.menu { background:#1a2a4a; border:1px solid #ff64dc; }
+  footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .info-grid { grid-template-columns:1fr; } }
+ </style>
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
 </head>
 <body>
-  <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Estadística</a></nav>
-  <div class="course-container" id="app">
-    <div class="hero-header">
-      <h1>🎯 Regularización</h1>
-      <p>Ridge, Lasso y Elastic Net</p>
-      <div class="badge-area">
-        <span class="chip"><i class="fas fa-draw-polygon"></i> Ridge</span>
-        <span class="chip"><i class="fas fa-compress-alt"></i> Lasso</span>
-        <span class="chip"><i class="fas fa-sliders-h"></i> Elastic Net</span>
-      </div>
+ <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Estadística</a></nav>
+ <div class="course-container" id="app">
+  <div class="hero-header">
+   <h1>🎯 Regularización</h1>
+   <p>Ridge, Lasso y Elastic Net</p>
+   <div class="badge-area">
+    <span class="chip"><i class="fas fa-draw-polygon"></i> Ridge</span>
+    <span class="chip"><i class="fas fa-compress-alt"></i> Lasso</span>
+    <span class="chip"><i class="fas fa-sliders-h"></i> Elastic Net</span>
+   </div>
+  </div>
+  <div class="progress-section">
+   <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+   <span class="progress-text" id="progressText">Módulo 3 de 12</span>
+  </div>
+  <div class="analogy-card">
+   <strong>💡 Piénsalo así:</strong> La regularización es como poner límites a un chef que quiere usar todos los ingredientes de la cocina. Ridge le dice "puedes usar todo, pero con moderación". Lasso le dice "elige solo los ingredientes esenciales". Elastic Net es un compromiso: "elige los esenciales, y a los demás úsalos con moderación".
+  </div>
+  <div class="main-area">
+   <div class="section-title"><i class="fas fa-cubes"></i> Métodos de Regularización</div>
+   <div class="info-grid">
+    <div class="info-panel">
+     <h3>🎯 Ridge (L2)</h3>
+     <p>Penaliza la suma de cuadrados de los coeficientes: λ∑βⱼ². Reduce todos los coeficientes pero no los lleva a cero. Ideal cuando muchos predictores tienen efecto pequeño. Mantiene todos los predictores en el modelo.</p>
     </div>
-    <div class="progress-section">
-      <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
-      <span class="progress-text" id="progressText">Módulo 3 de 12</span>
+    <div class="info-panel">
+     <h3>✂️ Lasso (L1)</h3>
+     <p>Penaliza la suma de valores absolutos: λ∑|βⱼ|. Puede llevar coeficientes exactamente a cero, haciendo selección de variables automática. Ideal cuando pocos predictores son realmente importantes.</p>
     </div>
-    <div class="analogy-card">
-      <strong>💡 Piénsalo así:</strong> La regularización es como poner límites a un chef que quiere usar todos los ingredientes de la cocina. Ridge le dice "puedes usar todo, pero con moderación". Lasso le dice "elige solo los ingredientes esenciales". Elastic Net es un compromiso: "elige los esenciales, y a los demás úsalos con moderación".
+    <div class="info-panel">
+     <h3>⚖️ Elastic Net</h3>
+     <p>Combina L1 y L2: λ(α∑|βⱼ| + (1-α)∑βⱼ²). Lo mejor de ambos mundos. Funciona bien con grupos de variables correlacionadas. El parámetro α controla la mezcla.</p>
     </div>
-    <div class="main-area">
-      <div class="section-title"><i class="fas fa-cubes"></i> Métodos de Regularización</div>
-      <div class="info-grid">
-        <div class="info-panel">
-          <h3>🎯 Ridge (L2)</h3>
-          <p>Penaliza la suma de cuadrados de los coeficientes: λ∑βⱼ². Reduce todos los coeficientes pero no los lleva a cero. Ideal cuando muchos predictores tienen efecto pequeño. Mantiene todos los predictores en el modelo.</p>
-        </div>
-        <div class="info-panel">
-          <h3>✂️ Lasso (L1)</h3>
-          <p>Penaliza la suma de valores absolutos: λ∑|βⱼ|. Puede llevar coeficientes exactamente a cero, haciendo selección de variables automática. Ideal cuando pocos predictores son realmente importantes.</p>
-        </div>
-        <div class="info-panel">
-          <h3>⚖️ Elastic Net</h3>
-          <p>Combina L1 y L2: λ(α∑|βⱼ| + (1-α)∑βⱼ²). Lo mejor de ambos mundos. Funciona bien con grupos de variables correlacionadas. El parámetro α controla la mezcla.</p>
-        </div>
-        <div class="info-panel">
-          <h3>📏 Bias-Variance Tradeoff</h3>
-          <p>Al aumentar λ, aumentamos el sesgo (bias) pero reducimos la varianza. El λ óptimo minimiza el error de predicción fuera de muestra. Se encuentra con cross-validation.</p>
-        </div>
-      </div>
+    <div class="info-panel">
+     <h3>📏 Bias-Variance Tradeoff</h3>
+     <p>Al aumentar λ, aumentamos el sesgo (bias) pero reducimos la varianza. El λ óptimo minimiza el error de predicción fuera de muestra. Se encuentra con cross-validation.</p>
+    </div>
+   </div>
 
-      <div class="sim-box">
-        <p style="margin-bottom:0.8rem;color:#b9ccee;">🎛️ <strong>Simulador de Regularización</strong></p>
-        <p style="font-size:0.85rem;color:#8899bb;">Ajusta λ para ver cómo cambian los coeficientes con Ridge vs Lasso.</p>
-        <div style="display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;margin:1rem 0;">
-          <div><label style="color:#ff9cf0;font-size:0.8rem;">λ (lambda)</label><br><input type="range" id="lambdaSlider" min="0" max="10" step="0.1" value="2" style="width:200px;" oninput="updateRegSim()"><br><span id="lambdaVal" style="color:#fff;font-weight:bold;">2.0</span></div>
-        </div>
-        <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:1rem;margin:0.5rem 0;">
-          <button class="sim-btn" onclick="setMode('ridge')" id="ridgeBtn" style="opacity:1;">Ridge</button>
-          <button class="sim-btn secondary" onclick="setMode('lasso')" id="lassoBtn">Lasso</button>
-        </div>
-        <canvas id="coefCanvas" width="500" height="200"></canvas>
-        <p id="coefInfo" style="font-size:0.85rem;color:#b9ccee;margin-top:0.5rem;"></p>
-      </div>
-
-      <div class="quiz-area">
-        <div class="quiz-title"><i class="fas fa-question-circle"></i> Mini Quiz: Regularización</div>
-        <div id="quizContainer"></div>
-        <button id="submitQuizBtn" class="btn-action">✅ Verificar respuestas</button>
-        <div id="insigniaArea" class="insignia hidden">
-          <i class="fas fa-medal"></i>
-          <h3>🏅 Regularizador/a Experto/a 🏅</h3>
-          <p>Has dominado Ridge, Lasso y Elastic Net. Sabes controlar el sobreajuste como un profesional.</p>
-        </div>
-      </div>
+   <div class="sim-box">
+    <p style="margin-bottom:0.8rem;color:#b9ccee;">🎛️ <strong>Simulador de Regularización</strong></p>
+    <p style="font-size:0.85rem;color:#8899bb;">Ajusta λ para ver cómo cambian los coeficientes con Ridge vs Lasso.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;margin:1rem 0;">
+     <div><label style="color:#ff9cf0;font-size:0.8rem;">λ (lambda)</label><br><input type="range" id="lambdaSlider" min="0" max="10" step="0.1" value="2" style="width:200px;" oninput="updateRegSim()"><br><span id="lambdaVal" style="color:#fff;font-weight:bold;">2.0</span></div>
     </div>
-
-    <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre regularización y bias-variance tradeoff.</div>
-
-    <div class="nav-links">
-      <a href="02-regresion-multiple.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
-      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
-      <a href="04-logistica-multinomial.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+    <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:1rem;margin:0.5rem 0;">
+     <button class="sim-btn" onclick="setMode('ridge')" id="ridgeBtn" style="opacity:1;">Ridge</button>
+     <button class="sim-btn secondary" onclick="setMode('lasso')" id="lassoBtn">Lasso</button>
     </div>
-    <footer><i class="fas fa-chart-line"></i> Curso 4: Modelos Predictivos · Regularización</footer>
+    <canvas id="coefCanvas" width="500" height="200"></canvas>
+    <p id="coefInfo" style="font-size:0.85rem;color:#b9ccee;margin-top:0.5rem;"></p>
+   </div>
+
+   <div class="quiz-area">
+    <div class="quiz-title"><i class="fas fa-question-circle"></i> Mini Quiz: Regularización</div>
+    <div id="quizContainer"></div>
+    <button id="submitQuizBtn" class="btn-action">✅ Verificar respuestas</button>
+    <div id="insigniaArea" class="insignia hidden">
+     <i class="fas fa-medal"></i>
+     <h3>🏅 Regularizador/a Experto/a 🏅</h3>
+     <p>Has dominado Ridge, Lasso y Elastic Net. Sabes controlar el sobreajuste como un profesional.</p>
+    </div>
+   </div>
   </div>
 
-  <script>
-    const STORAGE_KEY = 'prog_est_4_03';
-    const PROGRESS_KEY = 'prog_est_4_progress';
-    const questions = [
-      { text: "¿Qué tipo de penalización usa Ridge?", options: ["L2 (suma de cuadrados)", "L1 (suma absoluta)", "L0 (conteo de no ceros)"], correct: 0 },
-      { text: "¿Qué tipo de penalización usa Lasso?", options: ["L1 (suma absoluta)", "L2 (suma de cuadrados)", "Elastic Net"], correct: 0 },
-      { text: "¿Qué hace Lasso que Ridge no hace?", options: ["Selección de variables (coeficientes en cero)", "Reducir coeficientes", "Penalizar la magnitud"], correct: 0 },
-      { text: "Un λ muy grande causa:", options: ["Alto sesgo (bias)", "Alta varianza", "Sobreajuste"], correct: 0 },
-      { text: "El parámetro α en Elastic Net controla:", options: ["La mezcla entre L1 y L2", "La tasa de aprendizaje", "El número de iteraciones"], correct: 0 }
-    ];
-    let userAnswers = new Array(questions.length).fill(null);
-    let quizCompleted = false;
-    let currentMode = 'ridge';
-    let baseCoefs = [3.0, 1.5, 0.8, 0.3, -0.2];
+  <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre regularización y bias-variance tradeoff.</div>
 
-    function saveProgress() {
-      let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
-      if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
-      localStorage.setItem(STORAGE_KEY, 'true');
-    }
+  <div class="nav-links">
+   <a href="02-regresion-multiple.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+   <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+   <a href="04-logistica-multinomial.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-chart-line"></i> Curso 4: Modelos Predictivos · Regularización</footer>
+ </div>
 
-    function updateProgress() {
-      let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
-      document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
-      document.getElementById('progressText').textContent = 'M\u00f3dulo '+(p.length || 3)+' de 12';
-    }
+ <script>
+  const STORAGE_KEY = 'prog_est_4_03';
+  const PROGRESS_KEY = 'prog_est_4_progress';
+  const questions = [
+   { text: "¿Qué tipo de penalización usa Ridge?", options: ["L2 (suma de cuadrados)", "L1 (suma absoluta)", "L0 (conteo de no ceros)"], correct: 0 },
+   { text: "¿Qué tipo de penalización usa Lasso?", options: ["L1 (suma absoluta)", "L2 (suma de cuadrados)", "Elastic Net"], correct: 0 },
+   { text: "¿Qué hace Lasso que Ridge no hace?", options: ["Selección de variables (coeficientes en cero)", "Reducir coeficientes", "Penalizar la magnitud"], correct: 0 },
+   { text: "Un λ muy grande causa:", options: ["Alto sesgo (bias)", "Alta varianza", "Sobreajuste"], correct: 0 },
+   { text: "El parámetro α en Elastic Net controla:", options: ["La mezcla entre L1 y L2", "La tasa de aprendizaje", "El número de iteraciones"], correct: 0 }
+  ];
+  let userAnswers = new Array(questions.length).fill(null);
+  let quizCompleted = false;
+  let currentMode = 'ridge';
+  let baseCoefs = [3.0, 1.5, 0.8, 0.3, -0.2];
 
-    function renderQuestions() {
-      const container = document.getElementById('quizContainer');
-      container.innerHTML = '';
-      questions.forEach((q, idx) => {
-        const qDiv = document.createElement('div'); qDiv.classList.add('question');
-        qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
-        const optsDiv = qDiv.querySelector('.options');
-        q.options.forEach((opt, optIdx) => {
-          const span = document.createElement('div'); span.classList.add('opt');
-          span.textContent = opt; span.dataset.qIdx = idx; span.dataset.optIdx = optIdx;
-          span.addEventListener('click', function() {
-            if (quizCompleted) return;
-            this.parentElement.querySelectorAll('.opt').forEach(c => c.classList.remove('selected'));
-            this.classList.add('selected'); userAnswers[idx] = optIdx; updateBtnState();
-          });
-          optsDiv.appendChild(span);
-        });
-        container.appendChild(qDiv);
-      });
-    }
-
-    function updateBtnState() {
-      document.getElementById('submitQuizBtn').disabled = userAnswers.some(a => a === null) || quizCompleted;
-    }
-
-    function handleSubmit() {
-      if (quizCompleted) return;
-      if (userAnswers.some(a => a === null)) { document.getElementById('feedbackMsg').textContent = I18N.t('fb_0'); return; }
-      let correct = 0;
-      questions.forEach((q, i) => { if (userAnswers[i] === q.correct) correct++; });
-      const total = questions.length; const passed = correct >= Math.ceil(total * 0.6);
-      document.querySelectorAll('.question').forEach((qDiv, idx) => {
-        const opts = qDiv.querySelectorAll('.opt');
-        opts.forEach((o, oi) => {
-          o.classList.remove('selected');
-          if (oi === questions[idx].correct) o.classList.add('correct');
-          else if (oi === userAnswers[idx]) o.classList.add('wrong');
-        });
-      });
-      if (passed) {
-        quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
-        document.getElementById('insigniaArea').classList.remove('hidden');
-        document.getElementById('feedbackMsg').textContent = I18N.t('fb_1');
-        saveProgress(); updateProgress();
-      } else {
-        document.getElementById('feedbackMsg').textContent = '❌ ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. ¡Reintenta!';
-      }
-    }
-
-    function restoreProgress() {
-      const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
-      if (p.includes(STORAGE_KEY)) {
-        quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
-        document.getElementById('insigniaArea').classList.remove('hidden');
-        document.getElementById('feedbackMsg').textContent = I18N.t('fb_2');
-        document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
-      }
-    }
-
-    function setMode(mode) {
-      currentMode = mode;
-      document.getElementById('ridgeBtn').className = mode==='ridge' ? 'sim-btn' : 'sim-btn secondary';
-      document.getElementById('lassoBtn').className = mode==='lasso' ? 'sim-btn' : 'sim-btn secondary';
-      updateRegSim();
-    }
-
-    function updateRegSim() {
-      const lam = parseFloat(document.getElementById('lambdaSlider').value);
-      document.getElementById('lambdaVal').textContent = lam.toFixed(1);
-      const canvas = document.getElementById('coefCanvas');
-      const ctx = canvas.getContext('2d');
-      ctx.clearRect(0,0,canvas.width,canvas.height);
-
-      const pad = 40; const w = canvas.width-pad*2; const h = canvas.height-pad*2;
-      const nCoefs = baseCoefs.length; const barW = w / (nCoefs * 2.5);
-      const maxVal = 4; const colors = ['#ff64dc','#ff9cf0','#cc44bb','#ff4455','#ffaa00'];
-
-      let info = '';
-
-      baseCoefs.forEach((c, i) => {
-        let shrunk;
-        if (currentMode === 'ridge') {
-          shrunk = c / (1 + lam);
-        } else {
-          shrunk = Math.sign(c) * Math.max(0, Math.abs(c) - lam);
-        }
-        const cx = pad + (i + 0.75) * (w / nCoefs);
-        const barH = (Math.abs(shrunk) / maxVal) * h;
-        const yBase = pad + h;
-        ctx.fillStyle = colors[i % colors.length];
-        ctx.fillRect(cx - barW/2, yBase - barH, barW, barH);
-        ctx.fillStyle = '#fff';
-        ctx.font = '11px Inter';
-        ctx.textAlign = 'center';
-        ctx.fillText('β'+(i+1), cx, yBase - barH - 5);
-        ctx.fillStyle = '#8899bb';
-        ctx.fillText(shrunk.toFixed(2), cx, yBase + 15);
-        info += 'β'+(i+1)+': '+shrunk.toFixed(2)+' ';
-      });
-      document.getElementById('coefInfo').innerHTML = info + '| λ = '+lam.toFixed(1)+' | Modo: '+currentMode.toUpperCase();
-    }
-
-    document.getElementById('submitQuizBtn').addEventListener('click', handleSubmit);
-    renderQuestions(); updateBtnState(); restoreProgress(); updateProgress(); updateRegSim();
-  </script>
-  <script src="../../../assets/js/cookie-consent.js"></script>
-<script>
-window.I18N_DATA={
-  "fb_0": {
-    "es": "⚠️ Responde todas las preguntas primero.",
-    "en": "⚠️ Answer todas las preguntas primero."
-  },
-  "fb_1": {
-    "es": "🎉 ¡Excelente! Has dominado la regularización.",
-    "en": "🎉 !Excellent! Has dominado la regularización."
-  },
-  "fb_2": {
-    "es": "🏆 Ya completaste este módulo.",
-    "en": "🏆 Ya completaste este module."
+  function saveProgress() {
+   let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
+   localStorage.setItem(STORAGE_KEY, 'true');
   }
+
+  function updateProgress() {
+   let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
+   document.getElementById('progressText').textContent = 'M\u00f3dulo '+(p.length || 3)+' de 12';
+  }
+
+  function renderQuestions() {
+   const container = document.getElementById('quizContainer');
+   container.innerHTML = '';
+   questions.forEach((q, idx) => {
+    const qDiv = document.createElement('div'); qDiv.classList.add('question');
+    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
+    const optsDiv = qDiv.querySelector('.options');
+    q.options.forEach((opt, optIdx) => {
+     const span = document.createElement('div'); span.classList.add('opt');
+     span.textContent = opt; span.dataset.qIdx = idx; span.dataset.optIdx = optIdx;
+     span.addEventListener('click', function() {
+      if (quizCompleted) return;
+      this.parentElement.querySelectorAll('.opt').forEach(c => c.classList.remove('selected'));
+      this.classList.add('selected'); userAnswers[idx] = optIdx; updateBtnState();
+     });
+     optsDiv.appendChild(span);
+    });
+    container.appendChild(qDiv);
+   });
+  }
+
+  function updateBtnState() {
+   document.getElementById('submitQuizBtn').disabled = userAnswers.some(a => a === null) || quizCompleted;
+  }
+
+  function handleSubmit() {
+   if (quizCompleted) return;
+   if (userAnswers.some(a => a === null)) { document.getElementById('feedbackMsg').textContent = I18N.t('fb_0'); return; }
+   let correct = 0;
+   questions.forEach((q, i) => { if (userAnswers[i] === q.correct) correct++; });
+   const total = questions.length; const passed = correct >= Math.ceil(total * 0.6);
+   document.querySelectorAll('.question').forEach((qDiv, idx) => {
+    const opts = qDiv.querySelectorAll('.opt');
+    opts.forEach((o, oi) => {
+     o.classList.remove('selected');
+     if (oi === questions[idx].correct) o.classList.add('correct');
+     else if (oi === userAnswers[idx]) o.classList.add('wrong');
+    });
+   });
+   if (passed) {
+    quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').textContent = I18N.t('fb_1');
+    saveProgress(); updateProgress();
+   } else {
+    document.getElementById('feedbackMsg').textContent = '❌ ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. ¡Reintenta!';
+   }
+  }
+
+  function restoreProgress() {
+   const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   if (p.includes(STORAGE_KEY)) {
+    quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').textContent = I18N.t('fb_2');
+    document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
+   }
+  }
+
+  function setMode(mode) {
+   currentMode = mode;
+   document.getElementById('ridgeBtn').className = mode==='ridge' ? 'sim-btn' : 'sim-btn secondary';
+   document.getElementById('lassoBtn').className = mode==='lasso' ? 'sim-btn' : 'sim-btn secondary';
+   updateRegSim();
+  }
+
+  function updateRegSim() {
+   const lam = parseFloat(document.getElementById('lambdaSlider').value);
+   document.getElementById('lambdaVal').textContent = lam.toFixed(1);
+   const canvas = document.getElementById('coefCanvas');
+   const ctx = canvas.getContext('2d');
+   ctx.clearRect(0,0,canvas.width,canvas.height);
+
+   const pad = 40; const w = canvas.width-pad*2; const h = canvas.height-pad*2;
+   const nCoefs = baseCoefs.length; const barW = w / (nCoefs * 2.5);
+   const maxVal = 4; const colors = ['#ff64dc','#ff9cf0','#cc44bb','#ff4455','#ffaa00'];
+
+   let info = '';
+
+   baseCoefs.forEach((c, i) => {
+    let shrunk;
+    if (currentMode === 'ridge') {
+     shrunk = c / (1 + lam);
+    } else {
+     shrunk = Math.sign(c) * Math.max(0, Math.abs(c) - lam);
+    }
+    const cx = pad + (i + 0.75) * (w / nCoefs);
+    const barH = (Math.abs(shrunk) / maxVal) * h;
+    const yBase = pad + h;
+    ctx.fillStyle = colors[i % colors.length];
+    ctx.fillRect(cx - barW/2, yBase - barH, barW, barH);
+    ctx.fillStyle = '#fff';
+    ctx.font = '11px Inter';
+    ctx.textAlign = 'center';
+    ctx.fillText('β'+(i+1), cx, yBase - barH - 5);
+    ctx.fillStyle = '#8899bb';
+    ctx.fillText(shrunk.toFixed(2), cx, yBase + 15);
+    info += 'β'+(i+1)+': '+shrunk.toFixed(2)+' ';
+   });
+   document.getElementById('coefInfo').innerHTML = info + '| λ = '+lam.toFixed(1)+' | Modo: '+currentMode.toUpperCase();
+  }
+
+  document.getElementById('submitQuizBtn').addEventListener('click', handleSubmit);
+  renderQuestions(); updateBtnState(); restoreProgress(); updateProgress(); updateRegSim();
+ </script>
+ <script>
+window.I18N_DATA={
+ "fb_0": {
+  "es": "⚠️ Responde todas las preguntas primero.",
+  "en": "⚠️ Answer todas las preguntas primero."
+ },
+ "fb_1": {
+  "es": "🎉 ¡Excelente! Has dominado la regularización.",
+  "en": "🎉 !Excellent! Has dominado la regularización."
+ },
+ "fb_2": {
+  "es": "🏆 Ya completaste este módulo.",
+  "en": "🏆 Ya completaste este module."
+ }
 };
 </script>
-<script src="../../../assets/js/i18n.js"></script>  </body>
+<script src="../../../assets/js/i18n.js"></script> </body>
 </html>

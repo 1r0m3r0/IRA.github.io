@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -67,74 +67,74 @@ footer{text-align:center;padding:1.2rem;font-size:0.8rem;border-top:1px solid #2
 <body>
 <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a><a href="../index.html">Programa MQL5</a></nav>
 <div class="modulo-container">
-  <div class="hero-header">
-    <h1>📈 Walk-Forward Analysis</h1>
-    <p>"La prueba definitiva: entrena en el pasado, valida en el futuro"</p>
-    <div class="badge-area">
-      <span class="chip"><i class="fas fa-chalkboard-teacher"></i> In-Sample</span>
-      <span class="chip"><i class="fas fa-graduation-cap"></i> Out-of-Sample</span>
-      <span class="chip"><i class="fas fa-window-restore"></i> Ventanas</span>
-    </div>
+ <div class="hero-header">
+  <h1>📈 Walk-Forward Analysis</h1>
+  <p>"La prueba definitiva: entrena en el pasado, valida en el futuro"</p>
+  <div class="badge-area">
+   <span class="chip"><i class="fas fa-chalkboard-teacher"></i> In-Sample</span>
+   <span class="chip"><i class="fas fa-graduation-cap"></i> Out-of-Sample</span>
+   <span class="chip"><i class="fas fa-window-restore"></i> Ventanas</span>
+  </div>
+ </div>
+
+ <div class="progress-section">
+  <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+  <div class="progress-text" id="progressText">Módulo 7 de 12</div>
+ </div>
+
+ <div class="analogy-card">
+  <strong>🎓 Piénsalo así:</strong> Walk-Forward es como los exámenes parciales en la universidad. Estudias (optimizas) con los apuntes del primer parcial (In-Sample), y te evalúan con el segundo parcial (Out-of-Sample). Si solo estudias para un examen y sacas 10, pero en el siguiente sacas 2, algo falla. El WFA repite esto varias veces para asegurarse de que realmente aprendiste.
+ </div>
+
+ <div class="main-area">
+  <div class="wfa-panel">
+   <h3 style="color:#bcc9f0;margin-bottom:1rem"><i class="fas fa-sliders"></i> Configuración WFA</h3>
+   <div class="settings-grid">
+    <div class="form-group"><label>Nº Ventanas</label><input type="number" id="windowsInput" value="4" min="2" max="8"></div>
+    <div class="form-group"><label>Datos por ventana</label><input type="number" id="dataPerWindow" value="250" min="50" max="1000" step="50"></div>
+    <div class="form-group"><label>OOS (%)</label><input type="number" id="oosPct" value="30" min="10" max="50"></div>
+   </div>
+   <button class="btn-action" id="runWfaBtn"><i class="fas fa-play"></i> Ejecutar WFA</button>
+   <div class="sim-progress" id="wfaProgress" style="display:none">
+    <div class="sim-progress-fill" id="wfaProgressFill"></div>
+    <div class="sim-progress-label" id="wfaProgressLabel">0%</div>
+   </div>
   </div>
 
-  <div class="progress-section">
-    <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
-    <div class="progress-text" id="progressText">Módulo 7 de 12</div>
+  <div id="wfaResults" class="wfa-panel" style="display:none">
+   <h4 style="color:#bcc9f0;margin-bottom:.5rem"><i class="fas fa-chart-line"></i> Curvas por Ventana</h4>
+   <div class="vis-grid">
+    <div class="vis-canvas-wrap"><canvas id="isCanvas" width="900" height="150"></canvas><p style="font-size:.7rem;color:#667;margin-top:.3rem">In-Sample (entrenamiento)</p></div>
+    <div class="vis-canvas-wrap"><canvas id="oosCanvas" width="900" height="150"></canvas><p style="font-size:.7rem;color:#667;margin-top:.3rem">Out-of-Sample (validación)</p></div>
+   </div>
+
+   <div class="wfa-summary">
+    <div class="wfa-card"><div class="lbl">PF Promedio IS</div><div class="val green" id="avgPfIs">0.00</div></div>
+    <div class="wfa-card"><div class="lbl">PF Promedio OOS</div><div class="val" id="avgPfOos">0.00</div></div>
+    <div class="wfa-card"><div class="lbl">WFA Score</div><div class="val gold" id="wfaScore">0%</div></div>
+    <div class="wfa-card"><div class="lbl">Robustez</div><div class="val" id="robustness">—</div></div>
+   </div>
+
+   <div style="max-height:250px;overflow-y:auto;margin-top:1rem">
+    <table class="wfa-table"><thead><tr><th>Ventana</th><th>IS PF</th><th>IS DD</th><th>OOS PF</th><th>OOS DD</th><th>Decay</th></tr></thead><tbody id="wfaBody"></tbody></table>
+   </div>
   </div>
+ </div>
 
-  <div class="analogy-card">
-    <strong>🎓 Piénsalo así:</strong> Walk-Forward es como los exámenes parciales en la universidad. Estudias (optimizas) con los apuntes del primer parcial (In-Sample), y te evalúan con el segundo parcial (Out-of-Sample). Si solo estudias para un examen y sacas 10, pero en el siguiente sacas 2, algo falla. El WFA repite esto varias veces para asegurarse de que realmente aprendiste.
-  </div>
+ <div id="feedbackMsg" class="feedback">💡 Configura el número de ventanas y ejecuta el Walk-Forward Analysis para validar tu estrategia.</div>
 
-  <div class="main-area">
-    <div class="wfa-panel">
-      <h3 style="color:#bcc9f0;margin-bottom:1rem"><i class="fas fa-sliders"></i> Configuración WFA</h3>
-      <div class="settings-grid">
-        <div class="form-group"><label>Nº Ventanas</label><input type="number" id="windowsInput" value="4" min="2" max="8"></div>
-        <div class="form-group"><label>Datos por ventana</label><input type="number" id="dataPerWindow" value="250" min="50" max="1000" step="50"></div>
-        <div class="form-group"><label>OOS (%)</label><input type="number" id="oosPct" value="30" min="10" max="50"></div>
-      </div>
-      <button class="btn-action" id="runWfaBtn"><i class="fas fa-play"></i> Ejecutar WFA</button>
-      <div class="sim-progress" id="wfaProgress" style="display:none">
-        <div class="sim-progress-fill" id="wfaProgressFill"></div>
-        <div class="sim-progress-label" id="wfaProgressLabel">0%</div>
-      </div>
-    </div>
+ <div id="insigniaArea" class="insignia hidden">
+  <i class="fas fa-medal"></i>
+  <h3>🏅 WFA Analyst 🏅</h3>
+  <p>¡Dominas el Walk-Forward Analysis! Sabes validar estrategias como un verdadero cuant. 📈</p>
+ </div>
 
-    <div id="wfaResults" class="wfa-panel" style="display:none">
-      <h4 style="color:#bcc9f0;margin-bottom:.5rem"><i class="fas fa-chart-line"></i> Curvas por Ventana</h4>
-      <div class="vis-grid">
-        <div class="vis-canvas-wrap"><canvas id="isCanvas" width="900" height="150"></canvas><p style="font-size:.7rem;color:#667;margin-top:.3rem">In-Sample (entrenamiento)</p></div>
-        <div class="vis-canvas-wrap"><canvas id="oosCanvas" width="900" height="150"></canvas><p style="font-size:.7rem;color:#667;margin-top:.3rem">Out-of-Sample (validación)</p></div>
-      </div>
-
-      <div class="wfa-summary">
-        <div class="wfa-card"><div class="lbl">PF Promedio IS</div><div class="val green" id="avgPfIs">0.00</div></div>
-        <div class="wfa-card"><div class="lbl">PF Promedio OOS</div><div class="val" id="avgPfOos">0.00</div></div>
-        <div class="wfa-card"><div class="lbl">WFA Score</div><div class="val gold" id="wfaScore">0%</div></div>
-        <div class="wfa-card"><div class="lbl">Robustez</div><div class="val" id="robustness">—</div></div>
-      </div>
-
-      <div style="max-height:250px;overflow-y:auto;margin-top:1rem">
-        <table class="wfa-table"><thead><tr><th>Ventana</th><th>IS PF</th><th>IS DD</th><th>OOS PF</th><th>OOS DD</th><th>Decay</th></tr></thead><tbody id="wfaBody"></tbody></table>
-      </div>
-    </div>
-  </div>
-
-  <div id="feedbackMsg" class="feedback">💡 Configura el número de ventanas y ejecuta el Walk-Forward Analysis para validar tu estrategia.</div>
-
-  <div id="insigniaArea" class="insignia hidden">
-    <i class="fas fa-medal"></i>
-    <h3>🏅 WFA Analyst 🏅</h3>
-    <p>¡Dominas el Walk-Forward Analysis! Sabes validar estrategias como un verdadero cuant. 📈</p>
-  </div>
-
-  <div class="nav-links">
-    <a href="06-algoritmos-geneticos.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
-    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
-    <a href="08-monte-carlo.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
-  </div>
-  <footer><i class="fas fa-flask"></i> Curso 3: Backtesting y Validación Cuantitativa</footer>
+ <div class="nav-links">
+  <a href="06-algoritmos-geneticos.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+  <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+  <a href="08-monte-carlo.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+ </div>
+ <footer><i class="fas fa-flask"></i> Curso 3: Backtesting y Validación Cuantitativa</footer>
 </div>
 
 <script>
@@ -143,180 +143,178 @@ let completed = false;
 let wfaDone = false;
 
 function initProgress(){
-  const p = JSON.parse(localStorage.getItem('mql5_3_progress')) || [];
-  const pf = document.getElementById('progressFill');
-  const pt = document.getElementById('progressText');
-  if(pf) pf.style.width = Math.round((p.length/12)*100)+'%';
-  if(pt) pt.textContent = p.length+' de 12 módulos';
-  if(p.includes(STORAGE_KEY)){
-    document.getElementById('insigniaArea').classList.remove('hidden');
-    completed = true;
-  }
+ const p = JSON.parse(localStorage.getItem('mql5_3_progress')) || [];
+ const pf = document.getElementById('progressFill');
+ const pt = document.getElementById('progressText');
+ if(pf) pf.style.width = Math.round((p.length/12)*100)+'%';
+ if(pt) pt.textContent = p.length+' de 12 módulos';
+ if(p.includes(STORAGE_KEY)){
+  document.getElementById('insigniaArea').classList.remove('hidden');
+  completed = true;
+ }
 }
 
 function saveProgress(){
-  let p = JSON.parse(localStorage.getItem('mql5_3_progress')) || [];
-  if(!p.includes(STORAGE_KEY)){p.push(STORAGE_KEY);localStorage.setItem('mql5_3_progress',JSON.stringify(p));}
-  const pf = document.getElementById('progressFill');
-  const pt = document.getElementById('progressText');
-  if(pf) pf.style.width = Math.round((p.length/12)*100)+'%';
-  if(pt) pt.textContent = p.length+' de 12 módulos';
+ let p = JSON.parse(localStorage.getItem('mql5_3_progress')) || [];
+ if(!p.includes(STORAGE_KEY)){p.push(STORAGE_KEY);localStorage.setItem('mql5_3_progress',JSON.stringify(p));}
+ const pf = document.getElementById('progressFill');
+ const pt = document.getElementById('progressText');
+ if(pf) pf.style.width = Math.round((p.length/12)*100)+'%';
+ if(pt) pt.textContent = p.length+' de 12 módulos';
 }
 
 function simulateWindow(dataLen, oosPct){
-  const isLen = Math.floor(dataLen * (1 - oosPct/100));
-  const isTrades = Math.floor(isLen / 5);
-  const oosTrades = Math.floor((dataLen - isLen) / 5);
+ const isLen = Math.floor(dataLen * (1 - oosPct/100));
+ const isTrades = Math.floor(isLen / 5);
+ const oosTrades = Math.floor((dataLen - isLen) / 5);
 
-  // IS simulation
-  let isProfit = 0, isLoss = 0, isPeak = 10000, isBalance = 10000, isMaxDD = 0;
-  for(let i=0;i<isTrades;i++){
-    const won = Math.random() < 0.6;
-    const pl = won ? Math.random()*80+20 : -(Math.random()*40+10);
-    isBalance += pl;
-    if(won) isProfit += pl; else isLoss += Math.abs(pl);
-    if(isBalance > isPeak) isPeak = isBalance;
-    const dd = (isPeak - isBalance)/isPeak*100;
-    if(dd > isMaxDD) isMaxDD = dd;
-  }
-  const isPF = isLoss > 0 ? isProfit/isLoss : 999;
+ // IS simulation
+ let isProfit = 0, isLoss = 0, isPeak = 10000, isBalance = 10000, isMaxDD = 0;
+ for(let i=0;i<isTrades;i++){
+  const won = Math.random() < 0.6;
+  const pl = won ? Math.random()*80+20 : -(Math.random()*40+10);
+  isBalance += pl;
+  if(won) isProfit += pl; else isLoss += Math.abs(pl);
+  if(isBalance > isPeak) isPeak = isBalance;
+  const dd = (isPeak - isBalance)/isPeak*100;
+  if(dd > isMaxDD) isMaxDD = dd;
+ }
+ const isPF = isLoss > 0 ? isProfit/isLoss : 999;
 
-  // OOS simulation (less optimistic)
-  let oosProfit = 0, oosLoss = 0, oosPeak = 10000, oosBalance = 10000, oosMaxDD = 0;
-  for(let i=0;i<oosTrades;i++){
-    const won = Math.random() < 0.48;
-    const pl = won ? Math.random()*70+15 : -(Math.random()*45+15);
-    oosBalance += pl;
-    if(won) oosProfit += pl; else oosLoss += Math.abs(pl);
-    if(oosBalance > oosPeak) oosPeak = oosBalance;
-    const dd = (oosPeak - oosBalance)/oosPeak*100;
-    if(dd > oosMaxDD) oosMaxDD = dd;
-  }
-  const oosPF = oosLoss > 0 ? oosProfit/oosLoss : 999;
+ // OOS simulation (less optimistic)
+ let oosProfit = 0, oosLoss = 0, oosPeak = 10000, oosBalance = 10000, oosMaxDD = 0;
+ for(let i=0;i<oosTrades;i++){
+  const won = Math.random() < 0.48;
+  const pl = won ? Math.random()*70+15 : -(Math.random()*45+15);
+  oosBalance += pl;
+  if(won) oosProfit += pl; else oosLoss += Math.abs(pl);
+  if(oosBalance > oosPeak) oosPeak = oosBalance;
+  const dd = (oosPeak - oosBalance)/oosPeak*100;
+  if(dd > oosMaxDD) oosMaxDD = dd;
+ }
+ const oosPF = oosLoss > 0 ? oosProfit/oosLoss : 999;
 
-  return {isPF, isMaxDD, oosPF, oosMaxDD, isTrades, oosTrades};
+ return {isPF, isMaxDD, oosPF, oosMaxDD, isTrades, oosTrades};
 }
 
 function drawCurve(canvasId, data, color, label){
-  const canvas = document.getElementById(canvasId);
-  const ctx = canvas.getContext('2d');
-  const w = canvas.width, h = canvas.height;
-  ctx.clearRect(0,0,w,h);
-  ctx.fillStyle = '#0d1525';
-  ctx.fillRect(0,0,w,h);
+ const canvas = document.getElementById(canvasId);
+ const ctx = canvas.getContext('2d');
+ const w = canvas.width, h = canvas.height;
+ ctx.clearRect(0,0,w,h);
+ ctx.fillStyle = '#0d1525';
+ ctx.fillRect(0,0,w,h);
 
-  if(!data || data.length < 2) return;
-  const min = Math.min(...data), max = Math.max(...data);
-  const range = max-min||1;
-  const pad = 10, ch = h-pad*2;
+ if(!data || data.length < 2) return;
+ const min = Math.min(...data), max = Math.max(...data);
+ const range = max-min||1;
+ const pad = 10, ch = h-pad*2;
 
-  ctx.beginPath();
-  data.forEach((v,i)=>{
-    const x = i/(data.length-1)*(w-pad*2)+pad;
-    const y = pad+(max-v)/range*ch;
-    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
-  });
-  ctx.strokeStyle = color;
-  ctx.lineWidth = 2;
-  ctx.stroke();
+ ctx.beginPath();
+ data.forEach((v,i)=>{
+  const x = i/(data.length-1)*(w-pad*2)+pad;
+  const y = pad+(max-v)/range*ch;
+  i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+ });
+ ctx.strokeStyle = color;
+ ctx.lineWidth = 2;
+ ctx.stroke();
 
-  ctx.fillStyle = '#8899cc';
-  ctx.font = '10px Inter';
-  ctx.fillText(label+': $'+data[data.length-1].toFixed(0), pad+5, pad+12);
+ ctx.fillStyle = '#8899cc';
+ ctx.font = '10px Inter';
+ ctx.fillText(label+': $'+data[data.length-1].toFixed(0), pad+5, pad+12);
 }
 
 document.getElementById('runWfaBtn').addEventListener('click', function(){
-  const numWindows = parseInt(document.getElementById('windowsInput').value)||4;
-  const dataLen = parseInt(document.getElementById('dataPerWindow').value)||250;
-  const oosPct = parseInt(document.getElementById('oosPct').value)||30;
+ const numWindows = parseInt(document.getElementById('windowsInput').value)||4;
+ const dataLen = parseInt(document.getElementById('dataPerWindow').value)||250;
+ const oosPct = parseInt(document.getElementById('oosPct').value)||30;
 
-  const progressBar = document.getElementById('wfaProgress');
-  const fill = document.getElementById('wfaProgressFill');
-  const label = document.getElementById('wfaProgressLabel');
-  progressBar.style.display = 'block';
-  fill.style.width = '0%';
-  label.textContent = '0%';
+ const progressBar = document.getElementById('wfaProgress');
+ const fill = document.getElementById('wfaProgressFill');
+ const label = document.getElementById('wfaProgressLabel');
+ progressBar.style.display = 'block';
+ fill.style.width = '0%';
+ label.textContent = '0%';
 
-  const results = [];
-  const isCurves = [];
-  const oosCurves = [];
+ const results = [];
+ const isCurves = [];
+ const oosCurves = [];
 
-  function runWindow(idx){
-    if(idx >= numWindows){
-      // Display results
-      const avgIsPf = results.reduce((s,r)=>s+r.isPF,0)/results.length;
-      const avgOosPf = results.reduce((s,r)=>s+r.oosPF,0)/results.length;
-      const decay = results.some(r=>r.oosPF > 0) ? (results.filter(r=>r.oosPF>1).length/results.length*100) : 0;
-      const wfaScore = Math.min(100, Math.round(avgOosPf / (avgIsPf||1) * 100));
+ function runWindow(idx){
+  if(idx >= numWindows){
+   // Display results
+   const avgIsPf = results.reduce((s,r)=>s+r.isPF,0)/results.length;
+   const avgOosPf = results.reduce((s,r)=>s+r.oosPF,0)/results.length;
+   const decay = results.some(r=>r.oosPF > 0) ? (results.filter(r=>r.oosPF>1).length/results.length*100) : 0;
+   const wfaScore = Math.min(100, Math.round(avgOosPf / (avgIsPf||1) * 100));
 
-      drawCurve('isCanvas', isCurves.flat(), '#00e0ff', 'IS');
-      drawCurve('oosCanvas', oosCurves.flat(), '#ff64dc', 'OOS');
+   drawCurve('isCanvas', isCurves.flat(), '#00e0ff', 'IS');
+   drawCurve('oosCanvas', oosCurves.flat(), '#ff64dc', 'OOS');
 
-      document.getElementById('avgPfIs').textContent = avgIsPf.toFixed(2);
-      document.getElementById('avgPfOos').textContent = avgOosPf.toFixed(2);
-      document.getElementById('wfaScore').textContent = wfaScore+'%';
-      const robust = wfaScore >= 60 ? '🟢 Robusta' : wfaScore >= 40 ? '🟡 Moderada' : '🔴 Débil';
-      document.getElementById('robustness').textContent = robust;
+   document.getElementById('avgPfIs').textContent = avgIsPf.toFixed(2);
+   document.getElementById('avgPfOos').textContent = avgOosPf.toFixed(2);
+   document.getElementById('wfaScore').textContent = wfaScore+'%';
+   const robust = wfaScore >= 60 ? '🟢 Robusta' : wfaScore >= 40 ? '🟡 Moderada' : '🔴 Débil';
+   document.getElementById('robustness').textContent = robust;
 
-      const tbody = document.getElementById('wfaBody');
-      tbody.innerHTML = results.map((r,i)=>{
-        const decay = r.isPF > 0 ? (1 - r.oosPF/r.isPF)*100 : 0;
-        return '<tr><td>Ventana '+(i+1)+'</td><td class="is">'+r.isPF.toFixed(2)+'</td><td>'+r.isMaxDD.toFixed(1)+'%</td><td class="oos">'+r.oosPF.toFixed(2)+'</td><td>'+r.oosMaxDD.toFixed(1)+'%</td><td style="color:'+(decay>30?'#ff1744':decay>15?'#ffd700':'#00c853')+'">'+decay.toFixed(1)+'%</td></tr>';
-      }).join('');
+   const tbody = document.getElementById('wfaBody');
+   tbody.innerHTML = results.map((r,i)=>{
+    const decay = r.isPF > 0 ? (1 - r.oosPF/r.isPF)*100 : 0;
+    return '<tr><td>Ventana '+(i+1)+'</td><td class="is">'+r.isPF.toFixed(2)+'</td><td>'+r.isMaxDD.toFixed(1)+'%</td><td class="oos">'+r.oosPF.toFixed(2)+'</td><td>'+r.oosMaxDD.toFixed(1)+'%</td><td style="color:'+(decay>30?'#ff1744':decay>15?'#ffd700':'#00c853')+'">'+decay.toFixed(1)+'%</td></tr>';
+   }).join('');
 
-      document.getElementById('wfaResults').style.display = 'block';
-      progressBar.style.display = 'none';
-      wfaDone = true;
+   document.getElementById('wfaResults').style.display = 'block';
+   progressBar.style.display = 'none';
+   wfaDone = true;
 
-      document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_0')+numWindows+' ventanas | PF OOS promedio: '+avgOosPf.toFixed(2)+' | Score: '+wfaScore+'%';
+   document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_0')+numWindows+' ventanas | PF OOS promedio: '+avgOosPf.toFixed(2)+' | Score: '+wfaScore+'%';
 
-      if(!completed){
-        document.getElementById('insigniaArea').classList.remove('hidden');
-        document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_1');
-        saveProgress();
-        completed = true;
-      }
-      return;
-    }
-
-    const r = simulateWindow(dataLen, oosPct);
-    results.push(r);
-
-    // Generate curves
-    const isCurve = [];
-    let b = 10000;
-    for(let i=0;i<r.isTrades;i++){
-      b += (Math.random()-0.47)*30;
-      isCurve.push(b);
-    }
-    const oosCurve = [];
-    b = 10000;
-    for(let i=0;i<r.oosTrades;i++){
-      b += (Math.random()-0.48)*30;
-      oosCurve.push(b);
-    }
-    isCurves.push(isCurve);
-    oosCurves.push(oosCurve);
-
-    const pct = Math.round((idx+1)/numWindows*100);
-    fill.style.width = pct+'%';
-    label.textContent = pct+'%';
-    document.getElementById('feedbackMsg').innerHTML = '⏳ Procesando ventana '+(idx+1)+' de '+numWindows+'...';
-
-    setTimeout(()=>runWindow(idx+1), 300);
+   if(!completed){
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_1');
+    saveProgress();
+    completed = true;
+   }
+   return;
   }
 
-  runWindow(0);
+  const r = simulateWindow(dataLen, oosPct);
+  results.push(r);
+
+  // Generate curves
+  const isCurve = [];
+  let b = 10000;
+  for(let i=0;i<r.isTrades;i++){
+   b += (Math.random()-0.47)*30;
+   isCurve.push(b);
+  }
+  const oosCurve = [];
+  b = 10000;
+  for(let i=0;i<r.oosTrades;i++){
+   b += (Math.random()-0.48)*30;
+   oosCurve.push(b);
+  }
+  isCurves.push(isCurve);
+  oosCurves.push(oosCurve);
+
+  const pct = Math.round((idx+1)/numWindows*100);
+  fill.style.width = pct+'%';
+  label.textContent = pct+'%';
+  document.getElementById('feedbackMsg').innerHTML = '⏳ Procesando ventana '+(idx+1)+' de '+numWindows+'...';
+
+  setTimeout(()=>runWindow(idx+1), 300);
+ }
+
+ runWindow(0);
 });
 
 window.addEventListener('load', initProgress);
 </script>
-<script src="../../../assets/js/cookie-consent.js"></script>
-
 <script>
 window.I18N_DATA={
-  'fb_0': { es: '✅ WFA completado: ', en: '✅ WFA completado: ' },
-  'fb_1': { es: '🎉 ¡Walk-Forward dominado! Sabes validar estrategias como un profesional. ¡Insignia desbloqueada!', en: '🎉 ¡Walk-Forward dominado! Sabes validar estrategias como un profesional. Badge unlocked!' }
+ 'fb_0': { es: '✅ WFA completado: ', en: '✅ WFA completado: ' },
+ 'fb_1': { es: '🎉 ¡Walk-Forward dominado! Sabes validar estrategias como un profesional. ¡Insignia desbloqueada!', en: '🎉 ¡Walk-Forward dominado! Sabes validar estrategias como un profesional. Badge unlocked!' }
 };
 </script>
 </body>

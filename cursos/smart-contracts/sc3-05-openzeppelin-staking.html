@@ -1,164 +1,164 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OpenZeppelin & Staking | Smart Contracts DeFi</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700;14..32,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-    body{background:linear-gradient(145deg,#060010,#0e0020);font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:2rem 1rem}
-    .container{max-width:1300px;width:100%;background:rgba(6,0,16,.88);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(100,100,255,.22);box-shadow:0 25px 55px rgba(0,0,0,.65);overflow:hidden}
-    .hero{background:linear-gradient(95deg,#060010,#0e0020);padding:1.8rem 2rem;text-align:center;border-bottom:2px solid #6464ff}
-    .hero h1{font-size:1.9rem;font-weight:800;background:linear-gradient(135deg,#ccccff,#9999ff,#6464ff);-webkit-background-clip:text;background-clip:text;color:transparent}
-    .hero p{margin-top:.5rem;font-size:.95rem;color:#333388}
-    .chips{display:flex;justify-content:center;gap:.6rem;flex-wrap:wrap;margin-top:.7rem}
-    .chip{background:rgba(100,100,255,.1);border:1px solid rgba(100,100,255,.3);color:#333388;font-size:.72rem;padding:.25rem .8rem;border-radius:2rem}
-    .week-badge{display:inline-block;background:rgba(100,100,255,.15);border:1px solid #6464ff;color:#6464ff;font-size:.75rem;font-weight:700;padding:.3rem 1rem;border-radius:2rem;margin-top:.5rem}
-    .analogy{background:#060010cc;margin:1.4rem 2rem;padding:1.1rem 1.7rem;border-radius:2rem;border-left:7px solid #6464ff;font-size:.9rem;line-height:1.65}
-    .analogy strong{color:#9999ff}
-    .lab{display:flex;flex-wrap:wrap;gap:1.4rem;padding:0 1.8rem 1.5rem}
-    .left{flex:0 0 270px;display:flex;flex-direction:column;gap:.9rem}
-    .right{flex:1;min-width:300px;display:flex;flex-direction:column;gap:.9rem}
-    .panel{background:#0a001acc;border-radius:1.8rem;padding:1.2rem 1.3rem;border:1px solid rgba(100,100,255,.15)}
-    .panel h3{font-size:.88rem;font-weight:700;color:#9999ff;margin-bottom:.7rem}
-    label{font-size:.72rem;color:#222266;text-transform:uppercase;letter-spacing:.06rem;display:block;margin-bottom:.3rem;margin-top:.5rem}
-    input[type=range]{width:100%;accent-color:#6464ff}
-    .slider-row{display:flex;align-items:center;gap:.5rem;margin:.25rem 0}
-    .slider-row label{min-width:110px;margin:0}
-    .slider-row span{font-size:.75rem;color:#6464ff;font-family:monospace;min-width:44px;text-align:right}
-    .btn{background:linear-gradient(95deg,#6464ff,#4444cc);border:none;padding:.65rem 1.3rem;font-weight:700;border-radius:2rem;cursor:pointer;color:#fff;font-size:.85rem;transition:.2s;display:inline-flex;align-items:center;justify-content:center;gap:.5rem}
-    .btn:hover{transform:translateY(-2px);box-shadow:0 0 18px rgba(100,100,255,.4)}
-    .btn.outline{background:#0a001a;border:1px solid rgba(100,100,255,.3);color:#9999ff}
-    pre{background:#030008;border-radius:1rem;padding:.9rem 1rem;font-family:'JetBrains Mono',monospace;font-size:.71rem;line-height:1.75;overflow-x:auto;color:#ccccff;border:1px solid rgba(100,100,255,.12);white-space:pre}
-    .kw{color:#ff79c6}.fn{color:#50fa7b}.str{color:#f1fa8c}.num{color:#bd93f9}.cm{color:#6272a4;font-style:italic}.cls{color:#8be9fd}
-    .stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;margin:.5rem 0}
-    .s-card{background:#0a001a;border-radius:1rem;padding:.6rem;text-align:center;border:1px solid rgba(100,100,255,.15)}
-    .s-val{font-size:1rem;font-weight:800;font-family:monospace;color:#6464ff}
-    .s-lbl{font-size:.6rem;color:#222266;margin-top:.15rem}
-    canvas{border-radius:1rem;display:block}
-    .reward-bar{height:12px;border-radius:.5rem;background:linear-gradient(90deg,#6464ff,#9999ff);transition:.6s;margin-top:.2rem}
-    .staker-row{display:flex;align-items:center;gap:.5rem;background:#060010;border:1px solid rgba(100,100,255,.12);border-radius:.8rem;padding:.4rem .7rem;margin:.2rem 0;font-size:.74rem}
-    .staker-addr{color:#9999ff;font-family:monospace;flex:1}
-    .staker-amt{color:#ccccff;font-family:monospace}
-    .staker-reward{color:#50fa7b;font-family:monospace}
-    .feedback{background:#00000088;margin:0 1.8rem 1rem;padding:.85rem 1.2rem;border-radius:1.5rem;text-align:center;border-left:4px solid #6464ff;font-size:.88rem;line-height:1.55}
-    .insignia{text-align:center;background:#060010;border-radius:2rem;margin:0 1.8rem 1.5rem;padding:1rem;border:1px dashed gold}
-    .insignia i{font-size:2.4rem;color:gold}
-    .hidden{display:none}
-    .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.4rem 2rem}
-    .nav-link{background:#0a001a;padding:.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:.5rem;font-size:.88rem;transition:.2s}
-    .nav-link:hover{transform:translateY(-2px)}
-    .nav-link.next{background:linear-gradient(95deg,#f0a500,#ff6a00);color:#1e1a0c}
-    footer{text-align:center;padding:1rem;font-size:.72rem;border-top:1px solid #060010;color:#222266}
-  </style>
-  <link rel="stylesheet" href="../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>OpenZeppelin & Staking | Smart Contracts DeFi</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700;14..32,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+  body{background:linear-gradient(145deg,#060010,#0e0020);font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:2rem 1rem}
+  .container{max-width:1300px;width:100%;background:rgba(6,0,16,.88);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(100,100,255,.22);box-shadow:0 25px 55px rgba(0,0,0,.65);overflow:hidden}
+  .hero{background:linear-gradient(95deg,#060010,#0e0020);padding:1.8rem 2rem;text-align:center;border-bottom:2px solid #6464ff}
+  .hero h1{font-size:1.9rem;font-weight:800;background:linear-gradient(135deg,#ccccff,#9999ff,#6464ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p{margin-top:.5rem;font-size:.95rem;color:#333388}
+  .chips{display:flex;justify-content:center;gap:.6rem;flex-wrap:wrap;margin-top:.7rem}
+  .chip{background:rgba(100,100,255,.1);border:1px solid rgba(100,100,255,.3);color:#333388;font-size:.72rem;padding:.25rem .8rem;border-radius:2rem}
+  .week-badge{display:inline-block;background:rgba(100,100,255,.15);border:1px solid #6464ff;color:#6464ff;font-size:.75rem;font-weight:700;padding:.3rem 1rem;border-radius:2rem;margin-top:.5rem}
+  .analogy{background:#060010cc;margin:1.4rem 2rem;padding:1.1rem 1.7rem;border-radius:2rem;border-left:7px solid #6464ff;font-size:.9rem;line-height:1.65}
+  .analogy strong{color:#9999ff}
+  .lab{display:flex;flex-wrap:wrap;gap:1.4rem;padding:0 1.8rem 1.5rem}
+  .left{flex:0 0 270px;display:flex;flex-direction:column;gap:.9rem}
+  .right{flex:1;min-width:300px;display:flex;flex-direction:column;gap:.9rem}
+  .panel{background:#0a001acc;border-radius:1.8rem;padding:1.2rem 1.3rem;border:1px solid rgba(100,100,255,.15)}
+  .panel h3{font-size:.88rem;font-weight:700;color:#9999ff;margin-bottom:.7rem}
+  label{font-size:.72rem;color:#222266;text-transform:uppercase;letter-spacing:.06rem;display:block;margin-bottom:.3rem;margin-top:.5rem}
+  input[type=range]{width:100%;accent-color:#6464ff}
+  .slider-row{display:flex;align-items:center;gap:.5rem;margin:.25rem 0}
+  .slider-row label{min-width:110px;margin:0}
+  .slider-row span{font-size:.75rem;color:#6464ff;font-family:monospace;min-width:44px;text-align:right}
+  .btn{background:linear-gradient(95deg,#6464ff,#4444cc);border:none;padding:.65rem 1.3rem;font-weight:700;border-radius:2rem;cursor:pointer;color:#fff;font-size:.85rem;transition:.2s;display:inline-flex;align-items:center;justify-content:center;gap:.5rem}
+  .btn:hover{transform:translateY(-2px);box-shadow:0 0 18px rgba(100,100,255,.4)}
+  .btn.outline{background:#0a001a;border:1px solid rgba(100,100,255,.3);color:#9999ff}
+  pre{background:#030008;border-radius:1rem;padding:.9rem 1rem;font-family:'JetBrains Mono',monospace;font-size:.71rem;line-height:1.75;overflow-x:auto;color:#ccccff;border:1px solid rgba(100,100,255,.12);white-space:pre}
+  .kw{color:#ff79c6}.fn{color:#50fa7b}.str{color:#f1fa8c}.num{color:#bd93f9}.cm{color:#6272a4;font-style:italic}.cls{color:#8be9fd}
+  .stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;margin:.5rem 0}
+  .s-card{background:#0a001a;border-radius:1rem;padding:.6rem;text-align:center;border:1px solid rgba(100,100,255,.15)}
+  .s-val{font-size:1rem;font-weight:800;font-family:monospace;color:#6464ff}
+  .s-lbl{font-size:.6rem;color:#222266;margin-top:.15rem}
+  canvas{border-radius:1rem;display:block}
+  .reward-bar{height:12px;border-radius:.5rem;background:linear-gradient(90deg,#6464ff,#9999ff);transition:.6s;margin-top:.2rem}
+  .staker-row{display:flex;align-items:center;gap:.5rem;background:#060010;border:1px solid rgba(100,100,255,.12);border-radius:.8rem;padding:.4rem .7rem;margin:.2rem 0;font-size:.74rem}
+  .staker-addr{color:#9999ff;font-family:monospace;flex:1}
+  .staker-amt{color:#ccccff;font-family:monospace}
+  .staker-reward{color:#50fa7b;font-family:monospace}
+  .feedback{background:#00000088;margin:0 1.8rem 1rem;padding:.85rem 1.2rem;border-radius:1.5rem;text-align:center;border-left:4px solid #6464ff;font-size:.88rem;line-height:1.55}
+  .insignia{text-align:center;background:#060010;border-radius:2rem;margin:0 1.8rem 1.5rem;padding:1rem;border:1px dashed gold}
+  .insignia i{font-size:2.4rem;color:gold}
+  .hidden{display:none}
+  .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.4rem 2rem}
+  .nav-link{background:#0a001a;padding:.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:.5rem;font-size:.88rem;transition:.2s}
+  .nav-link:hover{transform:translateY(-2px)}
+  .nav-link.next{background:linear-gradient(95deg,#f0a500,#ff6a00);color:#1e1a0c}
+  footer{text-align:center;padding:1rem;font-size:.72rem;border-top:1px solid #060010;color:#222266}
+ </style>
+ <link rel="stylesheet" href="../../assets/css/theme.css">
 </head>
 <body>
 <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
 <div class="container">
-  <div class="hero">
-    <h1>🛡️ OpenZeppelin & Staking con Rewards</h1>
-    <p>La librería estándar de seguridad + construye un protocolo de staking desde cero</p>
-    <div class="week-badge"><i class="fas fa-calendar-week"></i> Semanas 3-4: OpenZeppelin y Staking</div>
-    <div class="chips"><span class="chip">OpenZeppelin v5</span><span class="chip">Ownable / AccessControl</span><span class="chip">ReentrancyGuard</span><span class="chip">Staking Rewards</span></div>
-  </div>
-  <div class="analogy">
-    <strong>🛡️ Piénsalo así:</strong> OpenZeppelin es como los <strong>cimientos antisísmicos</strong> de un edificio. No los inventas tú — los usa toda la industria, están auditados miles de veces, y si hay un bug ya lo encontraron otros. <code>Ownable</code>, <code>ReentrancyGuard</code>, <code>Pausable</code>: son módulos probados en batalla que heredas con una sola línea. El <strong>protocolo de staking</strong> es el caso de uso perfecto: los usuarios depositan tokens para ganar rewards. La fórmula de distribución de Synthetix (rewardPerToken) es el estándar de la industria.
-    <div style="margin-top:.5rem;font-size:.78rem;color:#222266"><strong>📚 Refs:</strong> OpenZeppelin Docs v5 — openzeppelin.com/contracts · Synthetix StakingRewards.sol (Kain Warwick, 2019)</div>
-  </div>
-  <div class="lab">
-    <div class="left">
-      <div class="panel">
-        <h3><i class="fas fa-sliders-h"></i> Configurar Staking Pool</h3>
-        <div class="slider-row"><label>APR (%)</label><input type="range" id="apr" min="5" max="200" value="50" oninput="document.getElementById('aprV').textContent=this.value+'%'"><span id="aprV">50%</span></div>
-        <div class="slider-row"><label>Duración (días)</label><input type="range" id="dur" min="7" max="365" value="90" oninput="document.getElementById('durV').textContent=this.value"><span id="durV">90</span></div>
-        <div class="slider-row"><label>Total rewards</label><input type="range" id="totReward" min="1000" max="100000" value="10000" step="1000" oninput="document.getElementById('totRewardV').textContent=this.value.toLocaleString()"><span id="totRewardV">10,000</span></div>
-        <button class="btn" style="width:100%;margin-top:.5rem" onclick="deployPool()"><i class="fas fa-rocket"></i> Deploy Pool</button>
-        <button class="btn outline" style="width:100%;margin-top:.3rem" onclick="addStaker()"><i class="fas fa-plus"></i> Agregar Staker</button>
-        <button class="btn outline" style="width:100%;margin-top:.3rem" onclick="advanceTime()"><i class="fas fa-forward"></i> Avanzar 7 días</button>
-      </div>
-      <div class="panel">
-        <h3>OZ Modules usados</h3>
-        <div style="font-size:.75rem;line-height:1.8">
-          <div><span style="color:#50fa7b">✔</span> <code style="color:#9999ff">Ownable</code> — admin funciones</div>
-          <div><span style="color:#50fa7b">✔</span> <code style="color:#9999ff">ReentrancyGuard</code> — anti-reentry</div>
-          <div><span style="color:#50fa7b">✔</span> <code style="color:#9999ff">Pausable</code> — emergency stop</div>
-          <div><span style="color:#50fa7b">✔</span> <code style="color:#9999ff">SafeERC20</code> — transfer seguro</div>
-        </div>
-      </div>
+ <div class="hero">
+  <h1>ðŸ›¡ï¸ OpenZeppelin & Staking con Rewards</h1>
+  <p>La librerÃ­a estÃ¡ndar de seguridad + construye un protocolo de staking desde cero</p>
+  <div class="week-badge"><i class="fas fa-calendar-week"></i> Semanas 3-4: OpenZeppelin y Staking</div>
+  <div class="chips"><span class="chip">OpenZeppelin v5</span><span class="chip">Ownable / AccessControl</span><span class="chip">ReentrancyGuard</span><span class="chip">Staking Rewards</span></div>
+ </div>
+ <div class="analogy">
+  <strong>ðŸ›¡ï¸ PiÃ©nsalo asÃ­:</strong> OpenZeppelin es como los <strong>cimientos antisÃ­smicos</strong> de un edificio. No los inventas tÃº â€” los usa toda la industria, estÃ¡n auditados miles de veces, y si hay un bug ya lo encontraron otros. <code>Ownable</code>, <code>ReentrancyGuard</code>, <code>Pausable</code>: son mÃ³dulos probados en batalla que heredas con una sola lÃ­nea. El <strong>protocolo de staking</strong> es el caso de uso perfecto: los usuarios depositan tokens para ganar rewards. La fÃ³rmula de distribuciÃ³n de Synthetix (rewardPerToken) es el estÃ¡ndar de la industria.
+  <div style="margin-top:.5rem;font-size:.78rem;color:#222266"><strong>ðŸ“š Refs:</strong> OpenZeppelin Docs v5 â€” openzeppelin.com/contracts Â· Synthetix StakingRewards.sol (Kain Warwick, 2019)</div>
+ </div>
+ <div class="lab">
+  <div class="left">
+   <div class="panel">
+    <h3><i class="fas fa-sliders-h"></i> Configurar Staking Pool</h3>
+    <div class="slider-row"><label>APR (%)</label><input type="range" id="apr" min="5" max="200" value="50" oninput="document.getElementById('aprV').textContent=this.value+'%'"><span id="aprV">50%</span></div>
+    <div class="slider-row"><label>DuraciÃ³n (dÃ­as)</label><input type="range" id="dur" min="7" max="365" value="90" oninput="document.getElementById('durV').textContent=this.value"><span id="durV">90</span></div>
+    <div class="slider-row"><label>Total rewards</label><input type="range" id="totReward" min="1000" max="100000" value="10000" step="1000" oninput="document.getElementById('totRewardV').textContent=this.value.toLocaleString()"><span id="totRewardV">10,000</span></div>
+    <button class="btn" style="width:100%;margin-top:.5rem" onclick="deployPool()"><i class="fas fa-rocket"></i> Deploy Pool</button>
+    <button class="btn outline" style="width:100%;margin-top:.3rem" onclick="addStaker()"><i class="fas fa-plus"></i> Agregar Staker</button>
+    <button class="btn outline" style="width:100%;margin-top:.3rem" onclick="advanceTime()"><i class="fas fa-forward"></i> Avanzar 7 dÃ­as</button>
+   </div>
+   <div class="panel">
+    <h3>OZ Modules usados</h3>
+    <div style="font-size:.75rem;line-height:1.8">
+     <div><span style="color:#50fa7b">âœ”</span> <code style="color:#9999ff">Ownable</code> â€” admin funciones</div>
+     <div><span style="color:#50fa7b">âœ”</span> <code style="color:#9999ff">ReentrancyGuard</code> â€” anti-reentry</div>
+     <div><span style="color:#50fa7b">âœ”</span> <code style="color:#9999ff">Pausable</code> â€” emergency stop</div>
+     <div><span style="color:#50fa7b">âœ”</span> <code style="color:#9999ff">SafeERC20</code> â€” transfer seguro</div>
     </div>
-    <div class="right">
-      <div class="panel">
-        <h3><i class="fas fa-chart-area"></i> Estado del Pool</h3>
-        <div class="stat-row">
-          <div class="s-card"><div class="s-val" id="sTVL">$0</div><div class="s-lbl">TVL</div></div>
-          <div class="s-card"><div class="s-val" id="sRPT">0</div><div class="s-lbl">Reward/Token</div></div>
-          <div class="s-card"><div class="s-val" id="sDays">0</div><div class="s-lbl">Días activos</div></div>
-          <div class="s-card"><div class="s-val" id="sDistrib">0</div><div class="s-lbl">Rewards dist.</div></div>
-        </div>
-        <canvas id="rewardCanvas" style="width:100%;height:120px"></canvas>
-      </div>
-      <div class="panel">
-        <h3><i class="fas fa-users"></i> Stakers <span id="stakerCount">(0)</span></h3>
-        <div id="stakerList" style="max-height:140px;overflow-y:auto"></div>
-      </div>
-      <div class="panel">
-        <h3><i class="fas fa-code"></i> Solidity — StakingRewards (patrón Synthetix)</h3>
-        <pre><span class="kw">contract</span> <span class="cls">StakingRewards</span> <span class="kw">is</span> <span class="cls">Ownable</span>, <span class="cls">ReentrancyGuard</span>, <span class="cls">Pausable</span> {
-    <span class="cls">IERC20</span> <span class="kw">public immutable</span> stakingToken;
-    <span class="cls">IERC20</span> <span class="kw">public immutable</span> rewardsToken;
+   </div>
+  </div>
+  <div class="right">
+   <div class="panel">
+    <h3><i class="fas fa-chart-area"></i> Estado del Pool</h3>
+    <div class="stat-row">
+     <div class="s-card"><div class="s-val" id="sTVL">$0</div><div class="s-lbl">TVL</div></div>
+     <div class="s-card"><div class="s-val" id="sRPT">0</div><div class="s-lbl">Reward/Token</div></div>
+     <div class="s-card"><div class="s-val" id="sDays">0</div><div class="s-lbl">DÃ­as activos</div></div>
+     <div class="s-card"><div class="s-val" id="sDistrib">0</div><div class="s-lbl">Rewards dist.</div></div>
+    </div>
+    <canvas id="rewardCanvas" style="width:100%;height:120px"></canvas>
+   </div>
+   <div class="panel">
+    <h3><i class="fas fa-users"></i> Stakers <span id="stakerCount">(0)</span></h3>
+    <div id="stakerList" style="max-height:140px;overflow-y:auto"></div>
+   </div>
+   <div class="panel">
+    <h3><i class="fas fa-code"></i> Solidity â€” StakingRewards (patrÃ³n Synthetix)</h3>
+    <pre><span class="kw">contract</span> <span class="cls">StakingRewards</span> <span class="kw">is</span> <span class="cls">Ownable</span>, <span class="cls">ReentrancyGuard</span>, <span class="cls">Pausable</span> {
+  <span class="cls">IERC20</span> <span class="kw">public immutable</span> stakingToken;
+  <span class="cls">IERC20</span> <span class="kw">public immutable</span> rewardsToken;
 
-    <span class="cls">uint256</span> <span class="kw">public</span> rewardRate;
-    <span class="cls">uint256</span> <span class="kw">public</span> rewardPerTokenStored;
-    <span class="cls">uint256</span> <span class="kw">public</span> lastUpdateTime;
-    <span class="cls">uint256</span> <span class="kw">private</span> _totalSupply;
+  <span class="cls">uint256</span> <span class="kw">public</span> rewardRate;
+  <span class="cls">uint256</span> <span class="kw">public</span> rewardPerTokenStored;
+  <span class="cls">uint256</span> <span class="kw">public</span> lastUpdateTime;
+  <span class="cls">uint256</span> <span class="kw">private</span> _totalSupply;
 
-    <span class="kw">mapping</span>(<span class="cls">address</span> => <span class="cls">uint256</span>) <span class="kw">private</span> _balances;
-    <span class="kw">mapping</span>(<span class="cls">address</span> => <span class="cls">uint256</span>) <span class="kw">public</span> userRewardPerTokenPaid;
-    <span class="kw">mapping</span>(<span class="cls">address</span> => <span class="cls">uint256</span>) <span class="kw">public</span> rewards;
+  <span class="kw">mapping</span>(<span class="cls">address</span> => <span class="cls">uint256</span>) <span class="kw">private</span> _balances;
+  <span class="kw">mapping</span>(<span class="cls">address</span> => <span class="cls">uint256</span>) <span class="kw">public</span> userRewardPerTokenPaid;
+  <span class="kw">mapping</span>(<span class="cls">address</span> => <span class="cls">uint256</span>) <span class="kw">public</span> rewards;
 
-    <span class="kw">modifier</span> <span class="fn">updateReward</span>(<span class="cls">address</span> account) {
-        rewardPerTokenStored = <span class="fn">rewardPerToken</span>();
-        lastUpdateTime = <span class="fn">block.timestamp</span>;
-        <span class="kw">if</span> (account != <span class="cls">address</span>(<span class="num">0</span>)) {
-            rewards[account] = <span class="fn">earned</span>(account);
-            userRewardPerTokenPaid[account] = rewardPerTokenStored;
-        }
-        _;
+  <span class="kw">modifier</span> <span class="fn">updateReward</span>(<span class="cls">address</span> account) {
+    rewardPerTokenStored = <span class="fn">rewardPerToken</span>();
+    lastUpdateTime = <span class="fn">block.timestamp</span>;
+    <span class="kw">if</span> (account != <span class="cls">address</span>(<span class="num">0</span>)) {
+      rewards[account] = <span class="fn">earned</span>(account);
+      userRewardPerTokenPaid[account] = rewardPerTokenStored;
     }
+    _;
+  }
 
-    <span class="kw">function</span> <span class="fn">stake</span>(<span class="cls">uint256</span> amount)
-        <span class="kw">external nonReentrant whenNotPaused updateReward</span>(<span class="fn">msg.sender</span>) {
-        _totalSupply += amount;
-        _balances[<span class="fn">msg.sender</span>] += amount;
-        stakingToken.<span class="fn">safeTransferFrom</span>(<span class="fn">msg.sender</span>, <span class="cls">address</span>(<span class="kw">this</span>), amount);
-    }
+  <span class="kw">function</span> <span class="fn">stake</span>(<span class="cls">uint256</span> amount)
+    <span class="kw">external nonReentrant whenNotPaused updateReward</span>(<span class="fn">msg.sender</span>) {
+    _totalSupply += amount;
+    _balances[<span class="fn">msg.sender</span>] += amount;
+    stakingToken.<span class="fn">safeTransferFrom</span>(<span class="fn">msg.sender</span>, <span class="cls">address</span>(<span class="kw">this</span>), amount);
+  }
 
-    <span class="kw">function</span> <span class="fn">earned</span>(<span class="cls">address</span> account) <span class="kw">public view returns</span> (<span class="cls">uint256</span>) {
-        <span class="kw">return</span> _balances[account]
-            * (<span class="fn">rewardPerToken</span>() - userRewardPerTokenPaid[account])
-            / <span class="num">1e18</span>
-            + rewards[account];
-    }
+  <span class="kw">function</span> <span class="fn">earned</span>(<span class="cls">address</span> account) <span class="kw">public view returns</span> (<span class="cls">uint256</span>) {
+    <span class="kw">return</span> _balances[account]
+      * (<span class="fn">rewardPerToken</span>() - userRewardPerTokenPaid[account])
+      / <span class="num">1e18</span>
+      + rewards[account];
+  }
 }</pre>
-      </div>
-    </div>
+   </div>
   </div>
-  <div class="feedback" id="feedbackMsg">🛡️ Despliega el pool, agrega stakers y avanza el tiempo para ver cómo se acumulan los rewards con la fórmula de Synthetix.</div>
-  <div class="insignia hidden" id="insigniaArea">
-    <i class="fas fa-shield-alt"></i>
-    <h3 style="margin:.4rem 0;color:#ffd700">🏅 ¡INSIGNIA OZ DEFENDER!</h3>
-    <p style="font-size:.85rem;color:#9999ff">Construiste un staking pool seguro con OpenZeppelin. ¡Este patrón maneja miles de millones en TVL en DeFi!</p>
-  </div>
-  <div class="nav-links">
-    <a href="sc3-04-erc1155-vaults.html" class="nav-link"><i class="fas fa-arrow-left"></i> ERC-1155 & Vaults</a>
-    <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Menú</a>
-    <a href="sc3-06-flash-swaps.html" class="nav-link next">Flash Swaps <i class="fas fa-arrow-right"></i></a>
-  </div>
-  <footer><i class="fas fa-crown"></i> Smart Contracts DeFi · Semana 3-4 · OpenZeppelin v5 · Synthetix StakingRewards</footer>
+ </div>
+ <div class="feedback" id="feedbackMsg">ðŸ›¡ï¸ Despliega el pool, agrega stakers y avanza el tiempo para ver cÃ³mo se acumulan los rewards con la fÃ³rmula de Synthetix.</div>
+ <div class="insignia hidden" id="insigniaArea">
+  <i class="fas fa-shield-alt"></i>
+  <h3 style="margin:.4rem 0;color:#ffd700">ðŸ… Â¡INSIGNIA OZ DEFENDER!</h3>
+  <p style="font-size:.85rem;color:#9999ff">Construiste un staking pool seguro con OpenZeppelin. Â¡Este patrÃ³n maneja miles de millones en TVL en DeFi!</p>
+ </div>
+ <div class="nav-links">
+  <a href="sc3-04-erc1155-vaults.html" class="nav-link"><i class="fas fa-arrow-left"></i> ERC-1155 & Vaults</a>
+  <a href="index.html" class="nav-link"><i class="fas fa-home"></i> MenÃº</a>
+  <a href="sc3-06-flash-swaps.html" class="nav-link next">Flash Swaps <i class="fas fa-arrow-right"></i></a>
+ </div>
+ <footer><i class="fas fa-crown"></i> Smart Contracts DeFi Â· Semana 3-4 Â· OpenZeppelin v5 Â· Synthetix StakingRewards</footer>
 </div>
 <script>
 const STORAGE_KEY='sc3_oz';
@@ -168,83 +168,83 @@ const ADDRS=['0xAlice','0xBob','0xCarlos','0xDiana','0xEvan','0xFiona'];
 let addrIdx=0;
 
 function deployPool(){
-  pool.deployed=true;pool.days=0;pool.tvl=0;pool.stakers=[];pool.distributed=0;pool.rewardPerToken=0;
-  pool.duration=+document.getElementById('dur').value;
-  pool.totalRewards=+document.getElementById('totReward').value;
-  pool.rewardRate=pool.totalRewards/(pool.duration*86400);
-  addrIdx=0;
-  updateStats();
-  document.getElementById('stakerList').innerHTML='<div style="color:#222266;font-size:.75rem;padding:.5rem">Pool desplegado. Agrega stakers para comenzar.</div>';
-  document.getElementById('feedbackMsg').innerHTML=`🚀 <strong>Pool desplegado.</strong> rewardRate = ${pool.rewardRate.toFixed(4)} tokens/segundo. Durante ${pool.duration} días distribuirá ${pool.totalRewards.toLocaleString()} tokens en rewards.`;
-  actions++;checkProgress();
+ pool.deployed=true;pool.days=0;pool.tvl=0;pool.stakers=[];pool.distributed=0;pool.rewardPerToken=0;
+ pool.duration=+document.getElementById('dur').value;
+ pool.totalRewards=+document.getElementById('totReward').value;
+ pool.rewardRate=pool.totalRewards/(pool.duration*86400);
+ addrIdx=0;
+ updateStats();
+ document.getElementById('stakerList').innerHTML='<div style="color:#222266;font-size:.75rem;padding:.5rem">Pool desplegado. Agrega stakers para comenzar.</div>';
+ document.getElementById('feedbackMsg').innerHTML=`ðŸš€ <strong>Pool desplegado.</strong> rewardRate = ${pool.rewardRate.toFixed(4)} tokens/segundo. Durante ${pool.duration} dÃ­as distribuirÃ¡ ${pool.totalRewards.toLocaleString()} tokens en rewards.`;
+ actions++;checkProgress();
 }
 
 function addStaker(){
-  if(!pool.deployed){alert('Despliega el pool primero');return;}
-  if(addrIdx>=ADDRS.length)addrIdx=0;
-  const addr=ADDRS[addrIdx++];
-  const amount=Math.floor(Math.random()*5000)+500;
-  const existing=pool.stakers.find(s=>s.addr===addr);
-  if(existing){existing.staked+=amount;}
-  else pool.stakers.push({addr,staked:amount,earned:0,joined:pool.days});
-  pool.tvl+=amount;
-  renderStakers();updateStats();
-  document.getElementById('feedbackMsg').innerHTML=`<strong>${addr}</strong> hizo stake de ${amount.toLocaleString()} tokens. TVL: ${pool.tvl.toLocaleString()}. Los rewards se calculan pro-rata al TVL.`;
-  actions++;checkProgress();
+ if(!pool.deployed){alert('Despliega el pool primero');return;}
+ if(addrIdx>=ADDRS.length)addrIdx=0;
+ const addr=ADDRS[addrIdx++];
+ const amount=Math.floor(Math.random()*5000)+500;
+ const existing=pool.stakers.find(s=>s.addr===addr);
+ if(existing){existing.staked+=amount;}
+ else pool.stakers.push({addr,staked:amount,earned:0,joined:pool.days});
+ pool.tvl+=amount;
+ renderStakers();updateStats();
+ document.getElementById('feedbackMsg').innerHTML=`<strong>${addr}</strong> hizo stake de ${amount.toLocaleString()} tokens. TVL: ${pool.tvl.toLocaleString()}. Los rewards se calculan pro-rata al TVL.`;
+ actions++;checkProgress();
 }
 
 function advanceTime(){
-  if(!pool.deployed){alert('Despliega el pool primero');return;}
-  pool.days+=7;
-  const elapsed=Math.min(pool.days,pool.duration);
-  const totalDist=pool.rewardRate*elapsed*86400;
-  pool.distributed=totalDist;
-  if(pool.tvl>0){
-    pool.rewardPerToken+=pool.rewardRate*7*86400*1e18/pool.tvl;
-    pool.stakers.forEach(s=>{
-      const daysActive=pool.days-s.joined;
-      const weight=s.staked/pool.tvl;
-      s.earned=Math.floor(totalDist*weight);
-    });
-  }
-  renderStakers();updateStats();drawCanvas();
-  document.getElementById('feedbackMsg').innerHTML=`⏩ <strong>Avanzado 7 días</strong> (total: ${pool.days} días). Distribuidos: ${pool.distributed.toFixed(0)} tokens. rewardPerToken = ${(pool.rewardPerToken/1e18).toFixed(6)} tokens por token stakeado.`;
-  actions++;checkProgress();
+ if(!pool.deployed){alert('Despliega el pool primero');return;}
+ pool.days+=7;
+ const elapsed=Math.min(pool.days,pool.duration);
+ const totalDist=pool.rewardRate*elapsed*86400;
+ pool.distributed=totalDist;
+ if(pool.tvl>0){
+  pool.rewardPerToken+=pool.rewardRate*7*86400*1e18/pool.tvl;
+  pool.stakers.forEach(s=>{
+   const daysActive=pool.days-s.joined;
+   const weight=s.staked/pool.tvl;
+   s.earned=Math.floor(totalDist*weight);
+  });
+ }
+ renderStakers();updateStats();drawCanvas();
+ document.getElementById('feedbackMsg').innerHTML=`â© <strong>Avanzado 7 dÃ­as</strong> (total: ${pool.days} dÃ­as). Distribuidos: ${pool.distributed.toFixed(0)} tokens. rewardPerToken = ${(pool.rewardPerToken/1e18).toFixed(6)} tokens por token stakeado.`;
+ actions++;checkProgress();
 }
 
 function renderStakers(){
-  const list=document.getElementById('stakerList');
-  document.getElementById('stakerCount').textContent=`(${pool.stakers.length})`;
-  list.innerHTML=pool.stakers.map(s=>`<div class="staker-row"><span class="staker-addr">${s.addr}</span><span class="staker-amt">${s.staked.toLocaleString()}</span><span class="staker-reward">+${s.earned.toFixed(0)} rwrd</span></div>`).join('');
+ const list=document.getElementById('stakerList');
+ document.getElementById('stakerCount').textContent=`(${pool.stakers.length})`;
+ list.innerHTML=pool.stakers.map(s=>`<div class="staker-row"><span class="staker-addr">${s.addr}</span><span class="staker-amt">${s.staked.toLocaleString()}</span><span class="staker-reward">+${s.earned.toFixed(0)} rwrd</span></div>`).join('');
 }
 
 function updateStats(){
-  document.getElementById('sTVL').textContent='$'+pool.tvl.toLocaleString();
-  document.getElementById('sRPT').textContent=(pool.rewardPerToken/1e18).toFixed(4);
-  document.getElementById('sDays').textContent=pool.days;
-  document.getElementById('sDistrib').textContent=pool.distributed.toFixed(0);
+ document.getElementById('sTVL').textContent='$'+pool.tvl.toLocaleString();
+ document.getElementById('sRPT').textContent=(pool.rewardPerToken/1e18).toFixed(4);
+ document.getElementById('sDays').textContent=pool.days;
+ document.getElementById('sDistrib').textContent=pool.distributed.toFixed(0);
 }
 
 function drawCanvas(){
-  const c=document.getElementById('rewardCanvas');
-  const W=c.parentElement.clientWidth-26;c.width=W;c.height=120;
-  const ctx=c.getContext('2d');
-  ctx.fillStyle='#030008';ctx.fillRect(0,0,W,120);
-  const pts=[];for(let d=0;d<=pool.days;d+=1){const dist=pool.rewardRate*d*86400;pts.push(Math.min(dist,pool.totalRewards));}
-  if(pts.length<2)return;
-  const maxV=pool.totalRewards;
-  const xS=i=>(i/(pts.length-1))*(W-16)+8;
-  const yS=v=>108-(v/maxV)*98;
-  const grad=ctx.createLinearGradient(0,0,0,120);grad.addColorStop(0,'rgba(100,100,255,.4)');grad.addColorStop(1,'rgba(100,100,255,.02)');
-  ctx.beginPath();pts.forEach((v,i)=>i===0?ctx.moveTo(xS(i),yS(v)):ctx.lineTo(xS(i),yS(v)));ctx.lineTo(xS(pts.length-1),120);ctx.lineTo(xS(0),120);ctx.closePath();ctx.fillStyle=grad;ctx.fill();
-  ctx.beginPath();ctx.strokeStyle='#6464ff';ctx.lineWidth=2;pts.forEach((v,i)=>i===0?ctx.moveTo(xS(i),yS(v)):ctx.lineTo(xS(i),yS(v)));ctx.stroke();
-  ctx.fillStyle='#222266';ctx.font='9px Inter';ctx.fillText('Rewards distribuidos',8,14);
+ const c=document.getElementById('rewardCanvas');
+ const W=c.parentElement.clientWidth-26;c.width=W;c.height=120;
+ const ctx=c.getContext('2d');
+ ctx.fillStyle='#030008';ctx.fillRect(0,0,W,120);
+ const pts=[];for(let d=0;d<=pool.days;d+=1){const dist=pool.rewardRate*d*86400;pts.push(Math.min(dist,pool.totalRewards));}
+ if(pts.length<2)return;
+ const maxV=pool.totalRewards;
+ const xS=i=>(i/(pts.length-1))*(W-16)+8;
+ const yS=v=>108-(v/maxV)*98;
+ const grad=ctx.createLinearGradient(0,0,0,120);grad.addColorStop(0,'rgba(100,100,255,.4)');grad.addColorStop(1,'rgba(100,100,255,.02)');
+ ctx.beginPath();pts.forEach((v,i)=>i===0?ctx.moveTo(xS(i),yS(v)):ctx.lineTo(xS(i),yS(v)));ctx.lineTo(xS(pts.length-1),120);ctx.lineTo(xS(0),120);ctx.closePath();ctx.fillStyle=grad;ctx.fill();
+ ctx.beginPath();ctx.strokeStyle='#6464ff';ctx.lineWidth=2;pts.forEach((v,i)=>i===0?ctx.moveTo(xS(i),yS(v)):ctx.lineTo(xS(i),yS(v)));ctx.stroke();
+ ctx.fillStyle='#222266';ctx.font='9px Inter';ctx.fillText('Rewards distribuidos',8,14);
 }
 
 function checkProgress(){
-  if(actions>=3&&!localStorage.getItem(STORAGE_KEY)){localStorage.setItem(STORAGE_KEY,'true');document.getElementById('insigniaArea').classList.remove('hidden');}
+ if(actions>=3&&!localStorage.getItem(STORAGE_KEY)){localStorage.setItem(STORAGE_KEY,'true');document.getElementById('insigniaArea').classList.remove('hidden');}
 }
 if(localStorage.getItem(STORAGE_KEY))document.getElementById('insigniaArea').classList.remove('hidden');
 </script>
-</body>
+ </body>
 </html>

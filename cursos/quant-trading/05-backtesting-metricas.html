@@ -1,214 +1,212 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Quant Trading | Backtesting I: Métricas</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
-    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-    .modulo-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,80,80,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
-    .hero-header { background:linear-gradient(95deg,#0b1120 0%,#111a2e 100%); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #ff5050; }
-    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#ff8a8a,#ff5050); -webkit-background-clip:text; background-clip:text; color:transparent; }
-    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ff5050; font-size:1rem; line-height:1.6; }
-    .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #ff5050; }
-    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:0 2rem 1.5rem; padding:1rem; border:1px dashed gold; }
-    .insignia i { font-size:2.5rem; color:gold; }
-    .hidden { display:none !important; }
-    .btn-action { background:linear-gradient(95deg,#f0a500,#ff6a00); border:none; padding:0.8rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; }
-    .btn-action:hover { transform:scale(1.04); box-shadow:0 0 15px rgba(255,80,80,0.3); }
-    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
-    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
-    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(0,224,255,0.4); }
-    .nav-link.next { background:linear-gradient(95deg,#f0a500,#ff6a00); color:#1e1a0c; }
-    .nav-link.menu { background:#1a2a4a; border:1px solid #3399ff; }
-    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+ <meta charset="UTF-8">
+ <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Quant Trading | Backtesting I: Métricas</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+  @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .modulo-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,80,80,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+  .hero-header { background:linear-gradient(95deg,#0b1120 0%,#111a2e 100%); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #ff5050; }
+  .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#ff8a8a,#ff5050); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ff5050; font-size:1rem; line-height:1.6; }
+  .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #ff5050; }
+  .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:0 2rem 1.5rem; padding:1rem; border:1px dashed gold; }
+  .insignia i { font-size:2.5rem; color:gold; }
+  .hidden { display:none !important; }
+  .btn-action { background:linear-gradient(95deg,#f0a500,#ff6a00); border:none; padding:0.8rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; }
+  .btn-action:hover { transform:scale(1.04); box-shadow:0 0 15px rgba(255,80,80,0.3); }
+  .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+  .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+  .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(0,224,255,0.4); }
+  .nav-link.next { background:linear-gradient(95deg,#f0a500,#ff6a00); color:#1e1a0c; }
+  .nav-link.menu { background:#1a2a4a; border:1px solid #3399ff; }
+  footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
 
-    .main-area { padding:1.5rem 2rem; display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; }
-    .calc-panel { background:rgba(15,25,45,0.5); border-radius:1.5rem; padding:1.5rem; border:1px solid rgba(255,80,80,0.15); }
-    .calc-panel h2 { font-size:1.2rem; margin-bottom:1rem; color:#ff8a8a; }
-    .calc-panel label { display:block; margin:0.6rem 0 0.3rem; font-size:0.85rem; color:#aab8d6; }
-    .calc-panel input { width:100%; padding:0.6rem 1rem; border-radius:1rem; border:1px solid #2c3e66; background:#0a1120; color:#eef5ff; font-size:1rem; }
-    .calc-panel input:focus { outline:none; border-color:#ff5050; box-shadow:0 0 8px rgba(255,80,80,0.2); }
-    .results-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.8rem; margin-top:1rem; }
-    .metric-card { background:rgba(0,0,0,0.3); padding:1rem; border-radius:1rem; text-align:center; border:1px solid rgba(255,80,80,0.1); }
-    .metric-card .value { font-size:1.5rem; font-weight:800; color:#ff8a8a; }
-    .metric-card .label { font-size:0.75rem; color:#8899bb; text-transform:uppercase; letter-spacing:0.05em; }
-    .metric-card .desc { font-size:0.7rem; color:#667799; margin-top:0.3rem; }
-    .info-panel { background:rgba(15,25,45,0.5); border-radius:1.5rem; padding:1.5rem; border:1px solid rgba(255,80,80,0.15); }
-    .info-panel h2 { font-size:1.2rem; margin-bottom:1rem; color:#ff8a8a; }
-    .info-panel p { font-size:0.9rem; line-height:1.6; color:#c8d6f0; margin-bottom:0.8rem; }
-    .info-panel ul { list-style:none; padding:0; }
-    .info-panel ul li { padding:0.4rem 0; font-size:0.85rem; border-bottom:1px solid #1a2a4a; }
-    .info-panel ul li:last-child { border-bottom:none; }
-    .info-panel ul li strong { color:#ff8a8a; }
+  .main-area { padding:1.5rem 2rem; display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; }
+  .calc-panel { background:rgba(15,25,45,0.5); border-radius:1.5rem; padding:1.5rem; border:1px solid rgba(255,80,80,0.15); }
+  .calc-panel h2 { font-size:1.2rem; margin-bottom:1rem; color:#ff8a8a; }
+  .calc-panel label { display:block; margin:0.6rem 0 0.3rem; font-size:0.85rem; color:#aab8d6; }
+  .calc-panel input { width:100%; padding:0.6rem 1rem; border-radius:1rem; border:1px solid #2c3e66; background:#0a1120; color:#eef5ff; font-size:1rem; }
+  .calc-panel input:focus { outline:none; border-color:#ff5050; box-shadow:0 0 8px rgba(255,80,80,0.2); }
+  .results-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.8rem; margin-top:1rem; }
+  .metric-card { background:rgba(0,0,0,0.3); padding:1rem; border-radius:1rem; text-align:center; border:1px solid rgba(255,80,80,0.1); }
+  .metric-card .value { font-size:1.5rem; font-weight:800; color:#ff8a8a; }
+  .metric-card .label { font-size:0.75rem; color:#8899bb; text-transform:uppercase; letter-spacing:0.05em; }
+  .metric-card .desc { font-size:0.7rem; color:#667799; margin-top:0.3rem; }
+  .info-panel { background:rgba(15,25,45,0.5); border-radius:1.5rem; padding:1.5rem; border:1px solid rgba(255,80,80,0.15); }
+  .info-panel h2 { font-size:1.2rem; margin-bottom:1rem; color:#ff8a8a; }
+  .info-panel p { font-size:0.9rem; line-height:1.6; color:#c8d6f0; margin-bottom:0.8rem; }
+  .info-panel ul { list-style:none; padding:0; }
+  .info-panel ul li { padding:0.4rem 0; font-size:0.85rem; border-bottom:1px solid #1a2a4a; }
+  .info-panel ul li:last-child { border-bottom:none; }
+  .info-panel ul li strong { color:#ff8a8a; }
 
-    @media(max-width:768px) {
-      .main-area { grid-template-columns:1fr; }
-      .hero-header h1 { font-size:1.8rem; }
-      .results-grid { grid-template-columns:1fr; }
-    }
-  </style>
-  <link rel="stylesheet" href="../../assets/css/theme.css">
+  @media(max-width:768px) {
+   .main-area { grid-template-columns:1fr; }
+   .hero-header h1 { font-size:1.8rem; }
+   .results-grid { grid-template-columns:1fr; }
+  }
+ </style>
+ <link rel="stylesheet" href="../../assets/css/theme.css">
 </head>
 <body>
-  <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
-  <div class="modulo-container">
-    <div class="hero-header">
-      <span style="display:inline-block;background:#ff505022;padding:0.3rem 1rem;border-radius:2rem;font-size:0.8rem;letter-spacing:0.1em;margin-bottom:0.5rem;"><i class="fas fa-chart-line"></i> MÓDULO 5</span>
-      <h1><i class="fas fa-calculator"></i> Backtesting I: Métricas</h1>
-      <p style="color:#99aacd;margin-top:0.4rem;">Sharpe, Sortino, Calmar, Profit Factor y más</p>
-    </div>
-
-    <div class="analogy-card">
-      <i class="fas fa-lightbulb" style="color:#ff5050;margin-right:0.6rem;"></i>
-      <strong>Analogía:</strong> Las métricas de backtesting son como el tablero de un automóvil. No conduces mirando solo la velocidad (retorno); necesitas el cuentakilómetros (Sharpe), el termómetro (Sortino) y el indicador de combustible (Calmar) para saber si realmente llegas a destino sin explosiones en el camino.
-    </div>
-
-    <div class="main-area">
-      <div class="calc-panel">
-        <h2><i class="fas fa-sliders-h"></i> Calculadora de Métricas</h2>
-        <label>Win Rate (%)</label>
-        <input type="number" id="winRate" value="55" min="0" max="100" step="0.1">
-        <label>Avg Win ($)</label>
-        <input type="number" id="avgWin" value="200" min="0" step="1">
-        <label>Avg Loss ($)</label>
-        <input type="number" id="avgLoss" value="100" min="1" step="1">
-        <label>Número de Trades</label>
-        <input type="number" id="numTrades" value="100" min="1" step="1">
-        <label>Desviación Est. Retornos (%)</label>
-        <input type="number" id="stdReturns" value="2.5" min="0.1" step="0.1">
-        <label>Desviación Est. Drawdown (%)</label>
-        <input type="number" id="stdDownside" value="1.8" min="0.1" step="0.1">
-        <label>Máximo Drawdown (%)</label>
-        <input type="number" id="maxDD" value="15" min="0.1" step="0.1">
-        <div style="margin-top:1rem;display:flex;gap:0.8rem;">
-          <button class="btn-action" onclick="calcular()"><i class="fas fa-calculator"></i> Calcular</button>
-          <button class="btn-action" style="background:#2c3e66;color:#eef5ff;" onclick="guardar()"><i class="fas fa-save"></i> Guardar</button>
-        </div>
-      </div>
-
-      <div class="info-panel">
-        <h2><i class="fas fa-tachometer-alt"></i> Resultados</h2>
-        <div id="resultados" class="results-grid">
-          <div class="metric-card"><div class="value" id="sharpeVal">—</div><div class="label">Sharpe Ratio</div><div class="desc">Retorno ajustado por riesgo total</div></div>
-          <div class="metric-card"><div class="value" id="sortinoVal">—</div><div class="label">Sortino Ratio</div><div class="desc">Retorno ajustado por riesgo bajista</div></div>
-          <div class="metric-card"><div class="value" id="calmarVal">—</div><div class="label">Calmar Ratio</div><div class="desc">Retorno vs máx. drawdown</div></div>
-          <div class="metric-card"><div class="value" id="profitFactorVal">—</div><div class="label">Profit Factor</div><div class="desc">Ganancia bruta / Pérdida bruta</div></div>
-        </div>
-
-        <h2 style="margin-top:1.5rem;"><i class="fas fa-book"></i> Interpretación</h2>
-        <ul>
-          <li><strong>Sharpe &gt; 1.0</strong> — Bueno, &gt; 2.0 excelente. Ratio entre retorno y volatilidad total.</li>
-          <li><strong>Sortino &gt; 1.5</strong> — Solo penaliza volatilidad negativa. Mejor para estrategias asimétricas.</li>
-          <li><strong>Calmar &gt; 2.0</strong> — Buen rendimiento ajustado por drawdown. Ideal para funds.</li>
-          <li><strong>Profit Factor &gt; 1.5</strong> — Por cada $1 perdido, ganas $1.50. &gt; 2.0 es sólido.</li>
-        </ul>
-      </div>
-    </div>
-
-    <div id="feedbackMsg" class="feedback"><i class="fas fa-robot"></i> Ajusta los parámetros y presiona "Calcular" para ver las métricas.</div>
-
-    <div id="insigniaArea" class="insignia hidden">
-      <i class="fas fa-medal"></i>
-      <h3 style="color:gold;margin:0.3rem 0;">¡Métricas Calculadas!</h3>
-      <p style="color:#ddd;">Has aprendido a interpretar las métricas clave de backtesting.</p>
-    </div>
-
-    <div class="nav-links">
-      <a href="04-backtesting-intro.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
-      <a href="index.html" class="nav-link menu"><i class="fas fa-th"></i> Menú</a>
-      <a href="06-backtesting-validacion.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
-    </div>
-
-    <footer>© 2026 Israel Romero — Quant Trading Course</footer>
+ <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+ <div class="modulo-container">
+  <div class="hero-header">
+   <span style="display:inline-block;background:#ff505022;padding:0.3rem 1rem;border-radius:2rem;font-size:0.8rem;letter-spacing:0.1em;margin-bottom:0.5rem;"><i class="fas fa-chart-line"></i> MÓDULO 5</span>
+   <h1><i class="fas fa-calculator"></i> Backtesting I: Métricas</h1>
+   <p style="color:#99aacd;margin-top:0.4rem;">Sharpe, Sortino, Calmar, Profit Factor y más</p>
   </div>
 
-  <script>
-    const STORAGE_KEY = 'quant_trading_05';
+  <div class="analogy-card">
+   <i class="fas fa-lightbulb" style="color:#ff5050;margin-right:0.6rem;"></i>
+   <strong>Analogía:</strong> Las métricas de backtesting son como el tablero de un automóvil. No conduces mirando solo la velocidad (retorno); necesitas el cuentakilómetros (Sharpe), el termómetro (Sortino) y el indicador de combustible (Calmar) para saber si realmente llegas a destino sin explosiones en el camino.
+  </div>
 
-    function calcular() {
-      const wr = parseFloat(document.getElementById('winRate').value)/100;
-      const aw = parseFloat(document.getElementById('avgWin').value);
-      const al = parseFloat(document.getElementById('avgLoss').value);
-      const nt = parseInt(document.getElementById('numTrades').value);
-      const stdR = parseFloat(document.getElementById('stdReturns').value);
-      const stdD = parseFloat(document.getElementById('stdDownside').value);
-      const mdd = parseFloat(document.getElementById('maxDD').value);
+  <div class="main-area">
+   <div class="calc-panel">
+    <h2><i class="fas fa-sliders-h"></i> Calculadora de Métricas</h2>
+    <label>Win Rate (%)</label>
+    <input type="number" id="winRate" value="55" min="0" max="100" step="0.1">
+    <label>Avg Win ($)</label>
+    <input type="number" id="avgWin" value="200" min="0" step="1">
+    <label>Avg Loss ($)</label>
+    <input type="number" id="avgLoss" value="100" min="1" step="1">
+    <label>Número de Trades</label>
+    <input type="number" id="numTrades" value="100" min="1" step="1">
+    <label>Desviación Est. Retornos (%)</label>
+    <input type="number" id="stdReturns" value="2.5" min="0.1" step="0.1">
+    <label>Desviación Est. Drawdown (%)</label>
+    <input type="number" id="stdDownside" value="1.8" min="0.1" step="0.1">
+    <label>Máximo Drawdown (%)</label>
+    <input type="number" id="maxDD" value="15" min="0.1" step="0.1">
+    <div style="margin-top:1rem;display:flex;gap:0.8rem;">
+     <button class="btn-action" onclick="calcular()"><i class="fas fa-calculator"></i> Calcular</button>
+     <button class="btn-action" style="background:#2c3e66;color:#eef5ff;" onclick="guardar()"><i class="fas fa-save"></i> Guardar</button>
+    </div>
+   </div>
 
-      if([wr,aw,al,nt,stdR,stdD,mdd].some(isNaN) || nt<1) {
-        document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_0');
-        return;
-      }
+   <div class="info-panel">
+    <h2><i class="fas fa-tachometer-alt"></i> Resultados</h2>
+    <div id="resultados" class="results-grid">
+     <div class="metric-card"><div class="value" id="sharpeVal">—</div><div class="label">Sharpe Ratio</div><div class="desc">Retorno ajustado por riesgo total</div></div>
+     <div class="metric-card"><div class="value" id="sortinoVal">—</div><div class="label">Sortino Ratio</div><div class="desc">Retorno ajustado por riesgo bajista</div></div>
+     <div class="metric-card"><div class="value" id="calmarVal">—</div><div class="label">Calmar Ratio</div><div class="desc">Retorno vs máx. drawdown</div></div>
+     <div class="metric-card"><div class="value" id="profitFactorVal">—</div><div class="label">Profit Factor</div><div class="desc">Ganancia bruta / Pérdida bruta</div></div>
+    </div>
 
-      const avgTrade = wr*aw - (1-wr)*al;
-      const expectancy = avgTrade / al;
-      const grossWin = wr*nt*aw;
-      const grossLoss = (1-wr)*nt*al;
-      const pf = grossLoss>0 ? grossWin/grossLoss : 999;
+    <h2 style="margin-top:1.5rem;"><i class="fas fa-book"></i> Interpretación</h2>
+    <ul>
+     <li><strong>Sharpe &gt; 1.0</strong> — Bueno, &gt; 2.0 excelente. Ratio entre retorno y volatilidad total.</li>
+     <li><strong>Sortino &gt; 1.5</strong> — Solo penaliza volatilidad negativa. Mejor para estrategias asimétricas.</li>
+     <li><strong>Calmar &gt; 2.0</strong> — Buen rendimiento ajustado por drawdown. Ideal para funds.</li>
+     <li><strong>Profit Factor &gt; 1.5</strong> — Por cada $1 perdido, ganas $1.50. &gt; 2.0 es sólido.</li>
+    </ul>
+   </div>
+  </div>
 
-      const sharpe = stdR>0 ? (avgTrade/al) / (stdR/100) : 0;
-      const sortino = stdD>0 ? (avgTrade/al) / (stdD/100) : 0;
-      const calmar = mdd>0 ? (avgTrade/al) / (mdd/100) : 0;
+  <div id="feedbackMsg" class="feedback"><i class="fas fa-robot"></i> Ajusta los parámetros y presiona "Calcular" para ver las métricas.</div>
 
-      const fmt = (v) => v.toFixed(2);
-      document.getElementById('sharpeVal').textContent = fmt(sharpe);
-      document.getElementById('sortinoVal').textContent = fmt(sortino);
-      document.getElementById('calmarVal').textContent = fmt(calmar);
-      document.getElementById('profitFactorVal').textContent = pf===999 ? '∞' : fmt(pf);
+  <div id="insigniaArea" class="insignia hidden">
+   <i class="fas fa-medal"></i>
+   <h3 style="color:gold;margin:0.3rem 0;">¡Métricas Calculadas!</h3>
+   <p style="color:#ddd;">Has aprendido a interpretar las métricas clave de backtesting.</p>
+  </div>
 
-      const color = v=> v>=2 ? '#4cd964' : v>=1 ? '#ffd700' : '#ff5050';
-      document.getElementById('sharpeVal').style.color = color(sharpe);
-      document.getElementById('sortinoVal').style.color = color(sortino);
-      document.getElementById('calmarVal').style.color = color(calmar);
+  <div class="nav-links">
+   <a href="04-backtesting-intro.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
+   <a href="index.html" class="nav-link menu"><i class="fas fa-th"></i> Menú</a>
+   <a href="06-backtesting-validacion.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
 
-      const msg = sharpe>=1 ? 'Métricas saludables. Esta estrategia muestra un perfil riesgo-retorno favorable.' : 'Las métricas son bajas. Considera optimizar tu estrategia o ajustar el risk management.';
-      document.getElementById('feedbackMsg').innerHTML = '<i class="fas fa-check-circle" style="color:#4cd964;"></i> ' + msg;
+  <footer>© 2026 Israel Romero — Quant Trading Course</footer>
+ </div>
 
-      document.getElementById('insigniaArea').classList.remove('hidden');
-      guardar();
-    }
+ <script>
+  const STORAGE_KEY = 'quant_trading_05';
 
-    function guardar() {
-      const data = {
-        winRate: document.getElementById('winRate').value,
-        avgWin: document.getElementById('avgWin').value,
-        avgLoss: document.getElementById('avgLoss').value,
-        numTrades: document.getElementById('numTrades').value,
-        stdReturns: document.getElementById('stdReturns').value,
-        stdDownside: document.getElementById('stdDownside').value,
-        maxDD: document.getElementById('maxDD').value
-      };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    }
+  function calcular() {
+   const wr = parseFloat(document.getElementById('winRate').value)/100;
+   const aw = parseFloat(document.getElementById('avgWin').value);
+   const al = parseFloat(document.getElementById('avgLoss').value);
+   const nt = parseInt(document.getElementById('numTrades').value);
+   const stdR = parseFloat(document.getElementById('stdReturns').value);
+   const stdD = parseFloat(document.getElementById('stdDownside').value);
+   const mdd = parseFloat(document.getElementById('maxDD').value);
 
-    function cargar() {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if(saved) {
-        try {
-          const d = JSON.parse(saved);
-          document.getElementById('winRate').value = d.winRate;
-          document.getElementById('avgWin').value = d.avgWin;
-          document.getElementById('avgLoss').value = d.avgLoss;
-          document.getElementById('numTrades').value = d.numTrades;
-          document.getElementById('stdReturns').value = d.stdReturns || 2.5;
-          document.getElementById('stdDownside').value = d.stdDownside || 1.8;
-          document.getElementById('maxDD').value = d.maxDD || 15;
-          calcular();
-        } catch(e){}
-      }
-    }
-    window.addEventListener('DOMContentLoaded', cargar);
-  </script>
-  <script src="../../assets/js/cookie-consent.js"></script>
+   if([wr,aw,al,nt,stdR,stdD,mdd].some(isNaN) || nt<1) {
+    document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_0');
+    return;
+   }
 
-<script>
+   const avgTrade = wr*aw - (1-wr)*al;
+   const expectancy = avgTrade / al;
+   const grossWin = wr*nt*aw;
+   const grossLoss = (1-wr)*nt*al;
+   const pf = grossLoss>0 ? grossWin/grossLoss : 999;
+
+   const sharpe = stdR>0 ? (avgTrade/al) / (stdR/100) : 0;
+   const sortino = stdD>0 ? (avgTrade/al) / (stdD/100) : 0;
+   const calmar = mdd>0 ? (avgTrade/al) / (mdd/100) : 0;
+
+   const fmt = (v) => v.toFixed(2);
+   document.getElementById('sharpeVal').textContent = fmt(sharpe);
+   document.getElementById('sortinoVal').textContent = fmt(sortino);
+   document.getElementById('calmarVal').textContent = fmt(calmar);
+   document.getElementById('profitFactorVal').textContent = pf===999 ? '∞' : fmt(pf);
+
+   const color = v=> v>=2 ? '#4cd964' : v>=1 ? '#ffd700' : '#ff5050';
+   document.getElementById('sharpeVal').style.color = color(sharpe);
+   document.getElementById('sortinoVal').style.color = color(sortino);
+   document.getElementById('calmarVal').style.color = color(calmar);
+
+   const msg = sharpe>=1 ? 'Métricas saludables. Esta estrategia muestra un perfil riesgo-retorno favorable.' : 'Las métricas son bajas. Considera optimizar tu estrategia o ajustar el risk management.';
+   document.getElementById('feedbackMsg').innerHTML = '<i class="fas fa-check-circle" style="color:#4cd964;"></i> ' + msg;
+
+   document.getElementById('insigniaArea').classList.remove('hidden');
+   guardar();
+  }
+
+  function guardar() {
+   const data = {
+    winRate: document.getElementById('winRate').value,
+    avgWin: document.getElementById('avgWin').value,
+    avgLoss: document.getElementById('avgLoss').value,
+    numTrades: document.getElementById('numTrades').value,
+    stdReturns: document.getElementById('stdReturns').value,
+    stdDownside: document.getElementById('stdDownside').value,
+    maxDD: document.getElementById('maxDD').value
+   };
+   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  }
+
+  function cargar() {
+   const saved = localStorage.getItem(STORAGE_KEY);
+   if(saved) {
+    try {
+     const d = JSON.parse(saved);
+     document.getElementById('winRate').value = d.winRate;
+     document.getElementById('avgWin').value = d.avgWin;
+     document.getElementById('avgLoss').value = d.avgLoss;
+     document.getElementById('numTrades').value = d.numTrades;
+     document.getElementById('stdReturns').value = d.stdReturns || 2.5;
+     document.getElementById('stdDownside').value = d.stdDownside || 1.8;
+     document.getElementById('maxDD').value = d.maxDD || 15;
+     calcular();
+    } catch(e){}
+   }
+  }
+  window.addEventListener('DOMContentLoaded', cargar);
+ </script>
+ <script>
 window.I18N_DATA={
-  'fb_0': { es: '<i class="fas fa-exclamation-triangle" style="color:#ff5050;"></i> Verifica todos los campos numéricos.', en: '<i class="fas fa-exclamation-triangle" style="color:#ff5050;"></i> Verifica todos los campos numéricos.' }
+ 'fb_0': { es: '<i class="fas fa-exclamation-triangle" style="color:#ff5050;"></i> Verifica todos los campos numéricos.', en: '<i class="fas fa-exclamation-triangle" style="color:#ff5050;"></i> Verifica todos los campos numéricos.' }
 };
 </script>
 </body>

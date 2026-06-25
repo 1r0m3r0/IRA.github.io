@@ -1,271 +1,269 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Risk Management | 📏 Fixed Lot vs Fixed Fraction</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { background:linear-gradient(135deg,#1a0808,#1f0a0a,#0f0505); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#ffe6e6; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
-    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-    .container { max-width:1300px; width:100%; background:rgba(30,12,12,0.85); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid #ff5050; box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
-    .hero { background:linear-gradient(95deg,#2a0f0f,#3a1212); padding:1.5rem 2rem; text-align:center; border-bottom:3px solid #ff5050; }
-    .hero h1 { font-size:2rem; font-weight:800; background:linear-gradient(135deg,#ffaaaa,#ff5050); -webkit-background-clip:text; background-clip:text; color:transparent; }
-    .hero p { margin-top:0.5rem; font-size:1rem; color:#ffcccc; }
-    .content { padding:1.5rem 2rem; }
-    .card { background:rgba(25,10,10,0.9); border-radius:2rem; padding:1.5rem; border:1px solid #ff505066; margin-bottom:1.5rem; }
-    .card h2 { color:#ff8888; margin-bottom:1rem; font-size:1.3rem; }
-    .card h3 { color:#ffaa66; margin:1rem 0 0.5rem; font-size:1.1rem; }
-    .form-group { margin-bottom:0.8rem; }
-    .form-group label { display:block; font-size:0.85rem; color:#ffbbbb; margin-bottom:0.3rem; }
-    .form-group input,.form-group select { width:100%; padding:0.6rem; border-radius:1rem; border:1px solid #ff505066; background:#1a0808; color:#ffe6e6; font-size:0.95rem; }
-    .btn { background:linear-gradient(95deg,#ff5050,#cc3333); border:none; padding:0.7rem 2rem; border-radius:3rem; font-weight:600; font-size:1rem; cursor:pointer; color:#fff; transition:0.2s; }
-    .btn:hover { transform:scale(1.02); box-shadow:0 0 20px #ff505066; }
-    .btn-secondary { background:linear-gradient(95deg,#555,#333); }
-    .btn-secondary:hover { box-shadow:0 0 20px #55555566; }
-    .result-box { background:#1a0a0a; border-radius:1.5rem; padding:1rem; border:1px solid #ff505044; margin-top:1rem; }
-    .result-box .value { font-size:1.5rem; font-weight:700; color:#ff8888; }
-    .result-box .label { font-size:0.8rem; color:#ffaaaa; }
-    .result-row { display:flex; justify-content:space-between; padding:0.5rem 0; border-bottom:1px solid #ff505022; }
-    .compare-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
-    .method-card { background:#1a0a0a; border-radius:1.2rem; padding:1rem; border:1px solid #ff505033; }
-    .method-card.green { border-color:#66ff88; }
-    .method-card h3 { color:#ffaa66; margin-bottom:0.5rem; }
-    .method-card.green h3 { color:#66ff88; }
-    .chart-visual { display:flex; align-items:flex-end; justify-content:space-around; height:200px; background:#0f0505; border-radius:1.5rem; padding:1rem; margin:1rem 0; }
-    .bar { width:40px; background:linear-gradient(0deg,#ff5050,#ff8888); border-radius:8px 8px 0 0; transition:height 0.5s; position:relative; }
-    .bar-label { position:absolute; bottom:-1.5rem; left:50%; transform:translateX(-50%); font-size:0.65rem; color:#ffaaaa; white-space:nowrap; }
-    .bar.green-bar { background:linear-gradient(0deg,#00cc66,#66ff99); }
-    .analogy-box { background:linear-gradient(135deg,#2a1212,#1a0808); border-left:4px solid #ff5050; border-radius:1.5rem; padding:1.2rem; margin-bottom:1.5rem; font-style:italic; color:#ffcccc; }
-    .analogy-box i { color:#ff5050; margin-right:0.5rem; }
-    .radio-group { display:flex; flex-wrap:wrap; gap:0.5rem; margin:0.5rem 0; }
-    .radio-group label { padding:0.5rem 1rem; border-radius:2rem; border:1px solid #ff505066; cursor:pointer; font-size:0.85rem; transition:0.2s; }
-    .radio-group input[type="radio"] { display:none; }
-    .radio-group input[type="radio"]:checked + label { background:#ff5050; color:#fff; border-color:#ff5050; }
-    .badge { font-size:0.85rem; }
-    .section-tabs { display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:1rem; }
-    .section-tab { padding:0.5rem 1rem; border-radius:2rem; border:1px solid #ff505066; cursor:pointer; font-size:0.8rem; transition:0.2s; background:transparent; color:#ffaaaa; }
-    .section-tab.active { background:#ff5050; color:#fff; border-color:#ff5050; }
-    .section-content { display:none; }
-    .section-content.active { display:block; }
-    .insignia { text-align:center; padding:1.5rem; border:2px dashed gold; border-radius:2rem; margin:1.5rem 0; font-size:1.2rem; display:none; }
-    .insignia.show { display:block; animation:glowPulse 2s ease infinite; }
-    @keyframes glowPulse { 0%,100%{box-shadow:0 0 20px rgba(255,215,0,0.3)} 50%{box-shadow:0 0 40px rgba(255,215,0,0.6)} }
-    .progress-section { display:flex; align-items:center; gap:1rem; padding:0.5rem 2rem; }
-    .progress-bar-outer { flex:1; height:8px; background:#1a1a1a; border-radius:1rem; overflow:hidden; }
-    .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#ff5050,#cc3333); border-radius:1rem; transition:width 0.5s; }
-    .progress-text { font-size:0.8rem; color:#cc8888; white-space:nowrap; }
-    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
-    .nav-link { background:#3a1a1a; border:none; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; cursor:pointer; text-decoration:none; color:#ffe6e6; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; font-size:0.95rem; }
-    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px #ff505066; }
-    .nav-link.menu { background:#1a1a1a; border:1px solid #ff5050; }
-    footer { text-align:center; padding:0.8rem; font-size:0.7rem; border-top:1px solid #ff505044; }
-    @media(max-width:600px){ .hero h1{font-size:1.4rem} .content{padding:1rem} .compare-grid{grid-template-columns:1fr} .nav-links{gap:0.5rem} .nav-link{font-size:0.8rem;padding:0.5rem 1rem} }
-  </style>
-  <link rel="stylesheet" href="../../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Risk Management | 📏 Fixed Lot vs Fixed Fraction</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:linear-gradient(135deg,#1a0808,#1f0a0a,#0f0505); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#ffe6e6; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+  @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .container { max-width:1300px; width:100%; background:rgba(30,12,12,0.85); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid #ff5050; box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+  .hero { background:linear-gradient(95deg,#2a0f0f,#3a1212); padding:1.5rem 2rem; text-align:center; border-bottom:3px solid #ff5050; }
+  .hero h1 { font-size:2rem; font-weight:800; background:linear-gradient(135deg,#ffaaaa,#ff5050); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero p { margin-top:0.5rem; font-size:1rem; color:#ffcccc; }
+  .content { padding:1.5rem 2rem; }
+  .card { background:rgba(25,10,10,0.9); border-radius:2rem; padding:1.5rem; border:1px solid #ff505066; margin-bottom:1.5rem; }
+  .card h2 { color:#ff8888; margin-bottom:1rem; font-size:1.3rem; }
+  .card h3 { color:#ffaa66; margin:1rem 0 0.5rem; font-size:1.1rem; }
+  .form-group { margin-bottom:0.8rem; }
+  .form-group label { display:block; font-size:0.85rem; color:#ffbbbb; margin-bottom:0.3rem; }
+  .form-group input,.form-group select { width:100%; padding:0.6rem; border-radius:1rem; border:1px solid #ff505066; background:#1a0808; color:#ffe6e6; font-size:0.95rem; }
+  .btn { background:linear-gradient(95deg,#ff5050,#cc3333); border:none; padding:0.7rem 2rem; border-radius:3rem; font-weight:600; font-size:1rem; cursor:pointer; color:#fff; transition:0.2s; }
+  .btn:hover { transform:scale(1.02); box-shadow:0 0 20px #ff505066; }
+  .btn-secondary { background:linear-gradient(95deg,#555,#333); }
+  .btn-secondary:hover { box-shadow:0 0 20px #55555566; }
+  .result-box { background:#1a0a0a; border-radius:1.5rem; padding:1rem; border:1px solid #ff505044; margin-top:1rem; }
+  .result-box .value { font-size:1.5rem; font-weight:700; color:#ff8888; }
+  .result-box .label { font-size:0.8rem; color:#ffaaaa; }
+  .result-row { display:flex; justify-content:space-between; padding:0.5rem 0; border-bottom:1px solid #ff505022; }
+  .compare-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+  .method-card { background:#1a0a0a; border-radius:1.2rem; padding:1rem; border:1px solid #ff505033; }
+  .method-card.green { border-color:#66ff88; }
+  .method-card h3 { color:#ffaa66; margin-bottom:0.5rem; }
+  .method-card.green h3 { color:#66ff88; }
+  .chart-visual { display:flex; align-items:flex-end; justify-content:space-around; height:200px; background:#0f0505; border-radius:1.5rem; padding:1rem; margin:1rem 0; }
+  .bar { width:40px; background:linear-gradient(0deg,#ff5050,#ff8888); border-radius:8px 8px 0 0; transition:height 0.5s; position:relative; }
+  .bar-label { position:absolute; bottom:-1.5rem; left:50%; transform:translateX(-50%); font-size:0.65rem; color:#ffaaaa; white-space:nowrap; }
+  .bar.green-bar { background:linear-gradient(0deg,#00cc66,#66ff99); }
+  .analogy-box { background:linear-gradient(135deg,#2a1212,#1a0808); border-left:4px solid #ff5050; border-radius:1.5rem; padding:1.2rem; margin-bottom:1.5rem; font-style:italic; color:#ffcccc; }
+  .analogy-box i { color:#ff5050; margin-right:0.5rem; }
+  .radio-group { display:flex; flex-wrap:wrap; gap:0.5rem; margin:0.5rem 0; }
+  .radio-group label { padding:0.5rem 1rem; border-radius:2rem; border:1px solid #ff505066; cursor:pointer; font-size:0.85rem; transition:0.2s; }
+  .radio-group input[type="radio"] { display:none; }
+  .radio-group input[type="radio"]:checked + label { background:#ff5050; color:#fff; border-color:#ff5050; }
+  .badge { font-size:0.85rem; }
+  .section-tabs { display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:1rem; }
+  .section-tab { padding:0.5rem 1rem; border-radius:2rem; border:1px solid #ff505066; cursor:pointer; font-size:0.8rem; transition:0.2s; background:transparent; color:#ffaaaa; }
+  .section-tab.active { background:#ff5050; color:#fff; border-color:#ff5050; }
+  .section-content { display:none; }
+  .section-content.active { display:block; }
+  .insignia { text-align:center; padding:1.5rem; border:2px dashed gold; border-radius:2rem; margin:1.5rem 0; font-size:1.2rem; display:none; }
+  .insignia.show { display:block; animation:glowPulse 2s ease infinite; }
+  @keyframes glowPulse { 0%,100%{box-shadow:0 0 20px rgba(255,215,0,0.3)} 50%{box-shadow:0 0 40px rgba(255,215,0,0.6)} }
+  .progress-section { display:flex; align-items:center; gap:1rem; padding:0.5rem 2rem; }
+  .progress-bar-outer { flex:1; height:8px; background:#1a1a1a; border-radius:1rem; overflow:hidden; }
+  .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#ff5050,#cc3333); border-radius:1rem; transition:width 0.5s; }
+  .progress-text { font-size:0.8rem; color:#cc8888; white-space:nowrap; }
+  .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+  .nav-link { background:#3a1a1a; border:none; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; cursor:pointer; text-decoration:none; color:#ffe6e6; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; font-size:0.95rem; }
+  .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px #ff505066; }
+  .nav-link.menu { background:#1a1a1a; border:1px solid #ff5050; }
+  footer { text-align:center; padding:0.8rem; font-size:0.7rem; border-top:1px solid #ff505044; }
+  @media(max-width:600px){ .hero h1{font-size:1.4rem} .content{padding:1rem} .compare-grid{grid-template-columns:1fr} .nav-links{gap:0.5rem} .nav-link{font-size:0.8rem;padding:0.5rem 1rem} }
+ </style>
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
 </head>
 <body>
 <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a></nav>
 
 <div class="container">
-  <div class="hero">
-    <h1><i class="fas fa-ruler"></i> Fixed Lot vs Fixed Fraction</h1>
-    <p>Dos filosofías de position sizing: constancia versus adaptabilidad</p>
+ <div class="hero">
+  <h1><i class="fas fa-ruler"></i> Fixed Lot vs Fixed Fraction</h1>
+  <p>Dos filosofías de position sizing: constancia versus adaptabilidad</p>
+ </div>
+
+ <div class="progress-section">
+  <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+  <span class="progress-text" id="progressText">Módulo 2 de 12</span>
+ </div>
+
+ <div class="content">
+  <div class="analogy-box">
+   <i class="fas fa-quote-left fa-2x"></i> Fixed Lot es como pagar siempre el mismo alquiler aunque tu sueldo cambie. Fixed Fraction es como pagar un porcentaje de tu sueldo: cuando ganas más, pagas más; cuando ganas menos, pagas menos. Una protege tu estilo de vida, la otra se adapta a tu realidad.
   </div>
 
-  <div class="progress-section">
-    <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
-    <span class="progress-text" id="progressText">Módulo 2 de 12</span>
+  <div class="section-tabs">
+   <div class="section-tab active" data-section="compare"><i class="fas fa-balance-scale"></i> Comparación</div>
+   <div class="section-tab" data-section="simulator"><i class="fas fa-chart-simple"></i> Simulador</div>
+   <div class="section-tab" data-section="quiz"><i class="fas fa-question-circle"></i> Quiz</div>
   </div>
 
-  <div class="content">
-    <div class="analogy-box">
-      <i class="fas fa-quote-left fa-2x"></i> Fixed Lot es como pagar siempre el mismo alquiler aunque tu sueldo cambie. Fixed Fraction es como pagar un porcentaje de tu sueldo: cuando ganas más, pagas más; cuando ganas menos, pagas menos. Una protege tu estilo de vida, la otra se adapta a tu realidad.
+  <div id="section-compare" class="section-content active">
+   <div class="compare-grid">
+    <div class="method-card">
+     <h3><i class="fas fa-anchor"></i> Fixed Lot</h3>
+     <p style="font-size:0.85rem;color:#ffcccc;">Tamaño de lote constante en cada operación, sin importar el saldo de la cuenta.</p>
+     <div class="result-row"><span class="label">Ventaja</span><span class="value" style="color:#66ff88;font-size:0.85rem;">Simplicidad total</span></div>
+     <div class="result-row"><span class="label">Desventaja</span><span class="value" style="color:#ff5050;font-size:0.85rem;">Ignora crecimiento/declive</span></div>
+     <div class="result-row"><span class="label">Riesgo de ruina</span><span class="value" style="color:#ff8888;font-size:0.85rem;">Alto si hay racha perdedora</span></div>
     </div>
-
-    <div class="section-tabs">
-      <div class="section-tab active" data-section="compare"><i class="fas fa-balance-scale"></i> Comparación</div>
-      <div class="section-tab" data-section="simulator"><i class="fas fa-chart-simple"></i> Simulador</div>
-      <div class="section-tab" data-section="quiz"><i class="fas fa-question-circle"></i> Quiz</div>
+    <div class="method-card green">
+     <h3><i class="fas fa-percent"></i> Fixed Fraction</h3>
+     <p style="font-size:0.85rem;color:#ffcccc;">Riesga un porcentaje fijo del saldo en cada operación. Se adapta al crecimiento.</p>
+     <div class="result-row"><span class="label">Ventaja</span><span class="value" style="color:#66ff88;font-size:0.85rem;">Protección contra drawdown</span></div>
+     <div class="result-row"><span class="label">Desventaja</span><span class="value" style="color:#ff8888;font-size:0.85rem;">Lotes variables (no enteros)</span></div>
+     <div class="result-row"><span class="label">Crecimiento compuesto</span><span class="value" style="color:#66ff88;font-size:0.85rem;">Sí, exponencial positivo</span></div>
     </div>
-
-    <div id="section-compare" class="section-content active">
-      <div class="compare-grid">
-        <div class="method-card">
-          <h3><i class="fas fa-anchor"></i> Fixed Lot</h3>
-          <p style="font-size:0.85rem;color:#ffcccc;">Tamaño de lote constante en cada operación, sin importar el saldo de la cuenta.</p>
-          <div class="result-row"><span class="label">Ventaja</span><span class="value" style="color:#66ff88;font-size:0.85rem;">Simplicidad total</span></div>
-          <div class="result-row"><span class="label">Desventaja</span><span class="value" style="color:#ff5050;font-size:0.85rem;">Ignora crecimiento/declive</span></div>
-          <div class="result-row"><span class="label">Riesgo de ruina</span><span class="value" style="color:#ff8888;font-size:0.85rem;">Alto si hay racha perdedora</span></div>
-        </div>
-        <div class="method-card green">
-          <h3><i class="fas fa-percent"></i> Fixed Fraction</h3>
-          <p style="font-size:0.85rem;color:#ffcccc;">Riesga un porcentaje fijo del saldo en cada operación. Se adapta al crecimiento.</p>
-          <div class="result-row"><span class="label">Ventaja</span><span class="value" style="color:#66ff88;font-size:0.85rem;">Protección contra drawdown</span></div>
-          <div class="result-row"><span class="label">Desventaja</span><span class="value" style="color:#ff8888;font-size:0.85rem;">Lotes variables (no enteros)</span></div>
-          <div class="result-row"><span class="label">Crecimiento compuesto</span><span class="value" style="color:#66ff88;font-size:0.85rem;">Sí, exponencial positivo</span></div>
-        </div>
-      </div>
-    </div>
-
-    <div id="section-simulator" class="section-content">
-      <div class="card">
-        <h2><i class="fas fa-chart-simple"></i> Simulador de Crecimiento</h2>
-        <p style="font-size:0.85rem;color:#ffcccc;margin-bottom:1rem;">Compara cómo crecería una cuenta con cada método tras una secuencia de trades.</p>
-        <div class="form-group"><label>Saldo Inicial ($)</label><input type="number" id="initBalance" value="10000" min="100" step="100"></div>
-        <div class="form-group"><label>Lote Fijo (Fixed Lot)</label><input type="number" id="fixedLotSize" value="0.1" min="0.01" step="0.01"></div>
-        <div class="form-group"><label>% Riesgo (Fixed Fraction)</label><input type="number" id="fracRiskPct" value="2" min="0.1" max="10" step="0.1"></div>
-        <div class="form-group"><label>Pips por trade (ganancia/pérdida)</label><input type="number" id="pipsPerTrade" value="30" min="1" step="1"></div>
-        <div class="form-group"><label>Número de trades</label><input type="number" id="numTrades" value="10" min="1" max="100" step="1"></div>
-        <div class="radio-group">
-          <input type="radio" name="sequence" id="seqAllWin" value="allWin" checked><label for="seqAllWin">Todos ganan</label>
-          <input type="radio" name="sequence" id="seqMixed" value="mixed"><label for="seqMixed">Mixto (70/30)</label>
-          <input type="radio" name="sequence" id="seqAllLoss" value="allLoss"><label for="seqAllLoss">Todos pierden</label>
-        </div>
-        <button class="btn" id="simulateBtn"><i class="fas fa-play"></i> Simular</button>
-        <div id="simResults" class="result-box" style="display:none;">
-          <div class="result-row"><span class="label">Fixed Lot Final</span><span class="value" id="fixedLotFinal">$0</span></div>
-          <div class="result-row"><span class="label">Fixed Fraction Final</span><span class="value" id="fixedFracFinal">$0</span></div>
-          <div class="result-row"><span class="label">Diferencia</span><span class="value" id="simDiff">$0</span></div>
-          <div class="chart-visual" id="chartVisual">
-            <div style="text-align:center;"><div class="bar" id="fixedLotBar" style="height:50px;"><div class="bar-label">Fixed Lot</div></div></div>
-            <div style="text-align:center;"><div class="bar green-bar" id="fixedFracBar" style="height:50px;"><div class="bar-label">Fixed Fraction</div></div></div>
-          </div>
-          <div class="formula-breakdown" id="simDetail" style="font-size:0.8rem;color:#ffaaaa;margin-top:0.5rem;"></div>
-        </div>
-      </div>
-    </div>
-
-    <div id="section-quiz" class="section-content">
-      <div class="card">
-        <h2><i class="fas fa-question-circle"></i> Verificación</h2>
-        <p style="font-size:0.85rem;color:#ffcccc;margin-bottom:1rem;">¿Cuál método de position sizing es más seguro en una racha perdedora?</p>
-        <div class="radio-group" id="quizOptions">
-          <input type="radio" name="mmQuiz" id="qFixedLot" value="fixedLot"><label for="qFixedLot">Fixed Lot</label>
-          <input type="radio" name="mmQuiz" id="qFixedFrac" value="fixedFrac"><label for="qFixedFrac">Fixed Fraction</label>
-        </div>
-        <button class="btn btn-secondary" id="quizBtn">Responder</button>
-        <div id="quizFeedback" class="result-box" style="display:none;"></div>
-      </div>
-    </div>
-
-    <div class="insignia" id="insignia">
-      🏅 Comparador de Métodos 🏅<br>
-      <span style="font-size:0.9rem;">Dominas las diferencias entre Fixed Lot y Fixed Fraction</span>
-    </div>
+   </div>
   </div>
 
-  <div class="nav-links">
-    <a href="01-portal.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
-    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
-    <a href="03-riesgo-porcentual.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  <div id="section-simulator" class="section-content">
+   <div class="card">
+    <h2><i class="fas fa-chart-simple"></i> Simulador de Crecimiento</h2>
+    <p style="font-size:0.85rem;color:#ffcccc;margin-bottom:1rem;">Compara cómo crecería una cuenta con cada método tras una secuencia de trades.</p>
+    <div class="form-group"><label>Saldo Inicial ($)</label><input type="number" id="initBalance" value="10000" min="100" step="100"></div>
+    <div class="form-group"><label>Lote Fijo (Fixed Lot)</label><input type="number" id="fixedLotSize" value="0.1" min="0.01" step="0.01"></div>
+    <div class="form-group"><label>% Riesgo (Fixed Fraction)</label><input type="number" id="fracRiskPct" value="2" min="0.1" max="10" step="0.1"></div>
+    <div class="form-group"><label>Pips por trade (ganancia/pérdida)</label><input type="number" id="pipsPerTrade" value="30" min="1" step="1"></div>
+    <div class="form-group"><label>Número de trades</label><input type="number" id="numTrades" value="10" min="1" max="100" step="1"></div>
+    <div class="radio-group">
+     <input type="radio" name="sequence" id="seqAllWin" value="allWin" checked><label for="seqAllWin">Todos ganan</label>
+     <input type="radio" name="sequence" id="seqMixed" value="mixed"><label for="seqMixed">Mixto (70/30)</label>
+     <input type="radio" name="sequence" id="seqAllLoss" value="allLoss"><label for="seqAllLoss">Todos pierden</label>
+    </div>
+    <button class="btn" id="simulateBtn"><i class="fas fa-play"></i> Simular</button>
+    <div id="simResults" class="result-box" style="display:none;">
+     <div class="result-row"><span class="label">Fixed Lot Final</span><span class="value" id="fixedLotFinal">$0</span></div>
+     <div class="result-row"><span class="label">Fixed Fraction Final</span><span class="value" id="fixedFracFinal">$0</span></div>
+     <div class="result-row"><span class="label">Diferencia</span><span class="value" id="simDiff">$0</span></div>
+     <div class="chart-visual" id="chartVisual">
+      <div style="text-align:center;"><div class="bar" id="fixedLotBar" style="height:50px;"><div class="bar-label">Fixed Lot</div></div></div>
+      <div style="text-align:center;"><div class="bar green-bar" id="fixedFracBar" style="height:50px;"><div class="bar-label">Fixed Fraction</div></div></div>
+     </div>
+     <div class="formula-breakdown" id="simDetail" style="font-size:0.8rem;color:#ffaaaa;margin-top:0.5rem;"></div>
+    </div>
+   </div>
   </div>
-  <footer><i class="fas fa-ruler"></i> Fixed Lot da constancia; Fixed Fraction da supervivencia</footer>
+
+  <div id="section-quiz" class="section-content">
+   <div class="card">
+    <h2><i class="fas fa-question-circle"></i> Verificación</h2>
+    <p style="font-size:0.85rem;color:#ffcccc;margin-bottom:1rem;">¿Cuál método de position sizing es más seguro en una racha perdedora?</p>
+    <div class="radio-group" id="quizOptions">
+     <input type="radio" name="mmQuiz" id="qFixedLot" value="fixedLot"><label for="qFixedLot">Fixed Lot</label>
+     <input type="radio" name="mmQuiz" id="qFixedFrac" value="fixedFrac"><label for="qFixedFrac">Fixed Fraction</label>
+    </div>
+    <button class="btn btn-secondary" id="quizBtn">Responder</button>
+    <div id="quizFeedback" class="result-box" style="display:none;"></div>
+   </div>
+  </div>
+
+  <div class="insignia" id="insignia">
+   🏅 Comparador de Métodos 🏅<br>
+   <span style="font-size:0.9rem;">Dominas las diferencias entre Fixed Lot y Fixed Fraction</span>
+  </div>
+ </div>
+
+ <div class="nav-links">
+  <a href="01-portal.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+  <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+  <a href="03-riesgo-porcentual.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+ </div>
+ <footer><i class="fas fa-ruler"></i> Fixed Lot da constancia; Fixed Fraction da supervivencia</footer>
 </div>
 
 <script>
-  const STORAGE_KEY = 'mql5_4_02';
-  const PROGRESS_KEY = 'mql5_4_progress';
+ const STORAGE_KEY = 'mql5_4_02';
+ const PROGRESS_KEY = 'mql5_4_progress';
 
-  function updateProgress() {
-    const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
-    document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
-    document.getElementById('progressText').textContent = 'Módulo 2 de 12';
-  }
+ function updateProgress() {
+  const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+  document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
+  document.getElementById('progressText').textContent = 'Módulo 2 de 12';
+ }
+ updateProgress();
+
+ function saveProgress() {
+  let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+  if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
+  localStorage.setItem(STORAGE_KEY, 'true');
   updateProgress();
+  checkInsignia();
+ }
 
-  function saveProgress() {
-    let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
-    if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
-    localStorage.setItem(STORAGE_KEY, 'true');
-    updateProgress();
-    checkInsignia();
+ function checkInsignia() {
+  const ins = document.getElementById('insignia');
+  if (document.getElementById('simResults').style.display === 'block' && localStorage.getItem(STORAGE_KEY) === 'true') {
+   ins.classList.add('show');
+  }
+ }
+
+ document.getElementById('simulateBtn').addEventListener('click', function() {
+  const initBal = parseFloat(document.getElementById('initBalance').value) || 10000;
+  const fixedLot = parseFloat(document.getElementById('fixedLotSize').value) || 0.1;
+  const fracPct = parseFloat(document.getElementById('fracRiskPct').value) || 2;
+  const pips = parseFloat(document.getElementById('pipsPerTrade').value) || 30;
+  const trades = parseInt(document.getElementById('numTrades').value) || 10;
+  const seq = document.querySelector('input[name="sequence"]:checked').value;
+
+  const pipVal = 10;
+  let fixedBal = initBal;
+  let fracBal = initBal;
+  let detail = '';
+
+  for (let i = 0; i < trades; i++) {
+   let isWin;
+   if (seq === 'allWin') isWin = true;
+   else if (seq === 'allLoss') isWin = false;
+   else isWin = Math.random() < 0.7;
+
+   const pl = isWin ? pips : -pips;
+   const fixedPl = fixedLot * pl * pipVal;
+   fixedBal += fixedPl;
+
+   const fracRisk = fracBal * (fracPct / 100);
+   const fracLot = Math.round(fracRisk / (pips * pipVal) / 0.01) * 0.01;
+   const fracPl = fracLot * pl * pipVal;
+   fracBal += fracPl;
   }
 
-  function checkInsignia() {
-    const ins = document.getElementById('insignia');
-    if (document.getElementById('simResults').style.display === 'block' && localStorage.getItem(STORAGE_KEY) === 'true') {
-      ins.classList.add('show');
-    }
-  }
+  document.getElementById('fixedLotFinal').textContent = '$' + fixedBal.toFixed(2);
+  document.getElementById('fixedFracFinal').textContent = '$' + fracBal.toFixed(2);
+  const diff = fracBal - fixedBal;
+  document.getElementById('simDiff').textContent = (diff >= 0 ? '+$' : '-$') + Math.abs(diff).toFixed(2);
+  document.getElementById('simDiff').style.color = diff >= 0 ? '#66ff88' : '#ff5050';
 
-  document.getElementById('simulateBtn').addEventListener('click', function() {
-    const initBal = parseFloat(document.getElementById('initBalance').value) || 10000;
-    const fixedLot = parseFloat(document.getElementById('fixedLotSize').value) || 0.1;
-    const fracPct = parseFloat(document.getElementById('fracRiskPct').value) || 2;
-    const pips = parseFloat(document.getElementById('pipsPerTrade').value) || 30;
-    const trades = parseInt(document.getElementById('numTrades').value) || 10;
-    const seq = document.querySelector('input[name="sequence"]:checked').value;
+  const maxH = 150;
+  const lotH = Math.min(maxH, Math.max(30, (fixedBal / initBal) * 80));
+  const fracH = Math.min(maxH, Math.max(30, (fracBal / initBal) * 80));
+  document.getElementById('fixedLotBar').style.height = lotH + 'px';
+  document.getElementById('fixedFracBar').style.height = fracH + 'px';
 
-    const pipVal = 10;
-    let fixedBal = initBal;
-    let fracBal = initBal;
-    let detail = '';
+  detail = `Fixed Lot: lote constante ${fixedLot.toFixed(2)} → $${initBal.toFixed(0)} → $${fixedBal.toFixed(0)} (${((fixedBal/initBal-1)*100).toFixed(1)}%)<br>`;
+  detail += `Fixed Fraction: ${fracPct}% riesgo/trade → $${initBal.toFixed(0)} → $${fracBal.toFixed(0)} (${((fracBal/initBal-1)*100).toFixed(1)}%)`;
+  document.getElementById('simDetail').innerHTML = detail;
+  document.getElementById('simResults').style.display = 'block';
+  saveProgress();
+ });
 
-    for (let i = 0; i < trades; i++) {
-      let isWin;
-      if (seq === 'allWin') isWin = true;
-      else if (seq === 'allLoss') isWin = false;
-      else isWin = Math.random() < 0.7;
+ document.getElementById('quizBtn').addEventListener('click', function() {
+  const selected = document.querySelector('input[name="mmQuiz"]:checked');
+  const fb = document.getElementById('quizFeedback');
+  if (!selected) { fb.style.display = 'block'; fb.innerHTML = I18N.t('fb_0'); return; }
+  const correct = selected.value === 'fixedFrac';
+  fb.style.display = 'block';
+  fb.innerHTML = correct
+   ? '<span style="color:#66ff88;">✅ Correcto! Fixed Fraction reduce el riesgo de ruina al ajustar el tamaño al saldo disponible.</span>'
+   : '<span style="color:#ff5050;">❌ Fixed Lot es más riesgoso en rachas perdedoras porque el lote no se reduce. Fixed Fraction se adapta.</span>';
+  if (correct) saveProgress();
+ });
 
-      const pl = isWin ? pips : -pips;
-      const fixedPl = fixedLot * pl * pipVal;
-      fixedBal += fixedPl;
-
-      const fracRisk = fracBal * (fracPct / 100);
-      const fracLot = Math.round(fracRisk / (pips * pipVal) / 0.01) * 0.01;
-      const fracPl = fracLot * pl * pipVal;
-      fracBal += fracPl;
-    }
-
-    document.getElementById('fixedLotFinal').textContent = '$' + fixedBal.toFixed(2);
-    document.getElementById('fixedFracFinal').textContent = '$' + fracBal.toFixed(2);
-    const diff = fracBal - fixedBal;
-    document.getElementById('simDiff').textContent = (diff >= 0 ? '+$' : '-$') + Math.abs(diff).toFixed(2);
-    document.getElementById('simDiff').style.color = diff >= 0 ? '#66ff88' : '#ff5050';
-
-    const maxH = 150;
-    const lotH = Math.min(maxH, Math.max(30, (fixedBal / initBal) * 80));
-    const fracH = Math.min(maxH, Math.max(30, (fracBal / initBal) * 80));
-    document.getElementById('fixedLotBar').style.height = lotH + 'px';
-    document.getElementById('fixedFracBar').style.height = fracH + 'px';
-
-    detail = `Fixed Lot: lote constante ${fixedLot.toFixed(2)} → $${initBal.toFixed(0)} → $${fixedBal.toFixed(0)} (${((fixedBal/initBal-1)*100).toFixed(1)}%)<br>`;
-    detail += `Fixed Fraction: ${fracPct}% riesgo/trade → $${initBal.toFixed(0)} → $${fracBal.toFixed(0)} (${((fracBal/initBal-1)*100).toFixed(1)}%)`;
-    document.getElementById('simDetail').innerHTML = detail;
-    document.getElementById('simResults').style.display = 'block';
-    saveProgress();
+ // Tabs
+ document.querySelectorAll('.section-tab').forEach(tab => {
+  tab.addEventListener('click', function() {
+   document.querySelectorAll('.section-tab').forEach(t => t.classList.remove('active'));
+   document.querySelectorAll('.section-content').forEach(s => s.classList.remove('active'));
+   this.classList.add('active');
+   document.getElementById('section-' + this.dataset.section).classList.add('active');
   });
-
-  document.getElementById('quizBtn').addEventListener('click', function() {
-    const selected = document.querySelector('input[name="mmQuiz"]:checked');
-    const fb = document.getElementById('quizFeedback');
-    if (!selected) { fb.style.display = 'block'; fb.innerHTML = I18N.t('fb_0'); return; }
-    const correct = selected.value === 'fixedFrac';
-    fb.style.display = 'block';
-    fb.innerHTML = correct
-      ? '<span style="color:#66ff88;">✅ Correcto! Fixed Fraction reduce el riesgo de ruina al ajustar el tamaño al saldo disponible.</span>'
-      : '<span style="color:#ff5050;">❌ Fixed Lot es más riesgoso en rachas perdedoras porque el lote no se reduce. Fixed Fraction se adapta.</span>';
-    if (correct) saveProgress();
-  });
-
-  // Tabs
-  document.querySelectorAll('.section-tab').forEach(tab => {
-    tab.addEventListener('click', function() {
-      document.querySelectorAll('.section-tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.section-content').forEach(s => s.classList.remove('active'));
-      this.classList.add('active');
-      document.getElementById('section-' + this.dataset.section).classList.add('active');
-    });
-  });
+ });
 </script>
-<script src="../../../assets/js/cookie-consent.js"></script>
-
 <script>
 window.I18N_DATA={
-  'fb_0': { es: '<span style="color:#ff5050;">Selecciona una opción.</span>', en: '<span style="color:#ff5050;">Selecciona una opción.</span>' }
+ 'fb_0': { es: '<span style="color:#ff5050;">Selecciona una opción.</span>', en: '<span style="color:#ff5050;">Selecciona una opción.</span>' }
 };
 </script>
 </body>

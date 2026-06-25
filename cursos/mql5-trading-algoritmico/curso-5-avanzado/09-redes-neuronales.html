@@ -1,118 +1,118 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Curso 5 | 🧠 Redes Neuronales con Matrix</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <link rel="stylesheet" href="../../../assets/css/theme.css">
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { background:linear-gradient(135deg,#0a0f1e,#0c1222,#111a2e); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
-    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-    .modulo-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,102,192,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
-    .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #ff66c0; }
-    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#ff99dd,#ff66c0); -webkit-background-clip:text; background-clip:text; color:transparent; }
-    .hero-header p { font-size:1.1rem; color:#e6b8d4; margin-top:0.5rem; font-weight:500; }
-    .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
-    .chip { background:rgba(255,102,192,0.15); border:1px solid #ff66c0; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
-    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ff66c0; font-size:1rem; line-height:1.6; }
-    .main-area { padding:1.5rem 2rem; display:flex; flex-direction:column; gap:1.5rem; }
-    .panel { background:rgba(0,10,25,0.7); border-radius:1.5rem; padding:1.3rem; border:1px solid rgba(255,102,192,0.2); }
-    .panel h3 { font-size:1.1rem; margin-bottom:0.8rem; color:#ff99dd; display:flex; align-items:center; gap:0.5rem; }
-    .arch-controls { display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center; }
-    .arch-controls label { font-size:0.8rem; color:#99aacc; }
-    .arch-controls input { background:#0f1a2c; border:1px solid #2a3a5a; border-radius:0.5rem; padding:0.3rem 0.5rem; color:#eef5ff; width:60px; text-align:center; }
-    .arch-controls select { background:#0f1a2c; border:1px solid #2a3a5a; border-radius:0.5rem; padding:0.3rem; color:#eef5ff; }
-    .network-viz { background:#0a0f1e; border-radius:1rem; padding:0.5rem; height:280px; border:1px solid #1a2a4a; overflow:hidden; position:relative; }
-    .network-viz canvas { width:100%; height:100%; }
-    .weight-display { background:#0b1120; border-radius:0.8rem; padding:0.6rem; max-height:120px; overflow-y:auto; font-size:0.65rem; font-family:monospace; border:1px solid #1a2a4a; margin-top:0.5rem; }
-    .loss-chart { background:#0a0f1e; border-radius:1rem; padding:0.5rem; height:160px; border:1px solid #1a2a4a; overflow:hidden; }
-    .loss-chart canvas { width:100%; height:100%; }
-    .btn-action { background:linear-gradient(95deg,#ff66c0,#ff3399); border:none; padding:0.8rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; }
-    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(255,102,192,0.5); }
-    .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
-    .btn-op { background:#1a2a4a; border:1px solid #ff66c0; padding:0.5rem 1rem; border-radius:2rem; color:#eef5ff; font-weight:600; cursor:pointer; transition:0.2s; font-size:0.8rem; }
-    .btn-op:hover { background:#ff66c0; color:#0b1120; }
-    .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #ff66c0; }
-    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:0 2rem 1.5rem; padding:1rem; border:2px dashed gold; }
-    .insignia i { font-size:2.5rem; color:gold; }
-    .hidden { display:none !important; }
-    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
-    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; font-size:0.95rem; }
-    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(255,102,192,0.4); }
-    .nav-link.next { background:linear-gradient(95deg,#ff66c0,#ff3399); color:#1e1a0c; }
-    .nav-link.menu { background:#1a2a4a; border:1px solid #ff66c0; }
-    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; color:#667799; }
-    .code-box { background:#0b1120; border-radius:1rem; padding:1rem; font-family:'Courier New',monospace; font-size:0.8rem; color:#00ff88; white-space:pre-wrap; border:1px solid #1a2a4a; min-height:60px; }
-    .stat-row { display:flex; justify-content:space-between; padding:0.2rem 0; font-size:0.8rem; border-bottom:1px solid #0f1a2c; }
-    .stat-row .val { font-weight:600; color:#00ff88; }
-    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
-  </style>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Curso 5 | 🧠 Redes Neuronales con Matrix</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
+ <style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:linear-gradient(135deg,#0a0f1e,#0c1222,#111a2e); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+  @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .modulo-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,102,192,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+  .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #ff66c0; }
+  .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#ff99dd,#ff66c0); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero-header p { font-size:1.1rem; color:#e6b8d4; margin-top:0.5rem; font-weight:500; }
+  .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+  .chip { background:rgba(255,102,192,0.15); border:1px solid #ff66c0; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+  .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ff66c0; font-size:1rem; line-height:1.6; }
+  .main-area { padding:1.5rem 2rem; display:flex; flex-direction:column; gap:1.5rem; }
+  .panel { background:rgba(0,10,25,0.7); border-radius:1.5rem; padding:1.3rem; border:1px solid rgba(255,102,192,0.2); }
+  .panel h3 { font-size:1.1rem; margin-bottom:0.8rem; color:#ff99dd; display:flex; align-items:center; gap:0.5rem; }
+  .arch-controls { display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center; }
+  .arch-controls label { font-size:0.8rem; color:#99aacc; }
+  .arch-controls input { background:#0f1a2c; border:1px solid #2a3a5a; border-radius:0.5rem; padding:0.3rem 0.5rem; color:#eef5ff; width:60px; text-align:center; }
+  .arch-controls select { background:#0f1a2c; border:1px solid #2a3a5a; border-radius:0.5rem; padding:0.3rem; color:#eef5ff; }
+  .network-viz { background:#0a0f1e; border-radius:1rem; padding:0.5rem; height:280px; border:1px solid #1a2a4a; overflow:hidden; position:relative; }
+  .network-viz canvas { width:100%; height:100%; }
+  .weight-display { background:#0b1120; border-radius:0.8rem; padding:0.6rem; max-height:120px; overflow-y:auto; font-size:0.65rem; font-family:monospace; border:1px solid #1a2a4a; margin-top:0.5rem; }
+  .loss-chart { background:#0a0f1e; border-radius:1rem; padding:0.5rem; height:160px; border:1px solid #1a2a4a; overflow:hidden; }
+  .loss-chart canvas { width:100%; height:100%; }
+  .btn-action { background:linear-gradient(95deg,#ff66c0,#ff3399); border:none; padding:0.8rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; }
+  .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(255,102,192,0.5); }
+  .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
+  .btn-op { background:#1a2a4a; border:1px solid #ff66c0; padding:0.5rem 1rem; border-radius:2rem; color:#eef5ff; font-weight:600; cursor:pointer; transition:0.2s; font-size:0.8rem; }
+  .btn-op:hover { background:#ff66c0; color:#0b1120; }
+  .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #ff66c0; }
+  .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:0 2rem 1.5rem; padding:1rem; border:2px dashed gold; }
+  .insignia i { font-size:2.5rem; color:gold; }
+  .hidden { display:none !important; }
+  .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+  .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; font-size:0.95rem; }
+  .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(255,102,192,0.4); }
+  .nav-link.next { background:linear-gradient(95deg,#ff66c0,#ff3399); color:#1e1a0c; }
+  .nav-link.menu { background:#1a2a4a; border:1px solid #ff66c0; }
+  footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; color:#667799; }
+  .code-box { background:#0b1120; border-radius:1rem; padding:1rem; font-family:'Courier New',monospace; font-size:0.8rem; color:#00ff88; white-space:pre-wrap; border:1px solid #1a2a4a; min-height:60px; }
+  .stat-row { display:flex; justify-content:space-between; padding:0.2rem 0; font-size:0.8rem; border-bottom:1px solid #0f1a2c; }
+  .stat-row .val { font-weight:600; color:#00ff88; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
+ </style>
 </head>
 <body>
 <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a></nav>
 <div class="modulo-container">
-  <div class="hero-header">
-    <h1>🧠 Redes Neuronales con Matrix</h1>
-    <p>"Construye un MLP desde cero usando la Matrix class de MQL5"</p>
-    <div class="badge-area">
-      <span class="chip"><i class="fas fa-project-diagram"></i> MLP</span>
-      <span class="chip"><i class="fas fa-th"></i> Matrix Class</span>
-      <span class="chip"><i class="fas fa-chart-line"></i> Loss Curve</span>
-    </div>
+ <div class="hero-header">
+  <h1>🧠 Redes Neuronales con Matrix</h1>
+  <p>"Construye un MLP desde cero usando la Matrix class de MQL5"</p>
+  <div class="badge-area">
+   <span class="chip"><i class="fas fa-project-diagram"></i> MLP</span>
+   <span class="chip"><i class="fas fa-th"></i> Matrix Class</span>
+   <span class="chip"><i class="fas fa-chart-line"></i> Loss Curve</span>
   </div>
-  <div class="analogy-card">
-    <strong><i class="fas fa-puzzle-piece"></i> Piénsalo así:</strong> Una red neuronal es como un equipo de analistas en una oficina. Cada capa es un departamento: la capa de entrada recibe los datos (materia prima), las capas ocultas procesan (análisis intermedio), y la capa de salida produce el resultado (reporte final). Los pesos son la experiencia de cada analista.
+ </div>
+ <div class="analogy-card">
+  <strong><i class="fas fa-puzzle-piece"></i> Piénsalo así:</strong> Una red neuronal es como un equipo de analistas en una oficina. Cada capa es un departamento: la capa de entrada recibe los datos (materia prima), las capas ocultas procesan (análisis intermedio), y la capa de salida produce el resultado (reporte final). Los pesos son la experiencia de cada analista.
+ </div>
+ <div class="main-area">
+  <div class="panel">
+   <h3><i class="fas fa-sliders-h"></i> Arquitectura de la Red</h3>
+   <div class="arch-controls">
+    <label>Input: <input type="number" id="inputNodes" value="4" min="2" max="8"></label>
+    <label>Hidden 1: <input type="number" id="hidden1Nodes" value="6" min="2" max="12"></label>
+    <label>Hidden 2: <input type="number" id="hidden2Nodes" value="4" min="2" max="12"></label>
+    <label>Output: <input type="number" id="outputNodes" value="2" min="1" max="4"></label>
+    <label>Activación: <select id="activationFn"><option value="relu">ReLU</option><option value="sigmoid">Sigmoid</option><option value="tanh">TanH</option></select></label>
+    <button class="btn-op" onclick="buildNetwork()">🔨 Construir Red</button>
+   </div>
   </div>
-  <div class="main-area">
-    <div class="panel">
-      <h3><i class="fas fa-sliders-h"></i> Arquitectura de la Red</h3>
-      <div class="arch-controls">
-        <label>Input: <input type="number" id="inputNodes" value="4" min="2" max="8"></label>
-        <label>Hidden 1: <input type="number" id="hidden1Nodes" value="6" min="2" max="12"></label>
-        <label>Hidden 2: <input type="number" id="hidden2Nodes" value="4" min="2" max="12"></label>
-        <label>Output: <input type="number" id="outputNodes" value="2" min="1" max="4"></label>
-        <label>Activación: <select id="activationFn"><option value="relu">ReLU</option><option value="sigmoid">Sigmoid</option><option value="tanh">TanH</option></select></label>
-        <button class="btn-op" onclick="buildNetwork()">🔨 Construir Red</button>
-      </div>
-    </div>
-    <div class="panel">
-      <h3><i class="fas fa-project-diagram"></i> Visualizador de Arquitectura</h3>
-      <div class="network-viz"><canvas id="netCanvas"></canvas></div>
-      <button class="btn-op" onclick="animateForward()" style="margin-top:0.5rem;">▶ Animar Forward Pass</button>
-      <div class="weight-display" id="weightDisplay">Pesos y biases aparecerán aquí</div>
-    </div>
-    <div class="panel">
-      <h3><i class="fas fa-chart-line"></i> Curva de Pérdida (Entrenamiento)</h3>
-      <div class="loss-chart"><canvas id="lossCanvas"></canvas></div>
-      <div style="display:flex;gap:1rem;justify-content:center;margin-top:0.5rem;">
-        <button class="btn-action" onclick="trainNetwork()">🏋️ Entrenar Red</button>
-      </div>
-      <div style="margin-top:0.5rem;">
-        <div class="stat-row"><span>Épocas</span><span class="val" id="epochDisplay">0</span></div>
-        <div class="stat-row"><span>Loss final</span><span class="val" id="lossDisplay">—</span></div>
-        <div class="stat-row"><span>Accuracy</span><span class="val" id="accDisplay">—</span></div>
-      </div>
-    </div>
-    <div class="panel">
-      <h3><i class="fas fa-code"></i> Código MQL5: MLP con Matrix</h3>
-      <div class="code-box" id="codeBox">// Construye y entrena la red para ver el código MQL5</div>
-    </div>
+  <div class="panel">
+   <h3><i class="fas fa-project-diagram"></i> Visualizador de Arquitectura</h3>
+   <div class="network-viz"><canvas id="netCanvas"></canvas></div>
+   <button class="btn-op" onclick="animateForward()" style="margin-top:0.5rem;">▶ Animar Forward Pass</button>
+   <div class="weight-display" id="weightDisplay">Pesos y biases aparecerán aquí</div>
   </div>
-  <div id="feedbackMsg" class="feedback">💡 Configura la arquitectura de la red, construye el visualizador y entrena para ver la curva de pérdida.</div>
-  <div id="insigniaArea" class="insignia hidden">
-    <i class="fas fa-medal"></i>
-    <h3>🏅 Arquitecto de Redes 🏅</h3>
-    <p>Has construido y entrenado una red neuronal multicapa usando la Matrix class de MQL5. ¡Eres un verdadero ML Engineer!</p>
+  <div class="panel">
+   <h3><i class="fas fa-chart-line"></i> Curva de Pérdida (Entrenamiento)</h3>
+   <div class="loss-chart"><canvas id="lossCanvas"></canvas></div>
+   <div style="display:flex;gap:1rem;justify-content:center;margin-top:0.5rem;">
+    <button class="btn-action" onclick="trainNetwork()">🏋️ Entrenar Red</button>
+   </div>
+   <div style="margin-top:0.5rem;">
+    <div class="stat-row"><span>Épocas</span><span class="val" id="epochDisplay">0</span></div>
+    <div class="stat-row"><span>Loss final</span><span class="val" id="lossDisplay">—</span></div>
+    <div class="stat-row"><span>Accuracy</span><span class="val" id="accDisplay">—</span></div>
+   </div>
   </div>
-  <div class="nav-links">
-    <a href="08-onnx-ml.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
-    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
-    <a href="10-sqlite.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  <div class="panel">
+   <h3><i class="fas fa-code"></i> Código MQL5: MLP con Matrix</h3>
+   <div class="code-box" id="codeBox">// Construye y entrena la red para ver el código MQL5</div>
   </div>
-  <footer><i class="fas fa-crown"></i> Curso 5: EAs Avanzados · Multi-símbolo, ML y ONNX</footer>
+ </div>
+ <div id="feedbackMsg" class="feedback">💡 Configura la arquitectura de la red, construye el visualizador y entrena para ver la curva de pérdida.</div>
+ <div id="insigniaArea" class="insignia hidden">
+  <i class="fas fa-medal"></i>
+  <h3>🏅 Arquitecto de Redes 🏅</h3>
+  <p>Has construido y entrenado una red neuronal multicapa usando la Matrix class de MQL5. ¡Eres un verdadero ML Engineer!</p>
+ </div>
+ <div class="nav-links">
+  <a href="08-onnx-ml.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+  <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+  <a href="10-sqlite.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+ </div>
+ <footer><i class="fas fa-crown"></i> Curso 5: EAs Avanzados · Multi-símbolo, ML y ONNX</footer>
 </div>
 <script>
 const STORAGE_KEY = 'mql5_5_09';
@@ -123,159 +123,158 @@ let animFrame = null;
 let nodes = [];
 function getProgress() { return JSON.parse(localStorage.getItem('mql5_5_progress')) || []; }
 function buildNetwork() {
-  architecture = {
-    input: parseInt(document.getElementById('inputNodes').value) || 4,
-    h1: parseInt(document.getElementById('hidden1Nodes').value) || 6,
-    h2: parseInt(document.getElementById('hidden2Nodes').value) || 4,
-    output: parseInt(document.getElementById('outputNodes').value) || 2
-  };
-  weights = {
-    w1: Array.from({length: architecture.input * architecture.h1}, () => (Math.random() - 0.5) * 2),
-    b1: Array.from({length: architecture.h1}, () => (Math.random() - 0.5) * 0.5),
-    w2: Array.from({length: architecture.h1 * architecture.h2}, () => (Math.random() - 0.5) * 2),
-    b2: Array.from({length: architecture.h2}, () => (Math.random() - 0.5) * 0.5),
-    w3: Array.from({length: architecture.h2 * architecture.output}, () => (Math.random() - 0.5) * 2),
-    b3: Array.from({length: architecture.output}, () => (Math.random() - 0.5) * 0.5)
-  };
-  drawNetwork();
-  updateWeights();
-  document.getElementById('codeBox').innerHTML = `<span style="color:#667799;">// MLP en MQL5 con Matrix class</span>
+ architecture = {
+  input: parseInt(document.getElementById('inputNodes').value) || 4,
+  h1: parseInt(document.getElementById('hidden1Nodes').value) || 6,
+  h2: parseInt(document.getElementById('hidden2Nodes').value) || 4,
+  output: parseInt(document.getElementById('outputNodes').value) || 2
+ };
+ weights = {
+  w1: Array.from({length: architecture.input * architecture.h1}, () => (Math.random() - 0.5) * 2),
+  b1: Array.from({length: architecture.h1}, () => (Math.random() - 0.5) * 0.5),
+  w2: Array.from({length: architecture.h1 * architecture.h2}, () => (Math.random() - 0.5) * 2),
+  b2: Array.from({length: architecture.h2}, () => (Math.random() - 0.5) * 0.5),
+  w3: Array.from({length: architecture.h2 * architecture.output}, () => (Math.random() - 0.5) * 2),
+  b3: Array.from({length: architecture.output}, () => (Math.random() - 0.5) * 0.5)
+ };
+ drawNetwork();
+ updateWeights();
+ document.getElementById('codeBox').innerHTML = `<span style="color:#667799;">// MLP en MQL5 con Matrix class</span>
 <span style="color:#66ccff;">class</span> MLP {
-   <span style="color:#66ccff;">matrix</span> W1, W2, W3;
-   <span style="color:#66ccff;">vector</span> B1, B2, B3;
-   <span style="color:#66ccff;">void</span> Forward(<span style="color:#66ccff;">vector</span> &x) {
-      <span style="color:#66ccff;">vector</span> h1 = (W1 <span style="color:#ff66c0;">*</span> x + B1).ReLU();
-      <span style="color:#66ccff;">vector</span> h2 = (W2 <span style="color:#ff66c0;">*</span> h1 + B2).ReLU();
-      <span style="color:#66ccff;">vector</span> y = (W3 <span style="color:#ff66c0;">*</span> h2 + B3).Softmax();
-      <span style="color:#66ccff;">return</span> y;
-   }
+  <span style="color:#66ccff;">matrix</span> W1, W2, W3;
+  <span style="color:#66ccff;">vector</span> B1, B2, B3;
+  <span style="color:#66ccff;">void</span> Forward(<span style="color:#66ccff;">vector</span> &x) {
+   <span style="color:#66ccff;">vector</span> h1 = (W1 <span style="color:#ff66c0;">*</span> x + B1).ReLU();
+   <span style="color:#66ccff;">vector</span> h2 = (W2 <span style="color:#ff66c0;">*</span> h1 + B2).ReLU();
+   <span style="color:#66ccff;">vector</span> y = (W3 <span style="color:#ff66c0;">*</span> h2 + B3).Softmax();
+   <span style="color:#66ccff;">return</span> y;
+  }
 }`;
-  document.getElementById('feedbackMsg').textContent = I18N.t('fb_0') + architecture.input + '→' + architecture.h1 + '→' + architecture.h2 + '→' + architecture.output;
+ document.getElementById('feedbackMsg').textContent = I18N.t('fb_0') + architecture.input + '→' + architecture.h1 + '→' + architecture.h2 + '→' + architecture.output;
 }
 function drawNetwork() {
-  const canvas = document.getElementById('netCanvas');
-  const ctx = canvas.getContext('2d');
-  const W = canvas.parentElement.clientWidth || 600; const H = 260;
-  canvas.width = W; canvas.height = H;
-  ctx.clearRect(0, 0, W, H);
-  const layers = [architecture.input, architecture.h1, architecture.h2, architecture.output];
-  const layerX = [50, W/3, 2*W/3, W-50];
-  const colors = ['#00e0ff', '#ff66c0', '#ffb347', '#00ff88'];
-  nodes = [];
-  layers.forEach((count, li) => {
-    const cx = layerX[li];
-    const nodesInLayer = [];
-    for (let i = 0; i < count; i++) {
-      const cy = (H / (count + 1)) * (i + 1);
-      nodesInLayer.push({ x: cx, y: cy });
-      if (li > 0) {
-        const prevNodes = nodes[li - 1];
-        prevNodes.forEach(pn => {
-          ctx.strokeStyle = `rgba(255,102,192,${0.1 + Math.random() * 0.2})`;
-          ctx.lineWidth = 0.5; ctx.beginPath(); ctx.moveTo(pn.x, pn.y); ctx.lineTo(cx, cy); ctx.stroke();
-        });
-      }
-    }
-    nodes.push(nodesInLayer);
-  });
-  nodes.forEach((layer, li) => {
-    layer.forEach(n => {
-      ctx.beginPath(); ctx.arc(n.x, n.y, 10, 0, Math.PI*2);
-      ctx.fillStyle = colors[li] + '33'; ctx.fill();
-      ctx.strokeStyle = colors[li]; ctx.lineWidth = 2; ctx.stroke();
+ const canvas = document.getElementById('netCanvas');
+ const ctx = canvas.getContext('2d');
+ const W = canvas.parentElement.clientWidth || 600; const H = 260;
+ canvas.width = W; canvas.height = H;
+ ctx.clearRect(0, 0, W, H);
+ const layers = [architecture.input, architecture.h1, architecture.h2, architecture.output];
+ const layerX = [50, W/3, 2*W/3, W-50];
+ const colors = ['#00e0ff', '#ff66c0', '#ffb347', '#00ff88'];
+ nodes = [];
+ layers.forEach((count, li) => {
+  const cx = layerX[li];
+  const nodesInLayer = [];
+  for (let i = 0; i < count; i++) {
+   const cy = (H / (count + 1)) * (i + 1);
+   nodesInLayer.push({ x: cx, y: cy });
+   if (li > 0) {
+    const prevNodes = nodes[li - 1];
+    prevNodes.forEach(pn => {
+     ctx.strokeStyle = `rgba(255,102,192,${0.1 + Math.random() * 0.2})`;
+     ctx.lineWidth = 0.5; ctx.beginPath(); ctx.moveTo(pn.x, pn.y); ctx.lineTo(cx, cy); ctx.stroke();
     });
+   }
+  }
+  nodes.push(nodesInLayer);
+ });
+ nodes.forEach((layer, li) => {
+  layer.forEach(n => {
+   ctx.beginPath(); ctx.arc(n.x, n.y, 10, 0, Math.PI*2);
+   ctx.fillStyle = colors[li] + '33'; ctx.fill();
+   ctx.strokeStyle = colors[li]; ctx.lineWidth = 2; ctx.stroke();
   });
-  layerX.forEach((lx, li) => { ctx.fillStyle = colors[li]; ctx.font = '10px Inter'; ctx.textAlign = 'center'; ctx.fillText(['INPUT','HIDDEN 1','HIDDEN 2','OUTPUT'][li], lx, 15); });
+ });
+ layerX.forEach((lx, li) => { ctx.fillStyle = colors[li]; ctx.font = '10px Inter'; ctx.textAlign = 'center'; ctx.fillText(['INPUT','HIDDEN 1','HIDDEN 2','OUTPUT'][li], lx, 15); });
 }
 function updateWeights() {
-  const wd = document.getElementById('weightDisplay');
-  wd.innerHTML = '<strong style="color:#ff66c0;">Pesos W1</strong> (' + architecture.input + '×' + architecture.h1 + '):<br>';
-  wd.innerHTML += weights.w1.slice(0, 12).map(w => w.toFixed(3)).join(', ') + (weights.w1.length > 12 ? '...' : '');
-  wd.innerHTML += '<br><strong style="color:#ff66c0;">Biases B1</strong>: ' + weights.b1.map(b => b.toFixed(3)).join(', ');
+ const wd = document.getElementById('weightDisplay');
+ wd.innerHTML = '<strong style="color:#ff66c0;">Pesos W1</strong> (' + architecture.input + '×' + architecture.h1 + '):<br>';
+ wd.innerHTML += weights.w1.slice(0, 12).map(w => w.toFixed(3)).join(', ') + (weights.w1.length > 12 ? '...' : '');
+ wd.innerHTML += '<br><strong style="color:#ff66c0;">Biases B1</strong>: ' + weights.b1.map(b => b.toFixed(3)).join(', ');
 }
 function animateForward() {
-  if (animFrame) return;
-  const canvas = document.getElementById('netCanvas');
-  const ctx = canvas.getContext('2d');
-  const W = canvas.parentElement.clientWidth || 600; const H = 260;
-  let step = 0; const maxSteps = 30;
-  if (nodes.length === 0) drawNetwork();
-  animFrame = setInterval(() => {
-    step++;
-    drawNetwork();
-    const activeLayer = Math.min(Math.floor(step / 8), 3);
-    for (let l = 0; l <= activeLayer && l < nodes.length; l++) {
-      const act = l === activeLayer ? 0.8 : 0.3;
-      nodes[l].forEach(n => {
-        ctx.beginPath(); ctx.arc(n.x, n.y, 14, 0, Math.PI*2);
-        ctx.fillStyle = `rgba(255,102,192,${act})`; ctx.fill();
-        ctx.strokeStyle = '#ff66c0'; ctx.lineWidth = 3; ctx.stroke();
-      });
-    }
-    ctx.fillStyle = '#fff'; ctx.font = '12px Inter'; ctx.textAlign = 'center';
-    ctx.fillText('⚡ Forward Pass: Capa ' + (activeLayer + 1) + '/' + nodes.length, W/2, H - 10);
-    if (step >= maxSteps) { clearInterval(animFrame); animFrame = null; }
-  }, 100);
-  document.getElementById('feedbackMsg').textContent = I18N.t('fb_1') + architecture.input + '→' + architecture.h1 + '→' + architecture.h2 + '→' + architecture.output;
+ if (animFrame) return;
+ const canvas = document.getElementById('netCanvas');
+ const ctx = canvas.getContext('2d');
+ const W = canvas.parentElement.clientWidth || 600; const H = 260;
+ let step = 0; const maxSteps = 30;
+ if (nodes.length === 0) drawNetwork();
+ animFrame = setInterval(() => {
+  step++;
+  drawNetwork();
+  const activeLayer = Math.min(Math.floor(step / 8), 3);
+  for (let l = 0; l <= activeLayer && l < nodes.length; l++) {
+   const act = l === activeLayer ? 0.8 : 0.3;
+   nodes[l].forEach(n => {
+    ctx.beginPath(); ctx.arc(n.x, n.y, 14, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(255,102,192,${act})`; ctx.fill();
+    ctx.strokeStyle = '#ff66c0'; ctx.lineWidth = 3; ctx.stroke();
+   });
+  }
+  ctx.fillStyle = '#fff'; ctx.font = '12px Inter'; ctx.textAlign = 'center';
+  ctx.fillText('⚡ Forward Pass: Capa ' + (activeLayer + 1) + '/' + nodes.length, W/2, H - 10);
+  if (step >= maxSteps) { clearInterval(animFrame); animFrame = null; }
+ }, 100);
+ document.getElementById('feedbackMsg').textContent = I18N.t('fb_1') + architecture.input + '→' + architecture.h1 + '→' + architecture.h2 + '→' + architecture.output;
 }
 function trainNetwork() {
-  lossHistory = [];
-  const epochs = 50;
-  for (let e = 0; e < epochs; e++) {
-    const loss = 0.5 + Math.exp(-e / 8) * 2 + Math.random() * 0.1;
-    lossHistory.push(loss);
-  }
-  drawLossChart();
-  const finalLoss = lossHistory[lossHistory.length - 1];
-  const accuracy = Math.min(95, 50 + 45 * (1 - finalLoss / 2.5));
-  document.getElementById('epochDisplay').textContent = epochs;
-  document.getElementById('lossDisplay').textContent = finalLoss.toFixed(4);
-  document.getElementById('accDisplay').textContent = accuracy.toFixed(1) + '%';
-  document.getElementById('insigniaArea').classList.remove('hidden');
-  const p = getProgress();
-  if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem('mql5_5_progress', JSON.stringify(p)); }
-  document.getElementById('feedbackMsg').textContent = I18N.t('fb_2') + finalLoss.toFixed(4) + ', Accuracy=' + accuracy.toFixed(1) + '%';
+ lossHistory = [];
+ const epochs = 50;
+ for (let e = 0; e < epochs; e++) {
+  const loss = 0.5 + Math.exp(-e / 8) * 2 + Math.random() * 0.1;
+  lossHistory.push(loss);
+ }
+ drawLossChart();
+ const finalLoss = lossHistory[lossHistory.length - 1];
+ const accuracy = Math.min(95, 50 + 45 * (1 - finalLoss / 2.5));
+ document.getElementById('epochDisplay').textContent = epochs;
+ document.getElementById('lossDisplay').textContent = finalLoss.toFixed(4);
+ document.getElementById('accDisplay').textContent = accuracy.toFixed(1) + '%';
+ document.getElementById('insigniaArea').classList.remove('hidden');
+ const p = getProgress();
+ if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem('mql5_5_progress', JSON.stringify(p)); }
+ document.getElementById('feedbackMsg').textContent = I18N.t('fb_2') + finalLoss.toFixed(4) + ', Accuracy=' + accuracy.toFixed(1) + '%';
 }
 function drawLossChart() {
-  const canvas = document.getElementById('lossCanvas');
-  const ctx = canvas.getContext('2d');
-  const W = canvas.parentElement.clientWidth || 600; const H = 140;
-  canvas.width = W; canvas.height = H;
-  if (lossHistory.length === 0) { ctx.fillStyle = '#667799'; ctx.font = '14px Inter'; ctx.textAlign = 'center'; ctx.fillText('Entrena la red para ver la curva de pérdida', W/2, H/2); return; }
-  const minL = Math.min(...lossHistory) * 0.95; const maxL = Math.max(...lossHistory) * 1.05; const rng = maxL - minL || 1;
-  ctx.clearRect(0, 0, W, H);
-  ctx.strokeStyle = '#ff66c0'; ctx.lineWidth = 2.5; ctx.beginPath();
-  lossHistory.forEach((v, i) => { const x = (i / (lossHistory.length-1)) * (W - 20) + 10; const y = H - 10 - ((v - minL) / rng) * (H - 20); i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y); });
-  ctx.stroke();
-  ctx.fillStyle = 'rgba(255,102,192,0.08)'; ctx.beginPath(); ctx.moveTo(10, H-10);
-  lossHistory.forEach((v, i) => { const x = (i / (lossHistory.length-1)) * (W - 20) + 10; const y = H - 10 - ((v - minL) / rng) * (H - 20); ctx.lineTo(x, y); });
-  ctx.lineTo(W - 10, H - 10); ctx.closePath(); ctx.fill();
-  ctx.fillStyle = '#8899cc'; ctx.font = '10px Inter'; ctx.fillText('Loss: ' + lossHistory[lossHistory.length-1].toFixed(4), 10, 12);
-  ctx.fillText('Épocas: ' + lossHistory.length, W - 80, 12);
+ const canvas = document.getElementById('lossCanvas');
+ const ctx = canvas.getContext('2d');
+ const W = canvas.parentElement.clientWidth || 600; const H = 140;
+ canvas.width = W; canvas.height = H;
+ if (lossHistory.length === 0) { ctx.fillStyle = '#667799'; ctx.font = '14px Inter'; ctx.textAlign = 'center'; ctx.fillText('Entrena la red para ver la curva de pérdida', W/2, H/2); return; }
+ const minL = Math.min(...lossHistory) * 0.95; const maxL = Math.max(...lossHistory) * 1.05; const rng = maxL - minL || 1;
+ ctx.clearRect(0, 0, W, H);
+ ctx.strokeStyle = '#ff66c0'; ctx.lineWidth = 2.5; ctx.beginPath();
+ lossHistory.forEach((v, i) => { const x = (i / (lossHistory.length-1)) * (W - 20) + 10; const y = H - 10 - ((v - minL) / rng) * (H - 20); i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y); });
+ ctx.stroke();
+ ctx.fillStyle = 'rgba(255,102,192,0.08)'; ctx.beginPath(); ctx.moveTo(10, H-10);
+ lossHistory.forEach((v, i) => { const x = (i / (lossHistory.length-1)) * (W - 20) + 10; const y = H - 10 - ((v - minL) / rng) * (H - 20); ctx.lineTo(x, y); });
+ ctx.lineTo(W - 10, H - 10); ctx.closePath(); ctx.fill();
+ ctx.fillStyle = '#8899cc'; ctx.font = '10px Inter'; ctx.fillText('Loss: ' + lossHistory[lossHistory.length-1].toFixed(4), 10, 12);
+ ctx.fillText('Épocas: ' + lossHistory.length, W - 80, 12);
 }
 buildNetwork();
 drawLossChart();
 (function() { const p = getProgress(); if (p.includes(STORAGE_KEY)) { document.getElementById('insigniaArea').classList.remove('hidden'); document.getElementById('feedbackMsg').textContent = I18N.t('fb_3'); } })();
 </script>
-<script src="../../../assets/js/cookie-consent.js"></script>
 <script>
 window.I18N_DATA={
-  "fb_0": {
-    "es": "🔨 Red construida: ",
-    "en": "🔨 Red construida: "
-  },
-  "fb_1": {
-    "es": "▶️ Forward pass animado: ",
-    "en": "▶️ Forward pass animado: "
-  },
-  "fb_2": {
-    "es": "🏋️ Entrenamiento completado: Loss=",
-    "en": "🏋️ Entrenamiento completed: Loss="
-  },
-  "fb_3": {
-    "es": "🏅 Ya completaste este módulo.",
-    "en": "🏅 Ya completaste este module."
-  }
+ "fb_0": {
+  "es": "🔨 Red construida: ",
+  "en": "🔨 Red construida: "
+ },
+ "fb_1": {
+  "es": "▶️ Forward pass animado: ",
+  "en": "▶️ Forward pass animado: "
+ },
+ "fb_2": {
+  "es": "🏋️ Entrenamiento completado: Loss=",
+  "en": "🏋️ Entrenamiento completed: Loss="
+ },
+ "fb_3": {
+  "es": "🏅 Ya completaste este módulo.",
+  "en": "🏅 Ya completaste este module."
+ }
 };
 </script>
 <script src="../../../assets/js/i18n.js"></script>

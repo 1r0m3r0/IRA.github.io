@@ -1,289 +1,289 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Estrategias y Backtesting | Optimización</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #111a2e 100%);
-      background-size: 200% 200%; animation: gradientShift 20s ease infinite;
-      font-family: 'Inter', sans-serif; color: #eef5ff; min-height: 100vh;
-      display: flex; align-items: center; justify-content: center; padding: 2rem 1rem;
-    }
-    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-    .curso3-container {
-      max-width: 1300px; width: 100%;
-      background: rgba(15, 25, 45, 0.65); backdrop-filter: blur(12px);
-      border-radius: 3rem; border: 1px solid rgba(0, 255, 200, 0.25);
-      box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden;
-    }
-    .hero-header { background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%); padding: 2rem 2rem 1.5rem; text-align: center; border-bottom: 2px solid #00ffc8; }
-    .hero-header h1 { font-size: 2.6rem; font-weight: 800; background: linear-gradient(135deg, #FFF, #66ffe0, #00ffc8); -webkit-background-clip: text; background-clip: text; color: transparent; }
-    .hero-header p { font-size: 1.1rem; color: #b9e2ff; margin-top: 0.3rem; }
-    .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
-    .chip { background: rgba(0,255,200,0.15); border: 1px solid #00ffc8; padding: 0.3rem 1rem; border-radius: 40px; font-size: 0.8rem; font-weight: 600; }
-    .analogy-card { background: #1e2a3acc; margin: 1.5rem 2rem; padding: 1.2rem 1.8rem; border-radius: 2rem; border-left: 8px solid #00ffc8; font-size: 1rem; line-height: 1.6; }
-    .main-area { padding: 0.5rem 2rem; }
-    .feedback { background: #00000099; margin: 1.5rem 2rem; padding: 1rem; border-radius: 1.5rem; text-align: center; font-weight: 500; border-left: 4px solid #00ffc8; }
-    .insignia { text-align: center; background: #0c1b2f; border-radius: 2rem; margin: 0 2rem 1.5rem; padding: 1rem; border: 1px dashed gold; }
-    .insignia i { font-size: 2.5rem; color: gold; }
-    .hidden { display: none; }
-    .btn-action { background: linear-gradient(95deg, #f0a500, #ff6a00); border: none; padding: 0.8rem 1.8rem; font-weight: bold; border-radius: 3rem; cursor: pointer; font-size: 1rem; transition: 0.2s; color: #1e1a0c; }
-    .btn-action:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(240,165,0,0.5); }
-    .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
-    .nav-link { background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem; font-weight: 600; text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; }
-    .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(0,255,200,0.4); }
-    .nav-link.next { background: linear-gradient(95deg, #f0a500, #ff6a00); color: #1e1a0c; }
-    .nav-link.menu { background: #1a2a4a; border: 1px solid #3399ff; }
-    footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
-    .param-group { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin: 1rem 0; }
-    .param-group label { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; font-size: 0.8rem; }
-    .param-group input { width: 60px; padding: 0.3rem; border-radius: 0.6rem; border: 1px solid #2c3e66; background: #0f1a2e; color: #eef5ff; text-align: center; }
-    .heatmap-container { background: #0c1222; border-radius: 1.5rem; padding: 1rem; margin: 1rem 0; overflow-x: auto; text-align: center; }
-    .heatmap-container canvas { margin: 0 auto; }
-    .best-result { background: #0a2a1a; border: 1px solid #00ff88; border-radius: 1.2rem; padding: 1rem; margin: 0.5rem 0; text-align: center; }
-    .best-result .big { font-size: 1.6rem; font-weight: 800; color: #00ff88; }
-    .opt-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap: 0.5rem; margin: 0.5rem 0; }
-    .opt-stat { background: #1a2640cc; border-radius: 0.8rem; padding: 0.6rem; text-align: center; border: 1px solid #2c3e66; }
-    .opt-stat .val { font-size: 1.1rem; font-weight: 700; color: #66ffe0; }
-    .opt-stat .label { font-size: 0.7rem; color: #8899bb; }
-    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
-  </style>
-  <link rel="stylesheet" href="../../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Estrategias y Backtesting | OptimizaciÃ³n</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+   background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #111a2e 100%);
+   background-size: 200% 200%; animation: gradientShift 20s ease infinite;
+   font-family: 'Inter', sans-serif; color: #eef5ff; min-height: 100vh;
+   display: flex; align-items: center; justify-content: center; padding: 2rem 1rem;
+  }
+  @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .curso3-container {
+   max-width: 1300px; width: 100%;
+   background: rgba(15, 25, 45, 0.65); backdrop-filter: blur(12px);
+   border-radius: 3rem; border: 1px solid rgba(0, 255, 200, 0.25);
+   box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden;
+  }
+  .hero-header { background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%); padding: 2rem 2rem 1.5rem; text-align: center; border-bottom: 2px solid #00ffc8; }
+  .hero-header h1 { font-size: 2.6rem; font-weight: 800; background: linear-gradient(135deg, #FFF, #66ffe0, #00ffc8); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero-header p { font-size: 1.1rem; color: #b9e2ff; margin-top: 0.3rem; }
+  .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
+  .chip { background: rgba(0,255,200,0.15); border: 1px solid #00ffc8; padding: 0.3rem 1rem; border-radius: 40px; font-size: 0.8rem; font-weight: 600; }
+  .analogy-card { background: #1e2a3acc; margin: 1.5rem 2rem; padding: 1.2rem 1.8rem; border-radius: 2rem; border-left: 8px solid #00ffc8; font-size: 1rem; line-height: 1.6; }
+  .main-area { padding: 0.5rem 2rem; }
+  .feedback { background: #00000099; margin: 1.5rem 2rem; padding: 1rem; border-radius: 1.5rem; text-align: center; font-weight: 500; border-left: 4px solid #00ffc8; }
+  .insignia { text-align: center; background: #0c1b2f; border-radius: 2rem; margin: 0 2rem 1.5rem; padding: 1rem; border: 1px dashed gold; }
+  .insignia i { font-size: 2.5rem; color: gold; }
+  .hidden { display: none; }
+  .btn-action { background: linear-gradient(95deg, #f0a500, #ff6a00); border: none; padding: 0.8rem 1.8rem; font-weight: bold; border-radius: 3rem; cursor: pointer; font-size: 1rem; transition: 0.2s; color: #1e1a0c; }
+  .btn-action:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(240,165,0,0.5); }
+  .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
+  .nav-link { background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem; font-weight: 600; text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; }
+  .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(0,255,200,0.4); }
+  .nav-link.next { background: linear-gradient(95deg, #f0a500, #ff6a00); color: #1e1a0c; }
+  .nav-link.menu { background: #1a2a4a; border: 1px solid #3399ff; }
+  footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
+  .param-group { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin: 1rem 0; }
+  .param-group label { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; font-size: 0.8rem; }
+  .param-group input { width: 60px; padding: 0.3rem; border-radius: 0.6rem; border: 1px solid #2c3e66; background: #0f1a2e; color: #eef5ff; text-align: center; }
+  .heatmap-container { background: #0c1222; border-radius: 1.5rem; padding: 1rem; margin: 1rem 0; overflow-x: auto; text-align: center; }
+  .heatmap-container canvas { margin: 0 auto; }
+  .best-result { background: #0a2a1a; border: 1px solid #00ff88; border-radius: 1.2rem; padding: 1rem; margin: 0.5rem 0; text-align: center; }
+  .best-result .big { font-size: 1.6rem; font-weight: 800; color: #00ff88; }
+  .opt-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap: 0.5rem; margin: 0.5rem 0; }
+  .opt-stat { background: #1a2640cc; border-radius: 0.8rem; padding: 0.6rem; text-align: center; border: 1px solid #2c3e66; }
+  .opt-stat .val { font-size: 1.1rem; font-weight: 700; color: #66ffe0; }
+  .opt-stat .label { font-size: 0.7rem; color: #8899bb; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
+ </style>
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
 </head>
 <body>
-  <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a></nav>
+ <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a></nav>
 
-  <div class="curso3-container">
-    <div class="hero-header">
-      <h1>🎯 OPTIMIZACIÓN</h1>
-      <p>Grid search, optimización bayesiana de parámetros</p>
-      <div class="badge-area">
-        <span class="chip"><i class="fas fa-th"></i> Grid Search</span>
-        <span class="chip"><i class="fas fa-fire"></i> Heatmap</span>
-      </div>
-    </div>
-    <div class="analogy-card"><strong>🎯 Piénsalo así:</strong> Optimizar parámetros es como buscar la temperatura perfecta para una ducha: muy fría no funciona, muy caliente te quemas. El grid search prueba todas las temperaturas hasta encontrar la ideal.</div>
-    <div class="main-area">
-      <div class="param-group">
-        <label>SMA Rápida Min <input type="number" id="fastMin" value="5" min="2" max="40" step="5"></label>
-        <label>Max <input type="number" id="fastMax" value="30" min="5" max="50" step="5"></label>
-        <label>SMA Lenta Min <input type="number" id="slowMin" value="20" min="10" max="50" step="10"></label>
-        <label>Max <input type="number" id="slowMax" value="100" min="20" max="200" step="10"></label>
-        <button id="runBtn" class="btn-action"><i class="fas fa-search"></i> Grid Search</button>
-      </div>
-      <div class="heatmap-container">
-        <canvas id="heatmapCanvas" height="300"></canvas>
-      </div>
-      <div id="bestResult" class="best-result hidden">
-        <div class="big" id="bestSharpeVal">0.00</div>
-        <div class="label-sm" id="bestParams">SMA Rápida: — | SMA Lenta: —</div>
-      </div>
-      <div class="opt-stats" id="optStats">
-        <div class="opt-stat"><div class="val" id="combosVal">0</div><div class="label">Combinaciones</div></div>
-        <div class="opt-stat"><div class="val" id="meanSharpeVal">0</div><div class="label">Sharpe Promedio</div></div>
-        <div class="opt-stat"><div class="val" id="sharpeStdVal">0</div><div class="label">Sharpe Std</div></div>
-        <div class="opt-stat"><div class="val" id="stablePct">0%</div><div class="label">Zona Estable</div></div>
-      </div>
-    </div>
-    <div id="feedbackMsg" class="feedback">💡 Define rangos de parámetros y ejecuta grid search. El heatmap muestra el Sharpe para cada combinación. Busca zonas de estabilidad.</div>
-    <div id="insigniaArea" class="insignia hidden">
-      <i class="fas fa-medal"></i>
-      <h3>🏅 OPTIMIZADOR MAESTRO 🏅</h3>
-      <p>¡Dominas el grid search y sabes encontrar zonas de estabilidad en los parámetros!</p>
-    </div>
-    <div class="nav-links">
-      <a href="10-sesgos.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
-      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
-      <a href="12-certificado.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
-    </div>
-    <footer><i class="fas fa-crown"></i> Estrategias y Backtesting · Trading Algorítmico con Python</footer>
+ <div class="curso3-container">
+  <div class="hero-header">
+   <h1>ðŸŽ¯ OPTIMIZACIÃ“N</h1>
+   <p>Grid search, optimizaciÃ³n bayesiana de parÃ¡metros</p>
+   <div class="badge-area">
+    <span class="chip"><i class="fas fa-th"></i> Grid Search</span>
+    <span class="chip"><i class="fas fa-fire"></i> Heatmap</span>
+   </div>
   </div>
+  <div class="analogy-card"><strong>ðŸŽ¯ PiÃ©nsalo asÃ­:</strong> Optimizar parÃ¡metros es como buscar la temperatura perfecta para una ducha: muy frÃ­a no funciona, muy caliente te quemas. El grid search prueba todas las temperaturas hasta encontrar la ideal.</div>
+  <div class="main-area">
+   <div class="param-group">
+    <label>SMA RÃ¡pida Min <input type="number" id="fastMin" value="5" min="2" max="40" step="5"></label>
+    <label>Max <input type="number" id="fastMax" value="30" min="5" max="50" step="5"></label>
+    <label>SMA Lenta Min <input type="number" id="slowMin" value="20" min="10" max="50" step="10"></label>
+    <label>Max <input type="number" id="slowMax" value="100" min="20" max="200" step="10"></label>
+    <button id="runBtn" class="btn-action"><i class="fas fa-search"></i> Grid Search</button>
+   </div>
+   <div class="heatmap-container">
+    <canvas id="heatmapCanvas" height="300"></canvas>
+   </div>
+   <div id="bestResult" class="best-result hidden">
+    <div class="big" id="bestSharpeVal">0.00</div>
+    <div class="label-sm" id="bestParams">SMA RÃ¡pida: â€” | SMA Lenta: â€”</div>
+   </div>
+   <div class="opt-stats" id="optStats">
+    <div class="opt-stat"><div class="val" id="combosVal">0</div><div class="label">Combinaciones</div></div>
+    <div class="opt-stat"><div class="val" id="meanSharpeVal">0</div><div class="label">Sharpe Promedio</div></div>
+    <div class="opt-stat"><div class="val" id="sharpeStdVal">0</div><div class="label">Sharpe Std</div></div>
+    <div class="opt-stat"><div class="val" id="stablePct">0%</div><div class="label">Zona Estable</div></div>
+   </div>
+  </div>
+  <div id="feedbackMsg" class="feedback">ðŸ’¡ Define rangos de parÃ¡metros y ejecuta grid search. El heatmap muestra el Sharpe para cada combinaciÃ³n. Busca zonas de estabilidad.</div>
+  <div id="insigniaArea" class="insignia hidden">
+   <i class="fas fa-medal"></i>
+   <h3>ðŸ… OPTIMIZADOR MAESTRO ðŸ…</h3>
+   <p>Â¡Dominas el grid search y sabes encontrar zonas de estabilidad en los parÃ¡metros!</p>
+  </div>
+  <div class="nav-links">
+   <a href="10-sesgos.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
+   <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> MenÃº</a>
+   <a href="12-certificado.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Estrategias y Backtesting Â· Trading AlgorÃ­tmico con Python</footer>
+ </div>
 
-  <script>
-    const STORAGE_KEY = 'py_trade_3_11';
+ <script>
+  const STORAGE_KEY = 'py_trade_3_11';
 
-    function runGridSearch() {
-      const fastMin = parseInt(document.getElementById('fastMin').value) || 5;
-      const fastMax = parseInt(document.getElementById('fastMax').value) || 30;
-      const slowMin = parseInt(document.getElementById('slowMin').value) || 20;
-      const slowMax = parseInt(document.getElementById('slowMax').value) || 100;
+  function runGridSearch() {
+   const fastMin = parseInt(document.getElementById('fastMin').value) || 5;
+   const fastMax = parseInt(document.getElementById('fastMax').value) || 30;
+   const slowMin = parseInt(document.getElementById('slowMin').value) || 20;
+   const slowMax = parseInt(document.getElementById('slowMax').value) || 100;
 
-      // Generate price data
-      const n = 500;
-      const prices = [];
-      let p = 100;
-      for (let i = 0; i < n; i++) {
-        p += p * (Math.random() - 0.48) * 0.025;
-        prices.push(Math.max(p, 50));
-      }
+   // Generate price data
+   const n = 500;
+   const prices = [];
+   let p = 100;
+   for (let i = 0; i < n; i++) {
+    p += p * (Math.random() - 0.48) * 0.025;
+    prices.push(Math.max(p, 50));
+   }
 
-      const fastValues = [];
-      for (let f = fastMin; f <= fastMax; f += Math.max(1, Math.floor((fastMax - fastMin) / 15))) {
-        if (!fastValues.includes(f)) fastValues.push(f);
-      }
+   const fastValues = [];
+   for (let f = fastMin; f <= fastMax; f += Math.max(1, Math.floor((fastMax - fastMin) / 15))) {
+    if (!fastValues.includes(f)) fastValues.push(f);
+   }
 
-      const slowValues = [];
-      for (let s = slowMin; s <= slowMax; s += Math.max(5, Math.floor((slowMax - slowMin) / 15))) {
-        if (!slowValues.includes(s)) slowValues.push(s);
-      }
+   const slowValues = [];
+   for (let s = slowMin; s <= slowMax; s += Math.max(5, Math.floor((slowMax - slowMin) / 15))) {
+    if (!slowValues.includes(s)) slowValues.push(s);
+   }
 
-      const results = [];
-      let bestSharpe = -Infinity;
-      let bestFast = 0, bestSlow = 0;
-      let sumSharpe = 0, count = 0;
-      let stableCount = 0;
+   const results = [];
+   let bestSharpe = -Infinity;
+   let bestFast = 0, bestSlow = 0;
+   let sumSharpe = 0, count = 0;
+   let stableCount = 0;
 
-      fastValues.forEach(fast => {
-        slowValues.forEach(slow => {
-          if (fast >= slow) return;
-          const sharpe = calcSharpe(prices, fast, slow);
-          results.push({ fast, slow, sharpe });
-          sumSharpe += sharpe;
-          count++;
-          if (sharpe > bestSharpe) {
-            bestSharpe = sharpe;
-            bestFast = fast;
-            bestSlow = slow;
-          }
-        });
-      });
+   fastValues.forEach(fast => {
+    slowValues.forEach(slow => {
+     if (fast >= slow) return;
+     const sharpe = calcSharpe(prices, fast, slow);
+     results.push({ fast, slow, sharpe });
+     sumSharpe += sharpe;
+     count++;
+     if (sharpe > bestSharpe) {
+      bestSharpe = sharpe;
+      bestFast = fast;
+      bestSlow = slow;
+     }
+    });
+   });
 
-      const meanSharpe = sumSharpe / count;
-      const stdSharpe = Math.sqrt(results.reduce((sum, r) => sum + Math.pow(r.sharpe - meanSharpe, 2), 0) / count);
-      const threshold = meanSharpe + 0.3 * stdSharpe;
-      results.forEach(r => { if (r.sharpe >= threshold) stableCount++; });
+   const meanSharpe = sumSharpe / count;
+   const stdSharpe = Math.sqrt(results.reduce((sum, r) => sum + Math.pow(r.sharpe - meanSharpe, 2), 0) / count);
+   const threshold = meanSharpe + 0.3 * stdSharpe;
+   results.forEach(r => { if (r.sharpe >= threshold) stableCount++; });
 
-      document.getElementById('combosVal').textContent = count;
-      document.getElementById('meanSharpeVal').textContent = meanSharpe.toFixed(2);
-      document.getElementById('sharpeStdVal').textContent = stdSharpe.toFixed(2);
-      document.getElementById('stablePct').textContent = (stableCount / count * 100).toFixed(0) + '%';
+   document.getElementById('combosVal').textContent = count;
+   document.getElementById('meanSharpeVal').textContent = meanSharpe.toFixed(2);
+   document.getElementById('sharpeStdVal').textContent = stdSharpe.toFixed(2);
+   document.getElementById('stablePct').textContent = (stableCount / count * 100).toFixed(0) + '%';
 
-      const bestDiv = document.getElementById('bestResult');
-      bestDiv.classList.remove('hidden');
-      document.getElementById('bestSharpeVal').textContent = bestSharpe.toFixed(2);
-      document.getElementById('bestParams').textContent = I18N.t('fb_0') + bestFast + ' | SMA Lenta: ' + bestSlow;
+   const bestDiv = document.getElementById('bestResult');
+   bestDiv.classList.remove('hidden');
+   document.getElementById('bestSharpeVal').textContent = bestSharpe.toFixed(2);
+   document.getElementById('bestParams').textContent = I18N.t('fb_0') + bestFast + ' | SMA Lenta: ' + bestSlow;
 
-      drawHeatmap(fastValues, slowValues, results);
+   drawHeatmap(fastValues, slowValues, results);
 
-      document.getElementById('feedbackMsg').textContent = I18N.t('fb_1') + count + ' combinaciones | Mejor Sharpe: ' + bestSharpe.toFixed(2) + ' (SMA ' + bestFast + '/' + bestSlow + ')';
+   document.getElementById('feedbackMsg').textContent = I18N.t('fb_1') + count + ' combinaciones | Mejor Sharpe: ' + bestSharpe.toFixed(2) + ' (SMA ' + bestFast + '/' + bestSlow + ')';
 
-      if (bestSharpe > 0.8 && stableCount / count > 0.2) {
-        document.getElementById('insigniaArea').classList.remove('hidden');
-        localStorage.setItem(STORAGE_KEY, 'true');
-      }
+   if (bestSharpe > 0.8 && stableCount / count > 0.2) {
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    localStorage.setItem(STORAGE_KEY, 'true');
+   }
+  }
+
+  function calcSharpe(data, fast, slow) {
+   if (data.length < slow) return -999;
+   const returns = [];
+   for (let i = slow; i < data.length; i++) {
+    let sumFast = 0, sumSlow = 0;
+    for (let j = 0; j < fast; j++) sumFast += data[i - j];
+    for (let j = 0; j < slow; j++) sumSlow += data[i - j];
+    const smaFast = sumFast / fast;
+    const smaSlow = sumSlow / slow;
+    if (i > slow) {
+     let prevSumFast = 0; for (let j = 0; j < fast; j++) prevSumFast += data[i - 1 - j];
+     let prevSumSlow = 0; for (let j = 0; j < slow; j++) prevSumSlow += data[i - 1 - j];
+     const prevFast = prevSumFast / fast;
+     const prevSlow = prevSumSlow / slow;
+     if (prevFast <= prevSlow && smaFast > smaSlow) {
+      returns.push((data[i] - data[i-1]) / data[i-1]);
+     } else if (prevFast >= prevSlow && smaFast < smaSlow) {
+      returns.push((data[i-1] - data[i]) / data[i]);
+     }
     }
+   }
+   if (returns.length < 5) return -1;
+   const avgRet = returns.reduce((a, b) => a + b, 0) / returns.length;
+   const std = Math.sqrt(returns.reduce((sum, r) => sum + Math.pow(r - avgRet, 2), 0) / returns.length);
+   return std === 0 ? 0 : (avgRet / std) * Math.sqrt(252);
+  }
 
-    function calcSharpe(data, fast, slow) {
-      if (data.length < slow) return -999;
-      const returns = [];
-      for (let i = slow; i < data.length; i++) {
-        let sumFast = 0, sumSlow = 0;
-        for (let j = 0; j < fast; j++) sumFast += data[i - j];
-        for (let j = 0; j < slow; j++) sumSlow += data[i - j];
-        const smaFast = sumFast / fast;
-        const smaSlow = sumSlow / slow;
-        if (i > slow) {
-          let prevSumFast = 0; for (let j = 0; j < fast; j++) prevSumFast += data[i - 1 - j];
-          let prevSumSlow = 0; for (let j = 0; j < slow; j++) prevSumSlow += data[i - 1 - j];
-          const prevFast = prevSumFast / fast;
-          const prevSlow = prevSumSlow / slow;
-          if (prevFast <= prevSlow && smaFast > smaSlow) {
-            returns.push((data[i] - data[i-1]) / data[i-1]);
-          } else if (prevFast >= prevSlow && smaFast < smaSlow) {
-            returns.push((data[i-1] - data[i]) / data[i]);
-          }
-        }
-      }
-      if (returns.length < 5) return -1;
-      const avgRet = returns.reduce((a, b) => a + b, 0) / returns.length;
-      const std = Math.sqrt(returns.reduce((sum, r) => sum + Math.pow(r - avgRet, 2), 0) / returns.length);
-      return std === 0 ? 0 : (avgRet / std) * Math.sqrt(252);
-    }
+  function drawHeatmap(fastVals, slowVals, results) {
+   const canvas = document.getElementById('heatmapCanvas');
+   const ctx = canvas.getContext('2d');
+   const W = canvas.parentElement.clientWidth - 40;
+   canvas.width = Math.max(W, 500);
+   canvas.height = Math.max(300, slowVals.length * 25 + 60);
 
-    function drawHeatmap(fastVals, slowVals, results) {
-      const canvas = document.getElementById('heatmapCanvas');
-      const ctx = canvas.getContext('2d');
-      const W = canvas.parentElement.clientWidth - 40;
-      canvas.width = Math.max(W, 500);
-      canvas.height = Math.max(300, slowVals.length * 25 + 60);
+   ctx.clearRect(0, 0, canvas.width, canvas.height);
+   ctx.fillStyle = '#0c1222';
+   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = '#0c1222';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+   const margin = { top: 30, bottom: 30, left: 60, right: 20 };
+   const cellW = (canvas.width - margin.left - margin.right) / fastVals.length;
+   const cellH = (canvas.height - margin.top - margin.bottom) / slowVals.length;
 
-      const margin = { top: 30, bottom: 30, left: 60, right: 20 };
-      const cellW = (canvas.width - margin.left - margin.right) / fastVals.length;
-      const cellH = (canvas.height - margin.top - margin.bottom) / slowVals.length;
+   const sharpeValues = results.map(r => r.sharpe);
+   const minS = Math.min(...sharpeValues);
+   const maxS = Math.max(...sharpeValues);
+   const range = maxS - minS || 1;
 
-      const sharpeValues = results.map(r => r.sharpe);
-      const minS = Math.min(...sharpeValues);
-      const maxS = Math.max(...sharpeValues);
-      const range = maxS - minS || 1;
+   results.forEach(r => {
+    const fx = fastVals.indexOf(r.fast);
+    const sy = slowVals.indexOf(r.slow);
+    if (fx === -1 || sy === -1) return;
+    const norm = (r.sharpe - minS) / range;
+    const rv = Math.round(norm * 80 + 20);
+    const gv = Math.round((1 - Math.abs(norm - 0.5) * 2) * 180);
+    const bv = Math.round((1 - norm) * 80 + 20);
+    ctx.fillStyle = `rgb(${rv}, ${gv}, ${bv})`;
+    ctx.fillRect(margin.left + fx * cellW, margin.top + sy * cellH, cellW, cellH);
+    ctx.strokeStyle = '#2c3e6644';
+    ctx.strokeRect(margin.left + fx * cellW, margin.top + sy * cellH, cellW, cellH);
 
-      results.forEach(r => {
-        const fx = fastVals.indexOf(r.fast);
-        const sy = slowVals.indexOf(r.slow);
-        if (fx === -1 || sy === -1) return;
-        const norm = (r.sharpe - minS) / range;
-        const rv = Math.round(norm * 80 + 20);
-        const gv = Math.round((1 - Math.abs(norm - 0.5) * 2) * 180);
-        const bv = Math.round((1 - norm) * 80 + 20);
-        ctx.fillStyle = `rgb(${rv}, ${gv}, ${bv})`;
-        ctx.fillRect(margin.left + fx * cellW, margin.top + sy * cellH, cellW, cellH);
-        ctx.strokeStyle = '#2c3e6644';
-        ctx.strokeRect(margin.left + fx * cellW, margin.top + sy * cellH, cellW, cellH);
+    ctx.fillStyle = '#eef5ff';
+    ctx.font = '10px Inter';
+    ctx.textAlign = 'center';
+    ctx.fillText(r.sharpe.toFixed(1), margin.left + fx * cellW + cellW/2, margin.top + sy * cellH + cellH/2 + 3);
+   });
 
-        ctx.fillStyle = '#eef5ff';
-        ctx.font = '10px Inter';
-        ctx.textAlign = 'center';
-        ctx.fillText(r.sharpe.toFixed(1), margin.left + fx * cellW + cellW/2, margin.top + sy * cellH + cellH/2 + 3);
-      });
+   ctx.fillStyle = '#8899bb';
+   ctx.font = '10px Inter';
+   ctx.textAlign = 'center';
+   fastVals.forEach((v, i) => {
+    ctx.fillText(v, margin.left + i * cellW + cellW/2, canvas.height - 8);
+   });
 
-      ctx.fillStyle = '#8899bb';
-      ctx.font = '10px Inter';
-      ctx.textAlign = 'center';
-      fastVals.forEach((v, i) => {
-        ctx.fillText(v, margin.left + i * cellW + cellW/2, canvas.height - 8);
-      });
+   ctx.textAlign = 'right';
+   slowVals.forEach((v, i) => {
+    ctx.fillText(v, margin.left - 6, margin.top + i * cellH + cellH/2 + 3);
+   });
 
-      ctx.textAlign = 'right';
-      slowVals.forEach((v, i) => {
-        ctx.fillText(v, margin.left - 6, margin.top + i * cellH + cellH/2 + 3);
-      });
+   ctx.textAlign = 'left';
+   ctx.fillStyle = '#8899bb';
+   ctx.font = '11px Inter';
+   ctx.fillText('SMA RÃ¡pida â†’', margin.left, 14);
+   ctx.save();
+   ctx.translate(10, margin.top + (canvas.height - margin.top - margin.bottom)/2);
+   ctx.rotate(-Math.PI/2);
+   ctx.textAlign = 'center';
+   ctx.fillText('SMA Lenta â†’', 0, 0);
+   ctx.restore();
+  }
 
-      ctx.textAlign = 'left';
-      ctx.fillStyle = '#8899bb';
-      ctx.font = '11px Inter';
-      ctx.fillText('SMA Rápida →', margin.left, 14);
-      ctx.save();
-      ctx.translate(10, margin.top + (canvas.height - margin.top - margin.bottom)/2);
-      ctx.rotate(-Math.PI/2);
-      ctx.textAlign = 'center';
-      ctx.fillText('SMA Lenta →', 0, 0);
-      ctx.restore();
-    }
-
-    document.getElementById('runBtn').addEventListener('click', runGridSearch);
-    runGridSearch();
-  </script>
+  document.getElementById('runBtn').addEventListener('click', runGridSearch);
+  runGridSearch();
+ </script>
 <script>
 window.I18N_DATA={
-  "fb_0": {
-    "es": "SMA Rápida: ",
-    "en": "SMA Rápida: "
-  },
-  "fb_1": {
-    "es": "📊 Grid search completado: ",
-    "en": "📊 Grid search completed: "
-  }
+ "fb_0": {
+  "es": "SMA RÃ¡pida: ",
+  "en": "SMA RÃ¡pida: "
+ },
+ "fb_1": {
+  "es": "ðŸ“Š Grid search completado: ",
+  "en": "ðŸ“Š Grid search completed: "
+ }
 };
 </script>
 <script src="../../../assets/js/i18n.js"></script>
-</body>
+ </body>
 </html>
 

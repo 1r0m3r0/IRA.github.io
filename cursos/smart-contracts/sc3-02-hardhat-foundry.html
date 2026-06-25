@@ -1,283 +1,283 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hardhat & Foundry | Smart Contracts DeFi</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700;14..32,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-    body{background:linear-gradient(145deg,#080a00,#121800);font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:2rem 1rem}
-    .container{max-width:1300px;width:100%;background:rgba(10,12,0,.88);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(100,220,0,.22);box-shadow:0 25px 55px rgba(0,0,0,.65);overflow:hidden}
-    .hero{background:linear-gradient(95deg,#080a00,#121800);padding:1.8rem 2rem;text-align:center;border-bottom:2px solid #64dc00}
-    .hero h1{font-size:1.9rem;font-weight:800;background:linear-gradient(135deg,#e8ffc8,#aaff50,#64dc00);-webkit-background-clip:text;background-clip:text;color:transparent}
-    .hero p{margin-top:.5rem;font-size:.95rem;color:#4a8800}
-    .chips{display:flex;justify-content:center;gap:.6rem;flex-wrap:wrap;margin-top:.7rem}
-    .chip{background:rgba(100,220,0,.1);border:1px solid rgba(100,220,0,.3);color:#3a6600;font-size:.72rem;padding:.25rem .8rem;border-radius:2rem}
-    .week-badge{display:inline-block;background:rgba(100,220,0,.15);border:1px solid #64dc00;color:#64dc00;font-size:.75rem;font-weight:700;padding:.3rem 1rem;border-radius:2rem;margin-top:.5rem}
-    .analogy{background:#0a0c00cc;margin:1.4rem 2rem;padding:1.1rem 1.7rem;border-radius:2rem;border-left:7px solid #64dc00;font-size:.9rem;line-height:1.65}
-    .analogy strong{color:#aaff50}
-    .tabs{display:flex;gap:.4rem;padding:.8rem 2rem 0}
-    .tab{background:#0c1000;border:1px solid rgba(100,220,0,.2);color:#3a6600;padding:.45rem 1.2rem;border-radius:2rem 2rem 0 0;cursor:pointer;font-size:.82rem;font-weight:600;transition:.15s}
-    .tab.active{background:#121800;border-color:#64dc00;border-bottom:1px solid #121800;color:#aaff50}
-    .tab-content{display:none;padding:0 2rem 1.2rem}
-    .tab-content.active{display:block}
-    .panel{background:#0c1000cc;border-radius:1.8rem;padding:1.2rem 1.3rem;border:1px solid rgba(100,220,0,.15);margin-top:.8rem}
-    .panel h3{font-size:.88rem;font-weight:700;color:#aaff50;margin-bottom:.7rem}
-    .two-col{display:flex;gap:1rem;flex-wrap:wrap}
-    .col{flex:1;min-width:250px}
-    pre{background:#050700;border-radius:1rem;padding:.9rem 1rem;font-family:'JetBrains Mono',monospace;font-size:.71rem;line-height:1.75;overflow-x:auto;color:#e8ffc8;border:1px solid rgba(100,220,0,.12);white-space:pre}
-    .kw{color:#ff79c6}.fn{color:#50fa7b}.str{color:#f1fa8c}.num{color:#bd93f9}.cm{color:#6272a4;font-style:italic}.cls{color:#8be9fd}.ok{color:#50fa7b}.err{color:#ff5555}.warn{color:#ffb86c}
-    .btn{background:linear-gradient(95deg,#64dc00,#448800);border:none;padding:.65rem 1.3rem;font-weight:700;border-radius:2rem;cursor:pointer;color:#0a1000;font-size:.85rem;transition:.2s;display:inline-flex;align-items:center;gap:.5rem}
-    .btn:hover{transform:translateY(-2px);box-shadow:0 0 18px rgba(100,220,0,.4)}
-    .terminal{background:#030500;border:1px solid #64dc0044;border-radius:1rem;padding:.8rem 1rem;font-family:'JetBrains Mono',monospace;font-size:.72rem;line-height:1.8;min-height:120px;overflow-y:auto;max-height:220px}
-    .t-pass{color:#50fa7b}.t-fail{color:#ff5555}.t-info{color:#8be9fd}.t-warn{color:#ffb86c}.t-header{color:#bd93f9}.t-prompt{color:#6272a4}
-    .test-stats{display:flex;gap:.8rem;margin-top:.5rem;flex-wrap:wrap}
-    .stat{background:#0c1000;border-radius:.8rem;padding:.4rem .8rem;font-size:.75rem;text-align:center;border:1px solid rgba(100,220,0,.15)}
-    .stat span{display:block;font-size:1rem;font-weight:800;font-family:monospace}
-    .stat .pass-num{color:#50fa7b}.stat .fail-num{color:#ff5555}.stat .skip-num{color:#ffb86c}
-    .feedback{background:#00000088;margin:0 1.8rem 1rem;padding:.85rem 1.2rem;border-radius:1.5rem;text-align:center;border-left:4px solid #64dc00;font-size:.88rem;line-height:1.55}
-    .insignia{text-align:center;background:#0a0c00;border-radius:2rem;margin:0 1.8rem 1.5rem;padding:1rem;border:1px dashed gold}
-    .insignia i{font-size:2.4rem;color:gold}
-    .hidden{display:none}
-    .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.4rem 2rem}
-    .nav-link{background:#0c1000;padding:.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:.5rem;font-size:.88rem;transition:.2s}
-    .nav-link:hover{transform:translateY(-2px)}
-    .nav-link.next{background:linear-gradient(95deg,#f0a500,#ff6a00);color:#1e1a0c}
-    footer{text-align:center;padding:1rem;font-size:.72rem;border-top:1px solid #0a0c00;color:#3a6600}
-    @media(max-width:860px){.hero h1{font-size:1.4rem}.col{min-width:100%}}
-  </style>
-  <link rel="stylesheet" href="../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Hardhat & Foundry | Smart Contracts DeFi</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700;14..32,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+  body{background:linear-gradient(145deg,#080a00,#121800);font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:2rem 1rem}
+  .container{max-width:1300px;width:100%;background:rgba(10,12,0,.88);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(100,220,0,.22);box-shadow:0 25px 55px rgba(0,0,0,.65);overflow:hidden}
+  .hero{background:linear-gradient(95deg,#080a00,#121800);padding:1.8rem 2rem;text-align:center;border-bottom:2px solid #64dc00}
+  .hero h1{font-size:1.9rem;font-weight:800;background:linear-gradient(135deg,#e8ffc8,#aaff50,#64dc00);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p{margin-top:.5rem;font-size:.95rem;color:#4a8800}
+  .chips{display:flex;justify-content:center;gap:.6rem;flex-wrap:wrap;margin-top:.7rem}
+  .chip{background:rgba(100,220,0,.1);border:1px solid rgba(100,220,0,.3);color:#3a6600;font-size:.72rem;padding:.25rem .8rem;border-radius:2rem}
+  .week-badge{display:inline-block;background:rgba(100,220,0,.15);border:1px solid #64dc00;color:#64dc00;font-size:.75rem;font-weight:700;padding:.3rem 1rem;border-radius:2rem;margin-top:.5rem}
+  .analogy{background:#0a0c00cc;margin:1.4rem 2rem;padding:1.1rem 1.7rem;border-radius:2rem;border-left:7px solid #64dc00;font-size:.9rem;line-height:1.65}
+  .analogy strong{color:#aaff50}
+  .tabs{display:flex;gap:.4rem;padding:.8rem 2rem 0}
+  .tab{background:#0c1000;border:1px solid rgba(100,220,0,.2);color:#3a6600;padding:.45rem 1.2rem;border-radius:2rem 2rem 0 0;cursor:pointer;font-size:.82rem;font-weight:600;transition:.15s}
+  .tab.active{background:#121800;border-color:#64dc00;border-bottom:1px solid #121800;color:#aaff50}
+  .tab-content{display:none;padding:0 2rem 1.2rem}
+  .tab-content.active{display:block}
+  .panel{background:#0c1000cc;border-radius:1.8rem;padding:1.2rem 1.3rem;border:1px solid rgba(100,220,0,.15);margin-top:.8rem}
+  .panel h3{font-size:.88rem;font-weight:700;color:#aaff50;margin-bottom:.7rem}
+  .two-col{display:flex;gap:1rem;flex-wrap:wrap}
+  .col{flex:1;min-width:250px}
+  pre{background:#050700;border-radius:1rem;padding:.9rem 1rem;font-family:'JetBrains Mono',monospace;font-size:.71rem;line-height:1.75;overflow-x:auto;color:#e8ffc8;border:1px solid rgba(100,220,0,.12);white-space:pre}
+  .kw{color:#ff79c6}.fn{color:#50fa7b}.str{color:#f1fa8c}.num{color:#bd93f9}.cm{color:#6272a4;font-style:italic}.cls{color:#8be9fd}.ok{color:#50fa7b}.err{color:#ff5555}.warn{color:#ffb86c}
+  .btn{background:linear-gradient(95deg,#64dc00,#448800);border:none;padding:.65rem 1.3rem;font-weight:700;border-radius:2rem;cursor:pointer;color:#0a1000;font-size:.85rem;transition:.2s;display:inline-flex;align-items:center;gap:.5rem}
+  .btn:hover{transform:translateY(-2px);box-shadow:0 0 18px rgba(100,220,0,.4)}
+  .terminal{background:#030500;border:1px solid #64dc0044;border-radius:1rem;padding:.8rem 1rem;font-family:'JetBrains Mono',monospace;font-size:.72rem;line-height:1.8;min-height:120px;overflow-y:auto;max-height:220px}
+  .t-pass{color:#50fa7b}.t-fail{color:#ff5555}.t-info{color:#8be9fd}.t-warn{color:#ffb86c}.t-header{color:#bd93f9}.t-prompt{color:#6272a4}
+  .test-stats{display:flex;gap:.8rem;margin-top:.5rem;flex-wrap:wrap}
+  .stat{background:#0c1000;border-radius:.8rem;padding:.4rem .8rem;font-size:.75rem;text-align:center;border:1px solid rgba(100,220,0,.15)}
+  .stat span{display:block;font-size:1rem;font-weight:800;font-family:monospace}
+  .stat .pass-num{color:#50fa7b}.stat .fail-num{color:#ff5555}.stat .skip-num{color:#ffb86c}
+  .feedback{background:#00000088;margin:0 1.8rem 1rem;padding:.85rem 1.2rem;border-radius:1.5rem;text-align:center;border-left:4px solid #64dc00;font-size:.88rem;line-height:1.55}
+  .insignia{text-align:center;background:#0a0c00;border-radius:2rem;margin:0 1.8rem 1.5rem;padding:1rem;border:1px dashed gold}
+  .insignia i{font-size:2.4rem;color:gold}
+  .hidden{display:none}
+  .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.4rem 2rem}
+  .nav-link{background:#0c1000;padding:.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:.5rem;font-size:.88rem;transition:.2s}
+  .nav-link:hover{transform:translateY(-2px)}
+  .nav-link.next{background:linear-gradient(95deg,#f0a500,#ff6a00);color:#1e1a0c}
+  footer{text-align:center;padding:1rem;font-size:.72rem;border-top:1px solid #0a0c00;color:#3a6600}
+  @media(max-width:860px){.hero h1{font-size:1.4rem}.col{min-width:100%}}
+ </style>
+ <link rel="stylesheet" href="../../assets/css/theme.css">
 </head>
 <body>
 <nav class="brand-return-nav">
-  <a href="../../index.html">&larr; Portfolio</a>
-  <a href="../../cursos/index.html">Cursos</a>
+ <a href="../../index.html">&larr; Portfolio</a>
+ <a href="../../cursos/index.html">Cursos</a>
 </nav>
 <div class="container">
-  <div class="hero">
-    <h1>🧪 HARDHAT & FOUNDRY: Testing como un Pro</h1>
-    <p>Escribe tests que detectan bugs antes de desplegar — porque en blockchain no hay "deshacer"</p>
-    <div class="week-badge"><i class="fas fa-calendar-week"></i> Semanas 1-2: Testing de Smart Contracts</div>
-    <div class="chips">
-      <span class="chip">Hardhat (JS/TS)</span>
-      <span class="chip">Foundry (Solidity)</span>
-      <span class="chip">Fuzz Testing</span>
-      <span class="chip">Coverage</span>
-    </div>
+ <div class="hero">
+  <h1>ðŸ§ª HARDHAT & FOUNDRY: Testing como un Pro</h1>
+  <p>Escribe tests que detectan bugs antes de desplegar â€” porque en blockchain no hay "deshacer"</p>
+  <div class="week-badge"><i class="fas fa-calendar-week"></i> Semanas 1-2: Testing de Smart Contracts</div>
+  <div class="chips">
+   <span class="chip">Hardhat (JS/TS)</span>
+   <span class="chip">Foundry (Solidity)</span>
+   <span class="chip">Fuzz Testing</span>
+   <span class="chip">Coverage</span>
   </div>
+ </div>
 
-  <div class="analogy">
-    <strong>🧪 Piénsalo así:</strong> Desplegar un smart contract sin tests es como construir un puente y cortar la cinta de inauguración sin haberlo probado con carga real. En blockchain, una vez desplegado el contrato, <strong>no puedes parchearlo</strong> (a menos que uses proxies). Un bug como el DAO Hack de 2016 drenó $60M. <strong>Hardhat</strong> usa JavaScript/TypeScript — ideal si ya sabes JS. <strong>Foundry</strong> usa Solidity puro para los tests — más rápido y con fuzzing integrado. Los mejores proyectos DeFi usan ambos.
-    <div style="margin-top:.5rem;font-size:.78rem;color:#3a6600"><strong>📚 Refs:</strong> Hardhat Docs — hardhat.org · Foundry Book — book.getfoundry.sh · "The DAO Hack" — Ethereum Foundation Blog (2016)</div>
-  </div>
+ <div class="analogy">
+  <strong>ðŸ§ª PiÃ©nsalo asÃ­:</strong> Desplegar un smart contract sin tests es como construir un puente y cortar la cinta de inauguraciÃ³n sin haberlo probado con carga real. En blockchain, una vez desplegado el contrato, <strong>no puedes parchearlo</strong> (a menos que uses proxies). Un bug como el DAO Hack de 2016 drenÃ³ $60M. <strong>Hardhat</strong> usa JavaScript/TypeScript â€” ideal si ya sabes JS. <strong>Foundry</strong> usa Solidity puro para los tests â€” mÃ¡s rÃ¡pido y con fuzzing integrado. Los mejores proyectos DeFi usan ambos.
+  <div style="margin-top:.5rem;font-size:.78rem;color:#3a6600"><strong>ðŸ“š Refs:</strong> Hardhat Docs â€” hardhat.org Â· Foundry Book â€” book.getfoundry.sh Â· "The DAO Hack" â€” Ethereum Foundation Blog (2016)</div>
+ </div>
 
-  <div class="tabs">
-    <div class="tab active" onclick="switchTab('hardhat')"><i class="fab fa-node-js"></i> Hardhat (JS)</div>
-    <div class="tab" onclick="switchTab('foundry')"><i class="fas fa-hammer"></i> Foundry (Solidity)</div>
-    <div class="tab" onclick="switchTab('fuzzing')"><i class="fas fa-random"></i> Fuzz Testing</div>
-  </div>
+ <div class="tabs">
+  <div class="tab active" onclick="switchTab('hardhat')"><i class="fab fa-node-js"></i> Hardhat (JS)</div>
+  <div class="tab" onclick="switchTab('foundry')"><i class="fas fa-hammer"></i> Foundry (Solidity)</div>
+  <div class="tab" onclick="switchTab('fuzzing')"><i class="fas fa-random"></i> Fuzz Testing</div>
+ </div>
 
-  <!-- Hardhat -->
-  <div class="tab-content active" id="tab-hardhat">
-    <div class="panel">
-      <h3><i class="fas fa-flask"></i> Test Suite en Hardhat — Token ERC-20</h3>
-      <div class="two-col">
-        <div class="col">
-          <pre><span class="cm">// test/Token.test.js — Hardhat + Chai</span>
+ <!-- Hardhat -->
+ <div class="tab-content active" id="tab-hardhat">
+  <div class="panel">
+   <h3><i class="fas fa-flask"></i> Test Suite en Hardhat â€” Token ERC-20</h3>
+   <div class="two-col">
+    <div class="col">
+     <pre><span class="cm">// test/Token.test.js â€” Hardhat + Chai</span>
 <span class="kw">const</span> { expect } = <span class="fn">require</span>(<span class="str">"chai"</span>);
 <span class="kw">const</span> { ethers } = <span class="fn">require</span>(<span class="str">"hardhat"</span>);
 
 <span class="fn">describe</span>(<span class="str">"MyToken"</span>, <span class="kw">function</span>() {
-  <span class="kw">let</span> token, owner, alice, bob;
+ <span class="kw">let</span> token, owner, alice, bob;
 
-  <span class="fn">beforeEach</span>(<span class="kw">async function</span>() {
-    [owner, alice, bob] = <span class="kw">await</span> ethers.<span class="fn">getSigners</span>();
-    <span class="kw">const</span> Token = <span class="kw">await</span> ethers.<span class="fn">getContractFactory</span>(<span class="str">"MyToken"</span>);
-    token = <span class="kw">await</span> Token.<span class="fn">deploy</span>(ethers.<span class="fn">parseEther</span>(<span class="str">"1000000"</span>));
-    <span class="kw">await</span> token.<span class="fn">waitForDeployment</span>();
+ <span class="fn">beforeEach</span>(<span class="kw">async function</span>() {
+  [owner, alice, bob] = <span class="kw">await</span> ethers.<span class="fn">getSigners</span>();
+  <span class="kw">const</span> Token = <span class="kw">await</span> ethers.<span class="fn">getContractFactory</span>(<span class="str">"MyToken"</span>);
+  token = <span class="kw">await</span> Token.<span class="fn">deploy</span>(ethers.<span class="fn">parseEther</span>(<span class="str">"1000000"</span>));
+  <span class="kw">await</span> token.<span class="fn">waitForDeployment</span>();
+ });
+
+ <span class="fn">describe</span>(<span class="str">"Deployment"</span>, <span class="kw">function</span>() {
+  <span class="fn">it</span>(<span class="str">"assigns total supply to owner"</span>, <span class="kw">async function</span>() {
+   <span class="kw">const</span> ownerBal = <span class="kw">await</span> token.<span class="fn">balanceOf</span>(owner.address);
+   <span class="fn">expect</span>(ownerBal).<span class="fn">to</span>.<span class="fn">equal</span>(ethers.<span class="fn">parseEther</span>(<span class="str">"1000000"</span>));
+  });
+ });
+
+ <span class="fn">describe</span>(<span class="str">"Transfers"</span>, <span class="kw">function</span>() {
+  <span class="fn">it</span>(<span class="str">"transfers tokens between accounts"</span>, <span class="kw">async function</span>() {
+   <span class="kw">await</span> token.<span class="fn">transfer</span>(alice.address, <span class="num">100n</span>);
+   <span class="fn">expect</span>(<span class="kw">await</span> token.<span class="fn">balanceOf</span>(alice.address)).<span class="fn">to</span>.<span class="fn">equal</span>(<span class="num">100n</span>);
   });
 
-  <span class="fn">describe</span>(<span class="str">"Deployment"</span>, <span class="kw">function</span>() {
-    <span class="fn">it</span>(<span class="str">"assigns total supply to owner"</span>, <span class="kw">async function</span>() {
-      <span class="kw">const</span> ownerBal = <span class="kw">await</span> token.<span class="fn">balanceOf</span>(owner.address);
-      <span class="fn">expect</span>(ownerBal).<span class="fn">to</span>.<span class="fn">equal</span>(ethers.<span class="fn">parseEther</span>(<span class="str">"1000000"</span>));
-    });
+  <span class="fn">it</span>(<span class="str">"reverts with insufficient balance"</span>, <span class="kw">async function</span>() {
+   <span class="kw">await</span> <span class="fn">expect</span>(
+    token.<span class="fn">connect</span>(alice).<span class="fn">transfer</span>(bob.address, <span class="num">1n</span>)
+   ).<span class="fn">to</span>.<span class="fn">be</span>.<span class="fn">revertedWith</span>(<span class="str">"ERC20: insufficient balance"</span>);
   });
 
-  <span class="fn">describe</span>(<span class="str">"Transfers"</span>, <span class="kw">function</span>() {
-    <span class="fn">it</span>(<span class="str">"transfers tokens between accounts"</span>, <span class="kw">async function</span>() {
-      <span class="kw">await</span> token.<span class="fn">transfer</span>(alice.address, <span class="num">100n</span>);
-      <span class="fn">expect</span>(<span class="kw">await</span> token.<span class="fn">balanceOf</span>(alice.address)).<span class="fn">to</span>.<span class="fn">equal</span>(<span class="num">100n</span>);
-    });
-
-    <span class="fn">it</span>(<span class="str">"reverts with insufficient balance"</span>, <span class="kw">async function</span>() {
-      <span class="kw">await</span> <span class="fn">expect</span>(
-        token.<span class="fn">connect</span>(alice).<span class="fn">transfer</span>(bob.address, <span class="num">1n</span>)
-      ).<span class="fn">to</span>.<span class="fn">be</span>.<span class="fn">revertedWith</span>(<span class="str">"ERC20: insufficient balance"</span>);
-    });
-
-    <span class="fn">it</span>(<span class="str">"emits Transfer event"</span>, <span class="kw">async function</span>() {
-      <span class="kw">await</span> <span class="fn">expect</span>(token.<span class="fn">transfer</span>(alice.address, <span class="num">50n</span>))
-        .<span class="fn">to</span>.<span class="fn">emit</span>(token, <span class="str">"Transfer"</span>)
-        .<span class="fn">withArgs</span>(owner.address, alice.address, <span class="num">50n</span>);
-    });
+  <span class="fn">it</span>(<span class="str">"emits Transfer event"</span>, <span class="kw">async function</span>() {
+   <span class="kw">await</span> <span class="fn">expect</span>(token.<span class="fn">transfer</span>(alice.address, <span class="num">50n</span>))
+    .<span class="fn">to</span>.<span class="fn">emit</span>(token, <span class="str">"Transfer"</span>)
+    .<span class="fn">withArgs</span>(owner.address, alice.address, <span class="num">50n</span>);
   });
+ });
 });</pre>
-        </div>
-        <div class="col">
-          <div class="terminal" id="hardhatTerminal">
-            <span class="t-prompt">$ </span><span style="color:#e8ffc8">npx hardhat test test/Token.test.js</span>
-          </div>
-          <div class="test-stats" id="hardhatStats" style="display:none">
-            <div class="stat"><span class="pass-num" id="hPass">0</span>passing</div>
-            <div class="stat"><span class="fail-num" id="hFail">0</span>failing</div>
-            <div class="stat"><span class="t-info" id="hTime">0ms</span>duration</div>
-          </div>
-          <div style="margin-top:.6rem;display:flex;gap:.5rem">
-            <button class="btn" onclick="runHardhat()"><i class="fas fa-play"></i> Ejecutar Tests</button>
-            <button class="btn" style="background:#0c1000;border:1px solid #64dc0044;color:#aaff50" onclick="runCoverage()"><i class="fas fa-percent"></i> Coverage</button>
-          </div>
-        </div>
-      </div>
     </div>
+    <div class="col">
+     <div class="terminal" id="hardhatTerminal">
+      <span class="t-prompt">$ </span><span style="color:#e8ffc8">npx hardhat test test/Token.test.js</span>
+     </div>
+     <div class="test-stats" id="hardhatStats" style="display:none">
+      <div class="stat"><span class="pass-num" id="hPass">0</span>passing</div>
+      <div class="stat"><span class="fail-num" id="hFail">0</span>failing</div>
+      <div class="stat"><span class="t-info" id="hTime">0ms</span>duration</div>
+     </div>
+     <div style="margin-top:.6rem;display:flex;gap:.5rem">
+      <button class="btn" onclick="runHardhat()"><i class="fas fa-play"></i> Ejecutar Tests</button>
+      <button class="btn" style="background:#0c1000;border:1px solid #64dc0044;color:#aaff50" onclick="runCoverage()"><i class="fas fa-percent"></i> Coverage</button>
+     </div>
+    </div>
+   </div>
   </div>
+ </div>
 
-  <!-- Foundry -->
-  <div class="tab-content" id="tab-foundry">
-    <div class="panel">
-      <h3><i class="fas fa-hammer"></i> Test Suite en Foundry — Solidity puro</h3>
-      <div class="two-col">
-        <div class="col">
-          <pre><span class="cm">// test/Token.t.sol — Foundry + forge-std</span>
+ <!-- Foundry -->
+ <div class="tab-content" id="tab-foundry">
+  <div class="panel">
+   <h3><i class="fas fa-hammer"></i> Test Suite en Foundry â€” Solidity puro</h3>
+   <div class="two-col">
+    <div class="col">
+     <pre><span class="cm">// test/Token.t.sol â€” Foundry + forge-std</span>
 <span class="kw">pragma solidity</span> ^<span class="num">0.8.20</span>;
 <span class="kw">import</span> {<span class="cls">Test</span>, <span class="cls">console</span>} <span class="kw">from</span> <span class="str">"forge-std/Test.sol"</span>;
 <span class="kw">import</span> {<span class="cls">MyToken</span>} <span class="kw">from</span> <span class="str">"../src/MyToken.sol"</span>;
 
 <span class="kw">contract</span> <span class="cls">TokenTest</span> <span class="kw">is</span> <span class="cls">Test</span> {
-    <span class="cls">MyToken</span> token;
-    <span class="cls">address</span> owner = <span class="fn">makeAddr</span>(<span class="str">"owner"</span>);
-    <span class="cls">address</span> alice = <span class="fn">makeAddr</span>(<span class="str">"alice"</span>);
+  <span class="cls">MyToken</span> token;
+  <span class="cls">address</span> owner = <span class="fn">makeAddr</span>(<span class="str">"owner"</span>);
+  <span class="cls">address</span> alice = <span class="fn">makeAddr</span>(<span class="str">"alice"</span>);
 
-    <span class="kw">function</span> <span class="fn">setUp</span>() <span class="kw">public</span> {
-        <span class="fn">vm.startPrank</span>(owner);
-        token = <span class="kw">new</span> <span class="fn">MyToken</span>(<span class="num">1_000_000e18</span>);
-        <span class="fn">vm.stopPrank</span>();
-    }
+  <span class="kw">function</span> <span class="fn">setUp</span>() <span class="kw">public</span> {
+    <span class="fn">vm.startPrank</span>(owner);
+    token = <span class="kw">new</span> <span class="fn">MyToken</span>(<span class="num">1_000_000e18</span>);
+    <span class="fn">vm.stopPrank</span>();
+  }
 
-    <span class="kw">function</span> <span class="fn">test_InitialSupply</span>() <span class="kw">public</span> <span class="kw">view</span> {
-        <span class="fn">assertEq</span>(token.<span class="fn">balanceOf</span>(owner), <span class="num">1_000_000e18</span>);
-    }
+  <span class="kw">function</span> <span class="fn">test_InitialSupply</span>() <span class="kw">public</span> <span class="kw">view</span> {
+    <span class="fn">assertEq</span>(token.<span class="fn">balanceOf</span>(owner), <span class="num">1_000_000e18</span>);
+  }
 
-    <span class="kw">function</span> <span class="fn">test_Transfer</span>() <span class="kw">public</span> {
-        <span class="fn">vm.prank</span>(owner);
-        token.<span class="fn">transfer</span>(alice, <span class="num">100e18</span>);
-        <span class="fn">assertEq</span>(token.<span class="fn">balanceOf</span>(alice), <span class="num">100e18</span>);
-    }
-
-    <span class="kw">function</span> <span class="fn">test_RevertOnInsufficientBalance</span>() <span class="kw">public</span> {
-        <span class="fn">vm.prank</span>(alice);
-        <span class="fn">vm.expectRevert</span>();
-        token.<span class="fn">transfer</span>(owner, <span class="num">1</span>);  <span class="cm">// alice tiene 0</span>
-    }
-
-    <span class="kw">function</span> <span class="fn">test_EmitTransferEvent</span>() <span class="kw">public</span> {
-        <span class="fn">vm.expectEmit</span>(<span class="kw">true</span>, <span class="kw">true</span>, <span class="kw">false</span>, <span class="kw">true</span>);
-        <span class="kw">emit</span> <span class="cls">Transfer</span>(owner, alice, <span class="num">50e18</span>);
-        <span class="fn">vm.prank</span>(owner);
-        token.<span class="fn">transfer</span>(alice, <span class="num">50e18</span>);
-    }
-}</pre>
-        </div>
-        <div class="col">
-          <div class="terminal" id="foundryTerminal">
-            <span class="t-prompt">$ </span><span style="color:#e8ffc8">forge test -vvv</span>
-          </div>
-          <div style="margin-top:.6rem">
-            <button class="btn" onclick="runFoundry()"><i class="fas fa-play"></i> forge test</button>
-          </div>
-          <div style="margin-top:.8rem" class="panel">
-            <h3>Ventajas de Foundry vs Hardhat</h3>
-            <div style="font-size:.75rem;line-height:1.7;color:#aaff50">
-              <div>🟢 <strong>Foundry:</strong> 10-100x más rápido · Fuzzing nativo · Solidity puro · forge-snapshot</div>
-              <div style="margin-top:.3rem">🟡 <strong>Hardhat:</strong> Ecosystem JS maduro · ethers.js integrado · Plugins abundantes · TypeScript nativo</div>
-              <div style="margin-top:.5rem;color:#6272a4;font-size:.7rem">✦ Recomendación: usa Foundry para unit tests y Hardhat para deploy scripts e integración con frontend</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Fuzz Testing -->
-  <div class="tab-content" id="tab-fuzzing">
-    <div class="panel">
-      <h3><i class="fas fa-random"></i> Fuzz Testing — Foundry encuentra bugs automáticamente</h3>
-      <div class="two-col">
-        <div class="col">
-          <pre><span class="cm">// Foundry ejecuta este test con 256+ inputs random</span>
-<span class="kw">function</span> <span class="fn">testFuzz_Transfer</span>(<span class="cls">uint256</span> amount) <span class="kw">public</span> {
-    <span class="cm">// Bound limita el rango (evita overflow)</span>
-    amount = <span class="fn">bound</span>(amount, <span class="num">0</span>, <span class="num">1_000_000e18</span>);
+  <span class="kw">function</span> <span class="fn">test_Transfer</span>() <span class="kw">public</span> {
     <span class="fn">vm.prank</span>(owner);
-    token.<span class="fn">transfer</span>(alice, amount);
-    <span class="fn">assertEq</span>(token.<span class="fn">balanceOf</span>(alice), amount);
-    <span class="fn">assertEq</span>(
-        token.<span class="fn">balanceOf</span>(owner),
-        <span class="num">1_000_000e18</span> - amount
-    );
+    token.<span class="fn">transfer</span>(alice, <span class="num">100e18</span>);
+    <span class="fn">assertEq</span>(token.<span class="fn">balanceOf</span>(alice), <span class="num">100e18</span>);
+  }
+
+  <span class="kw">function</span> <span class="fn">test_RevertOnInsufficientBalance</span>() <span class="kw">public</span> {
+    <span class="fn">vm.prank</span>(alice);
+    <span class="fn">vm.expectRevert</span>();
+    token.<span class="fn">transfer</span>(owner, <span class="num">1</span>); <span class="cm">// alice tiene 0</span>
+  }
+
+  <span class="kw">function</span> <span class="fn">test_EmitTransferEvent</span>() <span class="kw">public</span> {
+    <span class="fn">vm.expectEmit</span>(<span class="kw">true</span>, <span class="kw">true</span>, <span class="kw">false</span>, <span class="kw">true</span>);
+    <span class="kw">emit</span> <span class="cls">Transfer</span>(owner, alice, <span class="num">50e18</span>);
+    <span class="fn">vm.prank</span>(owner);
+    token.<span class="fn">transfer</span>(alice, <span class="num">50e18</span>);
+  }
+}</pre>
+    </div>
+    <div class="col">
+     <div class="terminal" id="foundryTerminal">
+      <span class="t-prompt">$ </span><span style="color:#e8ffc8">forge test -vvv</span>
+     </div>
+     <div style="margin-top:.6rem">
+      <button class="btn" onclick="runFoundry()"><i class="fas fa-play"></i> forge test</button>
+     </div>
+     <div style="margin-top:.8rem" class="panel">
+      <h3>Ventajas de Foundry vs Hardhat</h3>
+      <div style="font-size:.75rem;line-height:1.7;color:#aaff50">
+       <div>ðŸŸ¢ <strong>Foundry:</strong> 10-100x mÃ¡s rÃ¡pido Â· Fuzzing nativo Â· Solidity puro Â· forge-snapshot</div>
+       <div style="margin-top:.3rem">ðŸŸ¡ <strong>Hardhat:</strong> Ecosystem JS maduro Â· ethers.js integrado Â· Plugins abundantes Â· TypeScript nativo</div>
+       <div style="margin-top:.5rem;color:#6272a4;font-size:.7rem">âœ¦ RecomendaciÃ³n: usa Foundry para unit tests y Hardhat para deploy scripts e integraciÃ³n con frontend</div>
+      </div>
+     </div>
+    </div>
+   </div>
+  </div>
+ </div>
+
+ <!-- Fuzz Testing -->
+ <div class="tab-content" id="tab-fuzzing">
+  <div class="panel">
+   <h3><i class="fas fa-random"></i> Fuzz Testing â€” Foundry encuentra bugs automÃ¡ticamente</h3>
+   <div class="two-col">
+    <div class="col">
+     <pre><span class="cm">// Foundry ejecuta este test con 256+ inputs random</span>
+<span class="kw">function</span> <span class="fn">testFuzz_Transfer</span>(<span class="cls">uint256</span> amount) <span class="kw">public</span> {
+  <span class="cm">// Bound limita el rango (evita overflow)</span>
+  amount = <span class="fn">bound</span>(amount, <span class="num">0</span>, <span class="num">1_000_000e18</span>);
+  <span class="fn">vm.prank</span>(owner);
+  token.<span class="fn">transfer</span>(alice, amount);
+  <span class="fn">assertEq</span>(token.<span class="fn">balanceOf</span>(alice), amount);
+  <span class="fn">assertEq</span>(
+    token.<span class="fn">balanceOf</span>(owner),
+    <span class="num">1_000_000e18</span> - amount
+  );
 }
 
-<span class="cm">// Invariant Test — propiedad que siempre debe cumplirse</span>
+<span class="cm">// Invariant Test â€” propiedad que siempre debe cumplirse</span>
 <span class="kw">function</span> <span class="fn">invariant_TotalSupplyNeverChanges</span>() <span class="kw">public</span> <span class="kw">view</span> {
-    <span class="fn">assertEq</span>(token.<span class="fn">totalSupply</span>(), <span class="num">1_000_000e18</span>);
+  <span class="fn">assertEq</span>(token.<span class="fn">totalSupply</span>(), <span class="num">1_000_000e18</span>);
 }
 
-<span class="cm">// foundry.toml — Configuración de fuzzing</span>
+<span class="cm">// foundry.toml â€” ConfiguraciÃ³n de fuzzing</span>
 <span class="cm">// [fuzz]</span>
 <span class="cm">// runs = 1000</span>
 <span class="cm">// seed = 0x3e8</span>
 <span class="cm">// [invariant]</span>
 <span class="cm">// runs = 50</span>
-<span class="cm">// depth = 100   # Llamadas por run</span></pre>
-        </div>
-        <div class="col">
-          <div class="panel">
-            <h3>Simulador de Fuzzing</h3>
-            <div style="font-size:.75rem;color:#3a6600;margin-bottom:.5rem">Foundry ejecutará N runs con inputs aleatorios. Observa cuántos pasan.</div>
-            <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem">
-              <label style="font-size:.72rem;color:#3a6600;margin:0;text-transform:none">Runs:</label>
-              <input type="range" min="10" max="1000" value="256" id="fuzzRuns" oninput="document.getElementById('fuzzRunsV').textContent=this.value" style="flex:1;accent-color:#64dc00">
-              <span id="fuzzRunsV" style="font-family:monospace;color:#64dc00;font-size:.78rem">256</span>
-            </div>
-            <button class="btn" style="width:100%;margin-bottom:.5rem" onclick="runFuzz()"><i class="fas fa-random"></i> Ejecutar Fuzzing</button>
-            <div class="terminal" id="fuzzTerminal" style="min-height:80px">
-              <span class="t-prompt">$ </span><span style="color:#e8ffc8">forge test --match-test testFuzz</span>
-            </div>
-          </div>
-        </div>
-      </div>
+<span class="cm">// depth = 100  # Llamadas por run</span></pre>
     </div>
+    <div class="col">
+     <div class="panel">
+      <h3>Simulador de Fuzzing</h3>
+      <div style="font-size:.75rem;color:#3a6600;margin-bottom:.5rem">Foundry ejecutarÃ¡ N runs con inputs aleatorios. Observa cuÃ¡ntos pasan.</div>
+      <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem">
+       <label style="font-size:.72rem;color:#3a6600;margin:0;text-transform:none">Runs:</label>
+       <input type="range" min="10" max="1000" value="256" id="fuzzRuns" oninput="document.getElementById('fuzzRunsV').textContent=this.value" style="flex:1;accent-color:#64dc00">
+       <span id="fuzzRunsV" style="font-family:monospace;color:#64dc00;font-size:.78rem">256</span>
+      </div>
+      <button class="btn" style="width:100%;margin-bottom:.5rem" onclick="runFuzz()"><i class="fas fa-random"></i> Ejecutar Fuzzing</button>
+      <div class="terminal" id="fuzzTerminal" style="min-height:80px">
+       <span class="t-prompt">$ </span><span style="color:#e8ffc8">forge test --match-test testFuzz</span>
+      </div>
+     </div>
+    </div>
+   </div>
   </div>
+ </div>
 
-  <div class="feedback" id="feedbackMsg">
-    🧪 Ejecuta los tests en Hardhat o Foundry. Ambas herramientas son complementarias — los mejores proyectos DeFi usan las dos.
-  </div>
+ <div class="feedback" id="feedbackMsg">
+  ðŸ§ª Ejecuta los tests en Hardhat o Foundry. Ambas herramientas son complementarias â€” los mejores proyectos DeFi usan las dos.
+ </div>
 
-  <div class="insignia hidden" id="insigniaArea">
-    <i class="fas fa-vial"></i>
-    <h3 style="margin:.4rem 0;color:#ffd700">🏅 ¡INSIGNIA TEST ENGINEER!</h3>
-    <p style="font-size:.85rem;color:#aaff50">Ejecutaste tests en Hardhat y Foundry. ¡Un contrato sin tests no está listo para producción!</p>
-  </div>
+ <div class="insignia hidden" id="insigniaArea">
+  <i class="fas fa-vial"></i>
+  <h3 style="margin:.4rem 0;color:#ffd700">ðŸ… Â¡INSIGNIA TEST ENGINEER!</h3>
+  <p style="font-size:.85rem;color:#aaff50">Ejecutaste tests en Hardhat y Foundry. Â¡Un contrato sin tests no estÃ¡ listo para producciÃ³n!</p>
+ </div>
 
-  <div class="nav-links">
-    <a href="sc3-01-storage-gas.html" class="nav-link"><i class="fas fa-arrow-left"></i> Storage & Gas</a>
-    <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Menú</a>
-    <a href="sc3-03-erc721-nfts.html" class="nav-link next">ERC-721 NFTs <i class="fas fa-arrow-right"></i></a>
-  </div>
-  <footer><i class="fas fa-crown"></i> Smart Contracts DeFi · Semana 1-2 · Hardhat · Foundry · Fuzz Testing</footer>
+ <div class="nav-links">
+  <a href="sc3-01-storage-gas.html" class="nav-link"><i class="fas fa-arrow-left"></i> Storage & Gas</a>
+  <a href="index.html" class="nav-link"><i class="fas fa-home"></i> MenÃº</a>
+  <a href="sc3-03-erc721-nfts.html" class="nav-link next">ERC-721 NFTs <i class="fas fa-arrow-right"></i></a>
+ </div>
+ <footer><i class="fas fa-crown"></i> Smart Contracts DeFi Â· Semana 1-2 Â· Hardhat Â· Foundry Â· Fuzz Testing</footer>
 </div>
 
 <script>
@@ -286,111 +286,111 @@ const visitedTabs=new Set(['hardhat']);
 let testsRun=0;
 
 function switchTab(tab){
-  document.querySelectorAll('.tab').forEach((t,i)=>{const tabs=['hardhat','foundry','fuzzing'];t.classList.toggle('active',tabs[i]===tab);});
-  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
-  document.getElementById('tab-'+tab).classList.add('active');
-  visitedTabs.add(tab);
-  checkProgress();
+ document.querySelectorAll('.tab').forEach((t,i)=>{const tabs=['hardhat','foundry','fuzzing'];t.classList.toggle('active',tabs[i]===tab);});
+ document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+ document.getElementById('tab-'+tab).classList.add('active');
+ visitedTabs.add(tab);
+ checkProgress();
 }
 
 const HH_LINES=[
-  ['t-header','  MyToken'],
-  ['t-header','    Deployment'],
-  ['t-pass','      ✔ assigns total supply to owner (42ms)'],
-  ['t-header','    Transfers'],
-  ['t-pass','      ✔ transfers tokens between accounts (18ms)'],
-  ['t-pass','      ✔ reverts with insufficient balance (15ms)'],
-  ['t-pass','      ✔ emits Transfer event (12ms)'],
-  ['t-info',''],
-  ['t-pass','  4 passing (87ms)'],
+ ['t-header',' MyToken'],
+ ['t-header','  Deployment'],
+ ['t-pass','   âœ” assigns total supply to owner (42ms)'],
+ ['t-header','  Transfers'],
+ ['t-pass','   âœ” transfers tokens between accounts (18ms)'],
+ ['t-pass','   âœ” reverts with insufficient balance (15ms)'],
+ ['t-pass','   âœ” emits Transfer event (12ms)'],
+ ['t-info',''],
+ ['t-pass',' 4 passing (87ms)'],
 ];
 const FOUNDRY_LINES=[
-  ['t-header','[⠊] Compiling...'],
-  ['t-info','[⠒] Compiling 2 files with Solc 0.8.24'],
-  ['t-pass','[⠢] Solc 0.8.24 finished in 0.82s'],
-  ['t-pass','Compiler run successful!'],
-  ['t-info',''],
-  ['t-header','Running 4 tests for test/Token.t.sol:TokenTest'],
-  ['t-pass','[PASS] test_EmitTransferEvent() (gas: 42,108)'],
-  ['t-pass','[PASS] test_InitialSupply() (gas: 11,452)'],
-  ['t-pass','[PASS] test_RevertOnInsufficientBalance() (gas: 14,230)'],
-  ['t-pass','[PASS] test_Transfer() (gas: 38,904)'],
-  ['t-info',''],
-  ['t-pass','Test result: ok. 4 passed; 0 failed; finished in 2.45ms'],
+ ['t-header','[â Š] Compiling...'],
+ ['t-info','[â ’] Compiling 2 files with Solc 0.8.24'],
+ ['t-pass','[â ¢] Solc 0.8.24 finished in 0.82s'],
+ ['t-pass','Compiler run successful!'],
+ ['t-info',''],
+ ['t-header','Running 4 tests for test/Token.t.sol:TokenTest'],
+ ['t-pass','[PASS] test_EmitTransferEvent() (gas: 42,108)'],
+ ['t-pass','[PASS] test_InitialSupply() (gas: 11,452)'],
+ ['t-pass','[PASS] test_RevertOnInsufficientBalance() (gas: 14,230)'],
+ ['t-pass','[PASS] test_Transfer() (gas: 38,904)'],
+ ['t-info',''],
+ ['t-pass','Test result: ok. 4 passed; 0 failed; finished in 2.45ms'],
 ];
 
 async function animateTerminal(termId, lines, delay=60){
-  const term=document.getElementById(termId);
-  term.innerHTML='';
-  for(const [cls,line] of lines){
-    await new Promise(r=>setTimeout(r,delay));
-    const el=document.createElement('div');
-    el.className=cls;
-    el.textContent=line;
-    term.appendChild(el);
-    term.scrollTop=term.scrollHeight;
-  }
+ const term=document.getElementById(termId);
+ term.innerHTML='';
+ for(const [cls,line] of lines){
+  await new Promise(r=>setTimeout(r,delay));
+  const el=document.createElement('div');
+  el.className=cls;
+  el.textContent=line;
+  term.appendChild(el);
+  term.scrollTop=term.scrollHeight;
+ }
 }
 
 async function runHardhat(){
-  const term=document.getElementById('hardhatTerminal');
-  term.innerHTML='<span class="t-info">Ejecutando tests...</span>';
-  await new Promise(r=>setTimeout(r,400));
-  await animateTerminal('hardhatTerminal',HH_LINES,50);
-  document.getElementById('hardhatStats').style.display='flex';
-  document.getElementById('hPass').textContent='4';
-  document.getElementById('hFail').textContent='0';
-  document.getElementById('hTime').textContent='87ms';
-  testsRun++;checkProgress();
-  document.getElementById('feedbackMsg').innerHTML=I18N.t('fb_0');
+ const term=document.getElementById('hardhatTerminal');
+ term.innerHTML='<span class="t-info">Ejecutando tests...</span>';
+ await new Promise(r=>setTimeout(r,400));
+ await animateTerminal('hardhatTerminal',HH_LINES,50);
+ document.getElementById('hardhatStats').style.display='flex';
+ document.getElementById('hPass').textContent='4';
+ document.getElementById('hFail').textContent='0';
+ document.getElementById('hTime').textContent='87ms';
+ testsRun++;checkProgress();
+ document.getElementById('feedbackMsg').innerHTML=I18N.t('fb_0');
 }
 
 async function runCoverage(){
-  const term=document.getElementById('hardhatTerminal');
-  term.innerHTML='';
-  const lines=[
-    ['t-header','Running coverage...'],
-    ['t-info',''],
-    ['t-header','File            | % Stmts | % Branch | % Funcs | % Lines |'],
-    ['t-info','----------------|---------|----------|---------|---------|'],
-    ['t-pass','MyToken.sol     |   94.44 |    87.50 |     100 |   95.24 |'],
-    ['t-pass','All files       |   94.44 |    87.50 |     100 |   95.24 |'],
-    ['t-warn',''],
-    ['t-warn','Uncovered lines: MyToken.sol:45 (edge case en allowance)'],
-  ];
-  await animateTerminal('hardhatTerminal',lines,60);
-  testsRun++;checkProgress();
+ const term=document.getElementById('hardhatTerminal');
+ term.innerHTML='';
+ const lines=[
+  ['t-header','Running coverage...'],
+  ['t-info',''],
+  ['t-header','File      | % Stmts | % Branch | % Funcs | % Lines |'],
+  ['t-info','----------------|---------|----------|---------|---------|'],
+  ['t-pass','MyToken.sol   |  94.44 |  87.50 |   100 |  95.24 |'],
+  ['t-pass','All files    |  94.44 |  87.50 |   100 |  95.24 |'],
+  ['t-warn',''],
+  ['t-warn','Uncovered lines: MyToken.sol:45 (edge case en allowance)'],
+ ];
+ await animateTerminal('hardhatTerminal',lines,60);
+ testsRun++;checkProgress();
 }
 
 async function runFoundry(){
-  const term=document.getElementById('foundryTerminal');
-  term.innerHTML='<span class="t-info">Compilando...</span>';
-  await new Promise(r=>setTimeout(r,500));
-  await animateTerminal('foundryTerminal',FOUNDRY_LINES,45);
-  testsRun++;checkProgress();
-  document.getElementById('feedbackMsg').innerHTML=I18N.t('fb_1');
+ const term=document.getElementById('foundryTerminal');
+ term.innerHTML='<span class="t-info">Compilando...</span>';
+ await new Promise(r=>setTimeout(r,500));
+ await animateTerminal('foundryTerminal',FOUNDRY_LINES,45);
+ testsRun++;checkProgress();
+ document.getElementById('feedbackMsg').innerHTML=I18N.t('fb_1');
 }
 
 async function runFuzz(){
-  const runs=+document.getElementById('fuzzRuns').value;
-  const term=document.getElementById('fuzzTerminal');
-  term.innerHTML='<span class="t-info">Iniciando fuzzer...</span>';
-  await new Promise(r=>setTimeout(r,300));
-  const lines=[
-    ['t-header',`[FUZZ] Running ${runs} runs for testFuzz_Transfer`],
-  ];
-  const pass=Math.floor(runs*0.97+Math.random()*runs*.02);
-  const fail=runs-pass;
-  if(fail>0)lines.push(['t-fail',`[FAIL] Counterexample: amount=${(Math.random()*1e21).toFixed(0)}`]);
-  lines.push([fail>0?'t-fail':'t-pass',`Result: ${pass} passed, ${fail} failed (${runs} runs)`]);
-  lines.push(['t-info',`Time: ${(runs*0.8).toFixed(0)}ms`]);
-  await animateTerminal('fuzzTerminal',lines,80);
-  testsRun++;checkProgress();
-  document.getElementById('feedbackMsg').innerHTML=`🎲 <strong>Fuzzing ejecutó ${runs} casos automáticamente.</strong> Foundry genera inputs aleatorios para encontrar edge cases que tests manuales no detectarían. ${fail>0?'¡Encontró un bug!':'Todos los casos pasaron.'}`;
+ const runs=+document.getElementById('fuzzRuns').value;
+ const term=document.getElementById('fuzzTerminal');
+ term.innerHTML='<span class="t-info">Iniciando fuzzer...</span>';
+ await new Promise(r=>setTimeout(r,300));
+ const lines=[
+  ['t-header',`[FUZZ] Running ${runs} runs for testFuzz_Transfer`],
+ ];
+ const pass=Math.floor(runs*0.97+Math.random()*runs*.02);
+ const fail=runs-pass;
+ if(fail>0)lines.push(['t-fail',`[FAIL] Counterexample: amount=${(Math.random()*1e21).toFixed(0)}`]);
+ lines.push([fail>0?'t-fail':'t-pass',`Result: ${pass} passed, ${fail} failed (${runs} runs)`]);
+ lines.push(['t-info',`Time: ${(runs*0.8).toFixed(0)}ms`]);
+ await animateTerminal('fuzzTerminal',lines,80);
+ testsRun++;checkProgress();
+ document.getElementById('feedbackMsg').innerHTML=`ðŸŽ² <strong>Fuzzing ejecutÃ³ ${runs} casos automÃ¡ticamente.</strong> Foundry genera inputs aleatorios para encontrar edge cases que tests manuales no detectarÃ­an. ${fail>0?'Â¡EncontrÃ³ un bug!':'Todos los casos pasaron.'}`;
 }
 
 function checkProgress(){
-  if((visitedTabs.size>=2||testsRun>=2)&&!localStorage.getItem(STORAGE_KEY)){localStorage.setItem(STORAGE_KEY,'true');document.getElementById('insigniaArea').classList.remove('hidden');}
+ if((visitedTabs.size>=2||testsRun>=2)&&!localStorage.getItem(STORAGE_KEY)){localStorage.setItem(STORAGE_KEY,'true');document.getElementById('insigniaArea').classList.remove('hidden');}
 }
 
 if(localStorage.getItem(STORAGE_KEY))document.getElementById('insigniaArea').classList.remove('hidden');
@@ -398,9 +398,9 @@ if(localStorage.getItem(STORAGE_KEY))document.getElementById('insigniaArea').cla
 
 <script>
 window.I18N_DATA={
-  'fb_0': { es: '🧪 <strong>4 tests passed en Hardhat.</strong> Nota: <code>beforeEach</code> despliega el contrato fresco antes de cada test — esto es crucial para tests aislados. El snapshot del estado es automático.', en: '🧪 <strong>4 tests passed en Hardhat.</strong> Nota: <code>beforeEach</code> despliega el contrato fresco antes de cada test — esto es crucial para tests aislados. El snapshot del estado es automático.' },
-  'fb_1': { es: '🔨 <strong>Foundry es 10-100x más rápido que Hardhat</strong> para unit tests. El VM de Foundry corre directamente en Rust. Especialmente notable con suites de 100+ tests.', en: '🔨 <strong>Foundry es 10-100x más rápido que Hardhat</strong> para unit tests. El VM de Foundry corre directamente en Rust. Especialmente notable con suites de 100+ tests.' }
+ 'fb_0': { es: 'ðŸ§ª <strong>4 tests passed en Hardhat.</strong> Nota: <code>beforeEach</code> despliega el contrato fresco antes de cada test â€” esto es crucial para tests aislados. El snapshot del estado es automÃ¡tico.', en: 'ðŸ§ª <strong>4 tests passed en Hardhat.</strong> Nota: <code>beforeEach</code> despliega el contrato fresco antes de cada test â€” esto es crucial para tests aislados. El snapshot del estado es automÃ¡tico.' },
+ 'fb_1': { es: 'ðŸ”¨ <strong>Foundry es 10-100x mÃ¡s rÃ¡pido que Hardhat</strong> para unit tests. El VM de Foundry corre directamente en Rust. Especialmente notable con suites de 100+ tests.', en: 'ðŸ”¨ <strong>Foundry es 10-100x mÃ¡s rÃ¡pido que Hardhat</strong> para unit tests. El VM de Foundry corre directamente en Rust. Especialmente notable con suites de 100+ tests.' }
 };
 </script>
-</body>
+ </body>
 </html>

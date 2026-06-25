@@ -1,343 +1,341 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Probabilidades | Independencia</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #111a2e 100%);
-      background-size: 200% 200%;
-      animation: gradientShift 20s ease infinite;
-      font-family: 'Inter', sans-serif;
-      color: #eef5ff;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem 1rem;
-    }
-    @keyframes gradientShift {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-    .mod-container {
-      max-width: 1300px;
-      width: 100%;
-      background: rgba(15, 25, 45, 0.65);
-      backdrop-filter: blur(12px);
-      border-radius: 3rem;
-      border: 1px solid rgba(255, 215, 0, 0.25);
-      box-shadow: 0 25px 45px rgba(0, 0, 0, 0.5);
-      overflow: hidden;
-    }
-    .hero-header {
-      background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%);
-      padding: 2rem 2rem 1.5rem 2rem;
-      text-align: center;
-      border-bottom: 2px solid #ffd700;
-    }
-    .hero-header h1 {
-      font-size: 2.6rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, #FFF, #ffe77a, #ffd700);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-    .hero-header p { font-size: 1.1rem; color: #ffe9a0; margin-top: 0.5rem; }
-    .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1.2rem; flex-wrap: wrap; }
-    .chip {
-      background: rgba(255, 215, 0, 0.15);
-      border: 1px solid #ffd700;
-      padding: 0.4rem 1rem;
-      border-radius: 40px;
-      font-size: 0.8rem;
-      font-weight: 600;
-    }
-    .analogy-card {
-      background: #1e2a3acc;
-      margin: 1.5rem 2rem;
-      padding: 1.2rem 1.8rem;
-      border-radius: 2rem;
-      border-left: 8px solid #ffd700;
-      font-size: 1rem;
-      line-height: 1.6;
-    }
-    .main-flex {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 2rem;
-      padding: 0 2rem 1.5rem 2rem;
-    }
-    .theory-area {
-      flex: 1.2;
-      min-width: 260px;
-      background: rgba(0, 10, 25, 0.7);
-      border-radius: 2rem;
-      padding: 1.5rem;
-      border: 1px solid rgba(255, 215, 0, 0.2);
-    }
-    .theory-area h3 { color: #ffd700; margin: 0.8rem 0 0.4rem; font-size: 1.1rem; }
-    .theory-area p, .theory-area li { font-size: 0.9rem; line-height: 1.5; color: #d4dcec; }
-    .theory-area ul { padding-left: 1.2rem; }
-    .interactive-area {
-      flex: 1.8;
-      min-width: 280px;
-      background: rgba(20, 20, 30, 0.8);
-      border-radius: 2rem;
-      padding: 1.5rem;
-      text-align: center;
-      border: 1px solid #ffd700;
-    }
-    .interactive-area h3 { color: #ffd700; margin-bottom: 0.8rem; }
-    .coin-row { display: flex; justify-content: center; gap: 1.5rem; margin: 1rem 0; flex-wrap: wrap; }
-    .coin {
-      width: 80px; height: 80px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 2.5rem; cursor: pointer; transition: 0.15s;
-      background: linear-gradient(145deg, #ffd700, #b8860b);
-      color: #1e1a0c; font-weight: bold; user-select: none;
-      box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
-    }
-    .coin:active { transform: scale(0.9); }
-    .coin.flipping { animation: coinFlip 0.6s ease-in-out; }
-    @keyframes coinFlip {
-      0% { transform: rotateY(0deg); }
-      50% { transform: rotateY(180deg); }
-      100% { transform: rotateY(360deg); }
-    }
-    .result-row { display: flex; justify-content: center; gap: 2rem; margin: 0.8rem 0; flex-wrap: wrap; font-size: 1.1rem; }
-    .result-row span { background: #00000066; padding: 0.4rem 1rem; border-radius: 2rem; }
-    .prob-table { width: 100%; border-collapse: collapse; margin: 0.8rem 0; font-size: 0.85rem; }
-    .prob-table th, .prob-table td { padding: 0.4rem; border: 1px solid #ffd70055; text-align: center; }
-    .prob-table th { background: #ffd70022; color: #ffd700; }
-    .btn-action {
-      background: linear-gradient(95deg, #f0a500, #ff6a00);
-      border: none; padding: 0.8rem 1.8rem; font-weight: bold;
-      border-radius: 3rem; cursor: pointer; font-size: 1rem;
-      transition: 0.2s; color: #1e1a0c; margin: 0.3rem;
-    }
-    .btn-action:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(240,165,0,0.5); }
-    .btn-action.secondary { background: #2c3e66; color: #eef5ff; }
-    .feedback {
-      background: #00000099;
-      margin: 0 2rem 1.5rem 2rem;
-      padding: 1rem;
-      border-radius: 1.5rem;
-      text-align: center;
-      font-weight: 500;
-      border-left: 4px solid #ffd700;
-    }
-    .insignia {
-      text-align: center;
-      background: #0c1b2f;
-      border-radius: 2rem;
-      margin: 0 2rem 1.5rem;
-      padding: 1rem;
-      border: 1px dashed gold;
-    }
-    .insignia i { font-size: 2.5rem; color: gold; }
-    .hidden { display: none; }
-    .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
-    .nav-link {
-      background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem;
-      font-weight: 600; text-decoration: none; color: #eef5ff;
-      display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s;
-    }
-    .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(255,215,0,0.4); }
-    .nav-link.next { background: linear-gradient(95deg, #f0a500, #ff6a00); color: #1e1a0c; }
-    .nav-link.menu { background: #1a2a4a; border: 1px solid #3399ff; }
-    footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
-    @media (max-width: 800px) {
-      .hero-header h1 { font-size: 1.9rem; }
-      .coin { width: 60px; height: 60px; font-size: 1.8rem; }
-    }
-  </style>
-  <link rel="stylesheet" href="../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Probabilidades | Independencia</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+   background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #111a2e 100%);
+   background-size: 200% 200%;
+   animation: gradientShift 20s ease infinite;
+   font-family: 'Inter', sans-serif;
+   color: #eef5ff;
+   min-height: 100vh;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   padding: 2rem 1rem;
+  }
+  @keyframes gradientShift {
+   0% { background-position: 0% 50%; }
+   50% { background-position: 100% 50%; }
+   100% { background-position: 0% 50%; }
+  }
+  .mod-container {
+   max-width: 1300px;
+   width: 100%;
+   background: rgba(15, 25, 45, 0.65);
+   backdrop-filter: blur(12px);
+   border-radius: 3rem;
+   border: 1px solid rgba(255, 215, 0, 0.25);
+   box-shadow: 0 25px 45px rgba(0, 0, 0, 0.5);
+   overflow: hidden;
+  }
+  .hero-header {
+   background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%);
+   padding: 2rem 2rem 1.5rem 2rem;
+   text-align: center;
+   border-bottom: 2px solid #ffd700;
+  }
+  .hero-header h1 {
+   font-size: 2.6rem;
+   font-weight: 800;
+   background: linear-gradient(135deg, #FFF, #ffe77a, #ffd700);
+   -webkit-background-clip: text;
+   background-clip: text;
+   color: transparent;
+  }
+  .hero-header p { font-size: 1.1rem; color: #ffe9a0; margin-top: 0.5rem; }
+  .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1.2rem; flex-wrap: wrap; }
+  .chip {
+   background: rgba(255, 215, 0, 0.15);
+   border: 1px solid #ffd700;
+   padding: 0.4rem 1rem;
+   border-radius: 40px;
+   font-size: 0.8rem;
+   font-weight: 600;
+  }
+  .analogy-card {
+   background: #1e2a3acc;
+   margin: 1.5rem 2rem;
+   padding: 1.2rem 1.8rem;
+   border-radius: 2rem;
+   border-left: 8px solid #ffd700;
+   font-size: 1rem;
+   line-height: 1.6;
+  }
+  .main-flex {
+   display: flex;
+   flex-wrap: wrap;
+   gap: 2rem;
+   padding: 0 2rem 1.5rem 2rem;
+  }
+  .theory-area {
+   flex: 1.2;
+   min-width: 260px;
+   background: rgba(0, 10, 25, 0.7);
+   border-radius: 2rem;
+   padding: 1.5rem;
+   border: 1px solid rgba(255, 215, 0, 0.2);
+  }
+  .theory-area h3 { color: #ffd700; margin: 0.8rem 0 0.4rem; font-size: 1.1rem; }
+  .theory-area p, .theory-area li { font-size: 0.9rem; line-height: 1.5; color: #d4dcec; }
+  .theory-area ul { padding-left: 1.2rem; }
+  .interactive-area {
+   flex: 1.8;
+   min-width: 280px;
+   background: rgba(20, 20, 30, 0.8);
+   border-radius: 2rem;
+   padding: 1.5rem;
+   text-align: center;
+   border: 1px solid #ffd700;
+  }
+  .interactive-area h3 { color: #ffd700; margin-bottom: 0.8rem; }
+  .coin-row { display: flex; justify-content: center; gap: 1.5rem; margin: 1rem 0; flex-wrap: wrap; }
+  .coin {
+   width: 80px; height: 80px; border-radius: 50%;
+   display: flex; align-items: center; justify-content: center;
+   font-size: 2.5rem; cursor: pointer; transition: 0.15s;
+   background: linear-gradient(145deg, #ffd700, #b8860b);
+   color: #1e1a0c; font-weight: bold; user-select: none;
+   box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+  }
+  .coin:active { transform: scale(0.9); }
+  .coin.flipping { animation: coinFlip 0.6s ease-in-out; }
+  @keyframes coinFlip {
+   0% { transform: rotateY(0deg); }
+   50% { transform: rotateY(180deg); }
+   100% { transform: rotateY(360deg); }
+  }
+  .result-row { display: flex; justify-content: center; gap: 2rem; margin: 0.8rem 0; flex-wrap: wrap; font-size: 1.1rem; }
+  .result-row span { background: #00000066; padding: 0.4rem 1rem; border-radius: 2rem; }
+  .prob-table { width: 100%; border-collapse: collapse; margin: 0.8rem 0; font-size: 0.85rem; }
+  .prob-table th, .prob-table td { padding: 0.4rem; border: 1px solid #ffd70055; text-align: center; }
+  .prob-table th { background: #ffd70022; color: #ffd700; }
+  .btn-action {
+   background: linear-gradient(95deg, #f0a500, #ff6a00);
+   border: none; padding: 0.8rem 1.8rem; font-weight: bold;
+   border-radius: 3rem; cursor: pointer; font-size: 1rem;
+   transition: 0.2s; color: #1e1a0c; margin: 0.3rem;
+  }
+  .btn-action:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(240,165,0,0.5); }
+  .btn-action.secondary { background: #2c3e66; color: #eef5ff; }
+  .feedback {
+   background: #00000099;
+   margin: 0 2rem 1.5rem 2rem;
+   padding: 1rem;
+   border-radius: 1.5rem;
+   text-align: center;
+   font-weight: 500;
+   border-left: 4px solid #ffd700;
+  }
+  .insignia {
+   text-align: center;
+   background: #0c1b2f;
+   border-radius: 2rem;
+   margin: 0 2rem 1.5rem;
+   padding: 1rem;
+   border: 1px dashed gold;
+  }
+  .insignia i { font-size: 2.5rem; color: gold; }
+  .hidden { display: none; }
+  .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
+  .nav-link {
+   background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem;
+   font-weight: 600; text-decoration: none; color: #eef5ff;
+   display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s;
+  }
+  .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(255,215,0,0.4); }
+  .nav-link.next { background: linear-gradient(95deg, #f0a500, #ff6a00); color: #1e1a0c; }
+  .nav-link.menu { background: #1a2a4a; border: 1px solid #3399ff; }
+  footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
+  @media (max-width: 800px) {
+   .hero-header h1 { font-size: 1.9rem; }
+   .coin { width: 60px; height: 60px; font-size: 1.8rem; }
+  }
+ </style>
+ <link rel="stylesheet" href="../../assets/css/theme.css">
 </head>
 <body>
-  <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+ <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
 
-  <div class="mod-container">
-    <div class="hero-header">
-      <h1>🪙 INDEPENDENCIA 🪙</h1>
-      <p>Cuando un evento no afecta al otro — la base de los ensayos de Bernoulli</p>
-      <div class="badge-area">
-        <span class="chip"><i class="fas fa-dice"></i> Eventos independientes</span>
-        <span class="chip"><i class="fas fa-code-branch"></i> Ensayos de Bernoulli</span>
-        <span class="chip"><i class="fas fa-gem"></i> Insignia Dorada</span>
-      </div>
-    </div>
-
-    <div class="analogy-card">
-      <strong>🪙 Piénsalo así:</strong> La independencia es como lanzar dos monedas: una no sabe lo que hace la otra. Que salga cara en la primera no cambia la probabilidad de que salga cara en la segunda. Cada moneda sigue su propio destino.
-    </div>
-
-    <div class="main-flex">
-      <div class="theory-area">
-        <h3><i class="fas fa-calculator"></i> Definición</h3>
-        <p>Dos eventos A y B son independientes si:</p>
-        <p style="text-align:center;font-size:1.2rem;margin:0.6rem 0;color:#ffd700;font-weight:700;">P(A∩B) = P(A) · P(B)</p>
-        <h3><i class="fas fa-layer-group"></i> Independencia por pares vs mutua</h3>
-        <p>Dos eventos pueden ser independientes por pares sin ser mutuamente independientes. La independencia mutua requiere que cualquier subconjunto también sea independiente.</p>
-        <h3><i class="fas fa-random"></i> Independencia condicional</h3>
-        <p>A y B son condicionalmente independientes dado C si P(A∩B|C) = P(A|C)·P(B|C).</p>
-        <h3><i class="fas fa-flask"></i> Ensayos de Bernoulli</h3>
-        <p>Secuencia de n ensayos independientes con dos resultados posibles (éxito/fracaso) y probabilidad p constante.</p>
-      </div>
-
-      <div class="interactive-area">
-        <h3><i class="fas fa-coins"></i> Simulador de Independencia</h3>
-        <p style="font-size:0.85rem;margin-bottom:0.5rem;">Lanza dos monedas y observa la independencia en acción</p>
-        <div class="coin-row">
-          <div id="coin1" class="coin">C</div>
-          <div id="coin2" class="coin">C</div>
-        </div>
-        <button id="flipBtn" class="btn-action"><i class="fas fa-dice"></i> Lanzar ambas</button>
-        <button id="resetSimBtn" class="btn-action secondary"><i class="fas fa-redo"></i> Reiniciar</button>
-        <div class="result-row">
-          <span><i class="fas fa-coins"></i> Lanzamientos: <strong id="totalFlips">0</strong></span>
-          <span><i class="fas fa-check-circle" style="color:#4caf50;"></i> Caras: <strong id="headsCount">0</strong></span>
-        </div>
-        <table class="prob-table">
-          <tr><th>Evento</th><th>Observado</th><th>Esperado (indep.)</th></tr>
-          <tr><td>P(Cara₁)</td><td id="pA">0.000</td><td>0.500</td></tr>
-          <tr><td>P(Cara₂)</td><td id="pB">0.000</td><td>0.500</td></tr>
-          <tr><td>P(Cara₁∩Cara₂)</td><td id="pAB">0.000</td><td>0.250</td></tr>
-          <tr><td>P(A)·P(B)</td><td id="pAxB">0.000</td><td>0.250</td></tr>
-        </table>
-        <div id="simFeedback" style="font-size:0.85rem;margin-top:0.5rem;color:#ffe9a0;">
-          Lanza las monedas para ver cómo P(A∩B) se aproxima a P(A)·P(B)
-        </div>
-      </div>
-    </div>
-
-    <div id="feedbackMsg" class="feedback">
-      💡 Lanza las monedas al menos 20 veces para observar la convergencia. ¿Coinciden P(A∩B) y P(A)·P(B)?
-    </div>
-
-    <div id="insigniaArea" class="insignia hidden">
-      <i class="fas fa-medal"></i>
-      <h3>🏅 ¡MAESTRO DE LA INDEPENDENCIA! 🏅</h3>
-      <p>Has dominado el concepto de independencia probabilística. ¡Las monedas no se hablan entre sí!</p>
-    </div>
-
-    <div class="nav-links">
-      <a href="04-condicional.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
-      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
-      <a href="06-discretas1.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
-    </div>
-    <footer>
-      <i class="fas fa-crown"></i> Probabilidades Interactivas · La independencia es el superpoder de la aleatoriedad
-    </footer>
+ <div class="mod-container">
+  <div class="hero-header">
+   <h1>🪙 INDEPENDENCIA 🪙</h1>
+   <p>Cuando un evento no afecta al otro — la base de los ensayos de Bernoulli</p>
+   <div class="badge-area">
+    <span class="chip"><i class="fas fa-dice"></i> Eventos independientes</span>
+    <span class="chip"><i class="fas fa-code-branch"></i> Ensayos de Bernoulli</span>
+    <span class="chip"><i class="fas fa-gem"></i> Insignia Dorada</span>
+   </div>
   </div>
 
-  <script>
-    const STORAGE_KEY = 'prob_lvl5';
-    let flips = 0, heads1 = 0, heads2 = 0, bothHeads = 0;
-    const coin1 = document.getElementById('coin1');
-    const coin2 = document.getElementById('coin2');
-    const flipBtn = document.getElementById('flipBtn');
-    const resetBtn = document.getElementById('resetSimBtn');
-    const totalFlips = document.getElementById('totalFlips');
-    const headsCount = document.getElementById('headsCount');
-    const pA = document.getElementById('pA');
-    const pB = document.getElementById('pB');
-    const pAB = document.getElementById('pAB');
-    const pAxB = document.getElementById('pAxB');
-    const simFeedback = document.getElementById('simFeedback');
-    const feedbackMsg = document.getElementById('feedbackMsg');
-    const insigniaArea = document.getElementById('insigniaArea');
+  <div class="analogy-card">
+   <strong>🪙 Piénsalo así:</strong> La independencia es como lanzar dos monedas: una no sabe lo que hace la otra. Que salga cara en la primera no cambia la probabilidad de que salga cara en la segunda. Cada moneda sigue su propio destino.
+  </div>
 
-    function flipCoin() {
-      return Math.random() < 0.5;
-    }
+  <div class="main-flex">
+   <div class="theory-area">
+    <h3><i class="fas fa-calculator"></i> Definición</h3>
+    <p>Dos eventos A y B son independientes si:</p>
+    <p style="text-align:center;font-size:1.2rem;margin:0.6rem 0;color:#ffd700;font-weight:700;">P(A∩B) = P(A) · P(B)</p>
+    <h3><i class="fas fa-layer-group"></i> Independencia por pares vs mutua</h3>
+    <p>Dos eventos pueden ser independientes por pares sin ser mutuamente independientes. La independencia mutua requiere que cualquier subconjunto también sea independiente.</p>
+    <h3><i class="fas fa-random"></i> Independencia condicional</h3>
+    <p>A y B son condicionalmente independientes dado C si P(A∩B|C) = P(A|C)·P(B|C).</p>
+    <h3><i class="fas fa-flask"></i> Ensayos de Bernoulli</h3>
+    <p>Secuencia de n ensayos independientes con dos resultados posibles (éxito/fracaso) y probabilidad p constante.</p>
+   </div>
 
-    function updateStats() {
-      totalFlips.textContent = flips;
-      headsCount.textContent = heads1;
-      const probA = flips > 0 ? (heads1 / flips) : 0;
-      const probB = flips > 0 ? (heads2 / flips) : 0;
-      const probAB = flips > 0 ? (bothHeads / flips) : 0;
-      pA.textContent = probA.toFixed(3);
-      pB.textContent = probB.toFixed(3);
-      pAB.textContent = probAB.toFixed(3);
-      pAxB.textContent = (probA * probB).toFixed(3);
-    }
+   <div class="interactive-area">
+    <h3><i class="fas fa-coins"></i> Simulador de Independencia</h3>
+    <p style="font-size:0.85rem;margin-bottom:0.5rem;">Lanza dos monedas y observa la independencia en acción</p>
+    <div class="coin-row">
+     <div id="coin1" class="coin">C</div>
+     <div id="coin2" class="coin">C</div>
+    </div>
+    <button id="flipBtn" class="btn-action"><i class="fas fa-dice"></i> Lanzar ambas</button>
+    <button id="resetSimBtn" class="btn-action secondary"><i class="fas fa-redo"></i> Reiniciar</button>
+    <div class="result-row">
+     <span><i class="fas fa-coins"></i> Lanzamientos: <strong id="totalFlips">0</strong></span>
+     <span><i class="fas fa-check-circle" style="color:#4caf50;"></i> Caras: <strong id="headsCount">0</strong></span>
+    </div>
+    <table class="prob-table">
+     <tr><th>Evento</th><th>Observado</th><th>Esperado (indep.)</th></tr>
+     <tr><td>P(Cara₁)</td><td id="pA">0.000</td><td>0.500</td></tr>
+     <tr><td>P(Cara₂)</td><td id="pB">0.000</td><td>0.500</td></tr>
+     <tr><td>P(Cara₁∩Cara₂)</td><td id="pAB">0.000</td><td>0.250</td></tr>
+     <tr><td>P(A)·P(B)</td><td id="pAxB">0.000</td><td>0.250</td></tr>
+    </table>
+    <div id="simFeedback" style="font-size:0.85rem;margin-top:0.5rem;color:#ffe9a0;">
+     Lanza las monedas para ver cómo P(A∩B) se aproxima a P(A)·P(B)
+    </div>
+   </div>
+  </div>
 
-    function checkInsignia() {
-      if (localStorage.getItem(STORAGE_KEY) === 'true') {
-        insigniaArea.classList.remove('hidden');
-        feedbackMsg.innerHTML = I18N.t('fb_0');
-        flipBtn.disabled = true;
-        flipBtn.style.opacity = '0.5';
-        return true;
-      }
-      return false;
-    }
+  <div id="feedbackMsg" class="feedback">
+   💡 Lanza las monedas al menos 20 veces para observar la convergencia. ¿Coinciden P(A∩B) y P(A)·P(B)?
+  </div>
 
-    flipBtn.addEventListener('click', () => {
-      if (localStorage.getItem(STORAGE_KEY) === 'true') return;
-      coin1.classList.remove('flipping');
-      coin2.classList.remove('flipping');
-      void coin1.offsetWidth;
-      void coin2.offsetWidth;
-      coin1.classList.add('flipping');
-      coin2.classList.add('flipping');
-      const r1 = flipCoin();
-      const r2 = flipCoin();
-      setTimeout(() => {
-        coin1.textContent = r1 ? 'C' : 'X';
-        coin2.textContent = r2 ? 'C' : 'X';
-        flips++;
-        if (r1) heads1++;
-        if (r2) heads2++;
-        if (r1 && r2) bothHeads++;
-        updateStats();
-        simFeedback.innerHTML = flips >= 20
-          ? '📊 Con ' + flips + ' lanzamientos, P(A∩B) = ' + (bothHeads/flips).toFixed(3) + ' y P(A)·P(B) = ' + ((heads1/flips)*(heads2/flips)).toFixed(3) + '. ¿Se parecen?'
-          : '🔄 Llevas ' + flips + ' lanzamientos. ¡Sigue para que las frecuencias se estabilicen!';
-        if (flips >= 20) {
-          const diff = Math.abs((bothHeads/flips) - ((heads1/flips)*(heads2/flips)));
-          if (diff < 0.1 && !localStorage.getItem(STORAGE_KEY)) {
-            insigniaArea.classList.remove('hidden');
-            localStorage.setItem(STORAGE_KEY, 'true');
-            feedbackMsg.innerHTML = I18N.t('fb_1');
-            flipBtn.disabled = true;
-            flipBtn.style.opacity = '0.5';
-          } else {
-            feedbackMsg.innerHTML = I18N.t('fb_2') + diff.toFixed(3) + '. Sigue lanzando para que converja. ¡La ley de los grandes números funciona!';
-          }
-        }
-      }, 600);
-    });
+  <div id="insigniaArea" class="insignia hidden">
+   <i class="fas fa-medal"></i>
+   <h3>🏅 ¡MAESTRO DE LA INDEPENDENCIA! 🏅</h3>
+   <p>Has dominado el concepto de independencia probabilística. ¡Las monedas no se hablan entre sí!</p>
+  </div>
 
-    resetBtn.addEventListener('click', () => {
-      flips = 0; heads1 = 0; heads2 = 0; bothHeads = 0;
-      coin1.textContent = 'C'; coin2.textContent = 'C';
-      updateStats();
-      simFeedback.innerHTML = I18N.t('fb_3');
-      feedbackMsg.innerHTML = I18N.t('fb_4');
-    });
+  <div class="nav-links">
+   <a href="04-condicional.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+   <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+   <a href="06-discretas1.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer>
+   <i class="fas fa-crown"></i> Probabilidades Interactivas · La independencia es el superpoder de la aleatoriedad
+  </footer>
+ </div>
 
+ <script>
+  const STORAGE_KEY = 'prob_lvl5';
+  let flips = 0, heads1 = 0, heads2 = 0, bothHeads = 0;
+  const coin1 = document.getElementById('coin1');
+  const coin2 = document.getElementById('coin2');
+  const flipBtn = document.getElementById('flipBtn');
+  const resetBtn = document.getElementById('resetSimBtn');
+  const totalFlips = document.getElementById('totalFlips');
+  const headsCount = document.getElementById('headsCount');
+  const pA = document.getElementById('pA');
+  const pB = document.getElementById('pB');
+  const pAB = document.getElementById('pAB');
+  const pAxB = document.getElementById('pAxB');
+  const simFeedback = document.getElementById('simFeedback');
+  const feedbackMsg = document.getElementById('feedbackMsg');
+  const insigniaArea = document.getElementById('insigniaArea');
+
+  function flipCoin() {
+   return Math.random() < 0.5;
+  }
+
+  function updateStats() {
+   totalFlips.textContent = flips;
+   headsCount.textContent = heads1;
+   const probA = flips > 0 ? (heads1 / flips) : 0;
+   const probB = flips > 0 ? (heads2 / flips) : 0;
+   const probAB = flips > 0 ? (bothHeads / flips) : 0;
+   pA.textContent = probA.toFixed(3);
+   pB.textContent = probB.toFixed(3);
+   pAB.textContent = probAB.toFixed(3);
+   pAxB.textContent = (probA * probB).toFixed(3);
+  }
+
+  function checkInsignia() {
+   if (localStorage.getItem(STORAGE_KEY) === 'true') {
+    insigniaArea.classList.remove('hidden');
+    feedbackMsg.innerHTML = I18N.t('fb_0');
+    flipBtn.disabled = true;
+    flipBtn.style.opacity = '0.5';
+    return true;
+   }
+   return false;
+  }
+
+  flipBtn.addEventListener('click', () => {
+   if (localStorage.getItem(STORAGE_KEY) === 'true') return;
+   coin1.classList.remove('flipping');
+   coin2.classList.remove('flipping');
+   void coin1.offsetWidth;
+   void coin2.offsetWidth;
+   coin1.classList.add('flipping');
+   coin2.classList.add('flipping');
+   const r1 = flipCoin();
+   const r2 = flipCoin();
+   setTimeout(() => {
+    coin1.textContent = r1 ? 'C' : 'X';
+    coin2.textContent = r2 ? 'C' : 'X';
+    flips++;
+    if (r1) heads1++;
+    if (r2) heads2++;
+    if (r1 && r2) bothHeads++;
     updateStats();
-    checkInsignia();
-  </script>
-  <script src="../../assets/js/cookie-consent.js"></script>
+    simFeedback.innerHTML = flips >= 20
+     ? '📊 Con ' + flips + ' lanzamientos, P(A∩B) = ' + (bothHeads/flips).toFixed(3) + ' y P(A)·P(B) = ' + ((heads1/flips)*(heads2/flips)).toFixed(3) + '. ¿Se parecen?'
+     : '🔄 Llevas ' + flips + ' lanzamientos. ¡Sigue para que las frecuencias se estabilicen!';
+    if (flips >= 20) {
+     const diff = Math.abs((bothHeads/flips) - ((heads1/flips)*(heads2/flips)));
+     if (diff < 0.1 && !localStorage.getItem(STORAGE_KEY)) {
+      insigniaArea.classList.remove('hidden');
+      localStorage.setItem(STORAGE_KEY, 'true');
+      feedbackMsg.innerHTML = I18N.t('fb_1');
+      flipBtn.disabled = true;
+      flipBtn.style.opacity = '0.5';
+     } else {
+      feedbackMsg.innerHTML = I18N.t('fb_2') + diff.toFixed(3) + '. Sigue lanzando para que converja. ¡La ley de los grandes números funciona!';
+     }
+    }
+   }, 600);
+  });
 
-<script>
+  resetBtn.addEventListener('click', () => {
+   flips = 0; heads1 = 0; heads2 = 0; bothHeads = 0;
+   coin1.textContent = 'C'; coin2.textContent = 'C';
+   updateStats();
+   simFeedback.innerHTML = I18N.t('fb_3');
+   feedbackMsg.innerHTML = I18N.t('fb_4');
+  });
+
+  updateStats();
+  checkInsignia();
+ </script>
+ <script>
 window.I18N_DATA={
-  'fb_0': { es: '🎉 ¡Ya completaste este nivel! La independencia no tiene secretos para ti.', en: '🎉 ¡Ya completaste este nivel! La independencia no tiene secretos para ti.' },
-  'fb_1': { es: '🎉 ¡LO LOGRASTE! Has comprobado que P(A∩B) ≈ P(A)·P(B). ¡Independencia confirmada!', en: '🎉 YOU DID IT! Has comprobado que P(A∩B) ≈ P(A)·P(B). ¡Independencia confirmada!' },
-  'fb_2': { es: '📈 Diferencia: ', en: '📈 Diferencia: ' },
-  'fb_3': { es: 'Lanza las monedas para ver cómo P(A∩B) se aproxima a P(A)·P(B)', en: 'Lanza las monedas para ver cómo P(A∩B) se aproxima a P(A)·P(B)' },
-  'fb_4': { es: '💡 Lanza las monedas al menos 20 veces para observar la convergencia.', en: '💡 Lanza las monedas al menos 20 veces para observar la convergencia.' }
+ 'fb_0': { es: '🎉 ¡Ya completaste este nivel! La independencia no tiene secretos para ti.', en: '🎉 ¡Ya completaste este nivel! La independencia no tiene secretos para ti.' },
+ 'fb_1': { es: '🎉 ¡LO LOGRASTE! Has comprobado que P(A∩B) ≈ P(A)·P(B). ¡Independencia confirmada!', en: '🎉 YOU DID IT! Has comprobado que P(A∩B) ≈ P(A)·P(B). ¡Independencia confirmada!' },
+ 'fb_2': { es: '📈 Diferencia: ', en: '📈 Diferencia: ' },
+ 'fb_3': { es: 'Lanza las monedas para ver cómo P(A∩B) se aproxima a P(A)·P(B)', en: 'Lanza las monedas para ver cómo P(A∩B) se aproxima a P(A)·P(B)' },
+ 'fb_4': { es: '💡 Lanza las monedas al menos 20 veces para observar la convergencia.', en: '💡 Lanza las monedas al menos 20 veces para observar la convergencia.' }
 };
 </script>
 </body>

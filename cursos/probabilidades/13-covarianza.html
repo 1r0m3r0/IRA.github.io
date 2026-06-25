@@ -1,241 +1,241 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Probabilidades | Covarianza y Correlación</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Press+Start+2P&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%);background-size:200% 200%;animation:gradientShift 20s ease infinite;font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
-    @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-    .mod-container{max-width:1300px;width:100%;background:rgba(15,25,45,0.65);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(255,80,80,0.25);box-shadow:0 25px 45px rgba(0,0,0,0.5);overflow:hidden}
-    .hero-header{background:linear-gradient(95deg,#0b1120 0%,#111a2e 100%);padding:2rem 2rem 1.5rem;text-align:center;border-bottom:2px solid #ff5050}
-    .hero-header h1{font-size:2.6rem;font-weight:800;background:linear-gradient(135deg,#FFF,#ff9090,#ff5050);-webkit-background-clip:text;background-clip:text;color:transparent}
-    .hero-header p{font-size:1.2rem;color:#ffcccc;margin-top:0.5rem;font-weight:500}
-    .badge-area{display:flex;justify-content:center;gap:1rem;margin-top:1.2rem;flex-wrap:wrap}
-    .chip{background:rgba(255,80,80,0.15);border:1px solid #ff5050;padding:0.4rem 1rem;border-radius:40px;font-size:0.8rem;font-weight:600;backdrop-filter:blur(4px)}
-    .analogy-card{background:#1e2a3acc;margin:1.5rem 2rem;padding:1.2rem 1.8rem;border-radius:2rem;border-left:8px solid #ff5050;font-size:1rem;line-height:1.6}
-    .main-area{padding:0 2rem 1rem;display:flex;flex-direction:column;gap:1.5rem;align-items:center}
-    .theory-grid{display:flex;flex-wrap:wrap;gap:1.5rem;width:100%}
-    .method-card{flex:1;min-width:240px;background:#0f1a2ce6;border-radius:1.8rem;padding:1.5rem;border:1px solid rgba(255,80,80,0.2);transition:0.2s}
-    .method-card:hover{border-color:#ff5050;box-shadow:0 0 20px rgba(255,80,80,0.15);transform:translateY(-2px)}
-    .method-card h3{color:#ff5050;margin-bottom:0.8rem;font-size:1.1rem}
-    .method-card p{font-size:0.9rem;color:#e6cccc;line-height:1.5;margin-bottom:0.5rem}
-    .method-card .formula{font-family:'Courier New',monospace;background:#00000055;padding:0.6rem;border-radius:1rem;text-align:center;color:#ff9090;font-size:0.85rem}
-    .sim-area{width:100%;background:#0a1628e6;border-radius:1.8rem;padding:1.5rem;border:1px solid rgba(255,80,80,0.15)}
-    .sim-area h3{color:#ff5050;margin-bottom:1rem}
-    .param-row{display:flex;flex-wrap:wrap;gap:1rem;align-items:center;margin-bottom:1rem}
-    .param-row label{font-weight:600;font-size:0.9rem}
-    .scatter-box{background:#00000066;border-radius:1.5rem;padding:1rem;min-height:260px;display:flex;align-items:center;justify-content:center;margin-bottom:0.8rem}
-    #scatterCanvas{border-radius:1.2rem;max-width:100%;max-height:240px;cursor:crosshair}
-    .stats-row{display:flex;flex-wrap:wrap;gap:0.8rem;justify-content:center;margin-top:0.5rem}
-    .stats-row .s-card{background:#0f1a2ce6;border-radius:1rem;padding:0.5rem 1rem;text-align:center;border:1px solid rgba(255,80,80,0.15);min-width:100px}
-    .stats-row .s-label{font-size:0.7rem;color:#cc9999;text-transform:uppercase}
-    .stats-row .s-value{font-size:1.2rem;font-weight:700;color:#ff5050}
-    .btn-group{display:flex;gap:0.8rem;flex-wrap:wrap;justify-content:center}
-    .btn-action{background:linear-gradient(95deg,#ff5050,#cc2020);border:none;padding:0.7rem 1.5rem;font-weight:bold;border-radius:3rem;cursor:pointer;font-size:0.95rem;transition:0.2s;color:#fff}
-    .btn-action:hover{transform:translateY(-2px);box-shadow:0 0 15px rgba(255,80,80,0.5)}
-    .btn-action.secondary{background:#1a2a3a;border:1px solid #ff5050;color:#ff5050}
-    .feedback{background:#00000099;margin:0 2rem 1.5rem;padding:1rem;border-radius:1.5rem;text-align:center;font-weight:500;border-left:4px solid #ff5050}
-    .insignia{text-align:center;background:#0c1b2f;border-radius:2rem;margin:0 2rem 1.5rem;padding:1rem;border:1px dashed gold}
-    .insignia i{font-size:2.5rem;color:gold}
-    .hidden{display:none}
-    .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.5rem 2rem}
-    .nav-link{background:#2c3e66;padding:0.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:0.5rem;transition:0.2s;font-size:0.95rem}
-    .nav-link:hover{transform:translateY(-2px);box-shadow:0 0 10px rgba(0,224,255,0.4)}
-    .nav-link.next{background:linear-gradient(95deg,#f0a500,#ff6a00);color:#1e1a0c}
-    .nav-link.menu{background:#1a2a4a;border:1px solid #3399ff}
-    footer{text-align:center;padding:1.2rem;font-size:0.8rem;border-top:1px solid #2c3e66}
-    @media(max-width:800px){.hero-header h1{font-size:1.9rem}.theory-grid{flex-direction:column}}
-  </style>
-  <link rel="stylesheet" href="../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Probabilidades | Covarianza y CorrelaciÃ³n</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Press+Start+2P&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%);background-size:200% 200%;animation:gradientShift 20s ease infinite;font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
+  @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+  .mod-container{max-width:1300px;width:100%;background:rgba(15,25,45,0.65);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(255,80,80,0.25);box-shadow:0 25px 45px rgba(0,0,0,0.5);overflow:hidden}
+  .hero-header{background:linear-gradient(95deg,#0b1120 0%,#111a2e 100%);padding:2rem 2rem 1.5rem;text-align:center;border-bottom:2px solid #ff5050}
+  .hero-header h1{font-size:2.6rem;font-weight:800;background:linear-gradient(135deg,#FFF,#ff9090,#ff5050);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero-header p{font-size:1.2rem;color:#ffcccc;margin-top:0.5rem;font-weight:500}
+  .badge-area{display:flex;justify-content:center;gap:1rem;margin-top:1.2rem;flex-wrap:wrap}
+  .chip{background:rgba(255,80,80,0.15);border:1px solid #ff5050;padding:0.4rem 1rem;border-radius:40px;font-size:0.8rem;font-weight:600;backdrop-filter:blur(4px)}
+  .analogy-card{background:#1e2a3acc;margin:1.5rem 2rem;padding:1.2rem 1.8rem;border-radius:2rem;border-left:8px solid #ff5050;font-size:1rem;line-height:1.6}
+  .main-area{padding:0 2rem 1rem;display:flex;flex-direction:column;gap:1.5rem;align-items:center}
+  .theory-grid{display:flex;flex-wrap:wrap;gap:1.5rem;width:100%}
+  .method-card{flex:1;min-width:240px;background:#0f1a2ce6;border-radius:1.8rem;padding:1.5rem;border:1px solid rgba(255,80,80,0.2);transition:0.2s}
+  .method-card:hover{border-color:#ff5050;box-shadow:0 0 20px rgba(255,80,80,0.15);transform:translateY(-2px)}
+  .method-card h3{color:#ff5050;margin-bottom:0.8rem;font-size:1.1rem}
+  .method-card p{font-size:0.9rem;color:#e6cccc;line-height:1.5;margin-bottom:0.5rem}
+  .method-card .formula{font-family:'Courier New',monospace;background:#00000055;padding:0.6rem;border-radius:1rem;text-align:center;color:#ff9090;font-size:0.85rem}
+  .sim-area{width:100%;background:#0a1628e6;border-radius:1.8rem;padding:1.5rem;border:1px solid rgba(255,80,80,0.15)}
+  .sim-area h3{color:#ff5050;margin-bottom:1rem}
+  .param-row{display:flex;flex-wrap:wrap;gap:1rem;align-items:center;margin-bottom:1rem}
+  .param-row label{font-weight:600;font-size:0.9rem}
+  .scatter-box{background:#00000066;border-radius:1.5rem;padding:1rem;min-height:260px;display:flex;align-items:center;justify-content:center;margin-bottom:0.8rem}
+  #scatterCanvas{border-radius:1.2rem;max-width:100%;max-height:240px;cursor:crosshair}
+  .stats-row{display:flex;flex-wrap:wrap;gap:0.8rem;justify-content:center;margin-top:0.5rem}
+  .stats-row .s-card{background:#0f1a2ce6;border-radius:1rem;padding:0.5rem 1rem;text-align:center;border:1px solid rgba(255,80,80,0.15);min-width:100px}
+  .stats-row .s-label{font-size:0.7rem;color:#cc9999;text-transform:uppercase}
+  .stats-row .s-value{font-size:1.2rem;font-weight:700;color:#ff5050}
+  .btn-group{display:flex;gap:0.8rem;flex-wrap:wrap;justify-content:center}
+  .btn-action{background:linear-gradient(95deg,#ff5050,#cc2020);border:none;padding:0.7rem 1.5rem;font-weight:bold;border-radius:3rem;cursor:pointer;font-size:0.95rem;transition:0.2s;color:#fff}
+  .btn-action:hover{transform:translateY(-2px);box-shadow:0 0 15px rgba(255,80,80,0.5)}
+  .btn-action.secondary{background:#1a2a3a;border:1px solid #ff5050;color:#ff5050}
+  .feedback{background:#00000099;margin:0 2rem 1.5rem;padding:1rem;border-radius:1.5rem;text-align:center;font-weight:500;border-left:4px solid #ff5050}
+  .insignia{text-align:center;background:#0c1b2f;border-radius:2rem;margin:0 2rem 1.5rem;padding:1rem;border:1px dashed gold}
+  .insignia i{font-size:2.5rem;color:gold}
+  .hidden{display:none}
+  .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.5rem 2rem}
+  .nav-link{background:#2c3e66;padding:0.7rem 1.5rem;border-radius:3rem;font-weight:600;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:0.5rem;transition:0.2s;font-size:0.95rem}
+  .nav-link:hover{transform:translateY(-2px);box-shadow:0 0 10px rgba(0,224,255,0.4)}
+  .nav-link.next{background:linear-gradient(95deg,#f0a500,#ff6a00);color:#1e1a0c}
+  .nav-link.menu{background:#1a2a4a;border:1px solid #3399ff}
+  footer{text-align:center;padding:1.2rem;font-size:0.8rem;border-top:1px solid #2c3e66}
+  @media(max-width:800px){.hero-header h1{font-size:1.9rem}.theory-grid{flex-direction:column}}
+ </style>
+ <link rel="stylesheet" href="../../assets/css/theme.css">
 </head>
 <body>
-  <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
-  <div class="mod-container">
-    <div class="hero-header">
-      <h1>💃 Covarianza y Correlación 💃</h1>
-      <p>Cómo bailan dos variables: juntas, separadas o al ritmo opuesto</p>
-      <div class="badge-area">
-        <span class="chip"><i class="fas fa-dice-d6"></i> Covarianza</span>
-        <span class="chip"><i class="fas fa-ruler"></i> Correlación ρ</span>
-        <span class="chip"><i class="fas fa-project-diagram"></i> Esperanza condicional</span>
-      </div>
-    </div>
-    <div class="analogy-card">
-      <strong>💃 Piénsalo así:</strong> La covarianza mide cómo bailan dos variables: si se mueven juntas (positiva), separadas (negativa) o sin coordinarse (cero). La correlación es como un metrónomo que escala ese baile a un ritmo entre -1 y 1, perfectamente medible. La esperanza condicional E[Y|X] es como predecir los pasos de Y sabiendo los de X.
-    </div>
-    <div class="main-area">
-      <div class="theory-grid">
-        <div class="method-card">
-          <h3><i class="fas fa-times"></i> Covarianza</h3>
-          <div class="formula">Cov(X,Y) = E[XY] - E[X]E[Y]</div>
-          <p style="margin-top:0.8rem;font-size:0.85rem;">Mide la dirección de la relación lineal entre dos variables.</p>
-        </div>
-        <div class="method-card">
-          <h3><i class="fas fa-ruler-combined"></i> Correlación</h3>
-          <div class="formula">ρ = Cov(X,Y) / (σ<sub>X</sub>·σ<sub>Y</sub>) ∈ [-1,1]</div>
-          <p style="margin-top:0.8rem;font-size:0.85rem;">Versión normalizada de la covarianza, sin unidades y acotada.</p>
-        </div>
-        <div class="method-card">
-          <h3><i class="fas fa-arrow-right"></i> Var(X+Y)</h3>
-          <div class="formula">Var(aX+bY) = a²Var(X) + b²Var(Y) + 2ab·Cov(X,Y)</div>
-          <p style="margin-top:0.8rem;font-size:0.85rem;">La varianza de la suma incluye la covarianza como término cruzado.</p>
-        </div>
-      </div>
-      <div class="sim-area">
-        <h3><i class="fas fa-hand-pointer"></i> Simulador: Crea puntos y mide su relación</h3>
-        <p style="font-size:0.8rem;color:#ccaaaa;margin-bottom:0.8rem;">Haz clic en el gráfico para añadir puntos. La covarianza y correlación se actualizan en vivo.</p>
-        <div class="scatter-box">
-          <canvas id="scatterCanvas" width="500" height="220"></canvas>
-        </div>
-        <div class="stats-row" id="statsRow">
-          <div class="s-card"><div class="s-label">Puntos</div><div class="s-value" id="nDisplay">0</div></div>
-          <div class="s-card"><div class="s-label">Covarianza</div><div class="s-value" id="covDisplay">0</div></div>
-          <div class="s-card"><div class="s-label">Correlación ρ</div><div class="s-value" id="corrDisplay">0</div></div>
-          <div class="s-card"><div class="s-label">E[Y|X] pendiente</div><div class="s-value" id="slopeDisplay" style="font-size:0.9rem">—</div></div>
-        </div>
-        <div class="btn-group">
-          <button id="addPresetBtn" class="btn-action secondary"><i class="fas fa-plus"></i> Cargar ejemplo</button>
-          <button id="clearBtn" class="btn-action secondary"><i class="fas fa-trash"></i> Limpiar</button>
-        </div>
-      </div>
-    </div>
-    <div id="feedbackMsg" class="feedback">💡 Haz clic en el lienzo para añadir puntos. Cada punto nuevo cambia la covarianza y la correlación. ¡Observa cómo se comportan!</div>
-    <div id="insigniaArea" class="insignia hidden">
-      <i class="fas fa-medal"></i>
-      <h3>🏅 ¡CORRELACIONADOR MÁXIMO! 🏅</h3>
-      <p>Domínas la covarianza, la correlación y la esperanza condicional. Las variables ya no bailan sin que las entiendas.</p>
-    </div>
-    <div class="nav-links">
-      <a href="12-conjuntas.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
-      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
-      <a href="14-mgf.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
-    </div>
-    <footer><i class="fas fa-crown"></i> Probabilidades Interactiva · Covarianza, correlación y esperanza condicional</footer>
+ <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+ <div class="mod-container">
+  <div class="hero-header">
+   <h1>ðŸ’ƒ Covarianza y CorrelaciÃ³n ðŸ’ƒ</h1>
+   <p>CÃ³mo bailan dos variables: juntas, separadas o al ritmo opuesto</p>
+   <div class="badge-area">
+    <span class="chip"><i class="fas fa-dice-d6"></i> Covarianza</span>
+    <span class="chip"><i class="fas fa-ruler"></i> CorrelaciÃ³n Ï</span>
+    <span class="chip"><i class="fas fa-project-diagram"></i> Esperanza condicional</span>
+   </div>
   </div>
-  <script>
-    const STORAGE_KEY='prob_lvl13';
-    let completed=false;
-    const canvas=document.getElementById('scatterCanvas');
-    const ctx=canvas.getContext('2d');
-    let points=[];
+  <div class="analogy-card">
+   <strong>ðŸ’ƒ PiÃ©nsalo asÃ­:</strong> La covarianza mide cÃ³mo bailan dos variables: si se mueven juntas (positiva), separadas (negativa) o sin coordinarse (cero). La correlaciÃ³n es como un metrÃ³nomo que escala ese baile a un ritmo entre -1 y 1, perfectamente medible. La esperanza condicional E[Y|X] es como predecir los pasos de Y sabiendo los de X.
+  </div>
+  <div class="main-area">
+   <div class="theory-grid">
+    <div class="method-card">
+     <h3><i class="fas fa-times"></i> Covarianza</h3>
+     <div class="formula">Cov(X,Y) = E[XY] - E[X]E[Y]</div>
+     <p style="margin-top:0.8rem;font-size:0.85rem;">Mide la direcciÃ³n de la relaciÃ³n lineal entre dos variables.</p>
+    </div>
+    <div class="method-card">
+     <h3><i class="fas fa-ruler-combined"></i> CorrelaciÃ³n</h3>
+     <div class="formula">Ï = Cov(X,Y) / (Ïƒ<sub>X</sub>Â·Ïƒ<sub>Y</sub>) âˆˆ [-1,1]</div>
+     <p style="margin-top:0.8rem;font-size:0.85rem;">VersiÃ³n normalizada de la covarianza, sin unidades y acotada.</p>
+    </div>
+    <div class="method-card">
+     <h3><i class="fas fa-arrow-right"></i> Var(X+Y)</h3>
+     <div class="formula">Var(aX+bY) = aÂ²Var(X) + bÂ²Var(Y) + 2abÂ·Cov(X,Y)</div>
+     <p style="margin-top:0.8rem;font-size:0.85rem;">La varianza de la suma incluye la covarianza como tÃ©rmino cruzado.</p>
+    </div>
+   </div>
+   <div class="sim-area">
+    <h3><i class="fas fa-hand-pointer"></i> Simulador: Crea puntos y mide su relaciÃ³n</h3>
+    <p style="font-size:0.8rem;color:#ccaaaa;margin-bottom:0.8rem;">Haz clic en el grÃ¡fico para aÃ±adir puntos. La covarianza y correlaciÃ³n se actualizan en vivo.</p>
+    <div class="scatter-box">
+     <canvas id="scatterCanvas" width="500" height="220"></canvas>
+    </div>
+    <div class="stats-row" id="statsRow">
+     <div class="s-card"><div class="s-label">Puntos</div><div class="s-value" id="nDisplay">0</div></div>
+     <div class="s-card"><div class="s-label">Covarianza</div><div class="s-value" id="covDisplay">0</div></div>
+     <div class="s-card"><div class="s-label">CorrelaciÃ³n Ï</div><div class="s-value" id="corrDisplay">0</div></div>
+     <div class="s-card"><div class="s-label">E[Y|X] pendiente</div><div class="s-value" id="slopeDisplay" style="font-size:0.9rem">â€”</div></div>
+    </div>
+    <div class="btn-group">
+     <button id="addPresetBtn" class="btn-action secondary"><i class="fas fa-plus"></i> Cargar ejemplo</button>
+     <button id="clearBtn" class="btn-action secondary"><i class="fas fa-trash"></i> Limpiar</button>
+    </div>
+   </div>
+  </div>
+  <div id="feedbackMsg" class="feedback">ðŸ’¡ Haz clic en el lienzo para aÃ±adir puntos. Cada punto nuevo cambia la covarianza y la correlaciÃ³n. Â¡Observa cÃ³mo se comportan!</div>
+  <div id="insigniaArea" class="insignia hidden">
+   <i class="fas fa-medal"></i>
+   <h3>ðŸ… Â¡CORRELACIONADOR MÃXIMO! ðŸ…</h3>
+   <p>DomÃ­nas la covarianza, la correlaciÃ³n y la esperanza condicional. Las variables ya no bailan sin que las entiendas.</p>
+  </div>
+  <div class="nav-links">
+   <a href="12-conjuntas.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+   <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> MenÃº</a>
+   <a href="14-mgf.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Probabilidades Interactiva Â· Covarianza, correlaciÃ³n y esperanza condicional</footer>
+ </div>
+ <script>
+  const STORAGE_KEY='prob_lvl13';
+  let completed=false;
+  const canvas=document.getElementById('scatterCanvas');
+  const ctx=canvas.getContext('2d');
+  let points=[];
 
-    function draw(){
-      ctx.clearRect(0,0,canvas.width,canvas.height);
-      ctx.strokeStyle='#334466';
-      ctx.lineWidth=1;
-      ctx.beginPath();
-      ctx.moveTo(0,canvas.height/2);
-      ctx.lineTo(canvas.width,canvas.height/2);
-      ctx.moveTo(canvas.width/2,0);
-      ctx.lineTo(canvas.width/2,canvas.height);
-      ctx.stroke();
-      ctx.fillStyle='#ff505088';
-      points.forEach(p=>{
-        ctx.beginPath();
-        ctx.arc(p.x,p.y,5,0,Math.PI*2);
-        ctx.fill();
-        ctx.strokeStyle='#ff9090';
-        ctx.lineWidth=1;
-        ctx.stroke();
-      });
-      if(points.length>=2){
-        const n=points.length;
-        const mx=points.reduce((s,p)=>s+p.x,0)/n;
-        const my=points.reduce((s,p)=>s+p.y,0)/n;
-        let cov=0,varX=0,varY=0;
-        points.forEach(p=>{
-          cov+=(p.x-mx)*(p.y-my);
-          varX+=(p.x-mx)*(p.x-mx);
-          varY+=(p.y-my)*(p.y-my);
-        });
-        cov/=(n-1);varX/=(n-1);varY/=(n-1);
-        const sx=Math.sqrt(varX),sy=Math.sqrt(varY);
-        const rho=sx&&sy?cov/(sx*sy):0;
-        document.getElementById('nDisplay').textContent=n;
-        document.getElementById('covDisplay').textContent=cov.toFixed(2);
-        document.getElementById('corrDisplay').textContent=rho.toFixed(3);
-        const slope=varX?cov/varX:0;
-        document.getElementById('slopeDisplay').textContent=slope.toFixed(2);
-        ctx.strokeStyle='#ffd70088';
-        ctx.lineWidth=2;
-        ctx.setLineDash([5,5]);
-        ctx.beginPath();
-        const x1=0,x2=canvas.width;
-        const y1=my+slope*(x1-mx),y2=my+slope*(x2-mx);
-        ctx.moveTo(x1,y1);
-        ctx.lineTo(x2,y2);
-        ctx.stroke();
-        ctx.setLineDash([]);
-        ctx.fillStyle='#ffd700';
-        ctx.font='13px Inter';
-        ctx.fillText(`ρ = ${rho.toFixed(3)}`,10,20);
-        ctx.fillText(`Cov = ${cov.toFixed(2)}`,10,38);
-        if(Math.abs(rho)>0.7){
-          ctx.fillStyle='#66ff88';
-          ctx.fillText('✅ Fuerte correlación',10,56);
-        }else if(Math.abs(rho)>0.3){
-          ctx.fillStyle='#ffcc44';
-          ctx.fillText('⚠️ Correlación moderada',10,56);
-        }else{
-          ctx.fillStyle='#ff8888';
-          ctx.fillText('❌ Correlación débil',10,56);
-        }
-        completeModule();
-      }else{
-        document.getElementById('nDisplay').textContent=points.length;
-        document.getElementById('covDisplay').textContent='—';
-        document.getElementById('corrDisplay').textContent='—';
-        document.getElementById('slopeDisplay').textContent='—';
-      }
-    }
-
-    canvas.addEventListener('click',(e)=>{
-      const rect=canvas.getBoundingClientRect();
-      const scaleX=canvas.width/rect.width;
-      const scaleY=canvas.height/rect.height;
-      points.push({x:(e.clientX-rect.left)*scaleX,y:(e.clientY-rect.top)*scaleY});
-      draw();
+  function draw(){
+   ctx.clearRect(0,0,canvas.width,canvas.height);
+   ctx.strokeStyle='#334466';
+   ctx.lineWidth=1;
+   ctx.beginPath();
+   ctx.moveTo(0,canvas.height/2);
+   ctx.lineTo(canvas.width,canvas.height/2);
+   ctx.moveTo(canvas.width/2,0);
+   ctx.lineTo(canvas.width/2,canvas.height);
+   ctx.stroke();
+   ctx.fillStyle='#ff505088';
+   points.forEach(p=>{
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,5,0,Math.PI*2);
+    ctx.fill();
+    ctx.strokeStyle='#ff9090';
+    ctx.lineWidth=1;
+    ctx.stroke();
+   });
+   if(points.length>=2){
+    const n=points.length;
+    const mx=points.reduce((s,p)=>s+p.x,0)/n;
+    const my=points.reduce((s,p)=>s+p.y,0)/n;
+    let cov=0,varX=0,varY=0;
+    points.forEach(p=>{
+     cov+=(p.x-mx)*(p.y-my);
+     varX+=(p.x-mx)*(p.x-mx);
+     varY+=(p.y-my)*(p.y-my);
     });
-
-    function completeModule(){
-      if(!completed&&points.length>=3){
-        completed=true;
-        localStorage.setItem(STORAGE_KEY,'true');
-        document.getElementById('insigniaArea').classList.remove('hidden');
-        document.getElementById('feedbackMsg').innerHTML=I18N.t('fb_0');
-      }
+    cov/=(n-1);varX/=(n-1);varY/=(n-1);
+    const sx=Math.sqrt(varX),sy=Math.sqrt(varY);
+    const rho=sx&&sy?cov/(sx*sy):0;
+    document.getElementById('nDisplay').textContent=n;
+    document.getElementById('covDisplay').textContent=cov.toFixed(2);
+    document.getElementById('corrDisplay').textContent=rho.toFixed(3);
+    const slope=varX?cov/varX:0;
+    document.getElementById('slopeDisplay').textContent=slope.toFixed(2);
+    ctx.strokeStyle='#ffd70088';
+    ctx.lineWidth=2;
+    ctx.setLineDash([5,5]);
+    ctx.beginPath();
+    const x1=0,x2=canvas.width;
+    const y1=my+slope*(x1-mx),y2=my+slope*(x2-mx);
+    ctx.moveTo(x1,y1);
+    ctx.lineTo(x2,y2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='#ffd700';
+    ctx.font='13px Inter';
+    ctx.fillText(`Ï = ${rho.toFixed(3)}`,10,20);
+    ctx.fillText(`Cov = ${cov.toFixed(2)}`,10,38);
+    if(Math.abs(rho)>0.7){
+     ctx.fillStyle='#66ff88';
+     ctx.fillText('âœ… Fuerte correlaciÃ³n',10,56);
+    }else if(Math.abs(rho)>0.3){
+     ctx.fillStyle='#ffcc44';
+     ctx.fillText('âš ï¸ CorrelaciÃ³n moderada',10,56);
+    }else{
+     ctx.fillStyle='#ff8888';
+     ctx.fillText('âŒ CorrelaciÃ³n dÃ©bil',10,56);
     }
+    completeModule();
+   }else{
+    document.getElementById('nDisplay').textContent=points.length;
+    document.getElementById('covDisplay').textContent='â€”';
+    document.getElementById('corrDisplay').textContent='â€”';
+    document.getElementById('slopeDisplay').textContent='â€”';
+   }
+  }
 
-    document.getElementById('addPresetBtn').addEventListener('click',()=>{
-      points=[];
-      for(let i=0;i<12;i++){
-        const x=Math.random()*400+50;
-        const y=x*0.6+Math.random()*80-40+40;
-        points.push({x,y});
-      }
-      draw();
-    });
+  canvas.addEventListener('click',(e)=>{
+   const rect=canvas.getBoundingClientRect();
+   const scaleX=canvas.width/rect.width;
+   const scaleY=canvas.height/rect.height;
+   points.push({x:(e.clientX-rect.left)*scaleX,y:(e.clientY-rect.top)*scaleY});
+   draw();
+  });
 
-    document.getElementById('clearBtn').addEventListener('click',()=>{
-      points=[];
-      draw();
-    });
+  function completeModule(){
+   if(!completed&&points.length>=3){
+    completed=true;
+    localStorage.setItem(STORAGE_KEY,'true');
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').innerHTML=I18N.t('fb_0');
+   }
+  }
 
-    if(localStorage.getItem(STORAGE_KEY)==='true'){
-      completed=true;
-      document.getElementById('insigniaArea').classList.remove('hidden');
-    }
-  </script>
+  document.getElementById('addPresetBtn').addEventListener('click',()=>{
+   points=[];
+   for(let i=0;i<12;i++){
+    const x=Math.random()*400+50;
+    const y=x*0.6+Math.random()*80-40+40;
+    points.push({x,y});
+   }
+   draw();
+  });
+
+  document.getElementById('clearBtn').addEventListener('click',()=>{
+   points=[];
+   draw();
+  });
+
+  if(localStorage.getItem(STORAGE_KEY)==='true'){
+   completed=true;
+   document.getElementById('insigniaArea').classList.remove('hidden');
+  }
+ </script>
 
 <script>
 window.I18N_DATA={
-  'fb_0': { es: '🎉 ¡LO LOGRASTE, INVESTIGADOR! Has explorado la covarianza y correlación en acción. ¡Ya entiendes cómo bailan las variables!', en: '🎉 ¡LO LOGRASTE, INVESTIGADOR! Has explorado la covarianza y correlación en acción. ¡Ya entiendes cómo bailan las variables!' }
+ 'fb_0': { es: 'ðŸŽ‰ Â¡LO LOGRASTE, INVESTIGADOR! Has explorado la covarianza y correlaciÃ³n en acciÃ³n. Â¡Ya entiendes cÃ³mo bailan las variables!', en: 'ðŸŽ‰ Â¡LO LOGRASTE, INVESTIGADOR! Has explorado la covarianza y correlaciÃ³n en acciÃ³n. Â¡Ya entiendes cÃ³mo bailan las variables!' }
 };
 </script>
-</body>
+ </body>
 </html>

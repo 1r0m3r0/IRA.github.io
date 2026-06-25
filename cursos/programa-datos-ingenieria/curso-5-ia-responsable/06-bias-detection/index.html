@@ -1,122 +1,122 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <link rel="icon" type="image/svg+xml" href="../../../../favicon.svg">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>IA Responsable | 06. Bias Detection — Sesgos</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{background:linear-gradient(135deg,#0a0f1e,#0c1222);font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
-    .course-container{max-width:1000px;width:100%;background:rgba(15,25,45,.65);backdrop-filter:blur(12px);border-radius:2.5rem;border:1px solid rgba(255,80,80,.25);box-shadow:0 25px 45px rgba(0,0,0,.5);overflow:hidden}
-    .hero-header{background:linear-gradient(95deg,#0b1120,#111a2e);padding:1.8rem 2rem 1.2rem;text-align:center;border-bottom:2px solid #ff5050}
-    .hero-header h1{font-size:2rem;font-weight:800;background:linear-gradient(135deg,#FFF,#ff8888,#ff5050);-webkit-background-clip:text;background-clip:text;color:transparent}
-    .hero-header p{color:#ff8888;margin-top:.3rem;font-size:.95rem}
-    .progress-bar{margin:.8rem auto 0;max-width:400px}
-    .progress-track{height:6px;background:rgba(255,255,255,.06);border-radius:10px;overflow:hidden;border:1px solid rgba(255,80,80,.15)}
-    .progress-fill{height:100%;width:50%;background:linear-gradient(90deg,#ff5050,#ff8888);border-radius:10px;transition:width .6s ease}
-    .progress-text{font-size:.7rem;color:#667799;margin-top:.2rem}
-    .analogy-card{margin:1rem 1.5rem 0;padding:1rem 1.2rem;background:rgba(255,80,80,.08);border-left:4px solid #ff5050;border-radius:1rem;font-size:.85rem;color:#cce;line-height:1.5}
-    .analogy-card strong{color:#ff8888}
-    .main-area{padding:1.2rem 1.5rem 1.5rem}
-    .quiz-area{background:rgba(0,10,25,.6);border-radius:1.5rem;padding:1.2rem;border:1px solid rgba(255,80,80,.15)}
-    .quiz-title{font-size:1.1rem;font-weight:700;margin-bottom:.8rem;display:flex;align-items:center;gap:.5rem;color:#ff8888}
-    .question{background:rgba(15,26,44,.8);margin:.6rem 0;padding:.8rem 1rem;border-radius:1rem}
-    .question p{font-weight:600;font-size:.9rem;margin-bottom:.4rem}
-    .options{display:flex;flex-wrap:wrap;gap:.5rem}
-    .opt{background:#1e2a3e;padding:.35rem .9rem;border-radius:2rem;cursor:pointer;transition:.2s;font-size:.8rem;border:1px solid transparent}
-    .opt:hover{background:#2c3e66;transform:translateY(-2px);border-color:rgba(255,80,80,.3)}
-    .opt.selected{background:#ff5050;color:#000;font-weight:700;box-shadow:0 0 10px rgba(255,80,80,.4)}
-    .opt.correct{background:#00cc66;color:#000}
-    .opt.wrong{background:#cc3344;color:#fff}
-    .btn-submit{background:linear-gradient(95deg,#ff5050,#ff8888);border:none;padding:.7rem 1.6rem;font-weight:700;border-radius:3rem;margin-top:.8rem;cursor:pointer;font-size:.9rem;transition:.2s;color:#000;font-family:'Inter',sans-serif}
-    .btn-submit:disabled{opacity:.4;cursor:not-allowed}
-    .btn-submit:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 4px 15px rgba(255,80,80,.4)}
-    .feedback{margin-top:.8rem;padding:.7rem 1rem;border-radius:1rem;font-size:.85rem;min-height:2.5rem}
-    .feedback.success{background:rgba(0,204,102,.15);border:1px solid #00cc66;color:#88ffbb}
-    .feedback.error{background:rgba(204,51,68,.15);border:1px solid #cc3344;color:#ff8888}
-    .feedback.info{background:rgba(255,80,80,.1);border:1px solid rgba(255,80,80,.3);color:#ff8888}
-    .insignia{text-align:center;margin-top:1rem;padding:1rem;background:rgba(255,80,80,.08);border-radius:1.5rem;border:1px dashed #ff5050;animation:fadeIn .6s ease}
-    .insignia i{font-size:2rem;color:#ff5050}
-    .insignia h3{margin:.3rem 0;color:#ff8888}
-    .insignia p{font-size:.8rem;color:#cce}
-    @keyframes fadeIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
-    .hidden{display:none!important}
-    .btn-next{display:flex;align-items:center;justify-content:center;gap:.5rem;background:linear-gradient(95deg,#ff5050,#ff8888);border:none;padding:.75rem 2rem;font-weight:700;border-radius:3rem;cursor:pointer;font-size:.95rem;color:#000;margin:1rem auto 0;transition:.2s;font-family:'Inter',sans-serif;max-width:300px}
-    .btn-next:hover{transform:translateY(-2px);box-shadow:0 4px 15px rgba(255,80,80,.4)}
-    .nav-links{display:flex;justify-content:center;gap:.8rem;padding:0 1.5rem 1rem;flex-wrap:wrap}
-    .nav-link{background:rgba(255,80,80,.1);border:1px solid rgba(255,80,80,.25);padding:.5rem 1.2rem;border-radius:3rem;font-weight:600;cursor:pointer;text-decoration:none;color:#ff8888;display:inline-flex;align-items:center;gap:.4rem;transition:.2s;font-size:.8rem}
-    .nav-link:hover{transform:translateY(-2px);box-shadow:0 0 10px rgba(255,80,80,.3)}
-    footer{text-align:center;padding:.8rem;font-size:.7rem;border-top:1px solid #2c3e66;color:#667799}
-    @media (max-width:800px){.hero-header h1{font-size:1.5rem}}
-  </style>
-  <link rel="stylesheet" href="../../../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <link rel="icon" type="image/svg+xml" href="../../../../favicon.svg">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>IA Responsable | 06. Bias Detection â€” Sesgos</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:linear-gradient(135deg,#0a0f1e,#0c1222);font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
+  .course-container{max-width:1000px;width:100%;background:rgba(15,25,45,.65);backdrop-filter:blur(12px);border-radius:2.5rem;border:1px solid rgba(255,80,80,.25);box-shadow:0 25px 45px rgba(0,0,0,.5);overflow:hidden}
+  .hero-header{background:linear-gradient(95deg,#0b1120,#111a2e);padding:1.8rem 2rem 1.2rem;text-align:center;border-bottom:2px solid #ff5050}
+  .hero-header h1{font-size:2rem;font-weight:800;background:linear-gradient(135deg,#FFF,#ff8888,#ff5050);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero-header p{color:#ff8888;margin-top:.3rem;font-size:.95rem}
+  .progress-bar{margin:.8rem auto 0;max-width:400px}
+  .progress-track{height:6px;background:rgba(255,255,255,.06);border-radius:10px;overflow:hidden;border:1px solid rgba(255,80,80,.15)}
+  .progress-fill{height:100%;width:50%;background:linear-gradient(90deg,#ff5050,#ff8888);border-radius:10px;transition:width .6s ease}
+  .progress-text{font-size:.7rem;color:#667799;margin-top:.2rem}
+  .analogy-card{margin:1rem 1.5rem 0;padding:1rem 1.2rem;background:rgba(255,80,80,.08);border-left:4px solid #ff5050;border-radius:1rem;font-size:.85rem;color:#cce;line-height:1.5}
+  .analogy-card strong{color:#ff8888}
+  .main-area{padding:1.2rem 1.5rem 1.5rem}
+  .quiz-area{background:rgba(0,10,25,.6);border-radius:1.5rem;padding:1.2rem;border:1px solid rgba(255,80,80,.15)}
+  .quiz-title{font-size:1.1rem;font-weight:700;margin-bottom:.8rem;display:flex;align-items:center;gap:.5rem;color:#ff8888}
+  .question{background:rgba(15,26,44,.8);margin:.6rem 0;padding:.8rem 1rem;border-radius:1rem}
+  .question p{font-weight:600;font-size:.9rem;margin-bottom:.4rem}
+  .options{display:flex;flex-wrap:wrap;gap:.5rem}
+  .opt{background:#1e2a3e;padding:.35rem .9rem;border-radius:2rem;cursor:pointer;transition:.2s;font-size:.8rem;border:1px solid transparent}
+  .opt:hover{background:#2c3e66;transform:translateY(-2px);border-color:rgba(255,80,80,.3)}
+  .opt.selected{background:#ff5050;color:#000;font-weight:700;box-shadow:0 0 10px rgba(255,80,80,.4)}
+  .opt.correct{background:#00cc66;color:#000}
+  .opt.wrong{background:#cc3344;color:#fff}
+  .btn-submit{background:linear-gradient(95deg,#ff5050,#ff8888);border:none;padding:.7rem 1.6rem;font-weight:700;border-radius:3rem;margin-top:.8rem;cursor:pointer;font-size:.9rem;transition:.2s;color:#000;font-family:'Inter',sans-serif}
+  .btn-submit:disabled{opacity:.4;cursor:not-allowed}
+  .btn-submit:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 4px 15px rgba(255,80,80,.4)}
+  .feedback{margin-top:.8rem;padding:.7rem 1rem;border-radius:1rem;font-size:.85rem;min-height:2.5rem}
+  .feedback.success{background:rgba(0,204,102,.15);border:1px solid #00cc66;color:#88ffbb}
+  .feedback.error{background:rgba(204,51,68,.15);border:1px solid #cc3344;color:#ff8888}
+  .feedback.info{background:rgba(255,80,80,.1);border:1px solid rgba(255,80,80,.3);color:#ff8888}
+  .insignia{text-align:center;margin-top:1rem;padding:1rem;background:rgba(255,80,80,.08);border-radius:1.5rem;border:1px dashed #ff5050;animation:fadeIn .6s ease}
+  .insignia i{font-size:2rem;color:#ff5050}
+  .insignia h3{margin:.3rem 0;color:#ff8888}
+  .insignia p{font-size:.8rem;color:#cce}
+  @keyframes fadeIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+  .hidden{display:none!important}
+  .btn-next{display:flex;align-items:center;justify-content:center;gap:.5rem;background:linear-gradient(95deg,#ff5050,#ff8888);border:none;padding:.75rem 2rem;font-weight:700;border-radius:3rem;cursor:pointer;font-size:.95rem;color:#000;margin:1rem auto 0;transition:.2s;font-family:'Inter',sans-serif;max-width:300px}
+  .btn-next:hover{transform:translateY(-2px);box-shadow:0 4px 15px rgba(255,80,80,.4)}
+  .nav-links{display:flex;justify-content:center;gap:.8rem;padding:0 1.5rem 1rem;flex-wrap:wrap}
+  .nav-link{background:rgba(255,80,80,.1);border:1px solid rgba(255,80,80,.25);padding:.5rem 1.2rem;border-radius:3rem;font-weight:600;cursor:pointer;text-decoration:none;color:#ff8888;display:inline-flex;align-items:center;gap:.4rem;transition:.2s;font-size:.8rem}
+  .nav-link:hover{transform:translateY(-2px);box-shadow:0 0 10px rgba(255,80,80,.3)}
+  footer{text-align:center;padding:.8rem;font-size:.7rem;border-top:1px solid #2c3e66;color:#667799}
+  @media (max-width:800px){.hero-header h1{font-size:1.5rem}}
+ </style>
+ <link rel="stylesheet" href="../../../../assets/css/theme.css">
 </head>
 <body>
-  <nav class="brand-return-nav"><a href="../../../../index.html">&larr; Portfolio</a><a href="../../../../cursos/index.html">Cursos</a></nav>
-  <div class="course-container">
-    <div class="hero-header">
-      <h1>🚨 Bias Detection — Sesgos</h1>
-      <p>IA Responsable &middot; Módulo 06</p>
-      <div class="progress-bar">
-        <div class="progress-track"><div class="progress-fill"></div></div>
-        <div class="progress-text">Progreso: módulo 06 de 12</div>
-      </div>
-    </div>
-    <div class="analogy-card">
-      <strong>💡 Piénsalo así:</strong> Un detector de sesgos es como un corrector ortográfico para tus datos y modelos. Te alerta si tu dataset tiene más hombres que mujeres (selection bias) o si tu modelo aprende estereotipos.
-    </div>
-    <div class="main-area">
-      <div class="quiz-area">
-        <div class="quiz-title"><i class="fas fa-brain"></i> Reto: Bias Detection — Sesgos</div>
-        <div id="quizContainer"></div>
-        <button class="btn-submit" id="submitBtn">✅ Validar respuestas</button>
-        <div class="feedback info" id="feedback">💬 Responde todas las preguntas y valida para ganar tu insignia.</div>
-        <div class="insignia hidden" id="insignia">
-          <i class="fas fa-medal"></i>
-          <h3>🏅 INSIGNIA CAZADOR DE SESGOS 🏅</h3>
-          <p>¡Dominas la detección de dataset bias, label bias, measurement bias y más!</p>
-        </div>
-        <button class="btn-next" id="nextBtn" style="display:none" onclick="window.location.href='../07-differential-privacy/index.html'"><i class="fas fa-arrow-right"></i> Siguiente módulo</button>
-      </div>
-    </div>
-    <div class="nav-links">
-      <a href="../index.html" class="nav-link"><i class="fas fa-list"></i> Menú</a>
-    </div>
-    <footer><i class="fas fa-crown"></i> IA Responsable &middot; Módulo 06 &middot; Aprendizaje Activo</footer>
+ <nav class="brand-return-nav"><a href="../../../../index.html">&larr; Portfolio</a><a href="../../../../cursos/index.html">Cursos</a></nav>
+ <div class="course-container">
+  <div class="hero-header">
+   <h1>ðŸš¨ Bias Detection â€” Sesgos</h1>
+   <p>IA Responsable &middot; MÃ³dulo 06</p>
+   <div class="progress-bar">
+    <div class="progress-track"><div class="progress-fill"></div></div>
+    <div class="progress-text">Progreso: mÃ³dulo 06 de 12</div>
+   </div>
   </div>
-  <script>
-    const questions=[{text:"El dataset bias ocurre cuando...",options:["Los datos de entrenamiento no representan la población real","Las etiquetas son incorrectas","El modelo sobreajusta","Hay datos duplicados"],correct:0},{text:"Label bias es...",options:["Sesgo introducido por anotadores humanos en las etiquetas","Sesgo en las features de entrada","Sesgo en la selección de modelo","Sesgo de medición"],correct:0},{text:"Measurement bias ocurre cuando...",options:["El instrumento de medición es inexacto o inconsistente","Los datos están desbalanceados","El modelo es muy complejo","Hay data leakage"],correct:0}];
-    let uA=new Array(questions.length).fill(null);
-    let done=localStorage.getItem('datos3_c5_06')==='true';
-    const qc=document.getElementById('quizContainer'),sb=document.getElementById('submitBtn'),fb=document.getElementById('feedback'),in_=document.getElementById('insignia'),nb=document.getElementById('nextBtn');
-    function rQ(){qc.innerHTML='';questions.forEach((q,i)=>{const d=document.createElement('div');d.className='question';d.innerHTML='<p>'+q.text+'</p><div class="options" id="o-'+i+'"></div>';const od=d.querySelector('.options');q.options.forEach((o,j)=>{const s=document.createElement('div');s.className='opt';s.textContent=o;s.addEventListener('click',function(){if(done)return;this.parentElement.querySelectorAll('.opt').forEach(c=>c.classList.remove('selected'));this.classList.add('selected');uA[i]=j});od.appendChild(s)});qc.appendChild(d)})}
-    function ev(){let c=0;for(let i=0;i<questions.length;i++)if(uA[i]===questions[i].correct)c++;if(!uA.every(a=>a!==null)){fb.className='feedback error';fb.innerHTML=I18N.t('fb_0');return}
-    const t=Math.ceil(questions.length*.6);if(c>=t){done=true;localStorage.setItem('datos3_c5_06','true');fb.className='feedback success';fb.innerHTML=I18N.t('fb_1')+c+'/'+questions.length+' correctas. Has dominado este módulo!';in_.classList.remove('hidden');if(nb)nb.style.display='flex';sb.disabled=true;document.querySelectorAll('.question').forEach((qd,qi)=>{qd.querySelectorAll('.opt').forEach((o,oi)=>{o.style.pointerEvents='none';if(oi===questions[qi].correct)o.classList.add('correct');else if(oi===uA[qi]&&oi!==questions[qi].correct)o.classList.add('wrong')})})}
-    else{fb.className='feedback error';fb.innerHTML=I18N.t('fb_2')+c+'/'+questions.length+' correctas. Necesitas al menos '+t+'. Inténtalo de nuevo.'}}
-    function res(){if(done){in_.classList.remove('hidden');if(nb)nb.style.display='flex';sb.disabled=true;fb.className='feedback success';fb.innerHTML=I18N.t('fb_3');document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none')}}
-    rQ();res();sb.addEventListener('click',ev);
-  </script>
+  <div class="analogy-card">
+   <strong>ðŸ’¡ PiÃ©nsalo asÃ­:</strong> Un detector de sesgos es como un corrector ortogrÃ¡fico para tus datos y modelos. Te alerta si tu dataset tiene mÃ¡s hombres que mujeres (selection bias) o si tu modelo aprende estereotipos.
+  </div>
+  <div class="main-area">
+   <div class="quiz-area">
+    <div class="quiz-title"><i class="fas fa-brain"></i> Reto: Bias Detection â€” Sesgos</div>
+    <div id="quizContainer"></div>
+    <button class="btn-submit" id="submitBtn">âœ… Validar respuestas</button>
+    <div class="feedback info" id="feedback">ðŸ’¬ Responde todas las preguntas y valida para ganar tu insignia.</div>
+    <div class="insignia hidden" id="insignia">
+     <i class="fas fa-medal"></i>
+     <h3>ðŸ… INSIGNIA CAZADOR DE SESGOS ðŸ…</h3>
+     <p>Â¡Dominas la detecciÃ³n de dataset bias, label bias, measurement bias y mÃ¡s!</p>
+    </div>
+    <button class="btn-next" id="nextBtn" style="display:none" onclick="window.location.href='../07-differential-privacy/index.html'"><i class="fas fa-arrow-right"></i> Siguiente mÃ³dulo</button>
+   </div>
+  </div>
+  <div class="nav-links">
+   <a href="../index.html" class="nav-link"><i class="fas fa-list"></i> MenÃº</a>
+  </div>
+  <footer><i class="fas fa-crown"></i> IA Responsable &middot; MÃ³dulo 06 &middot; Aprendizaje Activo</footer>
+ </div>
+ <script>
+  const questions=[{text:"El dataset bias ocurre cuando...",options:["Los datos de entrenamiento no representan la poblaciÃ³n real","Las etiquetas son incorrectas","El modelo sobreajusta","Hay datos duplicados"],correct:0},{text:"Label bias es...",options:["Sesgo introducido por anotadores humanos en las etiquetas","Sesgo en las features de entrada","Sesgo en la selecciÃ³n de modelo","Sesgo de mediciÃ³n"],correct:0},{text:"Measurement bias ocurre cuando...",options:["El instrumento de mediciÃ³n es inexacto o inconsistente","Los datos estÃ¡n desbalanceados","El modelo es muy complejo","Hay data leakage"],correct:0}];
+  let uA=new Array(questions.length).fill(null);
+  let done=localStorage.getItem('datos3_c5_06')==='true';
+  const qc=document.getElementById('quizContainer'),sb=document.getElementById('submitBtn'),fb=document.getElementById('feedback'),in_=document.getElementById('insignia'),nb=document.getElementById('nextBtn');
+  function rQ(){qc.innerHTML='';questions.forEach((q,i)=>{const d=document.createElement('div');d.className='question';d.innerHTML='<p>'+q.text+'</p><div class="options" id="o-'+i+'"></div>';const od=d.querySelector('.options');q.options.forEach((o,j)=>{const s=document.createElement('div');s.className='opt';s.textContent=o;s.addEventListener('click',function(){if(done)return;this.parentElement.querySelectorAll('.opt').forEach(c=>c.classList.remove('selected'));this.classList.add('selected');uA[i]=j});od.appendChild(s)});qc.appendChild(d)})}
+  function ev(){let c=0;for(let i=0;i<questions.length;i++)if(uA[i]===questions[i].correct)c++;if(!uA.every(a=>a!==null)){fb.className='feedback error';fb.innerHTML=I18N.t('fb_0');return}
+  const t=Math.ceil(questions.length*.6);if(c>=t){done=true;localStorage.setItem('datos3_c5_06','true');fb.className='feedback success';fb.innerHTML=I18N.t('fb_1')+c+'/'+questions.length+' correctas. Has dominado este mÃ³dulo!';in_.classList.remove('hidden');if(nb)nb.style.display='flex';sb.disabled=true;document.querySelectorAll('.question').forEach((qd,qi)=>{qd.querySelectorAll('.opt').forEach((o,oi)=>{o.style.pointerEvents='none';if(oi===questions[qi].correct)o.classList.add('correct');else if(oi===uA[qi]&&oi!==questions[qi].correct)o.classList.add('wrong')})})}
+  else{fb.className='feedback error';fb.innerHTML=I18N.t('fb_2')+c+'/'+questions.length+' correctas. Necesitas al menos '+t+'. IntÃ©ntalo de nuevo.'}}
+  function res(){if(done){in_.classList.remove('hidden');if(nb)nb.style.display='flex';sb.disabled=true;fb.className='feedback success';fb.innerHTML=I18N.t('fb_3');document.querySelectorAll('.opt').forEach(o=>o.style.pointerEvents='none')}}
+  rQ();res();sb.addEventListener('click',ev);
+ </script>
 <script>
 window.I18N_DATA={
-  "fb_0": {
-    "es": "⚠️ Responde todas las preguntas.",
-    "en": "⚠️ Answer todas las preguntas."
-  },
-  "fb_1": {
-    "es": "🎉 Excelente! ",
-    "en": "🎉 Excellent! "
-  },
-  "fb_2": {
-    "es": "😅 Obtuviste ",
-    "en": "😅 You got "
-  },
-  "fb_3": {
-    "es": "✅ Ya completaste este módulo.",
-    "en": "✅ Ya completaste este module."
-  }
+ "fb_0": {
+  "es": "âš ï¸ Responde todas las preguntas.",
+  "en": "âš ï¸ Answer todas las preguntas."
+ },
+ "fb_1": {
+  "es": "ðŸŽ‰ Excelente! ",
+  "en": "ðŸŽ‰ Excellent! "
+ },
+ "fb_2": {
+  "es": "ðŸ˜… Obtuviste ",
+  "en": "ðŸ˜… You got "
+ },
+ "fb_3": {
+  "es": "âœ… Ya completaste este mÃ³dulo.",
+  "en": "âœ… Ya completaste este module."
+ }
 };
 </script>
 <script src="../../../../assets/js/i18n.js"></script>  </body>

@@ -1,207 +1,206 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>ML Estadístico | 🤖 Pipelines y AutoML</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { background:linear-gradient(135deg,#0a0f1e,#0c1222 50%,#111a2e); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
-    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-    .course-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,80,80,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
-    .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #ff5050; }
-    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#ff8080,#ff5050); -webkit-background-clip:text; background-clip:text; color:transparent; }
-    .hero-header p { font-size:1.1rem; color:#ffb0b0; margin-top:0.5rem; font-weight:500; }
-    .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
-    .chip { background:rgba(255,80,80,0.15); border:1px solid #ff5050; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
-    .progress-section { padding:1.2rem 2rem; border-bottom:1px solid #1a2a4a; }
-    .progress-bar-outer { background:#1a2a4a; border-radius:20px; height:16px; overflow:hidden; }
-    .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#ff5050,#cc2020); border-radius:20px; transition:width 0.5s ease; }
-    .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
-    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ff5050; font-size:1rem; line-height:1.6; }
-    .main-area { padding:1.5rem 2rem; }
-    .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#ff5050; }
-    .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
-    .info-panel { background:rgba(10,20,40,0.7); border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
-    .info-panel h3 { color:#ff8080; font-size:1rem; margin-bottom:0.5rem; }
-    .info-panel p { font-size:0.85rem; color:#b9ccee; line-height:1.6; }
-    .sim-area { background:rgba(0,10,25,0.5); border-radius:2rem; padding:1.5rem; margin-bottom:1.5rem; border:1px solid #2c3e66; }
-    .sim-area h3 { color:#ff5050; margin-bottom:1rem; }
-    .quiz-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #ff5050; margin-bottom:1.5rem; }
-    .quiz-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#ff5050; }
-    .question { background:#0f1a2c; margin:0.8rem 0; padding:0.8rem 1rem; border-radius:1.2rem; }
-    .question p { font-weight:600; margin-bottom:0.5rem; font-size:0.95rem; }
-    .options { display:flex; flex-wrap:wrap; gap:0.6rem; }
-    .opt { background:#1e2a3e; padding:0.3rem 0.9rem; border-radius:2rem; cursor:pointer; transition:0.2s; font-size:0.85rem; }
-    .opt:hover { background:#2c3e66; transform:translateY(-2px); }
-    .opt.selected { background:#ff5050; color:#fff; font-weight:bold; box-shadow:0 0 8px #ff5050; }
-    .opt.correct { background:#00cc88; color:#000; }
-    .opt.wrong { background:#ff4455; color:#fff; }
-    .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #ff5050; }
-    .btn-action { background:linear-gradient(95deg,#ff5050,#cc2020); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#fff; margin-top:1rem; }
-    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(255,80,80,0.5); }
-    .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
-    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin-top:1.5rem; padding:1rem; border:1px dashed gold; }
-    .insignia i { font-size:2.5rem; color:gold; }
-    .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
-    .hidden { display:none; }
-    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
-    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
-    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(255,80,80,0.4); }
-    .nav-link.next { background:linear-gradient(95deg,#ff5050,#cc2020); color:#fff; }
-    .nav-link.menu { background:#1a2a4a; border:1px solid #ff5050; }
-    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
-    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .info-grid { grid-template-columns:1fr; } }
-  </style>
-  <link rel="stylesheet" href="../../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>ML Estadístico | 🤖 Pipelines y AutoML</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:linear-gradient(135deg,#0a0f1e,#0c1222 50%,#111a2e); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+  @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .course-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,80,80,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+  .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #ff5050; }
+  .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#ff8080,#ff5050); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero-header p { font-size:1.1rem; color:#ffb0b0; margin-top:0.5rem; font-weight:500; }
+  .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+  .chip { background:rgba(255,80,80,0.15); border:1px solid #ff5050; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+  .progress-section { padding:1.2rem 2rem; border-bottom:1px solid #1a2a4a; }
+  .progress-bar-outer { background:#1a2a4a; border-radius:20px; height:16px; overflow:hidden; }
+  .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#ff5050,#cc2020); border-radius:20px; transition:width 0.5s ease; }
+  .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
+  .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ff5050; font-size:1rem; line-height:1.6; }
+  .main-area { padding:1.5rem 2rem; }
+  .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#ff5050; }
+  .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
+  .info-panel { background:rgba(10,20,40,0.7); border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
+  .info-panel h3 { color:#ff8080; font-size:1rem; margin-bottom:0.5rem; }
+  .info-panel p { font-size:0.85rem; color:#b9ccee; line-height:1.6; }
+  .sim-area { background:rgba(0,10,25,0.5); border-radius:2rem; padding:1.5rem; margin-bottom:1.5rem; border:1px solid #2c3e66; }
+  .sim-area h3 { color:#ff5050; margin-bottom:1rem; }
+  .quiz-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #ff5050; margin-bottom:1.5rem; }
+  .quiz-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#ff5050; }
+  .question { background:#0f1a2c; margin:0.8rem 0; padding:0.8rem 1rem; border-radius:1.2rem; }
+  .question p { font-weight:600; margin-bottom:0.5rem; font-size:0.95rem; }
+  .options { display:flex; flex-wrap:wrap; gap:0.6rem; }
+  .opt { background:#1e2a3e; padding:0.3rem 0.9rem; border-radius:2rem; cursor:pointer; transition:0.2s; font-size:0.85rem; }
+  .opt:hover { background:#2c3e66; transform:translateY(-2px); }
+  .opt.selected { background:#ff5050; color:#fff; font-weight:bold; box-shadow:0 0 8px #ff5050; }
+  .opt.correct { background:#00cc88; color:#000; }
+  .opt.wrong { background:#ff4455; color:#fff; }
+  .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #ff5050; }
+  .btn-action { background:linear-gradient(95deg,#ff5050,#cc2020); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#fff; margin-top:1rem; }
+  .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(255,80,80,0.5); }
+  .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
+  .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin-top:1.5rem; padding:1rem; border:1px dashed gold; }
+  .insignia i { font-size:2.5rem; color:gold; }
+  .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
+  .hidden { display:none; }
+  .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+  .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+  .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(255,80,80,0.4); }
+  .nav-link.next { background:linear-gradient(95deg,#ff5050,#cc2020); color:#fff; }
+  .nav-link.menu { background:#1a2a4a; border:1px solid #ff5050; }
+  footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .info-grid { grid-template-columns:1fr; } }
+ </style>
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
 </head>
 <body>
-  <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Estadística</a></nav>
-  <div class="course-container" id="app">
-    <div class="hero-header">
-      <h1>🤖 Pipelines y AutoML</h1>
-      <p>ML en producción: reproducible, automático y escalable</p>
-      <div class="badge-area">
-        <span class="chip"><i class="fas fa-pipe"></i> Pipeline</span>
-        <span class="chip"><i class="fas fa-search"></i> GridSearch</span>
-        <span class="chip"><i class="fas fa-robot"></i> AutoML</span>
-      </div>
-    </div>
-    <div class="progress-section">
-      <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
-      <span class="progress-text" id="progressText">Módulo 11 de 12</span>
-    </div>
-    <div class="analogy-card">
-      <strong>💡 Piénsalo así:</strong> Un Pipeline de ML es como una línea de ensamblaje en una fábrica: los datos entran por un lado, pasan por estaciones de limpieza (scaler), transformación (encoder) y ensamble (modelo), y salen como predicciones. Todo está conectado y no se pierde nada.
-    </div>
-    <div class="main-area">
-      <div class="section-title"><i class="fas fa-pipe"></i> Pipelines y Automatización</div>
-      <div class="info-grid">
-        <div class="info-panel"><h3>🔗 Pipeline (sklearn)</h3><p>Encadena transformaciones y un estimador final. Garantiza que las transformaciones se apliquen consistentemente en train/test. Facilita GridSearch y evita data leakage. Método: pipeline.fit(X_train, y_train).</p></div>
-        <div class="info-panel"><h3>🔀 ColumnTransformer</h3><p>Aplica diferentes transformaciones a diferentes columnas. Por ejemplo: estandarizar numéricas y one-hot codificar categóricas. Se combina con Pipeline para crear flujos completos y modulares.</p></div>
-        <div class="info-panel"><h3>🎯 GridSearchCV / RandomizedSearchCV</h3><p>Búsqueda sistemática de hiperparámetros con validación cruzada. GridSearch prueba todas las combinaciones; RandomizedSearch muestrea aleatoriamente. Optuna y Hyperopt son alternativas más eficientes.</p></div>
-        <div class="info-panel"><h3>🤖 AutoML</h3><p>Herramientas que automatizan selección de modelo, transformación de datos y ajuste de hiperparámetros. Frameworks: AutoGluon, H2O AutoML, TPOT, FLAML y Auto-sklearn. Ideales para prototipado rápido.</p></div>
-      </div>
-      <div class="sim-area">
-        <h3><i class="fas fa-cogs"></i> Simulador: Pipeline Completo</h3>
-        <p style="color:#b9ccee;margin-bottom:0.8rem;">Construye un pipeline de clasificación paso a paso.</p>
-        <div style="text-align:center;">
-          <button class="btn-action" onclick="runPipeline()" style="font-size:0.9rem;">🔧 Ejecutar Pipeline</button>
-        </div>
-        <div id="pipelineResult" style="margin-top:1rem;text-align:center;font-size:0.9rem;color:#b9ccee;">Haz clic para construir el pipeline.</div>
-      </div>
-      <div class="quiz-area">
-        <div class="quiz-title"><i class="fas fa-question-circle"></i> Mini Quiz: Pipelines y AutoML</div>
-        <div id="quizContainer"></div>
-        <button id="submitQuizBtn" class="btn-action">✅ Verificar respuestas</button>
-        <div id="insigniaArea" class="insignia hidden">
-          <i class="fas fa-medal"></i>
-          <h3>🏅 Ingeniero de ML en Producción 🏅</h3>
-          <p>Sabes construir pipelines y usar AutoML.</p>
-        </div>
-      </div>
-    </div>
-    <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre pipelines y AutoML.</div>
-    <div class="nav-links">
-      <a href="10-interpretabilidad.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
-      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
-      <a href="12-certificado.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
-    </div>
-    <footer><i class="fas fa-brain"></i> Curso 5: Machine Learning Estadístico · 12 módulos interactivos</footer>
+ <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Estadística</a></nav>
+ <div class="course-container" id="app">
+  <div class="hero-header">
+   <h1>🤖 Pipelines y AutoML</h1>
+   <p>ML en producción: reproducible, automático y escalable</p>
+   <div class="badge-area">
+    <span class="chip"><i class="fas fa-pipe"></i> Pipeline</span>
+    <span class="chip"><i class="fas fa-search"></i> GridSearch</span>
+    <span class="chip"><i class="fas fa-robot"></i> AutoML</span>
+   </div>
   </div>
-  <script>
-    const STORAGE_KEY = 'prog_est_5_11';
-    const PROGRESS_KEY = 'prog_est_5_progress';
-    const questions = [
-      { text: "¿Qué clase encadena transformaciones + modelo en sklearn?", options: ["Pipeline","Chain","Workflow","Flow"], correct: 0 },
-      { text: "¿Qué permite ColumnTransformer?", options: ["Transformar columnas con recetas distintas","Crear columnas","Eliminar nulos","Balancear clases"], correct: 0 },
-      { text: "¿Qué busca GridSearchCV?", options: ["Mejores hiperparámetros","Mejores datos","Mejores features","Mejor semilla"], correct: 0 },
-      { text: "¿Qué framework AutoML está basado en evolución genética?", options: ["AutoGluon","H2O","TPOT","FLAML"], correct: 2 },
-      { text: "¿Qué ventaja tienen los pipelines?", options: ["Evitan data leakage","Son más rápidos","Usan menos memoria","No necesitan datos"], correct: 0 },
-      { text: "¿Qué clase usa validación cruzada con búsqueda aleatoria?", options: ["GridSearchCV","RandomizedSearchCV","CrossValSearch","RandomCV"], correct: 1 }
-    ];
-    let userAnswers = new Array(questions.length).fill(null);
-    let quizCompleted = false;
-    function runPipeline() {
-      const steps = ['Datos crudos (1000×20)', 'ColumnTransformer: num→Scaler, cat→OneHot', 'RandomForest(n=100)', 'Accuracy: 0.87 ± 0.02'];
-      let html = '<div style="display:flex;flex-direction:column;gap:0.4rem;">';
-      steps.forEach((s, i) => {
-        html += '<div style="background:#1a2a4a;padding:0.4rem 0.8rem;border-radius:0.8rem;font-size:0.85rem;">'+
-          'Paso '+(i+1)+': '+s+'</div>';
-      });
-      html += '<p style="margin-top:0.5rem;color:#00cc88;font-weight:700;">✅ Pipeline completado. Mejores params: n_estimators=200, max_depth=10</p></div>';
-      document.getElementById('pipelineResult').innerHTML = html;
-    }
-    function saveProgress() {
-      let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
-      if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
-      localStorage.setItem(STORAGE_KEY, 'true');
-    }
-    function updateProgress() {
-      let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
-      document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
-      document.getElementById('progressText').textContent = 'M\u00f3dulo '+(p.length || 1)+' de 12';
-    }
-    function renderQuestions() {
-      const container = document.getElementById('quizContainer');
-      container.innerHTML = '';
-      questions.forEach((q, idx) => {
-        const qDiv = document.createElement('div'); qDiv.classList.add('question');
-        qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
-        const optsDiv = qDiv.querySelector('.options');
-        q.options.forEach((opt, optIdx) => {
-          const span = document.createElement('div'); span.classList.add('opt');
-          span.textContent = opt; span.dataset.qIdx = idx; span.dataset.optIdx = optIdx;
-          span.addEventListener('click', function() {
-            if (quizCompleted) return;
-            this.parentElement.querySelectorAll('.opt').forEach(c => c.classList.remove('selected'));
-            this.classList.add('selected'); userAnswers[idx] = optIdx; updateBtnState();
-          });
-          optsDiv.appendChild(span);
-        });
-        container.appendChild(qDiv);
-      });
-    }
-    function updateBtnState() {
-      document.getElementById('submitQuizBtn').disabled = userAnswers.some(a => a === null) || quizCompleted;
-    }
-    function handleSubmit() {
+  <div class="progress-section">
+   <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+   <span class="progress-text" id="progressText">Módulo 11 de 12</span>
+  </div>
+  <div class="analogy-card">
+   <strong>💡 Piénsalo así:</strong> Un Pipeline de ML es como una línea de ensamblaje en una fábrica: los datos entran por un lado, pasan por estaciones de limpieza (scaler), transformación (encoder) y ensamble (modelo), y salen como predicciones. Todo está conectado y no se pierde nada.
+  </div>
+  <div class="main-area">
+   <div class="section-title"><i class="fas fa-pipe"></i> Pipelines y Automatización</div>
+   <div class="info-grid">
+    <div class="info-panel"><h3>🔗 Pipeline (sklearn)</h3><p>Encadena transformaciones y un estimador final. Garantiza que las transformaciones se apliquen consistentemente en train/test. Facilita GridSearch y evita data leakage. Método: pipeline.fit(X_train, y_train).</p></div>
+    <div class="info-panel"><h3>🔀 ColumnTransformer</h3><p>Aplica diferentes transformaciones a diferentes columnas. Por ejemplo: estandarizar numéricas y one-hot codificar categóricas. Se combina con Pipeline para crear flujos completos y modulares.</p></div>
+    <div class="info-panel"><h3>🎯 GridSearchCV / RandomizedSearchCV</h3><p>Búsqueda sistemática de hiperparámetros con validación cruzada. GridSearch prueba todas las combinaciones; RandomizedSearch muestrea aleatoriamente. Optuna y Hyperopt son alternativas más eficientes.</p></div>
+    <div class="info-panel"><h3>🤖 AutoML</h3><p>Herramientas que automatizan selección de modelo, transformación de datos y ajuste de hiperparámetros. Frameworks: AutoGluon, H2O AutoML, TPOT, FLAML y Auto-sklearn. Ideales para prototipado rápido.</p></div>
+   </div>
+   <div class="sim-area">
+    <h3><i class="fas fa-cogs"></i> Simulador: Pipeline Completo</h3>
+    <p style="color:#b9ccee;margin-bottom:0.8rem;">Construye un pipeline de clasificación paso a paso.</p>
+    <div style="text-align:center;">
+     <button class="btn-action" onclick="runPipeline()" style="font-size:0.9rem;">🔧 Ejecutar Pipeline</button>
+    </div>
+    <div id="pipelineResult" style="margin-top:1rem;text-align:center;font-size:0.9rem;color:#b9ccee;">Haz clic para construir el pipeline.</div>
+   </div>
+   <div class="quiz-area">
+    <div class="quiz-title"><i class="fas fa-question-circle"></i> Mini Quiz: Pipelines y AutoML</div>
+    <div id="quizContainer"></div>
+    <button id="submitQuizBtn" class="btn-action">✅ Verificar respuestas</button>
+    <div id="insigniaArea" class="insignia hidden">
+     <i class="fas fa-medal"></i>
+     <h3>🏅 Ingeniero de ML en Producción 🏅</h3>
+     <p>Sabes construir pipelines y usar AutoML.</p>
+    </div>
+   </div>
+  </div>
+  <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre pipelines y AutoML.</div>
+  <div class="nav-links">
+   <a href="10-interpretabilidad.html" class="nav-link"><i class="fas fa-arrow-left"></i> Anterior</a>
+   <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+   <a href="12-certificado.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-brain"></i> Curso 5: Machine Learning Estadístico · 12 módulos interactivos</footer>
+ </div>
+ <script>
+  const STORAGE_KEY = 'prog_est_5_11';
+  const PROGRESS_KEY = 'prog_est_5_progress';
+  const questions = [
+   { text: "¿Qué clase encadena transformaciones + modelo en sklearn?", options: ["Pipeline","Chain","Workflow","Flow"], correct: 0 },
+   { text: "¿Qué permite ColumnTransformer?", options: ["Transformar columnas con recetas distintas","Crear columnas","Eliminar nulos","Balancear clases"], correct: 0 },
+   { text: "¿Qué busca GridSearchCV?", options: ["Mejores hiperparámetros","Mejores datos","Mejores features","Mejor semilla"], correct: 0 },
+   { text: "¿Qué framework AutoML está basado en evolución genética?", options: ["AutoGluon","H2O","TPOT","FLAML"], correct: 2 },
+   { text: "¿Qué ventaja tienen los pipelines?", options: ["Evitan data leakage","Son más rápidos","Usan menos memoria","No necesitan datos"], correct: 0 },
+   { text: "¿Qué clase usa validación cruzada con búsqueda aleatoria?", options: ["GridSearchCV","RandomizedSearchCV","CrossValSearch","RandomCV"], correct: 1 }
+  ];
+  let userAnswers = new Array(questions.length).fill(null);
+  let quizCompleted = false;
+  function runPipeline() {
+   const steps = ['Datos crudos (1000×20)', 'ColumnTransformer: num→Scaler, cat→OneHot', 'RandomForest(n=100)', 'Accuracy: 0.87 ± 0.02'];
+   let html = '<div style="display:flex;flex-direction:column;gap:0.4rem;">';
+   steps.forEach((s, i) => {
+    html += '<div style="background:#1a2a4a;padding:0.4rem 0.8rem;border-radius:0.8rem;font-size:0.85rem;">'+
+     'Paso '+(i+1)+': '+s+'</div>';
+   });
+   html += '<p style="margin-top:0.5rem;color:#00cc88;font-weight:700;">✅ Pipeline completado. Mejores params: n_estimators=200, max_depth=10</p></div>';
+   document.getElementById('pipelineResult').innerHTML = html;
+  }
+  function saveProgress() {
+   let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
+   localStorage.setItem(STORAGE_KEY, 'true');
+  }
+  function updateProgress() {
+   let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
+   document.getElementById('progressText').textContent = 'M\u00f3dulo '+(p.length || 1)+' de 12';
+  }
+  function renderQuestions() {
+   const container = document.getElementById('quizContainer');
+   container.innerHTML = '';
+   questions.forEach((q, idx) => {
+    const qDiv = document.createElement('div'); qDiv.classList.add('question');
+    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
+    const optsDiv = qDiv.querySelector('.options');
+    q.options.forEach((opt, optIdx) => {
+     const span = document.createElement('div'); span.classList.add('opt');
+     span.textContent = opt; span.dataset.qIdx = idx; span.dataset.optIdx = optIdx;
+     span.addEventListener('click', function() {
       if (quizCompleted) return;
-      if (userAnswers.some(a => a === null)) { document.getElementById('feedbackMsg').textContent = '\u26a0\ufe0f Responde todas las preguntas primero.'; return; }
-      let correct = 0;
-      questions.forEach((q, i) => { if (userAnswers[i] === q.correct) correct++; });
-      const total = questions.length; const passed = correct >= Math.ceil(total * 0.6);
-      document.querySelectorAll('.question').forEach((qDiv, idx) => {
-        const opts = qDiv.querySelectorAll('.opt');
-        opts.forEach((o, oi) => {
-          o.classList.remove('selected');
-          if (oi === questions[idx].correct) o.classList.add('correct');
-          else if (oi === userAnswers[idx]) o.classList.add('wrong');
-        });
-      });
-      if (passed) {
-        quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
-        document.getElementById('insigniaArea').classList.remove('hidden');
-        document.getElementById('feedbackMsg').textContent = '\ud83c\udf89 \u00a1Excelente! Dominas pipelines y AutoML.';
-        saveProgress(); updateProgress();
-      } else {
-        document.getElementById('feedbackMsg').textContent = '\u274c '+correct+'/'+total+' correctas. Necesitas al menos '+Math.ceil(total*0.6)+'. \u00a1Reintenta!';
-      }
-    }
-    function restoreProgress() {
-      const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
-      if (p.includes(STORAGE_KEY)) {
-        quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
-        document.getElementById('insigniaArea').classList.remove('hidden');
-        document.getElementById('feedbackMsg').textContent = '\ud83c\udfc6 Ya completaste este m\u00f3dulo.';
-        document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
-      }
-    }
-    document.getElementById('submitQuizBtn').addEventListener('click', handleSubmit);
-    renderQuestions(); updateBtnState(); restoreProgress(); updateProgress();
-  </script>
-  <script src="../../../assets/js/cookie-consent.js"></script>
-<script src="../../../assets/js/i18n.js"></script>  </body>
+      this.parentElement.querySelectorAll('.opt').forEach(c => c.classList.remove('selected'));
+      this.classList.add('selected'); userAnswers[idx] = optIdx; updateBtnState();
+     });
+     optsDiv.appendChild(span);
+    });
+    container.appendChild(qDiv);
+   });
+  }
+  function updateBtnState() {
+   document.getElementById('submitQuizBtn').disabled = userAnswers.some(a => a === null) || quizCompleted;
+  }
+  function handleSubmit() {
+   if (quizCompleted) return;
+   if (userAnswers.some(a => a === null)) { document.getElementById('feedbackMsg').textContent = '\u26a0\ufe0f Responde todas las preguntas primero.'; return; }
+   let correct = 0;
+   questions.forEach((q, i) => { if (userAnswers[i] === q.correct) correct++; });
+   const total = questions.length; const passed = correct >= Math.ceil(total * 0.6);
+   document.querySelectorAll('.question').forEach((qDiv, idx) => {
+    const opts = qDiv.querySelectorAll('.opt');
+    opts.forEach((o, oi) => {
+     o.classList.remove('selected');
+     if (oi === questions[idx].correct) o.classList.add('correct');
+     else if (oi === userAnswers[idx]) o.classList.add('wrong');
+    });
+   });
+   if (passed) {
+    quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').textContent = '\ud83c\udf89 \u00a1Excelente! Dominas pipelines y AutoML.';
+    saveProgress(); updateProgress();
+   } else {
+    document.getElementById('feedbackMsg').textContent = '\u274c '+correct+'/'+total+' correctas. Necesitas al menos '+Math.ceil(total*0.6)+'. \u00a1Reintenta!';
+   }
+  }
+  function restoreProgress() {
+   const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   if (p.includes(STORAGE_KEY)) {
+    quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').textContent = '\ud83c\udfc6 Ya completaste este m\u00f3dulo.';
+    document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
+   }
+  }
+  document.getElementById('submitQuizBtn').addEventListener('click', handleSubmit);
+  renderQuestions(); updateBtnState(); restoreProgress(); updateProgress();
+ </script>
+ <script src="../../../assets/js/i18n.js"></script> </body>
 </html>

@@ -1,183 +1,183 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Ejecución y Despliegue | WebSockets</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #111a2e 100%);
-      background-size: 200% 200%; animation: gradientShift 20s ease infinite;
-      font-family: 'Inter', sans-serif; color: #eef5ff; min-height: 100vh;
-      display: flex; align-items: center; justify-content: center; padding: 2rem 1rem;
-    }
-    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-    .curso5-container {
-      max-width: 1300px; width: 100%;
-      background: rgba(15, 25, 45, 0.65); backdrop-filter: blur(12px);
-      border-radius: 3rem; border: 1px solid rgba(43,158,255,0.25);
-      box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden;
-    }
-    .hero-header { background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%); padding: 2rem 2rem 1.5rem; text-align: center; border-bottom: 2px solid #2b9eff; }
-    .hero-header h1 { font-size: 2.6rem; font-weight: 800; background: linear-gradient(135deg, #FFF, #88ccff, #2b9eff); -webkit-background-clip: text; background-clip: text; color: transparent; }
-    .hero-header p { font-size: 1.1rem; color: #b9d9ff; margin-top: 0.3rem; }
-    .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
-    .chip { background: rgba(43,158,255,0.15); border: 1px solid #2b9eff; padding: 0.3rem 1rem; border-radius: 40px; font-size: 0.8rem; font-weight: 600; }
-    .analogy-card { background: #1e2a3acc; margin: 1.5rem 2rem; padding: 1.2rem 1.8rem; border-radius: 2rem; border-left: 8px solid #2b9eff; font-size: 1rem; line-height: 1.6; }
-    .main-area { padding: 0.5rem 2rem; }
-    .ws-box { background: #141e33cc; border-radius: 2rem; padding: 1.5rem; margin: 1rem 0; }
-    .ws-status { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
-    .ws-dot { width: 14px; height: 14px; border-radius: 50%; background: #555; }
-    .ws-dot.connected { background: #00ff88; box-shadow: 0 0 10px #00ff88; }
-    .tick-stream { background: #0a1220; border-radius: 1rem; height: 250px; overflow-y: scroll; padding: 0.5rem; font-family: monospace; font-size: 0.75rem; border: 1px solid #2c3e66; }
-    .tick-stream div { padding: 0.15rem 0; border-bottom: 1px solid #1a2a3a; }
-    .tick-buy { color: #00ff88; }
-    .tick-sell { color: #ff5050; }
-    .filter-row { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; margin: 0.8rem 0; }
-    .filter-row label { font-weight: 600; }
-    .filter-row input { background: #0a1220; border: 1px solid #2c3e66; color: #eef5ff; padding: 0.4rem 0.8rem; border-radius: 1rem; width: 100px; }
-    .vwap-display { background: #0a2540cc; border-radius: 1rem; padding: 0.8rem; margin-top: 0.5rem; border-left: 4px solid #2b9eff; }
-    .feedback { background: #00000099; margin: 1.5rem 2rem; padding: 1rem; border-radius: 1.5rem; text-align: center; font-weight: 500; border-left: 4px solid #2b9eff; }
-    .insignia { text-align: center; background: #0c1b2f; border-radius: 2rem; margin: 0 2rem 1.5rem; padding: 1rem; border: 1px dashed gold; }
-    .insignia i { font-size: 2.5rem; color: gold; }
-    .hidden { display: none; }
-    .btn-action { background: linear-gradient(95deg, #f0a500, #ff6a00); border: none; padding: 0.8rem 1.8rem; font-weight: bold; border-radius: 3rem; cursor: pointer; font-size: 1rem; transition: 0.2s; color: #1e1a0c; }
-    .btn-action:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(240,165,0,0.5); }
-    .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
-    .nav-link { background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem; font-weight: 600; text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; }
-    .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(43,158,255,0.4); }
-    .nav-link.next { background: linear-gradient(95deg, #f0a500, #ff6a00); color: #1e1a0c; }
-    .nav-link.menu { background: #1a2a4a; border: 1px solid #3399ff; }
-    footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
-    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
-  </style>
-  <link rel="stylesheet" href="../../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>EjecuciÃ³n y Despliegue | WebSockets</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+   background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #111a2e 100%);
+   background-size: 200% 200%; animation: gradientShift 20s ease infinite;
+   font-family: 'Inter', sans-serif; color: #eef5ff; min-height: 100vh;
+   display: flex; align-items: center; justify-content: center; padding: 2rem 1rem;
+  }
+  @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .curso5-container {
+   max-width: 1300px; width: 100%;
+   background: rgba(15, 25, 45, 0.65); backdrop-filter: blur(12px);
+   border-radius: 3rem; border: 1px solid rgba(43,158,255,0.25);
+   box-shadow: 0 25px 45px rgba(0,0,0,0.5); overflow: hidden;
+  }
+  .hero-header { background: linear-gradient(95deg, #0b1120 0%, #111a2e 100%); padding: 2rem 2rem 1.5rem; text-align: center; border-bottom: 2px solid #2b9eff; }
+  .hero-header h1 { font-size: 2.6rem; font-weight: 800; background: linear-gradient(135deg, #FFF, #88ccff, #2b9eff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero-header p { font-size: 1.1rem; color: #b9d9ff; margin-top: 0.3rem; }
+  .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
+  .chip { background: rgba(43,158,255,0.15); border: 1px solid #2b9eff; padding: 0.3rem 1rem; border-radius: 40px; font-size: 0.8rem; font-weight: 600; }
+  .analogy-card { background: #1e2a3acc; margin: 1.5rem 2rem; padding: 1.2rem 1.8rem; border-radius: 2rem; border-left: 8px solid #2b9eff; font-size: 1rem; line-height: 1.6; }
+  .main-area { padding: 0.5rem 2rem; }
+  .ws-box { background: #141e33cc; border-radius: 2rem; padding: 1.5rem; margin: 1rem 0; }
+  .ws-status { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+  .ws-dot { width: 14px; height: 14px; border-radius: 50%; background: #555; }
+  .ws-dot.connected { background: #00ff88; box-shadow: 0 0 10px #00ff88; }
+  .tick-stream { background: #0a1220; border-radius: 1rem; height: 250px; overflow-y: scroll; padding: 0.5rem; font-family: monospace; font-size: 0.75rem; border: 1px solid #2c3e66; }
+  .tick-stream div { padding: 0.15rem 0; border-bottom: 1px solid #1a2a3a; }
+  .tick-buy { color: #00ff88; }
+  .tick-sell { color: #ff5050; }
+  .filter-row { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; margin: 0.8rem 0; }
+  .filter-row label { font-weight: 600; }
+  .filter-row input { background: #0a1220; border: 1px solid #2c3e66; color: #eef5ff; padding: 0.4rem 0.8rem; border-radius: 1rem; width: 100px; }
+  .vwap-display { background: #0a2540cc; border-radius: 1rem; padding: 0.8rem; margin-top: 0.5rem; border-left: 4px solid #2b9eff; }
+  .feedback { background: #00000099; margin: 1.5rem 2rem; padding: 1rem; border-radius: 1.5rem; text-align: center; font-weight: 500; border-left: 4px solid #2b9eff; }
+  .insignia { text-align: center; background: #0c1b2f; border-radius: 2rem; margin: 0 2rem 1.5rem; padding: 1rem; border: 1px dashed gold; }
+  .insignia i { font-size: 2.5rem; color: gold; }
+  .hidden { display: none; }
+  .btn-action { background: linear-gradient(95deg, #f0a500, #ff6a00); border: none; padding: 0.8rem 1.8rem; font-weight: bold; border-radius: 3rem; cursor: pointer; font-size: 1rem; transition: 0.2s; color: #1e1a0c; }
+  .btn-action:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(240,165,0,0.5); }
+  .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
+  .nav-link { background: #2c3e66; padding: 0.7rem 1.5rem; border-radius: 3rem; font-weight: 600; text-decoration: none; color: #eef5ff; display: inline-flex; align-items: center; gap: 0.5rem; transition: 0.2s; }
+  .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(43,158,255,0.4); }
+  .nav-link.next { background: linear-gradient(95deg, #f0a500, #ff6a00); color: #1e1a0c; }
+  .nav-link.menu { background: #1a2a4a; border: 1px solid #3399ff; }
+  footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid #2c3e66; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
+ </style>
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
 </head>
 <body>
-  <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a></nav>
-  <div class="curso5-container">
-    <div class="hero-header">
-      <h1>📡 WebSockets</h1>
-      <p>Streaming de ticks, order books y trades en vivo</p>
-      <div class="badge-area">
-        <span class="chip"><i class="fas fa-bolt"></i> Tiempo Real</span>
-        <span class="chip"><i class="fas fa-filter"></i> Filtros</span>
-        <span class="chip"><i class="fas fa-calculator"></i> VWAP</span>
-      </div>
-    </div>
-    <div class="analogy-card"><strong>📡 Piénsalo así:</strong> REST es como llamar por teléfono a tu amigo cada 5 segundos para preguntarle "¿cómo va el partido?". WebSocket es como tener el partido en vivo por TV —la información fluye sola, sin que tengas que preguntar. Para trading de alta frecuencia, necesitas TV, no llamadas.</div>
-    <div class="main-area">
-      <div class="ws-box">
-        <div class="ws-status">
-          <div class="ws-dot" id="wsDot"></div>
-          <span id="wsStatusText">🔌 Desconectado</span>
-          <button class="btn-action" id="wsToggleBtn" onclick="toggleWS()" style="padding:0.4rem 1rem;font-size:0.85rem;"><i class="fas fa-plug"></i> Conectar</button>
-        </div>
-        <div class="filter-row">
-          <label>📊 Filtro precio min:</label>
-          <input type="number" id="minPrice" value="67000" step="1">
-          <label>📊 Volumen min:</label>
-          <input type="number" id="minVol" value="0.1" step="0.01">
-        </div>
-        <div class="tick-stream" id="tickStream">
-          <div style="color:#668;">⏳ Conéctate para ver los ticks en vivo...</div>
-        </div>
-        <div class="vwap-display">
-          <strong>VWAP (últimos 100 ticks):</strong> <span id="vwapValue">—</span>
-          <span style="font-size:0.8rem;color:#b9ccee;margin-left:1rem;">Ticks recibidos: <span id="tickCount">0</span></span>
-        </div>
-      </div>
-    </div>
-    <div id="feedbackMsg" class="feedback">💡 Conéctate al WebSocket simulado y observa los ticks de BTC/USDT en tiempo real. Usa filtros para aislar movimientos relevantes.</div>
-    <div id="insigniaArea" class="insignia hidden">
-      <i class="fas fa-medal"></i>
-      <h3>🏅 STREAMER DE DATOS 🏅</h3>
-      <p>Manejas streams de datos en tiempo real como un profesional. ¡Los ticks no tienen secretos para ti!</p>
-    </div>
-    <div style="text-align:center;margin:1rem 0;">
-      <button class="btn-action" onclick="completeModule()"><i class="fas fa-check"></i> Completar Módulo</button>
-    </div>
-    <div class="nav-links">
-      <a href="03-ordenes-ejecucion.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
-      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
-      <a href="05-asyncio.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
-    </div>
-    <footer><i class="fas fa-crown"></i> Ejecución y Despliegue · Trading Algorítmico con Python</footer>
+ <nav class="brand-return-nav"><a href="../../../index.html">&larr; Portfolio</a><a href="../../../cursos/index.html">Cursos</a></nav>
+ <div class="curso5-container">
+  <div class="hero-header">
+   <h1>ðŸ“¡ WebSockets</h1>
+   <p>Streaming de ticks, order books y trades en vivo</p>
+   <div class="badge-area">
+    <span class="chip"><i class="fas fa-bolt"></i> Tiempo Real</span>
+    <span class="chip"><i class="fas fa-filter"></i> Filtros</span>
+    <span class="chip"><i class="fas fa-calculator"></i> VWAP</span>
+   </div>
   </div>
-  <script>
-    const STORAGE_KEY = '04';
-    let wsConnected = false, wsInterval = null, ticks = [], tickCount = 0;
-    const tickStream = document.getElementById('tickStream');
-    function toggleWS() {
-      if (wsConnected) { disconnectWS(); }
-      else { connectWS(); }
-    }
-    function connectWS() {
-      wsConnected = true;
-      document.getElementById('wsDot').classList.add('connected');
-      document.getElementById('wsStatusText').textContent = '🔌 Conectado a BTC/USDT';
-      document.getElementById('wsToggleBtn').innerHTML = '<i class="fas fa-plug"></i> Desconectar';
-      tickStream.innerHTML = I18N.t('fb_0');
-      wsInterval = setInterval(generateTick, 400 + Math.random() * 600);
-    }
-    function disconnectWS() {
-      wsConnected = false;
-      clearInterval(wsInterval);
-      document.getElementById('wsDot').classList.remove('connected');
-      document.getElementById('wsStatusText').textContent = '🔌 Desconectado';
-      document.getElementById('wsToggleBtn').innerHTML = '<i class="fas fa-plug"></i> Conectar';
-      tickStream.innerHTML += '<div style="color:#ff6666;">❌ Desconectado</div>';
-    }
-    function generateTick() {
-      if (!wsConnected) return;
-      const basePrice = 67450;
-      const price = basePrice + (Math.random() - 0.5) * 60;
-      const vol = Math.random() * 2;
-      const side = Math.random() > 0.5 ? 'BUY' : 'SELL';
-      const minP = parseFloat(document.getElementById('minPrice').value) || 0;
-      const minV = parseFloat(document.getElementById('minVol').value) || 0;
-      if (price < minP || vol < minV) return;
-      tickCount++;
-      ticks.push({ price, vol, side });
-      if (ticks.length > 100) ticks.shift();
-      const vwap = ticks.reduce((s,t) => s + t.price * t.vol, 0) / ticks.reduce((s,t) => s + t.vol, 0);
-      document.getElementById('vwapValue').textContent = '$' + vwap.toFixed(2);
-      document.getElementById('tickCount').textContent = tickCount;
-      const cls = side === 'BUY' ? 'tick-buy' : 'tick-sell';
-      const arrow = side === 'BUY' ? '▲' : '▼';
-      const div = document.createElement('div');
-      div.className = cls;
-      div.textContent = `${arrow} ${price.toFixed(2)} | ${vol.toFixed(4)} BTC | ${new Date().toLocaleTimeString()}.${String(Date.now()).slice(-3)}`;
-      tickStream.appendChild(div);
-      tickStream.scrollTop = tickStream.scrollHeight;
-    }
-    function completeModule() {
-      if (!wsConnected && tickCount === 0) {
-        document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_1');
-        return;
-      }
-      const insignia = document.getElementById('insigniaArea');
-      insignia.classList.remove('hidden');
-      localStorage.setItem(STORAGE_KEY, 'true');
-      document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_2');
-    }
-    if (localStorage.getItem(STORAGE_KEY) === 'true') {
-      document.getElementById('insigniaArea').classList.remove('hidden');
-      document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_3');
-    }
-  </script>
+  <div class="analogy-card"><strong>ðŸ“¡ PiÃ©nsalo asÃ­:</strong> REST es como llamar por telÃ©fono a tu amigo cada 5 segundos para preguntarle "Â¿cÃ³mo va el partido?". WebSocket es como tener el partido en vivo por TV â€”la informaciÃ³n fluye sola, sin que tengas que preguntar. Para trading de alta frecuencia, necesitas TV, no llamadas.</div>
+  <div class="main-area">
+   <div class="ws-box">
+    <div class="ws-status">
+     <div class="ws-dot" id="wsDot"></div>
+     <span id="wsStatusText">ðŸ”Œ Desconectado</span>
+     <button class="btn-action" id="wsToggleBtn" onclick="toggleWS()" style="padding:0.4rem 1rem;font-size:0.85rem;"><i class="fas fa-plug"></i> Conectar</button>
+    </div>
+    <div class="filter-row">
+     <label>ðŸ“Š Filtro precio min:</label>
+     <input type="number" id="minPrice" value="67000" step="1">
+     <label>ðŸ“Š Volumen min:</label>
+     <input type="number" id="minVol" value="0.1" step="0.01">
+    </div>
+    <div class="tick-stream" id="tickStream">
+     <div style="color:#668;">â³ ConÃ©ctate para ver los ticks en vivo...</div>
+    </div>
+    <div class="vwap-display">
+     <strong>VWAP (Ãºltimos 100 ticks):</strong> <span id="vwapValue">â€”</span>
+     <span style="font-size:0.8rem;color:#b9ccee;margin-left:1rem;">Ticks recibidos: <span id="tickCount">0</span></span>
+    </div>
+   </div>
+  </div>
+  <div id="feedbackMsg" class="feedback">ðŸ’¡ ConÃ©ctate al WebSocket simulado y observa los ticks de BTC/USDT en tiempo real. Usa filtros para aislar movimientos relevantes.</div>
+  <div id="insigniaArea" class="insignia hidden">
+   <i class="fas fa-medal"></i>
+   <h3>ðŸ… STREAMER DE DATOS ðŸ…</h3>
+   <p>Manejas streams de datos en tiempo real como un profesional. Â¡Los ticks no tienen secretos para ti!</p>
+  </div>
+  <div style="text-align:center;margin:1rem 0;">
+   <button class="btn-action" onclick="completeModule()"><i class="fas fa-check"></i> Completar MÃ³dulo</button>
+  </div>
+  <div class="nav-links">
+   <a href="03-ordenes-ejecucion.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+   <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> MenÃº</a>
+   <a href="05-asyncio.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> EjecuciÃ³n y Despliegue Â· Trading AlgorÃ­tmico con Python</footer>
+ </div>
+ <script>
+  const STORAGE_KEY = '04';
+  let wsConnected = false, wsInterval = null, ticks = [], tickCount = 0;
+  const tickStream = document.getElementById('tickStream');
+  function toggleWS() {
+   if (wsConnected) { disconnectWS(); }
+   else { connectWS(); }
+  }
+  function connectWS() {
+   wsConnected = true;
+   document.getElementById('wsDot').classList.add('connected');
+   document.getElementById('wsStatusText').textContent = 'ðŸ”Œ Conectado a BTC/USDT';
+   document.getElementById('wsToggleBtn').innerHTML = '<i class="fas fa-plug"></i> Desconectar';
+   tickStream.innerHTML = I18N.t('fb_0');
+   wsInterval = setInterval(generateTick, 400 + Math.random() * 600);
+  }
+  function disconnectWS() {
+   wsConnected = false;
+   clearInterval(wsInterval);
+   document.getElementById('wsDot').classList.remove('connected');
+   document.getElementById('wsStatusText').textContent = 'ðŸ”Œ Desconectado';
+   document.getElementById('wsToggleBtn').innerHTML = '<i class="fas fa-plug"></i> Conectar';
+   tickStream.innerHTML += '<div style="color:#ff6666;">âŒ Desconectado</div>';
+  }
+  function generateTick() {
+   if (!wsConnected) return;
+   const basePrice = 67450;
+   const price = basePrice + (Math.random() - 0.5) * 60;
+   const vol = Math.random() * 2;
+   const side = Math.random() > 0.5 ? 'BUY' : 'SELL';
+   const minP = parseFloat(document.getElementById('minPrice').value) || 0;
+   const minV = parseFloat(document.getElementById('minVol').value) || 0;
+   if (price < minP || vol < minV) return;
+   tickCount++;
+   ticks.push({ price, vol, side });
+   if (ticks.length > 100) ticks.shift();
+   const vwap = ticks.reduce((s,t) => s + t.price * t.vol, 0) / ticks.reduce((s,t) => s + t.vol, 0);
+   document.getElementById('vwapValue').textContent = '$' + vwap.toFixed(2);
+   document.getElementById('tickCount').textContent = tickCount;
+   const cls = side === 'BUY' ? 'tick-buy' : 'tick-sell';
+   const arrow = side === 'BUY' ? 'â–²' : 'â–¼';
+   const div = document.createElement('div');
+   div.className = cls;
+   div.textContent = `${arrow} ${price.toFixed(2)} | ${vol.toFixed(4)} BTC | ${new Date().toLocaleTimeString()}.${String(Date.now()).slice(-3)}`;
+   tickStream.appendChild(div);
+   tickStream.scrollTop = tickStream.scrollHeight;
+  }
+  function completeModule() {
+   if (!wsConnected && tickCount === 0) {
+    document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_1');
+    return;
+   }
+   const insignia = document.getElementById('insigniaArea');
+   insignia.classList.remove('hidden');
+   localStorage.setItem(STORAGE_KEY, 'true');
+   document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_2');
+  }
+  if (localStorage.getItem(STORAGE_KEY) === 'true') {
+   document.getElementById('insigniaArea').classList.remove('hidden');
+   document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_3');
+  }
+ </script>
 
 <script>
 window.I18N_DATA={
-  'fb_0': { es: '<div style="color:#88ff88;">✅ Conectado. Recibiendo ticks...</div>', en: '<div style="color:#88ff88;">✅ Conectado. Recibiendo ticks...</div>' },
-  'fb_1': { es: '⚠️ Conéctate al WebSocket y recibe al menos algunos ticks antes de completar.', en: '⚠️ Conéctate al WebSocket y recibe al menos algunos ticks antes de completar.' },
-  'fb_2': { es: '✅ Módulo completado. ¡Eres un streamer de datos!', en: '✅ Módulo completado. ¡Eres un streamer de datos!' },
-  'fb_3': { es: '✅ Ya completaste este módulo. ¡Bien hecho!', en: '✅ Ya completaste este módulo. ¡Bien hecho!' }
+ 'fb_0': { es: '<div style="color:#88ff88;">âœ… Conectado. Recibiendo ticks...</div>', en: '<div style="color:#88ff88;">âœ… Conectado. Recibiendo ticks...</div>' },
+ 'fb_1': { es: 'âš ï¸ ConÃ©ctate al WebSocket y recibe al menos algunos ticks antes de completar.', en: 'âš ï¸ ConÃ©ctate al WebSocket y recibe al menos algunos ticks antes de completar.' },
+ 'fb_2': { es: 'âœ… MÃ³dulo completado. Â¡Eres un streamer de datos!', en: 'âœ… MÃ³dulo completado. Â¡Eres un streamer de datos!' },
+ 'fb_3': { es: 'âœ… Ya completaste este mÃ³dulo. Â¡Bien hecho!', en: 'âœ… Ya completaste este mÃ³dulo. Â¡Bien hecho!' }
 };
 </script>
-</body>
+ </body>
 </html>
 

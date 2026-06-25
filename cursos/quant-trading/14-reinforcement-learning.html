@@ -1,317 +1,315 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Quant Trading | Reinforcement Learning</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
-    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-    .modulo-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,102,192,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
-    .hero-header { background:linear-gradient(95deg,#0b1120 0%,#111a2e 100%); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #ff66c0; }
-    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#ffb3dd,#ff66c0); -webkit-background-clip:text; background-clip:text; color:transparent; }
-    .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
-    .chip { background:rgba(255,102,192,0.15); border:1px solid #ff66c0; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
-    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ff66c0; font-size:1rem; line-height:1.6; }
-    .main-area { padding:1.5rem 2rem; display:flex; flex-direction:column; gap:1.5rem; }
-    .grid-2col { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; }
-    .panel { background:rgba(10,18,40,0.7); border-radius:1.8rem; padding:1.5rem; border:1px solid rgba(255,102,192,0.15); }
-    .panel h3 { font-size:1.2rem; margin-bottom:1rem; color:#ffb3dd; }
-    .param-row { display:flex; align-items:center; gap:1rem; margin-bottom:0.8rem; flex-wrap:wrap; }
-    .param-row label { min-width:140px; font-weight:600; }
-    .param-row input[type=range] { flex:1; max-width:250px; accent-color:#ff66c0; height:6px; }
-    .param-row .val { font-weight:700; color:#ff66c0; min-width:40px; text-align:right; }
-    .param-row select { background:#1a2a44; border:1px solid #ff66c055; color:#fff; padding:0.4rem 0.8rem; border-radius:8px; font-family:'Inter',sans-serif; }
-    .stat-row { display:flex; justify-content:space-between; padding:0.5rem 0; border-bottom:1px solid rgba(255,102,192,0.1); }
-    .stat-row .label { color:#8899bb; }
-    .stat-row .value { font-weight:700; color:#ff66c0; }
-    .stat-row .value.green { color:#00e676; }
-    canvas { width:100%; max-width:500px; height:280px; border-radius:1.2rem; background:#080e1a; display:block; margin:0 auto; }
-    .sim-log { max-height:150px; overflow-y:auto; background:#080e1a; border-radius:1rem; padding:0.8rem; font-family:'Courier New',monospace; font-size:0.8rem; color:#99aabb; }
-    .sim-log::-webkit-scrollbar { width:4px; }
-    .sim-log::-webkit-scrollbar-thumb { background:#ff66c055; border-radius:2px; }
-    .sim-log .log-entry { padding:0.15rem 0; }
-    .sim-log .log-entry.good { color:#00e676; }
-    .sim-log .log-entry.bad { color:#ff5050; }
-    .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #ff66c0; }
-    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:0 2rem 1.5rem; padding:1rem; border:1px dashed gold; }
-    .insignia i { font-size:2.5rem; color:gold; }
-    .hidden { display:none; }
-    .btn-action { background:linear-gradient(95deg,#f0a500,#ff6a00); border:none; padding:0.8rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; color:#1e1a0c; transition:0.2s; }
-    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(240,165,0,0.5); }
-    .btn-train { background:linear-gradient(95deg,#ff66c0,#d5008f); }
-    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
-    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
-    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(255,102,192,0.4); }
-    .nav-link.next { background:linear-gradient(95deg,#f0a500,#ff6a00); color:#1e1a0c; }
-    .nav-link.menu { background:#1a2a4a; border:1px solid #3399ff; }
-    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
-    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .grid-2col { grid-template-columns:1fr; } }
-  </style>
-  <link rel="stylesheet" href="../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Quant Trading | Reinforcement Learning</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:linear-gradient(135deg,#0a0f1e 0%,#0c1222 50%,#111a2e 100%); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+  @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .modulo-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,102,192,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+  .hero-header { background:linear-gradient(95deg,#0b1120 0%,#111a2e 100%); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #ff66c0; }
+  .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#ffb3dd,#ff66c0); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+  .chip { background:rgba(255,102,192,0.15); border:1px solid #ff66c0; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+  .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ff66c0; font-size:1rem; line-height:1.6; }
+  .main-area { padding:1.5rem 2rem; display:flex; flex-direction:column; gap:1.5rem; }
+  .grid-2col { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; }
+  .panel { background:rgba(10,18,40,0.7); border-radius:1.8rem; padding:1.5rem; border:1px solid rgba(255,102,192,0.15); }
+  .panel h3 { font-size:1.2rem; margin-bottom:1rem; color:#ffb3dd; }
+  .param-row { display:flex; align-items:center; gap:1rem; margin-bottom:0.8rem; flex-wrap:wrap; }
+  .param-row label { min-width:140px; font-weight:600; }
+  .param-row input[type=range] { flex:1; max-width:250px; accent-color:#ff66c0; height:6px; }
+  .param-row .val { font-weight:700; color:#ff66c0; min-width:40px; text-align:right; }
+  .param-row select { background:#1a2a44; border:1px solid #ff66c055; color:#fff; padding:0.4rem 0.8rem; border-radius:8px; font-family:'Inter',sans-serif; }
+  .stat-row { display:flex; justify-content:space-between; padding:0.5rem 0; border-bottom:1px solid rgba(255,102,192,0.1); }
+  .stat-row .label { color:#8899bb; }
+  .stat-row .value { font-weight:700; color:#ff66c0; }
+  .stat-row .value.green { color:#00e676; }
+  canvas { width:100%; max-width:500px; height:280px; border-radius:1.2rem; background:#080e1a; display:block; margin:0 auto; }
+  .sim-log { max-height:150px; overflow-y:auto; background:#080e1a; border-radius:1rem; padding:0.8rem; font-family:'Courier New',monospace; font-size:0.8rem; color:#99aabb; }
+  .sim-log::-webkit-scrollbar { width:4px; }
+  .sim-log::-webkit-scrollbar-thumb { background:#ff66c055; border-radius:2px; }
+  .sim-log .log-entry { padding:0.15rem 0; }
+  .sim-log .log-entry.good { color:#00e676; }
+  .sim-log .log-entry.bad { color:#ff5050; }
+  .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #ff66c0; }
+  .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:0 2rem 1.5rem; padding:1rem; border:1px dashed gold; }
+  .insignia i { font-size:2.5rem; color:gold; }
+  .hidden { display:none; }
+  .btn-action { background:linear-gradient(95deg,#f0a500,#ff6a00); border:none; padding:0.8rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; color:#1e1a0c; transition:0.2s; }
+  .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(240,165,0,0.5); }
+  .btn-train { background:linear-gradient(95deg,#ff66c0,#d5008f); }
+  .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+  .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+  .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(255,102,192,0.4); }
+  .nav-link.next { background:linear-gradient(95deg,#f0a500,#ff6a00); color:#1e1a0c; }
+  .nav-link.menu { background:#1a2a4a; border:1px solid #3399ff; }
+  footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .grid-2col { grid-template-columns:1fr; } }
+ </style>
+ <link rel="stylesheet" href="../../assets/css/theme.css">
 </head>
 <body>
-  <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
-  <div class="modulo-container">
-    <div class="hero-header">
-      <h1><i class="fas fa-brain"></i> Reinforcement Learning</h1>
-      <p>Entrena agentes de IA que aprenden a tradear por sí mismos</p>
-      <div class="badge-area">
-        <span class="chip"><i class="fas fa-robot"></i> PPO</span>
-        <span class="chip"><i class="fas fa-chart-line"></i> Reward Curve</span>
-        <span class="chip"><i class="fas fa-dice-d6"></i> FinRL</span>
-      </div>
-    </div>
-    <div class="analogy-card">
-      <strong><i class="fas fa-lightbulb"></i> Piénsalo así:</strong> Entrenar un agente RL es como enseñarle a un perro un truco nuevo. Cuando el perro hace algo bien (comprar en el momento correcto), le das una galleta (reward). Cuando hace algo mal (vender muy temprano), no hay galleta. Al principio el perro se equivoca mucho, pero después de muchos intentos (episodios), aprende la mejor estrategia. PPO es el método que le dice al perro: "poco a poco, no cambies toda tu conducta de golpe". Así, el agente evoluciona sin volverse loco.
-    </div>
-    <div class="main-area">
-      <div class="grid-2col">
-        <div class="panel">
-          <h3><i class="fas fa-sliders-h"></i> Hiperparámetros</h3>
-          <div class="param-row"><label>Learning Rate</label><input type="range" id="lr" min="1" max="9" value="3"><span class="val" id="lrVal">3e-4</span></div>
-          <div class="param-row"><label>Episodios</label><input type="range" id="episodes" min="50" max="500" value="200" step="10"><span class="val" id="epVal">200</span></div>
-          <div class="param-row"><label>Entorno</label><select id="envSelect"><option value="stocks">Acciones</option><option value="crypto">Crypto</option><option value="forex">Forex</option></select></div>
-          <button class="btn-action btn-train" id="trainBtn" style="background:linear-gradient(95deg,#ff66c0,#d5008f);width:100%;margin-top:0.5rem;"><i class="fas fa-play"></i> Entrenar Agente PPO</button>
-        </div>
-        <div class="panel">
-          <h3><i class="fas fa-chart-line"></i> Resultados del Entrenamiento</h3>
-          <div class="stat-row"><span class="label">Reward Total</span><span class="value green" id="totalReward">0.00</span></div>
-          <div class="stat-row"><span class="label">Sharpe (agent)</span><span class="value" id="agentSharpe">0.00</span></div>
-          <div class="stat-row"><span class="label">Trades Ejecutados</span><span class="value" id="totalTrades">0</span></div>
-          <div class="stat-row"><span class="label">Win Rate</span><span class="value green" id="winRate">0%</span></div>
-        </div>
-      </div>
-      <div class="panel">
-        <h3><i class="fas fa-wave-square"></i> Curva de Recompensa por Episodio</h3>
-        <canvas id="rewardCanvas"></canvas>
-      </div>
-      <div class="sim-log" id="simLog">
-        <div class="log-entry">🤖 Inicializando agente PPO con redes neuronales...</div>
-        <div class="log-entry">📊 Entorno de trading configurado. Listo para entrenar.</div>
-      </div>
-    </div>
-    <div id="feedbackMsg" class="feedback">💡 Ajusta el learning rate y los episodios, luego entrena al agente. ¡Mira cómo aprende a tradear solo!</div>
-    <div id="insigniaArea" class="insignia hidden">
-      <i class="fas fa-medal"></i>
-      <h3>🏅 RL Trainer 🏅</h3>
-      <p>Has entrenado un agente de Reinforcement Learning. ¡Eres un verdadero científico de datos cuant!</p>
-    </div>
-    <div class="nav-links">
-      <a href="13-nlp-financiero.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
-      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
-      <a href="15-deploy-produccion.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
-    </div>
-    <footer><i class="fas fa-crown"></i> Quant Trading · Domina los algoritmos que mueven Wall Street</footer>
+ <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+ <div class="modulo-container">
+  <div class="hero-header">
+   <h1><i class="fas fa-brain"></i> Reinforcement Learning</h1>
+   <p>Entrena agentes de IA que aprenden a tradear por sí mismos</p>
+   <div class="badge-area">
+    <span class="chip"><i class="fas fa-robot"></i> PPO</span>
+    <span class="chip"><i class="fas fa-chart-line"></i> Reward Curve</span>
+    <span class="chip"><i class="fas fa-dice-d6"></i> FinRL</span>
+   </div>
   </div>
-  <script>
-    const STORAGE_KEY = 'quant_trading_14';
-    let training = false;
-    let rewardHistory = [];
+  <div class="analogy-card">
+   <strong><i class="fas fa-lightbulb"></i> Piénsalo así:</strong> Entrenar un agente RL es como enseñarle a un perro un truco nuevo. Cuando el perro hace algo bien (comprar en el momento correcto), le das una galleta (reward). Cuando hace algo mal (vender muy temprano), no hay galleta. Al principio el perro se equivoca mucho, pero después de muchos intentos (episodios), aprende la mejor estrategia. PPO es el método que le dice al perro: "poco a poco, no cambies toda tu conducta de golpe". Así, el agente evoluciona sin volverse loco.
+  </div>
+  <div class="main-area">
+   <div class="grid-2col">
+    <div class="panel">
+     <h3><i class="fas fa-sliders-h"></i> Hiperparámetros</h3>
+     <div class="param-row"><label>Learning Rate</label><input type="range" id="lr" min="1" max="9" value="3"><span class="val" id="lrVal">3e-4</span></div>
+     <div class="param-row"><label>Episodios</label><input type="range" id="episodes" min="50" max="500" value="200" step="10"><span class="val" id="epVal">200</span></div>
+     <div class="param-row"><label>Entorno</label><select id="envSelect"><option value="stocks">Acciones</option><option value="crypto">Crypto</option><option value="forex">Forex</option></select></div>
+     <button class="btn-action btn-train" id="trainBtn" style="background:linear-gradient(95deg,#ff66c0,#d5008f);width:100%;margin-top:0.5rem;"><i class="fas fa-play"></i> Entrenar Agente PPO</button>
+    </div>
+    <div class="panel">
+     <h3><i class="fas fa-chart-line"></i> Resultados del Entrenamiento</h3>
+     <div class="stat-row"><span class="label">Reward Total</span><span class="value green" id="totalReward">0.00</span></div>
+     <div class="stat-row"><span class="label">Sharpe (agent)</span><span class="value" id="agentSharpe">0.00</span></div>
+     <div class="stat-row"><span class="label">Trades Ejecutados</span><span class="value" id="totalTrades">0</span></div>
+     <div class="stat-row"><span class="label">Win Rate</span><span class="value green" id="winRate">0%</span></div>
+    </div>
+   </div>
+   <div class="panel">
+    <h3><i class="fas fa-wave-square"></i> Curva de Recompensa por Episodio</h3>
+    <canvas id="rewardCanvas"></canvas>
+   </div>
+   <div class="sim-log" id="simLog">
+    <div class="log-entry">🤖 Inicializando agente PPO con redes neuronales...</div>
+    <div class="log-entry">📊 Entorno de trading configurado. Listo para entrenar.</div>
+   </div>
+  </div>
+  <div id="feedbackMsg" class="feedback">💡 Ajusta el learning rate y los episodios, luego entrena al agente. ¡Mira cómo aprende a tradear solo!</div>
+  <div id="insigniaArea" class="insignia hidden">
+   <i class="fas fa-medal"></i>
+   <h3>🏅 RL Trainer 🏅</h3>
+   <p>Has entrenado un agente de Reinforcement Learning. ¡Eres un verdadero científico de datos cuant!</p>
+  </div>
+  <div class="nav-links">
+   <a href="13-nlp-financiero.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+   <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+   <a href="15-deploy-produccion.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Quant Trading · Domina los algoritmos que mueven Wall Street</footer>
+ </div>
+ <script>
+  const STORAGE_KEY = 'quant_trading_14';
+  let training = false;
+  let rewardHistory = [];
 
-    document.getElementById('lr').addEventListener('input',function(){
-      const vals = ['1e-5','5e-5','1e-4','3e-4','5e-4','1e-3','3e-3','5e-3','1e-2'];
-      document.getElementById('lrVal').textContent = vals[parseInt(this.value)-1];
-    });
-    document.getElementById('episodes').addEventListener('input',function(){
-      document.getElementById('epVal').textContent = this.value;
-    });
+  document.getElementById('lr').addEventListener('input',function(){
+   const vals = ['1e-5','5e-5','1e-4','3e-4','5e-4','1e-3','3e-3','5e-3','1e-2'];
+   document.getElementById('lrVal').textContent = vals[parseInt(this.value)-1];
+  });
+  document.getElementById('episodes').addEventListener('input',function(){
+   document.getElementById('epVal').textContent = this.value;
+  });
 
-    function log(msg,type='') {
-      const logDiv = document.getElementById('simLog');
-      const entry = document.createElement('div');
-      entry.className = 'log-entry'+(type?' '+type:'');
-      entry.textContent = msg;
-      logDiv.appendChild(entry);
-      logDiv.scrollTop = logDiv.scrollHeight;
+  function log(msg,type='') {
+   const logDiv = document.getElementById('simLog');
+   const entry = document.createElement('div');
+   entry.className = 'log-entry'+(type?' '+type:'');
+   entry.textContent = msg;
+   logDiv.appendChild(entry);
+   logDiv.scrollTop = logDiv.scrollHeight;
+  }
+
+  function simulateTraining() {
+   if(training) return;
+   training = true;
+   const btn = document.getElementById('trainBtn');
+   btn.disabled = true;
+   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Entrenando...';
+
+   const nEpisodes = parseInt(document.getElementById('episodes').value);
+   const lrIdx = parseInt(document.getElementById('lr').value);
+   const envName = document.getElementById('envSelect').value;
+   const lrVals = [1e-5,5e-5,1e-4,3e-4,5e-4,1e-3,3e-3,5e-3,1e-2];
+   const lr = lrVals[lrIdx-1];
+   rewardHistory = [];
+
+   log('🚀 Iniciando entrenamiento PPO en entorno '+envName+'...');
+   log('⚙️ Learning Rate: '+lr.toExponential()+' | Episodios: '+nEpisodes);
+   log('');
+
+   let episode = 0;
+   const totalRewards = [];
+   let totalTrades = 0;
+   let wins = 0;
+
+   function trainStep() {
+    if(episode >= nEpisodes) {
+     training = false;
+     btn.disabled = false;
+     btn.innerHTML = '<i class="fas fa-play"></i> Entrenar Agente PPO';
+     finishTraining(totalRewards,totalTrades,wins,nEpisodes);
+     return;
     }
 
-    function simulateTraining() {
-      if(training) return;
-      training = true;
-      const btn = document.getElementById('trainBtn');
-      btn.disabled = true;
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Entrenando...';
+    // Simulated reward with noise + improvement over time
+    const noise = randomNormal() * 0.3;
+    const improvement = Math.min(episode / nEpisodes * 1.5, 1.2);
+    const baseReward = 0.5 + improvement + noise * (1 - episode/nEpisodes * 0.5);
+    const reward = Math.max(-1, Math.min(3, baseReward));
+    totalRewards.push(reward);
 
-      const nEpisodes = parseInt(document.getElementById('episodes').value);
-      const lrIdx = parseInt(document.getElementById('lr').value);
-      const envName = document.getElementById('envSelect').value;
-      const lrVals = [1e-5,5e-5,1e-4,3e-4,5e-4,1e-3,3e-3,5e-3,1e-2];
-      const lr = lrVals[lrIdx-1];
-      rewardHistory = [];
+    const tradesThisEp = Math.floor(Math.random() * 8) + 2;
+    totalTrades += tradesThisEp;
+    const epWins = Math.floor(tradesThisEp * (0.4 + episode/nEpisodes * 0.3));
+    wins += epWins;
 
-      log('🚀 Iniciando entrenamiento PPO en entorno '+envName+'...');
-      log('⚙️ Learning Rate: '+lr.toExponential()+' | Episodios: '+nEpisodes);
-      log('');
-
-      let episode = 0;
-      const totalRewards = [];
-      let totalTrades = 0;
-      let wins = 0;
-
-      function trainStep() {
-        if(episode >= nEpisodes) {
-          training = false;
-          btn.disabled = false;
-          btn.innerHTML = '<i class="fas fa-play"></i> Entrenar Agente PPO';
-          finishTraining(totalRewards,totalTrades,wins,nEpisodes);
-          return;
-        }
-
-        // Simulated reward with noise + improvement over time
-        const noise = randomNormal() * 0.3;
-        const improvement = Math.min(episode / nEpisodes * 1.5, 1.2);
-        const baseReward = 0.5 + improvement + noise * (1 - episode/nEpisodes * 0.5);
-        const reward = Math.max(-1, Math.min(3, baseReward));
-        totalRewards.push(reward);
-
-        const tradesThisEp = Math.floor(Math.random() * 8) + 2;
-        totalTrades += tradesThisEp;
-        const epWins = Math.floor(tradesThisEp * (0.4 + episode/nEpisodes * 0.3));
-        wins += epWins;
-
-        if(episode % Math.max(1,Math.floor(nEpisodes/10)) === 0) {
-          const avgReward = totalRewards.slice(-20).reduce((a,b)=>a+b,0)/Math.min(20,totalRewards.length);
-          log('📈 Episodio '+(episode+1)+'/'+nEpisodes+' | Reward: '+reward.toFixed(3)+' | Avg: '+avgReward.toFixed(3)+' | Trades: '+tradesThisEp);
-        }
-
-        episode++;
-        setTimeout(trainStep, 30);
-      }
-
-      trainStep();
+    if(episode % Math.max(1,Math.floor(nEpisodes/10)) === 0) {
+     const avgReward = totalRewards.slice(-20).reduce((a,b)=>a+b,0)/Math.min(20,totalRewards.length);
+     log('📈 Episodio '+(episode+1)+'/'+nEpisodes+' | Reward: '+reward.toFixed(3)+' | Avg: '+avgReward.toFixed(3)+' | Trades: '+tradesThisEp);
     }
 
-    function finishTraining(totalRewards,totalTrades,wins,nEpisodes) {
-      const finalReward = totalRewards.reduce((a,b)=>a+b,0);
-      const avgReward = finalReward / nEpisodes;
-      const winRate = totalTrades > 0 ? (wins/totalTrades)*100 : 0;
+    episode++;
+    setTimeout(trainStep, 30);
+   }
 
-      // Simulated Sharpe based on reward consistency
-      const mean = avgReward;
-      const std = totalRewards.length > 1 ? Math.sqrt(totalRewards.map(r=>(r-mean)**2).reduce((a,b)=>a+b,0)/(totalRewards.length-1)) : 0.5;
-      const sharpe = std > 0 ? (mean-0.2)/std : 0;
+   trainStep();
+  }
 
-      document.getElementById('totalReward').textContent = finalReward.toFixed(2);
-      document.getElementById('agentSharpe').textContent = sharpe.toFixed(2);
-      document.getElementById('totalTrades').textContent = totalTrades;
-      document.getElementById('winRate').textContent = winRate.toFixed(1)+'%';
+  function finishTraining(totalRewards,totalTrades,wins,nEpisodes) {
+   const finalReward = totalRewards.reduce((a,b)=>a+b,0);
+   const avgReward = finalReward / nEpisodes;
+   const winRate = totalTrades > 0 ? (wins/totalTrades)*100 : 0;
 
-      rewardHistory = totalRewards;
-      drawRewardCurve(rewardHistory);
+   // Simulated Sharpe based on reward consistency
+   const mean = avgReward;
+   const std = totalRewards.length > 1 ? Math.sqrt(totalRewards.map(r=>(r-mean)**2).reduce((a,b)=>a+b,0)/(totalRewards.length-1)) : 0.5;
+   const sharpe = std > 0 ? (mean-0.2)/std : 0;
 
-      log('');
-      log('✅ ENTRENAMIENTO COMPLETADO');
-      log('🏆 Reward Total: '+finalReward.toFixed(2)+' | Sharpe: '+sharpe.toFixed(2));
-      log('📊 Win Rate: '+winRate.toFixed(1)+'% | Trades: '+totalTrades);
+   document.getElementById('totalReward').textContent = finalReward.toFixed(2);
+   document.getElementById('agentSharpe').textContent = sharpe.toFixed(2);
+   document.getElementById('totalTrades').textContent = totalTrades;
+   document.getElementById('winRate').textContent = winRate.toFixed(1)+'%';
 
-      document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_0')+finalReward.toFixed(2)+' | Sharpe '+sharpe.toFixed(2)+' | Win Rate '+winRate.toFixed(1)+'%';
-      localStorage.setItem(STORAGE_KEY,'completed');
-      document.getElementById('insigniaArea').classList.remove('hidden');
-    }
+   rewardHistory = totalRewards;
+   drawRewardCurve(rewardHistory);
 
-    function randomNormal() {
-      let u=0,v=0;
-      while(u===0) u=Math.random();
-      while(v===0) v=Math.random();
-      return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
-    }
+   log('');
+   log('✅ ENTRENAMIENTO COMPLETADO');
+   log('🏆 Reward Total: '+finalReward.toFixed(2)+' | Sharpe: '+sharpe.toFixed(2));
+   log('📊 Win Rate: '+winRate.toFixed(1)+'% | Trades: '+totalTrades);
 
-    function drawRewardCurve(data) {
-      const canvas = document.getElementById('rewardCanvas');
-      const ctx = canvas.getContext('2d');
-      const rect = canvas.parentElement.getBoundingClientRect();
-      const dpr = window.devicePixelRatio||1;
-      canvas.width = (rect.width-32)*dpr;
-      canvas.height = 280*dpr;
-      canvas.style.width = (rect.width-32)+'px';
-      canvas.style.height = '280px';
-      ctx.scale(dpr,dpr);
-      const W = canvas.width/dpr, H = canvas.height/dpr;
-      ctx.clearRect(0,0,W,H);
-      const pad = {t:20,r:20,b:30,l:50};
-      const plotW = W-pad.l-pad.r, plotH = H-pad.t-pad.b;
+   document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_0')+finalReward.toFixed(2)+' | Sharpe '+sharpe.toFixed(2)+' | Win Rate '+winRate.toFixed(1)+'%';
+   localStorage.setItem(STORAGE_KEY,'completed');
+   document.getElementById('insigniaArea').classList.remove('hidden');
+  }
 
-      const minR = Math.min(...data,-0.5);
-      const maxR = Math.max(...data,2);
-      const range = maxR-minR||1;
+  function randomNormal() {
+   let u=0,v=0;
+   while(u===0) u=Math.random();
+   while(v===0) v=Math.random();
+   return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
+  }
 
-      function x(i) { return pad.l+(i/data.length)*plotW; }
-      function y(v) { return pad.t+plotH-((v-minR)/range)*plotH; }
+  function drawRewardCurve(data) {
+   const canvas = document.getElementById('rewardCanvas');
+   const ctx = canvas.getContext('2d');
+   const rect = canvas.parentElement.getBoundingClientRect();
+   const dpr = window.devicePixelRatio||1;
+   canvas.width = (rect.width-32)*dpr;
+   canvas.height = 280*dpr;
+   canvas.style.width = (rect.width-32)+'px';
+   canvas.style.height = '280px';
+   ctx.scale(dpr,dpr);
+   const W = canvas.width/dpr, H = canvas.height/dpr;
+   ctx.clearRect(0,0,W,H);
+   const pad = {t:20,r:20,b:30,l:50};
+   const plotW = W-pad.l-pad.r, plotH = H-pad.t-pad.b;
 
-      // grid
-      ctx.strokeStyle='#1a2a44'; ctx.lineWidth=0.5;
-      for(let i=0;i<=5;i++) {
-        let vy = pad.t+(i/5)*plotH;
-        ctx.beginPath(); ctx.moveTo(pad.l,vy); ctx.lineTo(pad.l+plotW,vy); ctx.stroke();
-      }
-      ctx.fillStyle='#8899bb'; ctx.font='10px Inter'; ctx.textAlign='center';
-      ctx.fillText('Episodio',pad.l+plotW/2,H-5);
+   const minR = Math.min(...data,-0.5);
+   const maxR = Math.max(...data,2);
+   const range = maxR-minR||1;
 
-      // moving average (smooth)
-      const window = Math.max(1,Math.floor(data.length/10));
-      const smoothData = data.map((v,i)=>{
-        const start = Math.max(0,i-window);
-        const end = Math.min(data.length,i+window+1);
-        const slice = data.slice(start,end);
-        return slice.reduce((a,b)=>a+b,0)/slice.length;
-      });
+   function x(i) { return pad.l+(i/data.length)*plotW; }
+   function y(v) { return pad.t+plotH-((v-minR)/range)*plotH; }
 
-      // fill
-      ctx.beginPath();
-      ctx.moveTo(x(0),y(data[0]));
-      data.forEach((v,i)=>ctx.lineTo(x(i),y(v)));
-      ctx.lineTo(x(data.length-1),y(minR));
-      ctx.closePath();
-      ctx.fillStyle = 'rgba(255,102,192,0.15)';
-      ctx.fill();
+   // grid
+   ctx.strokeStyle='#1a2a44'; ctx.lineWidth=0.5;
+   for(let i=0;i<=5;i++) {
+    let vy = pad.t+(i/5)*plotH;
+    ctx.beginPath(); ctx.moveTo(pad.l,vy); ctx.lineTo(pad.l+plotW,vy); ctx.stroke();
+   }
+   ctx.fillStyle='#8899bb'; ctx.font='10px Inter'; ctx.textAlign='center';
+   ctx.fillText('Episodio',pad.l+plotW/2,H-5);
 
-      // raw data
-      ctx.beginPath();
-      ctx.strokeStyle = 'rgba(255,102,192,0.3)';
-      ctx.lineWidth = 1;
-      data.forEach((v,i)=>{
-        if(i===0) ctx.moveTo(x(i),y(v));
-        else ctx.lineTo(x(i),y(v));
-      });
-      ctx.stroke();
+   // moving average (smooth)
+   const window = Math.max(1,Math.floor(data.length/10));
+   const smoothData = data.map((v,i)=>{
+    const start = Math.max(0,i-window);
+    const end = Math.min(data.length,i+window+1);
+    const slice = data.slice(start,end);
+    return slice.reduce((a,b)=>a+b,0)/slice.length;
+   });
 
-      // smoothed
-      ctx.beginPath();
-      ctx.strokeStyle = '#ff66c0';
-      ctx.lineWidth = 2.5;
-      smoothData.forEach((v,i)=>{
-        if(i===0) ctx.moveTo(x(i),y(v));
-        else ctx.lineTo(x(i),y(v));
-      });
-      ctx.stroke();
+   // fill
+   ctx.beginPath();
+   ctx.moveTo(x(0),y(data[0]));
+   data.forEach((v,i)=>ctx.lineTo(x(i),y(v)));
+   ctx.lineTo(x(data.length-1),y(minR));
+   ctx.closePath();
+   ctx.fillStyle = 'rgba(255,102,192,0.15)';
+   ctx.fill();
 
-      // legend
-      ctx.fillStyle = 'rgba(255,102,192,0.5)'; ctx.font='10px Inter'; ctx.textAlign='left';
-      ctx.fillRect(pad.l+10,pad.t+10,12,3);
-      ctx.fillText('Reward (raw)',pad.l+26,pad.t+14);
-      ctx.fillStyle = '#ff66c0';
-      ctx.fillRect(pad.l+10,pad.t+24,12,3);
-      ctx.fillText('Reward (smoothed)',pad.l+26,pad.t+28);
-    }
+   // raw data
+   ctx.beginPath();
+   ctx.strokeStyle = 'rgba(255,102,192,0.3)';
+   ctx.lineWidth = 1;
+   data.forEach((v,i)=>{
+    if(i===0) ctx.moveTo(x(i),y(v));
+    else ctx.lineTo(x(i),y(v));
+   });
+   ctx.stroke();
 
-    document.getElementById('trainBtn').addEventListener('click',simulateTraining);
+   // smoothed
+   ctx.beginPath();
+   ctx.strokeStyle = '#ff66c0';
+   ctx.lineWidth = 2.5;
+   smoothData.forEach((v,i)=>{
+    if(i===0) ctx.moveTo(x(i),y(v));
+    else ctx.lineTo(x(i),y(v));
+   });
+   ctx.stroke();
 
-    if(localStorage.getItem(STORAGE_KEY)==='completed') {
-      document.getElementById('insigniaArea').classList.remove('hidden');
-      document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_1');
-    }
-  </script>
-  <script src="../../assets/js/cookie-consent.js"></script>
+   // legend
+   ctx.fillStyle = 'rgba(255,102,192,0.5)'; ctx.font='10px Inter'; ctx.textAlign='left';
+   ctx.fillRect(pad.l+10,pad.t+10,12,3);
+   ctx.fillText('Reward (raw)',pad.l+26,pad.t+14);
+   ctx.fillStyle = '#ff66c0';
+   ctx.fillRect(pad.l+10,pad.t+24,12,3);
+   ctx.fillText('Reward (smoothed)',pad.l+26,pad.t+28);
+  }
 
-<script>
+  document.getElementById('trainBtn').addEventListener('click',simulateTraining);
+
+  if(localStorage.getItem(STORAGE_KEY)==='completed') {
+   document.getElementById('insigniaArea').classList.remove('hidden');
+   document.getElementById('feedbackMsg').innerHTML = I18N.t('fb_1');
+  }
+ </script>
+ <script>
 window.I18N_DATA={
-  'fb_0': { es: '✅ Entrenamiento completado: Reward Total ', en: '✅ Entrenamiento completado: Reward Total ' },
-  'fb_1': { es: '✅ Ya has entrenado un agente PPO. ¡Vuelve a entrenar con nuevos parámetros!', en: '✅ Ya has entrenado un agente PPO. ¡Vuelve a entrenar con nuevos parámetros!' }
+ 'fb_0': { es: '✅ Entrenamiento completado: Reward Total ', en: '✅ Entrenamiento completado: Reward Total ' },
+ 'fb_1': { es: '✅ Ya has entrenado un agente PPO. ¡Vuelve a entrenar con nuevos parámetros!', en: '✅ Ya has entrenado un agente PPO. ¡Vuelve a entrenar con nuevos parámetros!' }
 };
 </script>
 </body>

@@ -1,117 +1,117 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Curso 1 | Threading y Sincronizaci&oacute;n</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { background:linear-gradient(135deg,#0a0f1e,#0c1222); font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
-    .modulo-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,80,80,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
-    .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #ff5050; }
-    .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#ff9090,#ff5050); -webkit-background-clip:text; background-clip:text; color:transparent; }
-    .hero-header p { font-size:1.1rem; color:#ffb0b0; margin-top:0.5rem; }
-    .chip { background:rgba(255,80,80,0.15); border:1px solid #ff5050; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; display:inline-block; margin:0.3rem; }
-    .progress-bar-top { background:#00000044; padding:0.6rem 2rem; text-align:center; font-size:0.85rem; border-bottom:1px solid #2c3e66; }
-    .progress-bar-top span { color:#ff9090; font-weight:600; }
-    .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ff5050; font-size:1rem; line-height:1.6; }
-    .main-area { padding:0 2rem 1.5rem; }
-    .simulador { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; border:1px solid #ff5050; }
-    .simulador h3 { margin-bottom:1rem; color:#ff9090; }
-    .thread-grid { display:flex; flex-direction:column; gap:0.5rem; margin:1rem 0; }
-    .thread-row { display:flex; align-items:center; gap:0.8rem; background:#0f1a2c; padding:0.6rem 1rem; border-radius:1rem; border:1px solid #2c3e66; }
-    .thread-row .tname { font-weight:700; color:#ff9090; min-width:100px; font-size:0.85rem; }
-    .thread-row .tbar { flex:1; height:24px; background:#1e2a3e; border-radius:12px; overflow:hidden; position:relative; }
-    .thread-row .tbar .fill { height:100%; width:0%; background:linear-gradient(90deg,#ff5050,#ff9090); border-radius:12px; transition:width 0.3s; }
-    .thread-row .tbar .label { position:absolute; top:3px; left:8px; font-size:0.7rem; color:#fff; }
-    .thread-row .tstatus { min-width:80px; font-size:0.75rem; text-align:right; }
-    .btn-action { background:linear-gradient(95deg,#ff9090,#ff5050); border:none; padding:0.8rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin:0.3rem; }
-    .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(255,80,80,0.5); }
-    .btn-reset { background:#2c3e66; border:none; padding:0.8rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; color:#eef5ff; margin:0.3rem; }
-    .btn-reset:hover { background:#3a4e7a; }
-    .lock-demo { display:flex; gap:1rem; margin-top:1rem; flex-wrap:wrap; }
-    .lock-card { background:#0f1a2c; border:1px solid #2c3e66; border-radius:1rem; padding:1rem; flex:1; min-width:200px; }
-    .lock-card h4 { color:#ff9090; margin-bottom:0.5rem; }
-    .lock-card .counter { font-size:2rem; font-weight:800; color:#fff; text-align:center; }
-    .feedback { background:#00000099; margin:1.5rem 2rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #ff5050; }
-    .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:1.5rem 2rem; padding:1rem; border:1px dashed gold; }
-    .insignia i { font-size:2.5rem; color:gold; }
-    .hidden { display:none; }
-    .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
-    .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; font-size:0.95rem; }
-    .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(255,80,80,0.4); }
-    .nav-link.next { background:linear-gradient(95deg,#ff9090,#ff5050); color:#1e1a0c; }
-    .nav-link.menu { background:#1a2a4a; border:1px solid #3399ff; }
-    footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
-    @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .thread-row { flex-wrap:wrap; } }
-  </style>
-  <link rel="stylesheet" href="../../assets/css/theme.css">
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Curso 1 | Threading y Sincronizaci&oacute;n</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:linear-gradient(135deg,#0a0f1e,#0c1222); font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+  .modulo-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(255,80,80,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+  .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #ff5050; }
+  .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#ff9090,#ff5050); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero-header p { font-size:1.1rem; color:#ffb0b0; margin-top:0.5rem; }
+  .chip { background:rgba(255,80,80,0.15); border:1px solid #ff5050; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; display:inline-block; margin:0.3rem; }
+  .progress-bar-top { background:#00000044; padding:0.6rem 2rem; text-align:center; font-size:0.85rem; border-bottom:1px solid #2c3e66; }
+  .progress-bar-top span { color:#ff9090; font-weight:600; }
+  .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ff5050; font-size:1rem; line-height:1.6; }
+  .main-area { padding:0 2rem 1.5rem; }
+  .simulador { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; border:1px solid #ff5050; }
+  .simulador h3 { margin-bottom:1rem; color:#ff9090; }
+  .thread-grid { display:flex; flex-direction:column; gap:0.5rem; margin:1rem 0; }
+  .thread-row { display:flex; align-items:center; gap:0.8rem; background:#0f1a2c; padding:0.6rem 1rem; border-radius:1rem; border:1px solid #2c3e66; }
+  .thread-row .tname { font-weight:700; color:#ff9090; min-width:100px; font-size:0.85rem; }
+  .thread-row .tbar { flex:1; height:24px; background:#1e2a3e; border-radius:12px; overflow:hidden; position:relative; }
+  .thread-row .tbar .fill { height:100%; width:0%; background:linear-gradient(90deg,#ff5050,#ff9090); border-radius:12px; transition:width 0.3s; }
+  .thread-row .tbar .label { position:absolute; top:3px; left:8px; font-size:0.7rem; color:#fff; }
+  .thread-row .tstatus { min-width:80px; font-size:0.75rem; text-align:right; }
+  .btn-action { background:linear-gradient(95deg,#ff9090,#ff5050); border:none; padding:0.8rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin:0.3rem; }
+  .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(255,80,80,0.5); }
+  .btn-reset { background:#2c3e66; border:none; padding:0.8rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; color:#eef5ff; margin:0.3rem; }
+  .btn-reset:hover { background:#3a4e7a; }
+  .lock-demo { display:flex; gap:1rem; margin-top:1rem; flex-wrap:wrap; }
+  .lock-card { background:#0f1a2c; border:1px solid #2c3e66; border-radius:1rem; padding:1rem; flex:1; min-width:200px; }
+  .lock-card h4 { color:#ff9090; margin-bottom:0.5rem; }
+  .lock-card .counter { font-size:2rem; font-weight:800; color:#fff; text-align:center; }
+  .feedback { background:#00000099; margin:1.5rem 2rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #ff5050; }
+  .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin:1.5rem 2rem; padding:1rem; border:1px dashed gold; }
+  .insignia i { font-size:2.5rem; color:gold; }
+  .hidden { display:none; }
+  .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+  .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; font-size:0.95rem; }
+  .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(255,80,80,0.4); }
+  .nav-link.next { background:linear-gradient(95deg,#ff9090,#ff5050); color:#1e1a0c; }
+  .nav-link.menu { background:#1a2a4a; border:1px solid #3399ff; }
+  footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .thread-row { flex-wrap:wrap; } }
+ </style>
+ <link rel="stylesheet" href="../../assets/css/theme.css">
 </head>
 <body>
-  <nav class="brand-return-nav"><a href="../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Python Avanzado</a></nav>
-  <div class="modulo-container">
-    <div class="progress-bar-top"><i class="fas fa-tasks"></i> Curso 1: Concurrencia y Paralelismo <span>| M&oacute;dulo 1 de 12</span></div>
-    <div class="hero-header">
-      <h1><i class="fas fa-project-diagram"></i> Threading y Sincronizaci&oacute;n</h1>
-      <p>Lanza 5 threads concurrentes y observa el GIL en acci&oacute;n</p>
-      <div><span class="chip"><i class="fas fa-microchip"></i> Threading</span><span class="chip"><i class="fas fa-lock"></i> Lock / RLock</span><span class="chip"><i class="fas fa-exclamation-triangle"></i> Race Condition</span></div>
-    </div>
-    <div class="analogy-card"><i class="fas fa-utensils" style="color:#ff5050;margin-right:0.5rem;"></i> <strong>Piensa en una cocina con varios chefs:</strong> 5 cocineros (threads) comparten una sola estufa (CPU). El GIL es como un ayudante que permite que solo un chef use la estufa a la vez. Sin locks, dos chefs podr&iacute;an a&ntilde;adir sal al mismo plato... &iexcl;desastre! Los locks son como candados en la despensa.</div>
-    <div class="main-area">
-      <div class="simulador">
-        <h3><i class="fas fa-microchip"></i> Simulador Visual de Threads</h3>
-        <p style="font-size:0.85rem;color:#8899bb;margin-bottom:0.8rem;">Cada barra representa un thread ejecutando una tarea. Observa c&oacute;mo el GIL simulado solo deja correr un thread a la vez (verde = ejecutando, gris = esperando).</p>
-        <div id="threadGrid" class="thread-grid"></div>
-        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
-          <button id="startThreadsBtn" class="btn-action"><i class="fas fa-play"></i> Lanzar 5 Threads</button>
-          <button id="raceBtn" class="btn-action"><i class="fas fa-exclamation-triangle"></i> Race Condition</button>
-          <button id="safeBtn" class="btn-action"><i class="fas fa-lock"></i> Con Lock</button>
-          <button id="resetThreadsBtn" class="btn-reset"><i class="fas fa-sync"></i> Reiniciar</button>
-        </div>
-        <div id="raceResult" class="lock-demo" style="margin-top:1rem;"></div>
-      </div>
-    </div>
-    <div id="feedbackMsg" class="feedback">Lanza los threads y experimenta con race conditions y locks para ganar tu insignia.</div>
-    <div id="insigniaArea" class="insignia hidden"><i class="fas fa-medal"></i><h3>INSIGNIA: DOMADOR DE THREADS</h3><p>Entiendes threading, GIL simulado y sincronizaci&oacute;n. &iexcl;Sigue as&iacute;!</p></div>
-    <div class="nav-links">
-      <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
-      <a href="02-multiprocessing-pool.html" class="nav-link next">Siguiente: Multiprocessing <i class="fas fa-arrow-right"></i></a>
-    </div>
-    <footer><i class="fas fa-crown"></i> Curso 1: Concurrencia y Paralelismo &middot; Threading y Sincronizaci&oacute;n</footer>
+ <nav class="brand-return-nav"><a href="../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Python Avanzado</a></nav>
+ <div class="modulo-container">
+  <div class="progress-bar-top"><i class="fas fa-tasks"></i> Curso 1: Concurrencia y Paralelismo <span>| M&oacute;dulo 1 de 12</span></div>
+  <div class="hero-header">
+   <h1><i class="fas fa-project-diagram"></i> Threading y Sincronizaci&oacute;n</h1>
+   <p>Lanza 5 threads concurrentes y observa el GIL en acci&oacute;n</p>
+   <div><span class="chip"><i class="fas fa-microchip"></i> Threading</span><span class="chip"><i class="fas fa-lock"></i> Lock / RLock</span><span class="chip"><i class="fas fa-exclamation-triangle"></i> Race Condition</span></div>
   </div>
-  <script>
-    const STORAGE_KEY='c1m1';let threads=[];let tId=0;let running=false;
-    const tNames=["Hilo-Compra","Hilo-Venta","Hilo-API","Hilo-Log","Hilo-DB"];
-    function renderThreads(){const g=document.getElementById('threadGrid');if(threads.length===0){g.innerHTML='<div style="color:#8899bb;text-align:center;padding:1rem;">Presiona "Lanzar 5 Threads"</div>';return;}
-    let h='';threads.forEach(function(t){const pct=Math.min(t.progress,100);h+='<div class="thread-row"><span class="tname"><i class="fas fa-'+t.icon+'"></i> '+t.name+'</span><div class="tbar"><div class="fill" style="width:'+pct+'%"></div><span class="label">'+t.task+'</span></div><span class="tstatus" style="color:'+(t.state==='running'?'#22c55e':t.state==='done'?'#ff5050':'#8899bb')+'">'+t.state+'</span></div>';});
-    g.innerHTML=h;}
-    function launchThreads(){if(running)return;threads=[];tId=0;running=true;
-    for(let i=0;i<5;i++){threads.push({id:tId++,name:"Thread-"+i,task:"Procesando...",progress:0,state:"waiting",icon:["shopping-cart","chart-line","cloud","file-alt","database"][i]});}
-    renderThreads();let completed=0;threads.forEach(function(t,i){function step(){if(!running||t.state==='done')return;t.state='running';t.progress+=Math.floor(Math.random()*15+5);if(t.progress>=100){t.progress=100;t.state='done';t.task="Completado";completed++;renderThreads();if(completed===5){running=false;document.getElementById('feedbackMsg').innerHTML='Todos los threads completaron. &iexcl;Prueba la Race Condition!';checkCompletion();}return;}
-    t.task=t.progress<30?"Iniciando...":t.progress<60?"Procesando...":t.progress<90?"Casi listo":"Finalizando";
-    renderThreads();setTimeout(step,200+Math.random()*300);}
-    setTimeout(step,i*100);});}
-    let raceCounter=0;let raceRunning=false;
-    function raceCondition(){raceCounter=0;raceRunning=true;let c=document.getElementById('raceResult');
-    c.innerHTML=I18N.t('fb_0');
-    let noLock=0,lockV=0;let doneNL=0,doneL=0;
-    for(let i=0;i<10;i++){setTimeout(function(){let v=noLock;for(let s=0;s<100;s++)v++;noLock=v;doneNL++;if(doneNL===10){document.getElementById('raceCountNoLock').textContent=noLock;}},i*50);}
-    for(let i=0;i<10;i++){setTimeout(function(){lockV++;doneL++;if(doneL===10){document.getElementById('raceCountLock').textContent=lockV;checkCompletion();}},i*50);}}
-    function checkCompletion(){if(raceRunning&&document.getElementById('raceCountLock')){const v=parseInt(document.getElementById('raceCountLock').textContent);if(v===10){localStorage.setItem(STORAGE_KEY,'true');document.getElementById('insigniaArea').classList.remove('hidden');document.getElementById('feedbackMsg').innerHTML=I18N.t('fb_1');}}}
-    document.getElementById('startThreadsBtn').addEventListener('click',launchThreads);
-    document.getElementById('raceBtn').addEventListener('click',raceCondition);
-    document.getElementById('safeBtn').addEventListener('click',function(){document.getElementById('feedbackMsg').innerHTML='Lock adquirido: solo un thread accede al recurso compartido a la vez. &iexcl;Sin race conditions!';});
-    document.getElementById('resetThreadsBtn').addEventListener('click',function(){running=false;raceRunning=false;threads=[];renderThreads();document.getElementById('raceResult').innerHTML='';});
-    if(localStorage.getItem(STORAGE_KEY)==='true'){document.getElementById('insigniaArea').classList.remove('hidden');document.getElementById('feedbackMsg').innerHTML='M&oacute;dulo completado';}
-    renderThreads();
-  </script>
+  <div class="analogy-card"><i class="fas fa-utensils" style="color:#ff5050;margin-right:0.5rem;"></i> <strong>Piensa en una cocina con varios chefs:</strong> 5 cocineros (threads) comparten una sola estufa (CPU). El GIL es como un ayudante que permite que solo un chef use la estufa a la vez. Sin locks, dos chefs podr&iacute;an a&ntilde;adir sal al mismo plato... &iexcl;desastre! Los locks son como candados en la despensa.</div>
+  <div class="main-area">
+   <div class="simulador">
+    <h3><i class="fas fa-microchip"></i> Simulador Visual de Threads</h3>
+    <p style="font-size:0.85rem;color:#8899bb;margin-bottom:0.8rem;">Cada barra representa un thread ejecutando una tarea. Observa c&oacute;mo el GIL simulado solo deja correr un thread a la vez (verde = ejecutando, gris = esperando).</p>
+    <div id="threadGrid" class="thread-grid"></div>
+    <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+     <button id="startThreadsBtn" class="btn-action"><i class="fas fa-play"></i> Lanzar 5 Threads</button>
+     <button id="raceBtn" class="btn-action"><i class="fas fa-exclamation-triangle"></i> Race Condition</button>
+     <button id="safeBtn" class="btn-action"><i class="fas fa-lock"></i> Con Lock</button>
+     <button id="resetThreadsBtn" class="btn-reset"><i class="fas fa-sync"></i> Reiniciar</button>
+    </div>
+    <div id="raceResult" class="lock-demo" style="margin-top:1rem;"></div>
+   </div>
+  </div>
+  <div id="feedbackMsg" class="feedback">Lanza los threads y experimenta con race conditions y locks para ganar tu insignia.</div>
+  <div id="insigniaArea" class="insignia hidden"><i class="fas fa-medal"></i><h3>INSIGNIA: DOMADOR DE THREADS</h3><p>Entiendes threading, GIL simulado y sincronizaci&oacute;n. &iexcl;Sigue as&iacute;!</p></div>
+  <div class="nav-links">
+   <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
+   <a href="02-multiprocessing-pool.html" class="nav-link next">Siguiente: Multiprocessing <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-crown"></i> Curso 1: Concurrencia y Paralelismo &middot; Threading y Sincronizaci&oacute;n</footer>
+ </div>
+ <script>
+  const STORAGE_KEY='c1m1';let threads=[];let tId=0;let running=false;
+  const tNames=["Hilo-Compra","Hilo-Venta","Hilo-API","Hilo-Log","Hilo-DB"];
+  function renderThreads(){const g=document.getElementById('threadGrid');if(threads.length===0){g.innerHTML='<div style="color:#8899bb;text-align:center;padding:1rem;">Presiona "Lanzar 5 Threads"</div>';return;}
+  let h='';threads.forEach(function(t){const pct=Math.min(t.progress,100);h+='<div class="thread-row"><span class="tname"><i class="fas fa-'+t.icon+'"></i> '+t.name+'</span><div class="tbar"><div class="fill" style="width:'+pct+'%"></div><span class="label">'+t.task+'</span></div><span class="tstatus" style="color:'+(t.state==='running'?'#22c55e':t.state==='done'?'#ff5050':'#8899bb')+'">'+t.state+'</span></div>';});
+  g.innerHTML=h;}
+  function launchThreads(){if(running)return;threads=[];tId=0;running=true;
+  for(let i=0;i<5;i++){threads.push({id:tId++,name:"Thread-"+i,task:"Procesando...",progress:0,state:"waiting",icon:["shopping-cart","chart-line","cloud","file-alt","database"][i]});}
+  renderThreads();let completed=0;threads.forEach(function(t,i){function step(){if(!running||t.state==='done')return;t.state='running';t.progress+=Math.floor(Math.random()*15+5);if(t.progress>=100){t.progress=100;t.state='done';t.task="Completado";completed++;renderThreads();if(completed===5){running=false;document.getElementById('feedbackMsg').innerHTML='Todos los threads completaron. &iexcl;Prueba la Race Condition!';checkCompletion();}return;}
+  t.task=t.progress<30?"Iniciando...":t.progress<60?"Procesando...":t.progress<90?"Casi listo":"Finalizando";
+  renderThreads();setTimeout(step,200+Math.random()*300);}
+  setTimeout(step,i*100);});}
+  let raceCounter=0;let raceRunning=false;
+  function raceCondition(){raceCounter=0;raceRunning=true;let c=document.getElementById('raceResult');
+  c.innerHTML=I18N.t('fb_0');
+  let noLock=0,lockV=0;let doneNL=0,doneL=0;
+  for(let i=0;i<10;i++){setTimeout(function(){let v=noLock;for(let s=0;s<100;s++)v++;noLock=v;doneNL++;if(doneNL===10){document.getElementById('raceCountNoLock').textContent=noLock;}},i*50);}
+  for(let i=0;i<10;i++){setTimeout(function(){lockV++;doneL++;if(doneL===10){document.getElementById('raceCountLock').textContent=lockV;checkCompletion();}},i*50);}}
+  function checkCompletion(){if(raceRunning&&document.getElementById('raceCountLock')){const v=parseInt(document.getElementById('raceCountLock').textContent);if(v===10){localStorage.setItem(STORAGE_KEY,'true');document.getElementById('insigniaArea').classList.remove('hidden');document.getElementById('feedbackMsg').innerHTML=I18N.t('fb_1');}}}
+  document.getElementById('startThreadsBtn').addEventListener('click',launchThreads);
+  document.getElementById('raceBtn').addEventListener('click',raceCondition);
+  document.getElementById('safeBtn').addEventListener('click',function(){document.getElementById('feedbackMsg').innerHTML='Lock adquirido: solo un thread accede al recurso compartido a la vez. &iexcl;Sin race conditions!';});
+  document.getElementById('resetThreadsBtn').addEventListener('click',function(){running=false;raceRunning=false;threads=[];renderThreads();document.getElementById('raceResult').innerHTML='';});
+  if(localStorage.getItem(STORAGE_KEY)==='true'){document.getElementById('insigniaArea').classList.remove('hidden');document.getElementById('feedbackMsg').innerHTML='M&oacute;dulo completado';}
+  renderThreads();
+ </script>
 
 <script>
 window.I18N_DATA={
-  'fb_0': { es: '<div class="lock-card"><h4><i class="fas fa-exclamation-triangle" style="color:#ef4444"></i> SIN LOCK (Race Condition)</h4><div class="counter" id="raceCountNoLock">0</div><p style="font-size:0.75rem;color:#8899bb;">10 threads incrementan sin protecci&oacute;n. Resultado impredecible.</p></div><div class="lock-card"><h4><i class="fas fa-lock" style="color:#22c55e"></i> CON LOCK</h4><div class="counter" id="raceCountLock">0</div><p style="font-size:0.75rem;color:#8899bb;">10 threads incrementan con Lock. Resultado correcto = 10.</p></div>', en: '<div class="lock-card"><h4><i class="fas fa-exclamation-triangle" style="color:#ef4444"></i> SIN LOCK (Race Condition)</h4><div class="counter" id="raceCountNoLock">0</div><p style="font-size:0.75rem;color:#8899bb;">10 threads incrementan sin protecci&oacute;n. Resultado impredecible.</p></div><div class="lock-card"><h4><i class="fas fa-lock" style="color:#22c55e"></i> CON LOCK</h4><div class="counter" id="raceCountLock">0</div><p style="font-size:0.75rem;color:#8899bb;">10 threads incrementan con Lock. Resultado correcto = 10.</p></div>' },
-  'fb_1': { es: 'Has completado el m&oacute;dulo. &iexcl;La insignia es tuya!', en: 'You completed el m&oacute;dulo. &iexcl;La insignia es tuya!' }
+ 'fb_0': { es: '<div class="lock-card"><h4><i class="fas fa-exclamation-triangle" style="color:#ef4444"></i> SIN LOCK (Race Condition)</h4><div class="counter" id="raceCountNoLock">0</div><p style="font-size:0.75rem;color:#8899bb;">10 threads incrementan sin protecci&oacute;n. Resultado impredecible.</p></div><div class="lock-card"><h4><i class="fas fa-lock" style="color:#22c55e"></i> CON LOCK</h4><div class="counter" id="raceCountLock">0</div><p style="font-size:0.75rem;color:#8899bb;">10 threads incrementan con Lock. Resultado correcto = 10.</p></div>', en: '<div class="lock-card"><h4><i class="fas fa-exclamation-triangle" style="color:#ef4444"></i> SIN LOCK (Race Condition)</h4><div class="counter" id="raceCountNoLock">0</div><p style="font-size:0.75rem;color:#8899bb;">10 threads incrementan sin protecci&oacute;n. Resultado impredecible.</p></div><div class="lock-card"><h4><i class="fas fa-lock" style="color:#22c55e"></i> CON LOCK</h4><div class="counter" id="raceCountLock">0</div><p style="font-size:0.75rem;color:#8899bb;">10 threads incrementan con Lock. Resultado correcto = 10.</p></div>' },
+ 'fb_1': { es: 'Has completado el m&oacute;dulo. &iexcl;La insignia es tuya!', en: 'You completed el m&oacute;dulo. &iexcl;La insignia es tuya!' }
 };
 </script>
 <script src="../../../assets/js/i18n.js"></script>  </body>
