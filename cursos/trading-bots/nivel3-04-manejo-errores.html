@@ -100,7 +100,7 @@
  </div>
 
  <div class="analogy">
-  <strong>âœˆï¸ Piénsalo así:</strong> Los pilotos no cancelan el vuelo cuando hay turbulencia ” tienen protocolos para cada escenario. Tu bot necesita lo mismo: si la API del exchange cae â†’ esperar y reintentar con <strong>exponential backoff</strong>. Si hay 10 errores seguidos â†’ activar <strong>circuit breaker</strong> y pausar. Si una orden no llega â†’ verificar con query separada. Un bot que explota al primer error perderá dinero real; uno robusto sobrevive semanas sin supervisión.
+  <strong>�ˆï¸ Piénsalo así:</strong> Los pilotos no cancelan el vuelo cuando hay turbulencia ” tienen protocolos para cada escenario. Tu bot necesita lo mismo: si la API del exchange cae �’ esperar y reintentar con <strong>exponential backoff</strong>. Si hay 10 errores seguidos �’ activar <strong>circuit breaker</strong> y pausar. Si una orden no llega �’ verificar con query separada. Un bot que explota al primer error perderá dinero real; uno robusto sobrevive semanas sin supervisión.
   <div style="margin-top:.5rem;font-size:.78rem;color:#884433"><strong>📚 Fuentes:</strong> Nygard, M. (2018) ” <em>"Release It! Design and Deploy Production-Ready Software"</em>. / tenacity library: tenacity.readthedocs.io</div>
  </div>
 
@@ -125,7 +125,7 @@
       <div class="err-head"><span class="err-icon">💥</span><span class="err-name">Exchange Down</span><span class="err-freq">Raro</span></div>
      </div>
      <div class="err-card" onclick="selectError(this,'partial')">
-      <div class="err-head"><span class="err-icon">�”€</span><span class="err-name">Partial Fill</span><span class="err-freq">Moderado</span></div>
+      <div class="err-head"><span class="err-icon">🔀</span><span class="err-name">Partial Fill</span><span class="err-freq">Moderado</span></div>
      </div>
     </div>
    </div>
@@ -148,7 +148,7 @@
     <div style="font-size:.8rem;color:#ff9966;margin-bottom:.4rem;font-weight:600">Estrategia de Retry (Exponential Backoff)</div>
     <div class="retry-vis" id="retryVis"></div>
     <div class="sim-log" id="simLog">
-     <p class="log-info">�¤– Bot iniciado. Esperando primer ciclo...</p>
+     <p class="log-info">🤖 Bot iniciado. Esperando primer ciclo...</p>
     </div>
    </div>
 
@@ -160,12 +160,12 @@
  </div>
 
  <div class="feedback" id="feedbackMsg">
-  �š¨ Selecciona un escenario de error y presiona <strong>Disparar Error</strong> para ver cómo el bot responde con retry automático y circuit breaker.
+  🚨 Selecciona un escenario de error y presiona <strong>Disparar Error</strong> para ver cómo el bot responde con retry automático y circuit breaker.
  </div>
 
  <div class="insignia hidden" id="insigniaArea">
   <i class="fas fa-shield-alt"></i>
-  <h3 style="margin:.4rem 0;color:#ffd700">�… ¡INSIGNIA RESILIENCE ENGINEER!</h3>
+  <h3 style="margin:.4rem 0;color:#ffd700">🏅 ¡INSIGNIA RESILIENCE ENGINEER!</h3>
   <p style="font-size:.85rem;color:#ff9966">Has simulado 5+ tipos de error. ¡Tu bot no muere ante el primer obstáculo!</p>
  </div>
 
@@ -210,14 +210,14 @@ const ERROR_CODES = {
   desc: 'Saldo insuficiente para la orden ” no retry',
   retries: [],
   fatal: false,
-  code: `<span class="kw">except</span> ccxt.InsufficientFunds <span class="kw">as</span> e:\n  <span class="cm"># NO hacer retry ” el problema no se resuelve esperando</span>\n  <span class="fn">logger.critical</span>(f<span class="str">"FONDOS INSUFICIENTES: {e}"</span>)\n  <span class="cm"># Cancelar órdenes abiertas</span>\n  exchange.<span class="fn">cancel_all_orders</span>(symbol)\n  <span class="cm"># Notificar al trader</span>\n  <span class="fn">send_telegram</span>(<span class="str">f"âš ï¸ Bot pausado: {e}"</span>)\n  <span class="cm"># Pausar el bot hasta reposición manual</span>\n  bot_state[<span class="str">'active'</span>] = <span class="kw">False</span>\n  <span class="kw">raise</span>`
+  code: `<span class="kw">except</span> ccxt.InsufficientFunds <span class="kw">as</span> e:\n  <span class="cm"># NO hacer retry ” el problema no se resuelve esperando</span>\n  <span class="fn">logger.critical</span>(f<span class="str">"FONDOS INSUFICIENTES: {e}"</span>)\n  <span class="cm"># Cancelar órdenes abiertas</span>\n  exchange.<span class="fn">cancel_all_orders</span>(symbol)\n  <span class="cm"># Notificar al trader</span>\n  <span class="fn">send_telegram</span>(<span class="str">f"� ï¸ Bot pausado: {e}"</span>)\n  <span class="cm"># Pausar el bot hasta reposición manual</span>\n  bot_state[<span class="str">'active'</span>] = <span class="kw">False</span>\n  <span class="kw">raise</span>`
  },
  exchange: {
   name: 'Exchange Down',
   desc: 'Exchange caído ” activar circuit breaker',
   retries: [30,60,120,300],
   fatal: false,
-  code: `<span class="kw">except</span> (ccxt.ExchangeNotAvailable,\n    ccxt.ExchangeError) <span class="kw">as</span> e:\n  <span class="fn">logger.error</span>(f<span class="str">"Exchange error: {e}"</span>)\n  <span class="cm"># Esperar tiempos más largos</span>\n  <span class="fn">send_alert</span>(<span class="str">f"�š¨ Exchange down: {str(e)[:100]}"</span>)\n  \n  <span class="cm"># Verificar en exchange status page</span>\n  status = requests.<span class="fn">get</span>(\n    <span class="str">'https://www.binancezh.com/api/v3/ping'</span>).status_code\n  <span class="kw">if</span> status != <span class="num">200</span>:\n    <span class="fn">time.sleep</span>(<span class="num">300</span>) <span class="cm"># 5 min antes de retry</span>`
+  code: `<span class="kw">except</span> (ccxt.ExchangeNotAvailable,\n    ccxt.ExchangeError) <span class="kw">as</span> e:\n  <span class="fn">logger.error</span>(f<span class="str">"Exchange error: {e}"</span>)\n  <span class="cm"># Esperar tiempos más largos</span>\n  <span class="fn">send_alert</span>(<span class="str">f"🚨 Exchange down: {str(e)[:100]}"</span>)\n  \n  <span class="cm"># Verificar en exchange status page</span>\n  status = requests.<span class="fn">get</span>(\n    <span class="str">'https://www.binancezh.com/api/v3/ping'</span>).status_code\n  <span class="kw">if</span> status != <span class="num">200</span>:\n    <span class="fn">time.sleep</span>(<span class="num">300</span>) <span class="cm"># 5 min antes de retry</span>`
  },
  partial: {
   name: 'Partial Fill',
@@ -246,9 +246,9 @@ function renderRetrySteps(delays, activeIdx) {
  vis.innerHTML = delays.map((d,i)=>`
   <div class="retry-step ${i<activeIdx?'done':i===activeIdx?'active':'pending'}">
    <div class="rs-n">${i+1}</div>
-   <div class="rs-t">Wait ${d}s â†’ retry #${i+1} ${i<activeIdx?'âœ…':i===activeIdx?'â³...':''}</div>
+   <div class="rs-t">Wait ${d}s �’ retry #${i+1} ${i<activeIdx?'�…':i===activeIdx?'â³...':''}</div>
   </div>`).join('') + `<div class="retry-step ${activeIdx>=delays.length?'fail':'pending'}">
-   <div class="rs-n">âœ•</div><div class="rs-t">Circuit Breaker: pausar 60s</div></div>`;
+   <div class="rs-n">�•</div><div class="rs-t">Circuit Breaker: pausar 60s</div></div>`;
 }
 
 let retryInterval;
@@ -268,10 +268,10 @@ function triggerError() {
  document.getElementById('errorName').textContent = err.name;
 
  if (!err.retries.length) {
-  appendLog('âš¡ No retry ” acción correctiva inmediata', 'log-warn');
-  appendLog('�“± Telegram alert enviado al trader', 'log-warn');
-  setTimeout(()=>{ dot.className='status-dot warning'; document.getElementById('statusText').textContent='âš ï¸ Bot pausado ” acción manual requerida'; },800);
-  document.getElementById('feedbackMsg').innerHTML = `âš¡ <strong>${err.name}</strong>: Este error no se resuelve con retry. Se requiere intervención manual.`;
+  appendLog('�¡ No retry ” acción correctiva inmediata', 'log-warn');
+  appendLog('📱 Telegram alert enviado al trader', 'log-warn');
+  setTimeout(()=>{ dot.className='status-dot warning'; document.getElementById('statusText').textContent='� ï¸ Bot pausado ” acción manual requerida'; },800);
+  document.getElementById('feedbackMsg').innerHTML = `�¡ <strong>${err.name}</strong>: Este error no se resuelve con retry. Se requiere intervención manual.`;
   renderRetrySteps([], -1);
   checkCompletion();
   return;
@@ -279,10 +279,10 @@ function triggerError() {
 
  if (circuitCount >= 5) {
   circuitOpen = true;
-  appendLog('�”´ CIRCUIT BREAKER ABIERTO ” demasiados fallos', 'log-err');
+  appendLog('🔴 CIRCUIT BREAKER ABIERTO ” demasiados fallos', 'log-err');
   appendLog('â³ Cooldown 60s antes de reanudar', 'log-warn');
   dot.className = 'status-dot error';
-  document.getElementById('statusText').textContent = '�”´ Circuit Breaker ABIERTO';
+  document.getElementById('statusText').textContent = '🔴 Circuit Breaker ABIERTO';
  }
 
  let step = 0;
@@ -291,24 +291,24 @@ function triggerError() {
  retryInterval = setInterval(()=>{
   if (step < err.retries.length) {
    totalRetries++;
-   appendLog(`�”„ Retry #${step+1} ” esperando ${err.retries[step]}s...`, 'log-warn');
+   appendLog(`🔄 Retry #${step+1} ” esperando ${err.retries[step]}s...`, 'log-warn');
    step++;
    renderRetrySteps(err.retries, step);
   } else {
    clearInterval(retryInterval);
    if (Math.random() > .35) {
-    appendLog('âœ… Reconectado exitosamente', 'log-ok');
+    appendLog('�… Reconectado exitosamente', 'log-ok');
     dot.className = 'status-dot';
-    document.getElementById('statusText').textContent = 'âœ… Bot recuperado ” reanudando operación';
+    document.getElementById('statusText').textContent = '�… Bot recuperado ” reanudando operación';
     circuitCount = Math.max(0, circuitCount-1);
     renderRetrySteps(err.retries, err.retries.length+1);
    } else {
-    appendLog('�”´ Todos los retries fallaron ” activando circuit breaker', 'log-err');
+    appendLog('🔴 Todos los retries fallaron ” activando circuit breaker', 'log-err');
     dot.className = 'status-dot error';
-    document.getElementById('statusText').textContent = '�”´ Circuit Breaker ” esperando 60s';
+    document.getElementById('statusText').textContent = '🔴 Circuit Breaker ” esperando 60s';
     renderRetrySteps(err.retries, err.retries.length+2);
     setTimeout(()=>{
-     appendLog('�Ÿ¡ Circuit breaker half-open ” probando reconexión', 'log-warn');
+     appendLog('🟡 Circuit breaker half-open ” probando reconexión', 'log-warn');
      dot.className = 'status-dot retry';
     }, 3000);
    }
@@ -316,7 +316,7 @@ function triggerError() {
   updateStats();
  }, 800);
 
- document.getElementById('feedbackMsg').innerHTML = `�”„ Simulando <strong>${err.name}</strong>: ${err.retries.length} intentos con backoff exponencial (${err.retries.join('s â†’ ')}s).`;
+ document.getElementById('feedbackMsg').innerHTML = `🔄 Simulando <strong>${err.name}</strong>: ${err.retries.length} intentos con backoff exponencial (${err.retries.join('s �’ ')}s).`;
  checkCompletion();
 }
 
@@ -327,7 +327,7 @@ function resetBot() {
  dot.className = 'status-dot';
  document.getElementById('statusText').textContent = 'Bot corriendo ” esperando señal';
  document.getElementById('statusSub').textContent = `Uptime: ${uptime}s Â· Errores: ${totalErrors} Â· Retries: ${totalRetries}`;
- appendLog('�” Bot reiniciado manualmente', 'log-info');
+ appendLog('🔁 Bot reiniciado manualmente', 'log-info');
  renderRetrySteps(ERROR_CODES[currentError].retries, -1);
 }
 
@@ -349,7 +349,7 @@ function checkCompletion() {
  if (errorsTriggered.size >= 4 && !localStorage.getItem(STORAGE_KEY)) {
   localStorage.setItem(STORAGE_KEY, 'true');
   document.getElementById('insigniaArea').classList.remove('hidden');
-  document.getElementById('feedbackMsg').innerHTML += '<br><strong style="color:#ff9966">�Ž“ ¡Insignia Resilience Engineer desbloqueada!</strong>';
+  document.getElementById('feedbackMsg').innerHTML += '<br><strong style="color:#ff9966">🎓 ¡Insignia Resilience Engineer desbloqueada!</strong>';
  }
 }
 
@@ -360,7 +360,7 @@ if (localStorage.getItem(STORAGE_KEY)) document.getElementById('insigniaArea').c
 
 <script>
 window.I18N_DATA={
- 'fb_0': { es: '<div style="color:#ff6432;font-size:.78rem">âš¡ Este error no permite retry ” acción inmediata requerida</div>', en: '<div style="color:#ff6432;font-size:.78rem">âš¡ Este error no permite retry ” acción inmediata requerida</div>' }
+ 'fb_0': { es: '<div style="color:#ff6432;font-size:.78rem">�¡ Este error no permite retry ” acción inmediata requerida</div>', en: '<div style="color:#ff6432;font-size:.78rem">�¡ Este error no permite retry ” acción inmediata requerida</div>' }
 };
 </script>
  </body>
