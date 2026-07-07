@@ -21,13 +21,20 @@
   .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#f97316,#ea580c); border-radius:20px; transition:width 0.5s ease; }
   .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
   .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #f97316; font-size:1rem; line-height:1.6; }
+  .objectives { background:rgba(249,115,22,0.1); border-radius:1.5rem; padding:1rem 1.5rem; margin:1rem 2rem; border:1px solid rgba(249,115,22,0.3); }
+  .objectives li { color:#b9ccee; font-size:0.9rem; margin:0.4rem 0; list-style-type: none; }
+  .objectives li::before { content:"🎯 "; }
   .main-area { padding:1.5rem 2rem; }
   .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#f97316; }
   .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
   .info-panel { background:rgba(10,20,40,0.7); border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
   .info-panel h3 { color:#fdba74; font-size:1rem; margin-bottom:0.5rem; }
-  .info-panel p { font-size:0.85rem; color:#b9ccee; line-height:1.6; }
+  .info-panel p { font-size:0.85rem; color:#b9ccee; line-height:1.6; margin-bottom:0.5rem; }
   .info-panel .formula { background:#0a0f1e; padding:0.5rem; border-radius:0.8rem; text-align:center; font-family:monospace; font-size:0.9rem; color:#fdba74; margin-top:0.5rem; }
+  .example-section { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #f97316; margin-bottom:1.5rem; }
+  .example-section .step { background:#0f1a2c; border-radius:1rem; padding:0.8rem 1.2rem; margin:0.6rem 0; border-left:4px solid #f97316; }
+  .example-section .step .step-num { color:#fdba74; font-weight:700; font-size:0.85rem; }
+  .example-section .step p { color:#b9ccee; font-size:0.85rem; margin-top:0.3rem; }
   .sim-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #f97316; margin-bottom:1.5rem; }
   .quiz-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #f97316; margin-bottom:1.5rem; }
   .quiz-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#f97316; }
@@ -39,7 +46,11 @@
   .opt.selected { background:#f97316; color:#000; font-weight:bold; box-shadow:0 0 8px #f97316; }
   .opt.correct { background:#00cc88; color:#000; }
   .opt.wrong { background:#ff4455; color:#fff; }
+  .explanation { background:#0a1525; border-radius:0.8rem; padding:0.6rem 1rem; margin-top:0.5rem; font-size:0.8rem; color:#fed7aa; border-left:3px solid #f97316; display:none; }
   .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #f97316; }
+  .recap { background:rgba(249,115,22,0.08); border-radius:1.5rem; padding:1rem 1.5rem; margin:0 2rem; border:1px dashed rgba(249,115,22,0.4); }
+  .recap h3 { color:#fdba74; font-size:1rem; margin-bottom:0.5rem; }
+  .recap li { color:#8899bb; font-size:0.8rem; margin:0.3rem 0; }
   .btn-action { background:linear-gradient(95deg,#f97316,#ea580c); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin-top:1rem; }
   .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(249,115,22,0.5); }
   .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
@@ -76,28 +87,89 @@
   <div class="analogy-card">
    <strong>💡 Pi&eacute;nsalo as&iacute;:</strong> La regularizaci&oacute;n es como un entrenador personal para tu modelo: Lasso es como decir "usa solo los ejercicios (variables) m&aacute;s importantes, elimina el resto". Ridge es como decir "haz todos los ejercicios pero con moderaci&oacute;n, sin exagerar ninguno". Elastic Net combina ambas filosof&iacute;as.
   </div>
+  <div class="objectives">
+   <ul>
+    <li>Entender por qu&eacute; la regularizaci&oacute;n mejora la predicci&oacute;n cuando hay muchas variables</li>
+    <li>Diferenciar entre penalizaci&oacute;n L1 (Lasso), L2 (Ridge) y su combinaci&oacute;n (Elastic Net)</li>
+    <li>Aprender a seleccionar el hiperpar&aacute;metro &lambda; mediante validaci&oacute;n cruzada</li>
+    <li>Interpretar los coefficient paths y saber cu&aacute;ndo usar cada tipo de regularizaci&oacute;n</li>
+   </ul>
+  </div>
   <div class="main-area">
    <div class="section-title"><i class="fas fa-graduation-cap"></i> Teor&iacute;a: Ridge, Lasso, Elastic Net</div>
    <div class="info-grid">
     <div class="info-panel">
      <h3>Ridge (L2)</h3>
-     <p>Minimiza RSS + &lambda;&Sigma;&beta;ⱼ². Encoge coeficientes pero no los lleva a cero. &Uacute;til cuando hay multicolinealidad.</p>
+     <p><strong>Intuici&oacute;n:</strong> Ridge a&ntilde;ade una penalizaci&oacute;n proporcional al cuadrado de cada coeficiente. Esto "encoge" todos los coeficientes hacia cero, pero ninguno llega exactamente a cero. Es como apretar una esponja: toda el agua (magnitud) se reduce, pero ninguna gota desaparece por completo.</p>
+     <p><strong>F&oacute;rmula explicada:</strong> La funci&oacute;n a minimizar es RSS + &lambda;&Sigma;&beta;ⱼ². RSS mide el error de predicci&oacute;n. &lambda;&Sigma;&beta;ⱼ² es la penalizaci&oacute;n: cuando &lambda; es grande, los coeficientes deben ser muy peque&ntilde;os para mantener baja la penalizaci&oacute;n. Al elevar al cuadrado, los coeficientes grandes se penalizan mucho m&aacute;s que los peque&ntilde;os.</p>
+     <p><strong>Caso real:</strong> En econometr&iacute;a financiera, si tienes 50 indicadores econ&oacute;micos correlacionados para predecir el PIB, Ridge los usa todos pero reduce sus pesos, evitando que la multicolinealidad infle la varianza de las predicciones.</p>
+     <p><strong>Error com&uacute;n:</strong> Ridge NO selecciona variables. Todos los predictores permanecen en el modelo, solo que con coeficientes m&aacute;s peque&ntilde;os. Esto puede hacer el modelo menos interpretable si tienes cientos de variables.</p>
      <div class="formula">min RSS + &lambda;&Sigma;&beta;<sub>j</sub><sup>2</sup></div>
     </div>
     <div class="info-panel">
      <h3>Lasso (L1)</h3>
-     <p>Minimiza RSS + &lambda;&Sigma;|&beta;ⱼ|. Puede llevar coeficientes exactamente a cero. Realiza selecci&oacute;n autom&aacute;tica de variables.</p>
+     <p><strong>Intuici&oacute;n:</strong> Lasso usa el valor absoluto de los coeficientes como penalizaci&oacute;n. Esto tiene un efecto sorprendente: puede llevar coeficientes EXACTAMENTE a cero. Es como un chef que prueba 50 ingredientes y decide que solo 5 son esenciales, descartando el resto por completo.</p>
+     <p><strong>F&oacute;rmula explicada:</strong> Minimiza RSS + &lambda;&Sigma;|&beta;ⱼ|. La diferencia clave con Ridge es el valor absoluto vs el cuadrado. Geom&eacute;tricamente, la restricci&oacute;n de Lasso tiene esquinas (un diamante), y es en esas esquinas donde los coeficientes tocan el eje y se vuelven cero. Ridge tiene una restricci&oacute;n circular, sin esquinas, por lo que los coeficientes se reducen pero nunca a cero.</p>
+     <p><strong>Caso real:</strong> En gen&eacute;tica, con 10,000 genes y solo 200 muestras, Lasso selecciona los pocos genes realmente asociados con una enfermedad, ignorando el resto. Esto produce modelos interpretables y con mejor capacidad predictiva.</p>
+     <p><strong>Error com&uacute;n:</strong> Cuando hay variables muy correlacionadas, Lasso tiende a elegir solo una del grupo, descartando las dem&aacute;s al azar. No es ideal cuando todas las variables correlacionadas son importantes.</p>
      <div class="formula">min RSS + &lambda;&Sigma;|&beta;<sub>j</sub>|</div>
     </div>
     <div class="info-panel">
      <h3>Elastic Net</h3>
-     <p>Combina L1 y L2: &alpha;(Lasso) + (1-&alpha;)(Ridge). Grupo de variables correlacionadas se seleccionan juntas vs Lasso que elige una al azar.</p>
+     <p><strong>Intuici&oacute;n:</strong> Elastic Net combina Lasso y Ridge usando una mezcla controlada por el par&aacute;metro &alpha;. Es como un chef que selecciona los ingredientes clave (como Lasso) pero sin descartar grupos enteros de ingredientes relacionados (como Ridge).</p>
+     <p><strong>F&oacute;rmula explicada:</strong> La penalizaci&oacute;n es &alpha;&Sigma;|&beta;ⱼ| + (1-&alpha;)&Sigma;&beta;ⱼ². Cuando &alpha;=1, es Lasso puro. Cuando &alpha;=0, es Ridge puro. Valores intermedios mezclan ambos efectos. Esto permite que grupos de variables correlacionadas se seleccionen juntas, resolviendo la limitaci&oacute;n de Lasso.</p>
+     <p><strong>Caso real:</strong> En predicci&oacute;n de precios de viviendas, donde variables como "metros cuadrados", "n&uacute;mero de habitaciones" y "tama&ntilde;o del terreno" est&aacute;n correlacionadas, Elastic Net las retiene a todas mientras elimina variables irrelevantes como "color de la fachada".</p>
+     <p><strong>Error com&uacute;n:</strong> &alpha; no se elige por validaci&oacute;n cruzada tan a menudo como debiera. Muchos investigadores usan Lasso o Ridge por defecto sin probar Elastic Net, que suele funcionar mejor en la pr&aacute;ctica.</p>
      <div class="formula">&alpha;&Sigma;|&beta;<sub>j</sub>| + (1-&alpha;)&Sigma;&beta;<sub>j</sub><sup>2</sup></div>
     </div>
     <div class="info-panel">
      <h3>Selecci&oacute;n de &lambda;</h3>
-     <p>Se elige mediante validaci&oacute;n cruzada. &lambda; grande → m&aacute;s regularizaci&oacute;n (sesgo alto, varianza baja). &lambda; peque&ntilde;o → menos regularizaci&oacute;n.</p>
+     <p><strong>Intuici&oacute;n:</strong> &lambda; controla cu&aacute;nta regularizaci&oacute;n aplicamos. &lambda; = 0 significa sin regularizaci&oacute;n (OLS puro). &lambda; muy grande significa que todos los coeficientes se encogen casi a cero (sesgo enorme). El punto &oacute;ptimo est&aacute; en el medio, donde se minimiza el error de predicci&oacute;n.</p>
+     <p><strong>F&oacute;rmula explicada:</strong> La validaci&oacute;n cruzada (CV) prueba muchos valores de &lambda; y elige el que minimiza el error promedio: &lambda;_CV = argmin CV Error(&lambda;). Para cada &lambda;, se divide la muestra en K partes, se entrena en K-1 y se eval&uacute;a en la restante, repitiendo K veces.</p>
+     <p><strong>Caso real:</strong> En la pr&aacute;ctica, se prueba una grilla de 100 valores de &lambda; desde muy peque&ntilde;o hasta muy grande (en escala logar&iacute;tmica). Se usa 5-fold o 10-fold CV y se selecciona el &lambda; con menor error. A veces se usa el "1-SE rule": elegir el &lambda; m&aacute;s grande cuyo error est&eacute; a menos de 1 error est&aacute;ndar del m&iacute;nimo.</p>
+     <p><strong>Error com&uacute;n:</strong> Usar el mismo &lambda; para Lasso y Ridge. La escala &oacute;ptima de &lambda; es completamente distinta para L1 y L2. Para Lasso, &lambda; suele ser m&aacute;s peque&ntilde;o porque los coeficientes ya son m&aacute;s dispersos.</p>
      <div class="formula">&lambda;<sub>CV</sub> = argmin CV Error(&lambda;)</div>
+    </div>
+    <div class="info-panel">
+     <h3>Tradeoff Sesgo-Varianza</h3>
+     <p><strong>Intuici&oacute;n:</strong> La regularizaci&oacute;n deliberadamente introduce algo de sesgo (los coeficientes se encogen hacia cero) a cambio de reducir dr&aacute;sticamente la varianza. Es como una navaja: m&aacute;s filo (menos sesgo) significa m&aacute;s riesgo de cortarte (m&aacute;s varianza).</p>
+     <p><strong>F&oacute;rmula explicada:</strong> El error de predicci&oacute;n esperado se descompone como: Error = Sesgo² + Varianza + Ruido irreducible. Sin regularizaci&oacute;n (&lambda;=0), el sesgo es m&iacute;nimo pero la varianza puede ser enorme (especialmente con p grande). Al aumentar &lambda;, el sesgo aumenta pero la varianza disminuye. El &lambda; &oacute;ptimo equilibra ambos.</p>
+     <p><strong>Caso real:</strong> Imagina estimar el efecto de la educaci&oacute;n en el salario. OLS te da un coeficiente puntual. En una muestra peque&ntilde;a (n=50), ese coeficiente puede variar enormemente entre muestras. Ridge lo estabiliza (menos varianza), pero lo encoge un poco hacia cero (m&aacute;s sesgo).</p>
+     <p><strong>Error com&uacute;n:</strong> Pensar que el mejor modelo es el de menor sesgo. En predicci&oacute;n, un modelo con algo de sesgo pero mucha menos varianza casi siempre funciona mejor.</p>
+     <div class="formula">E[Error] = Sesgo<sup>2</sup> + Varianza + &sigma;<sup>2</sup></div>
+    </div>
+    <div class="info-panel">
+     <h3>Coefficient Paths</h3>
+     <p><strong>Intuici&oacute;n:</strong> Los coefficient paths muestran c&oacute;mo cambia cada coeficiente &beta;ⱼ a medida que variamos &lambda; desde 0 (sin regularizaci&oacute;n) hasta valores grandes (m&aacute;xima regularizaci&oacute;n). Es como ver una pel&iacute;cula del proceso de regularizaci&oacute;n.</p>
+     <p><strong>F&oacute;rmula explicada:</strong> En Lasso, los paths son lineales a trozos: los coeficientes entran y salen del modelo (&beta;ⱼ = 0) en ciertos valores de &lambda;. En Ridge, son curvas suaves que tienden a cero sin tocarlo nunca. El orden en que las variables "entran" al modelo cuando disminuimos &lambda; revela su importancia relativa.</p>
+     <p><strong>Caso real:</strong> En marketing, si graficas los coefficient paths de 20 variables para predecir ventas, ver&aacute;s que "precio" y "publicidad en TV" entran primero (con &lambda; grande), mientras que "color del empaque" entra hasta el final (&lambda; peque&ntilde;o). Esto te dice cu&aacute;les variables son m&aacute;s importantes.</p>
+     <p><strong>Error com&uacute;n:</strong> Interpretar la magnitud del coeficiente en el path como el "efecto causal" de la variable. Los coeficientes regularizados tienen sesgo y no representan efectos causales sin ajustes adicionales.</p>
+     <div class="formula">&beta;<sub>j</sub>(&lambda;) para j = 1,...,p</div>
+    </div>
+   </div>
+
+   <div class="example-section">
+    <div class="section-title"><i class="fas fa-pen"></i> Ejemplo paso a paso</div>
+    <p style="color:#b9ccee;font-size:0.85rem;margin-bottom:0.8rem;">Imagina que queremos predecir el precio de una casa usando 10 variables, pero solo 3 son relevantes (metros², habitaciones, ubicaci&oacute;n). Las otras 7 son ruido.</p>
+    <div class="step">
+     <div class="step-num">Paso 1: Generamos datos con 100 casas, 10 variables. Solo X1, X2, X3 afectan el precio (coeficientes reales: 2.5, -1.8, 0.9). Las otras 7 variables son ruido puro.</div>
+     <p>En la simulaci&oacute;n de abajo, estos son los valores reales. Observa que X4 a X10 tienen coeficiente real = 0. No deber&iacute;an influir en el precio.</p>
+    </div>
+    <div class="step">
+     <div class="step-num">Paso 2: Estimamos OLS (sin regularizaci&oacute;n) y vemos que asigna coeficientes NO cero a las variables irrelevantes. Esto es sobreajuste.</div>
+     <p>OLS intenta minimizar el error en los 100 datos que tenemos, pero al hacerlo, "aprende" patrones del ruido. Por eso asigna coeficientes como 0.3 o -0.2 a variables que realmente no importan.</p>
+    </div>
+    <div class="step">
+     <div class="step-num">Paso 3: Aplicamos Lasso con &lambda;=10. Observa que muchos coeficientes irrelevantes se vuelven EXACTAMENTE cero.</div>
+     <p>Lasso hace selecci&oacute;n autom&aacute;tica de variables. Las &uacute;nicas que sobreviven son las que realmente importan. &iexcl;Pero cuidado! Con &lambda; muy grande, tambi&eacute;n encoge los coeficientes relevantes, subestimando su verdadero efecto.</p>
+    </div>
+    <div class="step">
+     <div class="step-num">Paso 4: Comparamos con Ridge usando el mismo &lambda;. Ridge encoge TODOS los coeficientes, pero ninguno llega a cero.</div>
+     <p>Ridge reduce la magnitud de todos los coeficientes por igual, incluyendo los de las variables irrelevantes. Es &uacute;til cuando todas las variables importan un poco, pero perjudicial cuando hay muchas variables irrelevantes porque a&ntilde;aden ruido.</p>
+    </div>
+    <div class="step">
+     <div class="step-num">Paso 5: Conclusi&oacute;n: &iquest;Cu&aacute;ndo usar cada uno? Si crees que pocas variables importan &rarr; Lasso. Si crees que todas importan un poco &rarr; Ridge. Si no est&aacute;s seguro &rarr; Elastic Net.</div>
+     <p>En la pr&aacute;ctica econom&eacute;trica, Elastic Net suele ser la mejor opci&oacute;n porque la realidad rara vez es tan simple como "solo 3 variables importan" o "todas importan por igual".</p>
     </div>
    </div>
 
@@ -124,6 +196,18 @@
      <p>Has dominado los conceptos de Ridge, Lasso y Elastic Net. &iexcl;Excelente!</p>
     </div>
    </div>
+
+   <div id="recapSection" class="recap hidden">
+    <h3>📝 Resumen del m&oacute;dulo</h3>
+    <ul>
+     <li>La regularizaci&oacute;n reduce la varianza del modelo a costa de aumentar el sesgo</li>
+     <li>Lasso (L1) lleva coeficientes a cero → selecci&oacute;n de variables autom&aacute;tica</li>
+     <li>Ridge (L2) encoge todos los coeficientes sin llegar a cero → ideal para multicolinealidad</li>
+     <li>Elastic Net combina L1 y L2, manejando grupos de variables correlacionadas</li>
+     <li>&lambda; se selecciona por validaci&oacute;n cruzada, buscando el punto &oacute;ptimo sesgo-varianza</li>
+     <li>Los coefficient paths revelan la importancia relativa de las variables</li>
+    </ul>
+   </div>
   </div>
 
   <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre regularizaci&oacute;n.</div>
@@ -140,11 +224,11 @@
   const STORAGE_KEY = 'prog_econ_4_02';
   const PROGRESS_KEY = 'prog_econ_4_progress';
   const questions = [
-   { text: "¿Qué hace la penalización L1 (Lasso) que la L2 (Ridge) no hace?", options: ["Encoge coeficientes", "Lleva coeficientes a cero", "Reduce la varianza", "Aumenta el sesgo"], correct: 1 },
-   { text: "¿Qué parámetro controla la fuerza de la regularización en Lasso?", options: ["α", "λ", "γ", "C"], correct: 1 },
-   { text: "Si λ es muy grande en Ridge, los coeficientes tienden a:", options: ["Cero", "Infinito", "Los mismos que OLS", "Negativos"], correct: 0 },
-   { text: "Elastic Net combina:", options: ["L1 y L2", "L1 y Logit", "L2 y SVM", "Ridge y PCR"], correct: 0 },
-   { text: "¿Cómo se selecciona λ típicamente?", options: ["Por teoría", "Validación cruzada", "Al azar", "Fijado en 1"], correct: 1 }
+   { text: "¿Qu&eacute; hace la penalizaci&oacute;n L1 (Lasso) que la L2 (Ridge) no hace?", options: ["Encoge coeficientes", "Lleva coeficientes a cero", "Reduce la varianza", "Aumenta el sesgo"], correct: 1, explanation: "La penalizaci&oacute;n L1 usa el valor absoluto, cuya forma de diamante tiene esquinas donde los coeficientes tocan exactamente cero. L2 es circular y solo encoge. Ambos encogen y reducen varianza a costa de sesgo, pero s&oacute;lo L1 hace selecci&oacute;n." },
+   { text: "¿Qu&eacute; par&aacute;metro controla la fuerza de la regularizaci&oacute;n en Lasso?", options: ["&alpha;", "&lambda;", "&gamma;", "C"], correct: 1, explanation: "&lambda; (lambda) controla cu&aacute;nto penalizamos los coeficientes. &lambda;=0 es OLS sin regularizaci&oacute;n. &lambda;→∞ lleva todos los coeficientes a cero. &alpha; se usa en Elastic Net para balancear L1 vs L2." },
+   { text: "Si &lambda; es muy grande en Ridge, los coeficientes tienden a:", options: ["Cero", "Infinito", "Los mismos que OLS", "Negativos"], correct: 0, explanation: "Con &lambda; enorme, la penalizaci&oacute;n domina la funci&oacute;n de costo. Para minimizarla, los coeficientes deben ser pr&aacute;cticamente cero. Nunca llegan a infinito ni igualan a OLS, que es el caso &lambda;=0." },
+   { text: "Elastic Net combina:", options: ["L1 y L2", "L1 y Logit", "L2 y SVM", "Ridge y PCR"], correct: 0, explanation: "Elastic Net suma las penalizaciones L1 (valor absoluto) y L2 (cuadrado) controladas por &alpha;. &alpha;=1 → Lasso puro. &alpha;=0 → Ridge puro. No tiene relaci&oacute;n con Logit, SVM o PCR." },
+   { text: "¿C&oacute;mo se selecciona &lambda; t&iacute;picamente?", options: ["Por teor&iacute;a", "Validaci&oacute;n cruzada", "Al azar", "Fijado en 1"], correct: 1, explanation: "Se prueba una grilla de valores de &lambda; y se elige el que minimiza el error de validaci&oacute;n cruzada. No hay teor&iacute;a que d&eacute; el &lambda; &oacute;ptimo porque depende de los datos." }
   ];
   let userAnswers = new Array(questions.length).fill(null);
   let quizCompleted = false;
@@ -166,7 +250,7 @@
    container.innerHTML = '';
    questions.forEach((q, idx) => {
     const qDiv = document.createElement('div'); qDiv.classList.add('question');
-    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
+    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div><div class="explanation" id="expl-'+idx+'">'+q.explanation+'</div>';
     const optsDiv = qDiv.querySelector('.options');
     q.options.forEach((opt, optIdx) => {
      const span = document.createElement('div'); span.classList.add('opt');
@@ -199,10 +283,12 @@
      if (oi === questions[idx].correct) o.classList.add('correct');
      else if (oi === userAnswers[idx]) o.classList.add('wrong');
     });
+    document.getElementById('expl-'+idx).style.display = 'block';
    });
    if (passed) {
     quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
     document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('recapSection').classList.remove('hidden');
     document.getElementById('feedbackMsg').textContent = I18N.t('fb_1') + correct + '/' + total + ' correctas. ¡Dominas la regularización!';
     saveProgress(); updateProgress();
    } else {
@@ -215,6 +301,7 @@
    if (p.includes(STORAGE_KEY)) {
     quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
     document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('recapSection').classList.remove('hidden');
     document.getElementById('feedbackMsg').textContent = I18N.t('fb_2');
     document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
    }
@@ -266,7 +353,7 @@
     html += '<tr style="border-bottom:1px solid #1a2a4a;"><td style="padding:0.3rem;">X'+(j+1)+'</td><td style="padding:0.3rem;text-align:center;">'+trueBeta[j].toFixed(1)+'</td><td style="padding:0.3rem;text-align:center;color:#f97316;">'+ols[j].toFixed(2)+'</td><td style="padding:0.3rem;text-align:center;color:#22c55e;">'+lasso[j].toFixed(2)+'</td><td style="padding:0.3rem;text-align:center;color:#3b82f6;">'+ridge[j].toFixed(2)+'</td></tr>';
    }
    html += '</table></div>';
-   html += '<p style="margin-top:0.8rem;color:#8899cc;font-size:0.8rem;">λ = ' + lambda.toFixed(1) + '. Variables reales relevantes: X1, X2, X3. Lasso puede llevar irrelevantes a cero.</p>';
+   html += '<p style="margin-top:0.8rem;color:#8899cc;font-size:0.8rem;">&lambda; = ' + lambda.toFixed(1) + '. Variables reales relevantes: X1, X2, X3. Lasso puede llevar irrelevantes a cero.</p>';
    document.getElementById('simResult').innerHTML = html;
   }
 

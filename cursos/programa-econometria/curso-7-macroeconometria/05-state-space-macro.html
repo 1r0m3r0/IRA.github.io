@@ -21,6 +21,18 @@
   .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#10b981,#059669); border-radius:20px; transition:width 0.5s ease; }
   .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
   .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #10b981; font-size:1rem; line-height:1.6; }
+  .objectives { background:rgba(16,185,129,0.1); border-radius:1.5rem; padding:1rem 1.5rem; margin:1rem 2rem; border:1px solid rgba(16,185,129,0.3); }
+  .objectives li { color:#b9ccee; font-size:0.9rem; margin:0.4rem 0; list-style-type: none; }
+  .objectives li::before { content:"🎯 "; }
+  .objectives h3 { color:#6ee7b7; font-size:1rem; margin-bottom:0.5rem; }
+  .example-section { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #10b981; margin:1rem 2rem 1.5rem; }
+  .example-section .step { background:#0f1a2c; border-radius:1rem; padding:0.8rem 1.2rem; margin:0.6rem 0; border-left:4px solid #10b981; }
+  .example-section .step .step-num { color:#6ee7b7; font-weight:700; font-size:0.85rem; }
+  .example-section .step p { color:#b9ccee; font-size:0.85rem; margin-top:0.3rem; }
+  .example-section h3 { color:#10b981; font-size:1.1rem; margin-bottom:0.8rem; }
+  .recap { background:rgba(16,185,129,0.08); border-radius:1.5rem; padding:1rem 1.5rem; margin:0 2rem 1.5rem; border:1px dashed rgba(16,185,129,0.4); }
+  .recap h3 { color:#6ee7b7; font-size:1rem; margin-bottom:0.5rem; }
+  .recap li { color:#8899bb; font-size:0.8rem; margin:0.3rem 0; }
   .main-area { padding:1.5rem 2rem; }
   .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#10b981; }
   .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
@@ -40,6 +52,7 @@
   .opt.correct { background:#00cc88; color:#000; }
   .opt.wrong { background:#ff4455; color:#fff; }
   .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #10b981; }
+  .explanation { background:#0a1525; border-radius:0.8rem; padding:0.6rem 1rem; margin-top:0.5rem; font-size:0.8rem; color:#a7f3d0; border-left:3px solid #10b981; display:none; }
   .btn-action { background:linear-gradient(95deg,#10b981,#059669); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin-top:1rem; }
   .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(16,185,129,0.5); }
   .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
@@ -76,28 +89,60 @@
   <div class="analogy-card">
    <strong>💡 Pi&eacute;nsalo as&iacute;:</strong> El filtro de Kalman es como navegar con GPS en medio de la niebla: recibes se&ntilde;ales ruidosas (datos) y el GPS (modelo) actualiza tu posici&oacute;n estimada (estado) en tiempo real. Cada nueva se&ntilde;al refina tu posici&oacute;n, combinando lo que sab&iacute;as con la nueva info.
   </div>
+  <div class="objectives">
+   <h3>🎯 &iquest;Qu&eacute; aprender&aacute;s en este m&oacute;dulo?</h3>
+   <li>Comprender la estructura de un modelo en espacio de estados: ecuaci&oacute;n de observaci&oacute;n y ecuaci&oacute;n de transici&oacute;n.</li>
+   <li>Implementar el filtro de Kalman para estimar estados no observados en tiempo real.</li>
+   <li>Descomponer el PIB en tendencia y ciclo usando un modelo UC (Unobserved Components).</li>
+   <li>Comparar el filtro HP (&lambda;=1600) con el filtro de Kalman para estimar la brecha de PIB.</li>
+   <li>Entender c&oacute;mo el Kalman filter maneja datos en tiempo real con actualizaciones secuenciales.</li>
+  </div>
   <div class="main-area">
    <div class="section-title"><i class="fas fa-flask"></i> Modelo en Espacio de Estados</div>
    <div class="info-grid">
     <div class="info-panel">
      <h3>📐 Ecuaci&oacute;n de Observaci&oacute;n</h3>
-     <p>y&#8344; = Z&#8344;&alpha;&#8344; + d&#8344; + &epsilon;&#8344;. Relaciona los datos observados con el estado no observado.</p>
-     <div class="formula">y&#8344; = Z&#8344;&alpha;&#8344; + &epsilon;&#8344;</div>
+     <p>La ecuaci&oacute;n de observaci&oacute;n es y_t = Z_t &alpha;_t + d_t + &epsilon;_t. Relaciona los datos observados (y_t) con el estado no observado (&alpha;_t). La matriz Z_t se llama matriz de dise&ntilde;o. &epsilon;_t ~ N(0, H_t) es el error de medici&oacute;n. En un modelo de tendencia-ciclo, y_t = PIB_t, Z_t = [1, 1], &alpha;_t = [T_t, C_t]' (tendencia y ciclo).</p>
+     <p><strong>Intuici&oacute;n:</strong> Los datos que vemos (PIB) son una combinaci&oacute;n de componentes que no observamos directamente (tendencia de largo plazo + ciclo de corto plazo) m&aacute;s un error de medici&oacute;n.</p>
+     <div class="formula">y_t = Z_t &alpha;_t + d_t + &epsilon;_t, &epsilon;_t ~ N(0, H_t)</div>
     </div>
     <div class="info-panel">
      <h3>⚙️ Ecuaci&oacute;n de Transici&oacute;n</h3>
-     <p>&alpha;&#8344;&#8334;&#8321; = T&#8344;&alpha;&#8344; + c&#8344; + R&#8344;&eta;&#8344;. Describe la din&aacute;mica del estado latente.</p>
-     <div class="formula">&alpha;&#8344;&#8334;&#8321; = T&#8344;&alpha;&#8344; + R&#8344;&eta;&#8344;</div>
+     <p>&alpha;_{t+1} = T_t &alpha;_t + c_t + R_t &eta;_t. Describe c&oacute;mo evoluciona el estado latente en el tiempo. T_t es la matriz de transici&oacute;n (contiene los par&aacute;metros AR del ciclo, por ejemplo). &eta;_t ~ N(0, Q_t) es el error del estado. En el modelo UC: T_t = [[1, 0], [0, &phi;_1]] si la tendencia es random walk y el ciclo es AR(1).</p>
+     <p><strong>Ejemplo real:</strong> El Banco Central usa modelos UC para estimar el PIB potencial en tiempo real. La tendencia (potencial) solo cambia por shocks de oferta, mientras que el ciclo captura fluctuaciones de demanda.</p>
+     <div class="formula">&alpha;_{t+1} = T_t &alpha;_t + c_t + R_t &eta;_t, &eta;_t ~ N(0, Q_t)</div>
     </div>
     <div class="info-panel">
-     <h3>🔧 UC Model (PIB)</h3>
-     <p>PIB&#8344; = T&#8344; + C&#8344;. T&#8344; = T&#8344;&#8321; + &mu;&#8344;&#8321; + &eta;&#8344;. C&#8344; = &phi;&#8321;C&#8344;&#8321; + &phi;&#8322;C&#8344;&#8322; + &epsilon;&#8344;. Tendencia estoc&aacute;stica + ciclo AR(2).</p>
-     <div class="formula">PIB&#8344; = T&#8344; + C&#8344;</div>
+     <h3>🔧 UC Model (PIB = Tendencia + Ciclo)</h3>
+     <p>El modelo UC (Unobserved Components) descompone el PIB en: PIB_t = T_t + C_t. La tendencia T_t sigue un random walk con deriva: T_t = T_{t-1} + &mu;_{t-1} + &eta;_t (donde &mu; es la tasa de crecimiento potencial). El ciclo C_t sigue un AR(2): C_t = &phi;_1 C_{t-1} + &phi;_2 C_{t-2} + &epsilon;_t. La brecha de PIB es precisamente C_t — la desviaci&oacute;n del PIB observado respecto a su tendencia.</p>
+     <p><strong>Pitfall:</strong> Si el ciclo es muy persistente (&phi;_1 + &phi;_2 ≈ 1), la separaci&oacute;n entre tendencia y ciclo se vuelve dif&iacute;cil — cualquier shock puede interpretarse como permanente o transitorio.</p>
+     <div class="formula">PIB_t = T_t + C_t, T_t = T_{t-1} + &mu; + &eta;_t, C_t = &phi;_1 C_{t-1} + &phi;_2 C_{t-2} + &epsilon;_t</div>
     </div>
     <div class="info-panel">
-     <h3>📊 HP Filter como Kalman</h3>
-     <p>El filtro HP (&lambda;=1600) es equivalente a un Kalman smoother con ciertas varianzas de estado. La brecha de PIB es el componente c&iacute;clico.</p>
-     <div class="formula">HP(&lambda;=1600) &asymp; Kalman</div>
+     <h3>📊 HP Filter como caso especial de Kalman</h3>
+     <p>El filtro Hodrick-Prescott con &lambda;=1600 (para datos trimestrales) es equivalente a un Kalman smoother donde la tendencia tiene varianza &sigma;_&eta;^2 y el ciclo tiene varianza &sigma;_&epsilon;^2 con &lambda; = &sigma;_&epsilon;^2 / &sigma;_&eta;^2. La ventaja del Kalman sobre HP es: (1) maneja datos faltantes, (2) se actualiza en tiempo real (HP es bilateral, revisa toda la serie), (3) produce intervalos de confianza para la brecha.</p>
+     <p><strong>Analog&iacute;a:</strong> HP es como una foto de toda la serie pasada. Kalman es como un video en vivo que se actualiza con cada nuevo dato. &iexcl;Para pol&iacute;tica monetaria, el video es mucho m&aacute;s &uacute;til!</p>
+     <div class="formula">HP(&lambda;=1600) &asymp; Kalman smoother con &lambda; = &sigma;_&epsilon;^2 / &sigma;_&eta;^2</div>
+    </div>
+   </div>
+
+   <div class="example-section">
+    <h3><i class="fas fa-calculator"></i> Ejemplo paso a paso: Descomponer PIB simulando 60 trimestres</h3>
+    <div class="step">
+     <div class="step-num">Paso 1: Generar datos simulados de PIB</div>
+     <p>Simulamos 60 trimestres (15 a&ntilde;os) de PIB. La tendencia crece 0.5% por trimestre (~2% anual) con un componente aleatorio. El ciclo oscila alrededor de la tendencia con persistencia AR(1) de 0.7. El PIB observado es la suma de ambos.</p>
+    </div>
+    <div class="step">
+     <div class="step-num">Paso 2: Aplicar filtro HP</div>
+     <p>HP(&lambda;=1600) estima la tendencia minimizando la suma de (desviaciones^2 + &lambda;*(aceleraci&oacute;n)^2). Con &lambda;=1600, la tendencia es bastante suave. El ciclo HP = PIB - tendencia HP. Las primeras y &uacute;ltimas observaciones tienen el "end-point problem": la estimaci&oacute;n es peor en los bordes de la muestra.</p>
+    </div>
+    <div class="step">
+     <div class="step-num">Paso 3: Aplicar filtro de Kalman</div>
+     <p>Kalman filter procesa los datos secuencialmente: para cada t, predice el estado (&alpha;_{t|t-1}), actualiza con la nueva observaci&oacute;n (&alpha;_{t|t}), y calcula la ganancia K_t. La ganancia de Kalman determina cu&aacute;nto peso darle al nuevo dato vs la predicci&oacute;n. Si la se&ntilde;al es ruidosa (H grande), K es peque&ntilde;a.</p>
+    </div>
+    <div class="step">
+     <div class="step-num">Paso 4: Comparar en la simulaci&oacute;n</div>
+     <p>La simulaci&oacute;n de abajo muestra que HP y Kalman dan estimaciones similares de la brecha en el centro de la muestra, pero Kalman es superior en los extremos y se actualiza en tiempo real. La &uacute;ltima estimaci&oacute;n de la brecha por Kalman es la m&aacute;s relevante para pol&iacute;tica.</p>
     </div>
    </div>
 
@@ -129,6 +174,15 @@
 
   <div id="feedbackMsg" class="feedback">💡 Ajusta el tama&ntilde;o de muestra y compara las descomposiciones HP y Kalman.</div>
 
+  <div class="recap">
+   <h3><i class="fas fa-check-circle"></i> Resumen del m&oacute;dulo</h3>
+   <li>Los modelos en espacio de estados tienen dos ecuaciones: observaci&oacute;n (datos ~ estado) y transici&oacute;n (evoluci&oacute;n del estado).</li>
+   <li>El filtro de Kalman estima el estado en tiempo real combinando predicci&oacute;n y actualizaci&oacute;n.</li>
+   <li>El modelo UC descompone el PIB en tendencia (crecimiento potencial) y ciclo (brecha de PIB).</li>
+   <li>HP(&lambda;=1600) es un caso especial de Kalman smoother, pero no se actualiza en tiempo real.</li>
+   <li>Kalman maneja datos faltantes, produce intervalos de confianza y evita el end-point problem de HP.</li>
+  </div>
+
   <div class="nav-links">
    <a href="04-bayesian-var.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
@@ -141,11 +195,11 @@
   const STORAGE_KEY = 'prog_econ_7_05';
   const PROGRESS_KEY = 'prog_econ_7_progress';
   const questions = [
-   { text: "&iquest;Qu&eacute; dos ecuaciones definen un modelo en espacio de estados?", options: ["Regresi&oacute;n y clasificaci&oacute;n", "Observaci&oacute;n y transici&oacute;n", "Media y varianza", "Oferta y demanda"], correct: 1 },
-   { text: "El filtro de Kalman permite estimar:", options: ["Par&aacute;metros fijos", "Estados no observados en tiempo real", "La funci&oacute;n de densidad conjunta", "El n&uacute;mero de rezagos"], correct: 1 },
-   { text: "En un modelo UC, el PIB se descompone en:", options: ["Media y mediana", "Tendencia y ciclo", "Oferta y demanda", "VAR y VEC"], correct: 1 },
-   { text: "&iquest;Qu&eacute; filtro es equivalente a un Kalman smoother con &lambda;=1600?", options: ["Filtro Hodrick-Prescott", "Filtro de Baxter-King", "Filtro HP", "Filtro de Christiano-Fitzgerald"], correct: 2 },
-   { text: "&iquest;Qu&eacute; ventaja tiene el Kalman filter sobre HP para brecha de PIB?", options: ["Es m&aacute;s simple", "Maneja datos en tiempo real con actualizaciones", "No tiene par&aacute;metros", "Es m&aacute;s r&aacute;pido"], correct: 1 }
+   { text: "&iquest;Qu&eacute; dos ecuaciones definen un modelo en espacio de estados?", options: ["Regresi&oacute;n y clasificaci&oacute;n", "Observaci&oacute;n y transici&oacute;n", "Media y varianza", "Oferta y demanda"], correct: 1, explanation: "La ecuaci&oacute;n de observaci&oacute;n relaciona los datos con el estado. La ecuaci&oacute;n de transici&oacute;n describe c&oacute;mo evoluciona el estado en el tiempo." },
+   { text: "El filtro de Kalman permite estimar:", options: ["Par&aacute;metros fijos", "Estados no observados en tiempo real", "La funci&oacute;n de densidad conjunta", "El n&uacute;mero de rezagos"], correct: 1, explanation: "El filtro de Kalman estima recursivamente el estado &alpha;_t usando toda la informaci&oacute;n disponible hasta t. Se actualiza con cada nueva observaci&oacute;n." },
+   { text: "En un modelo UC, el PIB se descompone en:", options: ["Media y mediana", "Tendencia y ciclo", "Oferta y demanda", "VAR y VEC"], correct: 1, explanation: "UC = Unobserved Components. Descompone la serie en tendencia (componente permanente) y ciclo (componente transitorio). La brecha de PIB es el ciclo." },
+   { text: "&iquest;Qu&eacute; filtro es equivalente a un Kalman smoother con &lambda;=1600?", options: ["Filtro Hodrick-Prescott", "Filtro de Baxter-King", "Filtro HP", "Filtro de Christiano-Fitzgerald"], correct: 2, explanation: "HP con &lambda;=1600 (para datos trimestrales) produce la misma descomposici&oacute;n que un Kalman smoother con una raz&oacute;n de varianzas espec&iacute;fica." },
+   { text: "&iquest;Qu&eacute; ventaja tiene el Kalman filter sobre HP para brecha de PIB?", options: ["Es m&aacute;s simple", "Maneja datos en tiempo real con actualizaciones", "No tiene par&aacute;metros", "Es m&aacute;s r&aacute;pido"], correct: 1, explanation: "Kalman se actualiza con cada nuevo dato (filtro en tiempo real), mientras que HP es bilateral y revisa toda la historia. Kalman tambi&eacute;n da intervalos de confianza." }
   ];
   let userAnswers = new Array(questions.length).fill(null);
   let quizCompleted = false;
@@ -167,7 +221,7 @@
    container.innerHTML = '';
    questions.forEach((q, idx) => {
     const qDiv = document.createElement('div'); qDiv.classList.add('question');
-    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
+    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div><div class="explanation" id="expl-'+idx+'">'+q.explanation+'</div>';
     const optsDiv = qDiv.querySelector('.options');
     q.options.forEach((opt, optIdx) => {
      const span = document.createElement('div'); span.classList.add('opt');
@@ -189,7 +243,7 @@
 
   function handleSubmit() {
    if (quizCompleted) return;
-   if (userAnswers.some(a => a === null)) { document.getElementById('feedbackMsg').textContent = I18N.t('fb_0'); return; }
+   if (userAnswers.some(a => a === null)) { document.getElementById('feedbackMsg').innerHTML = '\u26A0\ufe0f Responde todas las preguntas primero.'; return; }
    let correct = 0;
    questions.forEach((q, i) => { if (userAnswers[i] === q.correct) correct++; });
    const total = questions.length; const passed = correct >= Math.ceil(total * 0.6);
@@ -200,14 +254,16 @@
      if (oi === questions[idx].correct) o.classList.add('correct');
      else if (oi === userAnswers[idx]) o.classList.add('wrong');
     });
+    const expl = document.getElementById('expl-'+idx);
+    if (expl) expl.style.display = 'block';
    });
    if (passed) {
     quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
     document.getElementById('insigniaArea').classList.remove('hidden');
-    document.getElementById('feedbackMsg').textContent = I18N.t('fb_1') + correct + '/' + total + ' correctas. &iexcl;Dominas State-Space!';
+    document.getElementById('feedbackMsg').innerHTML = '\uD83C\uDF89 ' + correct + '/' + total + ' correctas. \u00a1Dominas State-Space!';
     saveProgress(); updateProgress();
    } else {
-    document.getElementById('feedbackMsg').textContent = '❌ ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. &iexcl;Reintenta!';
+    document.getElementById('feedbackMsg').innerHTML = '\u274C ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. \u00a1Reintenta!';
    }
   }
 
@@ -216,8 +272,9 @@
    if (p.includes(STORAGE_KEY)) {
     quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
     document.getElementById('insigniaArea').classList.remove('hidden');
-    document.getElementById('feedbackMsg').textContent = I18N.t('fb_2');
+    document.getElementById('feedbackMsg').innerHTML = '\uD83C\uDFC6 Ya completaste este m\u00f3dulo.';
     document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
+    document.querySelectorAll('.explanation').forEach(e => e.style.display = 'block');
    }
   }
 
@@ -268,21 +325,5 @@
   document.getElementById('simBtn').addEventListener('click', simulateDecomp);
   renderQuestions(); updateBtnState(); restoreProgress(); updateProgress();
  </script>
- <script>
-window.I18N_DATA={
- "fb_0": {
-  "es": "⚠️ Responde todas las preguntas primero.",
-  "en": "⚠️ Answer todas las preguntas primero."
- },
- "fb_1": {
-  "es": "🎉 ",
-  "en": "🎉 "
- },
- "fb_2": {
-  "es": "🏆 Ya completaste este m&oacute;dulo.",
-  "en": "🏆 Ya completaste este m&oacute;dulo."
- }
-};
-</script>
-<script src="../../../assets/js/i18n.js"></script> </body>
+</body>
 </html>

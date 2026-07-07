@@ -3,7 +3,7 @@
 <head>
  <meta charset="UTF-8">
  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
- <title>Series de Tiempo | 🎛️ State Space y Kalman Filter</title>
+ <title>Series de Tiempo | 🧠 Kalman y Espacio de Estados</title>
  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
  <style>
@@ -21,12 +21,15 @@
   .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#06b6d4,#0891b2); border-radius:20px; transition:width 0.5s ease; }
   .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
   .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #06b6d4; font-size:1rem; line-height:1.6; }
+  .objectives { background:rgba(6,182,212,0.1); border-radius:1.5rem; padding:1rem 1.5rem; margin:1rem 2rem; border:1px solid rgba(6,182,212,0.3); }
+  .objectives li { color:#b9ccee; font-size:0.9rem; margin:0.4rem 0; list-style-type: none; }
+  .objectives li::before { content:"🎯 "; }
   .main-area { padding:1.5rem 2rem; }
   .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#06b6d4; }
   .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
   .info-panel { background:rgba(10,20,40,0.7); border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
   .info-panel h3 { color:#67e8f9; font-size:1rem; margin-bottom:0.5rem; }
-  .info-panel p { font-size:0.85rem; color:#b9ccee; line-height:1.6; }
+  .info-panel p { font-size:0.85rem; color:#b9ccee; line-height:1.6; margin-bottom:0.6rem; }
   .info-panel .formula { background:#0a0f1e; padding:0.5rem; border-radius:0.8rem; text-align:center; font-family:monospace; font-size:0.9rem; color:#67e8f9; margin-top:0.5rem; }
   .sim-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #06b6d4; margin-bottom:1.5rem; }
   .quiz-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #06b6d4; margin-bottom:1.5rem; }
@@ -39,6 +42,7 @@
   .opt.selected { background:#06b6d4; color:#000; font-weight:bold; box-shadow:0 0 8px #06b6d4; }
   .opt.correct { background:#00cc88; color:#000; }
   .opt.wrong { background:#ff4455; color:#fff; }
+  .explanation { background:#0a1525; border-radius:0.8rem; padding:0.6rem 1rem; margin-top:0.5rem; font-size:0.8rem; color:#a5f3fc; border-left:3px solid #06b6d4; display:none; }
   .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #06b6d4; }
   .btn-action { background:linear-gradient(95deg,#06b6d4,#0891b2); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin-top:1rem; }
   .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(6,182,212,0.5); }
@@ -47,6 +51,13 @@
   .insignia i { font-size:2.5rem; color:gold; }
   .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
   .hidden { display:none; }
+  .example-section { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #06b6d4; margin-bottom:1.5rem; }
+  .example-section .step { background:#0f1a2c; border-radius:1rem; padding:0.8rem 1.2rem; margin:0.6rem 0; border-left:4px solid #06b6d4; }
+  .example-section .step .step-num { color:#67e8f9; font-weight:700; font-size:0.85rem; }
+  .example-section .step p { color:#b9ccee; font-size:0.85rem; margin-top:0.3rem; }
+  .recap { background:rgba(6,182,212,0.08); border-radius:1.5rem; padding:1rem 1.5rem; margin:0 2rem; border:1px dashed rgba(6,182,212,0.4); }
+  .recap h3 { color:#67e8f9; font-size:1rem; margin-bottom:0.5rem; }
+  .recap li { color:#8899bb; font-size:0.8rem; margin:0.3rem 0; }
   .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
   .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
   .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(6,182,212,0.4); }
@@ -61,13 +72,13 @@
  <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Econometr&iacute;a</a></nav>
  <div class="course-container" id="app">
   <div class="hero-header">
-   <h1>🎛️ State Space y Kalman Filter</h1>
-   <p>Filtrado, suavizado y par&aacute;metros variables en el tiempo</p>
+   <h1>🧠 Filtro de Kalman y Espacio de Estados</h1>
+   <p>Estimaci&oacute;n recursiva de estados latentes en sistemas din&aacute;micos</p>
    <div class="badge-area">
-    <span class="chip"><i class="fas fa-cubes"></i> Estado-Espacio</span>
-    <span class="chip"><i class="fas fa-filter"></i> Kalman</span>
-    <span class="chip"><i class="fas fa-sync-alt"></i> Predicci&oacute;n</span>
-    <span class="chip"><i class="fas fa-chart-line"></i> Suavizado</span>
+    <span class="chip"><i class="fas fa-cube"></i> Estado</span>
+    <span class="chip"><i class="fas fa-sync"></i> Predicci&oacute;n</span>
+    <span class="chip"><i class="fas fa-eye"></i> Actualizaci&oacute;n</span>
+    <span class="chip"><i class="fas fa-smoothed"></i> Suavizado</span>
    </div>
   </div>
   <div class="progress-section">
@@ -75,69 +86,115 @@
    <span class="progress-text" id="progressText">M&oacute;dulo 8 de 12</span>
   </div>
   <div class="analogy-card">
-   <strong>💡 Piénsalo así:</strong> Kalman filter es como navegar con GPS en medio de la niebla: el estado real (posici&oacute;n) es invisible, pero tienes mediciones ruidosas (se&ntilde;al GPS). El filtro combina tu modelo de movimiento (predicci&oacute;n) con la medici&oacute;n (actualizaci&oacute;n) para estimar tu posici&oacute;n exacta. En econom&iacute;a, estimamos el PIB potencial o betas variables de CAPM.
+   <strong>💡 Piénsalo así:</strong> Kalman es como navegar con GPS: tienes una estimación de tu posición (estado), el GPS te da una medición ruidosa, y el filtro combina ambas para dar la mejor estimación posible. Si la señal GPS se pierde, el filtro "predice" tu posición basado en tu velocidad anterior hasta recuperar señal.
   </div>
+
+  <div class="objectives">
+   <li><strong>Comprender</strong> la representaci&oacute;n en espacio de estados y sus componentes: ecuaci&oacute;n de estado y ecuaci&oacute;n de observaci&oacute;n.</li>
+   <li><strong>Aplicar</strong> el filtro de Kalman: paso de predicci&oacute;n y paso de actualizaci&oacute;n.</li>
+   <li><strong>Estimar</strong> par&aacute;metros variantes en el tiempo (TVP) usando Kalman.</li>
+   <li><strong>Distinguir</strong> entre filtrado, pron&oacute;stico y suavizado.</li>
+  </div>
+
   <div class="main-area">
-   <div class="section-title"><i class="fas fa-flask"></i> Representaci&oacute;n Estado-Espacio</div>
+   <div class="section-title"><i class="fas fa-flask"></i> Espacio de Estados</div>
    <div class="info-grid">
     <div class="info-panel">
-     <h3>📐 Ecuaci&oacute;n de Estado</h3>
-     <p>αₜ = Tαₜ₋₁ + Rηₜ. El estado (no observado) evoluciona como un proceso de Markov de primer orden.</p>
-     <div class="formula">&alpha;ₜ = T&alpha;ₜ₋₁ + R&eta;ₜ</div>
+     <h3>📐 Ecuaci&oacute;n de Estado (Transici&oacute;n)</h3>
+     <p>Describe c&oacute;mo evoluciona el estado latente θₜ en el tiempo: θₜ = F·θₜ₋₁ + ηₜ con ηₜ ~ N(0, Q). F es la matriz de transici&oacute;n (c&oacute;mo el estado anterior influye en el actual) y Q es la covarianza del error de estado.</p>
+     <p><strong>Intuici&oacute;n:</strong> Es como un modelo autorregresivo para el estado mismo. Por ejemplo, si θₜ es el PIB potencial, hoy depende del PIB potencial de ayer m&aacute;s un shock.</p>
+     <p><strong>Ejemplo:</strong> Para un AR(2): yₜ = φ₁yₜ₋₁ + φ₂yₜ₋₂ + εₜ, el estado es θₜ = [yₜ, yₜ₋₁]' y la transici&oacute;n es: [yₜ, yₜ₋₁]' = [φ₁, φ₂; 1, 0]·[yₜ₋₁, yₜ₋₂]' + [εₜ, 0]'.</p>
+     <p><strong>Peligro com&uacute;n:</strong> Si la matriz F tiene valores propios fuera del c&iacute;rculo unitario, el estado es no estacionario y el filtro puede no converger.</p>
     </div>
     <div class="info-panel">
-     <h3>📏 Ecuaci&oacute;n de Medici&oacute;n</h3>
-     <p>yₜ = Zαₜ + εₜ. Relaciona el estado con las observaciones.</p>
-     <div class="formula">yₜ = Z&alpha;ₜ + &epsilon;ₜ</div>
+     <h3>📏 Ecuaci&oacute;n de Observaci&oacute;n</h3>
+     <p>Conecta el estado latente con los datos observados: yₜ = H·θₜ + εₜ con εₜ ~ N(0, R). H es la matriz de medici&oacute;n (qu&eacute; parte del estado se observa) y R es la varianza del error de medici&oacute;n.</p>
+     <p><strong>Intuici&oacute;n:</strong> No vemos el estado directamente, sino una versi&oacute;n ruidosa de &eacute;l. Es como tratar de adivinar la "temperatura real" (estado) leyendo un term&oacute;metro imperfecto (observaci&oacute;n).</p>
+     <p><strong>Ejemplo:</strong> En un modelo de factor din&aacute;mico, el estado es el "factor com&uacute;n" de la econom&iacute;a (no observable) y las observaciones son PIB, empleo, consumo, inflaci&oacute;n, que dependen del factor con diferentes cargas.</p>
+     <p><strong>Peligro com&uacute;n:</strong> Si R (varianza de medici&oacute;n) se subestima, el filtro conf&iacute;a demasiado en los datos ruidosos y el estado estimado ser&aacute; muy vol&aacute;til.</p>
     </div>
     <div class="info-panel">
-     <h3>🔄 Kalman Filter</h3>
-     <p>Paso 1: Predicci&oacute;n (estado y varianza forward). Paso 2: Actualizaci&oacute;n (incorporar nueva observaci&oacute;n). Paso 3: Suavizado (retrospectivo para toda la muestra).</p>
+     <h3>🔁 Filtro de Kalman: Predicci&oacute;n-Actualizaci&oacute;n</h3>
+     <p>El filtro itera dos pasos: <strong>Predicci&oacute;n:</strong> θₜ|ₜ₋₁ = F·θₜ₋₁|ₜ₋₁, Pₜ|ₜ₋₁ = F·Pₜ₋₁|ₜ₋₁·F' + Q. <strong>Actualizaci&oacute;n:</strong> Kₜ = Pₜ|ₜ₋₁·H'·(H·Pₜ|ₜ₋₁·H' + R)⁻¹, θₜ|ₜ = θₜ|ₜ₋₁ + Kₜ·(yₜ - H·θₜ|ₜ₋₁), Pₜ|ₜ = (I - Kₜ·H)·Pₜ|ₜ₋₁.</p>
+     <p><strong>Intuici&oacute;n:</strong> Primero predices d&oacute;nde estar&aacute; el estado basado en la din&aacute;mica anterior. Luego, cuando llega la nueva observaci&oacute;n, actualizas la estimaci&oacute;n. K (Ganancia de Kalman) decide cu&aacute;nto peso dar a la nueva informaci&oacute;n vs. la predicci&oacute;n.</p>
+     <p><strong>Ejemplo num&eacute;rico:</strong> Si K ≈ 1, conf&iacute;as casi totalmente en la nueva observaci&oacute;n (el modelo de estado es poco confiable). Si K ≈ 0, ignoras la observaci&oacute;n (el ruido de medici&oacute;n es enorme).</p>
+     <p><strong>Peligro com&uacute;n:</strong> Las matrices Q y R son dif&iacute;ciles de estimar. En la pr&aacute;ctica se estiman por m&aacute;xima verosimilitud junto con los par&aacute;metros del modelo.</p>
+     <div class="formula"><i>K</i>ₜ = <i>P</i>ₜ|ₜ₋₁<i>H</i>' (<i>H P</i>ₜ|ₜ₋₁<i>H</i>' + <i>R</i>)⁻&sup1;</div>
     </div>
     <div class="info-panel">
-     <h3>📊 Filtered vs Smoothed</h3>
-     <p>Filtered: estimaci&oacute;n con informaci&oacute;n hasta t. Smoothed: estimaci&oacute;n con toda la muestra (m&aacute;s precisa).</p>
+     <h3>🔮 Suavizado vs. Filtrado vs. Pron&oacute;stico</h3>
+     <p><strong>Filtrado:</strong> Estimas θₜ usando datos hasta t (θₜ|ₜ). <strong>Pron&oacute;stico:</strong> Estimas θₜ₊ₖ usando datos hasta t (θₜ₊ₖ|ₜ). <strong>Suavizado:</strong> Estimas θₜ usando todos los datos disponibles T > t (θₜ|ₜ).</p>
+     <p><strong>Intuici&oacute;n:</strong> El filtrado es tiempo real (lo que sabes ahora), el pron&oacute;stico es hacia adelante, el suavizado es mirar hacia atr&aacute;s con informaci&oacute;n completa.</p>
+     <p><strong>Ejemplo:</strong> En un modelo de inflaci&oacute;n subyacente: filtrado te da la inflaci&oacute;n subyacente hoy, pron&oacute;stico te da la esperada en 3 meses, y suavizado (Rauch-Tung-Striebel) te da la inflaci&oacute;n subyacente revisada para todo el per&iacute;odo hist&oacute;rico.</p>
+     <p><strong>Peligro com&uacute;n:</strong> El suavizado siempre es m&aacute;s preciso que el filtrado (usa m&aacute;s informaci&oacute;n), pero solo es posible para an&aacute;lisis hist&oacute;ricos, no en tiempo real.</p>
     </div>
    </div>
 
-   <div class="section-title"><i class="fas fa-list-ol"></i> Aplicaciones</div>
+   <div class="section-title"><i class="fas fa-list-ol"></i> Aplicaciones Clave</div>
    <div class="info-grid">
     <div class="info-panel">
-     <h3>📈 Local Level Model</h3>
-     <p>yₜ = μₜ + εₜ, μₜ = μₜ₋₁ + ηₜ. Random walk + ruido. La se&ntilde;al es el nivel subyacente.</p>
-     <div class="formula">yₜ = &mu;ₜ + &epsilon;ₜ, &mu;ₜ = &mu;ₜ₋₁ + &eta;ₜ</div>
+     <h3>📈 TVP (Time-Varying Parameters)</h3>
+     <p>Modelos con par&aacute;metros que cambian lentamente: yₜ = βₜ·xₜ + εₜ, con βₜ = βₜ₋₁ + ηₜ. El filtro de Kalman estima βₜ en tiempo real. Usado para medir la evoluci&oacute;n de la NAIRU, la elasticidad PIB-empleo, o el beta de una acci&oacute;n.</p>
     </div>
     <div class="info-panel">
-     <h3>📉 CAPM con Beta Variable</h3>
-     <p>rᵢₜ = α + βₜ·rₘₜ + εₜ. βₜ = βₜ₋₁ + ηₜ. El riesgo sistem&aacute;tico cambia en el tiempo.</p>
+     <h3>📊 Filtro de Hodrick-Prescott (HP)</h3>
+     <p>Una versi&oacute;n simplificada de un filtro de Kalman. Descompone una serie en tendencia (estado) y ciclo. Aunque popular, tiene limitaciones: par&aacute;metro λ arbitrario, efecto de punto final, y asume que la tendencia es I(2).</p>
     </div>
    </div>
 
    <div class="sim-area">
-    <div class="section-title"><i class="fas fa-play"></i> Simulaci&oacute;n: Local Level Model</div>
-    <p style="margin-bottom:0.8rem;color:#b9ccee;">Genera datos de un modelo de nivel local (random walk + ruido). Ajusta la relaci&oacute;n se&ntilde;al-ruido q = σ²_η/σ²_ε.</p>
+    <div class="section-title"><i class="fas fa-play"></i> Simulaci&oacute;n: Filtro de Kalman</div>
+    <p style="margin-bottom:0.8rem;color:#b9ccee;">Genera un estado latente y una observaci&oacute;n ruidosa. El filtro estima recursivamente el estado.</p>
     <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem;">
-     <label style="color:#b9ccee;">q (se&ntilde;al/ruido): <input type="range" id="qVal" min="1" max="90" value="20" style="width:100px;"><span id="qValDisplay" style="color:#67e8f9;">0.20</span></label>
-     <button id="simKalmanBtn" class="btn-action" style="margin:0;">🎛️ Filtrar</button>
+     <label style="color:#b9ccee;">Ruido observaci&oacute;n (R): <input type="range" id="kalmanR" min="10" max="200" value="80" style="width:100px;"><span id="kalmanRDisplay" style="color:#67e8f9;">0.8</span></label>
+     <button id="simKalmanBtn" class="btn-action" style="margin:0;">🧠 Kalman</button>
     </div>
     <div id="simResult" style="background:#0a0f1e;border-radius:1rem;padding:1rem;text-align:center;font-size:0.9rem;color:#b9ccee;">
-     Presiona "Filtrar" para ver el filtro de Kalman.
+     Presiona "Kalman" para ver el filtro en acci&oacute;n.
+    </div>
+   </div>
+
+   <div class="example-section">
+    <div class="section-title"><i class="fas fa-calculator"></i> Ejemplo Paso a Paso: Kalman para un Modelo AR(1) Local</div>
+    <div class="step">
+     <div class="step-num">Paso 1: Especificar el espacio de estados</div>
+     <p>Modelo: yₜ = μₜ + εₜ (observaciones = nivel local + ruido) y μₜ = μₜ₋₁ + ηₜ (el nivel sigue un random walk). Estado: θₜ = μₜ. Ecuaci&oacute;n de observaci&oacute;n: yₜ = [1]·μₜ + εₜ. Ecuaci&oacute;n de estado: μₜ = [1]·μₜ₋₁ + ηₜ. Asume Q = 1, R = 1.</p>
+    </div>
+    <div class="step">
+     <div class="step-num">Paso 2: Inicializar el filtro</div>
+     <p>μ₀|₀ = y₁ (primera observaci&oacute;n como estimaci&oacute;n inicial). P₀|₀ = 1 (varianza inicial). En t=1, predecimos: μ₁|₀ = μ₀|₀, P₁|₀ = P₀|₀ + Q = 2. Luego actualizamos con y₁: K₁ = P₁|₀·(P₁|₀ + R)⁻¹ = 2/(2+1) = 0.67. μ₁|₁ = μ₁|₀ + 0.67·(y₁ - μ₁|₀). &iexcl;La ganancia de Kalman es 0.67!</p>
+    </div>
+    <div class="step">
+     <div class="step-num">Paso 3: Iterar para t = 2, 3, ...</div>
+     <p>Para t=2: μ₂|₁ = μ₁|₁, P₂|₁ = P₁|₁ + Q. Despu&eacute;s de actualizar, P₁|₁ = (1-K₁)·P₁|₀ = 0.33·2 = 0.66. Entonces P₂|₁ = 0.66 + 1 = 1.66. K₂ = 1.66/(1.66+1) = 0.62. Observa que K disminuye con el tiempo a medida que el filtro gana confianza en la estimaci&oacute;n del estado.</p>
+    </div>
+    <div class="step">
+     <div class="step-num">Paso 4: Interpretar resultados</div>
+     <p>Despu&eacute;s de suficientes per&iacute;odos, K converge a un valor de estado estacionario (depende de la raz&oacute;n Q/R). Las estimaciones filtradas μₜ|ₜ son m&aacute;s suaves que las observaciones originales yₜ. La verosimilitud se calcula del error de predicci&oacute;n: -2·ln(L) = Σ[ln(2π·Sₜ) + vₜ²/Sₜ], donde vₜ = yₜ - μₜ|ₜ₋₁ y Sₜ = Pₜ|ₜ₋₁ + R.</p>
     </div>
    </div>
 
    <div class="quiz-area">
-    <div class="quiz-title"><i class="fas fa-question-circle"></i> Mini Quiz: Kalman Filter</div>
+    <div class="quiz-title"><i class="fas fa-question-circle"></i> Mini Quiz: Filtro de Kalman</div>
     <div id="quizContainer"></div>
     <button id="submitQuizBtn" class="btn-action">✅ Verificar respuestas</button>
     <div id="insigniaArea" class="insignia hidden">
      <i class="fas fa-medal"></i>
      <h3>🏅 Kalman Navigator 🏅</h3>
-     <p>Has dominado el filtro de Kalman y estado-espacio. &iexcl;Excelente!</p>
+     <p>Has dominado el filtro de Kalman y espacio de estados. &iexcl;Incre&iacute;ble!</p>
     </div>
    </div>
   </div>
 
-  <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre Kalman filter.</div>
+  <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre el filtro de Kalman.</div>
+
+  <div class="recap">
+   <h3>📌 Resumen del m&oacute;dulo</h3>
+   <li>Espacio de estados separa el estado latente (din&aacute;mica) de las observaciones (medici&oacute;n ruidosa).</li>
+   <li>Filtro de Kalman: predice (usa la din&aacute;mica) y actualiza (incorpora nueva observaci&oacute;n con la ganancia K).</li>
+   <li>Ganancia K equilibra la confianza entre el modelo de estado y las observaciones.</li>
+   <li>Suavizado (RTS) da estimaciones m&aacute;s precisas del estado hist&oacute;rico usando toda la muestra.</li>
+  </div>
 
   <div class="nav-links">
    <a href="07-cointegracion.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
@@ -151,11 +208,16 @@
   const STORAGE_KEY = 'prog_econ_5_08';
   const PROGRESS_KEY = 'prog_econ_5_progress';
   const questions = [
-   { text: "\u00bfCu\u00e1les son las dos ecuaciones del estado-espacio?", options: ["Estado y medici\u00f3n", "Media y varianza", "AR y MA", "Filtrado y suavizado"], correct: 0 },
-   { text: "\u00bfQu\u00e9 hace el paso de predicci\u00f3n en Kalman?", options: ["Proyecta el estado forward", "Actualiza con la observaci\u00f3n", "Suaviza hacia atr\u00e1s", "Estima par\u00e1metros"], correct: 0 },
-   { text: "\u00bfQu&eacute; diferencia hay entre filtered y smoothed?", options: ["Filtered usa datos hasta t, smoothed toda la muestra", "Son iguales", "Smoothed es m\u00e1s r\u00e1pido", "Filtered usa m\u00e1s datos"], correct: 0 },
-   { text: "\u00bfQu\u00e9 controla q = \u03c3\u00b2_\u03b7/\u03c3\u00b2_\u03b5 en el local level model?", options: ["La relaci\u00f3n se\u00f1al-ruido", "La media", "La tendencia", "La estacionalidad"], correct: 0 },
-   { text: "\u00bfPara qu\u00e9 se usa Kalman en finanzas?", options: ["Beta variable en CAPM", "Predecir dividendos", "Valorar opciones", "Calcular VAR"], correct: 0 }
+   { text: "\u00bfCu\u00e1les son los dos componentes del espacio de estados?", options: ["Ecuaci\u00f3n de estado y de observaci\u00f3n", "Variable end\u00f3gena y ex\u00f3gena", "Filtrado y suavizado", "Predicci\u00f3n y error"], correct: 0,
+     explanation: "El espacio de estados tiene dos ecuaciones: la de estado (transici&oacute;n del estado latente) y la de observaci&oacute;n (conexi&oacute;n entre estado y datos)." },
+   { text: "\u00bfQu&eacute; hace la Ganancia de Kalman (K)?", options: ["Equilibra estado y observaci\u00f3n", "Mide la tendencia", "Calcula la varianza", "Estima la media"], correct: 0,
+     explanation: "K decide cu&aacute;nto peso darle a la nueva observaci&oacute;n frente a la predicci&oacute;n del modelo de estado. K cercano a 1 conf&iacute;a en la observaci&oacute;n; K cercano a 0 conf&iacute;a en el estado." },
+   { text: "\u00bfQu&eacute; es el suavizado en Kalman?", options: ["Estimar el estado pasado con toda la muestra", "Predecir el futuro", "Inicializar el filtro", "Calcular la verosimilitud"], correct: 0,
+     explanation: "El suavizado (usando el algoritmo de Rauch-Tung-Striebel) estima el estado en cada t usando toda la informaci&oacute;n disponible hasta T>t, dando estimaciones m&aacute;s precisas que el filtrado." },
+   { text: "\u00bfEn qu&eacute; contexto son &uacute;tiles los par\u00e1metros variantes en el tiempo (TVP)?", options: ["Cuando la relaci\u00f3n econ\u00f3mica cambia lentamente", "Solo con datos cross-section", "Cuando no hay datos", "Para series estacionarias"], correct: 0,
+     explanation: "TVP es ideal cuando el par&aacute;metro β de la regresi&oacute;n evoluciona en el tiempo (ej: elasticidad ingreso-demanda que cambia con el desarrollo econ&oacute;mico)." },
+   { text: "\u00bfQu&eacute; representa la matriz Q en el espacio de estados?", options: ["Covarianza del error de estado", "Matriz de medici\u00f3n", "Matriz de transici\u00f3n", "Varianza de observaci\u00f3n"], correct: 0,
+     explanation: "Q es la covarianza del error ηₜ en la ecuaci&oacute;n de estado θₜ = F·θₜ₋₁ + ηₜ. Controla cu&aacute;nto puede variar el estado de un per&iacute;odo a otro." }
   ];
   let userAnswers = new Array(questions.length).fill(null);
   let quizCompleted = false;
@@ -178,6 +240,8 @@
    questions.forEach((q, idx) => {
     const qDiv = document.createElement('div'); qDiv.classList.add('question');
     qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
+    const expDiv = document.createElement('div'); expDiv.classList.add('explanation'); expDiv.id = 'explanation-'+idx; expDiv.textContent = q.explanation;
+    qDiv.appendChild(expDiv);
     const optsDiv = qDiv.querySelector('.options');
     q.options.forEach((opt, optIdx) => {
      const span = document.createElement('div'); span.classList.add('opt');
@@ -205,11 +269,13 @@
    const total = questions.length; const passed = correct >= Math.ceil(total * 0.6);
    document.querySelectorAll('.question').forEach((qDiv, idx) => {
     const opts = qDiv.querySelectorAll('.opt');
+    const expDiv = document.getElementById('explanation-'+idx);
     opts.forEach((o, oi) => {
      o.classList.remove('selected');
      if (oi === questions[idx].correct) o.classList.add('correct');
      else if (oi === userAnswers[idx]) o.classList.add('wrong');
     });
+    if (expDiv) expDiv.style.display = 'block';
    });
    if (passed) {
     quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
@@ -232,54 +298,41 @@
   }
 
   function simulateKalman() {
-   const q = parseInt(document.getElementById('qVal').value) / 100;
-   const T = 100;
-   const sigmaEps = 1;
-   const sigmaEta = Math.sqrt(q) * sigmaEps;
-   let mu = new Array(T); let y = new Array(T);
-   mu[0] = 0; y[0] = mu[0] + (Math.random() - 0.5) * 2 * sigmaEps;
+   const R = parseInt(document.getElementById('kalmanR').value) / 100;
+   const Q = 0.5;
+   const T = 80;
+   let state = new Array(T);
+   let obs = new Array(T);
+   state[0] = 0;
+   for (let t = 1; t < T; t++) { state[t] = state[t-1] + (Math.random() - 0.5) * Q * 2; }
+   for (let t = 0; t < T; t++) { obs[t] = state[t] + (Math.random() - 0.5) * R * 2; }
+   let filt = new Array(T);
+   let P = 1;
+   filt[0] = obs[0];
    for (let t = 1; t < T; t++) {
-    mu[t] = mu[t-1] + (Math.random() - 0.5) * 2 * sigmaEta;
-    y[t] = mu[t] + (Math.random() - 0.5) * 2 * sigmaEps;
+    let pred = filt[t-1];
+    let P_pred = P + Q;
+    let K = P_pred / (P_pred + R);
+    filt[t] = pred + K * (obs[t] - pred);
+    P = (1 - K) * P_pred;
    }
-   let muFilter = new Array(T); let P = new Array(T);
-   muFilter[0] = 0; P[0] = 1;
-   for (let t = 1; t < T; t++) {
-    const muPred = muFilter[t-1];
-    const PPred = P[t-1] + sigmaEta * sigmaEta;
-    const K = PPred / (PPred + sigmaEps * sigmaEps);
-    muFilter[t] = muPred + K * (y[t] - muPred);
-    P[t] = (1 - K) * PPred;
-   }
-   let muSmooth = new Array(T);
-   muSmooth[T-1] = muFilter[T-1];
-   for (let t = T - 2; t >= 0; t--) {
-    const PPred = P[t] + sigmaEta * sigmaEta;
-    const G = P[t] / PPred;
-    muSmooth[t] = muFilter[t] + G * (muSmooth[t+1] - muFilter[t]);
-   }
-   function renderSeries3(data1, data2, data3, c1, c2, c3, label1, label2, label3) {
-    const all = [...data1, ...data2, ...data3];
-    const min = Math.min(...all); const max = Math.max(...all); const range = max - min || 1;
-    let h = '<div style="height:70px;display:flex;align-items:flex-end;gap:1px;">';
-    for (let t = 0; t < T; t++) {
-     h += '<div style="flex:1;min-width:2px;display:flex;flex-direction:column;align-items:center;">';
-     h += '<div style="width:2px;height:' + ((data1[t]-min)/range*65) + 'px;background:' + c1 + ';opacity:0.5;"></div>';
-     h += '<div style="width:2px;height:' + ((data2[t]-min)/range*65) + 'px;background:' + c2 + ';margin-top:-' + ((data1[t]-min)/range*65 + 2) + 'px;"></div>';
-     h += '<div style="width:2px;height:' + ((data3[t]-min)/range*65) + 'px;background:' + c3 + ';margin-top:-' + ((data2[t]-min)/range*65 + 2) + 'px;"></div>';
-     h += '</div>';
-    }
-    h += '</div><div style="font-size:0.65rem;color:#8899cc;">' + label1 + ' | ' + label2 + ' | ' + label3 + '</div>';
+   function renderSeries(data, color) {
+    const min = Math.min(...data); const max = Math.max(...data); const range = max - min || 1;
+    let h = '<div style="height:50px;display:flex;align-items:flex-end;gap:1px;">';
+    for (let t = 0; t < T; t++) h += '<div style="flex:1;min-width:2px;height:' + ((data[t]-min)/range*45) + 'px;background:' + color + ';border-radius:1px 1px 0 0;"></div>';
+    h += '</div>';
     return h;
    }
-   let html = '<div style="display:grid;grid-template-columns:1fr;gap:0.3rem;">';
-   html += renderSeries3(y, muFilter, muSmooth, '#8899cc', '#06b6d4', '#67e8f9', 'Obs', 'Filtered', 'Smoothed');
+   let html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">';
+   html += '<div>' + renderSeries(state, '#06b6d4') + '<div style="font-size:0.7rem;color:#8899cc;">Estado real (latente)</div></div>';
+   html += '<div>' + renderSeries(obs, '#ff6688aa') + '<div style="font-size:0.7rem;color:#8899cc;">Observación ruidosa</div></div>';
    html += '</div>';
-   html += '<p style="font-size:0.8rem;color:#8899cc;margin-top:0.5rem;">T=' + T + ' · q=' + q.toFixed(2) + ' · Filtered=cian, Smoothed=cyan claro</p>';
+   html += '<div>' + renderSeries(filt, '#67e8f9') + '<div style="font-size:0.7rem;color:#8899cc;">Estimación filtrada (Kalman)</div></div>';
+   html += '<p style="font-size:0.8rem;color:#8899cc;margin-top:0.5rem;">R='+R.toFixed(2)+' · Kalman suaviza las observaciones y sigue al estado real</p>';
    document.getElementById('simResult').innerHTML = html;
   }
 
-  document.getElementById('qVal').addEventListener('input', function() { document.getElementById('qValDisplay').textContent = (this.value / 100).toFixed(2); });
+  document.getElementById('kalmanR').addEventListener('input', function() { document.getElementById('kalmanRDisplay').textContent = (this.value / 100).toFixed(2); });
   document.getElementById('simKalmanBtn').addEventListener('click', simulateKalman);
   document.getElementById('submitQuizBtn').addEventListener('click', handleSubmit);
   renderQuestions(); updateBtnState(); restoreProgress(); updateProgress();

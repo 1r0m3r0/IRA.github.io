@@ -21,6 +21,18 @@
   .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#10b981,#059669); border-radius:20px; transition:width 0.5s ease; }
   .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
   .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #10b981; font-size:1rem; line-height:1.6; }
+  .objectives { background:rgba(16,185,129,0.1); border-radius:1.5rem; padding:1rem 1.5rem; margin:1rem 2rem; border:1px solid rgba(16,185,129,0.3); }
+  .objectives li { color:#b9ccee; font-size:0.9rem; margin:0.4rem 0; list-style-type: none; }
+  .objectives li::before { content:"🎯 "; }
+  .objectives h3 { color:#6ee7b7; font-size:1rem; margin-bottom:0.5rem; }
+  .example-section { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #10b981; margin:1rem 2rem 1.5rem; }
+  .example-section .step { background:#0f1a2c; border-radius:1rem; padding:0.8rem 1.2rem; margin:0.6rem 0; border-left:4px solid #10b981; }
+  .example-section .step .step-num { color:#6ee7b7; font-weight:700; font-size:0.85rem; }
+  .example-section .step p { color:#b9ccee; font-size:0.85rem; margin-top:0.3rem; }
+  .example-section h3 { color:#10b981; font-size:1.1rem; margin-bottom:0.8rem; }
+  .recap { background:rgba(16,185,129,0.08); border-radius:1.5rem; padding:1rem 1.5rem; margin:0 2rem 1.5rem; border:1px dashed rgba(16,185,129,0.4); }
+  .recap h3 { color:#6ee7b7; font-size:1rem; margin-bottom:0.5rem; }
+  .recap li { color:#8899bb; font-size:0.8rem; margin:0.3rem 0; }
   .main-area { padding:1.5rem 2rem; }
   .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#10b981; }
   .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
@@ -40,6 +52,7 @@
   .opt.correct { background:#00cc88; color:#000; }
   .opt.wrong { background:#ff4455; color:#fff; }
   .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #10b981; }
+  .explanation { background:#0a1525; border-radius:0.8rem; padding:0.6rem 1rem; margin-top:0.5rem; font-size:0.8rem; color:#a7f3d0; border-left:3px solid #10b981; display:none; }
   .btn-action { background:linear-gradient(95deg,#10b981,#059669); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin-top:1rem; }
   .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(16,185,129,0.5); }
   .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
@@ -76,28 +89,61 @@
   <div class="analogy-card">
    <strong>💡 Pi&eacute;nsalo as&iacute;:</strong> La descomposici&oacute;n de Cholesky es como pelar una cebolla capa por capa en un orden fijo. Primero pelas la capa m&aacute;s externa (la variable m&aacute;s ex&oacute;gena), luego la siguiente, y as&iacute; sucesivamente. En macroeconometr&iacute;a, ordenamos las variables de la m&aacute;s lenta (PIB) a la m&aacute;s r&aacute;pida (tasa de inter&eacute;s).
   </div>
+  <div class="objectives">
+   <h3>🎯 &iquest;Qu&eacute; aprender&aacute;s en este m&oacute;dulo?</h3>
+   <li>Distinguir entre la forma reducida y la forma estructural de un VAR.</li>
+   <li>Entender por qu&eacute; los errores del VAR reducido NO son independientes entre s&iacute; y c&oacute;mo Cholesky los ortogonaliza.</li>
+   <li>Implementar la descomposici&oacute;n de Cholesky para identificar n&uacute;nicamente n(n-1)/2 restricciones.</li>
+   <li>Interpretar las Funciones de Impulso-Respuesta (IRFs) y sus intervalos de confianza.</li>
+   <li>Reconocer que el orden recursivo afecta las IRFs — y por qu&eacute; es crucial justificarlo te&oacute;ricamente.</li>
+  </div>
   <div class="main-area">
    <div class="section-title"><i class="fas fa-flask"></i> Teor&iacute;a del SVAR</div>
    <div class="info-grid">
     <div class="info-panel">
      <h3>📉 Forma Reducida</h3>
-     <p>y&#832; = c + A&#832;&#8321;y&#8344;&#8321; + ... + A&#8349;y&#8344;&#8330; + u&#8344;. Los errores u&#8344; tienen matriz de covarianza &Sigma;.</p>
-     <div class="formula">y&#8344; = c + &Sigma;A&#8340;y&#8344;&#8340; + u&#8344;</div>
+     <p>La forma reducida es un VAR(p) que se estima directamente por MCO: y_t = c + A_1 y_{t-1} + ... + A_p y_{t-p} + u_t. Los errores u_t tienen matriz de covarianza Σ que NO es diagonal — las innovaciones est&aacute;n correlacionadas contempor&aacute;neamente. Esto significa que un shock en u_{1t} est&aacute; correlacionado con u_{2t}, imposibilitando identificar shocks estructurales &uacute;nicos.</p>
+     <p><strong>Intuici&oacute;n:</strong> Imagina que correlacionas PIB e inflaci&oacute;n. Un "shock" en la ecuaci&oacute;n del PIB en realidad contiene tanto un shock de oferta como uno de demanda mezclados.</p>
+     <div class="formula">y_t = c + ΣA_i y_{t-i} + u_t, u_t ~ N(0, Σ)</div>
     </div>
     <div class="info-panel">
      <h3>🔧 Forma Estructural</h3>
-     <p>A&#8320;y&#8344; = c̃ + &Sigma;Ã&#8340;y&#8344;&#8340; + &epsilon;&#8344;. Los shocks estructurales &epsilon;&#8344; son ortogonales.</p>
-     <div class="formula">A&#8320;y&#8344; = c̃ + &Sigma;Ã&#8340;y&#8344;&#8340; + &epsilon;&#8344;</div>
+     <p>El SVAR postula que existe una matriz A_0 tal que A_0 y_t = c̃ + ΣÃ_i y_{t-i} + ε_t, donde ε_t son los shocks estructurales con varianza identidad (ortogonales). La relaci&oacute;n clave es: u_t = A_0^{-1} ε_t. Es decir, los errores reducidos son combinaciones lineales de los shocks estructurales. El problema de identificaci&oacute;n es encontrar A_0.</p>
+     <p><strong>Ejemplo real:</strong> La Reserva Federal quiere saber c&oacute;mo responde el PIB a un shock de pol&iacute;tica monetaria. Necesita separar el shock de pol&iacute;tica de los dem&aacute;s shocks que afectan la econom&iacute;a simult&aacute;neamente.</p>
+     <div class="formula">A_0 y_t = c̃ + ΣÃ_i y_{t-i} + ε_t, ε_t ~ N(0, I)</div>
     </div>
     <div class="info-panel">
-     <h3>🔗 Relaci&oacute;n: u = A&#8320;&supmin;&sup1;&epsilon;</h3>
-     <p>Los errores reducidos son combinaci&oacute;n lineal de los shocks estructurales. Necesitamos &Sigma; = A&#8320;&supmin;&sup1;(A&#8320;&supmin;&sup1;)'.</p>
-     <div class="formula">u&#8344; = A&#8320;&supmin;&sup1;&epsilon;&#8344;</div>
+     <h3>🔗 Relaci&oacute;n: u = A_0^{-1} ε</h3>
+     <p>De la relaci&oacute;n u_t = A_0^{-1} ε_t y Var(u_t) = Σ, obtenemos Σ = A_0^{-1} (A_0^{-1})'. Esto nos da n(n+1)/2 ecuaciones (elementos &uacute;nicos de Σ) para n^2 inc&oacute;gnitas (elementos de A_0^{-1}). Necesitamos n(n-1)/2 restricciones adicionales para identificar el sistema.</p>
+     <p><strong>Punto clave:</strong> Sin restricciones, hay infinitas matrices A_0 que producen el mismo Σ. Cholesky es una forma de imponer exactamente n(n-1)/2 restricciones.</p>
+     <div class="formula">Σ = A_0^{-1} (A_0^{-1})'</div>
     </div>
     <div class="info-panel">
-     <h3>📊 Cholesky</h3>
-     <p>Impone A&#8320;&supmin;&sup1; = triangular inferior. Orden recursivo: GDP &rarr; inflaci&oacute;n &rarr; tasa de inter&eacute;s.</p>
-     <div class="formula">P = chol(&Sigma;)</div>
+     <h3>📊 Descomposici&oacute;n de Cholesky</h3>
+     <p>Cholesky impone que A_0^{-1} sea triangular inferior con unos en la diagonal. Esto significa que la primera variable responde solo a su propio shock estructural, la segunda responde al shock de la primera y al suyo propio, etc. El orden importa: ¡cambiar el orden cambia las IRFs!</p>
+     <p><strong>Ejemplo macro:</strong> Orden GDP → Inflaci&oacute;n → Tasa de Inter&eacute;s. Esto refleja que el PIB es lento (no responde contempor&aacute;neamente a shocks financieros), mientras que la tasa es r&aacute;pida (responde a todo de inmediato).</p>
+     <p><strong>Pitfall com&uacute;n:</strong> Muchos investigadores prueban varios ordenamientos hasta obtener IRFs "deseadas". Esto invalida la inferencia — el orden debe basarse en teor&iacute;a econ&oacute;mica, no en resultados.</p>
+     <div class="formula">P = chol(Σ), P'P = Σ</div>
+    </div>
+   </div>
+
+   <div class="example-section">
+    <h3><i class="fas fa-calculator"></i> Ejemplo paso a paso: Identificaci&oacute;n Cholesky con 3 variables macro</h3>
+    <div class="step">
+     <div class="step-num">Paso 1: Estimar el VAR reducido</div>
+     <p>Supongamos que tenemos un VAR(1) con 3 variables: GDP (PIB), INF (inflaci&oacute;n), IR (tasa de inter&eacute;s). Estimamos por MCO y obtenemos la matriz de covarianza de errores Σ = [[1.0, 0.5, 0.3], [0.5, 1.2, 0.4], [0.3, 0.4, 0.8]]. Nota que los errores est&aacute;n correlacionados (elementos fuera de la diagonal no son cero).</p>
+    </div>
+    <div class="step">
+     <div class="step-num">Paso 2: Aplicar descomposici&oacute;n de Cholesky</div>
+     <p>Calculamos P = chol(Σ), lo que nos da una matriz triangular inferior P = [[1.0, 0, 0], [0.5, 0.97, 0], [0.3, 0.26, 0.84]]. Esta P es nuestra A_0^{-1}. La interpretaci&oacute;n: la primera fila dice que el shock estructural del PIB ε_GDP afecta solo al PIB contempor&aacute;neamente. El shock de inflaci&oacute;n ε_INF afecta a GDP (0.5) y a INF (0.97).</p>
+    </div>
+    <div class="step">
+     <div class="step-num">Paso 3: Calcular las IRFs</div>
+     <p>Con A_0^{-1} identificada, podemos calcular c&oacute;mo responde cada variable a un shock de 1 desviaci&oacute;n est&aacute;ndar en cada ε. Por ejemplo, un shock contractivo de pol&iacute;tica monetaria (ε_IR = +1) eleva la tasa contempor&aacute;neamente, y en periodos siguientes el PIB cae y la inflaci&oacute;n baja — el efecto cl&aacute;sico de transmisi&oacute;n monetaria.</p>
+    </div>
+    <div class="step">
+     <div class="step-num">Paso 4: La simulaci&oacute;n interactiva</div>
+     <p>En la simulaci&oacute;n de abajo, puedes cambiar el orden de las 3 variables. Observa que las IRFs cambian — a veces dr&aacute;sticamente. Esto ilustra la sensibilidad del m&eacute;todo al orden recursivo. Un buen econometrista justifica su orden con teor&iacute;a: ¿el PIB responde a la tasa en el mismo trimestre? ¿O la tasa responde al PIB en el mismo mes?</p>
     </div>
    </div>
 
@@ -135,6 +181,15 @@
 
   <div id="feedbackMsg" class="feedback">💡 Experimenta con diferentes ordenamientos y observa la sensibilidad de las IRFs.</div>
 
+  <div class="recap">
+   <h3><i class="fas fa-check-circle"></i> Resumen del m&oacute;dulo</h3>
+   <li>El VAR reducido se estima por MCO pero sus errores est&aacute;n correlacionados (Σ no diagonal). No se pueden interpretar como shocks estructurales.</li>
+   <li>Cholesky impone que A_0^{-1} sea triangular inferior, imponiendo n(n-1)/2 restricciones de ordenamiento recursivo.</li>
+   <li>El orden de las variables debe basarse en teor&iacute;a econ&oacute;mica: de la m&aacute;s ex&oacute;gena (lenta) a la m&aacute;s end&oacute;gena (r&aacute;pida).</li>
+   <li>Las IRFs muestran la respuesta din&aacute;mica de cada variable a un shock estructural de 1 desviaci&oacute;n est&aacute;ndar.</li>
+   <li>La identificaci&oacute;n recursiva es transparente pero restrictiva. M&oacute;dulos siguientes cubren alternativas m&aacute;s flexibles.</li>
+  </div>
+
   <div class="nav-links">
    <a href="01-portal.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
@@ -147,11 +202,11 @@
   const STORAGE_KEY = 'prog_econ_7_02';
   const PROGRESS_KEY = 'prog_econ_7_progress';
   const questions = [
-   { text: "&iquest;Qu&eacute; forma tiene la matriz A&#8320;&supmin;&sup1; en la identificaci&oacute;n de Cholesky?", options: ["Diagonal", "Triangular inferior", "Triangular superior", "Sim&eacute;trica"], correct: 1 },
-   { text: "&iquest;Cu&aacute;ntas restricciones impone Cholesky para identificar n variables?", options: ["n", "n(n-1)/2", "2n", "n&sup2;"], correct: 1 },
-   { text: "En un SVAR con GDP, inflaci&oacute;n y tasa, &iquest;qu&eacute; orden es el m&aacute;s com&uacute;n?", options: ["Tasa &rarr; Inflaci&oacute;n &rarr; GDP", "GDP &rarr; Inflaci&oacute;n &rarr; Tasa", "Inflaci&oacute;n &rarr; Tasa &rarr; GDP", "Cualquier orden es equivalente"], correct: 1 },
-   { text: "&iquest;Qu&eacute; cambia al alterar el orden recursivo de Cholesky?", options: ["La media de los shocks", "La distribuci&oacute;n de las IRFs del shock de pol&iacute;tica monetaria", "La varianza total del sistema", "Nada, es invariante"], correct: 1 },
-   { text: "La IRF muestra:", options: ["La correlaci&oacute;n entre variables", "La respuesta de una variable a un shock estructural en el tiempo", "El valor esperado del sistema", "La varianza del error de pron&oacute;stico"], correct: 1 }
+   { text: "&iquest;Qu&eacute; forma tiene la matriz A_0^{-1} en la identificaci&oacute;n de Cholesky?", options: ["Diagonal", "Triangular inferior", "Triangular superior", "Sim&eacute;trica"], correct: 1, explanation: "Cholesky impone que A_0^{-1} sea triangular inferior (ceros arriba de la diagonal). Esto significa que la primera variable no responde contempor&aacute;neamente a ning&uacute;n shock excepto al propio." },
+   { text: "&iquest;Cu&aacute;ntas restricciones impone Cholesky para identificar n variables?", options: ["n", "n(n-1)/2", "2n", "n^2"], correct: 1, explanation: "Necesitamos n(n-1)/2 restricciones para identificar los n^2 elementos de A_0^{-1}. Cholesky impone exactamente esta cantidad al hacer la matriz triangular inferior con 1s en la diagonal." },
+   { text: "En un SVAR con GDP, inflaci&oacute;n y tasa, &iquest;qu&eacute; orden es el m&aacute;s com&uacute;n?", options: ["Tasa &rarr; Inflaci&oacute;n &rarr; GDP", "GDP &rarr; Inflaci&oacute;n &rarr; Tasa", "Inflaci&oacute;n &rarr; Tasa &rarr; GDP", "Cualquier orden es equivalente"], correct: 1, explanation: "GDP primero (m&aacute;s lento/ex&oacute;geno), luego inflaci&oacute;n, luego tasa (m&aacute;s r&aacute;pida/end&oacute;gena). Esto refleja rigideces nominales: la tasa puede ajustarse inmediatamente, el PIB no." },
+   { text: "&iquest;Qu&eacute; cambia al alterar el orden recursivo de Cholesky?", options: ["La media de los shocks", "La distribuci&oacute;n de las IRFs del shock de pol&iacute;tica monetaria", "La varianza total del sistema", "Nada, es invariante"], correct: 1, explanation: "El orden cambia dr&aacute;sticamente las IRFs. Cada orden produce shocks estructurales diferentes. Por eso la decisi&oacute;n del orden debe basarse en teor&iacute;a, no en conveniencia." },
+   { text: "La IRF muestra:", options: ["La correlaci&oacute;n entre variables", "La respuesta de una variable a un shock estructural en el tiempo", "El valor esperado del sistema", "La varianza del error de pron&oacute;stico"], correct: 1, explanation: "La Funci&oacute;n de Impulso-Respuesta (IRF) traza la respuesta de una variable end&oacute;gena a lo largo del tiempo ante un shock unitario en un error estructural." }
   ];
   let userAnswers = new Array(questions.length).fill(null);
   let quizCompleted = false;
@@ -173,7 +228,7 @@
    container.innerHTML = '';
    questions.forEach((q, idx) => {
     const qDiv = document.createElement('div'); qDiv.classList.add('question');
-    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
+    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div><div class="explanation" id="expl-'+idx+'">'+q.explanation+'</div>';
     const optsDiv = qDiv.querySelector('.options');
     q.options.forEach((opt, optIdx) => {
      const span = document.createElement('div'); span.classList.add('opt');
@@ -195,7 +250,7 @@
 
   function handleSubmit() {
    if (quizCompleted) return;
-   if (userAnswers.some(a => a === null)) { document.getElementById('feedbackMsg').textContent = I18N.t('fb_0'); return; }
+   if (userAnswers.some(a => a === null)) { document.getElementById('feedbackMsg').innerHTML = '\u26A0\ufe0f Responde todas las preguntas primero.'; return; }
    let correct = 0;
    questions.forEach((q, i) => { if (userAnswers[i] === q.correct) correct++; });
    const total = questions.length; const passed = correct >= Math.ceil(total * 0.6);
@@ -206,14 +261,16 @@
      if (oi === questions[idx].correct) o.classList.add('correct');
      else if (oi === userAnswers[idx]) o.classList.add('wrong');
     });
+    const expl = document.getElementById('expl-'+idx);
+    if (expl) expl.style.display = 'block';
    });
    if (passed) {
     quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
     document.getElementById('insigniaArea').classList.remove('hidden');
-    document.getElementById('feedbackMsg').textContent = I18N.t('fb_1') + correct + '/' + total + ' correctas. &iexcl;Dominas el SVAR con Cholesky!';
+    document.getElementById('feedbackMsg').innerHTML = '\uD83C\uDF89 ' + correct + '/' + total + ' correctas. \u00a1Dominas el SVAR con Cholesky!';
     saveProgress(); updateProgress();
    } else {
-    document.getElementById('feedbackMsg').textContent = '❌ ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. &iexcl;Reintenta!';
+    document.getElementById('feedbackMsg').innerHTML = '\u274C ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. \u00a1Reintenta!';
    }
   }
 
@@ -222,8 +279,9 @@
    if (p.includes(STORAGE_KEY)) {
     quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
     document.getElementById('insigniaArea').classList.remove('hidden');
-    document.getElementById('feedbackMsg').textContent = I18N.t('fb_2');
+    document.getElementById('feedbackMsg').innerHTML = '\uD83C\uDFC6 Ya completaste este m\u00f3dulo.';
     document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
+    document.querySelectorAll('.explanation').forEach(e => e.style.display = 'block');
    }
   }
 
@@ -263,21 +321,5 @@
   document.getElementById('simBtn').addEventListener('click', simulateCholesky);
   renderQuestions(); updateBtnState(); restoreProgress(); updateProgress();
  </script>
- <script>
-window.I18N_DATA={
- "fb_0": {
-  "es": "⚠️ Responde todas las preguntas primero.",
-  "en": "⚠️ Answer todas las preguntas primero."
- },
- "fb_1": {
-  "es": "🎉 ",
-  "en": "🎉 "
- },
- "fb_2": {
-  "es": "🏆 Ya completaste este m&oacute;dulo.",
-  "en": "🏆 Ya completaste este m&oacute;dulo."
- }
-};
-</script>
-<script src="../../../assets/js/i18n.js"></script> </body>
+</body>
 </html>

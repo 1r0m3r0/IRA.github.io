@@ -47,6 +47,17 @@
   .insignia i { font-size:2.5rem; color:gold; }
   .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
   .hidden { display:none; }
+  .objectives { background:rgba(239,68,68,0.1); border-radius:1.5rem; padding:1rem 1.5rem; margin:1rem 2rem; border:1px solid rgba(239,68,68,0.3); }
+  .objectives li { color:#b9ccee; font-size:0.9rem; margin:0.4rem 0; list-style-type: none; }
+  .objectives li::before { content:"\ud83c\udfaf "; }
+  .example-section { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #ef4444; margin-bottom:1.5rem; }
+  .example-section .step { background:#0f1a2c; border-radius:1rem; padding:0.8rem 1.2rem; margin:0.6rem 0; border-left:4px solid #ef4444; }
+  .example-section .step .step-num { color:#fca5a5; font-weight:700; font-size:0.85rem; }
+  .example-section .step p { color:#b9ccee; font-size:0.85rem; margin-top:0.3rem; }
+  .explanation { background:#0a1525; border-radius:0.8rem; padding:0.6rem 1rem; margin-top:0.5rem; font-size:0.8rem; color:#fecaca; border-left:3px solid #ef4444; display:none; }
+  .recap { background:rgba(239,68,68,0.08); border-radius:1.5rem; padding:1rem 1.5rem; margin:0 2rem; border:1px dashed rgba(239,68,68,0.4); }
+  .recap h3 { color:#fca5a5; font-size:1rem; margin-bottom:0.5rem; }
+  .recap li { color:#8899bb; font-size:0.8rem; margin:0.3rem 0; }
   .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
   .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
   .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(239,68,68,0.4); }
@@ -76,26 +87,43 @@
   <div class="analogy-card">
    <strong>💡 Pi&eacute;nsalo as&iacute;:</strong> GARCH es como un term&oacute;metro que adem&aacute;s de medir la temperatura, predice cu&aacute;nto va a fluctuar ma&ntilde;ana bas&aacute;ndose en cu&aacute;nto fluctu&oacute; hoy. Si hoy el mercado fue muy vol&aacute;til, GARCH dice "prep&aacute;rate, ma&ntilde;ana probablemente tambi&eacute;n".
   </div>
+
+  <div class="objectives">
+   <strong style="color:#fca5a5;font-size:1rem;">🎯 &iquest;Qu&eacute; aprender&aacute;s en este m&oacute;dulo?</strong>
+   <li>Entender la diferencia entre ARCH y GARCH y por qu&eacute; GARCH es m&aacute;s eficiente</li>
+   <li>Interpretar la condici&oacute;n de estacionariedad α + β &lt; 1</li>
+   <li>Analizar la News Impact Curve y su simetr&iacute;a en GARCH est&aacute;ndar</li>
+   <li>Comprender el concepto de persistencia de la volatilidad (IGARCH)</li>
+  </div>
+
   <div class="main-area">
    <div class="section-title"><i class="fas fa-lightbulb"></i> Modelos de Volatilidad Condicional</div>
    <div class="info-grid">
     <div class="info-panel">
      <h3>📐 ARCH(q)</h3>
-     <p>Engle (1982): σ²ₜ = α₀ + α₁ε²ₜ₋₁ + ... + αₙε²ₜ₋q. La varianza condicional depende de los errores cuadr&aacute;ticos pasados.</p>
+     <p>Engle (1982): σ²ₜ = α₀ + α₁ε²ₜ₋₁ + ... + αₙε²ₜ₋q. La varianza condicional depende de los errores cuadr&aacute;ticos pasados. <strong>Intuici&oacute;n:</strong> ARCH dice que si el shock de ayer (ε²ₜ₋₁) fue grande, la volatilidad de hoy ser&aacute; alta. Es como un medidor de intensidad: si ayer tembl&oacute; fuerte, hoy hay mayor probabilidad de r&eacute;plicas. El problema de ARCH es que necesita muchos rezagos (q grande) para capturar la persistencia de la volatilidad. Por ejemplo, para modelar la volatilidad mensual, necesitar&iacute;amos ARCH(12) o m&aacute;s &mdash; muchos par&aacute;metros. La estimaci&oacute;n por MLE maximiza la funci&oacute;n de verosimilitud asumiendo normalidad condicional.</p>
      <div class="formula">σ²ₜ = α₀ + &sum;αᵢε²ₜ₋ᵢ</div>
     </div>
     <div class="info-panel">
      <h3>📊 GARCH(1,1)</h3>
-     <p>Bollerslev (1986): σ²ₜ = α₀ + α₁ε²ₜ₋₁ + βσ²ₜ₋₁. Añade la varianza pasada como predictor. M&aacute;s parsimonioso que ARCH.</p>
+     <p>Bollerslev (1986): σ²ₜ = α₀ + α₁ε²ₜ₋₁ + βσ²ₜ₋₁. A&ntilde;ade la varianza pasada como predictor. M&aacute;s parsimonioso que ARCH. <strong>Intuici&oacute;n:</strong> GARCH(1,1) solo necesita 3 par&aacute;metros (α₀, α₁, β) para hacer lo que ARCH har&iacute;a con muchos. La clave es que la varianza de ayer (σ²ₜ₋₁) ya contiene toda la historia pasada de shocks. Es como un atajo: en lugar de recordar cada shock individual, recuerdas la "temperatura" general de la volatilidad y la actualizas con cada nuevo shock. En la pr&aacute;ctica, GARCH(1,1) es el modelo m&aacute;s usado en finanzas para riesgo. Se estima por m&aacute;xima verosimilitud y t&iacute;picamente α₁ ~ 0.05-0.15 y β ~ 0.80-0.95.</p>
      <div class="formula">σ²ₜ = ω + αε²ₜ₋₁ + βσ²ₜ₋₁</div>
     </div>
     <div class="info-panel">
      <h3>⚖️ Estacionariedad y Persistencia</h3>
-     <p>GARCH es estacionario en covarianza si α₁ + β < 1. La persistencia es α₁ + β. Si es cercano a 1, los shocks de volatilidad duran mucho (IGARCH).</p>
+     <p>GARCH es estacionario en covarianza si α₁ + β < 1. La persistencia es α₁ + β. Si es cercano a 1, los shocks de volatilidad duran mucho (IGARCH). <strong>Intuici&oacute;n:</strong> La persistencia mide qu&eacute; tan r&aacute;pido la volatilidad vuelve a su media despu&eacute;s de un shock. Si α+β = 0.95, la volatilidad de un shock se reduce a la mitad en aproximadamente 14 d&iacute;as (half-life = ln(0.5)/ln(α+β)). Si α+β = 0.99, el half-life es de ~70 d&iacute;as. Cuando α+β = 1 (IGARCH), el shock nunca desaparece completamente &mdash; la volatilidad tiene memoria infinita. Esto &uacute;ltimo es com&uacute;n en datos financieros de alta frecuencia. La varianza incondicional es σ² = ω / (1 - α - β).</p>
     </div>
     <div class="info-panel">
      <h3>🔔 News Impact Curve</h3>
-     <p>Muestra c&oacute;mo reacciona σ²ₜ a shocks εₜ₋₁. En GARCH sim&eacute;trico, la curva es parab&oacute;lica: shocks positivos y negativos del mismo tama&ntilde;o tienen el mismo efecto.</p>
+     <p>Muestra c&oacute;mo reacciona σ²ₜ a shocks εₜ₋₁. En GARCH sim&eacute;trico, la curva es parab&oacute;lica: shocks positivos y negativos del mismo tama&ntilde;o tienen el mismo efecto. <strong>Intuici&oacute;n:</strong> GARCH(1,1) solo mira el cuadrado del shock ε²ₜ₋₁. Esto significa que una subida del 3% tiene el mismo efecto en la volatilidad futura que una ca&iacute;da del 3%. &iexcl;Pero en los mercados reales, las ca&iacute;das generan m&aacute;s volatilidad! Esta limitaci&oacute;n motiva los modelos asim&eacute;tricos (EGARCH, GJR-GARCH) que veremos en el m&oacute;dulo 5. La NIC se grafica como σ²ₜ = ω + αε²ₜ₋₁ + βσ̄², donde σ̄² es la varianza incondicional (o un valor de referencia).</p>
+    </div>
+    <div class="info-panel">
+     <h3>📏 Distribuci&oacute;n Condicional</h3>
+     <p>Aunque los errores εₜ pueden asumirse normales, en la pr&aacute;ctica se usan distribuciones con colas m&aacute;s pesadas como t-Student o GED. <strong>Intuici&oacute;n:</strong> Incluso despu&eacute;s de modelar la volatilidad con GARCH, los residuos estandarizados zₜ = εₜ/σₜ todav&iacute;a muestran colas pesadas. Esto significa que la distribuci&oacute;n normal condicional no es suficiente. Usar una t-Student con pocos grados de libertad (df ~ 4-8) captura mejor estas colas remanentes. La estimaci&oacute;n por MLE con t-Student solo agrega un par&aacute;metro adicional (los df) pero mejora significativamente el ajuste, especialmente para c&aacute;lculo de VaR.</p>
+    </div>
+    <div class="info-panel">
+     <h3>📈 Pron&oacute;stico con GARCH</h3>
+     <p>El pron&oacute;stico h-pasos adelante de GARCH(1,1) converge a la varianza incondicional. σ²ₜ₊ₕ = σ̄² + (α+β)ʰ⁻¹(σ²ₜ₊₁ - σ̄²). <strong>Intuici&oacute;n:</strong> Para horizontes largos, el mejor pron&oacute;stico de la volatilidad es la varianza incondicional (media a largo plazo). Para horizontes cortos (1-10 d&iacute;as), el pron&oacute;stico depende del nivel actual de volatilidad. Esta propiedad es crucial para el c&aacute;lculo del VaR a diferentes horizontes temporales. El decaimiento exponencial del pron&oacute;stico depende directamente de α+β: a mayor persistencia, m&aacute;s lento el retorno a la media.</p>
     </div>
    </div>
 
@@ -116,6 +144,27 @@
     </div>
    </div>
 
+   <div class="example-section">
+    <div class="section-title"><i class="fas fa-calculator"></i> Ejemplo: C&aacute;lculo manual de GARCH(1,1) para Bitcoin</div>
+    <p style="color:#b9ccee;font-size:0.85rem;margin-bottom:0.8rem;">Estimamos un GARCH(1,1) para retornos diarios de Bitcoin con ω = 0.0001, α = 0.12, β = 0.85.</p>
+    <div class="step">
+     <div class="step-num">Paso 1: Inicializamos</div>
+     <p>Varianza incondicional: σ̄² = ω / (1 - α - β) = 0.0001 / (1 - 0.12 - 0.85) = 0.0001 / 0.03 = 0.00333. Volatilidad incondicional: √0.00333 = 5.77% diario. Asumimos σ²₁ = σ̄² (valor inicial).</p>
+    </div>
+    <div class="step">
+     <div class="step-num">Paso 2: D&iacute;a 1 &mdash; retorno r₁ = +2%</div>
+     <p>ε₁ = 0.02. σ²₁ = 0.00333 (inicial). Para el d&iacute;a 2: σ²₂ = ω + α × ε²₁ + β × σ²₁ = 0.0001 + 0.12 × (0.02)² + 0.85 × 0.00333 = 0.0001 + 0.12 × 0.0004 + 0.00283 = 0.0001 + 0.000048 + 0.00283 = 0.002978. σ₂ = √0.002978 = 5.46%.</p>
+    </div>
+    <div class="step">
+     <div class="step-num">Paso 3: D&iacute;a 2 &mdash; retorno r₂ = -4% (ca&iacute;da grande)</div>
+     <p>ε₂ = -0.04. σ²₃ = 0.0001 + 0.12 × 0.0016 + 0.85 × 0.002978 = 0.0001 + 0.000192 + 0.002531 = 0.002823. σ₃ = √0.002823 = 5.31%. &iexcl;La volatilidad baja un poco! Pero espera: el shock grande (-4%) aumentar&iacute;a la volatilidad en el siguiente paso.</p>
+    </div>
+    <div class="step">
+     <div class="step-num">Paso 4: D&iacute;a 3 &mdash; retorno r₃ = +1%</div>
+     <p>ε₃ = 0.01. σ²₄ = 0.0001 + 0.12 × 0.0001 + 0.85 × 0.002823 = 0.0001 + 0.000012 + 0.002400 = 0.002512. σ₄ = 5.01%. Observa c&oacute;mo la volatilidad "hereda" el efecto del shock del d&iacute;a 2 a trav&eacute;s del t&eacute;rmino βσ²ₜ₋₁. La persistencia es α+β = 0.97, lo que significa que los shocks de volatilidad duran bastante.</p>
+    </div>
+   </div>
+
    <div class="quiz-area">
     <div class="quiz-title"><i class="fas fa-question-circle"></i> Mini Quiz: ARCH/GARCH</div>
     <div id="quizContainer"></div>
@@ -126,6 +175,15 @@
      <p>Has comprendido los modelos ARCH y GARCH univariantes. &iexcl;Excelente!</p>
     </div>
    </div>
+
+   <div class="recap">
+    <h3>📌 Resumen del m&oacute;dulo</h3>
+    <li>ARCH(q) modela la varianza con errores cuadr&aacute;ticos pasados; GARCH a&ntilde;ade la varianza pasada</li>
+    <li>GARCH(1,1) es el modelo est&aacute;ndar: parsimonioso y efectivo con solo 3 par&aacute;metros</li>
+    <li>La estacionariedad requiere α+β &lt; 1; valores cercanos a 1 indican alta persistencia (IGARCH)</li>
+    <li>La News Impact Curve es sim&eacute;trica en GARCH: trata igual shocks positivos y negativos</li>
+    <li>Para colas pesadas residuales, se usa t-Student o GED en lugar de normal condicional</li>
+   </div>
   </div>
 
   <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre ARCH y GARCH.</div>
@@ -135,18 +193,18 @@
    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
    <a href="05-garch-asimetricos.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
   </div>
-  <footer><i class="fas fa-chart-line"></i> Econometr&iacute;a Financiera Aplicada · M&oacute;dulo 4</footer>
+  <footer><i class="fas fa-chart-line"></i> Econometr&iacute;a Financiera Aplicada &middot; M&oacute;dulo 4</footer>
  </div>
 
  <script>
   const STORAGE_KEY = 'prog_econ_8_04';
   const PROGRESS_KEY = 'prog_econ_8_progress';
   const questions = [
-   { text: "&iquest;Qu&eacute; diferencia a GARCH de ARCH?", options: ["GARCH usa menos par&aacute;metros", "GARCH incluye la varianza condicional pasada", "ARCH es m&aacute;s reciente", "No hay diferencia"], correct: 1 },
-   { text: "La condici&oacute;n de estacionariedad en GARCH(1,1) es:", options: ["α₁ + β = 1", "α₁ + β < 1", "α₁ + β > 1", "α₁ < 0"], correct: 1 },
-   { text: "Si α₁ + β ≈ 1, decimos que la volatilidad tiene:", options: ["Baja persistencia", "Alta persistencia (IGARCH)", "No hay volatilidad", "Efecto leverage"], correct: 1 },
-   { text: "La News Impact Curve muestra:", options: ["El efecto de noticias en precios", "C&oacute;mo afectan los shocks pasados a la varianza actual", "La correlaci&oacute;n entre activos", "La distribuci&oacute;n de retornos"], correct: 1 },
-   { text: "Para modelar colas pesadas en GARCH se usa:", options: ["Distribuci&oacute;n normal", "Distribuci&oacute;n t de Student", "Distribuci&oacute;n uniforme", "Distribuci&oacute;n Poisson"], correct: 1 }
+   { text: "\u00bfQu\u00e9 diferencia a GARCH de ARCH?", options: ["GARCH usa menos par\u00e1metros", "GARCH incluye la varianza condicional pasada", "ARCH es m\u00e1s reciente", "No hay diferencia"], correct: 1, explanation: "GARCH(\u00f3 \u03b2\u03c3\u00b2\u209c\u208b\u2081) a\u00f1ade la varianza condicional pasada como predictor, haciendo el modelo m\u00e1s parsimonioso que ARCH, que solo usa errores cuadr\u00e1ticos pasados (\u03b1\u1d62\u03b5\u00b2\u209c\u208b\u1d62)." },
+   { text: "La condici\u00f3n de estacionariedad en GARCH(1,1) es:", options: ["\u03b11 + \u03b2 = 1", "\u03b11 + \u03b2 < 1", "\u03b11 + \u03b2 > 1", "\u03b11 < 0"], correct: 1, explanation: "Para que GARCH(1,1) sea estacionario en covarianza, la suma \u03b11 + \u03b2 debe ser menor que 1. Si la suma es 1, es IGARCH (ra\u00edz unitaria en volatilidad)." },
+   { text: "Si \u03b11 + \u03b2 \u2248 1, decimos que la volatilidad tiene:", options: ["Baja persistencia", "Alta persistencia (IGARCH)", "No hay volatilidad", "Efecto leverage"], correct: 1, explanation: "Cuando \u03b11 + \u03b2 \u2248 1, los shocks de volatilidad tardan mucho en desaparecer (persistencia alta). Si es exactamente 1, es IGARCH: los shocks tienen efecto permanente." },
+   { text: "La News Impact Curve muestra:", options: ["El efecto de noticias en precios", "C\u00f3mo afectan los shocks pasados a la varianza actual", "La correlaci\u00f3n entre activos", "La distribuci\u00f3n de retornos"], correct: 1, explanation: "La News Impact Curve grafica c\u00f3mo la varianza actual (\u03c3\u00b2\u209c) responde a shocks pasados (\u03b5\u209c\u208b\u2081). En GARCH sim\u00e9trico, la curva es parab\u00f3lica e igual para shocks positivos y negativos." },
+   { text: "Para modelar colas pesadas en GARCH se usa:", options: ["Distribuci\u00f3n normal", "Distribuci\u00f3n t de Student", "Distribuci\u00f3n uniforme", "Distribuci\u00f3n Poisson"], correct: 1, explanation: "La distribuci\u00f3n t de Student (o GED) se usa para los errores estandarizados porque incluso despu\u00e9s de modelar la volatilidad, los residuos muestran colas m\u00e1s pesadas que la normal." }
   ];
   let userAnswers = new Array(questions.length).fill(null);
   let quizCompleted = false;
@@ -168,7 +226,7 @@
    container.innerHTML = '';
    questions.forEach((q, idx) => {
     const qDiv = document.createElement('div'); qDiv.classList.add('question');
-    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
+    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div><div class="explanation" id="expl-'+idx+'"></div>';
     const optsDiv = qDiv.querySelector('.options');
     q.options.forEach((opt, optIdx) => {
      const span = document.createElement('div'); span.classList.add('opt');
@@ -201,14 +259,16 @@
      if (oi === questions[idx].correct) o.classList.add('correct');
      else if (oi === userAnswers[idx]) o.classList.add('wrong');
     });
+    const explDiv = qDiv.querySelector('.explanation');
+    if (explDiv) { explDiv.textContent = '\ud83d\udca1 ' + questions[idx].explanation; explDiv.style.display = 'block'; }
    });
    if (passed) {
     quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
     document.getElementById('insigniaArea').classList.remove('hidden');
-    document.getElementById('feedbackMsg').textContent = I18N.t('fb_1') + correct + '/' + total + ' correctas. ¡Dominas GARCH!';
+    document.getElementById('feedbackMsg').textContent = I18N.t('fb_1') + correct + '/' + total + ' correctas. \u00a1Dominas GARCH!';
     saveProgress(); updateProgress();
    } else {
-    document.getElementById('feedbackMsg').textContent = '❌ ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. ¡Reintenta!';
+    document.getElementById('feedbackMsg').textContent = '\u274c ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. \u00a1Reintenta!';
    }
   }
 
@@ -244,17 +304,17 @@
    const persistence = (alpha + beta).toFixed(3);
    const volMean = Math.sqrt(sigma2.reduce((a,b) => a+b, 0) / n);
    let html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:0.5rem;margin-bottom:1rem;">';
-   html += '<div style="background:#1e2a3e;border-radius:0.8rem;padding:0.6rem;text-align:center;border:1px solid #ef4444;"><div style="font-weight:700;color:#fca5a5;">Persistencia</div><div style="font-size:0.8rem;">α+β = '+persistence+'</div></div>';
+   html += '<div style="background:#1e2a3e;border-radius:0.8rem;padding:0.6rem;text-align:center;border:1px solid #ef4444;"><div style="font-weight:700;color:#fca5a5;">Persistencia</div><div style="font-size:0.8rem;">\u03b1+\u03b2 = '+persistence+'</div></div>';
    html += '<div style="background:#1e2a3e;border-radius:0.8rem;padding:0.6rem;text-align:center;border:1px solid #ef4444;"><div style="font-weight:700;color:#fca5a5;">Vol. media</div><div style="font-size:0.8rem;">'+volMean.toFixed(4)+'</div></div>';
    html += '</div>';
-   html += '<div style="background:#0a0f1e;border-radius:1rem;padding:0.8rem;margin-bottom:0.5rem;"><div style="font-size:0.8rem;color:#fca5a5;">Volatilidad condicional (σₜ) vs retornos:</div><div style="display:flex;align-items:flex-end;gap:1px;height:100px;margin-top:0.3rem;">';
+   html += '<div style="background:#0a0f1e;border-radius:1rem;padding:0.8rem;margin-bottom:0.5rem;"><div style="font-size:0.8rem;color:#fca5a5;">Volatilidad condicional (\u03c3\u209c) vs retornos:</div><div style="display:flex;align-items:flex-end;gap:1px;height:100px;margin-top:0.3rem;">';
    const chunk = Math.floor(n / 100);
    for (let i = 0; i < n; i += chunk) {
     const s = Math.sqrt(sigma2[i]);
     const barH = Math.min(100, (s / volMean) * 50);
     html += '<div style="flex:1;background:#ef4444;height:'+barH+'%;border-radius:1px;opacity:0.6;"></div>';
    }
-   html += '</div></div><p style="color:#8899cc;font-size:0.8rem;">GARCH(1,1) simulado con α='+alpha+', β='+beta+'. Persistencia='+persistence+'. Estacionario: '+(alpha+beta < 1 ? 'S&iacute;' : 'No (IGARCH)')+'.</p>';
+   html += '</div></div><p style="color:#8899cc;font-size:0.8rem;">GARCH(1,1) simulado con \u03b1='+alpha+', \u03b2='+beta+'. Persistencia='+persistence+'. Estacionario: '+(alpha+beta < 1 ? 'S\u00ed' : 'No (IGARCH)')+'.</p>';
    document.getElementById('simResult').innerHTML = html;
   }
 
@@ -265,16 +325,16 @@
  <script>
 window.I18N_DATA={
  "fb_0": {
-  "es": "⚠️ Responde todas las preguntas primero.",
-  "en": "⚠️ Answer todas las preguntas primero."
+  "es": "\u26a0\ufe0f Responde todas las preguntas primero.",
+  "en": "\u26a0\ufe0f Responde todas las preguntas primero."
  },
  "fb_1": {
-  "es": "🎉 ",
-  "en": "🎉 "
+  "es": "\ud83c\udf89 ",
+  "en": "\ud83c\udf89 "
  },
  "fb_2": {
-  "es": "🏆 Ya completaste este m&oacute;dulo.",
-  "en": "🏆 Ya completaste este m&oacute;dulo."
+  "es": "\ud83c\udfc6 Ya completaste este m\u00f3dulo.",
+  "en": "\ud83c\udfc6 Ya completaste este m\u00f3dulo."
  }
 };
 </script>

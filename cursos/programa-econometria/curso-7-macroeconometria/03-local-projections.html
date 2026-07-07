@@ -21,6 +21,18 @@
   .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#10b981,#059669); border-radius:20px; transition:width 0.5s ease; }
   .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
   .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #10b981; font-size:1rem; line-height:1.6; }
+  .objectives { background:rgba(16,185,129,0.1); border-radius:1.5rem; padding:1rem 1.5rem; margin:1rem 2rem; border:1px solid rgba(16,185,129,0.3); }
+  .objectives li { color:#b9ccee; font-size:0.9rem; margin:0.4rem 0; list-style-type: none; }
+  .objectives li::before { content:"🎯 "; }
+  .objectives h3 { color:#6ee7b7; font-size:1rem; margin-bottom:0.5rem; }
+  .example-section { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #10b981; margin:1rem 2rem 1.5rem; }
+  .example-section .step { background:#0f1a2c; border-radius:1rem; padding:0.8rem 1.2rem; margin:0.6rem 0; border-left:4px solid #10b981; }
+  .example-section .step .step-num { color:#6ee7b7; font-weight:700; font-size:0.85rem; }
+  .example-section .step p { color:#b9ccee; font-size:0.85rem; margin-top:0.3rem; }
+  .example-section h3 { color:#10b981; font-size:1.1rem; margin-bottom:0.8rem; }
+  .recap { background:rgba(16,185,129,0.08); border-radius:1.5rem; padding:1rem 1.5rem; margin:0 2rem 1.5rem; border:1px dashed rgba(16,185,129,0.4); }
+  .recap h3 { color:#6ee7b7; font-size:1rem; margin-bottom:0.5rem; }
+  .recap li { color:#8899bb; font-size:0.8rem; margin:0.3rem 0; }
   .main-area { padding:1.5rem 2rem; }
   .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#10b981; }
   .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
@@ -40,6 +52,7 @@
   .opt.correct { background:#00cc88; color:#000; }
   .opt.wrong { background:#ff4455; color:#fff; }
   .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #10b981; }
+  .explanation { background:#0a1525; border-radius:0.8rem; padding:0.6rem 1rem; margin-top:0.5rem; font-size:0.8rem; color:#a7f3d0; border-left:3px solid #10b981; display:none; }
   .btn-action { background:linear-gradient(95deg,#10b981,#059669); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin-top:1rem; }
   .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(16,185,129,0.5); }
   .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
@@ -76,28 +89,60 @@
   <div class="analogy-card">
    <strong>💡 Pi&eacute;nsalo as&iacute;:</strong> Local Projections es como preguntarle directamente a alguien c&oacute;mo se siente cada d&iacute;a durante 2 semanas, en vez de construir un modelo de su personalidad y predecir. Cada horizonte h es una regresi&oacute;n separada: directa, sin asumir que el proceso subyacente es correcto.
   </div>
+  <div class="objectives">
+   <h3>🎯 &iquest;Qu&eacute; aprender&aacute;s en este m&oacute;dulo?</h3>
+   <li>Comprender la diferencia fundamental entre LP-IRF (proyecci&oacute;n directa) y VAR-IRF (recursiva a partir del modelo).</li>
+   <li>Implementar la ecuaci&oacute;n de Local Projections: y_{t+h} = &alpha;_h + &beta;_h shock_t + &gamma;_h X_{t-1} + &epsilon;_{t+h}.</li>
+   <li>Entender por qu&eacute; LP es robusta ante mala especificaci&oacute;n del VAR subyacente.</li>
+   <li>Conocer el trade-off: LP tiene mayor varianza pero menor sesgo que VAR-IRF.</li>
+   <li>Interpretar correctamente los errores est&aacute;ndar HAC (Newey-West) en LP.</li>
+  </div>
   <div class="main-area">
    <div class="section-title"><i class="fas fa-flask"></i> Teor&iacute;a de Local Projections</div>
    <div class="info-grid">
     <div class="info-panel">
      <h3>📐 Ecuaci&oacute;n de LP</h3>
-     <p>y&#8344;&#8334;h = &alpha;&#8344; + &beta;&#8344;shock&#8344; + &gamma;&#8344;X&#8344;&#8321; + &epsilon;&#8344;&#8334;h. Se estima una regresi&oacute;n para cada horizonte h = 0,...,H.</p>
-     <div class="formula">y&#8344;&#8334;h = &alpha;&#8344; + &beta;&#8344;shock&#8344; + &gamma;&#8344;X&#8344;&#8321; + &epsilon;&#8344;&#8334;h</div>
+     <p>La idea central de Jord&agrave; (2005) es sorprendentemente simple: para cada horizonte h = 0, 1, ..., H, se estima una regresi&oacute;n por MCO donde la variable dependiente es y_{t+h} (el valor de la variable h periodos adelante) y la independiente principal es el shock identificado en t. Esto significa que el coeficiente &beta;_h ES directamente la IRF en el horizonte h.</p>
+     <p><strong>Intuici&oacute;n:</strong> Si quieres saber el efecto de un shock hoy sobre el PIB dentro de 4 trimestres, simplemente regresionas PIB_{t+4} contra el shock de hoy. No necesitas un modelo de todo el sistema.</p>
+     <div class="formula">y_{t+h} = &alpha;_h + &beta;_h shock_t + &gamma;_h X_{t-1} + &epsilon;_{t+h}</div>
     </div>
     <div class="info-panel">
      <h3>📊 LP-IRF vs VAR-IRF</h3>
-     <p>VAR-IRF usa coeficientes estimados del sistema completo. LP-IRF estima &beta;&#8344; directamente en cada horizonte.</p>
-     <div class="formula">LP: &beta;&#8344; directo | VAR: recursivo</div>
+     <p>El VAR-IRF tradicional funciona as&iacute;: estimas un VAR(p) completo, obtienes los coeficientes A_1, ..., A_p, y luego simulas la respuesta iterativamente. El LP-IRF, en cambio, estima &beta;_h directamente para cada h. La ventaja es que LP no arrastra errores de especificaci&oacute;n de periodo a periodo.</p>
+     <p><strong>Analog&iacute;a:</strong> VAR-IRF es como construir un mapa de la ciudad y luego calcular todas las rutas posibles. LP es como preguntar por direcci&oacute;n en cada esquina. Si el mapa est&aacute; mal, VAR-IRF se equivoca en todas las rutas; LP solo se equivoca en la esquina donde preguntas.</p>
+     <div class="formula">LP: &beta;_h directo en cada h | VAR: acumulaci&oacute;n recursiva</div>
     </div>
     <div class="info-panel">
      <h3>🛡️ Ventajas de LP</h3>
-     <p>Robustez ante mala especificaci&oacute;n del VAR. No necesita estructura recursiva. Errores est&aacute;ndar con HAC. Mejor cobertura en muestras peque&ntilde;as.</p>
-     <div class="formula">Robustez &gt; Eficiencia</div>
+     <p>1. Robustez: si el DGP verdadero es VAR(p) pero el investigador estima VAR(p-1), las IRFs del VAR est&aacute;n sesgadas mientras LP sigue siendo consistente. 2. LP no requiere la estructura recursiva de Cholesky — funciona con cualquier identificaci&oacute;n. 3. Los errores est&aacute;ndar HAC (Newey-West, 1987) son v&aacute;lidos incluso si los errores est&aacute;n correlacionados serialmente. 4. Mejor cobertura en muestras peque&ntilde;as.</p>
+     <p><strong>Ejemplo real:</strong> En la estimaci&oacute;n del efecto de pol&iacute;tica fiscal, LP es el m&eacute;todo preferido porque los VAR pueden estar mal especificados debido a la naturaleza no lineal de los multiplicadores fiscales.</p>
+     <div class="formula">Robustez &gt; Eficiencia cuando el modelo es incierto</div>
     </div>
     <div class="info-panel">
-     <h3>⚠️ Desventajas</h3>
-     <p>Mayor varianza que VAR-IRF si el VAR est&aacute; bien especificado. Errores correlacionados entre horizontes (inferencia conjunta dif&iacute;cil).</p>
-     <div class="formula">Varianza &uarr; si modelo es correcto</div>
+     <h3>⚠️ Desventajas y errores comunes</h3>
+     <p>1. Los errores &epsilon;_{t+h} siguen un proceso MA(h) por construcci&oacute;n (se superponen h periodos), lo que requiere correcci&oacute;n HAC. 2. Mayor varianza que VAR-IRF si el VAR est&aacute; correctamente especificado — pagas un precio por la robustez. 3. Inferencia conjunta entre horizontes es dif&iacute;cil (las IRFs en h=1 y h=2 usan informaci&oacute;n solapada). 4. LP no puede extrapolar m&aacute;s all&aacute; del horizonte m&aacute;ximo H estimado.</p>
+     <p><strong>Pitfall:</strong> Alguien que usa LP con H=4 pero solo tiene T=20 observaciones estar&aacute; estimando con muy pocos grados de libertad en horizontes lejanos.</p>
+     <div class="formula">Varianza(&beta;_h) &uarr; conforme h &uarr;, muestra efectiva &darr;</div>
+    </div>
+   </div>
+
+   <div class="example-section">
+    <h3><i class="fas fa-calculator"></i> Ejemplo paso a paso: LP con datos simulados de PIB e inflaci&oacute;n</h3>
+    <div class="step">
+     <div class="step-num">Paso 1: Sup&oacute;n que identificaste un shock de pol&iacute;tica monetaria</div>
+     <p>Imagina que usaste Cholesky (M&oacute;dulo 2) y obtuviste una serie identificada de shocks de pol&iacute;tica monetaria: &epsilon;_t^MP (una serie de longitud T=100). Ahora quieres ver el efecto sobre el PIB.</p>
+    </div>
+    <div class="step">
+     <div class="step-num">Paso 2: Estimar LP para h=0</div>
+     <p>Regresi&oacute;n: GDP_t = &alpha;_0 + &beta;_0 &epsilon;_t^MP + &gamma;_0 X_{t-1} + error. El coeficiente &beta;_0 es el efecto contempor&aacute;neo inmediato del shock sobre el PIB. Se espera que sea negativo (pol&iacute;tica contractiva reduce PIB).</p>
+    </div>
+    <div class="step">
+     <div class="step-num">Paso 3: Estimar LP para h=1, h=2, ..., h=H</div>
+     <p>Para h=1: GDP_{t+1} = &alpha;_1 + &beta;_1 &epsilon;_t^MP + &gamma;_1 X_{t-1} + error. Nota que ahora usas GDP de 1 trimestre despu&eacute;s. El &beta;_1 muestra el efecto despu&eacute;s de 1 periodo, &beta;_2 despu&eacute;s de 2, etc. Juntos forman la IRF.</p>
+    </div>
+    <div class="step">
+     <div class="step-num">Paso 4: Comparar con VAR-IRF en la simulaci&oacute;n</div>
+     <p>La simulaci&oacute;n de abajo genera datos desde un DGP conocido y compara LP con VAR. Cuando el DGP es simple (VAR(1)), ambos coinciden. Cuando es complejo (VAR(3) + no linealidad), LP captura mejor la verdadera IRF. Observa que LP tiene intervalos m&aacute;s anchos — ese es el costo de la robustez.</p>
     </div>
    </div>
 
@@ -129,6 +174,15 @@
 
   <div id="feedbackMsg" class="feedback">💡 Ajusta la complejidad del DGP y observa cu&aacute;ndo LP supera al VAR.</div>
 
+  <div class="recap">
+   <h3><i class="fas fa-check-circle"></i> Resumen del m&oacute;dulo</h3>
+   <li>Local Projections estima IRFs directamente: una regresi&oacute;n separada para cada horizonte h.</li>
+   <li>La principal ventaja es robustez ante mala especificaci&oacute;n del modelo subyacente.</li>
+   <li>El costo es mayor varianza en las estimaciones, especialmente en horizontes lejanos.</li>
+   <li>Se requieren errores est&aacute;ndar HAC (Newey-West) porque los errores siguen un MA(h).</li>
+   <li>LP es el m&eacute;todo preferido en aplicaciones de pol&iacute;tica fiscal y monetaria donde el DGP es incierto.</li>
+  </div>
+
   <div class="nav-links">
    <a href="02-svar-cholesky.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
@@ -141,11 +195,11 @@
   const STORAGE_KEY = 'prog_econ_7_03';
   const PROGRESS_KEY = 'prog_econ_7_progress';
   const questions = [
-   { text: "&iquest;Qu&eacute; estima Local Projections directamente?", options: ["La matriz de varianzas", "La IRF en cada horizonte h", "Los coeficientes del VAR", "La funci&oacute;n de verosimilitud"], correct: 1 },
-   { text: "&iquest;Cu&aacute;l es la principal ventaja de LP sobre VAR-IRF?", options: ["Menor varianza", "Robustez ante mala especificaci&oacute;n", "No requiere datos", "Siempre es consistente"], correct: 1 },
-   { text: "&iquest;C&oacute;mo se estima cada horizonte en LP?", options: ["Con una regresi&oacute;n separada", "Con un sistema de ecuaciones", "Con MCO en todo el sistema", "Con m&aacute;xima verosimilitud"], correct: 0 },
-   { text: "&iquest;Qu&eacute; tipo de errores est&aacute;ndar se usan t&iacute;picamente en LP?", options: ["Homoced&aacute;sticos", "HAC (Newey-West)", "Bootstrapped", "MCO cl&aacute;sicos"], correct: 1 },
-   { text: "&iquest;Cu&aacute;ndo VAR-IRF supera a LP?", options: ["Siempre", "Cuando el VAR est&aacute; bien especificado", "Nunca", "En muestras grandes siempre"], correct: 1 }
+   { text: "&iquest;Qu&eacute; estima Local Projections directamente?", options: ["La matriz de varianzas", "La IRF en cada horizonte h", "Los coeficientes del VAR", "La funci&oacute;n de verosimilitud"], correct: 1, explanation: "LP estima &beta;_h directamente en cada horizonte h. Ese coeficiente ES la IRF: muestra la respuesta de y_{t+h} al shock en t. No se necesita acumulaci&oacute;n recursiva como en VAR." },
+   { text: "&iquest;Cu&aacute;l es la principal ventaja de LP sobre VAR-IRF?", options: ["Menor varianza", "Robustez ante mala especificaci&oacute;n", "No requiere datos", "Siempre es consistente"], correct: 1, explanation: "Si el VAR est&aacute; mal especificado (rezagos incorrectos, no linealidad), las IRFs del VAR son inconsistentes. LP sigue siendo consistente porque cada horizonte se estima independientemente." },
+   { text: "&iquest;C&oacute;mo se estima cada horizonte en LP?", options: ["Con una regresi&oacute;n separada", "Con un sistema de ecuaciones", "Con MCO en todo el sistema", "Con m&aacute;xima verosimilitud"], correct: 0, explanation: "Cada horizonte h requiere su propia regresi&oacute;n MCO: y_{t+h} sobre shock_t y controles. No hay un sistema de ecuaciones simult&aacute;neas." },
+   { text: "&iquest;Qu&eacute; tipo de errores est&aacute;ndar se usan t&iacute;picamente en LP?", options: ["Homoced&aacute;sticos", "HAC (Newey-West)", "Bootstrapped", "MCO cl&aacute;sicos"], correct: 1, explanation: "Los errores &epsilon;_{t+h} siguen un MA(h) porque hay solapamiento de datos. Newey-West (HAC) corrige la autocorrelaci&oacute;n y heterocedasticidad." },
+   { text: "&iquest;Cu&aacute;ndo VAR-IRF supera a LP?", options: ["Siempre", "Cuando el VAR est&aacute; bien especificado", "Nunca", "En muestras grandes siempre"], correct: 1, explanation: "Si conoces el verdadero DGP y es un VAR(p), entonces VAR-IRF es m&aacute;s eficiente (menor varianza). LP paga un precio por la robustez adicional." }
   ];
   let userAnswers = new Array(questions.length).fill(null);
   let quizCompleted = false;
@@ -167,7 +221,7 @@
    container.innerHTML = '';
    questions.forEach((q, idx) => {
     const qDiv = document.createElement('div'); qDiv.classList.add('question');
-    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
+    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div><div class="explanation" id="expl-'+idx+'">'+q.explanation+'</div>';
     const optsDiv = qDiv.querySelector('.options');
     q.options.forEach((opt, optIdx) => {
      const span = document.createElement('div'); span.classList.add('opt');
@@ -189,7 +243,7 @@
 
   function handleSubmit() {
    if (quizCompleted) return;
-   if (userAnswers.some(a => a === null)) { document.getElementById('feedbackMsg').textContent = I18N.t('fb_0'); return; }
+   if (userAnswers.some(a => a === null)) { document.getElementById('feedbackMsg').innerHTML = '\u26A0\ufe0f Responde todas las preguntas primero.'; return; }
    let correct = 0;
    questions.forEach((q, i) => { if (userAnswers[i] === q.correct) correct++; });
    const total = questions.length; const passed = correct >= Math.ceil(total * 0.6);
@@ -200,14 +254,16 @@
      if (oi === questions[idx].correct) o.classList.add('correct');
      else if (oi === userAnswers[idx]) o.classList.add('wrong');
     });
+    const expl = document.getElementById('expl-'+idx);
+    if (expl) expl.style.display = 'block';
    });
    if (passed) {
     quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
     document.getElementById('insigniaArea').classList.remove('hidden');
-    document.getElementById('feedbackMsg').textContent = I18N.t('fb_1') + correct + '/' + total + ' correctas. &iexcl;Dominas Local Projections!';
+    document.getElementById('feedbackMsg').innerHTML = '\uD83C\uDF89 ' + correct + '/' + total + ' correctas. \u00a1Dominas Local Projections!';
     saveProgress(); updateProgress();
    } else {
-    document.getElementById('feedbackMsg').textContent = '❌ ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. &iexcl;Reintenta!';
+    document.getElementById('feedbackMsg').innerHTML = '\u274C ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. \u00a1Reintenta!';
    }
   }
 
@@ -216,8 +272,9 @@
    if (p.includes(STORAGE_KEY)) {
     quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
     document.getElementById('insigniaArea').classList.remove('hidden');
-    document.getElementById('feedbackMsg').textContent = I18N.t('fb_2');
+    document.getElementById('feedbackMsg').innerHTML = '\uD83C\uDFC6 Ya completaste este m\u00f3dulo.';
     document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
+    document.querySelectorAll('.explanation').forEach(e => e.style.display = 'block');
    }
   }
 
@@ -250,21 +307,5 @@
   document.getElementById('simBtn').addEventListener('click', simulateLP);
   renderQuestions(); updateBtnState(); restoreProgress(); updateProgress();
  </script>
- <script>
-window.I18N_DATA={
- "fb_0": {
-  "es": "⚠️ Responde todas las preguntas primero.",
-  "en": "⚠️ Answer todas las preguntas primero."
- },
- "fb_1": {
-  "es": "🎉 ",
-  "en": "🎉 "
- },
- "fb_2": {
-  "es": "🏆 Ya completaste este m&oacute;dulo.",
-  "en": "🏆 Ya completaste este m&oacute;dulo."
- }
-};
-</script>
-<script src="../../../assets/js/i18n.js"></script> </body>
+</body>
 </html>

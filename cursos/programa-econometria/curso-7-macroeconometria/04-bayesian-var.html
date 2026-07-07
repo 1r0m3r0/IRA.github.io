@@ -21,6 +21,18 @@
   .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#10b981,#059669); border-radius:20px; transition:width 0.5s ease; }
   .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
   .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #10b981; font-size:1rem; line-height:1.6; }
+  .objectives { background:rgba(16,185,129,0.1); border-radius:1.5rem; padding:1rem 1.5rem; margin:1rem 2rem; border:1px solid rgba(16,185,129,0.3); }
+  .objectives li { color:#b9ccee; font-size:0.9rem; margin:0.4rem 0; list-style-type: none; }
+  .objectives li::before { content:"🎯 "; }
+  .objectives h3 { color:#6ee7b7; font-size:1rem; margin-bottom:0.5rem; }
+  .example-section { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #10b981; margin:1rem 2rem 1.5rem; }
+  .example-section .step { background:#0f1a2c; border-radius:1rem; padding:0.8rem 1.2rem; margin:0.6rem 0; border-left:4px solid #10b981; }
+  .example-section .step .step-num { color:#6ee7b7; font-weight:700; font-size:0.85rem; }
+  .example-section .step p { color:#b9ccee; font-size:0.85rem; margin-top:0.3rem; }
+  .example-section h3 { color:#10b981; font-size:1.1rem; margin-bottom:0.8rem; }
+  .recap { background:rgba(16,185,129,0.08); border-radius:1.5rem; padding:1rem 1.5rem; margin:0 2rem 1.5rem; border:1px dashed rgba(16,185,129,0.4); }
+  .recap h3 { color:#6ee7b7; font-size:1rem; margin-bottom:0.5rem; }
+  .recap li { color:#8899bb; font-size:0.8rem; margin:0.3rem 0; }
   .main-area { padding:1.5rem 2rem; }
   .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#10b981; }
   .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
@@ -40,6 +52,7 @@
   .opt.correct { background:#00cc88; color:#000; }
   .opt.wrong { background:#ff4455; color:#fff; }
   .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #10b981; }
+  .explanation { background:#0a1525; border-radius:0.8rem; padding:0.6rem 1rem; margin-top:0.5rem; font-size:0.8rem; color:#a7f3d0; border-left:3px solid #10b981; display:none; }
   .btn-action { background:linear-gradient(95deg,#10b981,#059669); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin-top:1rem; }
   .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(16,185,129,0.5); }
   .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
@@ -76,36 +89,68 @@
   <div class="analogy-card">
    <strong>💡 Pi&eacute;nsalo as&iacute;:</strong> El prior de Minnesota es como empezar un juego de adivinanzas con la corazonada de que la mejor predicci&oacute;n para ma&ntilde;ana es el valor de hoy (random walk). El par&aacute;metro de tightness es cu&aacute;n fuerte es tu corazonada: si es 0.1, conf&iacute;as mucho; si es 0.5, los datos pueden convencerte f&aacute;cilmente.
   </div>
+  <div class="objectives">
+   <h3>🎯 &iquest;Qu&eacute; aprender&aacute;s en este m&oacute;dulo?</h3>
+   <li>Entender por qu&eacute; el VAR cl&aacute;sico funciona mal cuando hay m&aacute;s par&aacute;metros que observaciones.</li>
+   <li>Comprender el prior de Minnesota: media 1 para primer rezago propio, 0 para los dem&aacute;s.</li>
+   <li>Interpretar los hiperpar&aacute;metros &lambda;_1 (tightness global) y &lambda;_2 (decaimiento de rezagos).</li>
+   <li>Distinguir entre priors conjugados (Normal-Wishart) y no conjugados.</li>
+   <li>Usar la verosimilitud marginal para seleccionar el n&uacute;mero de rezagos.</li>
+  </div>
   <div class="main-area">
    <div class="section-title"><i class="fas fa-flask"></i> Prior de Minnesota</div>
    <div class="info-grid">
     <div class="info-panel">
-     <h3>🎯 Media Prior</h3>
-     <p>El primer rezago propio tiene media 1 (random walk). Los dem&aacute;s coeficientes tienen media 0. El intercepto tiene prior difuso.</p>
-     <div class="formula">E[A&#8340;] : 1 en lag1, 0 en resto</div>
+     <h3>🎯 Media Prior y su justificaci&oacute;n</h3>
+     <p>El prior de Minnesota (Litterman, 1986) asume que cada serie sigue un random walk: y_{it} = y_{i,t-1} + u_{it}. Esto implica que el coeficiente del primer rezago propio tiene media 1 y todos los dem&aacute;s coeficientes (incluyendo rezagos de otras variables) tienen media 0. ¿Por qu&eacute; random walk? Porque muchas series macro (PIB, precios) son altamente persistentes.</p>
+     <p><strong>Ejemplo concreto:</strong> Para un BVAR(4) con 3 variables, el prior dice que GDP_t depende principalmente de GDP_{t-1} (coef ~1), y muy poco de GDP_{t-2}, GDP_{t-3}, INF_{t-1}, IR_{t-1}, etc. (coefs ~0).</p>
+     <div class="formula">E[A_l^{ij}] = 1 si i=j, l=1; 0 en otro caso</div>
     </div>
     <div class="info-panel">
-     <h3>🔧 Hiperpar&aacute;metros</h3>
-     <p>&lambda;&#8321; tightness global, &lambda;&#8322; decay de rezagos, &lambda;&#8323; varianza del intercepto. Var(A&#8340;) = (&lambda;&#8321;/l)^2 &middot; (&sigma;&#8340;/&sigma;&#8340;')^2.</p>
-     <div class="formula">&lambda;&#8321; = 0.1 &ndash; 0.5</div>
+     <h3>🔧 Hiperpar&aacute;metros: &lambda;_1, &lambda;_2, &lambda;_3</h3>
+     <p>La varianza del coeficiente A_l^{ij} (efecto de la variable j en la ecuaci&oacute;n i en el rezago l) se parametriza como: Var(A_l^{ij}) = (&lambda;_1 / l^&lambda;_2)^2 * (&sigma;_i/&sigma;_j)^2. &lambda;_1 controla la tightness global (&lt;1 = prior fuerte, &gt;1 = d&eacute;bil). &lambda;_2 controla cu&aacute;nto se encogen los rezagos m&aacute;s lejanos. &lambda;_3 es la varianza del intercepto (prior difuso si &lambda;_3 grande).</p>
+     <p><strong>Pitfall:</strong> Elegir &lambda;_1 demasiado peque&ntilde;o (ej. 0.01) hace que los datos casi no importen. Demasiado grande (ej. 10) elimina el beneficio del prior.</p>
+     <div class="formula">Var(A_l^{ij}) = (&lambda;_1 / l^&lambda;_2)^2 * (&sigma;_i/&sigma;_j)^2</div>
     </div>
     <div class="info-panel">
      <h3>📊 Conjugate Normal-Wishart</h3>
-     <p>Prior conjugado: &Sigma; ~ IW, vec(B) | &Sigma; ~ N(vec(B&#8320;), &Sigma; &otimes; &Omega;&#8320;&supmin;&sup1;). La posterior es anal&iacute;tica.</p>
-     <div class="formula">B|&Sigma;,Y ~ N(B&#8344;,...)</div>
+     <p>Cuando usamos un prior Normal para los coeficientes B (dado Σ) y un prior Inverse Wishart para Σ, la posterior es anal&iacute;tica: Normal para B|Σ,Y y Inverse Wishart para Σ|Y. Esto significa que no necesitamos MCMC — todo se calcula directamente. La media posterior es un promedio ponderado entre el prior y los datos, donde el peso depende de &lambda;_1.</p>
+     <p><strong>Ventaja:</strong> La estimaci&oacute;n de un BVAR con 20 variables y 4 rezagos (160 par&aacute;metros) toma segundos gracias a la conjugaci&oacute;n.</p>
+     <div class="formula">B|Σ,Y ~ N(B_bar, Σ ⊗ &Omega;_T^{-1})</div>
     </div>
     <div class="info-panel">
-     <h3>📏 Marginal Likelihood</h3>
-     <p>La verosimilitud marginal permite seleccionar rezagos y comparar modelos. p(Y) = &int; p(Y|&theta;)p(&theta;)d&theta;.</p>
-     <div class="formula">log p(Y) = ...</div>
+     <h3>📏 Marginal Likelihood y selecci&oacute;n de modelos</h3>
+     <p>La verosimilitud marginal p(Y) = ∫ p(Y|θ)p(θ)dθ es la probabilidad de los datos promediando sobre todos los par&aacute;metros. Con priors conjugados, tiene forma cerrada. Se usa para: (1) seleccionar el n&uacute;mero de rezagos p, (2) elegir entre diferentes especificaciones de prior, (3) comparar BVAR vs VAR cl&aacute;sico. Mayor log-marginal-likelihood = mejor modelo.</p>
+     <p><strong>Ejemplo real:</strong> El Banco Central de Chile usa BVAR con marginal likelihood para elegir entre modelos con 2, 3 o 4 rezagos en su sistema de proyecci&oacute;n de inflaci&oacute;n.</p>
+     <div class="formula">log p(Y) = -T/2 log|Σ_T| + ... (forma cerrada)</div>
+    </div>
+   </div>
+
+   <div class="example-section">
+    <h3><i class="fas fa-calculator"></i> Ejemplo paso a paso: BVAR con tightness &lambda;_1 = 0.2</h3>
+    <div class="step">
+     <div class="step-num">Paso 1: Definir el prior de Minnesota</div>
+     <p>Para un VAR(2) con 2 variables (GDP, INF), el prior tiene 2×2×2 = 8 coeficientes de rezago m&aacute;s 2 interceptos. El prior dice: GDP_{t-1}→GDP_t tiene media 1, GDP_{t-2}→GDP_t tiene media 0, INF_{t-1}→GDP_t tiene media 0, etc. Con &lambda;_1=0.2, las varianzas son peque&ntilde;as: por ejemplo, Var(GDP_{t-1}→GDP_t) = (0.2/1)^2 * (σ_GDP/σ_GDP)^2 = 0.04.</p>
+    </div>
+    <div class="step">
+     <div class="step-num">Paso 2: Combinar con los datos</div>
+     <p>La media posterior B_bar = (Ω_0 + X'X)^{-1} * (Ω_0 B_0 + X'Y), donde Ω_0 es la precisi&oacute;n del prior y X'X la precisi&oacute;n de los datos. Con &lambda;_1=0.2, Ω_0 es grande (prior fuerte), as&iacute; que la posterior se acerca m&aacute;s al prior. Con &lambda;_1=0.5, los datos pesan m&aacute;s.</p>
+    </div>
+    <div class="step">
+     <div class="step-num">Paso 3: Calcular IRFs del BVAR</div>
+     <p>Con la media posterior de los coeficientes, calculamos las IRFs. Las IRFs del BVAR con &lambda;_1 peque&ntilde;o est&aacute;n "encogidas" hacia cero: los efectos de los shocks son m&aacute;s peque&ntilde;os y menos vol&aacute;tiles que en un VAR cl&aacute;sico. Esto es bueno para pron&oacute;stico pero puede subestimar efectos reales.</p>
+    </div>
+    <div class="step">
+     <div class="step-num">Paso 4: Interpretar la simulaci&oacute;n interactiva</div>
+     <p>En la simulaci&oacute;n de abajo, ajusta la tightness y observa dos cosas: (1) las IRFs del BVAR vs VAR cl&aacute;sico, y (2) la distribuci&oacute;n posterior del coeficiente AR(1). Cuando la tightness es baja (0.1), los puntos verdes (posterior) est&aacute;n muy concentrados cerca del prior. Cuando es alta (0.5), se dispersan m&aacute;s.</p>
     </div>
    </div>
 
    <div class="sim-area">
     <div class="section-title"><i class="fas fa-play"></i> Simulaci&oacute;n: BVAR con Minnesota Prior</div>
-    <p style="margin-bottom:0.8rem;color:#b9ccee;">Controla la tightness &lambda;&#8321; y compara las IRFs del BVAR vs VAR cl&aacute;sico. Observa la distribuci&oacute;n posterior de los coeficientes.</p>
+    <p style="margin-bottom:0.8rem;color:#b9ccee;">Controla la tightness &lambda;_1 y compara las IRFs del BVAR vs VAR cl&aacute;sico. Observa la distribuci&oacute;n posterior de los coeficientes.</p>
     <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem;">
-     <label style="color:#b9ccee;">Tightness &lambda;&#8321;: <select id="tightness" style="background:#1e2a3e;color:#fff;border:1px solid #10b981;border-radius:0.5rem;padding:0.3rem 0.6rem;">
+     <label style="color:#b9ccee;">Tightness &lambda;_1: <select id="tightness" style="background:#1e2a3e;color:#fff;border:1px solid #10b981;border-radius:0.5rem;padding:0.3rem 0.6rem;">
       <option value="0.1">0.1 (prior fuerte)</option><option value="0.2">0.2</option><option value="0.3" selected>0.3 (medio)</option><option value="0.5">0.5 (prior d&eacute;bil)</option>
      </select></label>
      <button id="simBtn" class="btn-action" style="margin:0;">🎲 Estimar BVAR</button>
@@ -129,6 +174,15 @@
 
   <div id="feedbackMsg" class="feedback">💡 Ajusta la tightness para ver c&oacute;mo el prior afecta las IRFs estimadas.</div>
 
+  <div class="recap">
+   <h3><i class="fas fa-check-circle"></i> Resumen del m&oacute;dulo</h3>
+   <li>El prior de Minnesota asume random walk: media 1 para el primer rezago propio, 0 para los dem&aacute;s.</li>
+   <li>&lambda;_1 (tightness global) controla cu&aacute;nto pesa el prior vs los datos. &lambda;_2 controla el decaimiento entre rezagos.</li>
+   <li>Con priors conjugados Normal-Wishart, la posterior es anal&iacute;tica y la estimaci&oacute;n es r&aacute;pida.</li>
+   <li>La verosimilitud marginal permite seleccionar el n&uacute;mero &oacute;ptimo de rezagos de forma objetiva.</li>
+   <li>BVAR reduce la varianza de los coeficientes a costa de un posible sesgo, mejorando el pron&oacute;stico en muestras peque&ntilde;as.</li>
+  </div>
+
   <div class="nav-links">
    <a href="03-local-projections.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
@@ -141,11 +195,11 @@
   const STORAGE_KEY = 'prog_econ_7_04';
   const PROGRESS_KEY = 'prog_econ_7_progress';
   const questions = [
-   { text: "&iquest;Cu&aacute;l es la media prior del primer rezago propio en Minnesota?", options: ["0", "0.5", "1", "Sigue un random walk"], correct: 2 },
-   { text: "&iquest;Qu&eacute; controla el hiperpar&aacute;metro &lambda;&#8321;?", options: ["La media del prior", "La tightness global", "El intercepto", "El n&uacute;mero de rezagos"], correct: 1 },
-   { text: "&iquest;Qu&eacute; distribuci&oacute;n se usa como prior conjugado para &Sigma;?", options: ["Normal", "Gamma", "Inverse Wishart", "Beta"], correct: 2 },
-   { text: "La verosimilitud marginal se usa para:", options: ["Estimar coeficientes", "Seleccionar entre modelos", "Calcular errores est&aacute;ndar", "Identificar shocks"], correct: 1 },
-   { text: "&iquest;Qu&eacute; ventaja tiene BVAR sobre VAR cl&aacute;sico en muestras peque&ntilde;as?", options: ["No necesita datos", "Mejor pron&oacute;stico al encoger coeficientes", "Siempre da los mismos resultados", "Es m&aacute;s r&aacute;pido"], correct: 1 }
+   { text: "&iquest;Cu&aacute;l es la media prior del primer rezago propio en Minnesota?", options: ["0", "0.5", "1", "Sigue un random walk"], correct: 2, explanation: "La media es exactamente 1, que corresponde a un random walk. Esto refleja la alta persistencia de las series macroecon&oacute;micas como PIB e inflaci&oacute;n." },
+   { text: "&iquest;Qu&eacute; controla el hiperpar&aacute;metro &lambda;_1?", options: ["La media del prior", "La tightness global", "El intercepto", "El n&uacute;mero de rezagos"], correct: 1, explanation: "&lambda;_1 controla cu&aacute;nto se encogen todos los coeficientes hacia el prior. &lambda;_1 peque&ntilde;o (&lt;0.2) = prior fuerte, &lambda;_1 grande (&gt;0.5) = prior d&eacute;bil." },
+   { text: "&iquest;Qu&eacute; distribuci&oacute;n se usa como prior conjugado para Σ?", options: ["Normal", "Gamma", "Inverse Wishart", "Beta"], correct: 2, explanation: "Inverse Wishart es el prior conjugado para la matriz de covarianza Σ. Es la distribuci&oacute;n multivariada equivalente a la Inverse Gamma para la varianza univariada." },
+   { text: "La verosimilitud marginal se usa para:", options: ["Estimar coeficientes", "Seleccionar entre modelos", "Calcular errores est&aacute;ndar", "Identificar shocks"], correct: 1, explanation: "La verosimilitud marginal p(Y) permite comparar modelos: se elige el modelo con mayor log-marginal-likelihood. Se usa para seleccionar rezagos y especificaciones de prior." },
+   { text: "&iquest;Qu&eacute; ventaja tiene BVAR sobre VAR cl&aacute;sico en muestras peque&ntilde;as?", options: ["No necesita datos", "Mejor pron&oacute;stico al encoger coeficientes", "Siempre da los mismos resultados", "Es m&aacute;s r&aacute;pido"], correct: 1, explanation: "BVAR encoge los coeficientes hacia el prior, reduciendo la varianza de estimaci&oacute;n. Esto mejora el pron&oacute;stico fuera de muestra cuando T es peque&ntilde;o relativo al n&uacute;mero de par&aacute;metros." }
   ];
   let userAnswers = new Array(questions.length).fill(null);
   let quizCompleted = false;
@@ -167,7 +221,7 @@
    container.innerHTML = '';
    questions.forEach((q, idx) => {
     const qDiv = document.createElement('div'); qDiv.classList.add('question');
-    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
+    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div><div class="explanation" id="expl-'+idx+'">'+q.explanation+'</div>';
     const optsDiv = qDiv.querySelector('.options');
     q.options.forEach((opt, optIdx) => {
      const span = document.createElement('div'); span.classList.add('opt');
@@ -189,7 +243,7 @@
 
   function handleSubmit() {
    if (quizCompleted) return;
-   if (userAnswers.some(a => a === null)) { document.getElementById('feedbackMsg').textContent = I18N.t('fb_0'); return; }
+   if (userAnswers.some(a => a === null)) { document.getElementById('feedbackMsg').innerHTML = '\u26A0\ufe0f Responde todas las preguntas primero.'; return; }
    let correct = 0;
    questions.forEach((q, i) => { if (userAnswers[i] === q.correct) correct++; });
    const total = questions.length; const passed = correct >= Math.ceil(total * 0.6);
@@ -200,14 +254,16 @@
      if (oi === questions[idx].correct) o.classList.add('correct');
      else if (oi === userAnswers[idx]) o.classList.add('wrong');
     });
+    const expl = document.getElementById('expl-'+idx);
+    if (expl) expl.style.display = 'block';
    });
    if (passed) {
     quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
     document.getElementById('insigniaArea').classList.remove('hidden');
-    document.getElementById('feedbackMsg').textContent = I18N.t('fb_1') + correct + '/' + total + ' correctas. &iexcl;Dominas el BVAR!';
+    document.getElementById('feedbackMsg').innerHTML = '\uD83C\uDF89 ' + correct + '/' + total + ' correctas. \u00a1Dominas el BVAR!';
     saveProgress(); updateProgress();
    } else {
-    document.getElementById('feedbackMsg').textContent = '❌ ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. &iexcl;Reintenta!';
+    document.getElementById('feedbackMsg').innerHTML = '\u274C ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. \u00a1Reintenta!';
    }
   }
 
@@ -216,8 +272,9 @@
    if (p.includes(STORAGE_KEY)) {
     quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
     document.getElementById('insigniaArea').classList.remove('hidden');
-    document.getElementById('feedbackMsg').textContent = I18N.t('fb_2');
+    document.getElementById('feedbackMsg').innerHTML = '\uD83C\uDFC6 Ya completaste este m\u00f3dulo.';
     document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
+    document.querySelectorAll('.explanation').forEach(e => e.style.display = 'block');
    }
   }
 
@@ -253,21 +310,5 @@
   document.getElementById('simBtn').addEventListener('click', simulateBVAR);
   renderQuestions(); updateBtnState(); restoreProgress(); updateProgress();
  </script>
- <script>
-window.I18N_DATA={
- "fb_0": {
-  "es": "⚠️ Responde todas las preguntas primero.",
-  "en": "⚠️ Answer todas las preguntas primero."
- },
- "fb_1": {
-  "es": "🎉 ",
-  "en": "🎉 "
- },
- "fb_2": {
-  "es": "🏆 Ya completaste este m&oacute;dulo.",
-  "en": "🏆 Ya completaste este m&oacute;dulo."
- }
-};
-</script>
-<script src="../../../assets/js/i18n.js"></script> </body>
+</body>
 </html>

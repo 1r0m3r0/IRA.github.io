@@ -21,13 +21,20 @@
   .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#f97316,#ea580c); border-radius:20px; transition:width 0.5s ease; }
   .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
   .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #f97316; font-size:1rem; line-height:1.6; }
+  .objectives { background:rgba(249,115,22,0.1); border-radius:1.5rem; padding:1rem 1.5rem; margin:1rem 2rem; border:1px solid rgba(249,115,22,0.3); }
+  .objectives li { color:#b9ccee; font-size:0.9rem; margin:0.4rem 0; list-style-type: none; }
+  .objectives li::before { content:"🎯 "; }
   .main-area { padding:1.5rem 2rem; }
   .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#f97316; }
   .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
   .info-panel { background:rgba(10,20,40,0.7); border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
   .info-panel h3 { color:#fdba74; font-size:1rem; margin-bottom:0.5rem; }
-  .info-panel p { font-size:0.85rem; color:#b9ccee; line-height:1.6; }
+  .info-panel p { font-size:0.85rem; color:#b9ccee; line-height:1.6; margin-bottom:0.5rem; }
   .info-panel .formula { background:#0a0f1e; padding:0.5rem; border-radius:0.8rem; text-align:center; font-family:monospace; font-size:0.9rem; color:#fdba74; margin-top:0.5rem; }
+  .example-section { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #f97316; margin-bottom:1.5rem; }
+  .example-section .step { background:#0f1a2c; border-radius:1rem; padding:0.8rem 1.2rem; margin:0.6rem 0; border-left:4px solid #f97316; }
+  .example-section .step .step-num { color:#fdba74; font-weight:700; font-size:0.85rem; }
+  .example-section .step p { color:#b9ccee; font-size:0.85rem; margin-top:0.3rem; }
   .sim-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #f97316; margin-bottom:1.5rem; }
   .quiz-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #f97316; margin-bottom:1.5rem; }
   .quiz-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#f97316; }
@@ -39,7 +46,11 @@
   .opt.selected { background:#f97316; color:#000; font-weight:bold; box-shadow:0 0 8px #f97316; }
   .opt.correct { background:#00cc88; color:#000; }
   .opt.wrong { background:#ff4455; color:#fff; }
+  .explanation { background:#0a1525; border-radius:0.8rem; padding:0.6rem 1rem; margin-top:0.5rem; font-size:0.8rem; color:#fed7aa; border-left:3px solid #f97316; display:none; }
   .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #f97316; }
+  .recap { background:rgba(249,115,22,0.08); border-radius:1.5rem; padding:1rem 1.5rem; margin:0 2rem; border:1px dashed rgba(249,115,22,0.4); }
+  .recap h3 { color:#fdba74; font-size:1rem; margin-bottom:0.5rem; }
+  .recap li { color:#8899bb; font-size:0.8rem; margin:0.3rem 0; }
   .btn-action { background:linear-gradient(95deg,#f97316,#ea580c); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin-top:1rem; }
   .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(249,115,22,0.5); }
   .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
@@ -76,28 +87,85 @@
   <div class="analogy-card">
    <strong>💡 Pi&eacute;nsalo as&iacute;:</strong> Random Forest es como un comit&eacute; de expertos donde cada uno vota y el promedio es mejor que cualquier experto individual. Boosting es como un estudiante que aprende de sus errores: cada nuevo modelo se enfoca en lo que los anteriores fallaron. XGBoost es la versi&oacute;n turbo de ese estudiante.
   </div>
+  <div class="objectives">
+   <ul>
+    <li>Entender c&oacute;mo bagging reduce la varianza promediando muchos &aacute;rboles</li>
+    <li>Diferenciar Random Forest (paralelo) de Gradient Boosting (secuencial)</li>
+    <li>Interpretar la importancia de variables y gr&aacute;ficas de dependencia parcial</li>
+    <li>Saber cu&aacute;ndo usar RF vs XGBoost seg&uacute;n el problema y los datos</li>
+   </ul>
+  </div>
   <div class="main-area">
    <div class="section-title"><i class="fas fa-graduation-cap"></i> Teor&iacute;a: RF, Boosting, XGBoost</div>
    <div class="info-grid">
     <div class="info-panel">
      <h3>Bagging y Random Forest</h3>
-     <p>Bagging: bootstrap + &aacute;rbol. RF: bagging + muestreo aleatorio de variables en cada split. Reduce varianza sin aumentar sesgo.</p>
+     <p><strong>Intuici&oacute;n:</strong> Bagging (Bootstrap Aggregating) crea muchos &aacute;rboles con muestras bootstrap de los datos y promedia sus predicciones. Random Forest a&ntilde;ade una capa extra: en cada split del &aacute;rbol, solo se considera un subconjunto aleatorio de variables. Esto "desc correlaciona" los &aacute;rboles, haciendo que el promedio sea a&uacute;n m&aacute;s efectivo.</p>
+     <p><strong>F&oacute;rmula explicada:</strong> f̂_bag(x) = (1/B) Σ f̂_b(x). B es el n&uacute;mero de &aacute;rboles. Cada f̂_b se entrena en una muestra bootstrap distinta. En RF, cada split solo considera m &lt; p variables. Esto reduce la correlaci&oacute;n entre &aacute;rboles, y como Var(promedio) = σ²/B + (1 - 1/B)ρσ², reducir ρ (correlaci&oacute;n) reduce la varianza.</p>
+     <p><strong>Caso real:</strong> Para predecir si un cliente pagar&aacute; un pr&eacute;stamo (s&iacute;/no) con 30 variables del cliente, RF con 500 &aacute;rboles promedia 500 opiniones diversas. Cada &aacute;rbol ve un subconjunto diferente de clientes y variables, lo que estabiliza la predicci&oacute;n.</p>
+     <p><strong>Error com&uacute;n:</strong> Usar demasiados &aacute;rboles sin beneficio adicional. Despu&eacute;s de cierto punto (ej. 500 &aacute;rboles), agregar m&aacute;s no mejora el error pero s&iacute; aumenta el costo computacional.</p>
      <div class="formula">f&#770;<sub>bag</sub>(x) = (1/B) &Sigma; f&#770;<sub>b</sub>(x)</div>
     </div>
     <div class="info-panel">
      <h3>Gradient Boosting</h3>
-     <p>Construye &aacute;rboles secuencialmente, cada uno ajusta los residuos del anterior. Minimiza p&eacute;rdida con gradient descent funcional.</p>
+     <p><strong>Intuici&oacute;n:</strong> A diferencia de RF (que construye &aacute;rboles en paralelo), Gradient Boosting los construye en secuencia. Cada nuevo &aacute;rbol intenta corregir los errores del conjunto anterior. Es como un escultor: primero da forma gruesa, luego refina detalles, y cada paso corrige los defectos del paso anterior.</p>
+     <p><strong>F&oacute;rmula explicada:</strong> f_m(x) = f_{m-1}(x) + η h_m(x). En cada paso m, h_m es un &aacute;rbol peque&ntilde;o (stump) que predice los residuos (errores) del modelo actual. η (learning rate) controla qu&eacute; tan agresivamente se corrigen los errores. η peque&ntilde;o (~0.01-0.1) requiere m&aacute;s &aacute;rboles pero generaliza mejor.</p>
+     <p><strong>Caso real:</strong> Para predecir el precio de acciones, el primer &aacute;rbol captura la tendencia general. El segundo se enfoca en los d&iacute;as donde el primer &aacute;rbol fall&oacute;. El tercero en los errores del segundo, y as&iacute; sucesivamente. El resultado es un modelo muy preciso pero que requiere cuidado para no sobreajustar.</p>
+     <p><strong>Error com&uacute;n:</strong> Usar learning rate alto (ej. &gt;0.5) para llegar r&aacute;pido al m&iacute;nimo. Esto suele sobreajustar. Combinar learning rate bajo con suficientes &aacute;rboles da mejores resultados.</p>
      <div class="formula">f<sub>m</sub>(x) = f<sub>m-1</sub>(x) + &eta; h<sub>m</sub>(x)</div>
     </div>
     <div class="info-panel">
      <h3>XGBoost</h3>
-     <p>Implementaci&oacute;n optimizada de Gradient Boosting con regularizaci&oacute;n L1/L2, poda de &aacute;rboles y manejo de missing values. Altamente eficiente.</p>
+     <p><strong>Intuici&oacute;n:</strong> XGBoost es Gradient Boosting "con esteroides". A&ntilde;ade regularizaci&oacute;n L1/L2 (como Lasso/Ridge), maneja valores perdidos autom&aacute;ticamente, usa poda de &aacute;rboles (tree pruning) y es altamente paralelizable. Fue el algoritmo ganador de muchas competencias de Kaggle.</p>
+     <p><strong>F&oacute;rmula explicada:</strong> Obj = Σ L(yᵢ, f(xᵢ)) + Σ Ω(h_k), donde Ω(h) = γT + (1/2)λ||w||² + α||w||₁. T es el n&uacute;mero de hojas, w son los pesos de las hojas. γ controla la poda (&aacute;rboles m&aacute;s simples), λ y α son regularizaci&oacute;n Ridge y Lasso sobre los pesos.</p>
+     <p><strong>Caso real:</strong> En la competici&oacute;n de Kaggle "House Prices", XGBoost con 1,000 &aacute;rboles, learning rate=0.05 y max_depth=6 gan&oacute; a RF y Gradient Boosting cl&aacute;sico por su capacidad de manejar 80 variables heterog&eacute;neas y valores perdidos.</p>
+     <p><strong>Error com&uacute;n:</strong> No ajustar los hiperpar&aacute;metros de regularizaci&oacute;n (λ, γ, α). XGBoost sin regularizaci&oacute;n es solo Gradient Boosting r&aacute;pido. El poder real est&aacute; en la regularizaci&oacute;n.</p>
      <div class="formula">Obj = &Sigma; L(y<sub>i</sub>, f(x<sub>i</sub>)) + &Sigma; &Omega;(h<sub>k</sub>)</div>
     </div>
     <div class="info-panel">
      <h3>Variable Importance y PDP</h3>
-     <p>Importancia: reducci&oacute;n total de impureza por variable. Partial Dependence: efecto marginal de una variable sobre la predicci&oacute;n promediando sobre las dem&aacute;s.</p>
+     <p><strong>Intuici&oacute;n:</strong> La importancia de variables mide cu&aacute;nto contribuye cada variable a las predicciones del modelo. PDP (Partial Dependence Plot) muestra c&oacute;mo cambia la predicci&oacute;n al variar una variable, manteniendo las dem&aacute;s fijas. Es como preguntar: "si solo cambiara X1, &iquest;c&oacute;mo cambiar&iacute;a la predicci&oacute;n?".</p>
+     <p><strong>F&oacute;rmula explicada:</strong> Importancia = reducci&oacute;n total de impureza (MSE o Gini) atribuible a cada variable, sumada sobre todos los splits de todos los &aacute;rboles. PDP: PDP(xⱼ) = (1/n) Σ f(xⱼ, X_{-j,i}), donde se promedia sobre todas las dem&aacute;s variables de todas las observaciones.</p>
+     <p><strong>Caso real:</strong> En un modelo de riesgo crediticio, la importancia revela que "ingresos" e "historial crediticio" son las variables m&aacute;s importantes. PDP muestra que la probabilidad de default disminuye dr&aacute;sticamente cuando los ingresos superan $30,000.</p>
+     <p><strong>Error com&uacute;n:</strong> Confundir importancia con causalidad. Una variable puede ser importante para predecir Y sin tener un efecto causal sobre Y.</p>
      <div class="formula">PDP(x<sub>j</sub>) = (1/n) &Sigma; f(x<sub>j</sub>, X<sub>-j,i</sub>)</div>
+    </div>
+    <div class="info-panel">
+     <h3>Hiperpar&aacute;metros Clave</h3>
+     <p><strong>Intuici&oacute;n:</strong> Los hiperpar&aacute;metros controlan el balance entre sesgo y varianza. En RF: n_estimators (B), max_depth, min_samples_leaf, max_features. En Boosting: learning_rate (η), n_estimators, max_depth, subsample. La interacci&oacute;n entre ellos es compleja y requiere tuning cuidadoso.</p>
+     <p><strong>F&oacute;rmula explicada:</strong> RF: &aacute;rboles profundos (max_depth grande) tienen bajo sesgo pero alta varianza. Muchos &aacute;rboles (n_estimators grande) reducen la varianza. Boosting: η peque&ntilde;o requiere m&aacute;s &aacute;rboles pero generaliza mejor. max_depth peque&ntilde;o (2-4) fuerza aprendizaje lento y estable.</p>
+     <p><strong>Caso real:</strong> Para un problema con 10,000 observaciones y 50 variables: RF con max_depth=10, n_estimators=500, max_features=√50≈7. Boosting con learning_rate=0.05, n_estimators=1,000, max_depth=3, subsample=0.8.</p>
+     <p><strong>Error com&uacute;n:</strong> Usar valores por defecto sin entender los datos. Por ejemplo, max_features="sqrt" puede no ser &oacute;ptimo si hay muchas variables irrelevantes.</p>
+     <div class="formula">RF: max<sub>features</sub> &asymp; &radic;p &nbsp;|&nbsp; Boosting: &eta; &asymp; 0.01-0.1</div>
+    </div>
+    <div class="info-panel">
+     <h3>RF vs Boosting: Cu&aacute;ndo usar cada uno</h3>
+     <p><strong>Intuici&oacute;n:</strong> RF es mejor para datos con mucho ruido y cuando se necesita un modelo r&aacute;pido y robusto. Boosting (especialmente XGBoost) es mejor cuando se busca la m&aacute;xima precisi&oacute;n posible, aunque sea m&aacute;s sensible a hiperpar&aacute;metros. RF generaliza bien por defecto; Boosting requiere tuning cuidadoso.</p>
+     <p><strong>F&oacute;rmula explicada:</strong> RF: promedio de modelos independientes → reduce varianza. Boosting: suma secuencial de modelos → reduce sesgo. En la pr&aacute;ctica, XGBoost suele superar a RF en competencias, pero RF es m&aacute;s f&aacute;cil de usar sin sobreajustar.</p>
+     <p><strong>Caso real:</strong> Para datos financieros con mucho ruido (alta frecuencia), RF es m&aacute;s estable. Para datos estructurados con se&ntilde;al clara (ej. clasificaci&oacute;n de clientes), XGBoost suele dar la mejor precisi&oacute;n.</p>
+     <p><strong>Error com&uacute;n:</strong> Asumir que m&aacute;s complejidad siempre es mejor. XGBoost puede sobreajustar f&aacute;cilmente si no se regulariza. RF es m&aacute;s tolerante.</p>
+     <div class="formula">RF: robusto, f&aacute;cil &nbsp;|&nbsp; XGBoost: preciso, requiere tuning</div>
+    </div>
+   </div>
+
+   <div class="example-section">
+    <div class="section-title"><i class="fas fa-pen"></i> Ejemplo paso a paso</div>
+    <p style="color:#b9ccee;font-size:0.85rem;margin-bottom:0.8rem;">Comparamos OLS, Random Forest y XGBoost en un DGP no lineal con 5 variables (X1 sinusoidal, X2*X3 interacci&oacute;n, X5 irrelevante).</p>
+    <div class="step">
+     <div class="step-num">Paso 1: OLS asume linealidad. Falla estrepitosamente con la relaci&oacute;n sinusoidal (X1).</div>
+     <p>OLS solo puede capturar l&iacute;neas rectas. La relaci&oacute;n sinusoidal requiere muchos t&eacute;rminos polinomiales, que OLS no tiene por defecto.</p>
+    </div>
+    <div class="step">
+     <div class="step-num">Paso 2: Random Forest construye 50 &aacute;rboles con bootstrap y muestreo de variables. Captura la no linealidad.</div>
+     <p>Cada &aacute;rbol divide recursivamente el espacio. Logra aproximar la funci&oacute;n sinusoidal con m&uacute;ltiples splits en X1. El promedio de 50 &aacute;rboles suaviza la aproximaci&oacute;n.</p>
+    </div>
+    <div class="step">
+     <div class="step-num">Paso 3: XGBoost (Gradient Boosting) construye 30 &aacute;rboles secuenciales, cada uno corrigiendo errores del anterior.</div>
+     <p>XGBoost se enfoca primero en la tendencia general y luego en los detalles finos. Con learning rate=0.1, cada &aacute;rbol hace una correcci&oacute;n peque&ntilde;a, resultando en un modelo preciso.</p>
+    </div>
+    <div class="step">
+     <div class="step-num">Paso 4: Comparamos MSE en test. RF y XGBoost superan a OLS. La importancia de variables refleja el DGP.</div>
+     <p>X1 (sinusoidal) es la m&aacute;s importante, seguida por X2 y X3 (interacci&oacute;n). X4 tiene importancia baja y X5 (irrelevante) casi cero. Esto valida que los m&eacute;todos identifican correctamente qu&eacute; variables importan.</p>
     </div>
    </div>
 
@@ -122,6 +190,17 @@
      <p>Has dominado Random Forest, Boosting y XGBoost. &iexcl;Excelente!</p>
     </div>
    </div>
+
+   <div id="recapSection" class="recap hidden">
+    <h3>📝 Resumen del m&oacute;dulo</h3>
+    <ul>
+     <li>Bagging promedia &aacute;rboles bootstrap; RF adem&aacute;s muestra variables en cada split</li>
+     <li>Boosting es secuencial: cada &aacute;rbol corrige errores del anterior</li>
+     <li>XGBoost = Gradient Boosting + regularizaci&oacute;n + optimizaciones t&eacute;cnicas</li>
+     <li>Importancia de variables muestra contribuci&oacute;n relativa; PDP muestra el efecto marginal</li>
+     <li>RF es robusto y f&aacute;cil; XGBoost es m&aacute;s preciso pero requiere tuning</li>
+    </ul>
+   </div>
   </div>
 
   <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre Random Forest y Boosting.</div>
@@ -138,11 +217,11 @@
   const STORAGE_KEY = 'prog_econ_4_06';
   const PROGRESS_KEY = 'prog_econ_4_progress';
   const questions = [
-   { text: "¿Cuál es la principal diferencia entre bagging y boosting?", options: ["Boosting es secuencial, bagging paralelo", "Bagging usa redes", "Boosting no usa árboles", "Son lo mismo"], correct: 0 },
-   { text: "¿Qué técnica adicional usa Random Forest respecto a bagging?", options: ["Muestreo de variables", "Regularización", "Reducción de dimensionalidad", "Aumento de datos"], correct: 0 },
-   { text: "¿Qué es XGBoost?", options: ["Un tipo de SVM", "Gradient Boosting optimizado", "Random Forest profundo", "Red neuronal"], correct: 1 },
-   { text: "La importancia de variables en RF se mide por:", options: ["Correlación con Y", "Reducción de impureza", "p-valor", "Tamaño del coeficiente"], correct: 1 },
-   { text: "¿Qué hiperparámetro controla la tasa de aprendizaje en Gradient Boosting?", options: ["n_estimators", "learning rate (η)", "max_depth", "subsample"], correct: 1 }
+   { text: "¿Cu&aacute;l es la principal diferencia entre bagging y boosting?", options: ["Boosting es secuencial, bagging paralelo", "Bagging usa redes", "Boosting no usa &aacute;rboles", "Son lo mismo"], correct: 0, explanation: "Boosting construye &aacute;rboles secuencialmente, cada uno corrige los errores del anterior. Bagging construye &aacute;rboles en paralelo (independientes) y promedia. Ambos usan &aacute;rboles." },
+   { text: "¿Qu&eacute; t&eacute;cnica adicional usa Random Forest respecto a bagging?", options: ["Muestreo de variables", "Regularizaci&oacute;n", "Reducci&oacute;n de dimensionalidad", "Aumento de datos"], correct: 0, explanation: "RF a&ntilde;ade muestreo aleatorio de variables en cada split (max_features). Bagging solo usa bootstrap de observaciones. La regularizaci&oacute;n es de XGBoost, no de RF." },
+   { text: "¿Qu&eacute; es XGBoost?", options: ["Un tipo de SVM", "Gradient Boosting optimizado", "Random Forest profundo", "Red neuronal"], correct: 1, explanation: "XGBoost es una implementaci&oacute;n optimizada de Gradient Boosting con regularizaci&oacute;n L1/L2, poda de &aacute;rboles y manejo de valores perdidos. No es SVM, ni RF profundo, ni red neuronal." },
+   { text: "La importancia de variables en RF se mide por:", options: ["Correlaci&oacute;n con Y", "Reducci&oacute;n de impureza", "p-valor", "Tama&ntilde;o del coeficiente"], correct: 1, explanation: "La importancia en RF se mide por la reducci&oacute;n total de impureza (MSE o Gini) atribuible a cada variable en todos los splits de todos los &aacute;rboles. No usa correlaci&oacute;n, p-valores ni coeficientes." },
+   { text: "¿Qu&eacute; hiperpar&aacute;metro controla la tasa de aprendizaje en Gradient Boosting?", options: ["n_estimators", "learning rate (&eta;)", "max_depth", "subsample"], correct: 1, explanation: "El learning rate (&eta;) controla cu&aacute;nto contribuye cada &aacute;rbol al modelo final. &eta; peque&ntilde;o (0.01-0.1) requiere m&aacute;s &aacute;rboles pero generaliza mejor. n_estimators es n&uacute;mero de &aacute;rboles, max_depth es profundidad, subsample es fracci&oacute;n de datos." }
   ];
   let userAnswers = new Array(questions.length).fill(null);
   let quizCompleted = false;
@@ -164,7 +243,7 @@
    container.innerHTML = '';
    questions.forEach((q, idx) => {
     const qDiv = document.createElement('div'); qDiv.classList.add('question');
-    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
+    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div><div class="explanation" id="expl-'+idx+'">'+q.explanation+'</div>';
     const optsDiv = qDiv.querySelector('.options');
     q.options.forEach((opt, optIdx) => {
      const span = document.createElement('div'); span.classList.add('opt');
@@ -197,10 +276,12 @@
      if (oi === questions[idx].correct) o.classList.add('correct');
      else if (oi === userAnswers[idx]) o.classList.add('wrong');
     });
+    document.getElementById('expl-'+idx).style.display = 'block';
    });
    if (passed) {
     quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
     document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('recapSection').classList.remove('hidden');
     document.getElementById('feedbackMsg').textContent = I18N.t('fb_1') + correct + '/' + total + ' correctas. ¡Dominas Ensembles!';
     saveProgress(); updateProgress();
    } else {
@@ -213,6 +294,7 @@
    if (p.includes(STORAGE_KEY)) {
     quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
     document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('recapSection').classList.remove('hidden');
     document.getElementById('feedbackMsg').textContent = I18N.t('fb_2');
     document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
    }

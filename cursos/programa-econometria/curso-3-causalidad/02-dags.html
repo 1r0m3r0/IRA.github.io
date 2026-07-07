@@ -21,6 +21,9 @@
   .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#14b8a6,#0d9488); border-radius:20px; transition:width 0.5s ease; }
   .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
   .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #14b8a6; font-size:1rem; line-height:1.6; }
+  .objectives { background:rgba(20,184,166,0.1); border-radius:1.5rem; padding:1rem 1.5rem; margin:1rem 2rem; border:1px solid rgba(20,184,166,0.3); }
+  .objectives li { color:#b9ccee; font-size:0.9rem; margin:0.4rem 0; list-style-type: none; }
+  .objectives li::before { content:"🎯 "; }
   .main-area { padding:1.5rem 2rem; }
   .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#14b8a6; }
   .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
@@ -39,6 +42,7 @@
   .opt.selected { background:#14b8a6; color:#000; font-weight:bold; box-shadow:0 0 8px #14b8a6; }
   .opt.correct { background:#00cc88; color:#000; }
   .opt.wrong { background:#ff4455; color:#fff; }
+  .explanation { background:#0a1525; border-radius:0.8rem; padding:0.6rem 1rem; margin-top:0.5rem; font-size:0.8rem; color:#99f6e4; border-left:3px solid #14b8a6; display:none; }
   .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #14b8a6; }
   .btn-action { background:linear-gradient(95deg,#14b8a6,#0d9488); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#fff; margin-top:1rem; }
   .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(20,184,166,0.5); }
@@ -47,6 +51,13 @@
   .insignia i { font-size:2.5rem; color:gold; }
   .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
   .hidden { display:none; }
+  .example-section { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #14b8a6; margin-bottom:1.5rem; }
+  .example-section .step { background:#0f1a2c; border-radius:1rem; padding:0.8rem 1.2rem; margin:0.6rem 0; border-left:4px solid #14b8a6; }
+  .example-section .step .step-num { color:#5eead4; font-weight:700; font-size:0.85rem; }
+  .example-section .step p { color:#b9ccee; font-size:0.85rem; margin-top:0.3rem; }
+  .recap { background:rgba(20,184,166,0.08); border-radius:1.5rem; padding:1rem 1.5rem; margin:0 2rem; border:1px dashed rgba(20,184,166,0.4); }
+  .recap h3 { color:#5eead4; font-size:1rem; margin-bottom:0.5rem; }
+  .recap li { color:#8899bb; font-size:0.8rem; margin:0.3rem 0; }
   .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
   .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
   .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(20,184,166,0.4); }
@@ -84,25 +95,37 @@
   <div class="analogy-card">
    <strong>💡 Piénsalo así:</strong> Los DAGs son como mapas de carreteras de la causalidad. Cada flecha es una direcci&oacute;n: X &rarr; Y significa "X causa Y". El back-door criterion es como encontrar una ruta alternativa que evite el tr&aacute;fico de confusores. Un colisionador (X &rarr; M &larr; Y) es como un embudo: condicionar en &eacute;l abre caminos espurios.
   </div>
+  <div class="objectives">
+   <ul>
+    <li>Comprender c&oacute;mo los DAGs representan relaciones causales entre variables.</li>
+    <li>Identificar confusores, mediadores y colisionadores en un grafo causal.</li>
+    <li>Aplicar el back-door criterion para decidir qu&eacute; variables controlar.</li>
+    <li>Entender por qu&eacute; condicionar en un colisionador introduce sesgo (sesgo de Berkson).</li>
+   </ul>
+  </div>
   <div class="main-area">
    <div class="section-title"><i class="fas fa-code-branch"></i> Conceptos de DAGs</div>
    <div class="info-grid">
     <div class="info-panel">
      <h3>🔀 Grafo Ac&iacute;clico Dirigido (DAG)</h3>
-     <p>Representaci&oacute;n gr&aacute;fica de relaciones causales donde las flechas indican direcci&oacute;n de causalidad y no hay ciclos. Cada nodo es una variable.</p>
+     <p>Un DAG es un diagrama donde cada nodo es una variable y cada flecha indica una direcci&oacute;n de causalidad. "Ac&iacute;clico" significa que no puedes seguir las flechas y volver al punto de partida. Los DAGs son la herramienta fundamental de Judea Pearl para pensar en causalidad.</p>
+     <p>Ejemplo: X &rarr; Y significa que X causa Y. Si adem&aacute;s Z &rarr; X y Z &rarr; Y, entonces Z es un confusor. El DAG nos obliga a hacer expl&iacute;citos nuestros supuestos causales.</p>
     </div>
     <div class="info-panel">
      <h3>🚪 Back-Door Criterion</h3>
-     <p>Condiciones para identificar el efecto causal de X en Y: bloquear todos los caminos espurios entre X e Y sin bloquear mediadores ni colisionadores.</p>
+     <p>El back-door criterion nos dice qu&eacute; variables debemos controlar (condicionar) para obtener el efecto causal de X en Y. Un camino back-door es una ruta que va de X a Y con una flecha apuntando hacia X (X &larr; Z &rarr; Y).</p>
+     <p>Para identificar el efecto causal, debemos bloquear (condicionar en) todas las variables que abren caminos back-door, sin bloquear mediadores ni condicionar en colisionadores.</p>
      <div class="formula">P(Y|do(X)) = &sum;z P(Y|X,Z) P(Z)</div>
     </div>
     <div class="info-panel">
      <h3>🧭 Colisionador (Collider)</h3>
-     <p>Nodo M donde dos flechas apuntan hacia &eacute;l (X &rarr; M &larr; Y). Condicionar en un colisionador crea asociaci&oacute;n espuria entre sus padres (sesgo de Berkson).</p>
+     <p>Un colisionador es un nodo M donde dos flechas apuntan hacia &eacute;l (X &rarr; M &larr; Y). Se llama "colisionador" porque las flechas "colisionan" en M. Intuitivamente, M es una variable que es causada tanto por X como por Y.</p>
+     <p>El sesgo de Berkson ocurre cuando condicionamos en un colisionador: esto crea una asociaci&oacute;n espuria entre X e Y, incluso si son completamente independientes. Ejemplo cl&aacute;sico: los actores atractivos parecen menos talentosos (sesgo de selecci&oacute;n muestral).</p>
     </div>
     <div class="info-panel">
      <h3>📐 d-Separaci&oacute;n y do-Calculus</h3>
-     <p>d-separaci&oacute;n determina independencia condicional en un DAG. El do-calculus permite expresar efectos causales en t&eacute;rminos de distribuciones observables.</p>
+     <p>d-separaci&oacute;n (directional separation) determina si dos conjuntos de variables son independientes condicionalmente en un DAG. Si todos los caminos entre X e Y est&aacute;n bloqueados al condicionar en Z, entonces X y Y son independientes dado Z (X &#8741; Y | Z).</p>
+     <p>El do-calculus, desarrollado por Judea Pearl, proporciona reglas para transformar expresiones con el operador do() (intervenci&oacute;n) en expresiones que solo involucran distribuciones observables. Esto permite identificar efectos causales incluso con confusores no observados.</p>
      <div class="formula">do(X = x): intervenci&oacute;n externa</div>
     </div>
    </div>
@@ -111,20 +134,24 @@
    <div class="info-grid">
     <div class="info-panel">
      <h3>🔄 Confounding</h3>
-     <p>Un confusor Z causa tanto X como Y, abriendo un camino back-door. Controlar por Z bloquea el sesgo. Ej: educaci&oacute;n &rarr; ingresos, con habilidad como confusor.</p>
+     <p>Un confusor Z es una variable que causa tanto X como Y, creando una asociaci&oacute;n espuria entre ellas. Por ejemplo, la habilidad innata es un confusor entre educaci&oacute;n e ingresos: las personas m&aacute;s h&aacute;biles obtienen m&aacute;s educaci&oacute;n Y tienen mayores ingresos.</p>
+     <p>Controlar (condicionar) por el confusor bloquea el camino back-door y elimina el sesgo. Esto se hace t&iacute;picamente incluyendo Z en una regresi&oacute;n.</p>
     </div>
     <div class="info-panel">
      <h3>🔗 Mediaci&oacute;n</h3>
-     <p>Un mediador M est&aacute; en la cadena causal X &rarr; M &rarr; Y. Controlar por M bloquea el efecto indirecto y deja solo el efecto directo.</p>
+     <p>Un mediador M est&aacute; en medio de la cadena causal: X &rarr; M &rarr; Y. X causa M, y M causa Y. El efecto total de X en Y se descompone en: efecto directo (X &rarr; Y) + efecto indirecto (X &rarr; M &rarr; Y).</p>
+     <p>Si controlamos por M, bloqueamos el efecto indirecto y solo estimamos el efecto directo. Esto es importante para entender el mecanismo por el cual X afecta Y.</p>
     </div>
     <div class="info-panel">
      <h3>🚪 Front-Door Criterion</h3>
-     <p>Cuando hay confusores no observados, se puede usar un mediador M que no recibe influencia directa del confusor para identificar el efecto causal.</p>
+     <p>El front-door criterion es una alternativa al back-door cuando hay confusores no observados. Se basa en encontrar un mediador M que est&eacute; entre X e Y y que no reciba influencia directa del confusor no observado.</p>
+     <p>Ejemplo: X = fumar, M = alquitr&aacute;n en pulmones, Y = c&aacute;ncer. El confusor "factor gen&eacute;tico" podr&iacute;a ser no observado, pero podemos usar M para identificar el efecto causal.</p>
      <div class="formula">P(Y|do(X)) = &sum;m P(M=m|X) &sum;x P(Y|X=x,M=m) P(X=x)</div>
     </div>
     <div class="info-panel">
      <h3>⚠️ Sesgo por Condicionar</h3>
-     <p>Condicionar en una variable post-tratamiento o en un colisionador puede inducir sesgo. Ej: selecci&oacute;n de muestra basada en outcome (selection bias).</p>
+     <p>Condicionar en la variable equivocada puede introducir sesgo en lugar de eliminarlo. Los casos m&aacute;s comunes son: (1) condicionar en un colisionador (abre caminos espurios), (2) condicionar en un mediador (bloquea el efecto indirecto), (3) condicionar en una variable post-tratamiento.</p>
+     <p>Ejemplo: si condicionamos en n&uacute;mero de visitas al m&eacute;dico (colisionador entre salud y tratamiento), podemos crear una asociaci&oacute;n espuria entre salud y tratamiento.</p>
     </div>
    </div>
 
@@ -158,6 +185,26 @@
     </div>
    </div>
 
+   <div class="example-section">
+    <div class="section-title"><i class="fas fa-calculator"></i> Ejemplo paso a paso: Identificando confusores con DAGs</div>
+    <div class="step">
+     <span class="step-num">Paso 1: Dibujamos el DAG</span>
+     <p>Queremos saber si la educaci&oacute;n universitaria (X) causa mayores ingresos (Y). Sospechamos que la habilidad innata (Z) es un confusor: personas con m&aacute;s habilidad tienden a obtener t&iacute;tulos universitarios Y a ganar m&aacute;s dinero. Dibujamos: Z &rarr; X, Z &rarr; Y, X &rarr; Y.</p>
+    </div>
+    <div class="step">
+     <span class="step-num">Paso 2: Identificamos el camino back-door</span>
+     <p>El camino X &larr; Z &rarr; Y es un camino back-door: va de X a Y con una flecha apuntando hacia X. Si no controlamos Z, la asociaci&oacute;n entre X e Y estar&aacute; contaminada por Z.</p>
+    </div>
+    <div class="step">
+     <span class="step-num">Paso 3: Aplicamos el back-door criterion</span>
+     <p>Para identificar el efecto causal de X en Y, debemos condicionar en Z (la habilidad). Esto bloquea el camino back-door. En la pr&aacute;ctica, incluimos Z como covariable en la regresi&oacute;n. As&iacute;, el coeficiente de X estima el efecto causal de la educaci&oacute;n en los ingresos.</p>
+    </div>
+    <div class="step">
+     <span class="step-num">Paso 4: Verificamos</span>
+     <p>Si Z no estuviera disponible (habilidad no observada), necesitar&iacute;amos otro m&eacute;todo. Una opci&oacute;n ser&iacute;a encontrar un instrumento para X (como la distancia a la universidad). Otra opci&oacute;n ser&iacute;a usar el front-door criterion si hubiera un mediador medible.</p>
+    </div>
+   </div>
+
    <div class="quiz-area">
     <div class="quiz-title"><i class="fas fa-question-circle"></i> Mini Quiz: DAGs y Causalidad</div>
     <div id="quizContainer"></div>
@@ -172,6 +219,16 @@
 
   <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre DAGs, back-door y colisionadores.</div>
 
+  <div class="recap">
+   <h3>📝 Resumen del m&oacute;dulo</h3>
+   <ul>
+    <li>Los DAGs son mapas visuales de supuestos causales: cada flecha indica una direcci&oacute;n de causalidad.</li>
+    <li>El back-door criterion identifica qu&eacute; variables condicionar para eliminar el sesgo por confusores.</li>
+    <li>Condicionar en un colisionador (Berkson) o en un mediador introduce sesgo en lugar de eliminarlo.</li>
+    <li>El do-calculus de Pearl permite expresar efectos causales en t&eacute;rminos de distribuciones observables.</li>
+   </ul>
+  </div>
+
   <div class="nav-links">
    <a href="01-portal.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
@@ -184,11 +241,11 @@
   const STORAGE_KEY = 'prog_econ_3_02';
   const PROGRESS_KEY = 'prog_econ_3_progress';
   const questions = [
-   { text: "¿Qu&eacute; significa que un DAG sea 'ac&iacute;clico'?", options: ["No tiene flechas", "No tiene ciclos dirigidos", "Tiene exactamente un ciclo", "Todas las variables son independientes"], correct: 1 },
-   { text: "¿Qu&eacute; es el back-door criterion?", options: ["Un camino que va de X a Y sin flechas hacia atr&aacute;s", "Un conjunto de variables que bloquea todos los caminos espurios entre X e Y", "La puerta trasera del laboratorio", "Un m&eacute;todo para identificar colisionadores"], correct: 1 },
-   { text: "Condicionar en un colisionador (X → M ← Y) produce:", options: ["Elimina el sesgo", "Crea una asociaci&oacute;n espuria entre X e Y", "No tiene efecto", "Fortalece la relaci&oacute;n causal verdadera"], correct: 1 },
-   { text: "¿Qu&eacute; es un confusor?", options: ["Variable que causa solo el tratamiento", "Variable que causa solo el outcome", "Variable que causa tanto el tratamiento como el outcome", "Variable que no tiene relaci&oacute;n causal"], correct: 2 },
-   { text: "En un DAG X → M → Y, ¿qu&eacute; representa M?", options: ["Un confusor", "Un colisionador", "Un mediador", "Una variable instrumental"], correct: 2 }
+   { text: "¿Qu&eacute; significa que un DAG sea 'ac&iacute;clico'?", options: ["No tiene flechas", "No tiene ciclos dirigidos", "Tiene exactamente un ciclo", "Todas las variables son independientes"], correct: 1, explanation: "'Ac&iacute;clico' significa que no hay bucles: no puedes seguir las flechas y regresar al mismo nodo. Si X &rarr; Y y Y &rarr; X, habr&iacute;a un ciclo y no ser&iacute;a un DAG v&aacute;lido." },
+   { text: "¿Qu&eacute; es el back-door criterion?", options: ["Un camino que va de X a Y sin flechas hacia atr&aacute;s", "Un conjunto de variables que bloquea todos los caminos espurios entre X e Y", "La puerta trasera del laboratorio", "Un m&eacute;todo para identificar colisionadores"], correct: 1, explanation: "El back-door criterion identifica el conjunto de variables Z que bloquea todos los caminos back-door (con flecha hacia X) entre X e Y. Condicionar en Z permite identificar el efecto causal." },
+   { text: "Condicionar en un colisionador (X → M ← Y) produce:", options: ["Elimina el sesgo", "Crea una asociaci&oacute;n espuria entre X e Y", "No tiene efecto", "Fortalece la relaci&oacute;n causal verdadera"], correct: 1, explanation: "Condicionar en un colisionador (sesgo de Berkson) abre un camino espurio entre X e Y, creando una asociaci&oacute;n que no existe. Es como seleccionar una muestra basada en M y luego ver correlaci&oacute;n entre X e Y." },
+   { text: "¿Qu&eacute; es un confusor?", options: ["Variable que causa solo el tratamiento", "Variable que causa solo el outcome", "Variable que causa tanto el tratamiento como el outcome", "Variable que no tiene relaci&oacute;n causal"], correct: 2, explanation: "Un confusor Z causa tanto X como Y. Sin controlar Z, la asociaci&oacute;n entre X e Y es espuria. Ejemplo: la edad confunde la relaci&oacute;n entre consumo de cafe&iacute;na y salud cardiovascular." },
+   { text: "En un DAG X → M → Y, ¿qu&eacute; representa M?", options: ["Un confusor", "Un colisionador", "Un mediador", "Una variable instrumental"], correct: 2, explanation: "M es un mediador: est&aacute; en medio de la cadena causal. X causa M, y M causa Y. Si controlamos por M, bloqueamos el efecto indirecto de X en Y." }
   ];
   let userAnswers = new Array(questions.length).fill(null);
   let quizCompleted = false;
@@ -210,7 +267,7 @@
    container.innerHTML = '';
    questions.forEach((q, idx) => {
     const qDiv = document.createElement('div'); qDiv.classList.add('question');
-    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
+    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div><div class="explanation" id="expl-'+idx+'">'+q.explanation+'</div>';
     const optsDiv = qDiv.querySelector('.options');
     q.options.forEach((opt, optIdx) => {
      const span = document.createElement('div'); span.classList.add('opt');
@@ -243,6 +300,7 @@
      if (oi === questions[idx].correct) o.classList.add('correct');
      else if (oi === userAnswers[idx]) o.classList.add('wrong');
     });
+    document.getElementById('expl-'+idx).style.display = 'block';
    });
    if (passed) {
     quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
@@ -260,6 +318,9 @@
     quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
     document.getElementById('insigniaArea').classList.remove('hidden');
     document.getElementById('feedbackMsg').textContent = I18N.t('fb_2');
+    document.querySelectorAll('.question').forEach((qDiv, idx) => {
+     document.getElementById('expl-'+idx).style.display = 'block';
+    });
     document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
    }
   }

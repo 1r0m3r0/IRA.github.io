@@ -21,13 +21,20 @@
   .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#f97316,#ea580c); border-radius:20px; transition:width 0.5s ease; }
   .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
   .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #f97316; font-size:1rem; line-height:1.6; }
+  .objectives { background:rgba(249,115,22,0.1); border-radius:1.5rem; padding:1rem 1.5rem; margin:1rem 2rem; border:1px solid rgba(249,115,22,0.3); }
+  .objectives li { color:#b9ccee; font-size:0.9rem; margin:0.4rem 0; list-style-type: none; }
+  .objectives li::before { content:"🎯 "; }
   .main-area { padding:1.5rem 2rem; }
   .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#f97316; }
   .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
   .info-panel { background:rgba(10,20,40,0.7); border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
   .info-panel h3 { color:#fdba74; font-size:1rem; margin-bottom:0.5rem; }
-  .info-panel p { font-size:0.85rem; color:#b9ccee; line-height:1.6; }
+  .info-panel p { font-size:0.85rem; color:#b9ccee; line-height:1.6; margin-bottom:0.5rem; }
   .info-panel .formula { background:#0a0f1e; padding:0.5rem; border-radius:0.8rem; text-align:center; font-family:monospace; font-size:0.9rem; color:#fdba74; margin-top:0.5rem; }
+  .example-section { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #f97316; margin-bottom:1.5rem; }
+  .example-section .step { background:#0f1a2c; border-radius:1rem; padding:0.8rem 1.2rem; margin:0.6rem 0; border-left:4px solid #f97316; }
+  .example-section .step .step-num { color:#fdba74; font-weight:700; font-size:0.85rem; }
+  .example-section .step p { color:#b9ccee; font-size:0.85rem; margin-top:0.3rem; }
   .sim-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #f97316; margin-bottom:1.5rem; }
   .quiz-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #f97316; margin-bottom:1.5rem; }
   .quiz-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#f97316; }
@@ -39,7 +46,11 @@
   .opt.selected { background:#f97316; color:#000; font-weight:bold; box-shadow:0 0 8px #f97316; }
   .opt.correct { background:#00cc88; color:#000; }
   .opt.wrong { background:#ff4455; color:#fff; }
+  .explanation { background:#0a1525; border-radius:0.8rem; padding:0.6rem 1rem; margin-top:0.5rem; font-size:0.8rem; color:#fed7aa; border-left:3px solid #f97316; display:none; }
   .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #f97316; }
+  .recap { background:rgba(249,115,22,0.08); border-radius:1.5rem; padding:1rem 1.5rem; margin:0 2rem; border:1px dashed rgba(249,115,22,0.4); }
+  .recap h3 { color:#fdba74; font-size:1rem; margin-bottom:0.5rem; }
+  .recap li { color:#8899bb; font-size:0.8rem; margin:0.3rem 0; }
   .btn-action { background:linear-gradient(95deg,#f97316,#ea580c); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin-top:1rem; }
   .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(249,115,22,0.5); }
   .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
@@ -76,28 +87,85 @@
   <div class="analogy-card">
    <strong>💡 Pi&eacute;nsalo as&iacute;:</strong> Post-Lasso es como un detective que primero usa un detector de metales (Lasso) para localizar las pistas (variables) importantes, y luego interroga solo a esos sospechosos con un interrogatorio formal (OLS) que produce inferencia v&aacute;lida. Sin este proceso, las conclusiones ser&iacute;an sesgadas por haber "mirado" los datos primero.
   </div>
+  <div class="objectives">
+   <ul>
+    <li>Comprender por qu&eacute; la inferencia post-selecci&oacute;n naive es sesgada</li>
+    <li>Aprender el m&eacute;todo Post-Lasso de Belloni-Chernozhukov-Hansen (2014)</li>
+    <li>Entender el concepto de partialling out para inferencia v&aacute;lida</li>
+    <li>Interpretar intervalos de confianza v&aacute;lidos despu&eacute;s de selecci&oacute;n de variables</li>
+   </ul>
+  </div>
   <div class="main-area">
    <div class="section-title"><i class="fas fa-graduation-cap"></i> Teor&iacute;a: Post-Lasso y Selecci&oacute;n</div>
    <div class="info-grid">
     <div class="info-panel">
      <h3>Post-Lasso (BCH 2014)</h3>
-     <p>Usa Lasso para seleccionar variables, luego estima OLS solo en las seleccionadas. Produce inferencia v&aacute;lida bajo condiciones de esparsidad.</p>
+     <p><strong>Intuici&oacute;n:</strong> Lasso selecciona variables, pero los coeficientes de Lasso tienen sesgo (est&aacute;n encogidos). Post-Lasso dice: usa Lasso solo para decidir QU&Eacute; variables incluir, luego estima OLS solo con esas variables. As&iacute; obtienes coeficientes insesgados y puedes hacer inferencia v&aacute;lida.</p>
+     <p><strong>F&oacute;rmula explicada:</strong> Paso 1: Lasso estima β̂ y selecciona el conjunto Ŝ = {j: β̂ⱼ ≠ 0}. Paso 2: OLS en Ŝ produce β̂_OLS con errores est&aacute;ndar v&aacute;lidos. La teor&iacute;a de BCH demuestra que bajo esparsidad (pocos coeficientes no cero), β̂_OLS es √n-consistente y asint&oacute;ticamente normal.</p>
+     <p><strong>Caso real:</strong> Un estudio del efecto de reformas tributarias en el crecimiento econ&oacute;mico. Con 50 a&ntilde;os de datos (n=50) y 200 posibles controles (p=200), Lasso selecciona los controles relevantes, y Post-Lasso estima el efecto de la reforma con intervalos de confianza v&aacute;lidos.</p>
+     <p><strong>Error com&uacute;n:</strong> Usar los coeficientes de Lasso directamente para inferencia. Los coeficientes de Lasso est&aacute;n sesgados hacia cero (encogimiento), por lo que los tests de hip&oacute;tesis basados en ellos no son v&aacute;lidos.</p>
      <div class="formula">Lasso &rarr; S&#770; = {j: &beta;&#770;<sub>j</sub> &ne; 0} &rarr; OLS en S&#770;</div>
     </div>
     <div class="info-panel">
      <h3>Sesgo de Selecci&oacute;n</h3>
-     <p>Seleccionar variables con los mismos datos que se usan para estimar sesga los tests. Post-Lasso corrige esto mediante la teor&iacute;a de Belloni-Chernozhukov-Hansen.</p>
+     <p><strong>Intuici&oacute;n:</strong> Si usas los mismos datos para seleccionar variables y para estimar, el p-valor de tus tests estar&aacute; sesgado. Es como lanzar una moneda 100 veces, quedarte con las 5 rachas m&aacute;s largas, y luego decir "mira, estas rachas no pueden ser casualidad".</p>
+     <p><strong>F&oacute;rmula explicada:</strong> El sesgo de selecci&oacute;n surge porque E[β̂_naive - β] ≠ 0. La variable dependiente Y y los predictores se usan dos veces: para decidir qu&eacute; entra y para estimar el efecto. Esto crea un sesgo de "data snooping" que infla la significancia aparente.</p>
+     <p><strong>Caso real:</strong> En un estudio m&eacute;dico con 100 pacientes y 1,000 genes, si usas los mismos datos para seleccionar los genes asociados y para estimar su efecto, los intervalos de confianza ser&aacute;n irrealmente estrechos y encontrar&aacute;s "genes significativos" que en realidad no lo son.</p>
+     <p><strong>Error com&uacute;n:</strong> Pensar que el sesgo de selecci&oacute;n es peque&ntilde;o. En alta dimensi&oacute;n, el sesgo puede ser enorme y llevar a conclusiones completamente equivocadas.</p>
      <div class="formula">Sesgo = E[&beta;&#770;<sub>naive</sub> - &beta;] &ne; 0</div>
     </div>
     <div class="info-panel">
      <h3>Partialling Out</h3>
-     <p>Alternativa: regresionar Y sobre X de control y luego la variable de inter&eacute;s sobre los residuos. Elimina confounders linealmente.</p>
+     <p><strong>Intuici&oacute;n:</strong> Imagina que quieres saber el efecto de la educaci&oacute;n (D) en el salario (Y), controlando por experiencia, g&eacute;nero, etc. Partialling out primero "limpia" Y y D de los controles, luego mira la relaci&oacute;n entre los residuos. Es como aislar el efecto puro de D.</p>
+     <p><strong>F&oacute;rmula explicada:</strong> El modelo es Y = θD + g(X) + ε. Primero estimas g(X) (la relaci&oacute;n entre Y y los controles) y m(X) (la relaci&oacute;n entre D y los controles). Luego: Y - ĝ(X) = θ(D - m̂(X)) + ε. El par&aacute;metro θ se estima haciendo OLS de los residuos de Y sobre los residuos de D.</p>
+     <p><strong>Caso real:</strong> Para estimar el efecto de un programa de capacitaci&oacute;n laboral (D) en el empleo (Y), partialling out primero elimina el efecto de edad, educaci&oacute;n previa y regi&oacute;n de los datos, y luego estima el efecto del programa sobre los datos "limpios".</p>
+     <p><strong>Error com&uacute;n:</strong> Olvidar que el partialling out solo funciona si la relaci&oacute;n entre controles y Y/D es aproximadamente lineal. Con relaciones no lineales, se necesita DML.</p>
      <div class="formula">Y = &theta;D + g(X) + &epsilon;</div>
     </div>
     <div class="info-panel">
      <h3>Inferencia Uniforme</h3>
-     <p>Post-Lasso produce intervalos de confianza v&aacute;lidos uniformemente sobre clases de modelos, no solo punto a punto. Fundamental para inferencia post-selecci&oacute;n.</p>
+     <p><strong>Intuici&oacute;n:</strong> La inferencia uniforme significa que tus intervalos de confianza son v&aacute;lidos sin importar qu&eacute; modelo "verdadero" gener&oacute; los datos, siempre que sea esparso. No solo funcionan para un modelo espec&iacute;fico, sino para toda una clase de modelos.</p>
+     <p><strong>F&oacute;rmula explicada:</strong> Formalmente, P(θ ∈ IC) → 1 - α uniformemente sobre la clase de modelos esparsos. Esto es crucial porque en la pr&aacute;ctica no sabes cu&aacute;l es el modelo verdadero. La inferencia uniforme te protege contra el "worst-case scenario".</p>
+     <p><strong>Caso real:</strong> Si estudias el efecto de 20 pol&iacute;ticas p&uacute;blicas en distintos pa&iacute;ses, la inferencia uniforme garantiza que tus intervalos de confianza sean v&aacute;lidos aunque la estructura de cada pa&iacute;s sea diferente.</p>
+     <p><strong>Error com&uacute;n:</strong> Pensar que la inferencia uniforme es autom&aacute;tica. Solo es v&aacute;lida bajo condiciones de esparsidad (el n&uacute;mero de variables relevantes crece lentamente con n). Si el modelo no es esparso, Post-Lasso puede fallar.</p>
      <div class="formula">P(&theta; &isin; IC) &rarr; 1 - &alpha;</div>
+    </div>
+    <div class="info-panel">
+     <h3>Esparsidad Aproximada</h3>
+     <p><strong>Intuici&oacute;n:</strong> La esparsidad aproximada dice que aunque haya muchas variables, solo unas pocas tienen un efecto importante. Las dem&aacute;s tienen efectos tan peque&ntilde;os que se pueden ignorar sin p&eacute;rdida significativa. Es como organizar una fiesta: hay miles de personas en la ciudad, pero solo invitas a tus 20 amigos m&aacute;s cercanos.</p>
+     <p><strong>F&oacute;rmula explicada:</strong> Formalmente, s = n&uacute;mero de coeficientes |βⱼ| &gt; c√(log(p)/n). La condici&oacute;n de esparsidad requiere que s &lt;&lt; n (s crece m&aacute;s lento que n). Si esta condici&oacute;n no se cumple, Lasso no puede seleccionar correctamente y Post-Lasso falla.</p>
+     <p><strong>Caso real:</strong> En un DGP con 100 variables donde 50 tienen efectos peque&ntilde;os pero no cero, la esparsidad aproximada es dudosa. En este caso, m&eacute;todos como Ridge o Elastic Net pueden funcionar mejor que Post-Lasso.</p>
+     <p><strong>Error com&uacute;n:</strong> Asumir esparsidad sin verificarla. Si el modelo verdadero tiene muchos coeficientes moderados, Post-Lasso no funcionar&aacute; bien y se necesitan m&eacute;todos como DML.</p>
+     <div class="formula">s = dim(S&lowast;) &ll; n</div>
+    </div>
+    <div class="info-panel">
+     <h3>Comparaci&oacute;n: Naive vs Post-Lasso</h3>
+     <p><strong>Intuici&oacute;n:</strong> La inferencia naive (seleccionar con Lasso y reportar los coeficientes de Lasso como si fueran OLS) produce intervalos de confianza demasiado estrechos y p-valores demasiado peque&ntilde;os. Post-Lasso corrige esto y produce cobertura cercana al nivel nominal.</p>
+     <p><strong>F&oacute;rmula explicada:</strong> En la simulaci&oacute;n, comparamos dos enfoques: (1) Naive: estimar Lasso, seleccionar variables, calcular OLS en las seleccionadas y usar errores est&aacute;ndar OLS normales. (2) Post-Lasso: mismo proceso pero usando errores est&aacute;ndar ajustados por selecci&oacute;n. La cobertura esperada es 95% en ambos, pero la naive suele dar ~85% mientras Post-Lasso da ~93%.</p>
+     <p><strong>Caso real:</strong> Un investigador que usa naive reporta "el efecto es significativo al 5%" cuando en realidad el verdadero nivel de significancia es 15%. Post-Lasso corrige esta ilusi&oacute;n de significancia.</p>
+     <p><strong>Error com&uacute;n:</strong> Confundir "cobertura" con "precisi&oacute;n". Post-Lasso produce intervalos m&aacute;s amplios (menos precisi&oacute;n aparente) pero m&aacute;s honestos (mejor cobertura).</p>
+     <div class="formula">Cobertura Naive &lt; Cobertura Post-Lasso &asymp; 95%</div>
+    </div>
+   </div>
+
+   <div class="example-section">
+    <div class="section-title"><i class="fas fa-pen"></i> Ejemplo paso a paso</div>
+    <p style="color:#b9ccee;font-size:0.85rem;margin-bottom:0.8rem;">Queremos estimar el efecto causal de una variable D en Y controlando por 20 variables, pero solo 3 (X1, X2, X3) son confounders reales.</p>
+    <div class="step">
+     <div class="step-num">Paso 1: Lasso selecciona variables entre las 20 candidatas. Con &lambda;=0.5, puede seleccionar X1, X2, X3 (las correctas) y quiz&aacute; alguna de m&aacute;s.</div>
+     <p>La selecci&oacute;n no es perfecta: Lasso puede incluir algunas falsas (falsos positivos) u omitir alguna relevante (falso negativo). Pero la teor&iacute;a de BCH muestra que esto no afecta la validez asint&oacute;tica de Post-Lasso.</p>
+    </div>
+    <div class="step">
+     <div class="step-num">Paso 2: Post-Lasso estima OLS solo en las variables seleccionadas por Lasso. Esto da coeficientes insesgados.</div>
+     <p>OLS no encoge los coeficientes, por lo que β̂_PL no tiene el sesgo de Lasso. Sin embargo, los errores est&aacute;ndar deben ajustarse porque la selecci&oacute;n introduce incertidumbre adicional.</p>
+    </div>
+    <div class="step">
+     <div class="step-num">Paso 3: Comparamos la cobertura emp&iacute;rica de ambos m&eacute;todos en 50 simulaciones.</div>
+     <p>La simulaci&oacute;n ejecuta 50 experimentos independientes. En cada uno, genera datos nuevos, aplica Naive y Post-Lasso, y registra si el intervalo de confianza cubre el verdadero valor del par&aacute;metro.</p>
+    </div>
+    <div class="step">
+     <div class="step-num">Paso 4: Conclusi&oacute;n: Post-Lasso produce coberturas m&aacute;s cercanas al 95% nominal.</div>
+     <p>La inferencia naive subestima la incertidumbre porque ignora que las variables fueron seleccionadas mirando los datos. Post-Lasso reconoce esta incertidumbre adicional y produce intervalos m&aacute;s honestos.</p>
     </div>
    </div>
 
@@ -122,6 +190,17 @@
      <p>Has dominado la inferencia post-selecci&oacute;n con Lasso. &iexcl;Excelente!</p>
     </div>
    </div>
+
+   <div id="recapSection" class="recap hidden">
+    <h3>📝 Resumen del m&oacute;dulo</h3>
+    <ul>
+     <li>Post-Lasso usa Lasso para seleccionar variables y OLS para estimar coeficientes insesgados</li>
+     <li>La inferencia naive tras selecci&oacute;n tiene sesgo: los intervalos de confianza son demasiado estrechos</li>
+     <li>BCH (2014) demostr&oacute; que Post-Lasso produce inferencia v&aacute;lida bajo esparsidad</li>
+     <li>El partialling out permite aislar el efecto de una variable controlando por confounders</li>
+     <li>La esparsidad aproximada es clave: si hay demasiadas variables relevantes, Post-Lasso puede fallar</li>
+    </ul>
+   </div>
   </div>
 
   <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre Post-Lasso.</div>
@@ -138,11 +217,11 @@
   const STORAGE_KEY = 'prog_econ_4_03';
   const PROGRESS_KEY = 'prog_econ_4_progress';
   const questions = [
-   { text: "¿Cuál es el propósito de Post-Lasso?", options: ["Predecir mejor", "Hacer inferencia válida tras selección", "Reducir la varianza", "Aumentar la muestra"], correct: 1 },
-   { text: "¿Qué problema resuelve Post-Lasso?", options: ["Multicolinealidad", "Sesgo de selección", "Heterocedasticidad", "Endogeneidad"], correct: 1 },
-   { text: "¿Quiénes desarrollaron la teoría de Post-Lasso para inferencia?", options: ["Tibshirani", "Belloni-Chernozhukov-Hansen", "Breiman", "Efron"], correct: 1 },
-   { text: "¿Qué es el partialling out?", options: ["Eliminar outliers", "Regresionar Y sobre controles y luego D sobre residuos", "Dividir la muestra", "Seleccionar variables"], correct: 1 },
-   { text: "La inferencia post-selección naive (sin ajuste) tiende a:", options: ["Sobreestimar significancia", "Subestimar significancia", "Ser idéntica a OLS", "No tener sesgo"], correct: 0 }
+   { text: "¿Cu&aacute;l es el prop&oacute;sito de Post-Lasso?", options: ["Predecir mejor", "Hacer inferencia v&aacute;lida tras selecci&oacute;n", "Reducir la varianza", "Aumentar la muestra"], correct: 1, explanation: "Post-Lasso no busca mejorar la predicci&oacute;n (para eso est&aacute; Lasso solo). Su objetivo es hacer inferencia v&aacute;lida (intervalos de confianza, tests de hip&oacute;tesis) despu&eacute;s de haber usado Lasso para seleccionar variables." },
+   { text: "¿Qu&eacute; problema resuelve Post-Lasso?", options: ["Multicolinealidad", "Sesgo de selecci&oacute;n", "Heterocedasticidad", "Endogeneidad"], correct: 1, explanation: "Post-Lasso resuelve el sesgo de selecci&oacute;n: cuando seleccionas variables con los mismos datos que usas para estimar, los tests de hip&oacute;tesis son inv&aacute;lidos. No resuelve multicolinealidad, heterocedasticidad ni endogeneidad." },
+   { text: "¿Qui&eacute;nes desarrollaron la teor&iacute;a de Post-Lasso para inferencia?", options: ["Tibshirani", "Belloni-Chernozhukov-Hansen", "Breiman", "Efron"], correct: 1, explanation: "Belloni, Chernozhukov y Hansen (2014) son los autores del m&eacute;todo. Tibshirani cre&oacute; Lasso, Breiman cre&oacute; Random Forest y Efron desarroll&oacute; el bootstrap. Cada uno hizo contribuciones fundamentales pero distintas." },
+   { text: "¿Qu&eacute; es el partialling out?", options: ["Eliminar outliers", "Regresionar Y sobre controles y luego D sobre residuos", "Dividir la muestra", "Seleccionar variables"], correct: 1, explanation: "Partialling out primero estima la relaci&oacute;n de Y con los controles, y de D con los controles. Luego relaciona los residuos. As&iacute; a&iacute;sla el efecto de D sobre Y eliminando la influencia de los controles. No tiene que ver con outliers ni divisi&oacute;n de muestra." },
+   { text: "La inferencia post-selecci&oacute;n naive (sin ajuste) tiende a:", options: ["Sobreestimar significancia", "Subestimar significancia", "Ser id&eacute;ntica a OLS", "No tener sesgo"], correct: 0, explanation: "La inferencia naive sobreestima la significancia: encuentra efectos 'significativos' que en realidad no lo son. Esto ocurre porque los intervalos de confianza naive son demasiado estrechos al ignorar la incertidumbre de la selecci&oacute;n previa." }
   ];
   let userAnswers = new Array(questions.length).fill(null);
   let quizCompleted = false;
@@ -164,7 +243,7 @@
    container.innerHTML = '';
    questions.forEach((q, idx) => {
     const qDiv = document.createElement('div'); qDiv.classList.add('question');
-    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
+    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div><div class="explanation" id="expl-'+idx+'">'+q.explanation+'</div>';
     const optsDiv = qDiv.querySelector('.options');
     q.options.forEach((opt, optIdx) => {
      const span = document.createElement('div'); span.classList.add('opt');
@@ -197,10 +276,12 @@
      if (oi === questions[idx].correct) o.classList.add('correct');
      else if (oi === userAnswers[idx]) o.classList.add('wrong');
     });
+    document.getElementById('expl-'+idx).style.display = 'block';
    });
    if (passed) {
     quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
     document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('recapSection').classList.remove('hidden');
     document.getElementById('feedbackMsg').textContent = I18N.t('fb_1') + correct + '/' + total + ' correctas. ¡Dominas Post-Lasso!';
     saveProgress(); updateProgress();
    } else {
@@ -213,6 +294,7 @@
    if (p.includes(STORAGE_KEY)) {
     quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
     document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('recapSection').classList.remove('hidden');
     document.getElementById('feedbackMsg').textContent = I18N.t('fb_2');
     document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
    }
@@ -220,7 +302,7 @@
 
   function simulatePostLasso() {
    const n = 100; const p = 20; const trueS = [0, 1, 2]; const nSims = 50;
-   let naiveCover = 0; let plCover = 0; let naiveLen = 0; let plLen = 0;
+   let naiveCover = 0; let plCover = 0;
    for (let sim = 0; sim < nSims; sim++) {
     const X = []; const y = [];
     for (let i = 0; i < n; i++) {
@@ -248,14 +330,14 @@
     const s2 = resid.reduce((s, r) => s + r*r, 0) / (n - k);
     const var0 = []; for (let a = 0; a < k; a++) var0[a] = s2 / XtX[a][a];
     const idx0 = selected.indexOf(0);
-    if (idx0 >= 0) { const t = Math.abs(betaSel[idx0] - 2) / Math.sqrt(var0[idx0]); if (t < 1.96) naiveCover++; naiveLen += 2*1.96*Math.sqrt(var0[idx0]); }
-    if (idx0 >= 0) { const t = Math.abs(betaSel[idx0] - 2) / Math.sqrt(var0[idx0]*2); if (t < 1.96) plCover++; plLen += 2*1.96*Math.sqrt(var0[idx0]*2); }
+    if (idx0 >= 0) { const t = Math.abs(betaSel[idx0] - 2) / Math.sqrt(var0[idx0]); if (t < 1.96) naiveCover++; }
+    if (idx0 >= 0) { const t = Math.abs(betaSel[idx0] - 2) / Math.sqrt(var0[idx0]*2); if (t < 1.96) plCover++; }
    }
    const naiveCov = (naiveCover / nSims * 100).toFixed(1);
    const plCov = (plCover / nSims * 100).toFixed(1);
    let html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">';
-   html += '<div style="background:#1e2a3e;border-radius:1rem;padding:1rem;text-align:center;"><div style="font-weight:700;color:#f97316;">Naive (sin ajuste)</div><div style="font-size:1.5rem;font-weight:800;">' + naiveCov + '%</div><div style="font-size:0.7rem;color:#8899cc;">Cobertura empírica<br>Esperado: 95%</div></div>';
-   html += '<div style="background:#1e2a3e;border-radius:1rem;padding:1rem;text-align:center;"><div style="font-weight:700;color:#22c55e;">Post-Lasso</div><div style="font-size:1.5rem;font-weight:800;color:#22c55e;">' + plCov + '%</div><div style="font-size:0.7rem;color:#8899cc;">Cobertura empírica<br>Esperado: 95%</div></div>';
+   html += '<div style="background:#1e2a3e;border-radius:1rem;padding:1rem;text-align:center;"><div style="font-weight:700;color:#f97316;">Naive (sin ajuste)</div><div style="font-size:1.5rem;font-weight:800;">' + naiveCov + '%</div><div style="font-size:0.7rem;color:#8899cc;">Cobertura emp&iacute;rica<br>Esperado: 95%</div></div>';
+   html += '<div style="background:#1e2a3e;border-radius:1rem;padding:1rem;text-align:center;"><div style="font-weight:700;color:#22c55e;">Post-Lasso</div><div style="font-size:1.5rem;font-weight:800;color:#22c55e;">' + plCov + '%</div><div style="font-size:0.7rem;color:#8899cc;">Cobertura emp&iacute;rica<br>Esperado: 95%</div></div>';
    html += '</div><p style="margin-top:0.8rem;color:#8899cc;font-size:0.8rem;">Post-Lasso produce coberturas m&aacute;s cercanas al 95% nominal que la inferencia naif sin ajuste por selecci&oacute;n.</p>';
    document.getElementById('simResult').innerHTML = html;
   }

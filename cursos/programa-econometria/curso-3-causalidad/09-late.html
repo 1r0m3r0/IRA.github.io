@@ -3,7 +3,7 @@
 <head>
  <meta charset="UTF-8">
  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
- <title>Causalidad | 🎯 LATE y Heterogeneidad</title>
+ <title>Causalidad | 📐 LATE — Local Average Treatment Effect</title>
  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
  <style>
@@ -21,6 +21,9 @@
   .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#14b8a6,#0d9488); border-radius:20px; transition:width 0.5s ease; }
   .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
   .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #14b8a6; font-size:1rem; line-height:1.6; }
+  .objectives { background:rgba(20,184,166,0.1); border-radius:1.5rem; padding:1rem 1.5rem; margin:1rem 2rem; border:1px solid rgba(20,184,166,0.3); }
+  .objectives li { color:#b9ccee; font-size:0.9rem; margin:0.4rem 0; list-style-type: none; }
+  .objectives li::before { content:"📐 "; }
   .main-area { padding:1.5rem 2rem; }
   .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#14b8a6; }
   .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
@@ -39,6 +42,7 @@
   .opt.selected { background:#14b8a6; color:#000; font-weight:bold; box-shadow:0 0 8px #14b8a6; }
   .opt.correct { background:#00cc88; color:#000; }
   .opt.wrong { background:#ff4455; color:#fff; }
+  .explanation { background:#0a1525; border-radius:0.8rem; padding:0.6rem 1rem; margin-top:0.5rem; font-size:0.8rem; color:#99f6e4; border-left:3px solid #14b8a6; display:none; }
   .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #14b8a6; }
   .btn-action { background:linear-gradient(95deg,#14b8a6,#0d9488); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#fff; margin-top:1rem; }
   .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(20,184,166,0.5); }
@@ -47,6 +51,13 @@
   .insignia i { font-size:2.5rem; color:gold; }
   .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
   .hidden { display:none; }
+  .example-section { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #14b8a6; margin-bottom:1.5rem; }
+  .example-section .step { background:#0f1a2c; border-radius:1rem; padding:0.8rem 1.2rem; margin:0.6rem 0; border-left:4px solid #14b8a6; }
+  .example-section .step .step-num { color:#5eead4; font-weight:700; font-size:0.85rem; }
+  .example-section .step p { color:#b9ccee; font-size:0.85rem; margin-top:0.3rem; }
+  .recap { background:rgba(20,184,166,0.08); border-radius:1.5rem; padding:1rem 1.5rem; margin:0 2rem; border:1px dashed rgba(20,184,166,0.4); }
+  .recap h3 { color:#5eead4; font-size:1rem; margin-bottom:0.5rem; }
+  .recap li { color:#8899bb; font-size:0.8rem; margin:0.3rem 0; }
   .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
   .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
   .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(20,184,166,0.4); }
@@ -64,12 +75,12 @@
  <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Econometr&iacute;a</a></nav>
  <div class="course-container" id="app">
   <div class="hero-header">
-   <h1>🎯 LATE y Heterogeneidad</h1>
-   <p>Compliers, monotonicidad, Wald estimator y Marginal Treatment Effect</p>
+   <h1>📐 LATE — Local Average Treatment Effect</h1>
+   <p>IV, compliers, monotonicidad, Wald estimator, LATE vs ATE</p>
    <div class="badge-area">
-    <span class="chip"><i class="fas fa-bullseye"></i> LATE</span>
+    <span class="chip"><i class="fas fa-tools"></i> IV</span>
     <span class="chip"><i class="fas fa-users"></i> Compliers</span>
-    <span class="chip"><i class="fas fa-wave-square"></i> MTE</span>
+    <span class="chip"><i class="fas fa-chart-line"></i> Wald</span>
    </div>
   </div>
   <div class="progress-section">
@@ -77,55 +88,109 @@
    <span class="progress-text" id="progressText">M&oacute;dulo 9 de 12</span>
   </div>
   <div class="analogy-card">
-   <strong>💡 Piénsalo así:</strong> LATE (Local Average Treatment Effect) es como un experimento donde algunas personas hacen caso y otras no. Si usas una loter&iacute;a para decidir qui&eacute;n recibe un tratamiento, el efecto que mides es solo para los que participar&iacute;an si ganaran la loter&iacute;a pero no si la pierden: los compliers. No sabes nada de los always-takers (participan siempre) ni de los never-takers (nunca participan).
+   <strong>💡 Piénsalo así:</strong> LATE responde: "¿Cu&aacute;l es el efecto del tratamiento para quienes cambian su comportamiento por el instrumento?" No es el ATE promedio general, sino el efecto local en los <em>compliers</em> — los que aceptan el tratamiento cuando se les anima y lo rechazan cuando no.
+  </div>
+  <div class="objectives">
+   <ul>
+    <li>Comprender el Teorema de LATE de Imbens & Angrist (1994) y sus supuestos clave.</li>
+    <li>Distinguir entre always-takers, never-takers, compliers y defiers.</li>
+    <li>Entender el Wald estimator como raz&oacute;n de diferencias de medias.</li>
+    <li>Interpretar la diferencia entre LATE y ATE y cu&aacute;ndo se aproximan.</li>
+   </ul>
   </div>
   <div class="main-area">
-   <div class="section-title"><i class="fas fa-bullseye"></i> Conceptos de LATE</div>
+   <div class="section-title"><i class="fas fa-crosshairs"></i> Conceptos de LATE</div>
    <div class="info-grid">
     <div class="info-panel">
-     <h3>🎯 LATE = E[Y(1)-Y(0)|Complier]</h3>
-     <p>El efecto local promedio en los compliers: unidades cuyo tratamiento cambia con el instrumento. Es el par&aacute;metro identificado por IV.</p>
-     <div class="formula">LATE = E[Y|Z=1] - E[Y|Z=0] / E[T|Z=1] - E[T|Z=0]</div>
+     <h3>📐 Teorema de LATE</h3>
+     <p>Imbens & Angrist (1994) demostraron que bajo los supuestos de selecci&oacute;n en observables y existencia de un instrumento v&aacute;lido, el Wald estimador identifica el LATE: el efecto causal promedio para los compliers.</p>
+     <p>El LATE no es necesariamente igual al ATE, pero es un par&aacute;metro causal bien definido: el efecto para quienes son inducidos a cambiar su tratamiento por el instrumento.</p>
+     <div class="formula">LATE = E[Y|Z=1] - E[Y|Z=0] / E[D|Z=1] - E[D|Z=0]</div>
     </div>
     <div class="info-panel">
-     <h3>👥 Tipos de Agentes (Imbens-Angrist)</h3>
-     <p>Always-takers (T=1 siempre), Never-takers (T=0 siempre), Compliers (T=Z), Defiers (T=1-Z). Supuesto de monotonicidad: no hay defiers.</p>
+     <h3>👥 Tipolog&iacute;a de unidades (Angrist et al.)</h3>
+     <p>Dado un instrumento Z y un tratamiento D (1 = tratado, 0 = control):</p>
+     <ul style="color:#b9ccee;font-size:0.8rem;">
+      <li><strong>Always-takers</strong>: D=1 sin importar Z (reciben el tratamiento siempre).</li>
+      <li><strong>Never-takers</strong>: D=0 sin importar Z (nunca reciben el tratamiento).</li>
+      <li><strong>Compliers</strong>: D=Z (se comportan como se espera: reciben tratamiento si Z=1).</li>
+      <li><strong>Defiers</strong>: D=1-Z (hacen lo contrario de lo esperado).</li>
+     </ul>
+     <p>Bajo monotonicidad (no hay defiers), el Wald identifica el ATT para los compliers.</p>
     </div>
     <div class="info-panel">
-     <h3>📐 Wald Estimator</h3>
-     <p>El estimador de variables instrumentales en su forma m&aacute;s simple: cociente de diferencias de medias del outcome sobre diferencias de medias del tratamiento.</p>
-     <div class="formula">&beta;IV = Cov(Y,Z) / Cov(T,Z)</div>
+     <h3>🔧 Supuestos del Wald Estimator</h3>
+     <p>(1) Relevancia: Z debe estar correlacionado con D (cov(Z,D) ≠ 0).<br>(2) Exogeneidad: Z es independiente de los potenciales resultados Y(0), Y(1).<br>(3) Exclusi&oacute;n: Z solo afecta Y a trav&eacute;s de D.<br>(4) Monotonicidad: No hay defiers (D(1) ≥ D(0) para todos).</p>
+     <p>Sin monotonicidad, el estimador no tiene interpretaci&oacute;n causal clara.</p>
+     <div class="formula">Wald = (Y&#772;1 - Y&#772;0) / (D&#772;1 - D&#772;0)</div>
     </div>
     <div class="info-panel">
-     <h3>📊 Marginal Treatment Effect (MTE)</h3>
-     <p>Efecto del tratamiento para individuos en el margen de indiferencia entre tratar o no, dado el instrumento. La curva MTE revela heterogeneidad del efecto.</p>
+     <h3>⚖️ LATE vs ATE</h3>
+     <p>LATE = ATE solo si el efecto del tratamiento es homog&eacute;neo entre grupos (always-takers, never-takers, compliers tienen el mismo efecto). En general, LATE &ne; ATE.</p>
+     <p>Si los compliers son una fracci&oacute;n peque&ntilde;a de la poblaci&oacute;n, el LATE puede diferir sustancialmente del ATE. La validez externa requiere entender qui&eacute;nes son los compliers.</p>
     </div>
    </div>
 
    <div class="sim-area">
-    <div class="section-title"><i class="fas fa-play"></i> Simulaci&oacute;n: IV con Heterogeneidad</div>
-    <p style="margin-bottom:0.8rem;color:#b9ccee;">Compara el estimador IV (LATE) con ATE y ATT en presencia de heterogeneidad.</p>
+    <div class="section-title"><i class="fas fa-play"></i> Simulaci&oacute;n: LATE / Wald</div>
+    <p style="margin-bottom:0.8rem;color:#b9ccee;">Genera datos con instrumento binario y estima LATE v&iacute;a Wald. Compara con ATE verdadero.</p>
     <div class="sim-controls">
-     <button id="lateSimBtn" class="btn-action" style="margin:0;">📊 Simular LATE</button>
+     <label>Tama&ntilde;o: <select id="lateN">
+      <option value="200">200</option><option value="500" selected>500</option><option value="1000">1000</option>
+     </select></label>
+     <label>Fracci&oacute;n compliers: <select id="lateComplierFrac">
+      <option value="0.3">30%</option><option value="0.5" selected>50%</option><option value="0.7">70%</option>
+     </select></label>
+     <button id="lateSimBtn" class="btn-action" style="margin:0;">🎲 Simular LATE</button>
     </div>
     <div id="lateResult" style="background:#0a0f1e;border-radius:1rem;padding:1rem;text-align:center;font-size:0.9rem;color:#b9ccee;">
      Presiona "Simular LATE" para ver los resultados.
     </div>
    </div>
 
+   <div class="example-section">
+    <div class="section-title"><i class="fas fa-calculator"></i> Ejemplo paso a paso: Efecto del servicio militar obligatorio en ingresos</div>
+    <div class="step">
+     <span class="step-num">Paso 1: El problema</span>
+     <p>Queremos saber si hacer el servicio militar aumenta o reduce los ingresos futuros. Pero quienes se alistan no son aleatorios: pueden tener menor capital humano inicial.</p>
+    </div>
+    <div class="step">
+     <span class="step-num">Paso 2: Instrumento: sorteo de loter&iacute;a</span>
+     <p>Angrist (1990) us&oacute; el sorteo de la loter&iacute;a de reclutamiento de Vietnam como instrumento. Algunos j&oacute;venes recibieron n&uacute;meros bajos (ser llamados al servicio) y otros n&uacute;meros altos (no llamados).</p>
+    </div>
+    <div class="step">
+     <span class="step-num">Paso 3: Identificaci&oacute;n de compliers</span>
+     <p>Los compliers son quienes se alistaron solo si fueron llamados (n&uacute;mero bajo) y no se alistaron si no fueron llamados. Always-takers se alistan igual, never-takers no se alistan nunca.</p>
+    </div>
+    <div class="step">
+     <span class="step-num">Paso 4: Resultados</span>
+     <p>Wald estimador: diferencia de ingresos por estatus del sorteo dividida por diferencia en alistamiento. LATE estimado ≈ -15% en ingresos para compliers, significativo a los 10 a&ntilde;os post-servicio.</p>
+    </div>
+   </div>
+
    <div class="quiz-area">
-    <div class="quiz-title"><i class="fas fa-question-circle"></i> Mini Quiz: LATE y Heterogeneidad</div>
+    <div class="quiz-title"><i class="fas fa-question-circle"></i> Mini Quiz: LATE</div>
     <div id="quizContainer"></div>
     <button id="submitQuizBtn" class="btn-action">✅ Verificar respuestas</button>
     <div id="insigniaArea" class="insignia hidden">
      <i class="fas fa-medal"></i>
-     <h3>🏅 Especialista en LATE 🏅</h3>
-     <p>Has dominado el LATE, compliers y heterogeneidad de efectos. &iexcl;Excelente!</p>
+     <h3>🏅 Identificador de Efectos Locales 🏅</h3>
+     <p>Has dominado el concepto de LATE. &iexcl;Excelente!</p>
     </div>
    </div>
   </div>
 
-  <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre LATE, compliers e IV.</div>
+  <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre LATE y Variables Instrumentales.</div>
+
+  <div class="recap">
+   <h3>📝 Resumen del m&oacute;dulo</h3>
+   <ul>
+    <li>LATE es el efecto promedio del tratamiento en los compliers (quienes responden al instrumento).</li>
+    <li>Se requiere: relevancia, exogeneidad, exclusi&oacute;n y monotonicidad.</li>
+    <li>El Wald estimator = diferencia de Y / diferencia de D por instrumento.</li>
+    <li>LATE &ne; ATE a menos que el efecto sea homog&eacute;neo entre grupos.</li>
+   </ul>
+  </div>
 
   <div class="nav-links">
    <a href="08-synthetic-control.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
@@ -139,11 +204,11 @@
   const STORAGE_KEY = 'prog_econ_3_09';
   const PROGRESS_KEY = 'prog_econ_3_progress';
   const questions = [
-   { text: "\u00bfQu\u00e9 identifica el LATE?", options: ["El ATE poblacional", "El ATT poblacional", "El efecto en los compliers", "El efecto en los always-takers"], correct: 2 },
-   { text: "\u00bfQui\u00e9nes son los compliers?", options: ["Los que siempre reciben tratamiento", "Los que nunca reciben tratamiento", "Los que reciben tratamiento si Z=1 y no si Z=0", "Los que hacen lo contrario del instrumento"], correct: 2 },
-   { text: "\u00bfQu\u00e9 supuesto elimina a los defiers?", options: ["Exogeneidad", "Monotonicidad", "SUTVA", "Independencia"], correct: 1 },
-   { text: "\u00bfC\u00f3mo se calcula el Wald estimator?", options: ["Cov(Y,T)/Var(T)", "Cov(Y,Z)/Cov(T,Z)", "E[Y|Z=1]-E[Y|Z=0]", "El cociente de ATE y ATT"], correct: 1 },
-   { text: "\u00bfQu\u00e9 muestra la curva de MTE?", options: ["El efecto promedio en toda la poblaci\u00f3n", "C\u00f3mo var\u00eda el efecto del tratamiento con la propensi\u00f3n a recibirlo", "La distribuci\u00f3n del instrumento", "El sesgo del IV"], correct: 1 }
+   { text: "\u00bfQu\u00e9 identifica el LATE?", options: ["El ATE de toda la poblaci\u00f3n", "El efecto en los always-takers", "El efecto promedio en los compliers", "El ATT"], correct: 2, explanation: "LATE es el efecto promedio del tratamiento para los compliers, aquellos cuya participaci\u00f3n en el tratamiento es inducida por el instrumento." },
+   { text: "\u00bfQu\u00e9 supuesto elimina a los defiers?", options: ["Exogeneidad", "Exclusi\u00f3n", "Monotonicidad", "Relevancia"], correct: 2, explanation: "El supuesto de monotonicidad (D(1) \u2265 D(0) para todos) garantiza que no existen defiers, es decir, nadie hace lo contrario de lo que el instrumento sugiere." },
+   { text: "\u00bfC\u00f3mo se define el Wald estimator?", options: ["Cov(Y,Z)/Var(Z)", " (E[Y|Z=1] - E[Y|Z=0]) / (E[D|Z=1] - E[D|Z=0])", "E[Y|D=1] - E[Y|D=0]", "MCO"], correct: 1, explanation: "El estimador Wald es la diferencia en el outcome por estatus del instrumento dividida por la diferencia en el tratamiento por estatus del instrumento." },
+   { text: "\u00bfCu\u00e1ndo LATE = ATE?", options: ["Siempre", "Cuando el efecto del tratamiento es homog\u00e9neo entre grupos", "Cuando el instrumento es d\u00e9bil", "Nunca"], correct: 1, explanation: "LATE = ATE solo si el efecto del tratamiento es homog\u00e9neo entre always-takers, never-takers y compliers. En general, no son iguales." },
+   { text: "\u00bfQui\u00e9nes son los always-takers?", options: ["Quienes nunca reciben tratamiento", "Quienes siempre reciben tratamiento sin importar el instrumento", "Quienes siguen el instrumento", "Quienes hacen lo opuesto"], correct: 1, explanation: "Always-takers son unidades que reciben el tratamiento independientemente del valor del instrumento (D=1 siempre)." }
   ];
   let userAnswers = new Array(questions.length).fill(null);
   let quizCompleted = false;
@@ -165,7 +230,7 @@
    container.innerHTML = '';
    questions.forEach((q, idx) => {
     const qDiv = document.createElement('div'); qDiv.classList.add('question');
-    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
+    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div><div class="explanation" id="expl-'+idx+'">'+q.explanation+'</div>';
     const optsDiv = qDiv.querySelector('.options');
     q.options.forEach((opt, optIdx) => {
      const span = document.createElement('div'); span.classList.add('opt');
@@ -198,14 +263,15 @@
      if (oi === questions[idx].correct) o.classList.add('correct');
      else if (oi === userAnswers[idx]) o.classList.add('wrong');
     });
+    document.getElementById('expl-'+idx).style.display = 'block';
    });
    if (passed) {
     quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
     document.getElementById('insigniaArea').classList.remove('hidden');
-    document.getElementById('feedbackMsg').textContent = I18N.t('fb_1') + correct + '/' + total + ' correctas. \u00a1Dominas el LATE!';
+    document.getElementById('feedbackMsg').textContent = '\uD83C\uDF89 ' + correct + '/' + total + ' correctas. \u00a1Dominas el concepto de LATE!';
     saveProgress(); updateProgress();
    } else {
-    document.getElementById('feedbackMsg').textContent = '\u274c ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. \u00a1Reintenta!';
+    document.getElementById('feedbackMsg').textContent = '\u274C ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. \u00a1Reintenta!';
    }
   }
 
@@ -214,64 +280,63 @@
    if (p.includes(STORAGE_KEY)) {
     quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
     document.getElementById('insigniaArea').classList.remove('hidden');
-    document.getElementById('feedbackMsg').textContent = I18N.t('fb_2');
+    document.getElementById('feedbackMsg').textContent = '\uD83C\uDFC6 Ya completaste este m\u00f3dulo.';
+    document.querySelectorAll('.question').forEach((qDiv, idx) => {
+     document.getElementById('expl-'+idx).style.display = 'block';
+    });
     document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
    }
   }
 
   document.getElementById('lateSimBtn').addEventListener('click', function() {
-   let N = 500;
-   let data = [];
-   let trueATE = 4;
-   let trueComplierEffect = 6;
-   for (let i = 0; i < N; i++) {
+   const n = parseInt(document.getElementById('lateN').value);
+   const complierFrac = parseFloat(document.getElementById('lateComplierFrac').value);
+   // Generate data with instrument
+   let Z = []; let D = []; let Y = [];
+   let alwaysFrac = 0.2, neverFrac = 0.2;
+   let defierFrac = 0; // monotonicity
+   let trueEffect = 2.5;
+   let baseY = 10;
+   let complierATE = 0.8; // LATE
+
+   for (let i = 0; i < n; i++) {
     let z = Math.random() < 0.5 ? 1 : 0;
-    let u = Math.random();
-    let type;
-    if (u < 0.2) type = 'always';
-    else if (u < 0.5) type = 'never';
-    else type = 'complier';
-    if (type === 'always') { let t = 1; let y = 10 + trueATE + (Math.random()-0.5)*2; data.push({ z, t, y, type }); }
-    else if (type === 'never') { let t = 0; let y = 10 + (Math.random()-0.5)*2; data.push({ z, t, y, type }); }
-    else {
-     let t = z;
-     let y = 10 + t * trueComplierEffect + (Math.random()-0.5)*2;
-     data.push({ z, t, y, type });
-    }
+    let typeRand = Math.random();
+    let d = 0;
+    let type = '';
+    if (typeRand < alwaysFrac) { d = 1; type = 'always'; }
+    else if (typeRand < alwaysFrac + neverFrac) { d = 0; type = 'never'; }
+    else if (typeRand < alwaysFrac + neverFrac + defierFrac) { d = 1 - z; type = 'defier'; }
+    else { d = z; type = 'complier'; }
+
+    let effect = 0;
+    if (type === 'complier') effect = complierATE;
+    else effect = trueEffect * (0.5 + Math.random());
+
+    let y = baseY + (Math.random() - 0.5) * 4 + d * effect;
+    if (z === 1) y += (Math.random() - 0.5) * 0.2; // slight exclusion violation noise
+
+    Z.push(z); D.push(d); Y.push(y);
+    if (i === 0) { type = 'complier'; d = z; y = baseY + d * complierATE + (Math.random() - 0.5) * 4; }
    }
 
-   let z1 = data.filter(d => d.z === 1);
-   let z0 = data.filter(d => d.z === 0);
-   let ey1 = z1.reduce((s,d) => s + d.y, 0) / z1.length;
-   let ey0 = z0.reduce((s,d) => s + d.y, 0) / z0.length;
-   let et1 = z1.reduce((s,d) => s + d.t, 0) / z1.length;
-   let et0 = z0.reduce((s,d) => s + d.t, 0) / z0.length;
-   let wald = (ey1 - ey0) / (et1 - et0);
+   // Compute Wald estimator
+   let nZ1 = Z.filter(z => z === 1).length, nZ0 = n - nZ1;
+   let yBar1 = 0, yBar0 = 0, dBar1 = 0, dBar0 = 0;
+   for (let i = 0; i < n; i++) {
+    if (Z[i] === 1) { yBar1 += Y[i]; dBar1 += D[i]; }
+    else { yBar0 += Y[i]; dBar0 += D[i]; }
+   }
+   yBar1 /= nZ1; yBar0 /= nZ0; dBar1 /= nZ1; dBar0 /= nZ0;
+   let wald = (yBar1 - yBar0) / (dBar1 - dBar0);
 
-   let treated = data.filter(d => d.t === 1);
-   let control = data.filter(d => d.t === 0);
-   let ateNaive = treated.reduce((s,d) => s + d.y,0)/treated.length - control.reduce((s,d) => s + d.y,0)/control.length;
-
-   let compliers = data.filter(d => d.type === 'complier');
-   let cTreated = compliers.filter(d => d.t === 1);
-   let cControl = compliers.filter(d => d.t === 0);
-   let attComplier = cTreated.length && cControl.length ?
-    cTreated.reduce((s,d) => s + d.y,0)/cTreated.length - cControl.reduce((s,d) => s + d.y,0)/cControl.length : 0;
-
-   let types = { always: data.filter(d => d.type === 'always').length, never: data.filter(d => d.type === 'never').length, complier: data.filter(d => d.type === 'complier').length };
-
-   let html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:0.5rem;">' +
-    '<div style="background:#1e2a3e;border-radius:0.8rem;padding:0.5rem;border:1px solid #14b8a6;"><div style="font-weight:700;color:#5eead4;">Wald (LATE)</div><div style="font-size:1.2rem;color:#00cc88;">' + wald.toFixed(2) + '</div></div>' +
-    '<div style="background:#1e2a3e;border-radius:0.8rem;padding:0.5rem;border:1px solid #ff4455;"><div style="font-weight:700;color:#5eead4;">Naive ATE</div><div>' + ateNaive.toFixed(2) + '</div></div>' +
-    '<div style="background:#1e2a3e;border-radius:0.8rem;padding:0.5rem;border:1px solid #14b8a6;"><div style="font-weight:700;color:#5eead4;">ATT Compliers</div><div>' + attComplier.toFixed(2) + '</div></div>' +
-    '<div style="background:#1e2a3e;border-radius:0.8rem;padding:0.5rem;border:1px solid #14b8a6;"><div style="font-weight:700;color:#5eead4;">True Complier</div><div>' + trueComplierEffect + '</div></div>' +
-    '</div>' +
-    '<div style="margin-top:0.8rem;background:#0a0f1e;border-radius:0.8rem;padding:0.5rem;display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem;">' +
-    '<div style="text-align:center;"><span style="color:#5eead4;">Always</span>: ' + types.always + '</div>' +
-    '<div style="text-align:center;"><span style="color:#5eead4;">Never</span>: ' + types.never + '</div>' +
-    '<div style="text-align:center;"><span style="color:#5eead4;">Compliers</span>: ' + types.complier + '</div>' +
-    '</div><p style="margin-top:0.8rem;color:#8899cc;font-size:0.8rem;">El Wald estima el LATE (efecto en compliers=' + trueComplierEffect + '). El ATE naive mezcla tipos y da sesgado. El ATT compliers aproxima el LATE.</p>';
-
+   let html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:0.5rem;">' +
+    '<div style="background:#1e2a3e;border-radius:0.8rem;padding:0.5rem;border:1px solid #14b8a6;"><div style="font-weight:700;color:#5eead4;">Wald (LATE)</div><div style="font-size:1.2rem;">' + wald.toFixed(3) + '</div></div>' +
+    '<div style="background:#1e2a3e;border-radius:0.8rem;padding:0.5rem;border:1px solid #14b8a6;"><div style="font-weight:700;color:#5eead4;">ATE verdadero</div><div style="font-size:1.2rem;">' + trueEffect + '</div></div>' +
+    '<div style="background:#1e2a3e;border-radius:0.8rem;padding:0.5rem;border:1px solid #14b8a6;"><div style="font-weight:700;color:#5eead4;">LATE verdadero</div><div style="font-size:1.2rem;">' + complierATE + '</div></div>' +
+    '<div style="background:#1e2a3e;border-radius:0.8rem;padding:0.5rem;border:1px solid #14b8a6;"><div style="font-weight:700;color:#5eead4;">Compliers</div><div style="font-size:1.2rem;">' + Math.round(complierFrac * 100) + '%</div></div>' +
+    '<div style="background:#1e2a3e;border-radius:0.8rem;padding:0.5rem;border:1px solid #14b8a6;"><div style="font-weight:700;color:#5eead4;">1ra etapa (F)</div><div>Diferencia D: ' + (dBar1 - dBar0).toFixed(3) + '</div></div>' +
+    '</div><p style="margin-top:0.8rem;color:#8899cc;font-size:0.8rem;">N=' + n + '. Instrumento fuerte: diferencia en D por Z = ' + (dBar1 - dBar0).toFixed(3) + '. LATE se aproxima al efecto en compliers (' + complierATE + ').</p>';
    document.getElementById('lateResult').innerHTML = html;
   });
 
@@ -281,16 +346,16 @@
  <script>
 window.I18N_DATA={
  "fb_0": {
-  "es": "⚠️ Responde todas las preguntas primero.",
-  "en": "⚠️ Answer todas las preguntas primero."
+  "es": "\u26A0\uFE0F Responde todas las preguntas primero.",
+  "en": "\u26A0\uFE0F Answer all questions first."
  },
  "fb_1": {
-  "es": "🎉 ",
-  "en": "🎉 "
+  "es": "\uD83C\uDF89 ",
+  "en": "\uD83C\uDF89 "
  },
  "fb_2": {
-  "es": "🏆 Ya completaste este m\u00f3dulo.",
-  "en": "🏆 Ya completaste este m\u00f3dulo."
+  "es": "\uD83C\uDFC6 Ya completaste este m\u00f3dulo.",
+  "en": "\uD83C\uDFC6 You already completed this module."
  }
 };
 </script>

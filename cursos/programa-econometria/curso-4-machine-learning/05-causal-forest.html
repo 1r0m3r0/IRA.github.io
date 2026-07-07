@@ -21,13 +21,20 @@
   .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#f97316,#ea580c); border-radius:20px; transition:width 0.5s ease; }
   .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
   .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #f97316; font-size:1rem; line-height:1.6; }
+  .objectives { background:rgba(249,115,22,0.1); border-radius:1.5rem; padding:1rem 1.5rem; margin:1rem 2rem; border:1px solid rgba(249,115,22,0.3); }
+  .objectives li { color:#b9ccee; font-size:0.9rem; margin:0.4rem 0; list-style-type: none; }
+  .objectives li::before { content:"🎯 "; }
   .main-area { padding:1.5rem 2rem; }
   .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#f97316; }
   .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
   .info-panel { background:rgba(10,20,40,0.7); border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
   .info-panel h3 { color:#fdba74; font-size:1rem; margin-bottom:0.5rem; }
-  .info-panel p { font-size:0.85rem; color:#b9ccee; line-height:1.6; }
+  .info-panel p { font-size:0.85rem; color:#b9ccee; line-height:1.6; margin-bottom:0.5rem; }
   .info-panel .formula { background:#0a0f1e; padding:0.5rem; border-radius:0.8rem; text-align:center; font-family:monospace; font-size:0.9rem; color:#fdba74; margin-top:0.5rem; }
+  .example-section { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #f97316; margin-bottom:1.5rem; }
+  .example-section .step { background:#0f1a2c; border-radius:1rem; padding:0.8rem 1.2rem; margin:0.6rem 0; border-left:4px solid #f97316; }
+  .example-section .step .step-num { color:#fdba74; font-weight:700; font-size:0.85rem; }
+  .example-section .step p { color:#b9ccee; font-size:0.85rem; margin-top:0.3rem; }
   .sim-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #f97316; margin-bottom:1.5rem; }
   .quiz-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #f97316; margin-bottom:1.5rem; }
   .quiz-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#f97316; }
@@ -39,7 +46,11 @@
   .opt.selected { background:#f97316; color:#000; font-weight:bold; box-shadow:0 0 8px #f97316; }
   .opt.correct { background:#00cc88; color:#000; }
   .opt.wrong { background:#ff4455; color:#fff; }
+  .explanation { background:#0a1525; border-radius:0.8rem; padding:0.6rem 1rem; margin-top:0.5rem; font-size:0.8rem; color:#fed7aa; border-left:3px solid #f97316; display:none; }
   .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #f97316; }
+  .recap { background:rgba(249,115,22,0.08); border-radius:1.5rem; padding:1rem 1.5rem; margin:0 2rem; border:1px dashed rgba(249,115,22,0.4); }
+  .recap h3 { color:#fdba74; font-size:1rem; margin-bottom:0.5rem; }
+  .recap li { color:#8899bb; font-size:0.8rem; margin:0.3rem 0; }
   .btn-action { background:linear-gradient(95deg,#f97316,#ea580c); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin-top:1rem; }
   .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(249,115,22,0.5); }
   .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
@@ -76,28 +87,85 @@
   <div class="analogy-card">
    <strong>💡 Pi&eacute;nsalo as&iacute;:</strong> Causal Forest es como un m&eacute;dico que no solo te dice "este medicamento funciona en promedio", sino que te dice "para tu perfil espec&iacute;fico (edad, peso, gen&eacute;tica), el efecto ser&aacute; tal". Los &aacute;rboles causales dividen la poblaci&oacute;n en grupos con efectos similares, usando la mitad de los datos para partir (split) y la otra mitad para estimar (honest).
   </div>
+  <div class="objectives">
+   <ul>
+    <li>Entender la diferencia entre ATE (efecto promedio) y CATE (efecto heterog&eacute;neo condicional)</li>
+    <li>Comprender el honest splitting y por qu&eacute; reduce el sesgo en &aacute;rboles causales</li>
+    <li>Aprender a interpretar GATES (efectos por grupos) y CLAN (perfiles de grupos)</li>
+    <li>Saber cu&aacute;ndo usar Causal Forest vs DML para efectos heterog&eacute;neos</li>
+   </ul>
+  </div>
   <div class="main-area">
    <div class="section-title"><i class="fas fa-graduation-cap"></i> Teor&iacute;a: Causal Forest</div>
    <div class="info-grid">
     <div class="info-panel">
      <h3>Causal Tree</h3>
-     <p>&Aacute;rbol que divide el espacio de covariables para maximizar la heterogeneidad del efecto tratamiento. Usa honest splitting: datos separados para split y estimaci&oacute;n.</p>
+     <p><strong>Intuici&oacute;n:</strong> Un Causal Tree es un &aacute;rbol de decisi&oacute;n modificado para estimar efectos causales en lugar de predecir Y. En cada split, en lugar de minimizar el MSE de predicci&oacute;n, maximiza la heterogeneidad del efecto tratamiento entre los hijos izquierdo y derecho.</p>
+     <p><strong>F&oacute;rmula explicada:</strong> El CATE (Conditional Average Treatment Effect) es τ(x) = E[Y(1) - Y(0) | X = x]. En cada nodo hoja, se estima como la diferencia de medias entre tratados y controles dentro de ese grupo. El &aacute;rbol busca splits que maximicen la varianza de τ entre grupos.</p>
+     <p><strong>Caso real:</strong> En un experimento de env&iacute;o de cupones de descuento, un Causal Tree podr&iacute;a encontrar que el cupon funciona bien para clientes j&oacute;venes de ciudades grandes, pero no para clientes mayores de zonas rurales. Esto permite personalizar la estrategia de marketing.</p>
+     <p><strong>Error com&uacute;n:</strong> Usar &aacute;rboles de predicci&oacute;n est&aacute;ndar para estimar efectos causales. Un &aacute;rbol de predicci&oacute;n minimiza error de predicci&oacute;n, no encuentra heterogeneidad causal. Puede crear grupos con efectos causales mezclados.</p>
      <div class="formula">&#916;(x) = E[Y(1)-Y(0) | X=x]</div>
     </div>
     <div class="info-panel">
      <h3>Honest Splitting</h3>
-     <p>Divide la muestra: una parte para construir los &aacute;rboles (split), otra para estimar los efectos (estimation). Reduce el sesgo de sobreajuste.</p>
+     <p><strong>Intuici&oacute;n:</strong> Honest splitting significa usar datos diferentes para dos tareas distintas: una parte para decidir c&oacute;mo dividir el &aacute;rbol (split) y otra para estimar los efectos en las hojas (estimation). Esto evita que la estimaci&oacute;n del efecto est&eacute; contaminada por la b&uacute;squeda del split &oacute;ptimo.</p>
+     <p><strong>F&oacute;rmula explicada:</strong> Formalmente, S_split ∩ S_est = ∅. La muestra se divide aleatoriamente: la mitad para construir el &aacute;rbol, la otra mitad para estimar τ en cada hoja. Sin honest splitting, el &aacute;rbol tender&iacute;a a crear hojas donde el efecto parece grande pero solo por casualidad (sobreajuste).</p>
+     <p><strong>Caso real:</strong> Con n=1,000 pacientes, se usan 500 para decidir los splits del &aacute;rbol y 500 para estimar el efecto del medicamento en cada subgrupo. Esto garantiza que la estimaci&oacute;n del efecto no est&eacute; sesgada por la b&uacute;squeda de patrones.</p>
+     <p><strong>Error com&uacute;n:</strong> Pensar que honest splitting desperdicia datos. Aunque se usa la mitad para cada tarea, la reducci&oacute;n de sesgo compensa con creces la p&eacute;rdida de eficiencia.</p>
      <div class="formula">S<sub>split</sub> &cap; S<sub>est</sub> = &empty;</div>
     </div>
     <div class="info-panel">
      <h3>GRF (Generalized RF)</h3>
-     <p>Marco general para estimar par&aacute;metros que var&iacute;an a nivel de unidad. Incluye causal forest, instrumental forest, quantile forest.</p>
+     <p><strong>Intuici&oacute;n:</strong> GRF es un marco general que extiende la idea de Causal Forest a cualquier par&aacute;metro que se pueda definir como soluci&oacute;n de una ecuaci&oacute;n de estimaci&oacute;n. Incluye Causal Forest, Instrumental Forest, Quantile Forest, etc. Es como un toolkit de "bosques para todo".</p>
+     <p><strong>F&oacute;rmula explicada:</strong> Para cada punto x, GRF estima θ(x) = argmin Σ wᵢ(x) ψ(Yᵢ; θ), donde wᵢ(x) son pesos basados en &aacute;rboles (qu&eacute; tan frecuentemente i cae en el mismo nodo que x) y ψ es una funci&oacute;n de momento. Los &aacute;rboles se construyen para maximizar la heterogeneidad de θ.</p>
+     <p><strong>Caso real:</strong> GRF se usa para estimar elasticidades-precio heterog&eacute;neas (Causal Forest con logit), efectos de instrumentos variables (Instrumental Forest), o cuantiles del efecto tratamiento (Quantile Forest).</p>
+     <p><strong>Error com&uacute;n:</strong> Tratar GRF como una "caja negra". Aunque es flexible, requiere entender la funci&oacute;n de momento ψ para interpretar correctamente los resultados.</p>
      <div class="formula">&theta;(x) = argmin &Sigma; w<sub>i</sub>(x) &psi;(Y<sub>i</sub>; &theta;)</div>
     </div>
     <div class="info-panel">
      <h3>GATES y CLAN</h3>
-     <p>GATES: Group Average Treatment Effects (efecto por grupos de CATE). CLAN: Descriptive statistics de los grupos. Herramientas de an&aacute;lisis post-estimaci&oacute;n.</p>
+     <p><strong>Intuici&oacute;n:</strong> Despu&eacute;s de estimar CATE para cada persona, GATES agrupa a las personas por su CATE estimado (bajo, medio, alto) y calcula el efecto promedio en cada grupo. CLAN describe las caracter&iacute;sticas de cada grupo, respondiendo "&iquest;qui&eacute;nes son los que m&aacute;s se benefician?".</p>
+     <p><strong>F&oacute;rmula explicada:</strong> GATES: Ordena las personas por τ̂(x), crea G grupos (ej. 4 cuartiles), y estima E[τ(X) | G = g] para cada grupo. CLAN: Calcula E[Xⱼ | G = g] para cada variable Xⱼ, describiendo el perfil de cada grupo.</p>
+     <p><strong>Caso real:</strong> Un programa de capacitaci&oacute;n laboral. GATES muestra que el 25% de participantes con mayor CATE obtienen un efecto de +$500/mes, mientras que el 25% inferior obtiene solo +$50/mes. CLAN revela que el grupo alto son j&oacute;venes con educaci&oacute;n universitaria.</p>
+     <p><strong>Error com&uacute;n:</strong> Interpretar GATES como evidencia de que la variable de segmentaci&oacute;n (ej. "j&oacute;venes") es la &uacute;nica que importa. GATES solo dice qu&eacute; grupo se beneficia m&aacute;s, no por qu&eacute;.</p>
      <div class="formula">GATES: E[&theta;(X) | G = g]</div>
+    </div>
+    <div class="info-panel">
+     <h3>Diferencia: CF vs DML</h3>
+     <p><strong>Intuici&oacute;n:</strong> DML estima un solo ATE (efecto promedio) y permite flexibilidad en los controles. Causal Forest estima CATE (efecto individualizado) y se enfoca en la heterogeneidad. DML responde "&iquest;funciona?" y CF responde "&iquest;para qui&eacute;n funciona?".</p>
+     <p><strong>F&oacute;rmula explicada:</strong> DML: θ es un escalar (efecto constante o ATE). CF: τ(x) var&iacute;a con las covariables. CF puede verse como DML donde θ depende de x y se estima no param&eacute;tricamente con bosques. Ambos usan honestidad (CF: honest splitting, DML: cross-fitting).</p>
+     <p><strong>Caso real:</strong> En un estudio de impacto de una pol&iacute;tica de subsidios: DML estima que el subsidio aumenta el empleo en 2% en promedio. CF descubre que el efecto es 5% para peque&ntilde;as empresas en zonas urbanas y 0% para grandes empresas en zonas rurales.</p>
+     <p><strong>Error com&uacute;n:</strong> Usar CF para obtener un solo n&uacute;mero (ATE). CF est&aacute; dise&ntilde;ado para heterogeneidad. Si solo te interesa el efecto promedio, DML es m&aacute;s eficiente.</p>
+     <div class="formula">DML: &theta; (constante) &nbsp;|&nbsp; CF: &tau;(x) (variable)</div>
+    </div>
+    <div class="info-panel">
+     <h3>Inferencia en Causal Forest</h3>
+     <p><strong>Intuici&oacute;n:</strong> CF produce intervalos de confianza para cada CATE individual usando la varianza de los &aacute;rboles (similar a Random Forest). Tambi&eacute;n produce tests de heterogeneidad (Best Linear Projection) para saber si el efecto realmente var&iacute;a con X.</p>
+     <p><strong>F&oacute;rmula explicada:</strong> El error est&aacute;ndar de τ̂(x) se estima mediante la ley de total varianza: Var(τ̂(x)) = Var_bosques + Var_estimaci&oacute;n. Los intervalos de confianza puntuales son v&aacute;lidos asint&oacute;ticamente. Adem&aacute;s, el test de Omni-bus heterogeneidad eval&uacute;a si τ(x) var&iacute;a significativamente.</p>
+     <p><strong>Caso real:</strong> Un CF estima que Juan (30 a&ntilde;os, urbano) tiene un CATE de 3.2 ± 1.1 (IC 95%). Mar&iacute;a (50 a&ntilde;os, rural) tiene un CATE de 0.8 ± 1.3. El test de heterogeneidad da p=0.003, confirmando que el efecto var&iacute;a significativamente entre personas.</p>
+     <p><strong>Error com&uacute;n:</strong> Comparar CATEs de dos individuos sin considerar la incertidumbre. Dos CATEs pueden estar dentro del margen de error de cada uno aunque sus estimaciones puntuales difieran.</p>
+     <div class="formula">IC(&tau;(x)) = &tau;&#770;(x) &plusmn; 1.96 &times; SE(&tau;&#770;(x))</div>
+    </div>
+   </div>
+
+   <div class="example-section">
+    <div class="section-title"><i class="fas fa-pen"></i> Ejemplo paso a paso</div>
+    <p style="color:#b9ccee;font-size:0.85rem;margin-bottom:0.8rem;">Generamos datos donde el efecto de un tratamiento var&iacute;a con las covariables X1 y X2.</p>
+    <div class="step">
+     <div class="step-num">Paso 1: El verdadero CATE es τ(x) = 1.5 + 0.8·X1 + 0.5·X2. Personas con X1 y X2 grandes se benefician m&aacute;s.</div>
+     <p>Generamos n=200 personas. Cada una tiene dos caracter&iacute;sticas X1, X2. El tratamiento se asigna aleatoriamente (50% trata, 50% control).</p>
+    </div>
+    <div class="step">
+     <div class="step-num">Paso 2: Construimos 30 &aacute;rboles causales. Cada &aacute;rbol divide los datos por X1 o X2 y estima el efecto en cada hoja.</div>
+     <p>Cada &aacute;rbol elige aleatoriamente entre X1 y X2 para dividir (simplificaci&oacute;n). En cada hoja, calcula la diferencia de medias entre tratados y controles. Esto es el CATE estimado para esa hoja.</p>
+    </div>
+    <div class="step">
+     <div class="step-num">Paso 3: Promediamos los 30 &aacute;rboles para cada persona. Esto da el CATE estimado final (con menos varianza que un solo &aacute;rbol).</div>
+     <p>El promedio reduce la varianza. Cada persona obtiene un CATE estimado que es el promedio de los efectos de los &aacute;rboles en las hojas donde cay&oacute;.</p>
+    </div>
+    <div class="step">
+     <div class="step-num">Paso 4: Ordenamos por CATE estimado y creamos 4 grupos (GATES). Grupo 1: efecto bajo. Grupo 4: efecto alto.</div>
+     <p>GATES muestra n&iacute;tidamente que el CATE real aumenta de G1 a G4, validando que el Causal Forest captura la heterogeneidad.</p>
     </div>
    </div>
 
@@ -122,6 +190,17 @@
      <p>Has dominado Causal Forest y efectos heterog&eacute;neos. &iexcl;Excelente!</p>
     </div>
    </div>
+
+   <div id="recapSection" class="recap hidden">
+    <h3>📝 Resumen del m&oacute;dulo</h3>
+    <ul>
+     <li>Causal Forest estima CATE (efecto heterog&eacute;neo), no solo ATE (efecto promedio)</li>
+     <li>Honest splitting usa datos distintos para construir el &aacute;rbol y estimar efectos</li>
+     <li>GRF generaliza Causal Forest a cualquier par&aacute;metro definido por ecuaci&oacute;n de momento</li>
+     <li>GATES agrupa por nivel de CATE; CLAN describe los grupos resultantes</li>
+     <li>CF es ideal para personalizaci&oacute;n de tratamientos y an&aacute;lisis de heterogeneidad</li>
+    </ul>
+   </div>
   </div>
 
   <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre Causal Forest.</div>
@@ -138,11 +217,11 @@
   const STORAGE_KEY = 'prog_econ_4_05';
   const PROGRESS_KEY = 'prog_econ_4_progress';
   const questions = [
-   { text: "¿Qué estima Causal Forest?", options: ["ATE", "CATE (efecto heterogéneo)", "ITR", "ATT"], correct: 1 },
-   { text: "¿Qué es 'honest splitting'?", options: ["No dividir la muestra", "Usar datos distintos para split y estimación", "Dividir aleatoriamente", "Usar los mismos datos para todo"], correct: 1 },
-   { text: "¿Qué son GATES?", options: ["Efectos por grupos de CATE", "Variables instrumentales", "Tests de hipótesis", "Métricas de ajuste"], correct: 0 },
-   { text: "¿Quiénes desarrollaron Causal Forest?", options: ["Breiman", "Athey-Imbens-Wager", "Tibshirani", "Efron"], correct: 1 },
-   { text: "GRF significa:", options: ["Generalized Random Forest", "Gradient Random Forest", "General Regression Framework", "Gaussian Random Field"], correct: 0 }
+   { text: "¿Qu&eacute; estima Causal Forest?", options: ["ATE", "CATE (efecto heterog&eacute;neo)", "ITR", "ATT"], correct: 1, explanation: "Causal Forest estima CATE (Conditional Average Treatment Effect), que var&iacute;a con las covariables X. ATE es un solo n&uacute;mero. ITR es Individualized Treatment Rule (regla de asignaci&oacute;n). ATT es Average Treatment on the Treated." },
+   { text: "¿Qu&eacute; es 'honest splitting'?", options: ["No dividir la muestra", "Usar datos distintos para split y estimaci&oacute;n", "Dividir aleatoriamente", "Usar los mismos datos para todo"], correct: 1, explanation: "Honest splitting asigna una parte de los datos para decidir los splits del &aacute;rbol y otra parte para estimar los efectos en las hojas. Esto evita el sesgo de sobreajuste al separar la b&uacute;squeda de la estimaci&oacute;n." },
+   { text: "¿Qu&eacute; son GATES?", options: ["Efectos por grupos de CATE", "Variables instrumentales", "Tests de hip&oacute;tesis", "M&eacute;tricas de ajuste"], correct: 0, explanation: "GATES (Group Average Treatment Effects) ordena a los individuos por su CATE estimado, los agrupa en G grupos, y calcula el efecto promedio en cada grupo. No son IV, tests ni m&eacute;tricas." },
+   { text: "¿Qui&eacute;nes desarrollaron Causal Forest?", options: ["Breiman", "Athey-Imbens-Wager", "Tibshirani", "Efron"], correct: 1, explanation: "Athey, Imbens y Wager desarrollaron Causal Forest y GRF. Breiman cre&oacute; Random Forest. Tibshirani cre&oacute; Lasso. Efron desarroll&oacute; el bootstrap." },
+   { text: "GRF significa:", options: ["Generalized Random Forest", "Gradient Random Forest", "General Regression Framework", "Gaussian Random Field"], correct: 0, explanation: "GRF = Generalized Random Forest. Es el marco general que incluye Causal Forest, Instrumental Forest, Quantile Forest, etc. No es Gradient, ni General Regression, ni Gaussian." }
   ];
   let userAnswers = new Array(questions.length).fill(null);
   let quizCompleted = false;
@@ -164,7 +243,7 @@
    container.innerHTML = '';
    questions.forEach((q, idx) => {
     const qDiv = document.createElement('div'); qDiv.classList.add('question');
-    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
+    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div><div class="explanation" id="expl-'+idx+'">'+q.explanation+'</div>';
     const optsDiv = qDiv.querySelector('.options');
     q.options.forEach((opt, optIdx) => {
      const span = document.createElement('div'); span.classList.add('opt');
@@ -197,10 +276,12 @@
      if (oi === questions[idx].correct) o.classList.add('correct');
      else if (oi === userAnswers[idx]) o.classList.add('wrong');
     });
+    document.getElementById('expl-'+idx).style.display = 'block';
    });
    if (passed) {
     quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
     document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('recapSection').classList.remove('hidden');
     document.getElementById('feedbackMsg').textContent = I18N.t('fb_1') + correct + '/' + total + ' correctas. ¡Dominas Causal Forest!';
     saveProgress(); updateProgress();
    } else {
@@ -213,6 +294,7 @@
    if (p.includes(STORAGE_KEY)) {
     quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
     document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('recapSection').classList.remove('hidden');
     document.getElementById('feedbackMsg').textContent = I18N.t('fb_2');
     document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
    }

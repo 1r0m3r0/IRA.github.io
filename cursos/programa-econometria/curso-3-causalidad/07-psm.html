@@ -21,6 +21,9 @@
   .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#14b8a6,#0d9488); border-radius:20px; transition:width 0.5s ease; }
   .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
   .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #14b8a6; font-size:1rem; line-height:1.6; }
+  .objectives { background:rgba(20,184,166,0.1); border-radius:1.5rem; padding:1rem 1.5rem; margin:1rem 2rem; border:1px solid rgba(20,184,166,0.3); }
+  .objectives li { color:#b9ccee; font-size:0.9rem; margin:0.4rem 0; list-style-type: none; }
+  .objectives li::before { content:"🎯 "; }
   .main-area { padding:1.5rem 2rem; }
   .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#14b8a6; }
   .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
@@ -39,6 +42,7 @@
   .opt.selected { background:#14b8a6; color:#000; font-weight:bold; box-shadow:0 0 8px #14b8a6; }
   .opt.correct { background:#00cc88; color:#000; }
   .opt.wrong { background:#ff4455; color:#fff; }
+  .explanation { background:#0a1525; border-radius:0.8rem; padding:0.6rem 1rem; margin-top:0.5rem; font-size:0.8rem; color:#99f6e4; border-left:3px solid #14b8a6; display:none; }
   .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #14b8a6; }
   .btn-action { background:linear-gradient(95deg,#14b8a6,#0d9488); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#fff; margin-top:1rem; }
   .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(20,184,166,0.5); }
@@ -47,6 +51,13 @@
   .insignia i { font-size:2.5rem; color:gold; }
   .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
   .hidden { display:none; }
+  .example-section { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #14b8a6; margin-bottom:1.5rem; }
+  .example-section .step { background:#0f1a2c; border-radius:1rem; padding:0.8rem 1.2rem; margin:0.6rem 0; border-left:4px solid #14b8a6; }
+  .example-section .step .step-num { color:#5eead4; font-weight:700; font-size:0.85rem; }
+  .example-section .step p { color:#b9ccee; font-size:0.85rem; margin-top:0.3rem; }
+  .recap { background:rgba(20,184,166,0.08); border-radius:1.5rem; padding:1rem 1.5rem; margin:0 2rem; border:1px dashed rgba(20,184,166,0.4); }
+  .recap h3 { color:#5eead4; font-size:1rem; margin-bottom:0.5rem; }
+  .recap li { color:#8899bb; font-size:0.8rem; margin:0.3rem 0; }
   .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
   .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
   .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(20,184,166,0.4); }
@@ -79,26 +90,38 @@
   <div class="analogy-card">
    <strong>💡 Piénsalo así:</strong> El propensity score es como la probabilidad de que una persona reciba un tratamiento basado en sus caracter&iacute;sticas. Matching es encontrar gemelos estad&iacute;sticos: por cada persona tratada, buscamos una no tratada con la misma probabilidad de haber sido tratada. As&iacute; recreamos un experimento.
   </div>
+  <div class="objectives">
+   <ul>
+    <li>Entender el propensity score como herramienta para reducir la dimensionalidad del matching.</li>
+    <li>Comparar m&eacute;todos de matching: Nearest Neighbor, Caliper, Kernel e IPTW.</li>
+    <li>Evaluar el soporte com&uacute;n y el balance de covariables despu&eacute;s del matching.</li>
+    <li>Conocer los bounds de Rosenbaum como an&aacute;lisis de sensibilidad ante confusores no observados.</li>
+   </ul>
+  </div>
   <div class="main-area">
    <div class="section-title"><i class="fas fa-crosshairs"></i> Conceptos de PSM</div>
    <div class="info-grid">
     <div class="info-panel">
      <h3>🎯 Propensity Score</h3>
-     <p>p(X) = P(T=1|X). Probabilidad de recibir tratamiento dados los observables. Reduce la dimensionalidad del matching a un escalar.</p>
+     <p>El propensity score p(X) = P(T=1|X) es la probabilidad de recibir tratamiento dadas las covariables observables X. Rosenbaum & Rubin (1983) demostraron que si el tratamiento es ignorable dado X (selecci&oacute;n en observables), entonces tambi&eacute;n es ignorable dado p(X).</p>
+     <p>Esto es crucial porque reduce el problema de matching de alta dimensi&oacute;n (muchas X) a un escalar (p(X)). Se estima t&iacute;picamente con un logit o probit: P(T=1|X) = 1/(1+exp(-X&beta;)).</p>
      <div class="formula">p(X) = Logit o Probit</div>
     </div>
     <div class="info-panel">
      <h3>🔗 Matching Algorithms</h3>
-     <p>Nearest Neighbor (1:1 o 1:k), Caliper (matching dentro de una distancia m&aacute;xima), Kernel (todos los controles ponderados).</p>
+     <p>Nearest Neighbor: empareja cada tratado con el control m&aacute;s cercano en propensity score. Puede ser 1:1 o 1:k. Caliper: solo permite matches dentro de una distancia m&aacute;xima (ej. 0.05), evitando matches pobres. Kernel: usa todos los controles ponderados por la distancia en propensity score.</p>
+     <p>Cada m&eacute;todo tiene trade-offs: Nearest Neighbor es simple pero puede tener matches pobres; Caliper mejora la calidad pero puede perder observaciones; Kernel usa toda la informaci&oacute;n pero asume suavidad.</p>
     </div>
     <div class="info-panel">
      <h3>⚖️ IPTW (Inverse Probability Weighting)</h3>
-     <p>Ponderar cada observaci&oacute;n por el inverso de la probabilidad de recibir el tratamiento que realmente recibi&oacute;. Crea una pseudo-poblaci&oacute;n balanceada.</p>
+     <p>IPTW pondera cada observaci&oacute;n por el inverso de la probabilidad de recibir el tratamiento que realmente recibi&oacute;: w = T/p(X) + (1-T)/(1-p(X)). Esto crea una pseudo-poblaci&oacute;n donde las covariables est&aacute;n balanceadas entre tratados y controles.</p>
+     <p>Intuici&oacute;n: si un tratado tiene baja probabilidad de ser tratado (p(X) peque&ntilde;a), recibe mucho peso porque es "raro". Si un control tiene alta probabilidad de ser tratado (1-p(X) peque&ntilde;a), tambi&eacute;n recibe mucho peso.</p>
      <div class="formula">ATT = E[Y&middot;T/p(X) - Y&middot;(1-T)/(1-p(X))]</div>
     </div>
     <div class="info-panel">
      <h3>📊 Soporte Com&uacute;n y Balance</h3>
-     <p>El overlap de los propensity scores entre tratados y controles. Si no hay soporte com&uacute;n, el matching es inv&aacute;lido. Balance checks verifican que tras matching las covariables sean similares.</p>
+     <p>El soporte com&uacute;n (common support) es la regi&oacute;n donde las distribuciones del propensity score de tratados y controles se superponen. Si no hay superposici&oacute;n, no podemos encontrar controles comparables para ciertos tratados, y el matching es inv&aacute;lido.</p>
+     <p>Los balance checks verifican que despu&eacute;s del matching, las medias de las covariables sean similares entre grupos. Se usa la diferencia estandarizada: |X&#772;T - X&#772;C|/&sigma;. Un valor &lt; 0.1 indica buen balance.</p>
     </div>
    </div>
 
@@ -116,6 +139,26 @@
     </div>
    </div>
 
+   <div class="example-section">
+    <div class="section-title"><i class="fas fa-calculator"></i> Ejemplo paso a paso: Matching para evaluar un programa de salud</div>
+    <div class="step">
+     <span class="step-num">Paso 1: El problema de selecci&oacute;n</span>
+     <p>Queremos evaluar un programa de salud. Los participantes se autoseleccionan: los m&aacute;s saludables tienden a participar m&aacute;s. Comparar directamente participantes vs no participantes dar&iacute;a un estimador sesgado.</p>
+    </div>
+    <div class="step">
+     <span class="step-num">Paso 2: Estimamos el propensity score</span>
+     <p>Usamos un logit con covariables: edad, ingreso, educaci&oacute;n, y salud inicial. El modelo predice la probabilidad de participar. Por ejemplo, una persona de 40 a&ntilde;os con ingreso alto puede tener p=0.7.</p>
+    </div>
+    <div class="step">
+     <span class="step-num">Paso 3: Matching Nearest Neighbor</span>
+     <p>Para cada participante, encontramos un no-participante con propensity score similar. Si Juan tiene p=0.7, buscamos un control con p cercano a 0.7 (ej. 0.69). La distancia m&aacute;xima permitida (caliper) es 0.05.</p>
+    </div>
+    <div class="step">
+     <span class="step-num">Paso 4: Resultados</span>
+     <p>ATE naive (sin matching) = 5.2 (sesgado, sobreestima por autoselecci&oacute;n).<br>ATE con matching = 2.8 (corregido).<br>Efecto real = 3.0. El matching redujo el sesgo de selecci&oacute;n sustancialmente.</p>
+    </div>
+   </div>
+
    <div class="quiz-area">
     <div class="quiz-title"><i class="fas fa-question-circle"></i> Mini Quiz: Propensity Score</div>
     <div id="quizContainer"></div>
@@ -130,6 +173,16 @@
 
   <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre propensity score y matching.</div>
 
+  <div class="recap">
+   <h3>📝 Resumen del m&oacute;dulo</h3>
+   <ul>
+    <li>El propensity score p(X) resume las covariables en un escalar para hacer matching.</li>
+    <li>Nearest Neighbor, Caliper, Kernel e IPTW son m&eacute;todos alternativos de matching/ponderaci&oacute;n.</li>
+    <li>El soporte com&uacute;n y los balance checks son esenciales para validar el matching.</li>
+    <li>Los bounds de Rosenbaum eval&uacute;an la sensibilidad del resultado a confusores no observados.</li>
+   </ul>
+  </div>
+
   <div class="nav-links">
    <a href="06-rdd.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
@@ -142,11 +195,11 @@
   const STORAGE_KEY = 'prog_econ_3_07';
   const PROGRESS_KEY = 'prog_econ_3_progress';
   const questions = [
-   { text: "\u00bfQu\u00e9 es el propensity score?", options: ["E[Y|T=1]", "P(T=1|X), la probabilidad de recibir tratamiento dados los observables", "La diferencia de medias", "El efecto del tratamiento"], correct: 1 },
-   { text: "\u00bfQu\u00e9 es el soporte com\u00fan?", options: ["Que tratados y controles tengan distribuciones similares del propensity score", "Que todos los datos sean normales", "Que no haya missing values", "Que el modelo logit converja"], correct: 0 },
-   { text: "\u00bfQu\u00e9 m\u00e9todo de matching empareja cada tratado con el control m\u00e1s cercano?", options: ["Nearest Neighbor", "Kernel", "Caliper", "Stratification"], correct: 0 },
-   { text: "\u00bfQu\u00e9 hace IPTW?", options: ["Descarta observaciones", "Pondera por el inverso de la probabilidad de tratamiento", "Empareja 1:1", "Usa regresi\u00f3n lineal"], correct: 1 },
-   { text: "\u00bfQu\u00e9 son los bounds de Rosenbaum?", options: ["Intervalos de confianza del ATE", "An\u00e1lisis de sensibilidad ante confusores no observados", "L\u00edmites del soporte com\u00fan", "Errores est\u00e1ndar del matching"], correct: 1 }
+   { text: "\u00bfQu\u00e9 es el propensity score?", options: ["E[Y|T=1]", "P(T=1|X), la probabilidad de recibir tratamiento dados los observables", "La diferencia de medias", "El efecto del tratamiento"], correct: 1, explanation: "El propensity score es la probabilidad de recibir tratamiento condicional en las covariables observables X. Se usa para hacer matching en una sola dimensi\u00f3n." },
+   { text: "\u00bfQu\u00e9 es el soporte com\u00fan?", options: ["Que tratados y controles tengan distribuciones similares del propensity score", "Que todos los datos sean normales", "Que no haya missing values", "Que el modelo logit converja"], correct: 0, explanation: "El soporte com\u00fan es la regi\u00f3n donde las distribuciones del propensity score de tratados y controles se superponen. Sin superposici\u00f3n, el matching no es v\u00e1lido." },
+   { text: "\u00bfQu\u00e9 m\u00e9todo de matching empareja cada tratado con el control m\u00e1s cercano?", options: ["Nearest Neighbor", "Kernel", "Caliper", "Stratification"], correct: 0, explanation: "Nearest Neighbor empareja cada unidad tratada con la unidad control cuyo propensity score est\u00e1 m\u00e1s cercano." },
+   { text: "\u00bfQu\u00e9 hace IPTW?", options: ["Descarta observaciones", "Pondera por el inverso de la probabilidad de tratamiento", "Empareja 1:1", "Usa regresi\u00f3n lineal"], correct: 1, explanation: "IPTW pondera cada observaci\u00f3n por el inverso de la probabilidad de recibir el tratamiento que realmente recibi\u00f3, creando una pseudo-poblaci\u00f3n balanceada." },
+   { text: "\u00bfQu\u00e9 son los bounds de Rosenbaum?", options: ["Intervalos de confianza del ATE", "An\u00e1lisis de sensibilidad ante confusores no observados", "L\u00edmites del soporte com\u00fan", "Errores est\u00e1ndar del matching"], correct: 1, explanation: "Los bounds de Rosenbaum cuantifican cu\u00e1n sensible es la estimaci\u00f3n del ATE a la presencia de un confusor no observado." }
   ];
   let userAnswers = new Array(questions.length).fill(null);
   let quizCompleted = false;
@@ -168,7 +221,7 @@
    container.innerHTML = '';
    questions.forEach((q, idx) => {
     const qDiv = document.createElement('div'); qDiv.classList.add('question');
-    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
+    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div><div class="explanation" id="expl-'+idx+'">'+q.explanation+'</div>';
     const optsDiv = qDiv.querySelector('.options');
     q.options.forEach((opt, optIdx) => {
      const span = document.createElement('div'); span.classList.add('opt');
@@ -201,6 +254,7 @@
      if (oi === questions[idx].correct) o.classList.add('correct');
      else if (oi === userAnswers[idx]) o.classList.add('wrong');
     });
+    document.getElementById('expl-'+idx).style.display = 'block';
    });
    if (passed) {
     quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
@@ -218,6 +272,9 @@
     quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
     document.getElementById('insigniaArea').classList.remove('hidden');
     document.getElementById('feedbackMsg').textContent = I18N.t('fb_2');
+    document.querySelectorAll('.question').forEach((qDiv, idx) => {
+     document.getElementById('expl-'+idx).style.display = 'block';
+    });
     document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
    }
   }

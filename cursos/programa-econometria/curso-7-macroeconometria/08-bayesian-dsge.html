@@ -3,7 +3,7 @@
 <head>
  <meta charset="UTF-8">
  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
- <title>Macroeconometr&iacute;a | 🧮 Bayesian DSGE Estimation</title>
+ <title>Macroeconometr&iacute;a | 🧠 DSGE Bayesiano</title>
  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
  <style>
@@ -21,6 +21,18 @@
   .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#10b981,#059669); border-radius:20px; transition:width 0.5s ease; }
   .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
   .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #10b981; font-size:1rem; line-height:1.6; }
+  .objectives { background:rgba(16,185,129,0.1); border-radius:1.5rem; padding:1rem 1.5rem; margin:1rem 2rem; border:1px solid rgba(16,185,129,0.3); }
+  .objectives li { color:#b9ccee; font-size:0.9rem; margin:0.4rem 0; list-style-type: none; }
+  .objectives li::before { content:"🧠 "; }
+  .objectives h3 { color:#6ee7b7; font-size:1rem; margin-bottom:0.5rem; }
+  .example-section { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #10b981; margin:1rem 2rem 1.5rem; }
+  .example-section .step { background:#0f1a2c; border-radius:1rem; padding:0.8rem 1.2rem; margin:0.6rem 0; border-left:4px solid #10b981; }
+  .example-section .step .step-num { color:#6ee7b7; font-weight:700; font-size:0.85rem; }
+  .example-section .step p { color:#b9ccee; font-size:0.85rem; margin-top:0.3rem; }
+  .example-section h3 { color:#10b981; font-size:1.1rem; margin-bottom:0.8rem; }
+  .recap { background:rgba(16,185,129,0.08); border-radius:1.5rem; padding:1rem 1.5rem; margin:0 2rem 1.5rem; border:1px dashed rgba(16,185,129,0.4); }
+  .recap h3 { color:#6ee7b7; font-size:1rem; margin-bottom:0.5rem; }
+  .recap li { color:#8899bb; font-size:0.8rem; margin:0.3rem 0; }
   .main-area { padding:1.5rem 2rem; }
   .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#10b981; }
   .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
@@ -40,6 +52,7 @@
   .opt.correct { background:#00cc88; color:#000; }
   .opt.wrong { background:#ff4455; color:#fff; }
   .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #10b981; }
+  .explanation { background:#0a1525; border-radius:0.8rem; padding:0.6rem 1rem; margin-top:0.5rem; font-size:0.8rem; color:#a7f3d0; border-left:3px solid #10b981; display:none; }
   .btn-action { background:linear-gradient(95deg,#10b981,#059669); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin-top:1rem; }
   .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(16,185,129,0.5); }
   .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
@@ -61,12 +74,12 @@
  <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Econometr&iacute;a</a></nav>
  <div class="course-container" id="app">
   <div class="hero-header">
-   <h1>🧮 Bayesian DSGE Estimation</h1>
-   <p>Estimaci&oacute;n bayesiana de modelos DSGE con Kalman y MCMC</p>
+   <h1>🧠 DSGE Bayesiano</h1>
+   <p>Estimaci&oacute;n de modelos DSGE con MCMC, Kalman y verosimilitud marginal</p>
    <div class="badge-area">
-    <span class="chip"><i class="fas fa-wave-square"></i> Kalman</span>
-    <span class="chip"><i class="fas fa-chart-bar"></i> Priors</span>
     <span class="chip"><i class="fas fa-random"></i> MCMC</span>
+    <span class="chip"><i class="fas fa-filter"></i> Kalman</span>
+    <span class="chip"><i class="fas fa-chart-bell"></i> Posterior</span>
    </div>
   </div>
   <div class="progress-section">
@@ -74,60 +87,100 @@
    <span class="progress-text" id="progressText">M&oacute;dulo 8 de 12</span>
   </div>
   <div class="analogy-card">
-   <strong>💡 Pi&eacute;nsalo as&iacute;:</strong> Estimar un DSGE bayesianamente es como armar un mueble con instrucciones (priors) y despu&eacute;s ajustar con las medidas reales de tu sala (datos). Si las instrucciones dicen que el perno mide 5cm (&beta;~N(5,1)), los datos te dir&aacute;n si ajustarlo a 4.8 o 5.2. El MCMC es probar muchas combinaciones hasta encontrar el ajuste perfecto.
+   <strong>💡 Pi&eacute;nsalo as&iacute;:</strong> Estimar un DSGE por m&aacute;xima verosimilitud es como ajustar un traje solo con cinta m&eacute;trica (datos) pero sin saber las costuras. El enfoque bayesiano es como tener un sastre experto que ya sabe las proporciones t&iacute;picas (prior) y solo ajusta los detalles con la cinta m&eacute;trica (likelihood). El prior te da estabilidad donde los datos son d&eacute;biles.
+  </div>
+  <div class="objectives">
+   <h3>🎯 &iquest;Qu&eacute; aprender&aacute;s en este m&oacute;dulo?</h3>
+   <li>Comprender por qu&eacute; la estimaci&oacute;n bayesiana es preferible para DSGE frente a m&aacute;xima verosimilitud cl&aacute;sica.</li>
+   <li>Usar el filtro de Kalman para evaluar la verosimilitud de un modelo DSGE en espacio de estados.</li>
+   <li>Interpretar priors y posteriors de par&aacute;metros estructurales (&beta;, &kappa;, &sigma;, &phi;_&pi;, &phi;_y, &rho;).</li>
+   <li>Entender el concepto de verosimilitud marginal y el factor de Bayes para comparaci&oacute;n de modelos.</li>
+   <li>Realizar simulaci&oacute;n MCMC (Metropolis-Hastings) para explorar la distribuci&oacute;n posterior.</li>
   </div>
   <div class="main-area">
    <div class="section-title"><i class="fas fa-flask"></i> Estimaci&oacute;n Bayesiana de DSGE</div>
    <div class="info-grid">
     <div class="info-panel">
-     <h3>📐 State-space DSGE</h3>
-     <p>El DSGE se escribe en espacio de estados: ecuaci&oacute;n de transici&oacute;n (variables de estado) y observaci&oacute;n (datos). Filtro de Kalman para la verosimilitud.</p>
-     <div class="formula">p(Y|&theta;) via Kalman</div>
+     <h3>🔬 Del Modelo a la Estimaci&oacute;n: Espacio de Estados</h3>
+     <p>El modelo DSGE log-linealizado se escribe en forma de espacio de estados. La ecuaci&oacute;n de transici&oacute;n describe la din&aacute;mica de las variables de estado (brecha, inflaci&oacute;n, tasa). La ecuaci&oacute;n de observaci&oacute;n relaciona estas variables con los datos observados (PIB, IPC, tasa de pol&iacute;tica). El filtro de Kalman itera hacia adelante: predice el estado en t+1 y lo actualiza cuando llega la observaci&oacute;n, produciendo la verosimilitud como subproducto.</p>
+     <div class="formula">p(Y_T | &theta;) = &prod;_t p(y_t | Y_{t-1}, &theta;)</div>
     </div>
     <div class="info-panel">
-     <h3>🎯 Prior elicitation</h3>
-     <p>Distribuciones previas para par&aacute;metros estructurales: Beta para tasas, Gamma para elasticidades, Inverse Gamma para varianzas.</p>
-     <div class="formula">&theta; ~ p(&theta;)</div>
+     <h3>📊 Priors: El Punto de Partida</h3>
+     <p>Los par&aacute;metros estructurales tienen distribuciones iniciales (priors) basadas en la teor&iacute;a econ&oacute;mica. Por ejemplo: &beta; ~ Beta(0.99, 0.01) (tasa de descuento cercana a 1), &kappa; ~ Gamma(0.2, 0.1) (pendiente de NKPC), &sigma; ~ InvGamma(1, 0.5) (EIS). Los priors son informativos: estabilizan la estimaci&oacute;n cuando los datos tienen poca informaci&oacute;n sobre un par&aacute;metro. La elecci&oacute;n de la distribuci&oacute;n importa: Beta para [0,1], Gamma para positivos, InvGamma para varianzas.</p>
+     <div class="formula">Prior: p(&theta;) | Posterior: p(&theta;|Y) &prop; p(Y|&theta;) &times; p(&theta;)</div>
     </div>
     <div class="info-panel">
-     <h3>🔄 MCMC (RW-MH)</h3>
-     <p>Random Walk Metropolis-Hastings. Propuesta &theta;* = &theta;^(j-1) + N(0, c&Sigma;). Aceptaci&oacute;n con ratio de Hastings.</p>
-     <div class="formula">&alpha; = min(1, p(&theta;*|Y)/p(&theta;^(j-1)|Y))</div>
+     <h3>🔄 Metropolis-Hastings: MCMC</h3>
+     <p>La posterior p(&theta;|Y) no tiene forma anal&iacute;tica cerrada. Usamos MCMC con Metropolis-Hastings (MH): proponemos un nuevo &theta;' desde una distribuci&oacute;n candidata, calculamos la raz&oacute;n de aceptaci&oacute;n r = p(&theta;'|Y)/p(&theta;|Y), aceptamos con probabilidad min(r,1). La cadena converge a la distribuci&oacute;n posterior. Se descartan las primeras N iteraciones (burn-in) y se verifica la convergencia con el estad&iacute;stico de Geweke o el factor de escala.</p>
+     <div class="formula">&theta;_{m+1} = &theta;_m + &eta; &middot; &Sigma; &middot; &nabla; log p(&theta;_m | Y)</div>
     </div>
     <div class="info-panel">
-     <h3>✅ Convergencia</h3>
-     <p>Geweke (z-test between first/last part of chain). Brooks-Gelman (R-hat < 1.1). Posterior predictive checks (datos simulados vs reales).</p>
-     <div class="formula">R-hat < 1.1</div>
+     <h3>📐 Verosimilitud Marginal y Comparaci&oacute;n de Modelos</h3>
+     <p>La verosimilitud marginal p(Y) = &int; p(Y|&theta;) p(&theta;) d&theta; es la probabilidad de los datos integrando sobre todos los par&aacute;metros. El factor de Bayes entre el modelo A y el B es p_A(Y)/p_B(Y). Si es > 1, los datos favorecen el modelo A. En la pr&aacute;ctica, se usa el log-verosimilitud marginal (LVM) y se comparan diferencias (> 2-3 es evidencia positiva según Jeffreys). Esta es la herramienta clave para comparar especificaciones alternativas (ej: &phi;_&pi; libre vs restringido).</p>
+     <div class="formula">log p(Y) &asymp; log &Sigma; w_i &middot; L_i (M&eacute;todo de Harmonica)</div>
+    </div>
+   </div>
+
+   <div class="example-section">
+    <h3><i class="fas fa-calculator"></i> Ejemplo paso a paso: Estimaci&oacute;n de par&aacute;metros NK con datos sint&eacute;ticos</h3>
+    <div class="step">
+     <div class="step-num">Paso 1: Elegir priors</div>
+     <p>Definimos: &beta; ~ Beta(0.99, 0.01) — la tasa de descuento es muy cercana a 1. &kappa; ~ Gamma(0.3, 0.15) — la pendiente de la NKPC es peque&ntilde;a pero positiva. &sigma; ~ InvGamma(1, 0.5) — elasticidad de sustituci&oacute;n intertemporal. &phi;_&pi; ~ Normal(1.5, 0.3) — principio de Taylor. &rho; ~ Beta(0.7, 0.1) — suavizamiento de tasa.</p>
+    </div>
+    <div class="step">
+     <div class="step-num">Paso 2: Evaluar la verosimilitud con Kalman</div>
+     <p>Usamos datos simulados de inflaci&oacute;n (100 obs, media 2%, desv 0.5%) y brecha del producto (media 0%, desv 0.8%). El filtro de Kalman produce la verosimilitud p(Y|&theta;) para cada conjunto de par&aacute;metros. Iteramos sobre los 100 periodos: predicci&oacute;n, actualizaci&oacute;n, acumulaci&oacute;n de log-likelihood.</p>
+    </div>
+    <div class="step">
+     <div class="step-num">Paso 3: MCMC — 10,000 iteraciones</div>
+     <p>Corremos MH con 10,000 iteraciones (2,000 de burn-in). La tasa de aceptaci&oacute;n ideal es ~25-30%. Calculamos la media posterior y los intervalos de credibilidad al 90% (percentiles 5% y 95%). Por ejemplo: &kappa; posterior = 0.28 [0.15, 0.42], &phi;_&pi; posterior = 1.6 [1.2, 2.0].</p>
+    </div>
+    <div class="step">
+     <div class="step-num">Paso 4: Factores de Bayes entre modelos</div>
+     <p>Comparamos dos modelos: M1 (Taylor completo: &phi;_&pi; y &phi;_y libres) y M2 (&phi;_y = 0, solo inflaci&oacute;n). Calculamos log-p(Y) para cada uno. Si la diferencia es > 5, los datos favorecen fuertemente M1. Esto sugiere que responder a la brecha mejora el ajuste del modelo a los datos.</p>
     </div>
    </div>
 
    <div class="sim-area">
-    <div class="section-title"><i class="fas fa-play"></i> Simulaci&oacute;n: Prior vs Posterior y MCMC</div>
-    <p style="margin-bottom:0.8rem;color:#b9ccee;">Compara las distribuciones prior y posterior para par&aacute;metros clave del DSGE. Observa los trace plots de convergencia MCMC.</p>
+    <div class="section-title"><i class="fas fa-play"></i> Simulaci&oacute;n: MCMC Posterior</div>
+    <p style="margin-bottom:0.8rem;color:#b9ccee;">Observa c&oacute;mo evoluciona la cadena MCMC para &phi;_&pi; y &kappa;. Ajusta la cantidad de iteraciones y el factor de escala.</p>
     <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem;">
-     <label style="color:#b9ccee;">Par&aacute;metro: <select id="paramSelect" style="background:#1e2a3e;color:#fff;border:1px solid #10b981;border-radius:0.5rem;padding:0.3rem 0.6rem;">
-      <option value="phiPi">&phi;&#8346; (Taylor inflaci&oacute;n)</option><option value="kappa">&kappa; (NKPC pendiente)</option><option value="sigma">&sigma; (EIS)</option>
+     <label style="color:#b9ccee;">Iteraciones: <select id="mcmcIter" style="background:#1e2a3e;color:#fff;border:1px solid #10b981;border-radius:0.5rem;padding:0.3rem 0.6rem;">
+      <option value="50">50</option><option value="200" selected>200</option><option value="500">500</option>
      </select></label>
-     <button id="simBtn" class="btn-action" style="margin:0;">📊 Ver distribuciones</button>
+     <label style="color:#b9ccee;">Factor escala: <select id="scaleFactor" style="background:#1e2a3e;color:#fff;border:1px solid #10b981;border-radius:0.5rem;padding:0.3rem 0.6rem;">
+      <option value="0.5">0.5 (estrecho)</option><option value="1" selected>1.0</option><option value="2">2.0 (amplio)</option>
+     </select></label>
+     <button id="mcmcBtn" class="btn-action" style="margin:0;">🧪 Correr MCMC</button>
     </div>
-    <div id="simResult" style="background:#0a0f1e;border-radius:1rem;padding:1rem;text-align:center;font-size:0.9rem;color:#b9ccee;">
-     Presiona "Ver distribuciones" para comparar prior vs posterior.
+    <div id="mcmcResult" style="background:#0a0f1e;border-radius:1rem;padding:1rem;text-align:center;font-size:0.9rem;color:#b9ccee;">
+     Presiona "Correr MCMC" para ver la cadena de Metropolis-Hastings.
     </div>
    </div>
 
    <div class="quiz-area">
-    <div class="quiz-title"><i class="fas fa-question-circle"></i> Mini Quiz: Bayesian DSGE</div>
+    <div class="quiz-title"><i class="fas fa-question-circle"></i> Mini Quiz: DSGE Bayesiano</div>
     <div id="quizContainer"></div>
     <button id="submitQuizBtn" class="btn-action">✅ Verificar respuestas</button>
     <div id="insigniaArea" class="insignia hidden">
      <i class="fas fa-medal"></i>
-     <h3>🧮 Bayesian DSGE Estimator 🧮</h3>
-     <p>Has dominado la estimaci&oacute;n bayesiana de DSGE. &iexcl;Excelente!</p>
+     <h3>🧠 Bayesian DSGE Estimator 🧠</h3>
+     <p>Has comprendido la estimaci&oacute;n bayesiana de DSGE. &iexcl;Excelente trabajo!</p>
     </div>
    </div>
   </div>
 
-  <div id="feedbackMsg" class="feedback">💡 Compara c&oacute;mo los datos actualizan los priors para diferentes par&aacute;metros.</div>
+  <div id="feedbackMsg" class="feedback">💡 La estimaci&oacute;n bayesiana combina la teor&iacute;a econ&oacute;mica (priors) con los datos (likelihood).</div>
+
+  <div class="recap">
+   <h3><i class="fas fa-check-circle"></i> Resumen del m&oacute;dulo</h3>
+   <li>La estimaci&oacute;n bayesiana de DSGE usa el filtro de Kalman para evaluar la verosimilitud en espacio de estados.</li>
+   <li>Los priors permiten incorporar conocimiento previo (teor&iacute;a econ&oacute;mica) y estabilizar par&aacute;metros dif&iacute;ciles de identificar.</li>
+   <li>MCMC (Metropolis-Hastings) explora la distribuci&oacute;n posterior; la convergencia se eval&uacute;a con estad&iacute;sticos y gr&aacute;ficas de traza.</li>
+   <li>La verosimilitud marginal p(Y) permite comparar modelos mediante factores de Bayes.</li>
+   <li>El resultado final: distribuciones posteriores de par&aacute;metros con intervalos de credibilidad, no solo estimaciones puntuales.</li>
+  </div>
 
   <div class="nav-links">
    <a href="07-dsge-new-keynesian.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
@@ -141,11 +194,11 @@
   const STORAGE_KEY = 'prog_econ_7_08';
   const PROGRESS_KEY = 'prog_econ_7_progress';
   const questions = [
-   { text: "&iquest;Qu&eacute; filtro se usa para evaluar la verosimilitud de un DSGE en espacio de estados?", options: ["Filtro HP", "Filtro de Kalman", "Filtro de Baxter-King", "Filtro de Hodrick"], correct: 1 },
-   { text: "&iquest;Qu&eacute; distribuci&oacute;n es apropiada para un prior de par&aacute;metro entre 0 y 1 (&beta;, &rho;)?", options: ["Normal", "Beta", "Gamma", "Inverse Gamma"], correct: 1 },
-   { text: "El algoritmo Metropolis-Hastings se usa para:", options: ["Estimar MCO", "Muestrear de la posterior", "Calcular la media", "Filtrar datos"], correct: 1 },
-   { text: "&iquest;Qu&eacute; indica un R-hat < 1.1?", options: ["El modelo est&aacute; mal especificado", "La cadena MCMC convergi&oacute;", "Los datos son insuficientes", "El prior es muy fuerte"], correct: 1 },
-   { text: "Posterior predictive checks comparan:", options: ["Dos modelos DSGE", "Datos simulados del modelo vs datos reales", "Prior vs posterior", "Dos cadenas MCMC"], correct: 1 }
+   { text: "&iquest;Qu&eacute; se usa para evaluar la verosimilitud de un DSGE en espacio de estados?", options: ["MCO", "Filtro de Kalman", "Regresi&oacute;n Ridge", "VAR estructural"], correct: 1, explanation: "El filtro de Kalman itera sobre la predicci&oacute;n y actualizaci&oacute;n del estado, produciendo la verosimilitud p(Y|&theta;) como subproducto." },
+   { text: "&iquest;Por qu&eacute; son importantes los priors en DSGE bayesiano?", options: ["Porque eliminan la necesidad de datos", "Porque reflejan teor&iacute;a y evitan par&aacute;metros irreales", "Porque no afectan los resultados", "Porque reducen el tiempo de c&oacute;mputo"], correct: 1, explanation: "Los priors reflejan conocimiento previo (teor&iacute;a econ&oacute;mica) y estabilizan par&aacute;metros que los datos no pueden identificar por s&iacute; solos." },
+   { text: "El algoritmo Metropolis-Hastings es un m&eacute;todo de:", options: ["Optimizaci&oacute;n determinista", "Monte Carlo v&iacute;a Cadenas de Markov (MCMC)", "Filtro no lineal", "Suavizamiento exponencial"], correct: 1, explanation: "MH es un algoritmo MCMC que genera muestras de la distribuci&oacute;n posterior aceptando/rechazando propuestas con una probabilidad basada en la raz&oacute;n de densidades." },
+   { text: "La verosimilitud marginal p(Y) se usa para:", options: ["Estimar par&aacute;metros", "Comparar modelos via factor de Bayes", "Calcular residuales", "Predecir fuera de muestra"], correct: 1, explanation: "p(Y) = &int; p(Y|&theta;) p(&theta;) d&theta;. El factor de Bayes p_A(Y)/p_B(Y) indica qu&eacute; modelo es mejor apoyado por los datos." },
+   { text: "&iquest;Qu&eacute; distribuci&oacute;n es t&iacute;pica para el prior de &beta; (tasa de descuento)?", options: ["Normal", "Gamma", "Beta", "Inversa Gamma"], correct: 2, explanation: "&beta; &isin; (0,1), por lo tanto se usa una distribuci&oacute;n Beta, t&iacute;picamente Beta(0.99, 0.01) &mdash; la tasa de descuento es cercana a 1." }
   ];
   let userAnswers = new Array(questions.length).fill(null);
   let quizCompleted = false;
@@ -167,7 +220,7 @@
    container.innerHTML = '';
    questions.forEach((q, idx) => {
     const qDiv = document.createElement('div'); qDiv.classList.add('question');
-    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
+    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div><div class="explanation" id="expl-'+idx+'">'+q.explanation+'</div>';
     const optsDiv = qDiv.querySelector('.options');
     q.options.forEach((opt, optIdx) => {
      const span = document.createElement('div'); span.classList.add('opt');
@@ -189,7 +242,7 @@
 
   function handleSubmit() {
    if (quizCompleted) return;
-   if (userAnswers.some(a => a === null)) { document.getElementById('feedbackMsg').textContent = I18N.t('fb_0'); return; }
+   if (userAnswers.some(a => a === null)) { document.getElementById('feedbackMsg').innerHTML = '\u26A0\ufe0f Responde todas las preguntas primero.'; return; }
    let correct = 0;
    questions.forEach((q, i) => { if (userAnswers[i] === q.correct) correct++; });
    const total = questions.length; const passed = correct >= Math.ceil(total * 0.6);
@@ -200,14 +253,16 @@
      if (oi === questions[idx].correct) o.classList.add('correct');
      else if (oi === userAnswers[idx]) o.classList.add('wrong');
     });
+    const expl = document.getElementById('expl-'+idx);
+    if (expl) expl.style.display = 'block';
    });
    if (passed) {
     quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
     document.getElementById('insigniaArea').classList.remove('hidden');
-    document.getElementById('feedbackMsg').textContent = I18N.t('fb_1') + correct + '/' + total + ' correctas. &iexcl;Dominas la estimaci&oacute;n Bayesiana de DSGE!';
+    document.getElementById('feedbackMsg').innerHTML = '\uD83C\uDF89 ' + correct + '/' + total + ' correctas. \u00a1Dominas la estimaci\u00f3n bayesiana de DSGE!';
     saveProgress(); updateProgress();
    } else {
-    document.getElementById('feedbackMsg').textContent = '❌ ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. &iexcl;Reintenta!';
+    document.getElementById('feedbackMsg').innerHTML = '\u274C ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. \u00a1Reintenta!';
    }
   }
 
@@ -216,84 +271,66 @@
    if (p.includes(STORAGE_KEY)) {
     quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
     document.getElementById('insigniaArea').classList.remove('hidden');
-    document.getElementById('feedbackMsg').textContent = I18N.t('fb_2');
+    document.getElementById('feedbackMsg').innerHTML = '\uD83C\uDFC6 Ya completaste este m\u00f3dulo.';
     document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
+    document.querySelectorAll('.explanation').forEach(e => e.style.display = 'block');
    }
   }
 
-  function simulateBayesianDSGE() {
-   const param = document.getElementById('paramSelect').value;
-   const labels = {phiPi: '&phi;&#8346;', kappa: '&kappa;', sigma: '&sigma;'};
-   const priorMeans = {phiPi: 1.5, kappa: 0.5, sigma: 1.0};
-   const priorSds = {phiPi: 0.3, kappa: 0.15, sigma: 0.2};
-   const pm = priorMeans[param]; const psd = priorSds[param];
-   const postMean = pm + (Math.random() - 0.3) * 0.2;
-   const postSd = psd * (0.5 + Math.random() * 0.2);
-   const bins = 15;
-   function histData(mean, sd, n) {
-    const h = [];
-    for (let i = 0; i < n; i++) h.push(mean + (Math.random() + Math.random() + Math.random() - 1.5) * sd * 2);
-    return h;
+  function runMCMC() {
+   const iter = parseInt(document.getElementById('mcmcIter').value);
+   const scale = parseFloat(document.getElementById('scaleFactor').value);
+   const nBurn = Math.round(iter * 0.2);
+   const truePhiPi = 1.5; const trueKappa = 0.3;
+   let chainPhi = []; let chainKappa = [];
+   let currentPhi = 1.2; let currentKappa = 0.5;
+   let acceptCount = 0;
+   for (let i = 0; i < iter; i++) {
+    const propPhi = currentPhi + (Math.random() - 0.5) * 0.4 * scale;
+    const propKappa = currentKappa + (Math.random() - 0.5) * 0.2 * scale;
+    const llCurr = -0.5 * (Math.pow(currentPhi - truePhiPi, 2) / 0.3 + Math.pow(currentKappa - trueKappa, 2) / 0.1);
+    const llProp = -0.5 * (Math.pow(propPhi - truePhiPi, 2) / 0.3 + Math.pow(propKappa - trueKappa, 2) / 0.1);
+    const priorCurr = -0.5 * (Math.pow(currentPhi, 2) / 5 + Math.pow(currentKappa, 2) / 2);
+    const priorProp = -0.5 * (Math.pow(propPhi, 2) / 5 + Math.pow(propKappa, 2) / 2);
+    const r = Math.exp((llProp + priorProp) - (llCurr + priorCurr));
+    if (Math.random() < Math.min(r, 1)) { currentPhi = propPhi; currentKappa = propKappa; acceptCount++; }
+    chainPhi.push(currentPhi); chainKappa.push(currentKappa);
    }
-   const priorD = histData(pm, psd, 500);
-   const postD = histData(postMean, postSd, 500);
-   const minV = Math.min(pm - 2.5*psd, postMean - 2.5*postSd);
-   const maxV = Math.max(pm + 2.5*psd, postMean + 2.5*postSd);
-   const binW = (maxV - minV) / bins;
-   function binData(data) {
-    const b = Array(bins).fill(0);
-    data.forEach(v => {
-     const idx = Math.min(bins-1, Math.max(0, Math.floor((v - minV) / binW)));
-     b[idx]++;
-    });
-    return b;
-   }
-   const priorB = binData(priorD);
-   const postB = binData(postD);
-   const maxCount = Math.max(...priorB, ...postB) || 1;
-   let html = '<div style="display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;">';
-   html += '<div style="flex:1;min-width:220px;background:#1e2a3e;border-radius:1rem;padding:0.8rem;"><div style="font-weight:700;color:#6ee7b7;margin-bottom:0.3rem;">Prior: ' + labels[param] + '</div><div style="display:flex;gap:1px;align-items:flex-end;height:60px;">';
-   priorB.forEach(c => {
-    const h = Math.round((c / maxCount) * 50);
-    html += '<div style="flex:1;height:'+h+'px;background:#10b981;border-radius:1px;min-height:1px;" title="'+c+'"></div>';
+   const chain = chainPhi.map((v,i) => ({phi: v, kappa: chainKappa[i]}));
+   const afterBurn = chain.slice(nBurn);
+   const meanPhi = afterBurn.reduce((s,c) => s + c.phi, 0) / afterBurn.length;
+   const meanKappa = afterBurn.reduce((s,c) => s + c.kappa, 0) / afterBurn.length;
+   const sortedPhi = afterBurn.map(c => c.phi).sort((a,b) => a-b);
+   const sortedKappa = afterBurn.map(c => c.kappa).sort((a,b) => a-b);
+   const ci5Phi = sortedPhi[Math.round(0.05 * sortedPhi.length)];
+   const ci95Phi = sortedPhi[Math.round(0.95 * sortedPhi.length)];
+   const ci5Kappa = sortedKappa[Math.round(0.05 * sortedKappa.length)];
+   const ci95Kappa = sortedKappa[Math.round(0.95 * sortedKappa.length)];
+   const acceptRate = (acceptCount / iter * 100).toFixed(1);
+   const dispIter = Math.min(iter, 500);
+   const stepDisp = Math.max(1, Math.floor(iter / dispIter));
+   const display = chain.filter((_, i) => i % stepDisp === 0);
+   let html = '<div style="display:flex;gap:1.5rem;flex-wrap:wrap;">';
+   html += '<div style="flex:1;min-width:200px;"><div style="font-weight:700;color:#10b981;margin-bottom:0.3rem;font-size:0.85rem;">&phi;_&pi; Chain (post burn-in)</div>';
+   display.forEach((c, i) => {
+    const bar = Math.round((c.phi - 0.5) / 2.5 * 60);
+    html += '<div style="display:flex;align-items:center;gap:0.2rem;font-size:0.6rem;"><span style="width:30px;">'+(i*stepDisp+nBurn)+'</span><div style="height:6px;width:'+Math.max(bar,2)+'%;background:#10b981;border-radius:2px;"></div><span>'+c.phi.toFixed(2)+'</span></div>';
    });
-   html += '</div><p style="color:#8899cc;font-size:0.7rem;">Media='+pm.toFixed(2)+', SD='+psd.toFixed(2)+'</p></div>';
-   html += '<div style="flex:1;min-width:220px;background:#1e2a3e;border-radius:1rem;padding:0.8rem;"><div style="font-weight:700;color:#6ee7b7;margin-bottom:0.3rem;">Posterior: ' + labels[param] + '</div><div style="display:flex;gap:1px;align-items:flex-end;height:60px;">';
-   postB.forEach(c => {
-    const h = Math.round((c / maxCount) * 50);
-    html += '<div style="flex:1;height:'+h+'px;background:#059669;border-radius:1px;min-height:1px;" title="'+c+'"></div>';
+   html += '</div><div style="flex:1;min-width:200px;"><div style="font-weight:700;color:#6ee7b7;margin-bottom:0.3rem;font-size:0.85rem;">&kappa; Chain</div>';
+   display.forEach((c, i) => {
+    const bar = Math.round((c.kappa) / 1.0 * 60);
+    html += '<div style="display:flex;align-items:center;gap:0.2rem;font-size:0.6rem;"><span style="width:30px;">'+(i*stepDisp+nBurn)+'</span><div style="height:6px;width:'+Math.max(bar,2)+'%;background:#6ee7b7;border-radius:2px;"></div><span>'+c.kappa.toFixed(2)+'</span></div>';
    });
-   html += '</div><p style="color:#8899cc;font-size:0.7rem;">Media='+postMean.toFixed(2)+', SD='+postSd.toFixed(2)+'</p></div>';
+   html += '</div></div>';
+   html += '<div style="margin-top:0.8rem;background:#0f1a2c;border-radius:0.8rem;padding:0.6rem;font-size:0.8rem;color:#a7f3d0;text-align:center;">';
+   html += 'Aceptaci&oacute;n: '+acceptRate+'% | &phi;_&pi; post: '+meanPhi.toFixed(3)+' [IC90: '+ci5Phi.toFixed(3)+', '+ci95Phi.toFixed(3)+'] | &kappa; post: '+meanKappa.toFixed(3)+' [IC90: '+ci5Kappa.toFixed(3)+', '+ci95Kappa.toFixed(3)+']';
    html += '</div>';
-   html += '<div style="margin-top:0.8rem;background:#1e2a3e;border-radius:1rem;padding:0.8rem;"><div style="font-weight:700;color:#6ee7b7;margin-bottom:0.3rem;">Trace Plot MCMC</div><div style="display:flex;gap:1px;align-items:center;height:40px;overflow:hidden;">';
-   for (let i = 0; i < 100; i++) {
-    const v = postMean + (Math.sin(i * 0.3) + Math.random() - 0.5) * postSd;
-    const h = Math.round(((v - minV) / (maxV - minV)) * 30);
-    html += '<div style="flex:1;height:2px;background:#10b981;margin-top:'+(30-h)+'px;" title="'+v.toFixed(3)+'"></div>';
-   }
-   html += '</div><p style="color:#8899cc;font-size:0.7rem;">100 iteraciones. La cadena mezcla bien (sin tendencias).</p></div>';
-   document.getElementById('simResult').innerHTML = html;
+   document.getElementById('mcmcResult').innerHTML = html;
   }
 
   document.getElementById('submitQuizBtn').addEventListener('click', handleSubmit);
-  document.getElementById('simBtn').addEventListener('click', simulateBayesianDSGE);
+  document.getElementById('mcmcBtn').addEventListener('click', runMCMC);
   renderQuestions(); updateBtnState(); restoreProgress(); updateProgress();
  </script>
- <script>
-window.I18N_DATA={
- "fb_0": {
-  "es": "⚠️ Responde todas las preguntas primero.",
-  "en": "⚠️ Answer todas las preguntas primero."
- },
- "fb_1": {
-  "es": "🎉 ",
-  "en": "🎉 "
- },
- "fb_2": {
-  "es": "🏆 Ya completaste este m&oacute;dulo.",
-  "en": "🏆 Ya completaste este m&oacute;dulo."
- }
-};
-</script>
-<script src="../../../assets/js/i18n.js"></script> </body>
+</body>
 </html>

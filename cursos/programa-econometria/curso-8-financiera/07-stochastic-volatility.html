@@ -47,6 +47,17 @@
   .insignia i { font-size:2.5rem; color:gold; }
   .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
   .hidden { display:none; }
+  .objectives { background:rgba(239,68,68,0.1); border-radius:1.5rem; padding:1rem 1.5rem; margin:1rem 2rem; border:1px solid rgba(239,68,68,0.3); }
+  .objectives li { color:#b9ccee; font-size:0.9rem; margin:0.4rem 0; list-style-type: none; }
+  .objectives li::before { content:"\ud83c\udfaf "; }
+  .example-section { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #ef4444; margin-bottom:1.5rem; }
+  .example-section .step { background:#0f1a2c; border-radius:1rem; padding:0.8rem 1.2rem; margin:0.6rem 0; border-left:4px solid #ef4444; }
+  .example-section .step .step-num { color:#fca5a5; font-weight:700; font-size:0.85rem; }
+  .example-section .step p { color:#b9ccee; font-size:0.85rem; margin-top:0.3rem; }
+  .explanation { background:#0a1525; border-radius:0.8rem; padding:0.6rem 1rem; margin-top:0.5rem; font-size:0.8rem; color:#fecaca; border-left:3px solid #ef4444; display:none; }
+  .recap { background:rgba(239,68,68,0.08); border-radius:1.5rem; padding:1rem 1.5rem; margin:0 2rem; border:1px dashed rgba(239,68,68,0.4); }
+  .recap h3 { color:#fca5a5; font-size:1rem; margin-bottom:0.5rem; }
+  .recap li { color:#8899bb; font-size:0.8rem; margin:0.3rem 0; }
   .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
   .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
   .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(239,68,68,0.4); }
@@ -76,25 +87,42 @@
   <div class="analogy-card">
    <strong>💡 Pi&eacute;nsalo as&iacute;:</strong> En GARCH la volatilidad es una funci&oacute;n determinista de los retornos pasados. En SV, la volatilidad tiene su propia "personalidad" con shocks independientes. Es como comparar un termostato (GARCH: reacciona a la temperatura) con una persona con cambios de humor (SV: tiene sus propias fluctuaciones internas).
   </div>
+
+  <div class="objectives">
+   <strong style="color:#fca5a5;font-size:1rem;">🎯 &iquest;Qu&eacute; aprender&aacute;s en este m&oacute;dulo?</strong>
+   <li>Entender la diferencia fundamental entre SV y GARCH: dos fuentes de aleatoriedad vs una</li>
+   <li>Comprender el modelo SV(1) con log-volatilidad AR(1) latente</li>
+   <li>Conocer los m&eacute;todos de estimaci&oacute;n: MCMC, particle filter</li>
+   <li>Identificar las ventajas de SV para modelar volatilidad de opciones y criptomonedas</li>
+  </div>
+
   <div class="main-area">
    <div class="section-title"><i class="fas fa-lightbulb"></i> Volatilidad Estoc&aacute;stica</div>
    <div class="info-grid">
     <div class="info-panel">
      <h3>📐 Modelo SV(1)</h3>
-     <p>yₜ = exp(hₜ/2)εₜ, hₜ₊₁ = μ + φ(hₜ - μ) + ηₜ. La log-volatilidad hₜ sigue un AR(1) con su propio shock ηₜ ∼ N(0, σ²η).</p>
+     <p>yₜ = exp(hₜ/2)εₜ, hₜ₊₁ = μ + φ(hₜ - μ) + ηₜ. <strong>Intuici&oacute;n:</strong> La log-volatilidad hₜ sigue un proceso AR(1) con su propio shock ηₜ ∼ N(0, σ²η). Esto es clave: mientras que GARCH tiene una sola fuente de aleatoriedad (εₜ), SV tiene dos (εₜ para el retorno, ηₜ para la volatilidad). Esto hace que SV sea mucho m&aacute;s flexible: la volatilidad puede cambiar por razones no relacionadas con los retornos pasados. Por ejemplo, una noticia geopol&iacute;tica puede aumentar la volatilidad sin que haya habido un shock grande en los retornos ese d&iacute;a. El par&aacute;metro φ mide la persistencia de la volatilidad latente (t&iacute;picamente φ ~ 0.95-0.99).</p>
      <div class="formula">hₜ₊₁ = μ + φ(hₜ - μ) + σηηₜ</div>
     </div>
     <div class="info-panel">
      <h3>🔍 SV vs GARCH</h3>
-     <p>SV tiene dos fuentes de aleatoriedad (εₜ, ηₜ) mientras GARCH solo una (εₜ). SV es m&aacute;s flexible pero dif&iacute;cil de estimar por MLE.</p>
+     <p>SV tiene dos fuentes de aleatoriedad (εₜ, ηₜ) mientras GARCH solo una (εₜ). SV es m&aacute;s flexible pero dif&iacute;cil de estimar por MLE. <strong>Intuici&oacute;n:</strong> En GARCH, la varianza de ma&ntilde;ana es una funci&oacute;n determinista de los datos de hoy: si conoces εₜ y σ²ₜ, conoces exactamente σ²ₜ₊₁. En SV, incluso conociendo toda la historia, no puedes predecir exactamente hₜ₊₁ porque tiene su propio shock ηₜ. Esto hace que SV sea m&aacute;s realista: la volatilidad financiera tiene un componente impredecible. Sin embargo, la funci&oacute;n de verosimilitud de SV no tiene forma cerrada porque la volatilidad es latente (no observable), requiriendo m&eacute;todos de simulaci&oacute;n para la estimaci&oacute;n.</p>
     </div>
     <div class="info-panel">
      <h3>📊 Estimaci&oacute;n: MCMC</h3>
-     <p>MCMC (Gibbs sampling, Metropolis-Hastings) es el m&eacute;todo est&aacute;ndar para SV. Muestrea la volatilidad latente y los par&aacute;metros de forma iterativa.</p>
+     <p>MCMC (Gibbs sampling, Metropolis-Hastings) es el m&eacute;todo est&aacute;ndar para SV. Muestrea la volatilidad latente y los par&aacute;metros de forma iterativa. <strong>Intuici&oacute;n:</strong> MCMC funciona as&iacute;: (1) inicializa valores para los par&aacute;metros (μ, φ, ση) y las volatilidades hₜ. (2) Muestrea cada hₜ condicional a los datos y dem&aacute;s par&aacute;metros (Gibbs sampling). (3) Muestrea los par&aacute;metros condicionales a las hₜ. (4) Repite miles de veces, construyendo una cadena de Markov cuyas muestras convergen a la distribuci&oacute;n posterior. Las &uacute;ltimas muestras se usan para inferencia. Este proceso es computacionalmente intensivo: para 1000 observaciones, MCMC puede tomar minutos. M&eacute;todos m&aacute;s r&aacute;pidos incluyen el particle filter (SMC) y la estimaci&oacute;n por m&aacute;xima verosimilitud simulada.</p>
     </div>
     <div class="info-panel">
      <h3>🔄 Leverage SV</h3>
-     <p>Extiende SV permitiendo correlaci&oacute;n entre εₜ y ηₜ₊₁. Corr(εₜ, ηₜ₊₁) < 0 captura el efecto leverage.</p>
+     <p>Extiende SV permitiendo correlaci&oacute;n entre εₜ y ηₜ₊₁. Corr(εₜ, ηₜ₊₁) < 0 captura el efecto leverage. <strong>Intuici&oacute;n:</strong> En el SV b&aacute;sico, los shocks de retorno y volatilidad son independientes. El Leverage SV permite que est&eacute;n correlacionados: si el mercado cae hoy (εₜ negativo), la volatilidad de ma&ntilde;ana tiende a subir (ηₜ₊₁ positivo). Esta correlaci&oacute;n negativa (ρ < 0) captura el efecto leverage de manera m&aacute;s natural que en GARCH. La estimaci&oacute;n es m&aacute;s compleja porque ahora hay que estimar ρ adem&aacute;s de los dem&aacute;s par&aacute;metros. En la pr&aacute;ctica, ρ estimado para el S&P 500 es aproximadamente -0.3 a -0.5, confirmando el efecto leverage.</p>
+    </div>
+    <div class="info-panel">
+     <h3>📏 Propiedades de SV</h3>
+     <p>SV genera colas m&aacute;s pesadas que GARCH y puede producir series con mayor curtosis para los mismos par&aacute;metros. <strong>Intuici&oacute;n:</strong> La mezcla de dos normales (una para εₜ y otra para ηₜ) genera distribuciones con colas inherentemente m&aacute;s pesadas. La curtosis incondicional de SV es: K = 3 × exp(ση²/(1-φ²)). Incluso con φ = 0.95 y ση = 0.2, K ≈ 3.5. Con ση = 0.4, K ≈ 5. Esto significa que SV puede generar colas pesadas "naturalmente" sin necesidad de distribuciones t-Student en los errores. Adem&aacute;s, la funci&oacute;n de autocorrelaci&oacute;n de los retornos al cuadrado decae exponencialmente con la misma tasa que la autocorrelaci&oacute;n de hₜ, dando memoria larga si φ es cercano a 1.</p>
+    </div>
+    <div class="info-panel">
+     <h3>📈 Aplicaciones de SV</h3>
+     <p>SV es popular en valoraci&oacute;n de opciones (modelo Heston), riesgo de mercado, y modelado de criptomonedas. <strong>Intuici&oacute;n:</strong> El modelo Heston (1993) es un SV en tiempo continuo usado para valorar opciones. A diferencia de Black-Scholes (que asume volatilidad constante), Heston permite que la volatilidad var&iacute;e estoc&aacute;sticamente, lo que produce smiles de volatilidad (sonrisas) que se observan en los mercados de opciones. Para criptomonedas como Bitcoin, SV es particularmente &uacute;til porque la volatilidad de estos activos muestra cambios de r&eacute;gimen abruptos que los modelos GARCH (deterministas) no capturan bien. Por ejemplo, el halving de Bitcoin (2024) gener&oacute; un aumento de volatilidad que SV puede capturar como un shock ηₜ en la volatilidad latente.</p>
     </div>
    </div>
 
@@ -112,6 +140,27 @@
     </div>
    </div>
 
+   <div class="example-section">
+    <div class="section-title"><i class="fas fa-calculator"></i> Ejemplo: Simulando un proceso SV(1) paso a paso</div>
+    <p style="color:#b9ccee;font-size:0.85rem;margin-bottom:0.8rem;">Generamos 5 d&iacute;as de un proceso SV(1) con μ = -1, φ = 0.97, ση = 0.2.</p>
+    <div class="step">
+     <div class="step-num">Paso 1: Inicializamos h₁</div>
+     <p>h₁ = μ = -1 (valor inicial en la media). La volatilidad inicial es exp(h₁/2) = exp(-0.5) = 0.6065 ≈ 60.7% (anualizada; diaria ser&iacute;a ~3.8%).</p>
+    </div>
+    <div class="step">
+     <div class="step-num">Paso 2: D&iacute;a 1 — generamos el shock de retorno</div>
+     <p>ε₁ = 0.5 (shock normal est&aacute;ndar). y₁ = exp(h₁/2) × ε₁ = 0.6065 × 0.5 = 0.303. Retorno del d&iacute;a 1: +30.3% (en t&eacute;rminos anuales). Ahora generamos h₂: h₂ = -1 + 0.97(-1 - (-1)) + 0.2 × η₁. Con η₁ = -0.3: h₂ = -1 + 0 + (-0.06) = -1.06.</p>
+    </div>
+    <div class="step">
+     <div class="step-num">Paso 3: D&iacute;as 2-5 continuamos</div>
+     <p>D&iacute;a 2: h₂ = -1.06, σ₂ = exp(-0.53) = 0.588. ε₂ = -0.8. y₂ = 0.588 × (-0.8) = -0.470 (-47%). η₂ = 0.5. h₃ = -1 + 0.97(-1.06 - (-1)) + 0.2 × 0.5 = -1 + (-0.0582) + 0.1 = -0.958. D&iacute;a 3: σ₃ = exp(-0.479) = 0.619. As&iacute; sucesivamente. Observa que la volatilidad fluct&uacute;a suavemente (φ = 0.97), pero cada d&iacute;a tiene un shock ηₜ que la desv&iacute;a de su camino determinista.</p>
+    </div>
+    <div class="step">
+     <div class="step-num">Paso 4: Diferencia clave con GARCH</div>
+     <p>En GARCH, la volatilidad del d&iacute;a 2 depender&iacute;a solo de ε₂² y σ²₂. En SV, h₂ depende de η₁ (un shock independiente) y de φ (persistencia). Esto significa que SV puede generar cambios de volatilidad sin que haya habido un shock grande en retornos, lo que es m&aacute;s realista: a veces la volatilidad sube "porque s&iacute;", sin una noticia aparente.</p>
+    </div>
+   </div>
+
    <div class="quiz-area">
     <div class="quiz-title"><i class="fas fa-question-circle"></i> Mini Quiz: Stochastic Volatility</div>
     <div id="quizContainer"></div>
@@ -122,6 +171,15 @@
      <p>Has dominado los modelos de volatilidad estoc&aacute;stica. &iexcl;Excelente!</p>
     </div>
    </div>
+
+   <div class="recap">
+    <h3>📌 Resumen del m&oacute;dulo</h3>
+    <li>SV tiene dos fuentes de aleatoriedad: εₜ (retorno) y ηₜ (volatilidad latente)</li>
+    <li>La log-volatilidad hₜ sigue un AR(1): hₜ₊₁ = μ + φ(hₜ - μ) + σηηₜ</li>
+    <li>SV es m&aacute;s flexible que GARCH pero dif&iacute;cil de estimar (MCMC, particle filter)</li>
+    <li>Leverage SV extiende el modelo con correlaci&oacute;n Corr(εₜ, ηₜ₊₁) < 0</li>
+    <li>SV genera colas m&aacute;s pesadas naturalmente y es ideal para opciones y cripto</li>
+   </div>
   </div>
 
   <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre Stochastic Volatility.</div>
@@ -131,18 +189,18 @@
    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
    <a href="08-realized-volatility.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
   </div>
-  <footer><i class="fas fa-chart-line"></i> Econometr&iacute;a Financiera Aplicada · M&oacute;dulo 7</footer>
+  <footer><i class="fas fa-chart-line"></i> Econometr&iacute;a Financiera Aplicada &middot; M&oacute;dulo 7</footer>
  </div>
 
  <script>
   const STORAGE_KEY = 'prog_econ_8_07';
   const PROGRESS_KEY = 'prog_econ_8_progress';
   const questions = [
-   { text: "&iquest;Qu&eacute; diferencia fundamental hay entre SV y GARCH?", options: ["SV usa datos diarios, GARCH semanales", "SV tiene su propio shock en la volatilidad (ηₜ)", "GARCH es m&aacute;s nuevo", "No hay diferencia"], correct: 1 },
-   { text: "El par&aacute;metro φ en SV mide:", options: ["La media de retornos", "La persistencia de la volatilidad latente", "El apalancamiento", "La curtosis"], correct: 1 },
-   { text: "&iquest;Qu&eacute; m&eacute;todo se usa t&iacute;picamente para estimar SV?", options: ["MCO", "MLE directo", "MCMC", "Momentos"], correct: 2 },
-   { text: "SV se considera m&aacute;s flexible que GARCH porque:", options: ["Tiene m&aacute;s par&aacute;metros", "La volatilidad tiene su propia din&aacute;mica con shocks", "Es m&aacute;s f&aacute;cil de estimar", "Solo funciona con datos normales"], correct: 1 },
-   { text: "El Leverage SV extiende el modelo b&aacute;sico permitiendo:", options: ["Correlaci&oacute;n entre εₜ y ηₜ₊₁", "Volatilidad constante", "Distribuciones discretas", "Efectos estacionales"], correct: 0 }
+   { text: "\u00bfQu\u00e9 diferencia fundamental hay entre SV y GARCH?", options: ["SV usa datos diarios, GARCH semanales", "SV tiene su propio shock en la volatilidad (\u03b7\u209c)", "GARCH es m\u00e1s nuevo", "No hay diferencia"], correct: 1, explanation: "SV tiene DOS fuentes de aleatoriedad: \u03b5\u209c para el retorno y \u03b7\u209c para la volatilidad latente. GARCH solo tiene \u03b5\u209c. Esto hace que SV sea m\u00e1s flexible pero m\u00e1s dif\u00edcil de estimar." },
+   { text: "El par\u00e1metro \u03c6 en SV mide:", options: ["La media de retornos", "La persistencia de la volatilidad latente", "El apalancamiento", "La curtosis"], correct: 1, explanation: "\u03c6 mide la persistencia de la log-volatilidad h\u209c. Si \u03c6 \u2248 0.97, la volatilidad vuelve a su media lentamente. Si \u03c6 \u2248 0.99, la memoria es muy larga." },
+   { text: "\u00bfQu\u00e9 m\u00e9todo se usa t\u00edpicamente para estimar SV?", options: ["MCO", "MLE directo", "MCMC", "Momentos"], correct: 2, explanation: "MCMC (Markov Chain Monte Carlo) es el m\u00e9todo est\u00e1ndar para SV porque la volatilidad es latente y la funci\u00f3n de verosimilitud no tiene forma cerrada." },
+   { text: "SV se considera m\u00e1s flexible que GARCH porque:", options: ["Tiene m\u00e1s par\u00e1metros", "La volatilidad tiene su propia din\u00e1mica con shocks", "Es m\u00e1s f\u00e1cil de estimar", "Solo funciona con datos normales"], correct: 1, explanation: "La volatilidad en SV tiene su propia fuente de aleatoriedad (\u03b7\u209c), lo que permite cambios de volatilidad independientes de los retornos pasados." },
+   { text: "El Leverage SV extiende el modelo b\u00e1sico permitiendo:", options: ["Correlaci\u00f3n entre \u03b5\u209c y \u03b7\u209c\u208a\u2081", "Volatilidad constante", "Distribuciones discretas", "Efectos estacionales"], correct: 0, explanation: "Leverage SV permite correlaci\u00f3n entre el shock de retorno \u03b5\u209c y el shock de volatilidad futura \u03b7\u209c\u208a\u2081, capturando el efecto leverage de manera natural." }
   ];
   let userAnswers = new Array(questions.length).fill(null);
   let quizCompleted = false;
@@ -164,7 +222,7 @@
    container.innerHTML = '';
    questions.forEach((q, idx) => {
     const qDiv = document.createElement('div'); qDiv.classList.add('question');
-    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
+    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div><div class="explanation" id="expl-'+idx+'"></div>';
     const optsDiv = qDiv.querySelector('.options');
     q.options.forEach((opt, optIdx) => {
      const span = document.createElement('div'); span.classList.add('opt');
@@ -197,14 +255,16 @@
      if (oi === questions[idx].correct) o.classList.add('correct');
      else if (oi === userAnswers[idx]) o.classList.add('wrong');
     });
+    const explDiv = qDiv.querySelector('.explanation');
+    if (explDiv) { explDiv.textContent = '\ud83d\udca1 ' + questions[idx].explanation; explDiv.style.display = 'block'; }
    });
    if (passed) {
     quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
     document.getElementById('insigniaArea').classList.remove('hidden');
-    document.getElementById('feedbackMsg').textContent = I18N.t('fb_1') + correct + '/' + total + ' correctas. ¡Dominas SV!';
+    document.getElementById('feedbackMsg').textContent = I18N.t('fb_1') + correct + '/' + total + ' correctas. \u00a1Dominas SV!';
     saveProgress(); updateProgress();
    } else {
-    document.getElementById('feedbackMsg').textContent = '❌ ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. ¡Reintenta!';
+    document.getElementById('feedbackMsg').textContent = '\u274c ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. \u00a1Reintenta!';
    }
   }
 
@@ -233,17 +293,17 @@
    const hMean = h.reduce((a,b) => a+b, 0) / n;
    const volMean = Math.exp(hMean / 2);
    let html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:0.5rem;margin-bottom:1rem;">';
-   html += '<div style="background:#1e2a3e;border-radius:0.8rem;padding:0.6rem;text-align:center;border:1px solid #ef4444;"><div style="font-weight:700;color:#fca5a5;">φ (persistencia)</div><div style="font-size:0.8rem;">'+phi+'</div></div>';
+   html += '<div style="background:#1e2a3e;border-radius:0.8rem;padding:0.6rem;text-align:center;border:1px solid #ef4444;"><div style="font-weight:700;color:#fca5a5;">\u03c6 (persistencia)</div><div style="font-size:0.8rem;">'+phi+'</div></div>';
    html += '<div style="background:#1e2a3e;border-radius:0.8rem;padding:0.6rem;text-align:center;border:1px solid #ef4444;"><div style="font-weight:700;color:#fca5a5;">Vol. media</div><div style="font-size:0.8rem;">'+volMean.toFixed(3)+'</div></div>';
    html += '</div>';
-   html += '<div style="background:#0a0f1e;border-radius:1rem;padding:0.8rem;margin-bottom:0.3rem;"><div style="font-size:0.8rem;color:#fca5a5;">Log-volatilidad hₜ (proceso AR(1) latente):</div><div style="display:flex;align-items:flex-end;gap:1px;height:100px;margin-top:0.3rem;">';
+   html += '<div style="background:#0a0f1e;border-radius:1rem;padding:0.8rem;margin-bottom:0.3rem;"><div style="font-size:0.8rem;color:#fca5a5;">Log-volatilidad h\u209c (proceso AR(1) latente):</div><div style="display:flex;align-items:flex-end;gap:1px;height:100px;margin-top:0.3rem;">';
    const chunk = Math.floor(h.length / 100);
    const hMin = Math.min(...h); const hMax = Math.max(...h); const hRange = hMax - hMin || 1;
    for (let i = 0; i < h.length; i += chunk) {
     const barH = ((h[i] - hMin) / hRange) * 100;
     html += '<div style="flex:1;background:#ef4444;height:'+barH+'%;border-radius:1px;opacity:0.6;"></div>';
    }
-   html += '</div></div><p style="color:#8899cc;font-size:0.8rem;">SV(1) simulado con φ='+phi+'. La log-volatilidad hₜ (gr&aacute;fico) es un AR(1) con sus propios shocks ηₜ. A mayor φ, m&aacute;s persistente.</p>';
+   html += '</div></div><p style="color:#8899cc;font-size:0.8rem;">SV(1) simulado con \u03c6='+phi+'. La log-volatilidad h\u209c (gr\u00e1fico) es un AR(1) con sus propios shocks \u03b7\u209c. A mayor \u03c6, m\u00e1s persistente.</p>';
    document.getElementById('simResult').innerHTML = html;
   }
 
@@ -254,16 +314,16 @@
  <script>
 window.I18N_DATA={
  "fb_0": {
-  "es": "⚠️ Responde todas las preguntas primero.",
-  "en": "⚠️ Answer todas las preguntas primero."
+  "es": "\u26a0\ufe0f Responde todas las preguntas primero.",
+  "en": "\u26a0\ufe0f Responde todas las preguntas primero."
  },
  "fb_1": {
-  "es": "🎉 ",
-  "en": "🎉 "
+  "es": "\ud83c\udf89 ",
+  "en": "\ud83c\udf89 "
  },
  "fb_2": {
-  "es": "🏆 Ya completaste este m&oacute;dulo.",
-  "en": "🏆 Ya completaste este m&oacute;dulo."
+  "es": "\ud83c\udfc6 Ya completaste este m\u00f3dulo.",
+  "en": "\ud83c\udfc6 Ya completaste este m\u00f3dulo."
  }
 };
 </script>

@@ -47,6 +47,17 @@
   .insignia i { font-size:2.5rem; color:gold; }
   .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
   .hidden { display:none; }
+  .objectives { background:rgba(239,68,68,0.1); border-radius:1.5rem; padding:1rem 1.5rem; margin:1rem 2rem; border:1px solid rgba(239,68,68,0.3); }
+  .objectives li { color:#b9ccee; font-size:0.9rem; margin:0.4rem 0; list-style-type: none; }
+  .objectives li::before { content:"\ud83c\udfaf "; }
+  .example-section { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #ef4444; margin-bottom:1.5rem; }
+  .example-section .step { background:#0f1a2c; border-radius:1rem; padding:0.8rem 1.2rem; margin:0.6rem 0; border-left:4px solid #ef4444; }
+  .example-section .step .step-num { color:#fca5a5; font-weight:700; font-size:0.85rem; }
+  .example-section .step p { color:#b9ccee; font-size:0.85rem; margin-top:0.3rem; }
+  .explanation { background:#0a1525; border-radius:0.8rem; padding:0.6rem 1rem; margin-top:0.5rem; font-size:0.8rem; color:#fecaca; border-left:3px solid #ef4444; display:none; }
+  .recap { background:rgba(239,68,68,0.08); border-radius:1.5rem; padding:1rem 1.5rem; margin:0 2rem; border:1px dashed rgba(239,68,68,0.4); }
+  .recap h3 { color:#fca5a5; font-size:1rem; margin-bottom:0.5rem; }
+  .recap li { color:#8899bb; font-size:0.8rem; margin:0.3rem 0; }
   .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
   .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
   .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(239,68,68,0.4); }
@@ -76,24 +87,42 @@
   <div class="analogy-card">
    <strong>💡 Pi&eacute;nsalo as&iacute;:</strong> MGARCH es como un radar de tr&aacute;fico para m&uacute;ltiples activos. No solo mide la velocidad de cada auto (volatilidad individual), sino c&oacute;mo se mueven en relaci&oacute;n unos con otros (correlaci&oacute;n). DCC es especial porque permite que la correlaci&oacute;n cambie en el tiempo, como las rutas de los autos que se acercan o separan.
   </div>
+
+  <div class="objectives">
+   <strong style="color:#fca5a5;font-size:1rem;">🎯 &iquest;Qu&eacute; aprender&aacute;s en este m&oacute;dulo?</strong>
+   <li>Entender por qu&eacute; la correlaci&oacute;n entre activos cambia en el tiempo</li>
+   <li>Comprender la diferencia entre DCC y BEKK para modelar volatilidad multivariante</li>
+   <li>Aprender c&oacute;mo calcular el VaR de un portafolio con correlaciones din&aacute;micas</li>
+   <li>Reconocer la maldici&oacute;n de dimensionalidad en MGARCH</li>
+  </div>
+
   <div class="main-area">
    <div class="section-title"><i class="fas fa-lightbulb"></i> Modelos Multivariantes</div>
    <div class="info-grid">
     <div class="info-panel">
      <h3>📐 DCC (Engle, 2002)</h3>
-     <p>Rₜ = diag(Qₜ)⁻¹ Qₜ diag(Qₜ)⁻¹, donde Qₜ = (1-α-β)R̄ + αzₜ₋₁z'ₜ₋₁ + βQₜ₋₁. La correlaci&oacute;n din&aacute;mica es una media ponderada de la correlaci&oacute;n incondicional y las observaciones pasadas.</p>
+     <p>Rₜ = diag(Qₜ)⁻¹ Qₜ diag(Qₜ)⁻¹, donde Qₜ = (1-α-β)R̄ + αzₜ₋₁z'ₜ₋₁ + βQₜ₋₁. <strong>Intuici&oacute;n:</strong> DCC (Dynamic Conditional Correlation) estima la correlaci&oacute;n en dos etapas. Primera: estima GARCH(1,1) univariante para cada activo y obtiene los residuos estandarizados zₜ. Segunda: modela la matriz Qₜ como un promedio ponderado de tres componentes: (1) la correlaci&oacute;n incondicional R̄ (a largo plazo), (2) el producto de los residuos estandarizados del per&iacute;odo anterior zₜ₋₁z'ₜ₋₁ (el shock reciente), y (3) la matriz Q del per&iacute;odo anterior (persistencia). La correlaci&oacute;n condicional es ρᵢⱼₜ = qᵢⱼₜ / √(qᵢᵢₜ qⱼⱼₜ). En la crisis de 2008, la correlaci&oacute;n entre activos subi&oacute; de ~0.4 a ~0.8, demostrando la importancia de la correlaci&oacute;n din&aacute;mica.</p>
     </div>
     <div class="info-panel">
      <h3>📊 BEKK (Engle & Kroner, 1995)</h3>
-     <p>Hₜ = C'C + A'εₜ₋₁ε'ₜ₋₁A + B'Hₜ₋₁B. Garantiza Hₜ definida positiva. Pero sufre de maldici&oacute;n de dimensionalidad: para N activos, O(N²) par&aacute;metros.</p>
+     <p>Hₜ = C'C + A'εₜ₋₁ε'ₜ₋₁A + B'Hₜ₋₁B. Garantiza Hₜ definida positiva. <strong>Intuici&oacute;n:</strong> BEKK modela directamente la matriz de covarianzas Hₜ asegurando que sea definida positiva (requisito para que sea una matriz de covarianzas v&aacute;lida). Lo hace mediante una estructura cuadr&aacute;tica (producto de matrices) que garantiza la positividad autom&aacute;ticamente. El costo: para N activos, necesita estimar O(N²) par&aacute;metros. Para 10 activos, BEKK tiene ~210 par&aacute;metros. Para 50 activos, ~5,000 par&aacute;metros. &iexcl;Imposible de estimar! Adem&aacute;s, la interpretaci&oacute;n de los par&aacute;metros A y B no es intuitiva porque los efectos est&aacute;n "mezclados" por las matrices.</p>
     </div>
     <div class="info-panel">
      <h3>⚡ Correlation Targeting</h3>
-     <p>DCC permite estimar primero los GARCH univariantes y luego la correlaci&oacute;n din&aacute;mica en dos etapas. Escala a N grande (50+ activos).</p>
+     <p>DCC permite estimar primero los GARCH univariantes y luego la correlaci&oacute;n din&aacute;mica en dos etapas. Escala a N grande (50+ activos). <strong>Intuici&oacute;n:</strong> La gran ventaja de DCC es que separa el problema: primero estimas N modelos GARCH univariantes (uno por activo) y luego estimas solo 2 par&aacute;metros (α y β) para la correlaci&oacute;n din&aacute;mica, independientemente de N. La correlaci&oacute;n incondicional R̄ se estima como la media muestral de los residuos estandarizados. Esto hace que DCC sea computacionalmente factible para portafolios con 50, 100 o incluso 500 activos. En la pr&aacute;ctica, DCC con 50 activos se estima en segundos, mientras que BEKK con solo 5 activos puede tomar minutos y con 10 activos es pr&aacute;cticamente inviable.</p>
     </div>
     <div class="info-panel">
      <h3>🛡️ VaR de Portafolio</h3>
-     <p>Con DCC, el VaR del portafolio es: VaR_p = z_α √(w'Hₜw). La correlaci&oacute;n variable mejora la estimaci&oacute;n del riesgo en crisis.</p>
+     <p>Con DCC, el VaR del portafolio es: VaR_p = z_α √(w'Hₜw). La correlaci&oacute;n variable mejora la estimaci&oacute;n del riesgo en crisis. <strong>Intuici&oacute;n:</strong> El VaR de un portafolio depende de tres cosas: la volatilidad de cada activo (σᵢ), la correlaci&oacute;n entre ellos (ρᵢⱼ), y los pesos (wᵢ). La f&oacute;rmula completa es: σ²ₚ = Σwᵢ²σᵢ² + 2ΣΣwᵢwⱼσᵢσⱼρᵢⱼ. Con correlaci&oacute;n constante, subestimas el riesgo cuando las correlaciones suben en crisis. DCC captura este aumento, dando un VaR m&aacute;s preciso. Durante COVID-19 (marzo 2020), las correlaciones entre activos globales subieron de ~0.3 a ~0.7, y el VaR con DCC fue significativamente mayor que con correlaci&oacute;n constante.</p>
+     <div class="formula">VaRₚ = z_α √(w'Hₜw)</div>
+    </div>
+    <div class="info-panel">
+     <h3>📉 Modelos de Correlaci&oacute;n Constante (CCC)</h3>
+     <p>CCC-GARCH (Bollerslev, 1990): Hₜ = Dₜ R Dₜ, donde Dₜ contiene las volatilidades individuales y R es una matriz de correlaci&oacute;n constante. <strong>Intuici&oacute;n:</strong> CCC asume que la correlaci&oacute;n es constante en el tiempo, lo que simplifica enormemente la estimaci&oacute;n. Es &uacute;til como referencia o para periodos cortos. Sin embargo, la evidencia emp&iacute;rica muestra que las correlaciones NO son constantes: tienden a aumentar en crisis (cambio de r&eacute;gimen). El test de Tse (2000) permite verificar si la correlaci&oacute;n es constante vs din&aacute;mica: si se rechaza H₀, DCC es preferible a CCC. En la pr&aacute;ctica, para casi todos los pares de activos financieros, las correlaciones var&iacute;an significativamente en el tiempo.</p>
+    </div>
+    <div class="info-panel">
+     <h3>🌍 Aplicaciones de MGARCH</h3>
+     <p>MGARCH se usa para optimizaci&oacute;n de portafolios din&aacute;mica, cobertura (hedge ratios), c&aacute;lculo de capital regulatorio (Basel III), y stress testing. <strong>Intuici&oacute;n:</strong> Con DCC puedes calcular el hedge ratio &oacute;ptimo: βₜ = Cov(r₁ₜ, r₂ₜ) / Var(r₂ₜ) = ρ₁₂ₜ × (σ₁ₜ/σ₂ₜ). Si la correlaci&oacute;n cambia, la cobertura &oacute;ptima cambia. Por ejemplo, si tienes Bitcoin y Ethereum, la cobertura &oacute;ptima entre ellos var&iacute;a con la correlaci&oacute;n. En periodos de alta correlaci&oacute;n, tener ambos no diversifica; en periodos de baja correlaci&oacute;n, s&iacute;. Para cumplimiento de Basel III, el capital por riesgo de mercado se calcula con modelos de VaR que deben capturar correlaciones variables.</p>
     </div>
    </div>
 
@@ -111,6 +140,27 @@
     </div>
    </div>
 
+   <div class="example-section">
+    <div class="section-title"><i class="fas fa-calculator"></i> Ejemplo: VaR de portafolio con DCC</div>
+    <p style="color:#b9ccee;font-size:0.85rem;margin-bottom:0.8rem;">Portafolio 50% Bitcoin, 50% Ethereum. Pesos w = [0.5, 0.5].</p>
+    <div class="step">
+     <div class="step-num">Paso 1: Volatilidades individuales (de GARCH)</div>
+     <p>Bitcoin: σ₁ = 0.04 (4% diario). Ethereum: σ₂ = 0.05 (5% diario). Estimadas con GARCH(1,1) individual.</p>
+    </div>
+    <div class="step">
+     <div class="step-num">Paso 2: Correlaci&oacute;n din&aacute;mica de DCC</div>
+     <p>DCC estima que hoy la correlaci&oacute;n es ρ = 0.65. La matriz de covarianzas Hₜ = [σ₁², ρσ₁σ₂; ρσ₁σ₂, σ₂²] = [0.0016, 0.0013; 0.0013, 0.0025].</p>
+    </div>
+    <div class="step">
+     <div class="step-num">Paso 3: Varianza del portafolio</div>
+     <p>σ²ₚ = w₁²σ₁² + w₂²σ₂² + 2w₁w₂ρσ₁σ₂ = 0.25 × 0.0016 + 0.25 × 0.0025 + 2 × 0.5 × 0.5 × 0.0013 = 0.0004 + 0.000625 + 0.00065 = 0.001675. σₚ = √0.001675 = 0.0409 (4.09%).</p>
+    </div>
+    <div class="step">
+     <div class="step-num">Paso 4: VaR al 95%</div>
+     <p>VaR(95%) = -1.645 × σₚ = -1.645 × 0.0409 = -0.0673 = -6.73%. Para un portafolio de $100,000, el VaR es $6,730. Si hubi&eacute;ramos usado correlaci&oacute;n constante de 0.4 (subestimando), el VaR habr&iacute;a sido solo $5,890. &iexcl;Una diferencia del 14%! DCC captura que en periodos de estr&eacute;s las correlaciones suben, dando una imagen m&aacute;s realista del riesgo.</p>
+    </div>
+   </div>
+
    <div class="quiz-area">
     <div class="quiz-title"><i class="fas fa-question-circle"></i> Mini Quiz: MGARCH</div>
     <div id="quizContainer"></div>
@@ -121,6 +171,15 @@
      <p>Has dominado los modelos MGARCH multivariantes. &iexcl;Excelente!</p>
     </div>
    </div>
+
+   <div class="recap">
+    <h3>📌 Resumen del m&oacute;dulo</h3>
+    <li>DCC estima correlaciones din&aacute;micas en dos etapas: GARCH univariantes + correlaci&oacute;n</li>
+    <li>DCC escala a 50+ activos (solo 2 par&aacute;metros adicionales); BEKK no escala (O(N²))</li>
+    <li>CCC asume correlaci&oacute;n constante, pero en crisis las correlaciones suben significativamente</li>
+    <li>El VaR de portafolio con DCC es m&aacute;s preciso que con correlaci&oacute;n constante</li>
+    <li>Las aplicaciones incluyen hedge ratio din&aacute;mico y optimizaci&oacute;n de portafolios</li>
+   </div>
   </div>
 
   <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre modelos MGARCH multivariantes.</div>
@@ -130,18 +189,18 @@
    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
    <a href="07-stochastic-volatility.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
   </div>
-  <footer><i class="fas fa-chart-line"></i> Econometr&iacute;a Financiera Aplicada · M&oacute;dulo 6</footer>
+  <footer><i class="fas fa-chart-line"></i> Econometr&iacute;a Financiera Aplicada &middot; M&oacute;dulo 6</footer>
  </div>
 
  <script>
   const STORAGE_KEY = 'prog_econ_8_06';
   const PROGRESS_KEY = 'prog_econ_8_progress';
   const questions = [
-   { text: "&iquest;Qu&eacute; ventaja tiene DCC sobre BEKK?", options: ["Escala mejor a muchos activos", "Es m&aacute;s preciso", "No necesita estimaci&oacute;n", "Usa menos datos"], correct: 0 },
-   { text: "En DCC, la matriz Qₜ se actualiza como:", options: ["Media simple de correlaciones", "Media ponderada de R̄, zₜ₋₁z'ₜ₋₁ y Qₜ₋₁", "Solo con datos nuevos", "Con un promedio m&oacute;vil"], correct: 1 },
-   { text: "El VaR de portafolio con DCC usa:", options: ["Solo volatilidades individuales", "La matriz de covarianzas din&aacute;mica Hₜ", "Correlaci&oacute;n constante", "La media de retornos"], correct: 1 },
-   { text: "BEKK garantiza que Hₜ sea:", options: ["Singular", "Definida positiva", "Diagonal", "Sim&eacute;trica solo"], correct: 1 },
-   { text: "La maldici&oacute;n de dimensionalidad en MGARCH significa:", options: ["M&aacute;s activos requieren m&aacute;s datos", "M&aacute;s activos = menos par&aacute;metros", "El modelo no converge nunca", "No se puede estimar con 2 activos"], correct: 0 }
+   { text: "\u00bfQu\u00e9 ventaja tiene DCC sobre BEKK?", options: ["Escala mejor a muchos activos", "Es m\u00e1s preciso", "No necesita estimaci\u00f3n", "Usa menos datos"], correct: 0, explanation: "DCC escala a 50+ activos porque solo necesita 2 par\u00e1metros adicionales (α, β) para la correlaci\u00f3n din\u00e1mica. BEKK necesita O(N\u00b2) par\u00e1metros y no escala." },
+   { text: "En DCC, la matriz Q\u209c se actualiza como:", options: ["Media simple de correlaciones", "Media ponderada de R\u0305, z\u209c\u208b\u2081z'\u209c\u208b\u2081 y Q\u209c\u208b\u2081", "Solo con datos nuevos", "Con un promedio m\u00f3vil"], correct: 1, explanation: "Q\u209c = (1-α-β)R\u0305 + αz\u209c\u208b\u2081z'\u209c\u208b\u2081 + βQ\u209c\u208b\u2081. Es un promedio ponderado de la correlaci\u00f3n incondicional, el shock reciente y la matriz pasada." },
+   { text: "El VaR de portafolio con DCC usa:", options: ["Solo volatilidades individuales", "La matriz de covarianzas din\u00e1mica H\u209c", "Correlaci\u00f3n constante", "La media de retornos"], correct: 1, explanation: "El VaR del portafolio usa H\u209c (la matriz de covarianzas din\u00e1mica) que incluye tanto las volatilidades individuales como las correlaciones variables." },
+   { text: "BEKK garantiza que H\u209c sea:", options: ["Singular", "Definida positiva", "Diagonal", "Sim\u00e9trica solo"], correct: 1, explanation: "BEKK usa una estructura cuadr\u00e1tica (C'C + A'\u03b5\u03b5'A + B'H\u209c\u208b\u2081B) que garantiza que H\u209c sea definida positiva, requisito para una matriz de covarianzas v\u00e1lida." },
+   { text: "La maldici\u00f3n de dimensionalidad en MGARCH significa:", options: ["M\u00e1s activos requieren m\u00e1s datos", "M\u00e1s activos = menos par\u00e1metros", "El modelo no converge nunca", "No se puede estimar con 2 activos"], correct: 0, explanation: "La maldici\u00f3n de dimensionalidad significa que al agregar m\u00e1s activos, el n\u00famero de par\u00e1metros crece cuadr\u00e1ticamente (O(N\u00b2)), requiriendo muchos m\u00e1s datos para estimarlos." }
   ];
   let userAnswers = new Array(questions.length).fill(null);
   let quizCompleted = false;
@@ -163,7 +222,7 @@
    container.innerHTML = '';
    questions.forEach((q, idx) => {
     const qDiv = document.createElement('div'); qDiv.classList.add('question');
-    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
+    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div><div class="explanation" id="expl-'+idx+'"></div>';
     const optsDiv = qDiv.querySelector('.options');
     q.options.forEach((opt, optIdx) => {
      const span = document.createElement('div'); span.classList.add('opt');
@@ -196,14 +255,16 @@
      if (oi === questions[idx].correct) o.classList.add('correct');
      else if (oi === userAnswers[idx]) o.classList.add('wrong');
     });
+    const explDiv = qDiv.querySelector('.explanation');
+    if (explDiv) { explDiv.textContent = '\ud83d\udca1 ' + questions[idx].explanation; explDiv.style.display = 'block'; }
    });
    if (passed) {
     quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
     document.getElementById('insigniaArea').classList.remove('hidden');
-    document.getElementById('feedbackMsg').textContent = I18N.t('fb_1') + correct + '/' + total + ' correctas. ¡Dominas MGARCH!';
+    document.getElementById('feedbackMsg').textContent = I18N.t('fb_1') + correct + '/' + total + ' correctas. \u00a1Dominas MGARCH!';
     saveProgress(); updateProgress();
    } else {
-    document.getElementById('feedbackMsg').textContent = '❌ ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. ¡Reintenta!';
+    document.getElementById('feedbackMsg').textContent = '\u274c ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. \u00a1Reintenta!';
    }
   }
 
@@ -238,14 +299,14 @@
    html += '<div style="background:#1e2a3e;border-radius:0.8rem;padding:0.6rem;text-align:center;border:1px solid #ef4444;"><div style="font-weight:700;color:#fca5a5;">Corr. media</div><div style="font-size:0.8rem;">'+meanCorr.toFixed(3)+'</div></div>';
    html += '<div style="background:#1e2a3e;border-radius:0.8rem;padding:0.6rem;text-align:center;border:1px solid #ef4444;"><div style="font-weight:700;color:#fca5a5;">Min/Max</div><div style="font-size:0.8rem;">'+minCorr.toFixed(2)+' / '+maxCorr.toFixed(2)+'</div></div>';
    html += '</div>';
-   html += '<div style="background:#0a0f1e;border-radius:1rem;padding:0.8rem;margin-bottom:0.3rem;"><div style="font-size:0.8rem;color:#fca5a5;">Correlaci&oacute;n din&aacute;mica DCC a lo largo del tiempo:</div><div style="display:flex;align-items:flex-end;gap:1px;height:100px;margin-top:0.3rem;">';
+   html += '<div style="background:#0a0f1e;border-radius:1rem;padding:0.8rem;margin-bottom:0.3rem;"><div style="font-size:0.8rem;color:#fca5a5;">Correlaci\u00f3n din\u00e1mica DCC a lo largo del tiempo:</div><div style="display:flex;align-items:flex-end;gap:1px;height:100px;margin-top:0.3rem;">';
    const chunk = Math.floor(corrs.length / 100);
    for (let i = 0; i < corrs.length; i += chunk) {
     const rho = corrs[i];
     const barH = ((rho + 1) / 2) * 100;
     html += '<div style="flex:1;background:'+(rho > 0 ? '#ef4444' : '#dc2626')+';height:'+barH+'%;border-radius:1px;opacity:0.6;"></div>';
    }
-   html += '</div></div><p style="color:#8899cc;font-size:0.8rem;">Correlaci&oacute;n DCC simulada con persistencia='+persist.toFixed(2)+'. La correlaci&oacute;n fluct&uacute;a en el tiempo entre '+minCorr.toFixed(2)+' y '+maxCorr.toFixed(2)+'.</p>';
+   html += '</div></div><p style="color:#8899cc;font-size:0.8rem;">Correlaci\u00f3n DCC simulada con persistencia='+persist.toFixed(2)+'. La correlaci\u00f3n fluct\u00faa en el tiempo entre '+minCorr.toFixed(2)+' y '+maxCorr.toFixed(2)+'.</p>';
    document.getElementById('simResult').innerHTML = html;
   }
 
@@ -256,16 +317,16 @@
  <script>
 window.I18N_DATA={
  "fb_0": {
-  "es": "⚠️ Responde todas las preguntas primero.",
-  "en": "⚠️ Answer todas las preguntas primero."
+  "es": "\u26a0\ufe0f Responde todas las preguntas primero.",
+  "en": "\u26a0\ufe0f Responde todas las preguntas primero."
  },
  "fb_1": {
-  "es": "🎉 ",
-  "en": "🎉 "
+  "es": "\ud83c\udf89 ",
+  "en": "\ud83c\udf89 "
  },
  "fb_2": {
-  "es": "🏆 Ya completaste este m&oacute;dulo.",
-  "en": "🏆 Ya completaste este m&oacute;dulo."
+  "es": "\ud83c\udfc6 Ya completaste este m\u00f3dulo.",
+  "en": "\ud83c\udfc6 Ya completaste este m\u00f3dulo."
  }
 };
 </script>
