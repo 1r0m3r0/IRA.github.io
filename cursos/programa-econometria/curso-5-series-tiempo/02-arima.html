@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Series de Tiempo | 📊 ARIMA y Box-Jenkins</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:linear-gradient(135deg,#0a0f1e,#0c1222 50%,#111a2e); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+  @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .course-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(6,182,212,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+  .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #06b6d4; }
+  .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#67e8f9,#06b6d4); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero-header p { font-size:1.1rem; color:#a5f3fc; margin-top:0.5rem; font-weight:500; }
+  .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+  .chip { background:rgba(6,182,212,0.15); border:1px solid #06b6d4; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+  .progress-section { padding:1.2rem 2rem; border-bottom:1px solid #1a2a4a; }
+  .progress-bar-outer { background:#1a2a4a; border-radius:20px; height:16px; overflow:hidden; }
+  .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#06b6d4,#0891b2); border-radius:20px; transition:width 0.5s ease; }
+  .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
+  .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #06b6d4; font-size:1rem; line-height:1.6; }
+  .main-area { padding:1.5rem 2rem; }
+  .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#06b6d4; }
+  .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
+  .info-panel { background:rgba(10,20,40,0.7); border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
+  .info-panel h3 { color:#67e8f9; font-size:1rem; margin-bottom:0.5rem; }
+  .info-panel p { font-size:0.85rem; color:#b9ccee; line-height:1.6; }
+  .info-panel .formula { background:#0a0f1e; padding:0.5rem; border-radius:0.8rem; text-align:center; font-family:monospace; font-size:0.9rem; color:#67e8f9; margin-top:0.5rem; }
+  .sim-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #06b6d4; margin-bottom:1.5rem; }
+  .quiz-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #06b6d4; margin-bottom:1.5rem; }
+  .quiz-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#06b6d4; }
+  .question { background:#0f1a2c; margin:0.8rem 0; padding:0.8rem 1rem; border-radius:1.2rem; }
+  .question p { font-weight:600; margin-bottom:0.5rem; font-size:0.95rem; }
+  .options { display:flex; flex-wrap:wrap; gap:0.6rem; }
+  .opt { background:#1e2a3e; padding:0.3rem 0.9rem; border-radius:2rem; cursor:pointer; transition:0.2s; font-size:0.85rem; }
+  .opt:hover { background:#2c3e66; transform:translateY(-2px); }
+  .opt.selected { background:#06b6d4; color:#000; font-weight:bold; box-shadow:0 0 8px #06b6d4; }
+  .opt.correct { background:#00cc88; color:#000; }
+  .opt.wrong { background:#ff4455; color:#fff; }
+  .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #06b6d4; }
+  .btn-action { background:linear-gradient(95deg,#06b6d4,#0891b2); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin-top:1rem; }
+  .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(6,182,212,0.5); }
+  .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
+  .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin-top:1.5rem; padding:1rem; border:1px dashed gold; }
+  .insignia i { font-size:2.5rem; color:gold; }
+  .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
+  .hidden { display:none; }
+  .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+  .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+  .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(6,182,212,0.4); }
+  .nav-link.next { background:linear-gradient(95deg,#06b6d4,#0891b2); color:#1e1a0c; }
+  .nav-link.menu { background:#1a2a4a; border:1px solid #06b6d4; }
+  footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .info-grid { grid-template-columns:1fr; } }
+ </style>
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
+</head>
+<body>
+ <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Econometr&iacute;a</a></nav>
+ <div class="course-container" id="app">
+  <div class="hero-header">
+   <h1>📊 ARIMA y Box-Jenkins</h1>
+   <p>Modelos autorregresivos, medias m&oacute;viles y la metodolog&iacute;a sistem&aacute;tica de Box-Jenkins</p>
+   <div class="badge-area">
+    <span class="chip"><i class="fas fa-chart-line"></i> AR(p)</span>
+    <span class="chip"><i class="fas fa-wave-square"></i> MA(q)</span>
+    <span class="chip"><i class="fas fa-sliders-h"></i> ARIMA(p,d,q)</span>
+    <span class="chip"><i class="fas fa-search"></i> ACF/PACF</span>
+   </div>
+  </div>
+  <div class="progress-section">
+   <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+   <span class="progress-text" id="progressText">M&oacute;dulo 2 de 12</span>
+  </div>
+  <div class="analogy-card">
+   <strong>💡 Piénsalo así:</strong> ARIMA es como un chef que predice el siguiente ingrediente: los modelos AR usan ingredientes anteriores (pasado), MA corrige errores previos (como ajustar la sal), y la diferenciaci&oacute;n elimina tendencias (como nivelar una mesa coja). Box-Jenkins es la receta paso a paso para encontrar el mejor modelo.
+  </div>
+  <div class="main-area">
+   <div class="section-title"><i class="fas fa-flask"></i> Modelos ARIMA</div>
+   <div class="info-grid">
+    <div class="info-panel">
+     <h3>📈 AR(p) — Autorregresivo</h3>
+     <p>yₜ = φ₁yₜ₋₁ + ... + φₚyₜ₋ₚ + εₜ. El valor actual depende linealmente de p valores pasados m&aacute;s un error.</p>
+     <div class="formula">yₜ = φ₁yₜ₋₁ + ... + φₚyₜ₋ₚ + εₜ</div>
+    </div>
+    <div class="info-panel">
+     <h3>🌊 MA(q) — Media M&oacute;vil</h3>
+     <p>yₜ = εₜ + θ₁εₜ₋₁ + ... + θₙεₜ₋q. Combina errores pasados para predecir el presente.</p>
+     <div class="formula">yₜ = εₜ + &theta;₁&epsilon;ₜ₋₁ + ... + &theta;ₙ&epsilon;ₜ₋q</div>
+    </div>
+    <div class="info-panel">
+     <h3>🔧 ARIMA(p,d,q)</h3>
+     <p>Integra AR + MA + diferenciaci&oacute;n. d = orden de diferenciaci&oacute;n para lograr estacionariedad.</p>
+     <div class="formula">(1-B)ᵈyₜ = ARMA(p,q)</div>
+    </div>
+    <div class="info-panel">
+     <h3>📊 ACF y PACF</h3>
+     <p>ACF: correlaci&oacute;n entre yₜ e yₜ₋ₖ. PACF: correlaci&oacute;n parcial eliminando efectos intermedios. Clave para identificar p y q.</p>
+     <div class="formula">ACF(k) = Corr(yₜ, yₜ₋ₖ)</div>
+    </div>
+   </div>
+
+   <div class="section-title"><i class="fas fa-list-ol"></i> Metodolog&iacute;a Box-Jenkins</div>
+   <div class="info-grid">
+    <div class="info-panel">
+     <h3>1. Identificaci&oacute;n</h3>
+     <p>Usar ACF/PACF para identificar p, d, q tentativos. Examinar estacionariedad.</p>
+    </div>
+    <div class="info-panel">
+     <h3>2. Estimaci&oacute;n</h3>
+     <p>Estimar par&aacute;metros por m&aacute;xima verosimilitud o m&iacute;nimos cuadrados condicionales.</p>
+    </div>
+    <div class="info-panel">
+     <h3>3. Validaci&oacute;n</h3>
+     <p>Verificar residuos tipo ruido blanco. Tests de Ljung-Box, normalidad, heterocedasticidad.</p>
+    </div>
+    <div class="info-panel">
+     <h3>4. Pron&oacute;stico</h3>
+     <p>Generar predicciones puntuales e intervalos de confianza.</p>
+    </div>
+   </div>
+
+   <div class="sim-area">
+    <div class="section-title"><i class="fas fa-play"></i> Simulaci&oacute;n: Modelos ARMA</div>
+    <p style="margin-bottom:0.8rem;color:#b9ccee;">Genera datos de AR(1), MA(1) o ARMA(1,1) y observa ACF/PACF. Identifica el modelo correcto.</p>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem;">
+     <label style="color:#b9ccee;">Modelo: <select id="modelType" style="background:#1e2a3e;color:#fff;border:1px solid #06b6d4;border-radius:0.5rem;padding:0.3rem 0.6rem;">
+      <option value="ar1">AR(1)</option><option value="ma1">MA(1)</option><option value="arma11">ARMA(1,1)</option>
+     </select></label>
+     <label style="color:#b9ccee;">φ₁: <input type="range" id="phiVal" min="-90" max="90" value="70" style="width:100px;"><span id="phiValDisplay" style="color:#67e8f9;">0.7</span></label>
+     <label style="color:#b9ccee;">θ₁: <input type="range" id="thetaVal" min="-90" max="90" value="40" style="width:100px;"><span id="thetaValDisplay" style="color:#67e8f9;">0.4</span></label>
+     <button id="simArmaBtn" class="btn-action" style="margin:0;">📈 Generar</button>
+    </div>
+    <div id="simResult" style="background:#0a0f1e;border-radius:1rem;padding:1rem;text-align:center;font-size:0.9rem;color:#b9ccee;">
+     Presiona "Generar" para simular.
+    </div>
+   </div>
+
+   <div class="quiz-area">
+    <div class="quiz-title"><i class="fas fa-question-circle"></i> Mini Quiz: ARIMA y Box-Jenkins</div>
+    <div id="quizContainer"></div>
+    <button id="submitQuizBtn" class="btn-action">✅ Verificar respuestas</button>
+    <div id="insigniaArea" class="insignia hidden">
+     <i class="fas fa-medal"></i>
+     <h3>🏅 Box-Jenkins Master 🏅</h3>
+     <p>Has dominado los modelos ARIMA y la metodolog&iacute;a Box-Jenkins. &iexcl;Excelente!</p>
+    </div>
+   </div>
+  </div>
+
+  <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre modelos ARIMA y Box-Jenkins.</div>
+
+  <div class="nav-links">
+   <a href="01-portal.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+   <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
+   <a href="03-estacionalidad.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-chart-line"></i> Series de Tiempo y Pron&oacute;stico &middot; M&oacute;dulo 2</footer>
+ </div>
+
+ <script>
+  const STORAGE_KEY = 'prog_econ_5_02';
+  const PROGRESS_KEY = 'prog_econ_5_progress';
+  const questions = [
+   { text: "\u00bfQu\u00e9 condici\u00f3n debe cumplir un AR(1) para ser estacionario?", options: ["|\u03c6| < 1", "|\u03c6| > 1", "\u03c6 = 1", "\u03c6 = 0"], correct: 0 },
+   { text: "En un MA(q), la ACF tiene un corte despu\u00e9s de:", options: ["q rezagos", "p rezagos", "Nunca corta", "Depende de los datos"], correct: 0 },
+   { text: "\u00bfQu\u00e9 patr\u00f3n ACF/PACF sugiere un AR(2)?", options: ["ACF decae, PACF corta en 2", "PACF decae, ACF corta en 2", "Ambas decaen", "Ambas cortan"], correct: 0 },
+   { text: "\u00bfPara qu\u00e9 sirve la diferenciaci\u00f3n en ARIMA?", options: ["Eliminar estacionalidad", "Hacer la serie estacionaria", "Reducir el ruido", "Aumentar la muestra"], correct: 1 },
+   { text: "\u00bfCu\u00e1l es el tercer paso de Box-Jenkins?", options: ["Identificaci\u00f3n", "Estimaci\u00f3n", "Validaci\u00f3n diagn\u00f3stica", "Pron\u00f3stico"], correct: 2 }
+  ];
+  let userAnswers = new Array(questions.length).fill(null);
+  let quizCompleted = false;
+
+  function saveProgress() {
+   let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
+   localStorage.setItem(STORAGE_KEY, 'true');
+  }
+
+  function updateProgress() {
+   let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
+   document.getElementById('progressText').textContent = 'M\u00f3dulo '+(p.length || 1)+' de 12';
+  }
+
+  function renderQuestions() {
+   const container = document.getElementById('quizContainer');
+   container.innerHTML = '';
+   questions.forEach((q, idx) => {
+    const qDiv = document.createElement('div'); qDiv.classList.add('question');
+    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
+    const optsDiv = qDiv.querySelector('.options');
+    q.options.forEach((opt, optIdx) => {
+     const span = document.createElement('div'); span.classList.add('opt');
+     span.textContent = opt; span.dataset.qIdx = idx; span.dataset.optIdx = optIdx;
+     span.addEventListener('click', function() {
+      if (quizCompleted) return;
+      this.parentElement.querySelectorAll('.opt').forEach(c => c.classList.remove('selected'));
+      this.classList.add('selected'); userAnswers[idx] = optIdx; updateBtnState();
+     });
+     optsDiv.appendChild(span);
+    });
+    container.appendChild(qDiv);
+   });
+  }
+
+  function updateBtnState() {
+   document.getElementById('submitQuizBtn').disabled = userAnswers.some(a => a === null) || quizCompleted;
+  }
+
+  function handleSubmit() {
+   if (quizCompleted) return;
+   if (userAnswers.some(a => a === null)) { document.getElementById('feedbackMsg').textContent = '⚠️ Responde todas las preguntas primero.'; return; }
+   let correct = 0;
+   questions.forEach((q, i) => { if (userAnswers[i] === q.correct) correct++; });
+   const total = questions.length; const passed = correct >= Math.ceil(total * 0.6);
+   document.querySelectorAll('.question').forEach((qDiv, idx) => {
+    const opts = qDiv.querySelectorAll('.opt');
+    opts.forEach((o, oi) => {
+     o.classList.remove('selected');
+     if (oi === questions[idx].correct) o.classList.add('correct');
+     else if (oi === userAnswers[idx]) o.classList.add('wrong');
+    });
+   });
+   if (passed) {
+    quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').textContent = '🎉 ' + correct + '/' + total + ' correctas. ¡Dominas ARIMA!';
+    saveProgress(); updateProgress();
+   } else {
+    document.getElementById('feedbackMsg').textContent = '❌ ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. ¡Reintenta!';
+   }
+  }
+
+  function restoreProgress() {
+   const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   if (p.includes(STORAGE_KEY)) {
+    quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').textContent = '🏆 Ya completaste este módulo.';
+    document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
+   }
+  }
+
+  function simulateARMA() {
+   const model = document.getElementById('modelType').value;
+   const phi = parseInt(document.getElementById('phiVal').value) / 100;
+   const theta = parseInt(document.getElementById('thetaVal').value) / 100;
+   const T = 200;
+   const data = new Array(T); const errors = new Array(T);
+   for (let t = 0; t < T; t++) errors[t] = (Math.random() - 0.5) * 2;
+   data[0] = errors[0];
+   if (model === 'ar1') {
+    for (let t = 1; t < T; t++) data[t] = phi * data[t-1] + errors[t];
+   } else if (model === 'ma1') {
+    for (let t = 1; t < T; t++) data[t] = errors[t] + theta * errors[t-1];
+   } else {
+    data[1] = errors[1] + theta * errors[0];
+    for (let t = 2; t < T; t++) data[t] = phi * data[t-1] + errors[t] + theta * errors[t-1];
+   }
+   let html = '<div style="height:120px;display:flex;align-items:flex-end;gap:1px;padding:0 0.5rem;overflow-x:auto;">';
+   const min = Math.min(...data); const max = Math.max(...data); const range = max - min || 1;
+   for (let t = 0; t < T; t++) {
+    const h = ((data[t] - min) / range) * 100;
+    html += '<div style="flex:1;min-width:3px;height:' + h + 'px;background:#06b6d4;border-radius:1px 1px 0 0;"></div>';
+   }
+   html += '</div>';
+   const lagMax = 30;
+   let acf = []; let pacf = [];
+   const mean = data.reduce((a,b) => a+b, 0) / T;
+   const centered = data.map(v => v - mean);
+   const var0 = centered.reduce((a,b) => a + b*b, 0) / T;
+   for (let k = 0; k <= lagMax; k++) {
+    let ck = 0;
+    for (let t = k; t < T; t++) ck += centered[t] * centered[t - k];
+    acf.push(ck / T / var0);
+   }
+   for (let k = 0; k <= lagMax; k++) {
+    let m = new Array(k+1); for (let i=0;i<=k;i++) m[i]=new Array(k+1);
+    for (let i=0;i<=k;i++) for (let j=0;j<=k;j++) m[i][j] = acf[Math.abs(i-j)];
+    let num = [...m]; let den = [...m];
+    for (let i=0;i<=k;i++) { num[i][k] = acf[i+1]; den[i][k] = (i===k ? 1 : 0); }
+    function det(mat) {
+     const n = mat.length; if (n === 1) return mat[0][0];
+     let d = 0;
+     for (let c = 0; c < n; c++) {
+      const sub = mat.slice(1).map(r => r.filter((_,j) => j !== c));
+      d += mat[0][c] * det(sub) * (c % 2 === 0 ? 1 : -1);
+     }
+     return d;
+    }
+    try { pacf.push(det(num) / det(den)); } catch(e) { pacf.push(0); }
+   }
+   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-top:1rem;">';
+   html += '<div><div style="font-size:0.8rem;color:#67e8f9;margin-bottom:0.3rem;">ACF</div><div style="height:80px;display:flex;align-items:flex-end;gap:1px;">';
+   for (let k = 1; k <= 25; k++) {
+    const h = Math.abs(acf[k]) * 80;
+    html += '<div style="flex:1;height:' + h + 'px;background:' + (Math.abs(acf[k]) > 1.96/Math.sqrt(T) ? '#06b6d4' : '#2c3e66') + ';border-radius:1px 1px 0 0;"></div>';
+   }
+   html += '</div></div>';
+   html += '<div><div style="font-size:0.8rem;color:#67e8f9;margin-bottom:0.3rem;">PACF</div><div style="height:80px;display:flex;align-items:flex-end;gap:1px;">';
+   for (let k = 1; k <= 25; k++) {
+    const h = Math.abs(pacf[k]) * 80;
+    html += '<div style="flex:1;height:' + h + 'px;background:' + (Math.abs(pacf[k]) > 1.96/Math.sqrt(T) ? '#06b6d4' : '#2c3e66') + ';border-radius:1px 1px 0 0;"></div>';
+   }
+   html += '</div></div></div>';
+   html += '<p style="font-size:0.8rem;color:#8899cc;margin-top:0.5rem;">T=' + T + ' · ' + model + ' (\u03c6=' + phi.toFixed(2) + ', \u03b8=' + theta.toFixed(2) + ')</p>';
+   document.getElementById('simResult').innerHTML = html;
+  }
+
+  document.getElementById('modelType').addEventListener('change', simulateARMA);
+  document.getElementById('phiVal').addEventListener('input', function() { document.getElementById('phiValDisplay').textContent = (this.value / 100).toFixed(2); });
+  document.getElementById('thetaVal').addEventListener('input', function() { document.getElementById('thetaValDisplay').textContent = (this.value / 100).toFixed(2); });
+  document.getElementById('simArmaBtn').addEventListener('click', simulateARMA);
+  document.getElementById('submitQuizBtn').addEventListener('click', handleSubmit);
+  renderQuestions(); updateBtnState(); restoreProgress(); updateProgress();
+ </script>
+ <script>
+window.I18N_DATA={};
+</script>
+<script src="../../../assets/js/i18n.js"></script> </body>
+</html>

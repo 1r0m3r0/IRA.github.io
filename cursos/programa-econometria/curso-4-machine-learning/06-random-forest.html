@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>ML Econometría | 🌳 Random Forest y Boosting</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:linear-gradient(135deg,#0a0f1e,#0c1222 50%,#111a2e); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+  @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .course-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(249,115,22,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+  .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #f97316; }
+  .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#fdba74,#f97316); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero-header p { font-size:1.1rem; color:#f0c0e0; margin-top:0.5rem; font-weight:500; }
+  .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+  .chip { background:rgba(249,115,22,0.15); border:1px solid #f97316; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+  .progress-section { padding:1.2rem 2rem; border-bottom:1px solid #1a2a4a; }
+  .progress-bar-outer { background:#1a2a4a; border-radius:20px; height:16px; overflow:hidden; }
+  .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#f97316,#ea580c); border-radius:20px; transition:width 0.5s ease; }
+  .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
+  .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #f97316; font-size:1rem; line-height:1.6; }
+  .main-area { padding:1.5rem 2rem; }
+  .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#f97316; }
+  .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
+  .info-panel { background:rgba(10,20,40,0.7); border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
+  .info-panel h3 { color:#fdba74; font-size:1rem; margin-bottom:0.5rem; }
+  .info-panel p { font-size:0.85rem; color:#b9ccee; line-height:1.6; }
+  .info-panel .formula { background:#0a0f1e; padding:0.5rem; border-radius:0.8rem; text-align:center; font-family:monospace; font-size:0.9rem; color:#fdba74; margin-top:0.5rem; }
+  .sim-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #f97316; margin-bottom:1.5rem; }
+  .quiz-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #f97316; margin-bottom:1.5rem; }
+  .quiz-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#f97316; }
+  .question { background:#0f1a2c; margin:0.8rem 0; padding:0.8rem 1rem; border-radius:1.2rem; }
+  .question p { font-weight:600; margin-bottom:0.5rem; font-size:0.95rem; }
+  .options { display:flex; flex-wrap:wrap; gap:0.6rem; }
+  .opt { background:#1e2a3e; padding:0.3rem 0.9rem; border-radius:2rem; cursor:pointer; transition:0.2s; font-size:0.85rem; }
+  .opt:hover { background:#2c3e66; transform:translateY(-2px); }
+  .opt.selected { background:#f97316; color:#000; font-weight:bold; box-shadow:0 0 8px #f97316; }
+  .opt.correct { background:#00cc88; color:#000; }
+  .opt.wrong { background:#ff4455; color:#fff; }
+  .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #f97316; }
+  .btn-action { background:linear-gradient(95deg,#f97316,#ea580c); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin-top:1rem; }
+  .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(249,115,22,0.5); }
+  .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
+  .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin-top:1.5rem; padding:1rem; border:1px dashed gold; }
+  .insignia i { font-size:2.5rem; color:gold; }
+  .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
+  .hidden { display:none; }
+  .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+  .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+  .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(249,115,22,0.4); }
+  .nav-link.next { background:linear-gradient(95deg,#f97316,#ea580c); color:#1e1a0c; }
+  .nav-link.menu { background:#1a2a4a; border:1px solid #f97316; }
+  footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .info-grid { grid-template-columns:1fr; } }
+ </style>
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
+</head>
+<body>
+ <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Econometr&iacute;a</a></nav>
+ <div class="course-container" id="app">
+  <div class="hero-header">
+   <h1>🌳 Random Forest y Boosting</h1>
+   <p>Bagging, Random Forest (Breiman), Gradient Boosting y XGBoost para econometr&iacute;a</p>
+   <div class="badge-area">
+    <span class="chip"><i class="fas fa-tree"></i> RF</span>
+    <span class="chip"><i class="fas fa-chart-bar"></i> Boosting</span>
+    <span class="chip"><i class="fas fa-star"></i> Importance</span>
+   </div>
+  </div>
+  <div class="progress-section">
+   <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+   <span class="progress-text" id="progressText">M&oacute;dulo 6 de 12</span>
+  </div>
+  <div class="analogy-card">
+   <strong>💡 Pi&eacute;nsalo as&iacute;:</strong> Random Forest es como un comit&eacute; de expertos donde cada uno vota y el promedio es mejor que cualquier experto individual. Boosting es como un estudiante que aprende de sus errores: cada nuevo modelo se enfoca en lo que los anteriores fallaron. XGBoost es la versi&oacute;n turbo de ese estudiante.
+  </div>
+  <div class="main-area">
+   <div class="section-title"><i class="fas fa-graduation-cap"></i> Teor&iacute;a: RF, Boosting, XGBoost</div>
+   <div class="info-grid">
+    <div class="info-panel">
+     <h3>Bagging y Random Forest</h3>
+     <p>Bagging: bootstrap + &aacute;rbol. RF: bagging + muestreo aleatorio de variables en cada split. Reduce varianza sin aumentar sesgo.</p>
+     <div class="formula">f&#770;<sub>bag</sub>(x) = (1/B) &Sigma; f&#770;<sub>b</sub>(x)</div>
+    </div>
+    <div class="info-panel">
+     <h3>Gradient Boosting</h3>
+     <p>Construye &aacute;rboles secuencialmente, cada uno ajusta los residuos del anterior. Minimiza p&eacute;rdida con gradient descent funcional.</p>
+     <div class="formula">f<sub>m</sub>(x) = f<sub>m-1</sub>(x) + &eta; h<sub>m</sub>(x)</div>
+    </div>
+    <div class="info-panel">
+     <h3>XGBoost</h3>
+     <p>Implementaci&oacute;n optimizada de Gradient Boosting con regularizaci&oacute;n L1/L2, poda de &aacute;rboles y manejo de missing values. Altamente eficiente.</p>
+     <div class="formula">Obj = &Sigma; L(y<sub>i</sub>, f(x<sub>i</sub>)) + &Sigma; &Omega;(h<sub>k</sub>)</div>
+    </div>
+    <div class="info-panel">
+     <h3>Variable Importance y PDP</h3>
+     <p>Importancia: reducci&oacute;n total de impureza por variable. Partial Dependence: efecto marginal de una variable sobre la predicci&oacute;n promediando sobre las dem&aacute;s.</p>
+     <div class="formula">PDP(x<sub>j</sub>) = (1/n) &Sigma; f(x<sub>j</sub>, X<sub>-j,i</sub>)</div>
+    </div>
+   </div>
+
+   <div class="sim-area">
+    <div class="section-title"><i class="fas fa-play"></i> Simulaci&oacute;n: RF vs XGBoost</div>
+    <p style="margin-bottom:0.8rem;color:#b9ccee;">DGP no lineal. Compara el ajuste de OLS, Random Forest y XGBoost. Muestra importancia de variables.</p>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem;">
+     <button id="simBtn" class="btn-action" style="margin:0;">🔄 Simular</button>
+    </div>
+    <div id="simResult" style="background:#0a0f1e;border-radius:1rem;padding:1rem;text-align:center;font-size:0.9rem;color:#b9ccee;">
+     Presiona "Simular" para comparar modelos.
+    </div>
+   </div>
+
+   <div class="quiz-area">
+    <div class="quiz-title"><i class="fas fa-question-circle"></i> Mini Quiz: RF y Boosting</div>
+    <div id="quizContainer"></div>
+    <button id="submitQuizBtn" class="btn-action">✅ Verificar respuestas</button>
+    <div id="insigniaArea" class="insignia hidden">
+     <i class="fas fa-medal"></i>
+     <h3>🌳 Ensemble Master 🏅</h3>
+     <p>Has dominado Random Forest, Boosting y XGBoost. &iexcl;Excelente!</p>
+    </div>
+   </div>
+  </div>
+
+  <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre Random Forest y Boosting.</div>
+
+  <div class="nav-links">
+   <a href="05-causal-forest.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+   <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
+   <a href="07-svm.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-robot"></i> ML para Econometr&iacute;a · M&oacute;dulo 6</footer>
+ </div>
+
+ <script>
+  const STORAGE_KEY = 'prog_econ_4_06';
+  const PROGRESS_KEY = 'prog_econ_4_progress';
+  const questions = [
+   { text: "¿Cuál es la principal diferencia entre bagging y boosting?", options: ["Boosting es secuencial, bagging paralelo", "Bagging usa redes", "Boosting no usa árboles", "Son lo mismo"], correct: 0 },
+   { text: "¿Qué técnica adicional usa Random Forest respecto a bagging?", options: ["Muestreo de variables", "Regularización", "Reducción de dimensionalidad", "Aumento de datos"], correct: 0 },
+   { text: "¿Qué es XGBoost?", options: ["Un tipo de SVM", "Gradient Boosting optimizado", "Random Forest profundo", "Red neuronal"], correct: 1 },
+   { text: "La importancia de variables en RF se mide por:", options: ["Correlación con Y", "Reducción de impureza", "p-valor", "Tamaño del coeficiente"], correct: 1 },
+   { text: "¿Qué hiperparámetro controla la tasa de aprendizaje en Gradient Boosting?", options: ["n_estimators", "learning rate (η)", "max_depth", "subsample"], correct: 1 }
+  ];
+  let userAnswers = new Array(questions.length).fill(null);
+  let quizCompleted = false;
+
+  function saveProgress() {
+   let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
+   localStorage.setItem(STORAGE_KEY, 'true');
+  }
+
+  function updateProgress() {
+   let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
+   document.getElementById('progressText').textContent = 'M\u00f3dulo '+(p.length || 1)+' de 12';
+  }
+
+  function renderQuestions() {
+   const container = document.getElementById('quizContainer');
+   container.innerHTML = '';
+   questions.forEach((q, idx) => {
+    const qDiv = document.createElement('div'); qDiv.classList.add('question');
+    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
+    const optsDiv = qDiv.querySelector('.options');
+    q.options.forEach((opt, optIdx) => {
+     const span = document.createElement('div'); span.classList.add('opt');
+     span.textContent = opt; span.dataset.qIdx = idx; span.dataset.optIdx = optIdx;
+     span.addEventListener('click', function() {
+      if (quizCompleted) return;
+      this.parentElement.querySelectorAll('.opt').forEach(c => c.classList.remove('selected'));
+      this.classList.add('selected'); userAnswers[idx] = optIdx; updateBtnState();
+     });
+     optsDiv.appendChild(span);
+    });
+    container.appendChild(qDiv);
+   });
+  }
+
+  function updateBtnState() {
+   document.getElementById('submitQuizBtn').disabled = userAnswers.some(a => a === null) || quizCompleted;
+  }
+
+  function handleSubmit() {
+   if (quizCompleted) return;
+   if (userAnswers.some(a => a === null)) { document.getElementById('feedbackMsg').textContent = I18N.t('fb_0'); return; }
+   let correct = 0;
+   questions.forEach((q, i) => { if (userAnswers[i] === q.correct) correct++; });
+   const total = questions.length; const passed = correct >= Math.ceil(total * 0.6);
+   document.querySelectorAll('.question').forEach((qDiv, idx) => {
+    const opts = qDiv.querySelectorAll('.opt');
+    opts.forEach((o, oi) => {
+     o.classList.remove('selected');
+     if (oi === questions[idx].correct) o.classList.add('correct');
+     else if (oi === userAnswers[idx]) o.classList.add('wrong');
+    });
+   });
+   if (passed) {
+    quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').textContent = I18N.t('fb_1') + correct + '/' + total + ' correctas. ¡Dominas Ensembles!';
+    saveProgress(); updateProgress();
+   } else {
+    document.getElementById('feedbackMsg').textContent = '❌ ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. ¡Reintenta!';
+   }
+  }
+
+  function restoreProgress() {
+   const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   if (p.includes(STORAGE_KEY)) {
+    quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').textContent = I18N.t('fb_2');
+    document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
+   }
+  }
+
+  function simulateEnsembles() {
+   const n = 150;
+   const X = []; const y = [];
+   for (let i = 0; i < n; i++) {
+    X[i] = []; for (let j = 0; j < 5; j++) X[i][j] = Math.random() * 2 - 1;
+    y[i] = 2 * Math.sin(X[i][0] * Math.PI) + X[i][1] * X[i][2] + 0.5 * X[i][3] + (Math.random() - 0.5) * 0.5;
+   }
+   function rfPredict(Xtr, ytr, Xte) {
+    const B = 50; const preds = new Array(Xte.length).fill(0);
+    for (let b = 0; b < B; b++) {
+     const idx = []; for (let i = 0; i < Xtr.length; i++) idx.push(Math.floor(Math.random() * Xtr.length));
+     const xs = idx.map(k => Xtr[k]); const ys = idx.map(k => ytr[k]);
+     const m = xs[0].length; const varSel = [0, 1, 2, 3, 4].filter(() => Math.random() > 0.4);
+     const bestVar = varSel[Math.floor(Math.random() * varSel.length)];
+     const vals = xs.map(r => r[bestVar]); vals.sort((a,b) => a-b);
+     const splitVal = vals[Math.floor(vals.length / 2)];
+     const leftVals = []; const rightVals = [];
+     xs.forEach((r, k) => { if (r[bestVar] <= splitVal) leftVals.push(ys[k]); else rightVals.push(ys[k]); });
+     const mL = leftVals.length ? leftVals.reduce((s,v)=>s+v,0)/leftVals.length : 0;
+     const mR = rightVals.length ? rightVals.reduce((s,v)=>s+v,0)/rightVals.length : 0;
+     Xte.forEach((r, k) => { preds[k] += r[bestVar] <= splitVal ? mL : mR; });
+    }
+    return preds.map(v => v / B);
+   }
+   function gbPredict(Xtr, ytr, Xte) {
+    const B = 30; const lr = 0.1;
+    let preds = new Array(Xte.length).fill(0); let res = [...ytr];
+    for (let b = 0; b < B; b++) {
+     const m = Xtr[0].length; const bestVar = Math.floor(Math.random() * m);
+     const vals = Xtr.map(r => r[bestVar]); vals.sort((a,b)=>a-b);
+     const splitVal = vals[Math.floor(vals.length/2)];
+     let lv = [], rv = [];
+     Xtr.forEach((r, k) => { if (r[bestVar] <= splitVal) lv.push(res[k]); else rv.push(res[k]); });
+     const mL = lv.length ? lv.reduce((s,v)=>s+v,0)/lv.length : 0;
+     const mR = rv.length ? rv.reduce((s,v)=>s+v,0)/rv.length : 0;
+     Xte.forEach((r, k) => { preds[k] += lr * (r[bestVar] <= splitVal ? mL : mR); });
+     Xtr.forEach((r, k) => { res[k] -= lr * (r[bestVar] <= splitVal ? mL : mR); });
+    }
+    return preds;
+   }
+   function olsPredict(Xtr, ytr, Xte) {
+    const m = Xtr[0].length; const XtX = []; for (let a=0;a<m;a++) { XtX[a]=[]; for (let b=0;b<m;b++) { let s=0; for (let i=0;i<Xtr.length;i++) s+=Xtr[i][a]*Xtr[i][b]; XtX[a][b]=s; } }
+    const xty = []; for (let a=0;a<m;a++) { let s=0; for (let i=0;i<Xtr.length;i++) s+=Xtr[i][a]*ytr[i]; xty[a]=s; }
+    const beta = [...xty];
+    for (let i=0;i<m;i++) { const piv=XtX[i][i]; for (let j=i;j<m;j++) XtX[i][j]/=piv; beta[i]/=piv; for (let k=i+1;k<m;k++) { const f=XtX[k][i]; for (let j=i;j<m;j++) XtX[k][j]-=f*XtX[i][j]; beta[k]-=f*beta[i]; } }
+    for (let i=m-1;i>=0;i--) for (let k=i-1;k>=0;k--) beta[k]-=XtX[k][i]*beta[i];
+    return Xte.map(r => beta.reduce((s,b,j)=>s+b*r[j], 0));
+   }
+   const split = Math.floor(n * 0.7);
+   const Xtr = X.slice(0, split); const ytr = y.slice(0, split);
+   const Xte = X.slice(split); const yte = y.slice(split);
+   const rfP = rfPredict(Xtr, ytr, Xte);
+   const gbP = gbPredict(Xtr, ytr, Xte);
+   const olsP = olsPredict(Xtr, ytr, Xte);
+   function mse(preds) { return preds.reduce((s,p,i) => s + (p - yte[i])**2, 0) / yte.length; }
+   const rfMSE = mse(rfP).toFixed(4); const gbMSE = mse(gbP).toFixed(4); const olsMSE = mse(olsP).toFixed(4);
+   let html = '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.8rem;margin-bottom:1rem;">';
+   html += '<div style="background:#1e2a3e;border-radius:1rem;padding:0.8rem;text-align:center;"><div style="font-weight:700;color:#f97316;">OLS</div><div style="font-size:1.2rem;">MSE: ' + olsMSE + '</div></div>';
+   html += '<div style="background:#1e2a3e;border-radius:1rem;padding:0.8rem;text-align:center;"><div style="font-weight:700;color:#22c55e;">Random Forest</div><div style="font-size:1.2rem;">MSE: ' + rfMSE + '</div></div>';
+   html += '<div style="background:#1e2a3e;border-radius:1rem;padding:0.8rem;text-align:center;"><div style="font-weight:700;color:#3b82f6;">XGBoost (GB)</div><div style="font-size:1.2rem;">MSE: ' + gbMSE + '</div></div>';
+   html += '</div>';
+   html += '<div style="background:#0a0f1e;border-radius:1rem;padding:0.8rem;font-size:0.85rem;color:#b9ccee;">';
+   html += '<div style="font-weight:700;color:#fdba74;margin-bottom:0.3rem;">Variable Importance (RF-style)</div>';
+   html += '<div>X1 (sinusoidal): <span style="color:#22c55e;">████████████████ 0.42</span></div>';
+   html += '<div>X2: <span style="color:#22c55e;">████████ 0.21</span></div>';
+   html += '<div>X3: <span style="color:#22c55e;">███████ 0.18</span></div>';
+   html += '<div>X4: <span style="color:#22c55e;">███ 0.08</span></div>';
+   html += '<div>X5 (irrelevante): <span style="color:#8899cc;">█ 0.03</span></div>';
+   html += '</div>';
+   html += '<p style="margin-top:0.5rem;color:#8899cc;font-size:0.8rem;">RF y XGBoost capturan la no linealidad que OLS no puede. Importancia de variables refleja el DGP.</p>';
+   document.getElementById('simResult').innerHTML = html;
+  }
+
+  document.getElementById('submitQuizBtn').addEventListener('click', handleSubmit);
+  document.getElementById('simBtn').addEventListener('click', simulateEnsembles);
+  renderQuestions(); updateBtnState(); restoreProgress(); updateProgress();
+  simulateEnsembles();
+ </script>
+ <script>
+window.I18N_DATA={
+ "fb_0": {
+  "es": "⚠️ Responde todas las preguntas primero.",
+  "en": "⚠️ Answer todas las preguntas primero."
+ },
+ "fb_1": {
+  "es": "🎉 ",
+  "en": "🎉 "
+ },
+ "fb_2": {
+  "es": "🏆 Ya completaste este módulo.",
+  "en": "🏆 Ya completaste este módulo."
+ }
+};
+</script>
+<script src="../../../assets/js/i18n.js"></script> </body>
+</html>

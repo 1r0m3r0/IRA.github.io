@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Series de Tiempo | 🔍 SVAR (Structural VAR)</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:linear-gradient(135deg,#0a0f1e,#0c1222 50%,#111a2e); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+  @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .course-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(6,182,212,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+  .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #06b6d4; }
+  .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#67e8f9,#06b6d4); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero-header p { font-size:1.1rem; color:#a5f3fc; margin-top:0.5rem; font-weight:500; }
+  .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+  .chip { background:rgba(6,182,212,0.15); border:1px solid #06b6d4; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+  .progress-section { padding:1.2rem 2rem; border-bottom:1px solid #1a2a4a; }
+  .progress-bar-outer { background:#1a2a4a; border-radius:20px; height:16px; overflow:hidden; }
+  .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#06b6d4,#0891b2); border-radius:20px; transition:width 0.5s ease; }
+  .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
+  .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #06b6d4; font-size:1rem; line-height:1.6; }
+  .main-area { padding:1.5rem 2rem; }
+  .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#06b6d4; }
+  .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
+  .info-panel { background:rgba(10,20,40,0.7); border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
+  .info-panel h3 { color:#67e8f9; font-size:1rem; margin-bottom:0.5rem; }
+  .info-panel p { font-size:0.85rem; color:#b9ccee; line-height:1.6; }
+  .info-panel .formula { background:#0a0f1e; padding:0.5rem; border-radius:0.8rem; text-align:center; font-family:monospace; font-size:0.9rem; color:#67e8f9; margin-top:0.5rem; }
+  .sim-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #06b6d4; margin-bottom:1.5rem; }
+  .quiz-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #06b6d4; margin-bottom:1.5rem; }
+  .quiz-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#06b6d4; }
+  .question { background:#0f1a2c; margin:0.8rem 0; padding:0.8rem 1rem; border-radius:1.2rem; }
+  .question p { font-weight:600; margin-bottom:0.5rem; font-size:0.95rem; }
+  .options { display:flex; flex-wrap:wrap; gap:0.6rem; }
+  .opt { background:#1e2a3e; padding:0.3rem 0.9rem; border-radius:2rem; cursor:pointer; transition:0.2s; font-size:0.85rem; }
+  .opt:hover { background:#2c3e66; transform:translateY(-2px); }
+  .opt.selected { background:#06b6d4; color:#000; font-weight:bold; box-shadow:0 0 8px #06b6d4; }
+  .opt.correct { background:#00cc88; color:#000; }
+  .opt.wrong { background:#ff4455; color:#fff; }
+  .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #06b6d4; }
+  .btn-action { background:linear-gradient(95deg,#06b6d4,#0891b2); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin-top:1rem; }
+  .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(6,182,212,0.5); }
+  .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
+  .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin-top:1.5rem; padding:1rem; border:1px dashed gold; }
+  .insignia i { font-size:2.5rem; color:gold; }
+  .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
+  .hidden { display:none; }
+  .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+  .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+  .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(6,182,212,0.4); }
+  .nav-link.next { background:linear-gradient(95deg,#06b6d4,#0891b2); color:#1e1a0c; }
+  .nav-link.menu { background:#1a2a4a; border:1px solid #06b6d4; }
+  footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .info-grid { grid-template-columns:1fr; } }
+ </style>
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
+</head>
+<body>
+ <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Econometr&iacute;a</a></nav>
+ <div class="course-container" id="app">
+  <div class="hero-header">
+   <h1>🔍 SVAR (Structural VAR)</h1>
+   <p>Identificaci&oacute;n estructural, restricciones de corto y largo plazo</p>
+   <div class="badge-area">
+    <span class="chip"><i class="fas fa-sort-amount-down"></i> Cholesky</span>
+    <span class="chip"><i class="fas fa-clock"></i> Corto Plazo</span>
+    <span class="chip"><i class="fas fa-infinity"></i> Largo Plazo</span>
+    <span class="chip"><i class="fas fa-signature"></i> Sign Restr.</span>
+   </div>
+  </div>
+  <div class="progress-section">
+   <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+   <span class="progress-text" id="progressText">M&oacute;dulo 6 de 12</span>
+  </div>
+  <div class="analogy-card">
+   <strong>💡 Piénsalo así:</strong> SVAR es como un detective que observa correlaciones (VAR) y luego impone restricciones para identificar causalidad. Cholesky es como ordenar a los sospechosos: el primero afecta a todos, el &uacute;ltimo solo se afecta a s&iacute; mismo. Cambiar el orden cambia la historia.
+  </div>
+  <div class="main-area">
+   <div class="section-title"><i class="fas fa-flask"></i> Identificaci&oacute;n Estructural</div>
+   <div class="info-grid">
+    <div class="info-panel">
+     <h3>📐 SVAR General</h3>
+     <p>A₀yₜ = c + A₁yₜ₋₁ + ... + Aₚyₜ₋ₚ + εₜ. A₀ captura relaciones contempor&aacute;neas. Necesita restricciones para identificaci&oacute;n.</p>
+     <div class="formula">A₀yₜ = c + A₁yₜ₋₁ + ... + εₜ</div>
+    </div>
+    <div class="info-panel">
+     <h3>🔷 Cholesky (Sims 1980)</h3>
+     <p>Descomposici&oacute;n recursiva: A₀ es triangular inferior. El orden de las variables importa y cambia las IRF.</p>
+    </div>
+    <div class="info-panel">
+     <h3>📏 Blanchard-Quah (1989)</h3>
+     <p>Restricciones de largo plazo: shocks de demanda no afectan el producto en el largo plazo. La matriz de IRF acumulada tiene ceros.</p>
+    </div>
+    <div class="info-panel">
+     <h3>✏️ Sign Restrictions (Uhlig 2005)</h3>
+     <p>No ceros exactos, sino signos: un shock monetario aumenta la tasa, disminuye la inflaci&oacute;n. M&aacute;s flexible.</p>
+    </div>
+   </div>
+
+   <div class="sim-area">
+    <div class="section-title"><i class="fas fa-play"></i> Simulaci&oacute;n: SVAR con Cholesky</div>
+    <p style="margin-bottom:0.8rem;color:#b9ccee;">Define el orden de las variables para la descomposici&oacute;n de Cholesky. Observa c&oacute;mo el orden cambia las IRF.</p>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem;">
+     <label style="color:#b9ccee;">Orden: 1<sup>a</sup> variable <select id="orderVar1" style="background:#1e2a3e;color:#fff;border:1px solid #06b6d4;border-radius:0.5rem;padding:0.3rem 0.6rem;">
+      <option value="0">y₁</option><option value="1" selected>y₂</option><option value="2">y₃</option>
+     </select></label>
+     <button id="simSvarBtn" class="btn-action" style="margin:0;">🔍 Mostrar IRF</button>
+    </div>
+    <div id="simResult" style="background:#0a0f1e;border-radius:1rem;padding:1rem;text-align:center;font-size:0.9rem;color:#b9ccee;">
+     Presiona "Mostrar IRF" para ver el efecto del ordenamiento.
+    </div>
+   </div>
+
+   <div class="quiz-area">
+    <div class="quiz-title"><i class="fas fa-question-circle"></i> Mini Quiz: SVAR</div>
+    <div id="quizContainer"></div>
+    <button id="submitQuizBtn" class="btn-action">✅ Verificar respuestas</button>
+    <div id="insigniaArea" class="insignia hidden">
+     <i class="fas fa-medal"></i>
+     <h3>🏅 SVAR Identificador 🏅</h3>
+     <p>Has dominado la identificaci&oacute;n estructural en VAR. &iexcl;Excelente!</p>
+    </div>
+   </div>
+  </div>
+
+  <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre SVAR.</div>
+
+  <div class="nav-links">
+   <a href="05-var.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+   <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
+   <a href="07-cointegracion.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-chart-line"></i> Series de Tiempo y Pron&oacute;stico &middot; M&oacute;dulo 6</footer>
+ </div>
+
+ <script>
+  const STORAGE_KEY = 'prog_econ_5_06';
+  const PROGRESS_KEY = 'prog_econ_5_progress';
+  const questions = [
+   { text: "\u00bfCu\u00e1ntas restricciones se necesitan para identificar un SVAR con n variables?", options: ["n", "n(n-1)/2", "2n", "n²"], correct: 1 },
+   { text: "\u00bfQu\u00e9 supone la descomposici\u00f3n de Cholesky?", options: ["A₀ es triangular inferior", "A₀ es diagonal", "A₀ es simétrica", "A₀ es identidad"], correct: 0 },
+   { text: "\u00bfQu\u00e9 restringen Blanchard-Quah?", options: ["Efectos de largo plazo a cero", "Efectos de corto plazo a cero", "Signos de las IRF", "Varianzas"], correct: 0 },
+   { text: "\u00bfQu&eacute; caracteriza a las sign restrictions?", options: ["Imponen signos en lugar de ceros exactos", "Son m\u00e1s restrictivas que Cholesky", "Solo funcionan con 2 variables", "No requieren identificaci\u00f3n"], correct: 0 },
+   { text: "\u00bfPor qu&eacute; el orden de Cholesky importa?", options: ["Porque cambia las IRF estimadas", "Porque cambia la media", "Porque afecta la estacionariedad", "No importa"], correct: 0 }
+  ];
+  let userAnswers = new Array(questions.length).fill(null);
+  let quizCompleted = false;
+
+  function saveProgress() {
+   let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
+   localStorage.setItem(STORAGE_KEY, 'true');
+  }
+
+  function updateProgress() {
+   let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
+   document.getElementById('progressText').textContent = 'M\u00f3dulo '+(p.length || 1)+' de 12';
+  }
+
+  function renderQuestions() {
+   const container = document.getElementById('quizContainer');
+   container.innerHTML = '';
+   questions.forEach((q, idx) => {
+    const qDiv = document.createElement('div'); qDiv.classList.add('question');
+    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
+    const optsDiv = qDiv.querySelector('.options');
+    q.options.forEach((opt, optIdx) => {
+     const span = document.createElement('div'); span.classList.add('opt');
+     span.textContent = opt; span.dataset.qIdx = idx; span.dataset.optIdx = optIdx;
+     span.addEventListener('click', function() {
+      if (quizCompleted) return;
+      this.parentElement.querySelectorAll('.opt').forEach(c => c.classList.remove('selected'));
+      this.classList.add('selected'); userAnswers[idx] = optIdx; updateBtnState();
+     });
+     optsDiv.appendChild(span);
+    });
+    container.appendChild(qDiv);
+   });
+  }
+
+  function updateBtnState() {
+   document.getElementById('submitQuizBtn').disabled = userAnswers.some(a => a === null) || quizCompleted;
+  }
+
+  function handleSubmit() {
+   if (quizCompleted) return;
+   if (userAnswers.some(a => a === null)) { document.getElementById('feedbackMsg').textContent = '⚠️ Responde todas las preguntas primero.'; return; }
+   let correct = 0;
+   questions.forEach((q, i) => { if (userAnswers[i] === q.correct) correct++; });
+   const total = questions.length; const passed = correct >= Math.ceil(total * 0.6);
+   document.querySelectorAll('.question').forEach((qDiv, idx) => {
+    const opts = qDiv.querySelectorAll('.opt');
+    opts.forEach((o, oi) => {
+     o.classList.remove('selected');
+     if (oi === questions[idx].correct) o.classList.add('correct');
+     else if (oi === userAnswers[idx]) o.classList.add('wrong');
+    });
+   });
+   if (passed) {
+    quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').textContent = '🎉 ' + correct + '/' + total + ' correctas. ¡Dominas SVAR!';
+    saveProgress(); updateProgress();
+   } else {
+    document.getElementById('feedbackMsg').textContent = '❌ ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. ¡Reintenta!';
+   }
+  }
+
+  function restoreProgress() {
+   const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   if (p.includes(STORAGE_KEY)) {
+    quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').textContent = '🏆 Ya completaste este módulo.';
+    document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
+   }
+  }
+
+  function simulateSVAR() {
+   const order = parseInt(document.getElementById('orderVar1').value);
+   const T = 100; const H = 16;
+   let y1 = new Array(T); let y2 = new Array(T); let y3 = new Array(T);
+   y1[0] = y2[0] = y3[0] = 0;
+   for (let t = 1; t < T; t++) {
+    const e1 = (Math.random() - 0.5) * 2;
+    const e2 = (Math.random() - 0.5) * 2;
+    const e3 = (Math.random() - 0.5) * 2;
+    y1[t] = 0.5 * y1[t-1] + 0.2 * y2[t-1] + e1;
+    y2[t] = 0.3 * y1[t-1] + 0.5 * y2[t-1] + 0.1 * y3[t-1] + e2;
+    y3[t] = 0.1 * y1[t-1] + 0.3 * y3[t-1] + e3;
+   }
+   const A = [[0.5, 0.2, 0], [0.3, 0.5, 0.1], [0.1, 0, 0.3]];
+   const Sigma = [[1, 0.3, 0.1], [0.3, 1, 0.2], [0.1, 0.2, 1]];
+   function cholesky(S, ord) {
+    const n = 3; let L = [[0,0,0],[0,0,0],[0,0,0]];
+    for (let j = 0; j < n; j++) {
+     let s = 0;
+     for (let k = 0; k < j; k++) s += L[j][k] * L[j][k];
+     L[j][j] = Math.sqrt(Math.max(0.01, S[ord[j]][ord[j]] - s));
+     for (let i = j+1; i < n; i++) {
+      s = 0;
+      for (let k = 0; k < j; k++) s += L[i][k] * L[j][k];
+      L[i][j] = (S[ord[i]][ord[j]] - s) / L[j][j];
+     }
+    }
+    return L;
+   }
+   const L1 = cholesky(Sigma, [0,1,2]);
+   const L2 = cholesky(Sigma, order === 0 ? [0,1,2] : [1,0,2]);
+   function computeIRF(Amat, Lmat, H) {
+    let irf = Array.from({length:3}, () => Array.from({length:3}, () => new Array(H).fill(0)));
+    for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) irf[i][j][0] = Lmat[i][j];
+    for (let h = 1; h < H; h++) {
+     for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+       let s = 0;
+       for (let k = 0; k < 3; k++) s += Amat[i][k] * irf[k][j][h-1];
+       irf[i][j][h] = s;
+      }
+     }
+    }
+    return irf;
+   }
+   const irf1 = computeIRF(A, L1, H);
+   const irf2 = computeIRF(A, L2, H);
+   function renderIRFComp(data1, data2, label, c1, c2) {
+    const maxAbs = Math.max(...data1.map(Math.abs), ...data2.map(Math.abs), 0.1);
+    let h = '<div style="height:50px;display:flex;align-items:center;gap:1px;">';
+    for (let t = 0; t < H; t++) {
+     const h1 = (data1[t] / maxAbs) * 22;
+     const h2 = (data2[t] / maxAbs) * 22;
+     h += '<div style="flex:1;min-width:3px;display:flex;flex-direction:column;align-items:center;"><div style="width:3px;height:' + Math.abs(h1) + 'px;background:' + (h1 >= 0 ? c1 : '#ff4455') + ';border-radius:1px 1px 0 0;"></div><div style="width:3px;height:' + Math.abs(h2) + 'px;background:' + (h2 >= 0 ? c2 : '#ff8888') + ';border-radius:0 0 1px 1px;"></div></div>';
+    }
+    h += '</div><div style="font-size:0.65rem;color:#8899cc;">' + label + '</div>';
+    return h;
+   }
+   let html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">';
+   html += renderIRFComp(irf1[0][0], irf2[0][0], 'y₁→y₁', '#06b6d4', '#67e8f9');
+   html += renderIRFComp(irf1[1][0], irf2[1][0], 'y₁→y₂', '#06b6d4', '#67e8f9');
+   html += renderIRFComp(irf1[2][0], irf2[2][0], 'y₁→y₃', '#06b6d4', '#67e8f9');
+   html += '</div>';
+   html += '<p style="font-size:0.8rem;color:#8899cc;margin-top:0.5rem;">Azul=orden [y₁,y₂,y₃], Cian=orden alternativo. H=' + H + ' pasos.</p>';
+   document.getElementById('simResult').innerHTML = html;
+  }
+
+  document.getElementById('simSvarBtn').addEventListener('click', simulateSVAR);
+  document.getElementById('submitQuizBtn').addEventListener('click', handleSubmit);
+  renderQuestions(); updateBtnState(); restoreProgress(); updateProgress();
+ </script>
+ <script>
+window.I18N_DATA={};
+</script>
+<script src="../../../assets/js/i18n.js"></script> </body>
+</html>

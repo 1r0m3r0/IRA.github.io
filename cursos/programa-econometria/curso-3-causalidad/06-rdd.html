@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Causalidad | ✂️ Regression Discontinuity</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:linear-gradient(135deg,#0a0f1e,#0c1222 50%,#111a2e); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+  @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .course-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(20,184,166,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+  .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #14b8a6; }
+  .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#5eead4,#14b8a6); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero-header p { font-size:1.1rem; color:#99f6e4; margin-top:0.5rem; font-weight:500; }
+  .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+  .chip { background:rgba(20,184,166,0.15); border:1px solid #14b8a6; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+  .progress-section { padding:1.2rem 2rem; border-bottom:1px solid #1a2a4a; }
+  .progress-bar-outer { background:#1a2a4a; border-radius:20px; height:16px; overflow:hidden; }
+  .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#14b8a6,#0d9488); border-radius:20px; transition:width 0.5s ease; }
+  .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
+  .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #14b8a6; font-size:1rem; line-height:1.6; }
+  .main-area { padding:1.5rem 2rem; }
+  .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#14b8a6; }
+  .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
+  .info-panel { background:rgba(10,20,40,0.7); border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
+  .info-panel h3 { color:#5eead4; font-size:1rem; margin-bottom:0.5rem; }
+  .info-panel p { font-size:0.85rem; color:#b9ccee; line-height:1.6; }
+  .info-panel .formula { background:#0a0f1e; padding:0.5rem; border-radius:0.8rem; text-align:center; font-family:monospace; font-size:0.9rem; color:#5eead4; margin-top:0.5rem; }
+  .sim-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #14b8a6; margin-bottom:1.5rem; }
+  .quiz-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #14b8a6; margin-bottom:1.5rem; }
+  .quiz-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#14b8a6; }
+  .question { background:#0f1a2c; margin:0.8rem 0; padding:0.8rem 1rem; border-radius:1.2rem; }
+  .question p { font-weight:600; margin-bottom:0.5rem; font-size:0.95rem; }
+  .options { display:flex; flex-wrap:wrap; gap:0.6rem; }
+  .opt { background:#1e2a3e; padding:0.3rem 0.9rem; border-radius:2rem; cursor:pointer; transition:0.2s; font-size:0.85rem; }
+  .opt:hover { background:#2c3e66; transform:translateY(-2px); }
+  .opt.selected { background:#14b8a6; color:#000; font-weight:bold; box-shadow:0 0 8px #14b8a6; }
+  .opt.correct { background:#00cc88; color:#000; }
+  .opt.wrong { background:#ff4455; color:#fff; }
+  .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #14b8a6; }
+  .btn-action { background:linear-gradient(95deg,#14b8a6,#0d9488); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#fff; margin-top:1rem; }
+  .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(20,184,166,0.5); }
+  .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
+  .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin-top:1.5rem; padding:1rem; border:1px dashed gold; }
+  .insignia i { font-size:2.5rem; color:gold; }
+  .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
+  .hidden { display:none; }
+  .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+  .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+  .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(20,184,166,0.4); }
+  .nav-link.next { background:linear-gradient(95deg,#14b8a6,#0d9488); color:#fff; }
+  .nav-link.menu { background:#1a2a4a; border:1px solid #14b8a6; }
+  footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+  .sim-controls { display:flex; gap:1rem; flex-wrap:wrap; align-items:center; margin-bottom:1rem; }
+  .sim-controls label { color:#b9ccee; font-size:0.85rem; }
+  .sim-controls select, .sim-controls input { background:#1e2a3e; color:#fff; border:1px solid #14b8a6; border-radius:0.5rem; padding:0.3rem 0.6rem; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .info-grid { grid-template-columns:1fr; } }
+ </style>
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
+</head>
+<body>
+ <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Econometr&iacute;a</a></nav>
+ <div class="course-container" id="app">
+  <div class="hero-header">
+   <h1>✂️ Regression Discontinuity</h1>
+   <p>Dise&ntilde;o de regresi&oacute;n discontinua: sharp, fuzzy y selecci&oacute;n de bandwidth</p>
+   <div class="badge-area">
+    <span class="chip"><i class="fas fa-cut"></i> Sharp RDD</span>
+    <span class="chip"><i class="fas fa-wave-square"></i> Bandwidth</span>
+    <span class="chip"><i class="fas fa-chart-area"></i> Polinomio</span>
+   </div>
+  </div>
+  <div class="progress-section">
+   <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+   <span class="progress-text" id="progressText">M&oacute;dulo 6 de 12</span>
+  </div>
+  <div class="analogy-card">
+   <strong>💡 Piénsalo así:</strong> RDD es como una competencia de salto de altura: los que saltan m&aacute;s de cierta altura (el cutoff) pasan a la siguiente ronda. Comparar a los que quedaron justo arriba vs justo abajo del corte es pr&aacute;cticamente un experimento aleatorio, porque cerca del umbral son muy similares. La discontinuidad en el outcome revela el efecto causal.
+  </div>
+  <div class="main-area">
+   <div class="section-title"><i class="fas fa-cut"></i> Conceptos de RDD</div>
+   <div class="info-grid">
+    <div class="info-panel">
+     <h3>✂️ Sharp RDD</h3>
+     <p>El tratamiento se asigna determin&iacute;sticamente si X &ge; c (cutoff). Todos los que pasan el umbral reciben tratamiento. El efecto es el salto en el cutoff.</p>
+     <div class="formula">&tau; = lim&#8321;&darr;c E[Y|X=x] - lim&#8321;&uarr;c E[Y|X=x]</div>
+    </div>
+    <div class="info-panel">
+     <h3>🌫️ Fuzzy RDD</h3>
+     <p>El cutoff aumenta la probabilidad de tratamiento, pero no la determina exactamente. Se usa IV donde el cutoff es el instrumento para el tratamiento.</p>
+    </div>
+    <div class="info-panel">
+     <h3>📏 Selecci&oacute;n de Bandwidth</h3>
+     <p>Ancho de ventana &oacute;ptimo alrededor del cutoff. Muy grande: sesgo. Muy chico: alta varianza. MSE-optimal balancea ambos. (Imbens & Kalyanaraman, 2012)</p>
+    </div>
+    <div class="info-panel">
+     <h3>📊 Test de McCrary</h3>
+     <p>Test para detectar manipulaci&oacute;n de la variable de asignaci&oacute;n (forcing variable). Si hay acumulaci&oacute;n sospechosa cerca del cutoff, el RDD no es v&aacute;lido.</p>
+    </div>
+   </div>
+
+   <div class="sim-area">
+    <div class="section-title"><i class="fas fa-play"></i> Simulaci&oacute;n: RDD</div>
+    <p style="margin-bottom:0.8rem;color:#b9ccee;">Selecciona bandwidth y orden polinomial para estimar la discontinuidad.</p>
+    <div class="sim-controls">
+     <label>Bandwidth: <select id="rddBW">
+      <option value="0.5">0.5</option><option value="1" selected>1.0</option><option value="1.5">1.5</option><option value="2">2.0</option>
+     </select></label>
+     <label>Polinomio: <select id="rddPoly">
+      <option value="1">Lineal</option><option value="2" selected>Cuadr&aacute;tico</option><option value="3">C&uacute;bico</option>
+     </select></label>
+     <button id="rddSimBtn" class="btn-action" style="margin:0;">📊 Estimar RDD</button>
+     <button id="rddPlaceboBtn" class="btn-action" style="margin:0;background:#2c3e66;">🧪 Placebo Test</button>
+    </div>
+    <div id="rddResult" style="background:#0a0f1e;border-radius:1rem;padding:1rem;text-align:center;font-size:0.9rem;color:#b9ccee;">
+     Configura y presiona "Estimar RDD" para ver los resultados.
+    </div>
+   </div>
+
+   <div class="quiz-area">
+    <div class="quiz-title"><i class="fas fa-question-circle"></i> Mini Quiz: Regression Discontinuity</div>
+    <div id="quizContainer"></div>
+    <button id="submitQuizBtn" class="btn-action">✅ Verificar respuestas</button>
+    <div id="insigniaArea" class="insignia hidden">
+     <i class="fas fa-medal"></i>
+     <h3>🏅 Cortador de Continuidad 🏅</h3>
+     <p>Has dominado el m&eacute;todo de regresi&oacute;n discontinua. &iexcl;Excelente!</p>
+    </div>
+   </div>
+  </div>
+
+  <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre RDD, bandwidth y supuestos.</div>
+
+  <div class="nav-links">
+   <a href="05-did-staggered.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+   <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
+   <a href="07-psm.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-dice"></i> Causalidad y Evaluaci&oacute;n de Impacto · M&oacute;dulo 6</footer>
+ </div>
+
+ <script>
+  const STORAGE_KEY = 'prog_econ_3_06';
+  const PROGRESS_KEY = 'prog_econ_3_progress';
+  const questions = [
+   { text: "\u00bfCu\u00e1l es el supuesto clave de identificaci\u00f3n en RDD?", options: ["Linealidad de la funci\u00f3n", "Continuidad de la esperanza condicional en el cutoff", "Normalidad de los errores", "Homocedasticidad"], correct: 1 },
+   { text: "\u00bfQu\u00e9 es la selecci\u00f3n de bandwidth?", options: ["Elegir el cutoff", "El ancho de ventana \u00f3ptimo alrededor del cutoff para estimar", "El n\u00famero de polinomios", "La variable dependiente"], correct: 1 },
+   { text: "\u00bfQu\u00e9 detecta el test de McCrary?", options: ["Heterocedasticidad", "Manipulaci\u00f3n de la forcing variable cerca del cutoff", "El efecto del tratamiento", "La normalidad de los residuos"], correct: 1 },
+   { text: "\u00bfQu\u00e9 diferencia a Fuzzy RDD de Sharp RDD?", options: ["El cutoff no determina completamente el tratamiento", "No hay cutoff", "Se usa una variable instrumental adicional", "Es igual pero con m\u00e1s datos"], correct: 0 },
+   { text: "\u00bfPara qu\u00e9 sirve un placebo test en RDD?", options: ["Para estimar el efecto verdadero", "Para probar el supuesto de continuidad usando cutoffs falsos", "Para aumentar la muestra", "Para calcular el bandwidth"], correct: 1 }
+  ];
+  let userAnswers = new Array(questions.length).fill(null);
+  let quizCompleted = false;
+  let rddData = [];
+
+  function saveProgress() {
+   let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
+   localStorage.setItem(STORAGE_KEY, 'true');
+  }
+
+  function updateProgress() {
+   let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
+   document.getElementById('progressText').textContent = 'M\u00f3dulo '+(p.length || 1)+' de 12';
+  }
+
+  function renderQuestions() {
+   const container = document.getElementById('quizContainer');
+   container.innerHTML = '';
+   questions.forEach((q, idx) => {
+    const qDiv = document.createElement('div'); qDiv.classList.add('question');
+    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
+    const optsDiv = qDiv.querySelector('.options');
+    q.options.forEach((opt, optIdx) => {
+     const span = document.createElement('div'); span.classList.add('opt');
+     span.textContent = opt; span.dataset.qIdx = idx; span.dataset.optIdx = optIdx;
+     span.addEventListener('click', function() {
+      if (quizCompleted) return;
+      this.parentElement.querySelectorAll('.opt').forEach(c => c.classList.remove('selected'));
+      this.classList.add('selected'); userAnswers[idx] = optIdx; updateBtnState();
+     });
+     optsDiv.appendChild(span);
+    });
+    container.appendChild(qDiv);
+   });
+  }
+
+  function updateBtnState() {
+   document.getElementById('submitQuizBtn').disabled = userAnswers.some(a => a === null) || quizCompleted;
+  }
+
+  function handleSubmit() {
+   if (quizCompleted) return;
+   if (userAnswers.some(a => a === null)) { document.getElementById('feedbackMsg').textContent = I18N.t('fb_0'); return; }
+   let correct = 0;
+   questions.forEach((q, i) => { if (userAnswers[i] === q.correct) correct++; });
+   const total = questions.length; const passed = correct >= Math.ceil(total * 0.6);
+   document.querySelectorAll('.question').forEach((qDiv, idx) => {
+    const opts = qDiv.querySelectorAll('.opt');
+    opts.forEach((o, oi) => {
+     o.classList.remove('selected');
+     if (oi === questions[idx].correct) o.classList.add('correct');
+     else if (oi === userAnswers[idx]) o.classList.add('wrong');
+    });
+   });
+   if (passed) {
+    quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').textContent = I18N.t('fb_1') + correct + '/' + total + ' correctas. \u00a1Dominas el RDD!';
+    saveProgress(); updateProgress();
+   } else {
+    document.getElementById('feedbackMsg').textContent = '\u274c ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. \u00a1Reintenta!';
+   }
+  }
+
+  function restoreProgress() {
+   const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   if (p.includes(STORAGE_KEY)) {
+    quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').textContent = I18N.t('fb_2');
+    document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
+   }
+  }
+
+  function genRDD() {
+   rddData = [];
+   let cutoff = 0;
+   let trueEffect = 4;
+   for (let i = 0; i < 200; i++) {
+    let x = (Math.random() - 0.5) * 4;
+    let treated = x >= cutoff ? 1 : 0;
+    let y = 10 + x * 0.8 + treated * trueEffect + (Math.random() - 0.5) * 2;
+    rddData.push({ x, y, treated });
+   }
+  }
+
+  function estimateRDD(bw, poly, data) {
+   let cutoff = 0;
+   let inBW = data.filter(d => Math.abs(d.x - cutoff) <= bw);
+   if (inBW.length < 10) return null;
+   let left = inBW.filter(d => d.x < cutoff);
+   let right = inBW.filter(d => d.x >= cutoff);
+   if (left.length < 3 || right.length < 3) return null;
+   let meanL = left.reduce((s,d) => s + d.y, 0) / left.length;
+   let meanR = right.reduce((s,d) => s + d.y, 0) / right.length;
+   let est = meanR - meanL;
+   let varL = left.reduce((s,d) => s + (d.y - meanL)**2, 0) / (left.length * left.length);
+   let varR = right.reduce((s,d) => s + (d.y - meanR)**2, 0) / (right.length * right.length);
+   let se = Math.sqrt(varL + varR);
+   return { est, se, n: inBW.length };
+  }
+
+  genRDD();
+
+  document.getElementById('rddSimBtn').addEventListener('click', function() {
+   const bw = parseFloat(document.getElementById('rddBW').value);
+   const poly = parseInt(document.getElementById('rddPoly').value);
+   const res = estimateRDD(bw, poly, rddData);
+   if (!res) {
+    document.getElementById('rddResult').textContent = '⚠️ Muy pocos datos en el bandwidth. Intenta con un bandwidth mayor.';
+    return;
+   }
+   document.getElementById('rddResult').innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:0.5rem;">' +
+    '<div style="background:#1e2a3e;border-radius:0.8rem;padding:0.5rem;border:1px solid #14b8a6;"><div style="font-weight:700;color:#5eead4;">Discontinuidad</div><div style="font-size:1.2rem;">' + res.est.toFixed(3) + '</div></div>' +
+    '<div style="background:#1e2a3e;border-radius:0.8rem;padding:0.5rem;border:1px solid #14b8a6;"><div style="font-weight:700;color:#5eead4;">Error Est&aacute;ndar</div><div>' + res.se.toFixed(3) + '</div></div>' +
+    '<div style="background:#1e2a3e;border-radius:0.8rem;padding:0.5rem;border:1px solid ' + (Math.abs(res.est/res.se) > 1.96 ? '#00cc88' : '#ff4455') + ';"><div style="font-weight:700;color:#5eead4;">Significativo</div><div>' + (Math.abs(res.est/res.se) > 1.96 ? '✅ S&iacute;' : '❌ No') + '</div></div>' +
+    '<div style="background:#1e2a3e;border-radius:0.8rem;padding:0.5rem;border:1px solid #14b8a6;"><div style="font-weight:700;color:#5eead4;">N en BW</div><div>' + res.n + '</div></div>' +
+    '</div><p style="margin-top:0.8rem;color:#8899cc;font-size:0.8rem;">Efecto real = 4. Bandwidth = ' + bw + ', polinomio orden ' + poly + '.</p>';
+  });
+
+  document.getElementById('rddPlaceboBtn').addEventListener('click', function() {
+   let placebos = [];
+   for (let c = -1.5; c <= 1.5; c += 0.5) {
+    if (Math.abs(c) < 0.1) continue;
+    let left = rddData.filter(d => d.x >= c - 0.5 && d.x < c);
+    let right = rddData.filter(d => d.x >= c && d.x <= c + 0.5);
+    if (left.length >= 3 && right.length >= 3) {
+     let est = right.reduce((s,d) => s + d.y, 0)/right.length - left.reduce((s,d) => s + d.y, 0)/left.length;
+     placebos.push({ cutoff: c.toFixed(1), est: est.toFixed(2) });
+    }
+   }
+   let html = '<p style="font-weight:700;color:#5eead4;margin-bottom:0.5rem;">Placebo Tests en Cutoffs Falsos</p>';
+   html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:0.3rem;">';
+   placebos.forEach(p => {
+    html += '<div style="background:#1e2a3e;border-radius:0.5rem;padding:0.3rem;text-align:center;border:1px solid #2c3e66;"><div style="font-size:0.8rem;color:#5eead4;">c=' + p.cutoff + '</div><div>' + p.est + '</div></div>';
+   });
+   html += '</div><p style="margin-top:0.8rem;color:#8899cc;font-size:0.8rem;">Los placebos deber&iacute;an estar cerca de 0. Solo en el cutoff verdadero (c=0) vemos el salto.</p>';
+   document.getElementById('rddResult').innerHTML = html;
+  });
+
+  document.getElementById('submitQuizBtn').addEventListener('click', handleSubmit);
+  renderQuestions(); updateBtnState(); restoreProgress(); updateProgress();
+ </script>
+ <script>
+window.I18N_DATA={
+ "fb_0": {
+  "es": "⚠️ Responde todas las preguntas primero.",
+  "en": "⚠️ Answer todas las preguntas primero."
+ },
+ "fb_1": {
+  "es": "🎉 ",
+  "en": "🎉 "
+ },
+ "fb_2": {
+  "es": "🏆 Ya completaste este m\u00f3dulo.",
+  "en": "🏆 Ya completaste este m\u00f3dulo."
+ }
+};
+</script>
+<script src="../../../assets/js/i18n.js"></script> </body>
+</html>

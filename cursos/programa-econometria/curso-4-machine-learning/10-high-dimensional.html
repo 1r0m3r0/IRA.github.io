@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>ML Econometría | 📐 High-Dimensional Inference</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:linear-gradient(135deg,#0a0f1e,#0c1222 50%,#111a2e); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+  @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .course-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(249,115,22,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+  .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #f97316; }
+  .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#fdba74,#f97316); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero-header p { font-size:1.1rem; color:#f0c0e0; margin-top:0.5rem; font-weight:500; }
+  .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+  .chip { background:rgba(249,115,22,0.15); border:1px solid #f97316; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+  .progress-section { padding:1.2rem 2rem; border-bottom:1px solid #1a2a4a; }
+  .progress-bar-outer { background:#1a2a4a; border-radius:20px; height:16px; overflow:hidden; }
+  .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#f97316,#ea580c); border-radius:20px; transition:width 0.5s ease; }
+  .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
+  .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #f97316; font-size:1rem; line-height:1.6; }
+  .main-area { padding:1.5rem 2rem; }
+  .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#f97316; }
+  .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
+  .info-panel { background:rgba(10,20,40,0.7); border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
+  .info-panel h3 { color:#fdba74; font-size:1rem; margin-bottom:0.5rem; }
+  .info-panel p { font-size:0.85rem; color:#b9ccee; line-height:1.6; }
+  .info-panel .formula { background:#0a0f1e; padding:0.5rem; border-radius:0.8rem; text-align:center; font-family:monospace; font-size:0.9rem; color:#fdba74; margin-top:0.5rem; }
+  .sim-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #f97316; margin-bottom:1.5rem; }
+  .quiz-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #f97316; margin-bottom:1.5rem; }
+  .quiz-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#f97316; }
+  .question { background:#0f1a2c; margin:0.8rem 0; padding:0.8rem 1rem; border-radius:1.2rem; }
+  .question p { font-weight:600; margin-bottom:0.5rem; font-size:0.95rem; }
+  .options { display:flex; flex-wrap:wrap; gap:0.6rem; }
+  .opt { background:#1e2a3e; padding:0.3rem 0.9rem; border-radius:2rem; cursor:pointer; transition:0.2s; font-size:0.85rem; }
+  .opt:hover { background:#2c3e66; transform:translateY(-2px); }
+  .opt.selected { background:#f97316; color:#000; font-weight:bold; box-shadow:0 0 8px #f97316; }
+  .opt.correct { background:#00cc88; color:#000; }
+  .opt.wrong { background:#ff4455; color:#fff; }
+  .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #f97316; }
+  .btn-action { background:linear-gradient(95deg,#f97316,#ea580c); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin-top:1rem; }
+  .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(249,115,22,0.5); }
+  .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
+  .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin-top:1.5rem; padding:1rem; border:1px dashed gold; }
+  .insignia i { font-size:2.5rem; color:gold; }
+  .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
+  .hidden { display:none; }
+  .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+  .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+  .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(249,115,22,0.4); }
+  .nav-link.next { background:linear-gradient(95deg,#f97316,#ea580c); color:#1e1a0c; }
+  .nav-link.menu { background:#1a2a4a; border:1px solid #f97316; }
+  footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .info-grid { grid-template-columns:1fr; } }
+ </style>
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
+</head>
+<body>
+ <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Econometr&iacute;a</a></nav>
+ <div class="course-container" id="app">
+  <div class="hero-header">
+   <h1>📐 High-Dimensional Inference</h1>
+   <p>p &gg; n, m&uacute;ltiples pruebas, knockoffs, debiased Lasso y desparsificaci&oacute;n</p>
+   <div class="badge-area">
+    <span class="chip"><i class="fas fa-layer-group"></i> p &gg; n</span>
+    <span class="chip"><i class="fas fa-filter"></i> FDR · Bonferroni</span>
+    <span class="chip"><i class="fas fa-crosshairs"></i> Knockoffs</span>
+   </div>
+  </div>
+  <div class="progress-section">
+   <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+   <span class="progress-text" id="progressText">M&oacute;dulo 10 de 12</span>
+  </div>
+  <div class="analogy-card">
+   <strong>💡 Pi&eacute;nsalo as&iacute;:</strong> La alta dimensionalidad (p &gg; n) es como tratar de adivinar la personalidad de alguien con solo 3 fotos: tienes m&aacute;s preguntas (variables) que respuestas (datos). Bonferroni es como ser extremadamente estricto: solo aceptas una pista si es abrumadora. FDR es m&aacute;s pragm&aacute;tico: aceptas que algunas pistas sean falsas, pero controlas la proporci&oacute;n. Knockoffs son como crear gemelos falsos de tus variables para detectar se&ntilde;ales genuinas.
+  </div>
+  <div class="main-area">
+   <div class="section-title"><i class="fas fa-graduation-cap"></i> Teor&iacute;a: Inferencia en Alta Dimensi&oacute;n</div>
+   <div class="info-grid">
+    <div class="info-panel">
+     <h3>M&uacute;ltiples Pruebas (Bonferroni, FDR)</h3>
+     <p>Bonferroni: &alpha;/p (controla FWER). FDR (Benjamini-Hochberg): controla proporci&oacute;n de falsos descubrimientos. M&aacute;s potente que Bonferroni.</p>
+     <div class="formula">FDR = E[V / R]</div>
+    </div>
+    <div class="info-panel">
+     <h3>Knockoffs</h3>
+     <p>Barber-Cand&egrave;s. Construye variables "fake" que imitan la correlaci&oacute;n de las reales. Detecta se&ntilde;ales genuinas comparando original vs knockoff.</p>
+     <div class="formula">W<sub>j</sub> = |Z<sub>j</sub>| - |Z&#771;<sub>j</sub>|</div>
+    </div>
+    <div class="info-panel">
+     <h3>Debiased Lasso</h3>
+     <p>Corrige el sesgo de Lasso a&ntilde;adiendo un t&eacute;rmino de "desparsificaci&oacute;n". Produce estimaciones &radic;n-consistentes y normales asint&oacute;ticas.</p>
+     <div class="formula">&beta;&#770;<sup>u</sup> = &beta;&#770;<sup>Lasso</sup> + M X'(Y - X&beta;&#770;<sup>Lasso</sup>)</div>
+    </div>
+    <div class="info-panel">
+     <h3>Desparsificaci&oacute;n de van de Geer</h3>
+     <p>M&eacute;todo de desparsificaci&oacute;n basado en el nodewise Lasso. Construye intervalos de confianza v&aacute;lidos para coeficientes individuales cuando p &gg; n.</p>
+     <div class="formula">&radic;n(&beta;&#770;<sup>u</sup> - &beta;*) &rarr; N(0, &sigma;<sup>2</sup>&Theta;&Sigma;&Theta;)</div>
+    </div>
+   </div>
+
+   <div class="sim-area">
+    <div class="section-title"><i class="fas fa-play"></i> Simulaci&oacute;n: p=100, n=50</div>
+    <p style="margin-bottom:0.8rem;color:#b9ccee;">Compara inferencia naive vs corregida (Bonferroni, BH). Mira las tasas de descubrimiento y cobertura.</p>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem;">
+     <button id="simBtn" class="btn-action" style="margin:0;">🔄 Simular</button>
+    </div>
+    <div id="simResult" style="background:#0a0f1e;border-radius:1rem;padding:1rem;text-align:center;font-size:0.9rem;color:#b9ccee;">
+     Presiona "Simular" para ver comparaci&oacute;n.
+    </div>
+   </div>
+
+   <div class="quiz-area">
+    <div class="quiz-title"><i class="fas fa-question-circle"></i> Mini Quiz: High-Dimensional Inference</div>
+    <div id="quizContainer"></div>
+    <button id="submitQuizBtn" class="btn-action">✅ Verificar respuestas</button>
+    <div id="insigniaArea" class="insignia hidden">
+     <i class="fas fa-medal"></i>
+     <h3>📐 Dimensionalidad Controlada 🏅</h3>
+     <p>Has dominado la inferencia en alta dimensi&oacute;n. &iexcl;Excelente!</p>
+    </div>
+   </div>
+  </div>
+
+  <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre inferencia de alta dimensi&oacute;n.</div>
+
+  <div class="nav-links">
+   <a href="09-embeddings.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+   <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
+   <a href="11-cross-validation.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-robot"></i> ML para Econometr&iacute;a · M&oacute;dulo 10</footer>
+ </div>
+
+ <script>
+  const STORAGE_KEY = 'prog_econ_4_10';
+  const PROGRESS_KEY = 'prog_econ_4_progress';
+  const questions = [
+   { text: "¿Qué controla Bonferroni?", options: ["FDR", "FWER (Familywise Error Rate)", "La varianza", "El sesgo"], correct: 1 },
+   { text: "¿Qué es FDR?", options: ["Tasa de falsos descubrimientos", "Error tipo I", "Error tipo II", "Potencia estadística"], correct: 0 },
+   { text: "¿Qué hacen los knockoffs?", options: ["Reducir la dimensión", "Crear variables artificiales para controlar FDR", "Aumentar la muestra", "Regularizar"], correct: 1 },
+   { text: "¿Qué problema resuelve el debiased Lasso?", options: ["El sesgo de selección de Lasso", "La multicolinealidad", "La heterocedasticidad", "La endogeneidad"], correct: 0 },
+   { text: "¿Qué es la desparsificación de van de Geer?", options: ["Método para inferencia válida con Lasso", "Técnica de boosting", "Algoritmo de clustering", "Métrica de evaluación"], correct: 0 }
+  ];
+  let userAnswers = new Array(questions.length).fill(null);
+  let quizCompleted = false;
+
+  function saveProgress() {
+   let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
+   localStorage.setItem(STORAGE_KEY, 'true');
+  }
+
+  function updateProgress() {
+   let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
+   document.getElementById('progressText').textContent = 'M\u00f3dulo '+(p.length || 1)+' de 12';
+  }
+
+  function renderQuestions() {
+   const container = document.getElementById('quizContainer');
+   container.innerHTML = '';
+   questions.forEach((q, idx) => {
+    const qDiv = document.createElement('div'); qDiv.classList.add('question');
+    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
+    const optsDiv = qDiv.querySelector('.options');
+    q.options.forEach((opt, optIdx) => {
+     const span = document.createElement('div'); span.classList.add('opt');
+     span.textContent = opt; span.dataset.qIdx = idx; span.dataset.optIdx = optIdx;
+     span.addEventListener('click', function() {
+      if (quizCompleted) return;
+      this.parentElement.querySelectorAll('.opt').forEach(c => c.classList.remove('selected'));
+      this.classList.add('selected'); userAnswers[idx] = optIdx; updateBtnState();
+     });
+     optsDiv.appendChild(span);
+    });
+    container.appendChild(qDiv);
+   });
+  }
+
+  function updateBtnState() {
+   document.getElementById('submitQuizBtn').disabled = userAnswers.some(a => a === null) || quizCompleted;
+  }
+
+  function handleSubmit() {
+   if (quizCompleted) return;
+   if (userAnswers.some(a => a === null)) { document.getElementById('feedbackMsg').textContent = I18N.t('fb_0'); return; }
+   let correct = 0;
+   questions.forEach((q, i) => { if (userAnswers[i] === q.correct) correct++; });
+   const total = questions.length; const passed = correct >= Math.ceil(total * 0.6);
+   document.querySelectorAll('.question').forEach((qDiv, idx) => {
+    const opts = qDiv.querySelectorAll('.opt');
+    opts.forEach((o, oi) => {
+     o.classList.remove('selected');
+     if (oi === questions[idx].correct) o.classList.add('correct');
+     else if (oi === userAnswers[idx]) o.classList.add('wrong');
+    });
+   });
+   if (passed) {
+    quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').textContent = I18N.t('fb_1') + correct + '/' + total + ' correctas. ¡Dominas inferencia de alta dimensión!';
+    saveProgress(); updateProgress();
+   } else {
+    document.getElementById('feedbackMsg').textContent = '❌ ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. ¡Reintenta!';
+   }
+  }
+
+  function restoreProgress() {
+   const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   if (p.includes(STORAGE_KEY)) {
+    quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').textContent = I18N.t('fb_2');
+    document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
+   }
+  }
+
+  function simulateHighDim() {
+   const p = 100; const n = 50; const nSims = 20;
+   let naiveDisc = 0; let bonfDisc = 0; let bhDisc = 0;
+   const trueNonZero = [0, 1, 2, 3, 4];
+   for (let sim = 0; sim < nSims; sim++) {
+    const X = []; const y = [];
+    for (let i = 0; i < n; i++) {
+     X[i] = []; for (let j = 0; j < p; j++) X[i][j] = Math.random() * 2 - 1;
+     y[i] = trueNonZero.reduce((s, j) => s + X[i][j] * (j+1)*0.5, 0) + (Math.random() - 0.5) * 3;
+    }
+    const XtX = []; for (let a=0;a<p;a++) { XtX[a]=[]; for (let b=0;b<p;b++) { let s=0; for (let i=0;i<n;i++) s+=X[i][a]*X[i][b]; XtX[a][b]=s; } }
+    const Xty = []; for (let a=0;a<p;a++) { let s=0; for (let i=0;i<n;i++) s+=X[i][a]*y[i]; Xty[a]=s; }
+    const beta = [...Xty]; for (let i=0;i<p;i++) { const piv=XtX[i][i]; for (let j=i;j<p;j++) XtX[i][j]/=piv; beta[i]/=piv; for (let k=i+1;k<p;k++) { const f=XtX[k][i]; for (let j=i;j<p;j++) XtX[k][j]-=f*XtX[i][j]; beta[k]-=f*beta[i]; } }
+    for (let i=p-1;i>=0;i--) for (let k=i-1;k>=0;k--) beta[k] -= XtX[k][i]*beta[i];
+    const resid = []; for (let i=0;i<n;i++) { let pred=0; for (let j=0;j<p;j++) pred+=beta[j]*X[i][j]; resid[i]=y[i]-pred; }
+    const s2 = resid.reduce((s,r)=>s+r*r,0)/(n-p);
+    const pvals = []; for (let j=0;j<p;j++) { const t = beta[j]/Math.sqrt(s2/XtX[j][j]); pvals.push(2*(1-0.5*(1+Math.erf(Math.abs(t)/Math.sqrt(2))))); }
+    const naiveSig = pvals.filter(pv => pv < 0.05).length;
+    const bonfSig = pvals.filter(pv => pv < 0.05/p).length;
+    const sorted = pvals.map((v,i)=>({v,i})).sort((a,b)=>a.v-b.v);
+    let bhCount=0; for (let k=0;k<sorted.length;k++) if (sorted[k].v <= (k+1)/p*0.05) bhCount=k+1;
+    naiveDisc += naiveSig; bonfDisc += bonfSig; bhDisc += bhCount;
+   }
+   const avgNaive = (naiveDisc/nSims).toFixed(1);
+   const avgBonf = (bonfDisc/nSims).toFixed(1);
+   const avgBH = (bhDisc/nSims).toFixed(1);
+   let html = '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.8rem;">';
+   html += '<div style="background:#1e2a3e;border-radius:1rem;padding:0.8rem;text-align:center;"><div style="font-weight:700;color:#f97316;">Naive</div><div style="font-size:1.3rem;">&mu; = ' + avgNaive + '</div><div style="font-size:0.7rem;color:#ff4455;">Muchos falsos +</div></div>';
+   html += '<div style="background:#1e2a3e;border-radius:1rem;padding:0.8rem;text-align:center;"><div style="font-weight:700;color:#3b82f6;">Bonferroni</div><div style="font-size:1.3rem;">&mu; = ' + avgBonf + '</div><div style="font-size:0.7rem;color:#22c55e;">Controla FWER</div></div>';
+   html += '<div style="background:#1e2a3e;border-radius:1rem;padding:0.8rem;text-align:center;"><div style="font-weight:700;color:#a855f7;">BH (FDR)</div><div style="font-size:1.3rem;">&mu; = ' + avgBH + '</div><div style="font-size:0.7rem;color:#22c55e;">&iexcl;M&aacute;s potente!</div></div>';
+   html += '</div>';
+   html += '<p style="margin-top:0.8rem;color:#8899cc;font-size:0.8rem;">p=100, n=50, 5 variables reales. Bonferroni es conservador, FDR (BH) encuentra m&aacute;s se&ntilde;ales genuinas. Naive detecta demasiados falsos positivos.</p>';
+   document.getElementById('simResult').innerHTML = html;
+  }
+
+  document.getElementById('submitQuizBtn').addEventListener('click', handleSubmit);
+  document.getElementById('simBtn').addEventListener('click', simulateHighDim);
+  renderQuestions(); updateBtnState(); restoreProgress(); updateProgress();
+  simulateHighDim();
+ </script>
+ <script>
+window.I18N_DATA={
+ "fb_0": {
+  "es": "⚠️ Responde todas las preguntas primero.",
+  "en": "⚠️ Answer todas las preguntas primero."
+ },
+ "fb_1": {
+  "es": "🎉 ",
+  "en": "🎉 "
+ },
+ "fb_2": {
+  "es": "🏆 Ya completaste este módulo.",
+  "en": "🏆 Ya completaste este módulo."
+ }
+};
+</script>
+<script src="../../../assets/js/i18n.js"></script> </body>
+</html>

@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Causalidad | 🔀 DAGs y Causal Inference</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:linear-gradient(135deg,#0a0f1e,#0c1222 50%,#111a2e); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+  @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .course-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(20,184,166,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+  .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #14b8a6; }
+  .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#5eead4,#14b8a6); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero-header p { font-size:1.1rem; color:#99f6e4; margin-top:0.5rem; font-weight:500; }
+  .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+  .chip { background:rgba(20,184,166,0.15); border:1px solid #14b8a6; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+  .progress-section { padding:1.2rem 2rem; border-bottom:1px solid #1a2a4a; }
+  .progress-bar-outer { background:#1a2a4a; border-radius:20px; height:16px; overflow:hidden; }
+  .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#14b8a6,#0d9488); border-radius:20px; transition:width 0.5s ease; }
+  .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
+  .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #14b8a6; font-size:1rem; line-height:1.6; }
+  .main-area { padding:1.5rem 2rem; }
+  .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#14b8a6; }
+  .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
+  .info-panel { background:rgba(10,20,40,0.7); border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
+  .info-panel h3 { color:#5eead4; font-size:1rem; margin-bottom:0.5rem; }
+  .info-panel p { font-size:0.85rem; color:#b9ccee; line-height:1.6; }
+  .info-panel .formula { background:#0a0f1e; padding:0.5rem; border-radius:0.8rem; text-align:center; font-family:monospace; font-size:0.9rem; color:#5eead4; margin-top:0.5rem; }
+  .sim-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #14b8a6; margin-bottom:1.5rem; }
+  .quiz-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #14b8a6; margin-bottom:1.5rem; }
+  .quiz-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#14b8a6; }
+  .question { background:#0f1a2c; margin:0.8rem 0; padding:0.8rem 1rem; border-radius:1.2rem; }
+  .question p { font-weight:600; margin-bottom:0.5rem; font-size:0.95rem; }
+  .options { display:flex; flex-wrap:wrap; gap:0.6rem; }
+  .opt { background:#1e2a3e; padding:0.3rem 0.9rem; border-radius:2rem; cursor:pointer; transition:0.2s; font-size:0.85rem; }
+  .opt:hover { background:#2c3e66; transform:translateY(-2px); }
+  .opt.selected { background:#14b8a6; color:#000; font-weight:bold; box-shadow:0 0 8px #14b8a6; }
+  .opt.correct { background:#00cc88; color:#000; }
+  .opt.wrong { background:#ff4455; color:#fff; }
+  .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #14b8a6; }
+  .btn-action { background:linear-gradient(95deg,#14b8a6,#0d9488); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#fff; margin-top:1rem; }
+  .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(20,184,166,0.5); }
+  .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
+  .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin-top:1.5rem; padding:1rem; border:1px dashed gold; }
+  .insignia i { font-size:2.5rem; color:gold; }
+  .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
+  .hidden { display:none; }
+  .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+  .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+  .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(20,184,166,0.4); }
+  .nav-link.next { background:linear-gradient(95deg,#14b8a6,#0d9488); color:#fff; }
+  .nav-link.menu { background:#1a2a4a; border:1px solid #14b8a6; }
+  footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+  .dag-canvas { background:#0a0f1e; border-radius:1rem; padding:1rem; min-height:200px; display:flex; justify-content:center; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:1rem; }
+  .dag-node { background:#1e2a3e; border:2px solid #2c3e66; border-radius:1rem; padding:0.5rem 1rem; cursor:pointer; transition:0.2s; text-align:center; font-size:0.8rem; min-width:80px; }
+  .dag-node:hover { border-color:#5eead4; transform:scale(1.05); }
+  .dag-node.selected { border-color:#14b8a6; box-shadow:0 0 10px #14b8a6; }
+  .dag-node.treatment { border-color:#ff4455; }
+  .dag-node.outcome { border-color:#00cc88; }
+  .dag-arrow { font-size:1.5rem; color:#5eead4; }
+  .dag-controls { display:flex; gap:0.5rem; flex-wrap:wrap; justify-content:center; margin-bottom:1rem; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .info-grid { grid-template-columns:1fr; } }
+ </style>
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
+</head>
+<body>
+ <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Econometr&iacute;a</a></nav>
+ <div class="course-container" id="app">
+  <div class="hero-header">
+   <h1>🔀 DAGs y Causal Inference</h1>
+   <p>Grafos ac&iacute;clicos dirigidos, back-door, front-door y el marco de Pearl</p>
+   <div class="badge-area">
+    <span class="chip"><i class="fas fa-code-branch"></i> DAGs</span>
+    <span class="chip"><i class="fas fa-door-open"></i> Back-Door</span>
+    <span class="chip"><i class="fas fa-compress"></i> Colisionadores</span>
+   </div>
+  </div>
+  <div class="progress-section">
+   <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+   <span class="progress-text" id="progressText">M&oacute;dulo 2 de 12</span>
+  </div>
+  <div class="analogy-card">
+   <strong>💡 Piénsalo así:</strong> Los DAGs son como mapas de carreteras de la causalidad. Cada flecha es una direcci&oacute;n: X &rarr; Y significa "X causa Y". El back-door criterion es como encontrar una ruta alternativa que evite el tr&aacute;fico de confusores. Un colisionador (X &rarr; M &larr; Y) es como un embudo: condicionar en &eacute;l abre caminos espurios.
+  </div>
+  <div class="main-area">
+   <div class="section-title"><i class="fas fa-code-branch"></i> Conceptos de DAGs</div>
+   <div class="info-grid">
+    <div class="info-panel">
+     <h3>🔀 Grafo Ac&iacute;clico Dirigido (DAG)</h3>
+     <p>Representaci&oacute;n gr&aacute;fica de relaciones causales donde las flechas indican direcci&oacute;n de causalidad y no hay ciclos. Cada nodo es una variable.</p>
+    </div>
+    <div class="info-panel">
+     <h3>🚪 Back-Door Criterion</h3>
+     <p>Condiciones para identificar el efecto causal de X en Y: bloquear todos los caminos espurios entre X e Y sin bloquear mediadores ni colisionadores.</p>
+     <div class="formula">P(Y|do(X)) = &sum;z P(Y|X,Z) P(Z)</div>
+    </div>
+    <div class="info-panel">
+     <h3>🧭 Colisionador (Collider)</h3>
+     <p>Nodo M donde dos flechas apuntan hacia &eacute;l (X &rarr; M &larr; Y). Condicionar en un colisionador crea asociaci&oacute;n espuria entre sus padres (sesgo de Berkson).</p>
+    </div>
+    <div class="info-panel">
+     <h3>📐 d-Separaci&oacute;n y do-Calculus</h3>
+     <p>d-separaci&oacute;n determina independencia condicional en un DAG. El do-calculus permite expresar efectos causales en t&eacute;rminos de distribuciones observables.</p>
+     <div class="formula">do(X = x): intervenci&oacute;n externa</div>
+    </div>
+   </div>
+
+   <div class="section-title"><i class="fas fa-list-ol"></i> Confounding, Mediaci&oacute;n y Front-Door</div>
+   <div class="info-grid">
+    <div class="info-panel">
+     <h3>🔄 Confounding</h3>
+     <p>Un confusor Z causa tanto X como Y, abriendo un camino back-door. Controlar por Z bloquea el sesgo. Ej: educaci&oacute;n &rarr; ingresos, con habilidad como confusor.</p>
+    </div>
+    <div class="info-panel">
+     <h3>🔗 Mediaci&oacute;n</h3>
+     <p>Un mediador M est&aacute; en la cadena causal X &rarr; M &rarr; Y. Controlar por M bloquea el efecto indirecto y deja solo el efecto directo.</p>
+    </div>
+    <div class="info-panel">
+     <h3>🚪 Front-Door Criterion</h3>
+     <p>Cuando hay confusores no observados, se puede usar un mediador M que no recibe influencia directa del confusor para identificar el efecto causal.</p>
+     <div class="formula">P(Y|do(X)) = &sum;m P(M=m|X) &sum;x P(Y|X=x,M=m) P(X=x)</div>
+    </div>
+    <div class="info-panel">
+     <h3>⚠️ Sesgo por Condicionar</h3>
+     <p>Condicionar en una variable post-tratamiento o en un colisionador puede inducir sesgo. Ej: selecci&oacute;n de muestra basada en outcome (selection bias).</p>
+    </div>
+   </div>
+
+   <div class="sim-area">
+    <div class="section-title"><i class="fas fa-play"></i> Simulaci&oacute;n: Constructor de DAGs</div>
+    <p style="margin-bottom:0.8rem;color:#b9ccee;">Selecciona qu&eacute; nodo es tratamiento y cu&aacute;l es outcome. El sistema analizar&aacute; el DAG y te dir&aacute; qu&eacute; variables condicionar.</p>
+    <div class="dag-controls">
+     <button id="setTreatmentBtn" class="btn-action" style="margin:0;font-size:0.85rem;padding:0.4rem 1rem;">🎯 Marcar Tratamiento</button>
+     <button id="setOutcomeBtn" class="btn-action" style="margin:0;font-size:0.85rem;padding:0.4rem 1rem;">📊 Marcar Outcome</button>
+     <button id="dagAnalyzeBtn" class="btn-action" style="margin:0;font-size:0.85rem;padding:0.4rem 1rem;">🔍 Analizar DAG</button>
+     <button id="dagResetBtn" class="btn-action" style="margin:0;font-size:0.85rem;padding:0.4rem 1rem;background:#2c3e66;">🔄 Reset</button>
+    </div>
+    <div class="dag-canvas" id="dagCanvas">
+     <div class="dag-node" data-node="X">X<br><small>Tratamiento</small></div>
+     <span class="dag-arrow">&rarr;</span>
+     <div class="dag-node" data-node="M">M<br><small>Mediador</small></div>
+     <span class="dag-arrow">&rarr;</span>
+     <div class="dag-node" data-node="Y">Y<br><small>Outcome</small></div>
+    </div>
+    <div class="dag-canvas" id="dagCanvas2" style="margin-top:0.5rem;">
+     <div class="dag-node" data-node="Z">Z<br><small>Confusor</small></div>
+     <span class="dag-arrow">&rarr;</span>
+     <div class="dag-node" data-node="X2">X<br><small>Tratamiento</small></div>
+     <span class="dag-arrow">&rarr;</span>
+     <div class="dag-node" data-node="Y2">Y<br><small>Outcome</small></div>
+     <span class="dag-arrow" style="font-size:0.8rem;">&larr;</span>
+     <div class="dag-node" data-node="Z2">Z<br><small>Confusor</small></div>
+    </div>
+    <div id="dagResult" style="background:#0a0f1e;border-radius:1rem;padding:1rem;text-align:center;font-size:0.9rem;color:#b9ccee;">
+     Selecciona tratamiento y outcome, luego presiona "Analizar DAG".
+    </div>
+   </div>
+
+   <div class="quiz-area">
+    <div class="quiz-title"><i class="fas fa-question-circle"></i> Mini Quiz: DAGs y Causalidad</div>
+    <div id="quizContainer"></div>
+    <button id="submitQuizBtn" class="btn-action">✅ Verificar respuestas</button>
+    <div id="insigniaArea" class="insignia hidden">
+     <i class="fas fa-medal"></i>
+     <h3>🏅 Arquitecto de DAGs 🏅</h3>
+     <p>Has dominado los grafos causales y el marco de Pearl. &iexcl;Excelente!</p>
+    </div>
+   </div>
+  </div>
+
+  <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre DAGs, back-door y colisionadores.</div>
+
+  <div class="nav-links">
+   <a href="01-portal.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+   <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
+   <a href="03-rcts.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-dice"></i> Causalidad y Evaluaci&oacute;n de Impacto · M&oacute;dulo 2</footer>
+ </div>
+
+ <script>
+  const STORAGE_KEY = 'prog_econ_3_02';
+  const PROGRESS_KEY = 'prog_econ_3_progress';
+  const questions = [
+   { text: "¿Qu&eacute; significa que un DAG sea 'ac&iacute;clico'?", options: ["No tiene flechas", "No tiene ciclos dirigidos", "Tiene exactamente un ciclo", "Todas las variables son independientes"], correct: 1 },
+   { text: "¿Qu&eacute; es el back-door criterion?", options: ["Un camino que va de X a Y sin flechas hacia atr&aacute;s", "Un conjunto de variables que bloquea todos los caminos espurios entre X e Y", "La puerta trasera del laboratorio", "Un m&eacute;todo para identificar colisionadores"], correct: 1 },
+   { text: "Condicionar en un colisionador (X → M ← Y) produce:", options: ["Elimina el sesgo", "Crea una asociaci&oacute;n espuria entre X e Y", "No tiene efecto", "Fortalece la relaci&oacute;n causal verdadera"], correct: 1 },
+   { text: "¿Qu&eacute; es un confusor?", options: ["Variable que causa solo el tratamiento", "Variable que causa solo el outcome", "Variable que causa tanto el tratamiento como el outcome", "Variable que no tiene relaci&oacute;n causal"], correct: 2 },
+   { text: "En un DAG X → M → Y, ¿qu&eacute; representa M?", options: ["Un confusor", "Un colisionador", "Un mediador", "Una variable instrumental"], correct: 2 }
+  ];
+  let userAnswers = new Array(questions.length).fill(null);
+  let quizCompleted = false;
+
+  function saveProgress() {
+   let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
+   localStorage.setItem(STORAGE_KEY, 'true');
+  }
+
+  function updateProgress() {
+   let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
+   document.getElementById('progressText').textContent = 'M\u00f3dulo '+(p.length || 1)+' de 12';
+  }
+
+  function renderQuestions() {
+   const container = document.getElementById('quizContainer');
+   container.innerHTML = '';
+   questions.forEach((q, idx) => {
+    const qDiv = document.createElement('div'); qDiv.classList.add('question');
+    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
+    const optsDiv = qDiv.querySelector('.options');
+    q.options.forEach((opt, optIdx) => {
+     const span = document.createElement('div'); span.classList.add('opt');
+     span.textContent = opt; span.dataset.qIdx = idx; span.dataset.optIdx = optIdx;
+     span.addEventListener('click', function() {
+      if (quizCompleted) return;
+      this.parentElement.querySelectorAll('.opt').forEach(c => c.classList.remove('selected'));
+      this.classList.add('selected'); userAnswers[idx] = optIdx; updateBtnState();
+     });
+     optsDiv.appendChild(span);
+    });
+    container.appendChild(qDiv);
+   });
+  }
+
+  function updateBtnState() {
+   document.getElementById('submitQuizBtn').disabled = userAnswers.some(a => a === null) || quizCompleted;
+  }
+
+  function handleSubmit() {
+   if (quizCompleted) return;
+   if (userAnswers.some(a => a === null)) { document.getElementById('feedbackMsg').textContent = I18N.t('fb_0'); return; }
+   let correct = 0;
+   questions.forEach((q, i) => { if (userAnswers[i] === q.correct) correct++; });
+   const total = questions.length; const passed = correct >= Math.ceil(total * 0.6);
+   document.querySelectorAll('.question').forEach((qDiv, idx) => {
+    const opts = qDiv.querySelectorAll('.opt');
+    opts.forEach((o, oi) => {
+     o.classList.remove('selected');
+     if (oi === questions[idx].correct) o.classList.add('correct');
+     else if (oi === userAnswers[idx]) o.classList.add('wrong');
+    });
+   });
+   if (passed) {
+    quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').textContent = I18N.t('fb_1') + correct + '/' + total + ' correctas. \u00a1Dominas los DAGs!';
+    saveProgress(); updateProgress();
+   } else {
+    document.getElementById('feedbackMsg').textContent = '\u274c ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. \u00a1Reintenta!';
+   }
+  }
+
+  function restoreProgress() {
+   const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   if (p.includes(STORAGE_KEY)) {
+    quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').textContent = I18N.t('fb_2');
+    document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
+   }
+  }
+
+  let dagState = { mode: 'none', treatment: null, outcome: null };
+
+  function initDAG() {
+   const nodes = document.querySelectorAll('.dag-node');
+   nodes.forEach(n => {
+    n.addEventListener('click', function() {
+     if (dagState.mode === 'treatment') {
+      nodes.forEach(c => c.classList.remove('treatment'));
+      this.classList.add('treatment');
+      dagState.treatment = this.dataset.node;
+     } else if (dagState.mode === 'outcome') {
+      nodes.forEach(c => c.classList.remove('outcome'));
+      this.classList.add('outcome');
+      dagState.outcome = this.dataset.node;
+     }
+    });
+   });
+  }
+
+  document.getElementById('setTreatmentBtn').addEventListener('click', function() {
+   dagState.mode = 'treatment';
+   document.getElementById('dagResult').textContent = 'Haz clic en un nodo para marcarlo como tratamiento.';
+  });
+  document.getElementById('setOutcomeBtn').addEventListener('click', function() {
+   dagState.mode = 'outcome';
+   document.getElementById('dagResult').textContent = 'Haz clic en un nodo para marcarlo como outcome.';
+  });
+  document.getElementById('dagAnalyzeBtn').addEventListener('click', function() {
+   if (!dagState.treatment || !dagState.outcome) {
+    document.getElementById('dagResult').textContent = '⚠️ Primero selecciona tratamiento y outcome.';
+    return;
+   }
+   const msg = '🔍 DAG analizado: Tratamiento = ' + dagState.treatment + ', Outcome = ' + dagState.outcome + '. ';
+   if (dagState.treatment === 'X' || dagState.treatment === 'X2') {
+    document.getElementById('dagResult').textContent = msg + 'Posibles confusores detectados. Deber&iacute;as condicionar en Z para bloquear el camino back-door.';
+   } else {
+    document.getElementById('dagResult').textContent = msg + 'No se detectan caminos back-door abiertos. El efecto es identificable sin condicionar.';
+   }
+  });
+  document.getElementById('dagResetBtn').addEventListener('click', function() {
+   dagState = { mode: 'none', treatment: null, outcome: null };
+   document.querySelectorAll('.dag-node').forEach(n => { n.classList.remove('treatment','outcome'); });
+   document.getElementById('dagResult').textContent = 'Selecciona tratamiento y outcome, luego presiona "Analizar DAG".';
+  });
+
+  document.getElementById('submitQuizBtn').addEventListener('click', handleSubmit);
+  renderQuestions(); updateBtnState(); restoreProgress(); updateProgress();
+  initDAG();
+ </script>
+ <script>
+window.I18N_DATA={
+ "fb_0": {
+  "es": "⚠️ Responde todas las preguntas primero.",
+  "en": "⚠️ Answer todas las preguntas primero."
+ },
+ "fb_1": {
+  "es": "🎉 ",
+  "en": "🎉 "
+ },
+ "fb_2": {
+  "es": "🏆 Ya completaste este m\u00f3dulo.",
+  "en": "🏆 Ya completaste este m\u00f3dulo."
+ }
+};
+</script>
+<script src="../../../assets/js/i18n.js"></script> </body>
+</html>

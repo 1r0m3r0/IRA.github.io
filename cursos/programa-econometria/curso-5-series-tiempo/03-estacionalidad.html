@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Series de Tiempo | 🌡️ Estacionalidad y Descomposición</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:linear-gradient(135deg,#0a0f1e,#0c1222 50%,#111a2e); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+  @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .course-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(6,182,212,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+  .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #06b6d4; }
+  .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#67e8f9,#06b6d4); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero-header p { font-size:1.1rem; color:#a5f3fc; margin-top:0.5rem; font-weight:500; }
+  .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+  .chip { background:rgba(6,182,212,0.15); border:1px solid #06b6d4; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+  .progress-section { padding:1.2rem 2rem; border-bottom:1px solid #1a2a4a; }
+  .progress-bar-outer { background:#1a2a4a; border-radius:20px; height:16px; overflow:hidden; }
+  .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#06b6d4,#0891b2); border-radius:20px; transition:width 0.5s ease; }
+  .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
+  .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #06b6d4; font-size:1rem; line-height:1.6; }
+  .main-area { padding:1.5rem 2rem; }
+  .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#06b6d4; }
+  .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
+  .info-panel { background:rgba(10,20,40,0.7); border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
+  .info-panel h3 { color:#67e8f9; font-size:1rem; margin-bottom:0.5rem; }
+  .info-panel p { font-size:0.85rem; color:#b9ccee; line-height:1.6; }
+  .info-panel .formula { background:#0a0f1e; padding:0.5rem; border-radius:0.8rem; text-align:center; font-family:monospace; font-size:0.9rem; color:#67e8f9; margin-top:0.5rem; }
+  .sim-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #06b6d4; margin-bottom:1.5rem; }
+  .quiz-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #06b6d4; margin-bottom:1.5rem; }
+  .quiz-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#06b6d4; }
+  .question { background:#0f1a2c; margin:0.8rem 0; padding:0.8rem 1rem; border-radius:1.2rem; }
+  .question p { font-weight:600; margin-bottom:0.5rem; font-size:0.95rem; }
+  .options { display:flex; flex-wrap:wrap; gap:0.6rem; }
+  .opt { background:#1e2a3e; padding:0.3rem 0.9rem; border-radius:2rem; cursor:pointer; transition:0.2s; font-size:0.85rem; }
+  .opt:hover { background:#2c3e66; transform:translateY(-2px); }
+  .opt.selected { background:#06b6d4; color:#000; font-weight:bold; box-shadow:0 0 8px #06b6d4; }
+  .opt.correct { background:#00cc88; color:#000; }
+  .opt.wrong { background:#ff4455; color:#fff; }
+  .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #06b6d4; }
+  .btn-action { background:linear-gradient(95deg,#06b6d4,#0891b2); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin-top:1rem; }
+  .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(6,182,212,0.5); }
+  .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
+  .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin-top:1.5rem; padding:1rem; border:1px dashed gold; }
+  .insignia i { font-size:2.5rem; color:gold; }
+  .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
+  .hidden { display:none; }
+  .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+  .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+  .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(6,182,212,0.4); }
+  .nav-link.next { background:linear-gradient(95deg,#06b6d4,#0891b2); color:#1e1a0c; }
+  .nav-link.menu { background:#1a2a4a; border:1px solid #06b6d4; }
+  footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .info-grid { grid-template-columns:1fr; } }
+ </style>
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
+</head>
+<body>
+ <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Econometr&iacute;a</a></nav>
+ <div class="course-container" id="app">
+  <div class="hero-header">
+   <h1>🌡️ Estacionalidad y Descomposici&oacute;n</h1>
+   <p>Tendencia, estacionalidad y residuos: c&oacute;mo descomponer una serie en sus partes fundamentales</p>
+   <div class="badge-area">
+    <span class="chip"><i class="fas fa-chart-line"></i> Tendencia</span>
+    <span class="chip"><i class="fas fa-calendar"></i> Estacionalidad</span>
+    <span class="chip"><i class="fas fa-random"></i> Residual</span>
+    <span class="chip"><i class="fas fa-layer-group"></i> STL</span>
+   </div>
+  </div>
+  <div class="progress-section">
+   <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+   <span class="progress-text" id="progressText">M&oacute;dulo 3 de 12</span>
+  </div>
+  <div class="analogy-card">
+   <strong>💡 Piénsalo así:</strong> Descomponer una serie de tiempo es como separar una m&uacute;sica en sus instrumentos: la tendencia es el bajo (movimiento lento), la estacionalidad es la guitarra r&iacute;tmica (patr&oacute;n que se repite), y el residuo es la bater&iacute;a (ruido improvisado). STL es como un ingeniero de sonido que separa las pistas.
+  </div>
+  <div class="main-area">
+   <div class="section-title"><i class="fas fa-flask"></i> Modelos de Descomposici&oacute;n</div>
+   <div class="info-grid">
+    <div class="info-panel">
+     <h3>➕ Aditivo</h3>
+     <p>yₜ = Tₜ + Sₜ + Rₜ. Los componentes se suman. Usado cuando la amplitud estacional es constante.</p>
+     <div class="formula">yₜ = Tₜ + Sₜ + Rₜ</div>
+    </div>
+    <div class="info-panel">
+     <h3>✖️ Multiplicativo</h3>
+     <p>yₜ = Tₜ × Sₜ × Rₜ. Los componentes se multiplican. Amplitud estacional crece con la tendencia.</p>
+     <div class="formula">yₜ = Tₜ &times; Sₜ &times; Rₜ</div>
+    </div>
+    <div class="info-panel">
+     <h3>📊 STL (Seasonal-Trend LOESS)</h3>
+     <p>Descomposici&oacute;n robusta usando regresi&oacute;n LOESS. Maneja cualquier estacionalidad, tolera outliers.</p>
+    </div>
+    <div class="info-panel">
+     <h3>🔬 X-13ARIMA-SEATS</h3>
+     <p>Est&aacute;ndar del U.S. Census Bureau. Combina regresi&oacute;n ARIMA con ajuste estacional y calendario.</p>
+    </div>
+   </div>
+
+   <div class="section-title"><i class="fas fa-list-ol"></i> Diferenciaci&oacute;n Estacional y SARIMA</div>
+   <div class="info-grid">
+    <div class="info-panel">
+     <h3>🔄 Diferenciaci&oacute;n Estacional</h3>
+     <p>∇ₛyₜ = yₜ - yₜ₋ₛ. Elimina el componente estacional aplicando diferencias de orden estacional.</p>
+     <div class="formula">&nabla;s yₜ = yₜ - yₜ₋ₛ</div>
+    </div>
+    <div class="info-panel">
+     <h3>📦 SARIMA(p,d,q)(P,D,Q)s</h3>
+     <p>ARIMA con componentes estacionales. P: AR estacional, D: diferencias estacionales, Q: MA estacional.</p>
+     <div class="formula">SARIMA(p,d,q)(P,D,Q)s</div>
+    </div>
+   </div>
+
+   <div class="sim-area">
+    <div class="section-title"><i class="fas fa-play"></i> Simulaci&oacute;n: Descomposici&oacute;n STL</div>
+    <p style="margin-bottom:0.8rem;color:#b9ccee;">Genera datos con tendencia y estacionalidad. Ajusta la amplitud estacional y la tendencia para ver la descomposici&oacute;n en 3 paneles.</p>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem;">
+     <label style="color:#b9ccee;">Amplitud estacional: <input type="range" id="seasAmp" min="0" max="100" value="30" style="width:100px;"><span id="seasAmpVal" style="color:#67e8f9;">0.3</span></label>
+     <label style="color:#b9ccee;">Tendencia: <input type="range" id="trendStr" min="0" max="50" value="10" style="width:100px;"><span id="trendStrVal" style="color:#67e8f9;">0.10</span></label>
+     <button id="simSeasBtn" class="btn-action" style="margin:0;">📊 Descomponer</button>
+    </div>
+    <div id="simResult" style="background:#0a0f1e;border-radius:1rem;padding:1rem;text-align:center;font-size:0.9rem;color:#b9ccee;">
+     Presiona "Descomponer" para ver la descomposici&oacute;n.
+    </div>
+   </div>
+
+   <div class="quiz-area">
+    <div class="quiz-title"><i class="fas fa-question-circle"></i> Mini Quiz: Estacionalidad y Descomposici&oacute;n</div>
+    <div id="quizContainer"></div>
+    <button id="submitQuizBtn" class="btn-action">✅ Verificar respuestas</button>
+    <div id="insigniaArea" class="insignia hidden">
+     <i class="fas fa-medal"></i>
+     <h3>🏅 Descomponedor Estacional 🏅</h3>
+     <p>Has dominado la descomposici&oacute;n de series temporales. &iexcl;Excelente!</p>
+    </div>
+   </div>
+  </div>
+
+  <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre descomposici&oacute;n estacional.</div>
+
+  <div class="nav-links">
+   <a href="02-arima.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+   <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
+   <a href="04-garch.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-chart-line"></i> Series de Tiempo y Pron&oacute;stico &middot; M&oacute;dulo 3</footer>
+ </div>
+
+ <script>
+  const STORAGE_KEY = 'prog_econ_5_03';
+  const PROGRESS_KEY = 'prog_econ_5_progress';
+  const questions = [
+   { text: "\u00bfCu\u00e1l es la diferencia entre el modelo aditivo y multiplicativo?", options: ["El aditivo suma componentes, el multiplicativo los multiplica", "El multiplicativo solo usa tendencia", "No hay diferencia", "El aditivo usa logaritmos"], correct: 0 },
+   { text: "\u00bfQu\u00e9 significa STL?", options: ["Seasonal Trend Line", "Seasonal-Trend decomposition using LOESS", "Standard Time Lags", "Simple Trend Location"], correct: 1 },
+   { text: "\u00bfCu\u00e1ndo se usa la diferenciaci\u00f3n estacional?", options: ["Siempre", "Cuando hay estacionalidad en los datos", "Cuando la serie es estacionaria", "Cuando no hay tendencia"], correct: 1 },
+   { text: "\u00bfQu\u00e9 hace el componente P en SARIMA(p,d,q)(P,D,Q)s?", options: ["MA estacional", "AR estacional", "Diferenciaci\u00f3n estacional", "Tendencia"], correct: 1 },
+   { text: "\u00bfQu\u00e9 organismo desarroll\u00f3 X-13ARIMA-SEATS?", options: ["FMI", "U.S. Census Bureau", "Banco Mundial", "OCDE"], correct: 1 }
+  ];
+  let userAnswers = new Array(questions.length).fill(null);
+  let quizCompleted = false;
+
+  function saveProgress() {
+   let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
+   localStorage.setItem(STORAGE_KEY, 'true');
+  }
+
+  function updateProgress() {
+   let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
+   document.getElementById('progressText').textContent = 'M\u00f3dulo '+(p.length || 1)+' de 12';
+  }
+
+  function renderQuestions() {
+   const container = document.getElementById('quizContainer');
+   container.innerHTML = '';
+   questions.forEach((q, idx) => {
+    const qDiv = document.createElement('div'); qDiv.classList.add('question');
+    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
+    const optsDiv = qDiv.querySelector('.options');
+    q.options.forEach((opt, optIdx) => {
+     const span = document.createElement('div'); span.classList.add('opt');
+     span.textContent = opt; span.dataset.qIdx = idx; span.dataset.optIdx = optIdx;
+     span.addEventListener('click', function() {
+      if (quizCompleted) return;
+      this.parentElement.querySelectorAll('.opt').forEach(c => c.classList.remove('selected'));
+      this.classList.add('selected'); userAnswers[idx] = optIdx; updateBtnState();
+     });
+     optsDiv.appendChild(span);
+    });
+    container.appendChild(qDiv);
+   });
+  }
+
+  function updateBtnState() {
+   document.getElementById('submitQuizBtn').disabled = userAnswers.some(a => a === null) || quizCompleted;
+  }
+
+  function handleSubmit() {
+   if (quizCompleted) return;
+   if (userAnswers.some(a => a === null)) { document.getElementById('feedbackMsg').textContent = '⚠️ Responde todas las preguntas primero.'; return; }
+   let correct = 0;
+   questions.forEach((q, i) => { if (userAnswers[i] === q.correct) correct++; });
+   const total = questions.length; const passed = correct >= Math.ceil(total * 0.6);
+   document.querySelectorAll('.question').forEach((qDiv, idx) => {
+    const opts = qDiv.querySelectorAll('.opt');
+    opts.forEach((o, oi) => {
+     o.classList.remove('selected');
+     if (oi === questions[idx].correct) o.classList.add('correct');
+     else if (oi === userAnswers[idx]) o.classList.add('wrong');
+    });
+   });
+   if (passed) {
+    quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').textContent = '🎉 ' + correct + '/' + total + ' correctas. ¡Dominas la descomposición!';
+    saveProgress(); updateProgress();
+   } else {
+    document.getElementById('feedbackMsg').textContent = '❌ ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. ¡Reintenta!';
+   }
+  }
+
+  function restoreProgress() {
+   const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   if (p.includes(STORAGE_KEY)) {
+    quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').textContent = '🏆 Ya completaste este módulo.';
+    document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
+   }
+  }
+
+  function simulateSeasonal() {
+   const seasAmp = parseInt(document.getElementById('seasAmp').value) / 100;
+   const trendStr = parseInt(document.getElementById('trendStr').value) / 100;
+   const T = 120; const period = 12;
+   let series = new Array(T);
+   for (let t = 0; t < T; t++) {
+    const trend = trendStr * t;
+    const seasonal = seasAmp * Math.sin(2 * Math.PI * (t % period) / period);
+    const noise = (Math.random() - 0.5) * 0.2;
+    series[t] = trend + seasonal + noise;
+   }
+   const N = 11;
+   let trendEst = new Array(T).fill(0);
+   for (let t = N; t < T - N; t++) {
+    let s = 0;
+    for (let i = -N; i <= N; i++) s += series[t + i];
+    trendEst[t] = s / (2 * N + 1);
+   }
+   for (let t = 0; t < N; t++) trendEst[t] = trendEst[N];
+   for (let t = T - N; t < T; t++) trendEst[t] = trendEst[T - N - 1];
+   let detrended = series.map((v, i) => v - trendEst[i]);
+   let seasEst = new Array(T).fill(0);
+   for (let s = 0; s < period; s++) {
+    let sum = 0; let cnt = 0;
+    for (let t = s; t < T; t += period) { sum += detrended[t]; cnt++; }
+    seasEst[s] = sum / cnt;
+   }
+   for (let t = 0; t < T; t++) seasEst[t] = seasEst[t % period];
+   const meanSeas = seasEst.reduce((a,b) => a+b, 0) / T;
+   for (let t = 0; t < T; t++) seasEst[t] -= meanSeas;
+   let residEst = series.map((v, i) => v - trendEst[i] - seasEst[i]);
+
+   function renderPanel(data, color, label, yLabel) {
+    const min = Math.min(...data); const max = Math.max(...data); const range = max - min || 1;
+    let h = '<div style="height:60px;display:flex;align-items:flex-end;gap:1px;">';
+    for (let t = 0; t < T; t++) {
+     const ht = ((data[t] - min) / range) * 55;
+     h += '<div style="flex:1;min-width:2px;height:' + ht + 'px;background:' + color + ';border-radius:1px 1px 0 0;"></div>';
+    }
+    h += '</div><div style="font-size:0.7rem;color:#8899cc;">' + yLabel + '</div>';
+    return h;
+   }
+
+   let html = '<div style="display:grid;grid-template-columns:1fr;gap:0.5rem;">';
+   html += '<div>' + renderPanel(series, '#06b6d4', 'Serie', 'Serie original') + '</div>';
+   html += '<div>' + renderPanel(trendEst, '#67e8f9', 'Trend', 'Tendencia estimada') + '</div>';
+   html += '<div>' + renderPanel(seasEst, '#0891b2', 'Seas', 'Estacionalidad') + '</div>';
+   html += '<div>' + renderPanel(residEst, '#8899cc', 'Resid', 'Residual') + '</div>';
+   html += '</div>';
+   html += '<p style="font-size:0.8rem;color:#8899cc;margin-top:0.5rem;">T=' + T + ', periodo=12 · Descomposici&oacute;n aditiva tipo STL</p>';
+   document.getElementById('simResult').innerHTML = html;
+  }
+
+  document.getElementById('seasAmp').addEventListener('input', function() { document.getElementById('seasAmpVal').textContent = (this.value / 100).toFixed(2); });
+  document.getElementById('trendStr').addEventListener('input', function() { document.getElementById('trendStrVal').textContent = (this.value / 100).toFixed(2); });
+  document.getElementById('simSeasBtn').addEventListener('click', simulateSeasonal);
+  document.getElementById('submitQuizBtn').addEventListener('click', handleSubmit);
+  renderQuestions(); updateBtnState(); restoreProgress(); updateProgress();
+ </script>
+ <script>
+window.I18N_DATA={};
+</script>
+<script src="../../../assets/js/i18n.js"></script> </body>
+</html>

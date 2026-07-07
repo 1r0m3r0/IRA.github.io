@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>ML Econometría | 🧠 Word Embeddings y Topic Models</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:linear-gradient(135deg,#0a0f1e,#0c1222 50%,#111a2e); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+  @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .course-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(249,115,22,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+  .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #f97316; }
+  .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#fdba74,#f97316); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero-header p { font-size:1.1rem; color:#f0c0e0; margin-top:0.5rem; font-weight:500; }
+  .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+  .chip { background:rgba(249,115,22,0.15); border:1px solid #f97316; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+  .progress-section { padding:1.2rem 2rem; border-bottom:1px solid #1a2a4a; }
+  .progress-bar-outer { background:#1a2a4a; border-radius:20px; height:16px; overflow:hidden; }
+  .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#f97316,#ea580c); border-radius:20px; transition:width 0.5s ease; }
+  .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
+  .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #f97316; font-size:1rem; line-height:1.6; }
+  .main-area { padding:1.5rem 2rem; }
+  .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#f97316; }
+  .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
+  .info-panel { background:rgba(10,20,40,0.7); border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
+  .info-panel h3 { color:#fdba74; font-size:1rem; margin-bottom:0.5rem; }
+  .info-panel p { font-size:0.85rem; color:#b9ccee; line-height:1.6; }
+  .info-panel .formula { background:#0a0f1e; padding:0.5rem; border-radius:0.8rem; text-align:center; font-family:monospace; font-size:0.9rem; color:#fdba74; margin-top:0.5rem; }
+  .sim-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #f97316; margin-bottom:1.5rem; }
+  .quiz-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #f97316; margin-bottom:1.5rem; }
+  .quiz-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#f97316; }
+  .question { background:#0f1a2c; margin:0.8rem 0; padding:0.8rem 1rem; border-radius:1.2rem; }
+  .question p { font-weight:600; margin-bottom:0.5rem; font-size:0.95rem; }
+  .options { display:flex; flex-wrap:wrap; gap:0.6rem; }
+  .opt { background:#1e2a3e; padding:0.3rem 0.9rem; border-radius:2rem; cursor:pointer; transition:0.2s; font-size:0.85rem; }
+  .opt:hover { background:#2c3e66; transform:translateY(-2px); }
+  .opt.selected { background:#f97316; color:#000; font-weight:bold; box-shadow:0 0 8px #f97316; }
+  .opt.correct { background:#00cc88; color:#000; }
+  .opt.wrong { background:#ff4455; color:#fff; }
+  .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #f97316; }
+  .btn-action { background:linear-gradient(95deg,#f97316,#ea580c); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin-top:1rem; }
+  .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(249,115,22,0.5); }
+  .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
+  .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin-top:1.5rem; padding:1rem; border:1px dashed gold; }
+  .insignia i { font-size:2.5rem; color:gold; }
+  .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
+  .hidden { display:none; }
+  .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+  .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+  .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(249,115,22,0.4); }
+  .nav-link.next { background:linear-gradient(95deg,#f97316,#ea580c); color:#1e1a0c; }
+  .nav-link.menu { background:#1a2a4a; border:1px solid #f97316; }
+  footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .info-grid { grid-template-columns:1fr; } }
+ </style>
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
+</head>
+<body>
+ <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Econometr&iacute;a</a></nav>
+ <div class="course-container" id="app">
+  <div class="hero-header">
+   <h1>🧠 Word Embeddings y Topic Models</h1>
+   <p>Word2Vec, GloVe, BERT, LDA y modelos de t&oacute;picos estructurales</p>
+   <div class="badge-area">
+    <span class="chip"><i class="fas fa-cubes"></i> Word2Vec</span>
+    <span class="chip"><i class="fas fa-layer-group"></i> LDA</span>
+    <span class="chip"><i class="fas fa-robot"></i> BERT</span>
+   </div>
+  </div>
+  <div class="progress-section">
+   <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+   <span class="progress-text" id="progressText">M&oacute;dulo 9 de 12</span>
+  </div>
+  <div class="analogy-card">
+   <strong>💡 Pi&eacute;nsalo as&iacute;:</strong> Word embeddings son como un mapa de palabras donde t&eacute;rminos similares aparecen cerca. "Rey" - "Hombre" + "Mujer" ≈ "Reina". LDA (Latent Dirichlet Allocation) es como un bibliotecario que clasifica libros en temas sin que le digas cu&aacute;les son: solo observa las palabras que aparecen juntas y descubre los temas subyacentes.
+  </div>
+  <div class="main-area">
+   <div class="section-title"><i class="fas fa-graduation-cap"></i> Teor&iacute;a: Embeddings y Topic Models</div>
+   <div class="info-grid">
+    <div class="info-panel">
+     <h3>Word2Vec (CBOW, Skip-gram)</h3>
+     <p>Representa palabras como vectores densos. CBOW predice la palabra del contexto, Skip-gram predice el contexto de la palabra. Captura relaciones sem&aacute;nticas.</p>
+     <div class="formula">v("rey") - v("hombre") + v("mujer") &asymp; v("reina")</div>
+    </div>
+    <div class="info-panel">
+     <h3>GloVe y BERT</h3>
+     <p>GloVe: factorizaci&oacute;n de matriz de co-ocurrencia. BERT: transformer bidireccional pre-entrenado. Produce embeddings contextuales (la misma palabra tiene distinto vector seg&uacute;n contexto).</p>
+     <div class="formula">BERT: contextual embeddings</div>
+    </div>
+    <div class="info-panel">
+     <h3>LDA (Latent Dirichlet Allocation)</h3>
+     <p>Modelo generativo: cada documento es una mezcla de temas, cada tema es una distribuci&oacute;n sobre palabras. Inferencia v&iacute;a Gibbs Sampling o VI.</p>
+     <div class="formula">P(w|d) = &Sigma;<sub>t</sub> P(w|t) &times; P(t|d)</div>
+    </div>
+    <div class="info-panel">
+     <h3>Structural Topic Models (STM)</h3>
+     <p>Extensi&oacute;n de LDA que incorpora covariables del documento (tiempo, autor, tratamiento). Permite que la prevalencia y el contenido de t&oacute;picos var&iacute;en con X.</p>
+     <div class="formula">&theta;<sub>d</sub> ~ LogisticNormal(X<sub>d</sub>&gamma;, &Sigma;)</div>
+    </div>
+   </div>
+
+   <div class="sim-area">
+    <div class="section-title"><i class="fas fa-play"></i> Simulaci&oacute;n: LDA Topic Model (20 Newsgroups)</div>
+    <p style="margin-bottom:0.8rem;color:#b9ccee;">Simulamos LDA con 4 temas. Muestra las top palabras por tema y proporciones documento-tema.</p>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem;">
+     <label style="color:#b9ccee;">Documento: <select id="docSelect" style="background:#1e2a3e;color:#fff;border:1px solid #f97316;border-radius:0.5rem;padding:0.3rem 0.6rem;">
+      <option value="0">Doc 1</option><option value="1">Doc 2</option><option value="2">Doc 3</option><option value="3">Doc 4</option><option value="4">Doc 5</option>
+     </select></label>
+     <button id="simBtn" class="btn-action" style="margin:0;">🔄 Actualizar</button>
+    </div>
+    <div id="simResult" style="background:#0a0f1e;border-radius:1rem;padding:1rem;text-align:center;font-size:0.9rem;color:#b9ccee;">
+     Presiona "Actualizar" para ver los t&oacute;picos LDA.
+    </div>
+   </div>
+
+   <div class="quiz-area">
+    <div class="quiz-title"><i class="fas fa-question-circle"></i> Mini Quiz: Embeddings y Topic Models</div>
+    <div id="quizContainer"></div>
+    <button id="submitQuizBtn" class="btn-action">✅ Verificar respuestas</button>
+    <div id="insigniaArea" class="insignia hidden">
+     <i class="fas fa-medal"></i>
+     <h3>🧠 Embedding Explorer 🏅</h3>
+     <p>Has dominado Word Embeddings y Topic Models. &iexcl;Excelente!</p>
+    </div>
+   </div>
+  </div>
+
+  <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre Embeddings y Topic Models.</div>
+
+  <div class="nav-links">
+   <a href="08-text-as-data.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+   <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
+   <a href="10-high-dimensional.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-robot"></i> ML para Econometr&iacute;a · M&oacute;dulo 9</footer>
+ </div>
+
+ <script>
+  const STORAGE_KEY = 'prog_econ_4_09';
+  const PROGRESS_KEY = 'prog_econ_4_progress';
+  const questions = [
+   { text: "¿Qué arquitectura de Word2Vec predice la palabra dado su contexto?", options: ["Skip-gram", "CBOW", "GloVe", "BERT"], correct: 1 },
+   { text: "¿Qué hace LDA?", options: ["Reduce dimensionalidad", "Modela documentos como mezcla de temas", "Clasifica imágenes", "Traduce idiomas"], correct: 1 },
+   { text: "¿Qué mide la coherencia de un tópico?", options: ["Qué tan interpretable es el tema", "La varianza del modelo", "El número de palabras", "La accuracy"], correct: 0 },
+   { text: "¿Cuál es la diferencia principal entre Word2Vec y BERT?", options: ["BERT es contextual, Word2Vec no", "Word2Vec es más nuevo", "BERT no usa redes", "Word2Vec usa transformers"], correct: 0 },
+   { text: "¿Qué es STM?", options: ["LDA con covariables", "Un tipo de embedding", "Similar a PCA", "Un clasificador"], correct: 0 }
+  ];
+  let userAnswers = new Array(questions.length).fill(null);
+  let quizCompleted = false;
+
+  function saveProgress() {
+   let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
+   localStorage.setItem(STORAGE_KEY, 'true');
+  }
+
+  function updateProgress() {
+   let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
+   document.getElementById('progressText').textContent = 'M\u00f3dulo '+(p.length || 1)+' de 12';
+  }
+
+  function renderQuestions() {
+   const container = document.getElementById('quizContainer');
+   container.innerHTML = '';
+   questions.forEach((q, idx) => {
+    const qDiv = document.createElement('div'); qDiv.classList.add('question');
+    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
+    const optsDiv = qDiv.querySelector('.options');
+    q.options.forEach((opt, optIdx) => {
+     const span = document.createElement('div'); span.classList.add('opt');
+     span.textContent = opt; span.dataset.qIdx = idx; span.dataset.optIdx = optIdx;
+     span.addEventListener('click', function() {
+      if (quizCompleted) return;
+      this.parentElement.querySelectorAll('.opt').forEach(c => c.classList.remove('selected'));
+      this.classList.add('selected'); userAnswers[idx] = optIdx; updateBtnState();
+     });
+     optsDiv.appendChild(span);
+    });
+    container.appendChild(qDiv);
+   });
+  }
+
+  function updateBtnState() {
+   document.getElementById('submitQuizBtn').disabled = userAnswers.some(a => a === null) || quizCompleted;
+  }
+
+  function handleSubmit() {
+   if (quizCompleted) return;
+   if (userAnswers.some(a => a === null)) { document.getElementById('feedbackMsg').textContent = I18N.t('fb_0'); return; }
+   let correct = 0;
+   questions.forEach((q, i) => { if (userAnswers[i] === q.correct) correct++; });
+   const total = questions.length; const passed = correct >= Math.ceil(total * 0.6);
+   document.querySelectorAll('.question').forEach((qDiv, idx) => {
+    const opts = qDiv.querySelectorAll('.opt');
+    opts.forEach((o, oi) => {
+     o.classList.remove('selected');
+     if (oi === questions[idx].correct) o.classList.add('correct');
+     else if (oi === userAnswers[idx]) o.classList.add('wrong');
+    });
+   });
+   if (passed) {
+    quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').textContent = I18N.t('fb_1') + correct + '/' + total + ' correctas. ¡Dominas Embeddings y Topic Models!';
+    saveProgress(); updateProgress();
+   } else {
+    document.getElementById('feedbackMsg').textContent = '❌ ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. ¡Reintenta!';
+   }
+  }
+
+  function restoreProgress() {
+   const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   if (p.includes(STORAGE_KEY)) {
+    quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').textContent = I18N.t('fb_2');
+    document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
+   }
+  }
+
+  function simulateLDA() {
+   const docIdx = parseInt(document.getElementById('docSelect').value);
+   const topics = [
+    { name: 'Economía', words: ['mercado', 'inflación', 'crecimiento', 'PIB', 'tasas', 'fiscal', 'monetaria', 'banco', 'central', 'déficit'] },
+    { name: 'Deportes', words: ['fútbol', 'equipo', 'partido', 'gol', 'jugador', 'liga', 'campeonato', 'entrenador', 'victoria', 'torneo'] },
+    { name: 'Tecnología', words: ['datos', 'software', 'inteligencia', 'artificial', 'algoritmo', 'machine', 'learning', 'red', 'neural', 'código'] },
+    { name: 'Política', words: ['gobierno', 'elecciones', 'congreso', 'partido', 'presidente', 'voto', 'reforma', 'ley', 'senado', 'democracia'] }
+   ];
+   const docTopics = [
+    [0.60, 0.10, 0.20, 0.10],
+    [0.15, 0.70, 0.05, 0.10],
+    [0.10, 0.10, 0.75, 0.05],
+    [0.10, 0.10, 0.15, 0.65],
+    [0.35, 0.25, 0.20, 0.20]
+   ];
+   const probs = docTopics[docIdx] || docTopics[0];
+   let html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">';
+   html += '<div><div style="font-weight:700;color:#fdba74;margin-bottom:0.5rem;">Top palabras por t&oacute;pico</div>';
+   topics.forEach((t, ti) => {
+    html += '<div style="background:#1e2a3e;border-radius:0.8rem;padding:0.5rem;margin-bottom:0.4rem;"><span style="font-weight:700;color:#f97316;">' + t.name + ':</span> <span style="font-size:0.8rem;color:#b9ccee;">' + t.words.slice(0,5).join(', ') + '</span></div>';
+   });
+   html += '</div>';
+   html += '<div><div style="font-weight:700;color:#fdba74;margin-bottom:0.5rem;">Proporciones Documento-Tema (Doc ' + (docIdx+1) + ')</div>';
+   const colors = ['#f97316', '#22c55e', '#3b82f6', '#a855f7'];
+   topics.forEach((t, ti) => {
+    html += '<div style="margin-bottom:0.4rem;"><div style="display:flex;justify-content:space-between;font-size:0.8rem;"><span>' + t.name + '</span><span>' + (probs[ti]*100).toFixed(0) + '%</span></div><div style="background:#1a2a4a;height:12px;border-radius:10px;overflow:hidden;"><div style="height:100%;width:'+(probs[ti]*100)+'%;background:'+colors[ti]+';border-radius:10px;"></div></div></div>';
+   });
+   html += '</div></div>';
+   html += '<p style="margin-top:0.5rem;color:#8899cc;font-size:0.8rem;">LDA descubre 4 temas latentes en el corpus. Cada documento tiene proporciones distintas de cada tema.</p>';
+   document.getElementById('simResult').innerHTML = html;
+  }
+
+  document.getElementById('submitQuizBtn').addEventListener('click', handleSubmit);
+  document.getElementById('simBtn').addEventListener('click', simulateLDA);
+  renderQuestions(); updateBtnState(); restoreProgress(); updateProgress();
+  simulateLDA();
+ </script>
+ <script>
+window.I18N_DATA={
+ "fb_0": {
+  "es": "⚠️ Responde todas las preguntas primero.",
+  "en": "⚠️ Answer todas las preguntas primero."
+ },
+ "fb_1": {
+  "es": "🎉 ",
+  "en": "🎉 "
+ },
+ "fb_2": {
+  "es": "🏆 Ya completaste este módulo.",
+  "en": "🏆 Ya completaste este módulo."
+ }
+};
+</script>
+<script src="../../../assets/js/i18n.js"></script> </body>
+</html>

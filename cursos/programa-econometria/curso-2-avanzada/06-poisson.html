@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Econometr&iacute;a Avanzada | 🔢 Poisson y Conteo</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:linear-gradient(135deg,#0a0f1e,#0c1222 50%,#111a2e); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+  @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .course-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(168,85,247,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+  .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #a855f7; }
+  .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#c084fc,#a855f7); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero-header p { font-size:1.1rem; color:#d8b4fe; margin-top:0.5rem; font-weight:500; }
+  .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+  .chip { background:rgba(168,85,247,0.15); border:1px solid #a855f7; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+  .progress-section { padding:1.2rem 2rem; border-bottom:1px solid #1a2a4a; }
+  .progress-bar-outer { background:#1a2a4a; border-radius:20px; height:16px; overflow:hidden; }
+  .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#a855f7,#9333ea); border-radius:20px; transition:width 0.5s ease; }
+  .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
+  .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #a855f7; font-size:1rem; line-height:1.6; }
+  .main-area { padding:1.5rem 2rem; }
+  .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#a855f7; }
+  .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
+  .info-panel { background:rgba(10,20,40,0.7); border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
+  .info-panel h3 { color:#c084fc; font-size:1rem; margin-bottom:0.5rem; }
+  .info-panel p { font-size:0.85rem; color:#b9ccee; line-height:1.6; }
+  .info-panel .formula { background:#0a0f1e; padding:0.5rem; border-radius:0.8rem; text-align:center; font-family:monospace; font-size:0.9rem; color:#c084fc; margin-top:0.5rem; }
+  .sim-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #a855f7; margin-bottom:1.5rem; }
+  .table-wrap { overflow-x:auto; margin-bottom:1rem; }
+  table { width:100%; border-collapse:collapse; background:rgba(10,20,40,0.7); border-radius:1rem; overflow:hidden; }
+  th { background:#a855f7; color:#000; padding:0.5rem; font-size:0.85rem; }
+  td { padding:0.5rem; text-align:center; border-bottom:1px solid #2c3e66; font-size:0.8rem; color:#b9ccee; }
+  td:first-child { color:#c084fc; font-weight:600; }
+  .quiz-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #a855f7; margin-bottom:1.5rem; }
+  .quiz-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#a855f7; }
+  .question { background:#0f1a2c; margin:0.8rem 0; padding:0.8rem 1rem; border-radius:1.2rem; }
+  .question p { font-weight:600; margin-bottom:0.5rem; font-size:0.95rem; }
+  .options { display:flex; flex-wrap:wrap; gap:0.6rem; }
+  .opt { background:#1e2a3e; padding:0.3rem 0.9rem; border-radius:2rem; cursor:pointer; transition:0.2s; font-size:0.85rem; }
+  .opt:hover { background:#2c3e66; transform:translateY(-2px); }
+  .opt.selected { background:#a855f7; color:#000; font-weight:bold; box-shadow:0 0 8px #a855f7; }
+  .opt.correct { background:#00cc88; color:#000; }
+  .opt.wrong { background:#ff4455; color:#fff; }
+  .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #a855f7; }
+  .btn-action { background:linear-gradient(95deg,#a855f7,#9333ea); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#fff; margin-top:1rem; }
+  .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(168,85,247,0.5); }
+  .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
+  .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin-top:1.5rem; padding:1rem; border:1px dashed gold; }
+  .insignia i { font-size:2.5rem; color:gold; }
+  .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
+  .hidden { display:none; }
+  .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+  .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+  .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(168,85,247,0.4); }
+  .nav-link.next { background:linear-gradient(95deg,#a855f7,#9333ea); color:#fff; }
+  .nav-link.menu { background:#1a2a4a; border:1px solid #a855f7; }
+  footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .info-grid { grid-template-columns:1fr; } }
+ </style>
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
+</head>
+<body>
+ <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Econometr&iacute;a</a></nav>
+ <div class="course-container" id="app">
+  <div class="hero-header">
+   <h1>🔢 Modelos de Poisson y Conteo</h1>
+   <p>Contando eventos: accidentes, visitas, patentes y m&aacute;s</p>
+   <div class="badge-area">
+    <span class="chip"><i class="fas fa-calculator"></i> Poisson</span>
+    <span class="chip"><i class="fas fa-exclamation-triangle"></i> Sobredispersi&oacute;n</span>
+    <span class="chip"><i class="fas fa-ban"></i> Zero-Inflated</span>
+   </div>
+  </div>
+  <div class="progress-section">
+   <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+   <span class="progress-text" id="progressText">M&oacute;dulo 6 de 12</span>
+  </div>
+  <div class="analogy-card">
+   <strong>💡 Pi&eacute;nsalo as&iacute;</strong> El n&uacute;mero de emails que recibes al d&iacute;a es un dato de conteo: 0, 1, 2, ... No tiene sentido usar regresi&oacute;n lineal porque los valores son enteros no negativos y hay muchos ceros. Poisson modela esto: &lambda; es la tasa media de llegada. Si hay m&aacute;s variabilidad de la que Poisson permite (sobredispersi&oacute;n), usamos Negativa Binomial. Y si hay demasiados ceros, usamos Zero-Inflated.
+  </div>
+  <div class="main-area">
+   <div class="section-title"><i class="fas fa-lightbulb"></i> Modelos de Conteo</div>
+   <div class="info-grid">
+    <div class="info-panel">
+     <h3>📐 Poisson</h3>
+     <p>P(Y=y) = e^{-&lambda;}&lambda;&circ;y/y!, con &lambda; = exp(X&beta;). Propiedad clave: E[Y] = Var[Y] = &lambda;.</p>
+     <div class="formula">P(Y=y) = e^{-&lambda;}&lambda;&circ;y/y!</div>
+    </div>
+    <div class="info-panel">
+     <h3>📊 Semi-elasticidad</h3>
+     <p>En Poisson, &beta; se interpreta como semi-elasticidad: un cambio unitario en X cambia el conteo esperado en 100&times;&beta;%.</p>
+     <div class="formula">&part;E[Y|X]/&part;X = &beta;&middot;&lambda;</div>
+    </div>
+    <div class="info-panel">
+     <h3>⚠️ Sobredispersi&oacute;n</h3>
+     <p>Si Var[Y] &gt; E[Y], hay sobredispersi&oacute;n. Se usa Negativa Binomial: NB(&mu;, &alpha;), donde Var = &mu; + &alpha;&mu;&sup2;.</p>
+     <div class="formula">Var[Y] = &mu; + &alpha;&mu;&sup2;</div>
+    </div>
+    <div class="info-panel">
+     <h3>🚫 Zero-Inflated</h3>
+     <p>Modela dos procesos: (1) &iquest;Y puede ser &gt;0? (logit). (2) Si s&iacute;, &iquest;cu&aacute;nto? (Poisson/NB). &Uacute;til cuando hay exceso de ceros.</p>
+     <div class="formula">P(Y=0) = &pi; + (1-&pi;)e^{-&lambda;}</div>
+    </div>
+   </div>
+
+   <div class="sim-area">
+    <div class="section-title"><i class="fas fa-chart-bar"></i> Simulaci&oacute;n: Datos de Conteo</div>
+    <p style="color:#b9ccee;margin-bottom:0.8rem;">Genera datos de conteo y compara las estimaciones de Poisson, NB y OLS.</p>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem;">
+     <label style="color:#b9ccee;">Tasa base (&lambda;): <input type="range" id="lambdaRate" min="0.5" max="8" step="0.1" value="3" style="width:150px;"></label>
+     <span id="lambdaLabel" style="color:#c084fc;font-weight:700;">3.0</span>
+     <button id="simBtn" class="btn-action" style="margin:0;">🔄 Generar</button>
+    </div>
+    <div id="simResult" style="background:#0a0f1e;border-radius:1rem;padding:1rem;text-align:center;font-size:0.9rem;color:#b9ccee;">
+     Presiona "Generar" para ver los resultados.
+    </div>
+   </div>
+
+   <div class="quiz-area">
+    <div class="quiz-title"><i class="fas fa-question-circle"></i> Mini Quiz: Poisson y Conteo</div>
+    <div id="quizContainer"></div>
+    <button id="submitQuizBtn" class="btn-action">✅ Verificar respuestas</button>
+    <div id="insigniaArea" class="insignia hidden">
+     <i class="fas fa-medal"></i>
+     <h3>🏅 🔢 Contador Experto 🏅</h3>
+     <p>Dominas los modelos de datos de conteo. &iexcl;Excelente!</p>
+    </div>
+   </div>
+  </div>
+
+  <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre modelos de Poisson y conteo.</div>
+
+  <div class="nav-links">
+   <a href="05-tobit.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+   <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
+   <a href="07-panel-efectos.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-chart-bar"></i> Econometr&iacute;a Avanzada &middot; M&oacute;dulo 6</footer>
+ </div>
+
+ <script>
+  const STORAGE_KEY = 'prog_econ_2_06';
+  const PROGRESS_KEY = 'prog_econ_2_progress';
+  const questions = [
+   { text: "\u00bfQu\u00e9 propiedad tienen la media y varianza en Poisson?", options: ["Media > Varianza", "Media = Varianza", "Media < Varianza", "No hay relaci\u00f3n"], correct: 1 },
+   { text: "\u00bfQu\u00e9 modelo se usa cuando hay sobredispersi\u00f3n?", options: ["Logit", "Negativa Binomial", "Tobit", "Probit"], correct: 1 },
+   { text: "\u00bfC\u00f3mo se interpreta &beta; en regresi\u00f3n Poisson?", options: ["Efecto directo en Y", "Semi-elasticidad: cambio porcentual en E[Y]", "Odds ratio", "Efecto marginal constante"], correct: 1 },
+   { text: "\u00bfQu\u00e9 problema resuelven los modelos Zero-Inflated?", options: ["Endogeneidad", "Exceso de ceros en la variable dependiente", "Heterocedasticidad", "Multicolinealidad"], correct: 1 },
+   { text: "\u00bfQu\u00e9 funci\u00f3n de enlace usa Poisson?", options: ["Identidad", "Logaritmo natural", "Logit", "Probit"], correct: 1 }
+  ];
+  let userAnswers = new Array(questions.length).fill(null);
+  let quizCompleted = false;
+
+  function saveProgress() {
+   let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
+   localStorage.setItem(STORAGE_KEY, 'true');
+  }
+
+  function updateProgress() {
+   let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
+   document.getElementById('progressText').textContent = 'M\u00f3dulo '+(p.length || 1)+' de 12';
+  }
+
+  function renderQuestions() {
+   const container = document.getElementById('quizContainer');
+   container.innerHTML = '';
+   questions.forEach((q, idx) => {
+    const qDiv = document.createElement('div'); qDiv.classList.add('question');
+    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
+    const optsDiv = qDiv.querySelector('.options');
+    q.options.forEach((opt, optIdx) => {
+     const span = document.createElement('div'); span.classList.add('opt');
+     span.textContent = opt; span.dataset.qIdx = idx; span.dataset.optIdx = optIdx;
+     span.addEventListener('click', function() {
+      if (quizCompleted) return;
+      this.parentElement.querySelectorAll('.opt').forEach(c => c.classList.remove('selected'));
+      this.classList.add('selected'); userAnswers[idx] = optIdx; updateBtnState();
+     });
+     optsDiv.appendChild(span);
+    });
+    container.appendChild(qDiv);
+   });
+  }
+
+  function updateBtnState() {
+   document.getElementById('submitQuizBtn').disabled = userAnswers.some(a => a === null) || quizCompleted;
+  }
+
+  function handleSubmit() {
+   if (quizCompleted) return;
+   if (userAnswers.some(a => a === null)) { document.getElementById('feedbackMsg').textContent = '⚠️ Responde todas las preguntas primero.'; return; }
+   let correct = 0;
+   questions.forEach((q, i) => { if (userAnswers[i] === q.correct) correct++; });
+   const total = questions.length; const passed = correct >= Math.ceil(total * 0.6);
+   document.querySelectorAll('.question').forEach((qDiv, idx) => {
+    const opts = qDiv.querySelectorAll('.opt');
+    opts.forEach((o, oi) => {
+     o.classList.remove('selected');
+     if (oi === questions[idx].correct) o.classList.add('correct');
+     else if (oi === userAnswers[idx]) o.classList.add('wrong');
+    });
+   });
+   if (passed) {
+    quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').textContent = '🎉 ' + correct + '/' + total + ' correctas. ¡Cuentas como un experto!';
+    saveProgress(); updateProgress();
+   } else {
+    document.getElementById('feedbackMsg').textContent = '❌ ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. ¡Reintenta!';
+   }
+  }
+
+  function restoreProgress() {
+   const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   if (p.includes(STORAGE_KEY)) {
+    quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').textContent = '🏆 Ya completaste este m\u00f3dulo.';
+    document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
+   }
+  }
+
+  function runSim() {
+   const lambdaBase = parseFloat(document.getElementById('lambdaRate').value);
+   document.getElementById('lambdaLabel').textContent = lambdaBase.toFixed(1);
+   const n = 500;
+   const X = Array.from({length:n}, () => Math.random() * 3);
+   const beta = 0.5;
+   const lambda = X.map(x => lambdaBase * Math.exp(beta * (x - 1.5)));
+   const Y = lambda.map(l => { let c = 0; let p = Math.exp(-l); let s = p; let u = Math.random(); while (u > s) { c++; p *= l / c; s += p; } return c; });
+   const meanY = Y.reduce((s,v) => s+v, 0) / n;
+   const varY = Y.reduce((s,v) => s + (v-meanY)**2, 0) / n;
+   const maxY = Math.max(...Y);
+   const bins = Array.from({length:Math.min(maxY+1, 15)}, (_,i) => Y.filter(y => y === i).length);
+   let histHtml = '<div style="display:flex;align-items:flex-end;gap:0.2rem;justify-content:center;height:100px;margin-bottom:0.5rem;">';
+   bins.forEach((c, i) => {
+    const h = Math.max(3, c / Math.max(...bins) * 90);
+    histHtml += '<div style="display:flex;flex-direction:column;align-items:center;"><div style="width:20px;height:'+h+'px;background:#a855f7;border-radius:3px 3px 0 0;"></div><div style="font-size:0.6rem;color:#8899cc;">'+i+'</div></div>';
+   });
+   histHtml += '</div>';
+
+   const betaOLS = (() => { const mX = X.reduce((s,v) => s+v, 0)/n; const mY_ = Y.reduce((s,v) => s+v, 0)/n; return X.reduce((s,x,i) => s + (x-mX)*(Y[i]-mY_), 0) / X.reduce((s,x) => s + (x-mX)**2, 0); })();
+   const betaPoisson = (() => { const mX = X.reduce((s,v) => s+v, 0)/n; const mLog = Y.map(y => y > 0 ? Math.log(y) : 0); const mL = mLog.reduce((s,v) => s+v, 0)/n; return X.reduce((s,x,i) => s + (x-mX)*(mLog[i]-mL), 0) / X.reduce((s,x) => s + (x-mX)**2, 0); })();
+
+   document.getElementById('simResult').innerHTML = histHtml +
+    '<div class="table-wrap"><table><tr><th>Modelo</th><th>&beta;</th></tr><tr><td>Valor verdadero</td><td>'+beta.toFixed(3)+'</td></tr><tr><td>OLS (lineal)</td><td>'+betaOLS.toFixed(3)+'</td></tr><tr><td>Poisson (log)</td><td>'+betaPoisson.toFixed(3)+'</td></tr></table></div>' +
+    '<p style="color:#8899cc;font-size:0.8rem;">Media(Y)='+meanY.toFixed(2)+' | Var(Y)='+varY.toFixed(2)+' | n='+n+' | &lambda; base='+lambdaBase.toFixed(1)+'</p>';
+  }
+
+  document.getElementById('submitQuizBtn').addEventListener('click', handleSubmit);
+  document.getElementById('simBtn').addEventListener('click', runSim);
+  document.getElementById('lambdaRate').addEventListener('input', function() {
+   document.getElementById('lambdaLabel').textContent = parseFloat(this.value).toFixed(1);
+  });
+  renderQuestions(); updateBtnState(); restoreProgress(); updateProgress();
+ </script>
+ <script>
+window.I18N_DATA={
+ "fb_0": {
+  "es": "⚠️ Responde todas las preguntas primero.",
+  "en": "⚠️ Answer todas las preguntas primero."
+ },
+ "fb_1": {
+  "es": "🎉 ",
+  "en": "🎉 "
+ },
+ "fb_2": {
+  "es": "🏆 Ya completaste este m\u00f3dulo.",
+  "en": "🏆 Ya completaste este m\u00f3dulo."
+ }
+};
+</script>
+<script src="../../../assets/js/i18n.js"></script> </body>
+</html>

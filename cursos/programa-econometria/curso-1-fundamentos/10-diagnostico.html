@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Econometría | 🔬 Diagnóstico y Validación de Modelos</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:linear-gradient(135deg,#0a0f1e,#0c1222 50%,#111a2e); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+  @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .course-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(74,158,255,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+  .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #4a9eff; }
+  .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#60a5fa,#4a9eff); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero-header p { font-size:1.1rem; color:#a0c4ff; margin-top:0.5rem; font-weight:500; }
+  .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+  .chip { background:rgba(74,158,255,0.15); border:1px solid #4a9eff; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+  .progress-section { padding:1.2rem 2rem; border-bottom:1px solid #1a2a4a; }
+  .progress-bar-outer { background:#1a2a4a; border-radius:20px; height:16px; overflow:hidden; }
+  .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#4a9eff,#3b82f6); border-radius:20px; transition:width 0.5s ease; }
+  .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
+  .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #4a9eff; font-size:1rem; line-height:1.6; }
+  .main-area { padding:1.5rem 2rem; }
+  .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#4a9eff; }
+  .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
+  .info-panel { background:rgba(10,20,40,0.7); border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
+  .info-panel h3 { color:#60a5fa; font-size:1rem; margin-bottom:0.5rem; }
+  .info-panel p { font-size:0.85rem; color:#b9ccee; line-height:1.6; }
+  .info-panel .formula { background:#0a0f1e; padding:0.5rem; border-radius:0.8rem; text-align:center; font-family:monospace; font-size:0.9rem; color:#60a5fa; margin-top:0.5rem; }
+  .sim-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #4a9eff; margin-bottom:1.5rem; }
+  .quiz-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #4a9eff; margin-bottom:1.5rem; }
+  .quiz-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#4a9eff; }
+  .question { background:#0f1a2c; margin:0.8rem 0; padding:0.8rem 1rem; border-radius:1.2rem; }
+  .question p { font-weight:600; margin-bottom:0.5rem; font-size:0.95rem; }
+  .options { display:flex; flex-wrap:wrap; gap:0.6rem; }
+  .opt { background:#1e2a3e; padding:0.3rem 0.9rem; border-radius:2rem; cursor:pointer; transition:0.2s; font-size:0.85rem; }
+  .opt:hover { background:#2c3e66; transform:translateY(-2px); }
+  .opt.selected { background:#4a9eff; color:#000; font-weight:bold; box-shadow:0 0 8px #4a9eff; }
+  .opt.correct { background:#00cc88; color:#000; }
+  .opt.wrong { background:#ff4455; color:#fff; }
+  .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #4a9eff; }
+  .btn-action { background:linear-gradient(95deg,#4a9eff,#3b82f6); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin-top:1rem; }
+  .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(74,158,255,0.5); }
+  .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
+  .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin-top:1.5rem; padding:1rem; border:1px dashed gold; }
+  .insignia i { font-size:2.5rem; color:gold; }
+  .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
+  .hidden { display:none; }
+  .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+  .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+  .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(74,158,255,0.4); }
+  .nav-link.next { background:linear-gradient(95deg,#4a9eff,#3b82f6); color:#1e1a0c; }
+  .nav-link.menu { background:#1a2a4a; border:1px solid #4a9eff; }
+  footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .info-grid { grid-template-columns:1fr; } }
+  #diagChart { width:100%; height:300px; background:#0a0f1e; border-radius:1rem; margin-bottom:1rem; }
+  .sim-controls { display:flex; gap:1rem; flex-wrap:wrap; align-items:center; margin-bottom:1rem; }
+  .sim-controls label { color:#b9ccee; font-size:0.85rem; }
+  .sim-controls select { background:#1e2a3e; color:#fff; border:1px solid #4a9eff; border-radius:0.5rem; padding:0.3rem 0.6rem; }
+  .result-values { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:0.5rem; margin-top:0.8rem; }
+  .result-box { background:#0a0f1e; border-radius:0.8rem; padding:0.5rem; text-align:center; border:1px solid #2c3e66; }
+  .result-box .label { font-size:0.7rem; color:#8899cc; }
+  .result-box .value { font-size:1.1rem; font-weight:700; color:#60a5fa; }
+ </style>
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
+</head>
+<body>
+ <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Econometr&iacute;a</a></nav>
+ <div class="course-container" id="app">
+  <div class="hero-header">
+   <h1>🔬 Diagn&oacute;stico y Validaci&oacute;n de Modelos</h1>
+   <p>Especificaci&oacute;n, normalidad, outliers, influencia y medidas de diagn&oacute;stico</p>
+   <div class="badge-area">
+    <span class="chip"><i class="fas fa-stethoscope"></i> RESET</span>
+    <span class="chip"><i class="fas fa-chart-bar"></i> Normalidad</span>
+    <span class="chip"><i class="fas fa-dot-circle"></i> Cook's D</span>
+   </div>
+  </div>
+  <div class="progress-section">
+   <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+   <span class="progress-text" id="progressText">M&oacute;dulo 10 de 12</span>
+  </div>
+  <div class="analogy-card">
+   <strong>💡 Pi&eacute;nsalo as&iacute;:</strong> El diagn&oacute;stico de modelos es como un chequeo m&eacute;dico completo: revisas cada signo vital del modelo para asegurarte de que est&eacute; sano.
+  </div>
+  <div class="main-area">
+   <div class="section-title"><i class="fas fa-flask"></i> Conceptos Fundamentales</div>
+   <div class="info-grid">
+    <div class="info-panel">
+     <h3>🔍 Test RESET de Ramsey</h3>
+     <p>Prueba de especificaci&oacute;n: a&ntilde;ade potencias de Ŷ al modelo. H₀: el modelo est&aacute; bien especificado.</p>
+     <div class="formula">Y = Xβ + γ₁Ŷ² + γ₂Ŷ³ + ε</div>
+    </div>
+    <div class="info-panel">
+     <h3>📊 Normalidad de Errores</h3>
+     <p>Test Jarque-Bera: basado en asimetr&iacute;a y curtosis de residuos. H₀: errores normales.</p>
+     <div class="formula">JB = n(S²/6 + (K-3)²/24)</div>
+    </div>
+    <div class="info-panel">
+     <h3>⚠️ Outliers y Leverage</h3>
+     <p>Leverage (hᵢ) mide cu&aacute;nto se aleja Xᵢ del centro. Outliers son observaciones at&iacute;picas en Y.</p>
+     <div class="formula">hᵢ = xᵢ'(X'X)⁻¹xᵢ</div>
+    </div>
+    <div class="info-panel">
+     <h3>📐 Distancia de Cook</h3>
+     <p>Mide la influencia de cada observaci&oacute;n en los coeficientes estimados. Cook &gt; 4/n es influyente.</p>
+     <div class="formula">Dᵢ = (êᵢ²/ks²) · (hᵢ/(1-hᵢ)²)</div>
+    </div>
+   </div>
+
+   <div class="sim-area">
+    <div class="section-title"><i class="fas fa-play"></i> Simulaci&oacute;n: Diagn&oacute;stico con Outliers</div>
+    <p style="margin-bottom:0.8rem;color:#b9ccee;">Genera datos con un outlier influyente y observa c&oacute;mo cambia la recta de regresi&oacute;n.</p>
+    <div class="sim-controls">
+     <button id="genDiagBtn" class="btn-action" style="margin:0;">🎲 Generar datos</button>
+    </div>
+    <canvas id="diagChart"></canvas>
+    <div class="result-values">
+     <div class="result-box"><div class="label">Cook's D max</div><div class="value" id="cooksD">—</div></div>
+     <div class="result-box"><div class="label">Outliers detectados</div><div class="value" id="outlierCount">—</div></div>
+     <div class="result-box"><div class="label">R² con outlier</div><div class="value" id="r2With">—</div></div>
+     <div class="result-box"><div class="label">R² sin outlier</div><div class="value" id="r2Without">—</div></div>
+    </div>
+   </div>
+
+   <div class="quiz-area">
+    <div class="quiz-title"><i class="fas fa-question-circle"></i> Mini Quiz: Diagn&oacute;stico y Validaci&oacute;n</div>
+    <div id="quizContainer"></div>
+    <button id="submitQuizBtn" class="btn-action">✅ Verificar respuestas</button>
+    <div id="insigniaArea" class="insignia hidden">
+     <i class="fas fa-medal"></i>
+     <h3>🔬 Diagnosticador Profesional 🔬</h3>
+     <p>Has comprendido el diagn&oacute;stico y validaci&oacute;n de modelos. &iexcl;Excelente!</p>
+    </div>
+   </div>
+  </div>
+
+  <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre diagn&oacute;stico de modelos.</div>
+
+  <div class="nav-links">
+   <a href="09-endogeneidad.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+   <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
+   <a href="11-intro-r.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-chart-line"></i> Fundamentos de Econometr&iacute;a · M&oacute;dulo 10</footer>
+ </div>
+
+ <script>
+  const STORAGE_KEY = 'prog_econ_1_10';
+  const PROGRESS_KEY = 'prog_econ_1_progress';
+  const questions = [
+   { text: "El test RESET de Ramsey detecta:", options: ["Heterocedasticidad", "Mala especificaci\u00f3n funcional", "Multicolinealidad", "Autocorrelaci\u00f3n"], correct: 1 },
+   { text: "El test Jarque-Bera eval\u00faa:", options: ["Homocedasticidad", "Normalidad de errores", "Linealidad", "Independencia"], correct: 1 },
+   { text: "La distancia de Cook mide:", options: ["La varianza del error", "La influencia de cada observaci\u00f3n", "La correlaci\u00f3n entre variables", "El R\u00b2 del modelo"], correct: 1 },
+   { text: "Un valor de leverage alto indica:", options: ["La observaci\u00f3n es at\u00edpica en X", "La observaci\u00f3n es at\u00edpica en Y", "El error es grande", "El coeficiente es grande"], correct: 0 },
+   { text: "\u00bfCu\u00e1ndo se considera que una observaci\u00f3n es influyente seg\u00fan Cook?", options: ["D > 4/n", "D > 1", "D < 0.5", "D = 0"], correct: 0 }
+  ];
+  let userAnswers = new Array(questions.length).fill(null);
+  let quizCompleted = false;
+
+  function saveProgress() {
+   let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
+   localStorage.setItem(STORAGE_KEY, 'true');
+  }
+  function updateProgress() {
+   let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
+   document.getElementById('progressText').textContent = 'M\u00f3dulo '+(p.length || 1)+' de 12';
+  }
+  function renderQuestions() {
+   const container = document.getElementById('quizContainer');
+   container.innerHTML = '';
+   questions.forEach((q, idx) => {
+    const qDiv = document.createElement('div'); qDiv.classList.add('question');
+    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
+    const optsDiv = qDiv.querySelector('.options');
+    q.options.forEach((opt, optIdx) => {
+     const span = document.createElement('div'); span.classList.add('opt');
+     span.textContent = opt; span.dataset.qIdx = idx; span.dataset.optIdx = optIdx;
+     span.addEventListener('click', function() {
+      if (quizCompleted) return;
+      this.parentElement.querySelectorAll('.opt').forEach(c => c.classList.remove('selected'));
+      this.classList.add('selected'); userAnswers[idx] = optIdx; updateBtnState();
+     });
+     optsDiv.appendChild(span);
+    });
+    container.appendChild(qDiv);
+   });
+  }
+  function updateBtnState() {
+   document.getElementById('submitQuizBtn').disabled = userAnswers.some(a => a === null) || quizCompleted;
+  }
+  function handleSubmit() {
+   if (quizCompleted) return;
+   if (userAnswers.some(a => a === null)) { document.getElementById('feedbackMsg').textContent = I18N.t('fb_0'); return; }
+   let correct = 0;
+   questions.forEach((q, i) => { if (userAnswers[i] === q.correct) correct++; });
+   const total = questions.length; const passed = correct >= Math.ceil(total * 0.6);
+   document.querySelectorAll('.question').forEach((qDiv, idx) => {
+    const opts = qDiv.querySelectorAll('.opt');
+    opts.forEach((o, oi) => {
+     o.classList.remove('selected');
+     if (oi === questions[idx].correct) o.classList.add('correct');
+     else if (oi === userAnswers[idx]) o.classList.add('wrong');
+    });
+   });
+   if (passed) {
+    quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').textContent = I18N.t('fb_1') + correct + '/' + total + ' correctas. \u00a1Dominas diagn\u00f3stico!';
+    saveProgress(); updateProgress();
+   } else {
+    document.getElementById('feedbackMsg').textContent = '\u274c ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. \u00a1Reintenta!';
+   }
+  }
+  function restoreProgress() {
+   const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   if (p.includes(STORAGE_KEY)) {
+    quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').textContent = I18N.t('fb_2');
+    document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
+   }
+  }
+
+  function simulateDiagnostics() {
+   const n = 30;
+   const xs = [], ys = [];
+   for (let i=0; i<n-1; i++) {
+    const x = 2 + Math.random() * 8;
+    const y = 2 + 1.5*x + (Math.random()-0.5)*2;
+    xs.push(x); ys.push(y);
+   }
+   xs.push(15); ys.push(35);
+   const xm = xs.reduce((a,b)=>a+b,0)/n, ym = ys.reduce((a,b)=>a+b,0)/n;
+   let num=0, den=0;
+   for (let i=0; i<n; i++) { num += (xs[i]-xm)*(ys[i]-ym); den += (xs[i]-xm)**2; }
+   const b1 = num/den, b0 = ym - b1*xm;
+   let ssrTotal=0, sst=0;
+   for (let i=0; i<n; i++) { ssrTotal += (ys[i]-(b0+b1*xs[i]))**2; sst += (ys[i]-ym)**2; }
+   const r2With = 1 - ssrTotal/sst;
+
+   const xs2 = xs.slice(0,-1), ys2 = ys.slice(0,-1);
+   const n2 = xs2.length;
+   const xm2 = xs2.reduce((a,b)=>a+b,0)/n2, ym2 = ys2.reduce((a,b)=>a+b,0)/n2;
+   let num2=0, den2=0;
+   for (let i=0; i<n2; i++) { num2 += (xs2[i]-xm2)*(ys2[i]-ym2); den2 += (xs2[i]-xm2)**2; }
+   const b12 = num2/den2, b02 = ym2 - b12*xm2;
+   let ssr2=0, sst2=0;
+   for (let i=0; i<n2; i++) { ssr2 += (ys2[i]-(b02+b12*xs2[i]))**2; sst2 += (ys2[i]-ym2)**2; }
+   const r2Without = 1 - ssr2/sst2;
+
+   const resids = ys.map((y,i)=>y-(b0+b1*xs[i]));
+   const sigma2 = ssrTotal/(n-2);
+   let maxCook = 0, outlierCnt = 0;
+   for (let i=0; i<n; i++) {
+    const h = 1/n + (xs[i]-xm)**2/den;
+    const cook = (resids[i]**2/(2*sigma2)) * (h/(1-h)**2);
+    if (cook > maxCook) maxCook = cook;
+    if (Math.abs(resids[i]) > 2*Math.sqrt(sigma2)) outlierCnt++;
+   }
+
+   document.getElementById('cooksD').textContent = maxCook.toFixed(4);
+   document.getElementById('outlierCount').textContent = outlierCnt;
+   document.getElementById('r2With').textContent = r2With.toFixed(4);
+   document.getElementById('r2Without').textContent = r2Without.toFixed(4);
+
+   drawDiagChart(xs, ys, b0, b1);
+  }
+
+  function drawDiagChart(xs, ys, b0, b1) {
+   const canvas = document.getElementById('diagChart');
+   const ctx = canvas.getContext('2d');
+   canvas.width = canvas.parentElement.clientWidth || 600;
+   canvas.height = 300;
+   const w = canvas.width, h = canvas.height, pad = 50;
+   const xMin = Math.min(...xs)*0.9, xMax = Math.max(...xs)*1.1;
+   const yMin = Math.min(...ys)*0.9, yMax = Math.max(...ys)*1.1;
+   function sx(x){return pad+(x-xMin)/(xMax-xMin)*(w-2*pad);}
+   function sy(y){return h-pad-(y-yMin)/(yMax-yMin)*(h-2*pad);}
+   ctx.clearRect(0,0,w,h);
+   ctx.fillStyle='#0a0f1e'; ctx.fillRect(0,0,w,h);
+   for (let i=0;i<xs.length;i++) {
+    const isOutlier = (i === xs.length-1);
+    ctx.beginPath(); ctx.arc(sx(xs[i]),sy(ys[i]), isOutlier?6:3, 0, 2*Math.PI);
+    ctx.fillStyle = isOutlier ? '#ff4455' : 'rgba(74,158,255,0.7)';
+    ctx.fill();
+    if (isOutlier) {
+     ctx.strokeStyle = '#ff4455'; ctx.lineWidth = 2; ctx.stroke();
+    }
+   }
+   const lx1=xMin, lx2=xMax;
+   const ly1=b0+b1*lx1, ly2=b0+b1*lx2;
+   ctx.beginPath(); ctx.moveTo(sx(lx1),sy(ly1)); ctx.lineTo(sx(lx2),sy(ly2));
+   ctx.strokeStyle='#4a9eff'; ctx.lineWidth=2.5; ctx.stroke();
+   ctx.fillStyle='#8899cc'; ctx.font='10px Inter';
+   ctx.fillText('X',w-pad+5,h-pad+12);
+   ctx.fillText('Y',pad-10,pad-5);
+  }
+
+  document.getElementById('submitQuizBtn').addEventListener('click', handleSubmit);
+  document.getElementById('genDiagBtn').addEventListener('click', simulateDiagnostics);
+  renderQuestions(); updateBtnState(); restoreProgress(); updateProgress();
+  simulateDiagnostics();
+ </script>
+ <script>
+window.I18N_DATA={
+ "fb_0": {"es": "\u26a0\ufe0f Responde todas las preguntas primero.", "en": "\u26a0\ufe0f Answer all questions first."},
+ "fb_1": {"es": "\ud83c\udf89 ", "en": "\ud83c\udf89 "},
+ "fb_2": {"es": "\ud83c\udfc6 Ya completaste este m\u00f3dulo.", "en": "\ud83c\udfc6 You already completed this module."}
+};
+</script>
+<script src="../../../assets/js/i18n.js"></script> </body>
+</html>

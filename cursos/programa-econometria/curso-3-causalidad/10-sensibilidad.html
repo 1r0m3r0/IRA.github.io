@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Causalidad | 🛡️ Sensibilidad y Robustez</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:linear-gradient(135deg,#0a0f1e,#0c1222 50%,#111a2e); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+  @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .course-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(20,184,166,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+  .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #14b8a6; }
+  .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#5eead4,#14b8a6); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero-header p { font-size:1.1rem; color:#99f6e4; margin-top:0.5rem; font-weight:500; }
+  .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+  .chip { background:rgba(20,184,166,0.15); border:1px solid #14b8a6; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+  .progress-section { padding:1.2rem 2rem; border-bottom:1px solid #1a2a4a; }
+  .progress-bar-outer { background:#1a2a4a; border-radius:20px; height:16px; overflow:hidden; }
+  .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#14b8a6,#0d9488); border-radius:20px; transition:width 0.5s ease; }
+  .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
+  .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #14b8a6; font-size:1rem; line-height:1.6; }
+  .main-area { padding:1.5rem 2rem; }
+  .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#14b8a6; }
+  .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
+  .info-panel { background:rgba(10,20,40,0.7); border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
+  .info-panel h3 { color:#5eead4; font-size:1rem; margin-bottom:0.5rem; }
+  .info-panel p { font-size:0.85rem; color:#b9ccee; line-height:1.6; }
+  .info-panel .formula { background:#0a0f1e; padding:0.5rem; border-radius:0.8rem; text-align:center; font-family:monospace; font-size:0.9rem; color:#5eead4; margin-top:0.5rem; }
+  .sim-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #14b8a6; margin-bottom:1.5rem; }
+  .quiz-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #14b8a6; margin-bottom:1.5rem; }
+  .quiz-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#14b8a6; }
+  .question { background:#0f1a2c; margin:0.8rem 0; padding:0.8rem 1rem; border-radius:1.2rem; }
+  .question p { font-weight:600; margin-bottom:0.5rem; font-size:0.95rem; }
+  .options { display:flex; flex-wrap:wrap; gap:0.6rem; }
+  .opt { background:#1e2a3e; padding:0.3rem 0.9rem; border-radius:2rem; cursor:pointer; transition:0.2s; font-size:0.85rem; }
+  .opt:hover { background:#2c3e66; transform:translateY(-2px); }
+  .opt.selected { background:#14b8a6; color:#000; font-weight:bold; box-shadow:0 0 8px #14b8a6; }
+  .opt.correct { background:#00cc88; color:#000; }
+  .opt.wrong { background:#ff4455; color:#fff; }
+  .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #14b8a6; }
+  .btn-action { background:linear-gradient(95deg,#14b8a6,#0d9488); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#fff; margin-top:1rem; }
+  .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(20,184,166,0.5); }
+  .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
+  .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin-top:1.5rem; padding:1rem; border:1px dashed gold; }
+  .insignia i { font-size:2.5rem; color:gold; }
+  .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
+  .hidden { display:none; }
+  .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+  .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+  .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(20,184,166,0.4); }
+  .nav-link.next { background:linear-gradient(95deg,#14b8a6,#0d9488); color:#fff; }
+  .nav-link.menu { background:#1a2a4a; border:1px solid #14b8a6; }
+  footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+  .sim-controls { display:flex; gap:1rem; flex-wrap:wrap; align-items:center; margin-bottom:1rem; }
+  .sim-controls label { color:#b9ccee; font-size:0.85rem; }
+  .sim-controls select, .sim-controls input { background:#1e2a3e; color:#fff; border:1px solid #14b8a6; border-radius:0.5rem; padding:0.3rem 0.6rem; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .info-grid { grid-template-columns:1fr; } }
+ </style>
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
+</head>
+<body>
+ <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Econometr&iacute;a</a></nav>
+ <div class="course-container" id="app">
+  <div class="hero-header">
+   <h1>🛡️ Sensibilidad y Robustez</h1>
+   <p>Oster bounds, Cinelli-Hazlett, placebo, permutaciones y m&uacute;ltiples hip&oacute;tesis</p>
+   <div class="badge-area">
+    <span class="chip"><i class="fas fa-shield-alt"></i> Robustez</span>
+    <span class="chip"><i class="fas fa-chart-area"></i> Contornos</span>
+    <span class="chip"><i class="fas fa-random"></i> Permutaciones</span>
+   </div>
+  </div>
+  <div class="progress-section">
+   <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+   <span class="progress-text" id="progressText">M&oacute;dulo 10 de 12</span>
+  </div>
+  <div class="analogy-card">
+   <strong>💡 Piénsalo así:</strong> El an&aacute;lisis de sensibilidad es como probar la resistencia de un puente: le pones cada vez m&aacute;s peso hasta que se rompe. En econometr&iacute;a, preguntamos: "¿Qu&eacute; tan fuerte tendr&iacute;a que ser un confusor no observado para hacer que nuestro efecto estimado desaparezca?" Si se necesita un confusor extremadamente fuerte, nuestro resultado es robusto.
+  </div>
+  <div class="main-area">
+   <div class="section-title"><i class="fas fa-shield-alt"></i> Conceptos de Sensibilidad</div>
+   <div class="info-grid">
+    <div class="info-panel">
+     <h3>📐 Oster's Bounds</h3>
+     <p>Basado en la proporci&oacute;n de selecci&oacute;n en observables vs no observables. Asume &delta; = 1 (igual importancia) y calcula el estimador ajustado por confusores no observados.</p>
+     <div class="formula">&beta;* &asymp; &beta;~ - &delta;(&beta; - &beta;~) &middot; (R&sup2;max - R&sup2;~)/(R&sup2; - R&sup2;~)</div>
+    </div>
+    <div class="info-panel">
+     <h3>🗺️ Cinelli-Hazlett Sensitivity</h3>
+     <p>Gr&aacute;fico de contorno que muestra cu&aacute;nto tendr&iacute;a que explicar un confusor no observado de la varianza del tratamiento y del outcome para cambiar el resultado.</p>
+    </div>
+    <div class="info-panel">
+     <h3>🧪 Placebo y Permutaciones</h3>
+     <p>Placebo: asignar tratamiento falsamente. Permutaciones: reordenar aleatoriamente la variable de tratamiento miles de veces para obtener la distribuci&oacute;n nula del estimador.</p>
+    </div>
+    <div class="info-panel">
+     <h3>📊 M&uacute;ltiples Hip&oacute;tesis</h3>
+     <p>Bonferroni: &alpha;/k. FDR (Benjamini-Hochberg): controla la tasa de falsos descubrimientos. Crucial cuando se testean muchos outcomes o subgrupos.</p>
+     <div class="formula">pBonf = min(k&middot;p, 1)</div>
+    </div>
+   </div>
+
+   <div class="sim-area">
+    <div class="section-title"><i class="fas fa-play"></i> Simulaci&oacute;n: Sensibilidad a Confusores</div>
+    <p style="margin-bottom:0.8rem;color:#b9ccee;">Especifica la fuerza de un confusor no observado y observa c&oacute;mo cambia el estimador.</p>
+    <div class="sim-controls">
+     <label>Fuerza confusor: <select id="sensStrength">
+      <option value="0">0 (nulo)</option><option value="0.3" selected>0.3 (d&eacute;bil)</option><option value="0.6">0.6 (medio)</option><option value="1">1 (fuerte)</option>
+     </select></label>
+     <button id="sensSimBtn" class="btn-action" style="margin:0;">🔬 Simular</button>
+    </div>
+    <div id="sensResult" style="background:#0a0f1e;border-radius:1rem;padding:1rem;text-align:center;font-size:0.9rem;color:#b9ccee;">
+     Presiona "Simular" para ver el an&aacute;lisis de sensibilidad.
+    </div>
+   </div>
+
+   <div class="quiz-area">
+    <div class="quiz-title"><i class="fas fa-question-circle"></i> Mini Quiz: Sensibilidad y Robustez</div>
+    <div id="quizContainer"></div>
+    <button id="submitQuizBtn" class="btn-action">✅ Verificar respuestas</button>
+    <div id="insigniaArea" class="insignia hidden">
+     <i class="fas fa-medal"></i>
+     <h3>🏅 Analista de Robustez 🏅</h3>
+     <p>Has dominado los m&eacute;todos de sensibilidad y robustez. &iexcl;Excelente!</p>
+    </div>
+   </div>
+  </div>
+
+  <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre an&aacute;lisis de sensibilidad.</div>
+
+  <div class="nav-links">
+   <a href="09-late.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+   <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
+   <a href="11-poder-estadistico.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-dice"></i> Causalidad y Evaluaci&oacute;n de Impacto · M&oacute;dulo 10</footer>
+ </div>
+
+ <script>
+  const STORAGE_KEY = 'prog_econ_3_10';
+  const PROGRESS_KEY = 'prog_econ_3_progress';
+  const questions = [
+   { text: "\u00bfQu\u00e9 pregunta responde Oster's bounds?", options: ["Cu\u00e1l es el ATE", "Qu\u00e9 tan fuerte deber\u00eda ser un confusor no observado para eliminar el efecto", "Si los datos son normales", "El bandwidth \u00f3ptimo"], correct: 1 },
+   { text: "\u00bfPara qu\u00e9 sirve un placebo test?", options: ["Estimar el efecto real", "Probar que el efecto estimado no es artefactual asignando tratamiento falsamente", "Calcular la varianza", "Aumentar la muestra"], correct: 1 },
+   { text: "\u00bfQu\u00e9 hace un test de permutaci\u00f3n?", options: ["Reordena aleatoriamente el tratamiento para obtener la distribuci\u00f3n nula", "Calcula el ATE", "Estima la varianza", "Hace bootstrap"], correct: 0 },
+   { text: "La correcci\u00f3n de Bonferroni:", options: ["Divide &alpha; por el n\u00famero de tests", "Multiplica &alpha; por el n\u00famero de tests", "Usa FDR", "No ajusta por m\u00faltiples tests"], correct: 0 },
+   { text: "\u00bfQu\u00e9 controla el FDR (Benjamini-Hochberg)?", options: ["La tasa de error familiar", "La tasa de falsos descubrimientos", "El error tipo I", "El error tipo II"], correct: 1 }
+  ];
+  let userAnswers = new Array(questions.length).fill(null);
+  let quizCompleted = false;
+
+  function saveProgress() {
+   let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
+   localStorage.setItem(STORAGE_KEY, 'true');
+  }
+
+  function updateProgress() {
+   let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
+   document.getElementById('progressText').textContent = 'M\u00f3dulo '+(p.length || 1)+' de 12';
+  }
+
+  function renderQuestions() {
+   const container = document.getElementById('quizContainer');
+   container.innerHTML = '';
+   questions.forEach((q, idx) => {
+    const qDiv = document.createElement('div'); qDiv.classList.add('question');
+    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
+    const optsDiv = qDiv.querySelector('.options');
+    q.options.forEach((opt, optIdx) => {
+     const span = document.createElement('div'); span.classList.add('opt');
+     span.textContent = opt; span.dataset.qIdx = idx; span.dataset.optIdx = optIdx;
+     span.addEventListener('click', function() {
+      if (quizCompleted) return;
+      this.parentElement.querySelectorAll('.opt').forEach(c => c.classList.remove('selected'));
+      this.classList.add('selected'); userAnswers[idx] = optIdx; updateBtnState();
+     });
+     optsDiv.appendChild(span);
+    });
+    container.appendChild(qDiv);
+   });
+  }
+
+  function updateBtnState() {
+   document.getElementById('submitQuizBtn').disabled = userAnswers.some(a => a === null) || quizCompleted;
+  }
+
+  function handleSubmit() {
+   if (quizCompleted) return;
+   if (userAnswers.some(a => a === null)) { document.getElementById('feedbackMsg').textContent = I18N.t('fb_0'); return; }
+   let correct = 0;
+   questions.forEach((q, i) => { if (userAnswers[i] === q.correct) correct++; });
+   const total = questions.length; const passed = correct >= Math.ceil(total * 0.6);
+   document.querySelectorAll('.question').forEach((qDiv, idx) => {
+    const opts = qDiv.querySelectorAll('.opt');
+    opts.forEach((o, oi) => {
+     o.classList.remove('selected');
+     if (oi === questions[idx].correct) o.classList.add('correct');
+     else if (oi === userAnswers[idx]) o.classList.add('wrong');
+    });
+   });
+   if (passed) {
+    quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').textContent = I18N.t('fb_1') + correct + '/' + total + ' correctas. \u00a1Dominas la robustez!';
+    saveProgress(); updateProgress();
+   } else {
+    document.getElementById('feedbackMsg').textContent = '\u274c ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. \u00a1Reintenta!';
+   }
+  }
+
+  function restoreProgress() {
+   const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   if (p.includes(STORAGE_KEY)) {
+    quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').contentText = I18N.t('fb_2');
+    document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
+   }
+  }
+
+  document.getElementById('sensSimBtn').addEventListener('click', function() {
+   const strength = parseFloat(document.getElementById('sensStrength').value);
+   let N = 200;
+   let data = [];
+   let baseEffect = 3;
+   for (let i = 0; i < N; i++) {
+    let confounder = Math.random();
+    let x = confounder * 0.5 + (Math.random() - 0.5) * 0.5;
+    let treated = x + confounder * strength > 0.5 ? 1 : 0;
+    let y = 10 + treated * baseEffect + confounder * strength * 3 + (Math.random() - 0.5) * 2;
+    data.push({ x, treated, y, confounder });
+   }
+
+   let naive = data.filter(d => d.treated === 1).reduce((s,d) => s + d.y, 0) / data.filter(d => d.treated === 1).length -
+    data.filter(d => d.treated === 0).reduce((s,d) => s + d.y, 0) / data.filter(d => d.treated === 0).length;
+
+   let bins = [];
+   for (let i = 0; i < 10; i++) {
+    let lower = i / 10;
+    let upper = (i + 1) / 10;
+    let slice = data.filter(d => d.x >= lower && d.x < upper);
+    if (slice.length > 0) {
+     let est = slice.filter(d => d.treated === 1).reduce((s,d) => s + d.y, 0) / slice.filter(d => d.treated === 1).length -
+      slice.filter(d => d.treated === 0).reduce((s,d) => s + d.y, 0) / slice.filter(d => d.treated === 0).length;
+     bins.push(est);
+    }
+   }
+   let controlledATE = bins.length > 0 ? bins.reduce((a,b) => a+b, 0) / bins.length : 0;
+
+   let contourColors = ['#00cc88', '#5eead4', '#ffcc00', '#ff8800', '#ff4455'];
+   let html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:0.5rem;">' +
+    '<div style="background:#1e2a3e;border-radius:0.8rem;padding:0.5rem;border:1px solid #ff4455;"><div style="font-weight:700;color:#5eead4;">Naive (sesgado)</div><div style="font-size:1.2rem;">' + naive.toFixed(2) + '</div></div>' +
+    '<div style="background:#1e2a3e;border-radius:0.8rem;padding:0.5rem;border:1px solid #14b8a6;"><div style="font-weight:700;color:#5eead4;">Controlado (bins)</div><div>' + controlledATE.toFixed(2) + '</div></div>' +
+    '<div style="background:#1e2a3e;border-radius:0.8rem;padding:0.5rem;border:1px solid #14b8a6;"><div style="font-weight:700;color:#5eead4;">Efecto Real</div><div>' + baseEffect + '</div></div>' +
+    '<div style="background:#1e2a3e;border-radius:0.8rem;padding:0.5rem;border:1px solid ' + (strength > 0.5 ? '#ff4455' : '#00cc88') + ';"><div style="font-weight:700;color:#5eead4;">Fuerza Confusor</div><div>' + strength + '</div></div>' +
+    '</div>' +
+    '<div style="margin-top:1rem;background:#0a0f1e;border-radius:1rem;padding:0.8rem;"><p style="font-size:0.8rem;color:#5eead4;margin-bottom:0.5rem;">Contorno de Sensibilidad (Cinelli-Hazlett style)</p>' +
+    '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:0.3rem;">';
+   for (let r = 0; r < 5; r++) {
+    let val = (strength * 3 * (r+1) / 5).toFixed(2);
+    let colorIdx = Math.min(Math.floor(r * 5 / 5), 4);
+    html += '<div style="background:' + contourColors[colorIdx] + '40;border:1px solid ' + contourColors[colorIdx] + ';border-radius:0.5rem;padding:0.5rem;text-align:center;"><div style="font-size:0.7rem;color:#8899cc;">Conf=' + val + '</div><div style="font-size:0.8rem;color:#fff;">' + (baseEffect - strength * (r+1) * 0.5).toFixed(2) + '</div></div>';
+   }
+   html += '</div><p style="margin-top:0.5rem;font-size:0.7rem;color:#8899cc;">A medida que el confusor se fortalece, el estimador se aleja del valor real (' + baseEffect + ').</p></div>';
+
+   document.getElementById('sensResult').innerHTML = html;
+  });
+
+  document.getElementById('submitQuizBtn').addEventListener('click', handleSubmit);
+  renderQuestions(); updateBtnState(); restoreProgress(); updateProgress();
+ </script>
+ <script>
+window.I18N_DATA={
+ "fb_0": {
+  "es": "⚠️ Responde todas las preguntas primero.",
+  "en": "⚠️ Answer todas las preguntas primero."
+ },
+ "fb_1": {
+  "es": "🎉 ",
+  "en": "🎉 "
+ },
+ "fb_2": {
+  "es": "🏆 Ya completaste este m\u00f3dulo.",
+  "en": "🏆 Ya completaste este m\u00f3dulo."
+ }
+};
+</script>
+<script src="../../../assets/js/i18n.js"></script> </body>
+</html>

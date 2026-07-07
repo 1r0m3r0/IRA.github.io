@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Econometr&iacute;a Financiera | 🔄 GARCH Asim&eacute;tricos</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:linear-gradient(135deg,#0a0f1e,#0c1222 50%,#111a2e); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+  @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .course-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(239,68,68,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+  .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #ef4444; }
+  .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#fca5a5,#ef4444); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero-header p { font-size:1.1rem; color:#f0c0c0; margin-top:0.5rem; font-weight:500; }
+  .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+  .chip { background:rgba(239,68,68,0.15); border:1px solid #ef4444; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+  .progress-section { padding:1.2rem 2rem; border-bottom:1px solid #1a2a4a; }
+  .progress-bar-outer { background:#1a2a4a; border-radius:20px; height:16px; overflow:hidden; }
+  .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#ef4444,#dc2626); border-radius:20px; transition:width 0.5s ease; }
+  .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
+  .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ef4444; font-size:1rem; line-height:1.6; }
+  .main-area { padding:1.5rem 2rem; }
+  .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#ef4444; }
+  .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
+  .info-panel { background:rgba(10,20,40,0.7); border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
+  .info-panel h3 { color:#fca5a5; font-size:1rem; margin-bottom:0.5rem; }
+  .info-panel p { font-size:0.85rem; color:#b9ccee; line-height:1.6; }
+  .info-panel .formula { background:#0a0f1e; padding:0.5rem; border-radius:0.8rem; text-align:center; font-family:monospace; font-size:0.9rem; color:#fca5a5; margin-top:0.5rem; }
+  .sim-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #ef4444; margin-bottom:1.5rem; }
+  .quiz-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #ef4444; margin-bottom:1.5rem; }
+  .quiz-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#ef4444; }
+  .question { background:#0f1a2c; margin:0.8rem 0; padding:0.8rem 1rem; border-radius:1.2rem; }
+  .question p { font-weight:600; margin-bottom:0.5rem; font-size:0.95rem; }
+  .options { display:flex; flex-wrap:wrap; gap:0.6rem; }
+  .opt { background:#1e2a3e; padding:0.3rem 0.9rem; border-radius:2rem; cursor:pointer; transition:0.2s; font-size:0.85rem; }
+  .opt:hover { background:#2c3e66; transform:translateY(-2px); }
+  .opt.selected { background:#ef4444; color:#fff; font-weight:bold; box-shadow:0 0 8px #ef4444; }
+  .opt.correct { background:#00cc88; color:#000; }
+  .opt.wrong { background:#ff4455; color:#fff; }
+  .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #ef4444; }
+  .btn-action { background:linear-gradient(95deg,#ef4444,#dc2626); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#fff; margin-top:1rem; }
+  .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(239,68,68,0.5); }
+  .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
+  .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin-top:1.5rem; padding:1rem; border:1px dashed gold; }
+  .insignia i { font-size:2.5rem; color:gold; }
+  .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
+  .hidden { display:none; }
+  .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+  .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+  .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(239,68,68,0.4); }
+  .nav-link.next { background:linear-gradient(95deg,#ef4444,#dc2626); color:#fff; }
+  .nav-link.menu { background:#1a2a4a; border:1px solid #ef4444; }
+  footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .info-grid { grid-template-columns:1fr; } }
+ </style>
+ <link rel="stylesheet" href="../../../../assets/css/theme.css">
+</head>
+<body>
+ <nav class="brand-return-nav"><a href="../../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Econometr&iacute;a</a></nav>
+ <div class="course-container" id="app">
+  <div class="hero-header">
+   <h1>🔄 GARCH Asim&eacute;tricos</h1>
+   <p>Capturando el impacto asim&eacute;trico de las noticias en la volatilidad</p>
+   <div class="badge-area">
+    <span class="chip"><i class="fas fa-chart-bar"></i> EGARCH</span>
+    <span class="chip"><i class="fas fa-chart-area"></i> GJR-GARCH</span>
+    <span class="chip"><i class="fas fa-exchange-alt"></i> Leverage</span>
+   </div>
+  </div>
+  <div class="progress-section">
+   <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+   <span class="progress-text" id="progressText">M&oacute;dulo 5 de 12</span>
+  </div>
+  <div class="analogy-card">
+   <strong>💡 Pi&eacute;nsalo as&iacute;:</strong> El GARCH sim&eacute;trico trata igual las malas y buenas noticias. Pero en finanzas, las ca&iacute;das (shocks negativos) generan m&aacute;s volatilidad que las subidas. EGARCH y GJR-GARCH capturan esta asimetr&iacute;a: como un veloc&iacute;metro que acelera m&aacute;s cuando frenas que cuando aceleras.
+  </div>
+  <div class="main-area">
+   <div class="section-title"><i class="fas fa-lightbulb"></i> Modelos Asim&eacute;tricos</div>
+   <div class="info-grid">
+    <div class="info-panel">
+     <h3>📐 EGARCH (Nelson, 1991)</h3>
+     <p>log(σ²ₜ) = ω + α(|zₜ₋₁| - E|zₜ₋₁|) + γzₜ₋₁ + βlog(σ²ₜ₋₁). El logaritmo garantiza σ²ₜ > 0 siempre. γ captura el efecto leverage.</p>
+     <div class="formula">log(σ²ₜ) = ω + α|zₜ₋₁| + γzₜ₋₁ + βlog(σ²ₜ₋₁)</div>
+    </div>
+    <div class="info-panel">
+     <h3>📊 GJR-GARCH (Glosten et al., 1993)</h3>
+     <p>σ²ₜ = ω + αε²ₜ₋₁ + γε²ₜ₋₁I(εₜ₋₁<0) + βσ²ₜ₋₁. γ > 0 significa que las noticias negativas tienen mayor impacto.</p>
+    </div>
+    <div class="info-panel">
+     <h3>🔄 TGARCH y APARCH</h3>
+     <p>TGARCH modela σₜ en vez de σ²ₜ. APARCH permite potencias distintas de 2. Ambos capturan asimetr&iacute;as.</p>
+    </div>
+    <div class="info-panel">
+     <h3>🔍 Leverage vs Volatility Feedback</h3>
+     <p>Leverage: ca&iacute;da de precio → mayor apalancamiento → mayor riesgo. Feedback: mayor volatilidad → mayor prima de riesgo → ca&iacute;da de precio. Ambos producen asimetr&iacute;a.</p>
+    </div>
+   </div>
+
+   <div class="sim-area">
+    <div class="section-title"><i class="fas fa-play"></i> Simulaci&oacute;n: Comparaci&oacute;n de Modelos</div>
+    <p style="margin-bottom:0.8rem;color:#b9ccee;">Compara GARCH, EGARCH y GJR-GARCH. Controla el par&aacute;metro de leverage γ.</p>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem;">
+     <label style="color:#b9ccee;">Leverage (γ): <select id="gammaLev" style="background:#1e2a3e;color:#fff;border:1px solid #ef4444;border-radius:0.5rem;padding:0.3rem 0.6rem;">
+      <option value="0.05">Bajo (0.05)</option><option value="0.15" selected>Medio (0.15)</option><option value="0.30">Alto (0.30)</option>
+     </select></label>
+     <button id="simBtn" class="btn-action" style="margin:0;">📊 Simular</button>
+    </div>
+    <div id="simResult" style="background:#0a0f1e;border-radius:1rem;padding:1rem;text-align:center;font-size:0.9rem;color:#b9ccee;">
+     Presiona "Simular" para comparar modelos de volatilidad asim&eacute;trica.
+    </div>
+   </div>
+
+   <div class="quiz-area">
+    <div class="quiz-title"><i class="fas fa-question-circle"></i> Mini Quiz: GARCH Asim&eacute;tricos</div>
+    <div id="quizContainer"></div>
+    <button id="submitQuizBtn" class="btn-action">✅ Verificar respuestas</button>
+    <div id="insigniaArea" class="insignia hidden">
+     <i class="fas fa-medal"></i>
+     <h3>🏅 Asymmetric Volatility Expert 🏅</h3>
+     <p>Has dominado los modelos GARCH asim&eacute;tricos. &iexcl;Excelente!</p>
+    </div>
+   </div>
+  </div>
+
+  <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre modelos GARCH asim&eacute;tricos.</div>
+
+  <div class="nav-links">
+   <a href="04-arch-garch.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+   <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
+   <a href="06-mgarch.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-chart-line"></i> Econometr&iacute;a Financiera Aplicada · M&oacute;dulo 5</footer>
+ </div>
+
+ <script>
+  const STORAGE_KEY = 'prog_econ_8_05';
+  const PROGRESS_KEY = 'prog_econ_8_progress';
+  const questions = [
+   { text: "&iquest;Qu&eacute; ventaja tiene EGARCH sobre GARCH?", options: ["Usa menos datos", "Modela el logaritmo de la varianza, garantizando positividad", "No necesita estimaci&oacute;n", "Solo sirve para datos diarios"], correct: 1 },
+   { text: "En GJR-GARCH, el par&aacute;metro γ captura:", options: ["La persistencia", "El efecto leverage (asimetr&iacute;a)", "La media de retornos", "El orden del modelo"], correct: 1 },
+   { text: "La News Impact Curve de EGARCH es:", options: ["Sim&eacute;trica", "Asim&eacute;trica con pendiente distinta para shocks negativos", "Plana", "Lineal"], correct: 1 },
+   { text: "El efecto leverage se refiere a:", options: ["Correlaci&oacute;n positiva retornos-volatilidad", "Correlaci&oacute;n negativa retornos-volatilidad", "Volatilidad constante", "Retornos normales"], correct: 1 },
+   { text: "&iquest;Qu&eacute; modelo usa I(εₜ₋₁<0) para capturar asimetr&iacute;a?", options: ["GARCH", "EGARCH", "GJR-GARCH", "ARCH"], correct: 2 }
+  ];
+  let userAnswers = new Array(questions.length).fill(null);
+  let quizCompleted = false;
+
+  function saveProgress() {
+   let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
+   localStorage.setItem(STORAGE_KEY, 'true');
+  }
+
+  function updateProgress() {
+   let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
+   document.getElementById('progressText').textContent = 'M\u00f3dulo '+(p.length || 1)+' de 12';
+  }
+
+  function renderQuestions() {
+   const container = document.getElementById('quizContainer');
+   container.innerHTML = '';
+   questions.forEach((q, idx) => {
+    const qDiv = document.createElement('div'); qDiv.classList.add('question');
+    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
+    const optsDiv = qDiv.querySelector('.options');
+    q.options.forEach((opt, optIdx) => {
+     const span = document.createElement('div'); span.classList.add('opt');
+     span.textContent = opt; span.dataset.qIdx = idx; span.dataset.optIdx = optIdx;
+     span.addEventListener('click', function() {
+      if (quizCompleted) return;
+      this.parentElement.querySelectorAll('.opt').forEach(c => c.classList.remove('selected'));
+      this.classList.add('selected'); userAnswers[idx] = optIdx; updateBtnState();
+     });
+     optsDiv.appendChild(span);
+    });
+    container.appendChild(qDiv);
+   });
+  }
+
+  function updateBtnState() {
+   document.getElementById('submitQuizBtn').disabled = userAnswers.some(a => a === null) || quizCompleted;
+  }
+
+  function handleSubmit() {
+   if (quizCompleted) return;
+   if (userAnswers.some(a => a === null)) { document.getElementById('feedbackMsg').textContent = I18N.t('fb_0'); return; }
+   let correct = 0;
+   questions.forEach((q, i) => { if (userAnswers[i] === q.correct) correct++; });
+   const total = questions.length; const passed = correct >= Math.ceil(total * 0.6);
+   document.querySelectorAll('.question').forEach((qDiv, idx) => {
+    const opts = qDiv.querySelectorAll('.opt');
+    opts.forEach((o, oi) => {
+     o.classList.remove('selected');
+     if (oi === questions[idx].correct) o.classList.add('correct');
+     else if (oi === userAnswers[idx]) o.classList.add('wrong');
+    });
+   });
+   if (passed) {
+    quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').textContent = I18N.t('fb_1') + correct + '/' + total + ' correctas. ¡Dominas GARCH asim&eacute;tricos!';
+    saveProgress(); updateProgress();
+   } else {
+    document.getElementById('feedbackMsg').textContent = '❌ ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. ¡Reintenta!';
+   }
+  }
+
+  function restoreProgress() {
+   const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   if (p.includes(STORAGE_KEY)) {
+    quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').textContent = I18N.t('fb_2');
+    document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
+   }
+  }
+
+  function simulateAsymmetric() {
+   const gamma = parseFloat(document.getElementById('gammaLev').value);
+   const n = 500; const omega = 0.02; const alpha = 0.12; const beta = 0.85;
+   let ret = []; let volGarch = []; let volEgar = []; let volGjr = [];
+   let s2g = [omega / (1 - alpha - beta)]; let s2e = [Math.log(omega / (1 - beta))]; let s2j = [omega / (1 - alpha - gamma/2 - beta)];
+   for (let i = 0; i < n; i++) {
+    const e = (() => { let u=0,v=0; while(u===0)u=Math.random(); while(v===0)v=Math.random(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); })();
+    const lastS2g = s2g[i]; const lastS2e = Math.exp(s2e[i]); const lastS2j = s2j[i];
+    const newS2g = omega + alpha * (i > 0 ? ret[i-1]**2 : 0) + beta * lastS2g;
+    const z = i > 0 ? ret[i-1] / Math.sqrt(lastS2g) : 0;
+    const newS2e = Math.exp((1 - beta) * Math.log(omega) + alpha * (Math.abs(z) - Math.sqrt(2/Math.PI)) + gamma * z + beta * s2e[i]);
+    const newS2j = omega + alpha * (i > 0 ? ret[i-1]**2 : 0) + gamma * (i > 0 && ret[i-1] < 0 ? ret[i-1]**2 : 0) + beta * lastS2j;
+    s2g.push(newS2g); s2e.push(Math.log(newS2e)); s2j.push(newS2j);
+    ret.push(e * Math.sqrt(newS2g));
+   }
+   s2g.shift(); s2e.shift(); s2j.shift();
+   let html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:0.5rem;margin-bottom:1rem;">';
+   html += '<div style="background:#1e2a3e;border-radius:0.8rem;padding:0.6rem;text-align:center;border:1px solid #ef4444;"><div style="font-weight:700;color:#fca5a5;">γ (leverage)</div><div style="font-size:0.8rem;">'+gamma+'</div></div>';
+   html += '</div>';
+   html += '<div style="background:#0a0f1e;border-radius:1rem;padding:0.8rem;margin-bottom:0.3rem;"><div style="font-size:0.8rem;color:#fca5a5;">News Impact Curves (shock vs volatilidad siguiente):</div><div style="display:flex;align-items:flex-end;gap:1px;height:80px;margin-top:0.3rem;">';
+   for (let s = -3; s <= 3; s += 0.3) {
+    const nicG = omega + alpha * s*s + beta * 0.1;
+    const nicE = Math.exp(Math.log(omega) + alpha * (Math.abs(s) - Math.sqrt(2/Math.PI)) + gamma * s + beta * Math.log(0.1));
+    const nicJ = omega + alpha * s*s + gamma * (s < 0 ? s*s : 0) + beta * 0.1;
+    const avg = (nicG + nicE + nicJ) / 3;
+    const barH = Math.min(100, (nicE / avg) * 30);
+    html += '<div style="flex:1;background:#dc2626;height:'+barH+'%;border-radius:1px;opacity:0.7;" title="EGARCH en s='+s.toFixed(1)+'"></div>';
+   }
+   html += '</div></div><p style="color:#8899cc;font-size:0.8rem;">Comparaci&oacute;n de modelos con γ='+gamma+'. EGARCH (rojo) muestra asimetr&iacute;a: shocks negativos (izquierda) generan m&aacute;s volatilidad. GARCH sim&eacute;trico responder&iacute;a igual a ambos lados.</p>';
+   document.getElementById('simResult').innerHTML = html;
+  }
+
+  document.getElementById('submitQuizBtn').addEventListener('click', handleSubmit);
+  document.getElementById('simBtn').addEventListener('click', simulateAsymmetric);
+  renderQuestions(); updateBtnState(); restoreProgress(); updateProgress();
+ </script>
+ <script>
+window.I18N_DATA={
+ "fb_0": {
+  "es": "⚠️ Responde todas las preguntas primero.",
+  "en": "⚠️ Answer todas las preguntas primero."
+ },
+ "fb_1": {
+  "es": "🎉 ",
+  "en": "🎉 "
+ },
+ "fb_2": {
+  "es": "🏆 Ya completaste este m&oacute;dulo.",
+  "en": "🏆 Ya completaste este m&oacute;dulo."
+ }
+};
+</script>
+<script src="../../../../assets/js/i18n.js"></script> </body>
+</html>

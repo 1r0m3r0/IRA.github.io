@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>ML Econometría | 🔲 SVM y Kernel Methods</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:linear-gradient(135deg,#0a0f1e,#0c1222 50%,#111a2e); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+  @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .course-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(249,115,22,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+  .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #f97316; }
+  .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#fdba74,#f97316); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero-header p { font-size:1.1rem; color:#f0c0e0; margin-top:0.5rem; font-weight:500; }
+  .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+  .chip { background:rgba(249,115,22,0.15); border:1px solid #f97316; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+  .progress-section { padding:1.2rem 2rem; border-bottom:1px solid #1a2a4a; }
+  .progress-bar-outer { background:#1a2a4a; border-radius:20px; height:16px; overflow:hidden; }
+  .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#f97316,#ea580c); border-radius:20px; transition:width 0.5s ease; }
+  .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
+  .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #f97316; font-size:1rem; line-height:1.6; }
+  .main-area { padding:1.5rem 2rem; }
+  .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#f97316; }
+  .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
+  .info-panel { background:rgba(10,20,40,0.7); border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
+  .info-panel h3 { color:#fdba74; font-size:1rem; margin-bottom:0.5rem; }
+  .info-panel p { font-size:0.85rem; color:#b9ccee; line-height:1.6; }
+  .info-panel .formula { background:#0a0f1e; padding:0.5rem; border-radius:0.8rem; text-align:center; font-family:monospace; font-size:0.9rem; color:#fdba74; margin-top:0.5rem; }
+  .sim-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #f97316; margin-bottom:1.5rem; }
+  .quiz-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #f97316; margin-bottom:1.5rem; }
+  .quiz-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#f97316; }
+  .question { background:#0f1a2c; margin:0.8rem 0; padding:0.8rem 1rem; border-radius:1.2rem; }
+  .question p { font-weight:600; margin-bottom:0.5rem; font-size:0.95rem; }
+  .options { display:flex; flex-wrap:wrap; gap:0.6rem; }
+  .opt { background:#1e2a3e; padding:0.3rem 0.9rem; border-radius:2rem; cursor:pointer; transition:0.2s; font-size:0.85rem; }
+  .opt:hover { background:#2c3e66; transform:translateY(-2px); }
+  .opt.selected { background:#f97316; color:#000; font-weight:bold; box-shadow:0 0 8px #f97316; }
+  .opt.correct { background:#00cc88; color:#000; }
+  .opt.wrong { background:#ff4455; color:#fff; }
+  .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #f97316; }
+  .btn-action { background:linear-gradient(95deg,#f97316,#ea580c); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#1e1a0c; margin-top:1rem; }
+  .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(249,115,22,0.5); }
+  .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
+  .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin-top:1.5rem; padding:1rem; border:1px dashed gold; }
+  .insignia i { font-size:2.5rem; color:gold; }
+  .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
+  .hidden { display:none; }
+  .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+  .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+  .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(249,115,22,0.4); }
+  .nav-link.next { background:linear-gradient(95deg,#f97316,#ea580c); color:#1e1a0c; }
+  .nav-link.menu { background:#1a2a4a; border:1px solid #f97316; }
+  footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .info-grid { grid-template-columns:1fr; } }
+ </style>
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
+</head>
+<body>
+ <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Econometr&iacute;a</a></nav>
+ <div class="course-container" id="app">
+  <div class="hero-header">
+   <h1>🔲 SVM y Kernel Methods</h1>
+   <p>M&aacute;rgenes, kernel trick y clasificaci&oacute;n no lineal para econometr&iacute;a</p>
+   <div class="badge-area">
+    <span class="chip"><i class="fas fa-vector-square"></i> Maximal Margin</span>
+    <span class="chip"><i class="fas fa-circle"></i> Kernel Trick</span>
+    <span class="chip"><i class="fas fa-sliders-h"></i> C parameter</span>
+   </div>
+  </div>
+  <div class="progress-section">
+   <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+   <span class="progress-text" id="progressText">M&oacute;dulo 7 de 12</span>
+  </div>
+  <div class="analogy-card">
+   <strong>💡 Pi&eacute;nsalo as&iacute;:</strong> SVM es como un urbanista que traza la carretera m&aacute;s ancha posible entre dos barrios (clases). El kernel trick es como poner un espejo que deforma el espacio para que calles curvas se vuelvan rectas en el reflejo. Los support vectors son las casas m&aacute;s cercanas a la carretera, las que definen su trazo.
+  </div>
+  <div class="main-area">
+   <div class="section-title"><i class="fas fa-graduation-cap"></i> Teor&iacute;a: SVM y Kernels</div>
+   <div class="info-grid">
+    <div class="info-panel">
+     <h3>Maximal Margin Classifier</h3>
+     <p>Encuentra el hiperplano que maximiza la distancia (margen) entre las dos clases. Solo los puntos en el borde del margen importan (support vectors).</p>
+     <div class="formula">max M s.t. y<sub>i</sub>(&beta;<sub>0</sub> + &beta;'x<sub>i</sub>) &ge; M</div>
+    </div>
+    <div class="info-panel">
+     <h3>Support Vector Classifier</h3>
+     <p>Versi&oacute;n con margen suave: permite errores de clasificaci&oacute;n controlados por el par&aacute;metro C (costo). C grande &rarr; menos errores pero margen m&aacute;s estrecho.</p>
+     <div class="formula">C &sum; &epsilon;<sub>i</sub> + (1/2)||&beta;||<sup>2</sup></div>
+    </div>
+    <div class="info-panel">
+     <h3>Kernel Trick (RBF, Polynomial)</h3>
+     <p>Proyecta los datos a un espacio de mayor dimensi&oacute;n sin calcular expl&iacute;citamente la transformaci&oacute;n. RBF: K(x,x') = exp(-&gamma;||x-x'||<sup>2</sup>).</p>
+     <div class="formula">K(x, x') = &phi;(x) &middot; &phi;(x')</div>
+    </div>
+    <div class="info-panel">
+     <h3>SVM en Econometr&iacute;a</h3>
+     <p>Usado para clasificaci&oacute;n con fronteras no lineales: predicci&oacute;n de default, clustering de patrones de consumo, clasificaci&oacute;n de textos.</p>
+     <div class="formula">f(x) = sign(&Sigma; &alpha;<sub>i</sub> y<sub>i</sub> K(x, x<sub>i</sub>) + b)</div>
+    </div>
+   </div>
+
+   <div class="sim-area">
+    <div class="section-title"><i class="fas fa-play"></i> Simulaci&oacute;n: Frontera de Decisi&oacute;n</div>
+    <p style="margin-bottom:0.8rem;color:#b9ccee;">Clasificaci&oacute;n 2D no lineal. Elige kernel y C para ver la frontera de decisi&oacute;n.</p>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem;">
+     <label style="color:#b9ccee;">Kernel: <select id="kernelSelect" style="background:#1e2a3e;color:#fff;border:1px solid #f97316;border-radius:0.5rem;padding:0.3rem 0.6rem;">
+      <option value="linear">Lineal</option><option value="rbf" selected>RBF</option><option value="poly">Polynomial (deg=3)</option>
+     </select></label>
+     <label style="color:#b9ccee;">C: <select id="cSelect" style="background:#1e2a3e;color:#fff;border:1px solid #f97316;border-radius:0.5rem;padding:0.3rem 0.6rem;">
+      <option value="0.1">0.1</option><option value="1" selected>1</option><option value="10">10</option>
+     </select></label>
+     <button id="simBtn" class="btn-action" style="margin:0;">🔄 Graficar</button>
+    </div>
+    <div id="simResult" style="background:#0a0f1e;border-radius:1rem;padding:1rem;text-align:center;font-size:0.9rem;color:#b9ccee;">
+     Presiona "Graficar" para ver la frontera.
+    </div>
+   </div>
+
+   <div class="quiz-area">
+    <div class="quiz-title"><i class="fas fa-question-circle"></i> Mini Quiz: SVM</div>
+    <div id="quizContainer"></div>
+    <button id="submitQuizBtn" class="btn-action">✅ Verificar respuestas</button>
+    <div id="insigniaArea" class="insignia hidden">
+     <i class="fas fa-medal"></i>
+     <h3>🔲 Kernel Ninja 🏅</h3>
+     <p>Has dominado SVM y Kernel Methods. &iexcl;Excelente!</p>
+    </div>
+   </div>
+  </div>
+
+  <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre SVM.</div>
+
+  <div class="nav-links">
+   <a href="06-random-forest.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+   <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
+   <a href="08-text-as-data.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-robot"></i> ML para Econometr&iacute;a · M&oacute;dulo 7</footer>
+ </div>
+
+ <script>
+  const STORAGE_KEY = 'prog_econ_4_07';
+  const PROGRESS_KEY = 'prog_econ_4_progress';
+  const questions = [
+   { text: "¿Qué son los support vectors?", options: ["Todos los datos", "Puntos en el borde del margen", "Los datos mal clasificados", "Los centroides"], correct: 1 },
+   { text: "¿Qué permite el kernel trick?", options: ["Reducir la dimensión", "Clasificar datos no lineales sin transformarlos explícitamente", "Acelerar el entrenamiento", "Eliminar outliers"], correct: 1 },
+   { text: "Un parámetro C pequeño en SVM produce:", options: ["Margen estrecho", "Margen ancho (más tolerancia a errores)", "Menos support vectors", "Mayor exactitud"], correct: 1 },
+   { text: "¿Qué kernel es más usado para datos no lineales sin estructura conocida?", options: ["Lineal", "RBF", "Sigmoid", "Laplace"], correct: 1 },
+   { text: "¿Cuál es una diferencia entre SVM y regresión logística?", options: ["SVM maximiza margen, logit estima probabilidades", "Son idénticos", "Logit usa kernels", "SVM no tiene hiperparámetros"], correct: 0 }
+  ];
+  let userAnswers = new Array(questions.length).fill(null);
+  let quizCompleted = false;
+
+  function saveProgress() {
+   let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
+   localStorage.setItem(STORAGE_KEY, 'true');
+  }
+
+  function updateProgress() {
+   let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
+   document.getElementById('progressText').textContent = 'M\u00f3dulo '+(p.length || 1)+' de 12';
+  }
+
+  function renderQuestions() {
+   const container = document.getElementById('quizContainer');
+   container.innerHTML = '';
+   questions.forEach((q, idx) => {
+    const qDiv = document.createElement('div'); qDiv.classList.add('question');
+    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
+    const optsDiv = qDiv.querySelector('.options');
+    q.options.forEach((opt, optIdx) => {
+     const span = document.createElement('div'); span.classList.add('opt');
+     span.textContent = opt; span.dataset.qIdx = idx; span.dataset.optIdx = optIdx;
+     span.addEventListener('click', function() {
+      if (quizCompleted) return;
+      this.parentElement.querySelectorAll('.opt').forEach(c => c.classList.remove('selected'));
+      this.classList.add('selected'); userAnswers[idx] = optIdx; updateBtnState();
+     });
+     optsDiv.appendChild(span);
+    });
+    container.appendChild(qDiv);
+   });
+  }
+
+  function updateBtnState() {
+   document.getElementById('submitQuizBtn').disabled = userAnswers.some(a => a === null) || quizCompleted;
+  }
+
+  function handleSubmit() {
+   if (quizCompleted) return;
+   if (userAnswers.some(a => a === null)) { document.getElementById('feedbackMsg').textContent = I18N.t('fb_0'); return; }
+   let correct = 0;
+   questions.forEach((q, i) => { if (userAnswers[i] === q.correct) correct++; });
+   const total = questions.length; const passed = correct >= Math.ceil(total * 0.6);
+   document.querySelectorAll('.question').forEach((qDiv, idx) => {
+    const opts = qDiv.querySelectorAll('.opt');
+    opts.forEach((o, oi) => {
+     o.classList.remove('selected');
+     if (oi === questions[idx].correct) o.classList.add('correct');
+     else if (oi === userAnswers[idx]) o.classList.add('wrong');
+    });
+   });
+   if (passed) {
+    quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').textContent = I18N.t('fb_1') + correct + '/' + total + ' correctas. ¡Dominas SVM!';
+    saveProgress(); updateProgress();
+   } else {
+    document.getElementById('feedbackMsg').textContent = '❌ ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. ¡Reintenta!';
+   }
+  }
+
+  function restoreProgress() {
+   const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   if (p.includes(STORAGE_KEY)) {
+    quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').textContent = I18N.t('fb_2');
+    document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
+   }
+  }
+
+  function simulateSVM() {
+   const kernel = document.getElementById('kernelSelect').value;
+   const C = parseFloat(document.getElementById('cSelect').value);
+   const n = 80;
+   const x = []; const y = [];
+   for (let i = 0; i < n; i++) {
+    const x1 = Math.random() * 4 - 2; const x2 = Math.random() * 4 - 2;
+    x[i] = [x1, x2];
+    const label = (x1*x1 + x2*x2 < 1.5 || (x1-1.5)*(x1-1.5) + x2*x2 < 0.8) ? 1 : -1;
+    y[i] = Math.random() < 0.9 ? label : -label;
+   }
+   const gridPts = 20; const gridX = []; const gridY = [];
+   for (let i = 0; i < gridPts; i++) {
+    for (let j = 0; j < gridPts; j++) {
+     gridX.push(-2 + i * 4 / (gridPts - 1));
+     gridY.push(-2 + j * 4 / (gridPts - 1));
+    }
+   }
+   const nSV = Math.min(10, Math.floor(n * 0.3));
+   const svIdx = []; for (let i = 0; i < n; i++) svIdx.push(i);
+   svIdx.sort(() => Math.random() - 0.5);
+   const selectedSV = svIdx.slice(0, nSV);
+   const alphas = selectedSV.map(() => Math.random() * C);
+   const svPts = selectedSV.map(k => ({x: x[k], y: y[k], alpha: alphas[selectedSV.indexOf(k)]}));
+   function kernelFn(a, b) {
+    const dot = a[0]*b[0] + a[1]*b[1];
+    if (kernel === 'linear') return dot;
+    if (kernel === 'rbf') { const gamma = 1; return Math.exp(-gamma * ((a[0]-b[0])**2 + (a[1]-b[1])**2)); }
+    if (kernel === 'poly') return (dot + 1) ** 3;
+    return dot;
+   }
+   function predict(pt) {
+    let s = 0;
+    for (const sv of svPts) s += sv.alpha * sv.y * kernelFn(pt, sv.x);
+    return s;
+   }
+   const gridPreds = gridX.map((_, i) => predict([gridX[i], gridY[i]]));
+   let html = '<div style="display:grid;grid-template-columns:repeat('+gridPts+',1fr);gap:1px;margin:0 auto;max-width:400px;">';
+   for (let i = 0; i < gridPreds.length; i++) {
+    const val = Math.max(-1, Math.min(1, gridPreds[i] / 5));
+    const r = val > 0 ? Math.floor(200 * (1 - val)) : 200;
+    const g = 100 + Math.floor(100 * (1 - Math.abs(val)));
+    const b = val < 0 ? Math.floor(200 * (1 + val)) : 200;
+    html += '<div style="width:100%;aspect-ratio:1;background:rgb('+r+','+g+','+b+');"></div>';
+   }
+   html += '</div>';
+   const negs = x.filter((_, i) => y[i] === -1); const poss = x.filter((_, i) => y[i] === 1);
+   html += '<div style="margin-top:0.5rem;font-size:0.8rem;color:#8899cc;">Kernel: ' + kernel + ', C = ' + C + '. Support vectors: ' + nSV + ' (de ' + n + ' puntos).</div>';
+   document.getElementById('simResult').innerHTML = html;
+  }
+
+  document.getElementById('submitQuizBtn').addEventListener('click', handleSubmit);
+  document.getElementById('simBtn').addEventListener('click', simulateSVM);
+  renderQuestions(); updateBtnState(); restoreProgress(); updateProgress();
+  simulateSVM();
+ </script>
+ <script>
+window.I18N_DATA={
+ "fb_0": {
+  "es": "⚠️ Responde todas las preguntas primero.",
+  "en": "⚠️ Answer todas las preguntas primero."
+ },
+ "fb_1": {
+  "es": "🎉 ",
+  "en": "🎉 "
+ },
+ "fb_2": {
+  "es": "🏆 Ya completaste este módulo.",
+  "en": "🏆 Ya completaste este módulo."
+ }
+};
+</script>
+<script src="../../../assets/js/i18n.js"></script> </body>
+</html>

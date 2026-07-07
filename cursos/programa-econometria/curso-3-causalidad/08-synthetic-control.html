@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Causalidad | 🧬 Synthetic Control</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:linear-gradient(135deg,#0a0f1e,#0c1222 50%,#111a2e); background-size:200% 200%; animation:gradientShift 20s ease infinite; font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+  @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .course-container { max-width:1300px; width:100%; background:rgba(15,25,45,0.65); backdrop-filter:blur(12px); border-radius:3rem; border:1px solid rgba(20,184,166,0.25); box-shadow:0 25px 45px rgba(0,0,0,0.5); overflow:hidden; }
+  .hero-header { background:linear-gradient(95deg,#0b1120,#111a2e); padding:2rem 2rem 1.5rem; text-align:center; border-bottom:2px solid #14b8a6; }
+  .hero-header h1 { font-size:2.6rem; font-weight:800; background:linear-gradient(135deg,#FFF,#5eead4,#14b8a6); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero-header p { font-size:1.1rem; color:#99f6e4; margin-top:0.5rem; font-weight:500; }
+  .badge-area { display:flex; justify-content:center; gap:1rem; margin-top:1.2rem; flex-wrap:wrap; }
+  .chip { background:rgba(20,184,166,0.15); border:1px solid #14b8a6; padding:0.4rem 1rem; border-radius:40px; font-size:0.8rem; font-weight:600; }
+  .progress-section { padding:1.2rem 2rem; border-bottom:1px solid #1a2a4a; }
+  .progress-bar-outer { background:#1a2a4a; border-radius:20px; height:16px; overflow:hidden; }
+  .progress-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#14b8a6,#0d9488); border-radius:20px; transition:width 0.5s ease; }
+  .progress-text { display:block; text-align:center; margin-top:0.3rem; font-size:0.8rem; color:#8899cc; }
+  .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #14b8a6; font-size:1rem; line-height:1.6; }
+  .main-area { padding:1.5rem 2rem; }
+  .section-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#14b8a6; }
+  .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
+  .info-panel { background:rgba(10,20,40,0.7); border-radius:1.5rem; padding:1.2rem; border:1px solid #2c3e66; }
+  .info-panel h3 { color:#5eead4; font-size:1rem; margin-bottom:0.5rem; }
+  .info-panel p { font-size:0.85rem; color:#b9ccee; line-height:1.6; }
+  .info-panel .formula { background:#0a0f1e; padding:0.5rem; border-radius:0.8rem; text-align:center; font-family:monospace; font-size:0.9rem; color:#5eead4; margin-top:0.5rem; }
+  .sim-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #14b8a6; margin-bottom:1.5rem; }
+  .quiz-area { background:rgba(0,10,25,0.7); border-radius:2rem; padding:1.5rem; backdrop-filter:blur(8px); border:1px solid #14b8a6; margin-bottom:1.5rem; }
+  .quiz-title { font-size:1.3rem; font-weight:700; margin-bottom:1rem; color:#14b8a6; }
+  .question { background:#0f1a2c; margin:0.8rem 0; padding:0.8rem 1rem; border-radius:1.2rem; }
+  .question p { font-weight:600; margin-bottom:0.5rem; font-size:0.95rem; }
+  .options { display:flex; flex-wrap:wrap; gap:0.6rem; }
+  .opt { background:#1e2a3e; padding:0.3rem 0.9rem; border-radius:2rem; cursor:pointer; transition:0.2s; font-size:0.85rem; }
+  .opt:hover { background:#2c3e66; transform:translateY(-2px); }
+  .opt.selected { background:#14b8a6; color:#000; font-weight:bold; box-shadow:0 0 8px #14b8a6; }
+  .opt.correct { background:#00cc88; color:#000; }
+  .opt.wrong { background:#ff4455; color:#fff; }
+  .feedback { background:#00000099; margin:0 2rem 1.5rem; padding:1rem; border-radius:1.5rem; text-align:center; font-weight:500; border-left:4px solid #14b8a6; }
+  .btn-action { background:linear-gradient(95deg,#14b8a6,#0d9488); border:none; padding:0.7rem 1.8rem; font-weight:bold; border-radius:3rem; cursor:pointer; font-size:1rem; transition:0.2s; color:#fff; margin-top:1rem; }
+  .btn-action:hover { transform:translateY(-2px); box-shadow:0 0 15px rgba(20,184,166,0.5); }
+  .btn-action:disabled { opacity:0.5; cursor:not-allowed; }
+  .insignia { text-align:center; background:#0c1b2f; border-radius:2rem; margin-top:1.5rem; padding:1rem; border:1px dashed gold; }
+  .insignia i { font-size:2.5rem; color:gold; }
+  .insignia h3 { font-size:1.3rem; color:#ffd700; margin:0.5rem 0; }
+  .hidden { display:none; }
+  .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+  .nav-link { background:#2c3e66; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; }
+  .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(20,184,166,0.4); }
+  .nav-link.next { background:linear-gradient(95deg,#14b8a6,#0d9488); color:#fff; }
+  .nav-link.menu { background:#1a2a4a; border:1px solid #14b8a6; }
+  footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
+  .sim-controls { display:flex; gap:1rem; flex-wrap:wrap; align-items:center; margin-bottom:1rem; }
+  .sim-controls label { color:#b9ccee; font-size:0.85rem; }
+  .sim-controls select, .sim-controls input { background:#1e2a3e; color:#fff; border:1px solid #14b8a6; border-radius:0.5rem; padding:0.3rem 0.6rem; }
+  @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .info-grid { grid-template-columns:1fr; } }
+ </style>
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
+</head>
+<body>
+ <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a><a href="../index.html">Programa Econometr&iacute;a</a></nav>
+ <div class="course-container" id="app">
+  <div class="hero-header">
+   <h1>🧬 Synthetic Control</h1>
+   <p>Control sint&eacute;tico, donor pool, placebo tests e inferencia de Abadie</p>
+   <div class="badge-area">
+    <span class="chip"><i class="fas fa-dna"></i> Sint&eacute;tico</span>
+    <span class="chip"><i class="fas fa-pool"></i> Donor Pool</span>
+    <span class="chip"><i class="fas fa-vial"></i> Placebo</span>
+   </div>
+  </div>
+  <div class="progress-section">
+   <div class="progress-bar-outer"><div class="progress-bar-fill" id="progressFill"></div></div>
+   <span class="progress-text" id="progressText">M&oacute;dulo 8 de 12</span>
+  </div>
+  <div class="analogy-card">
+   <strong>💡 Piénsalo así:</strong> Synthetic Control es como crear un gemelo digital de una persona (un pa&iacute;s, una empresa) usando una mezcla de otras personas similares. Si queremos saber qu&eacute; habr&iacute;a pasado con California si no hubiera implementado una ley, creamos un "California sint&eacute;tico" combinando otros estados que no tuvieron la ley. La diferencia post-tratamiento es el efecto causal.
+  </div>
+  <div class="main-area">
+   <div class="section-title"><i class="fas fa-dna"></i> Conceptos de Synthetic Control</div>
+   <div class="info-grid">
+    <div class="info-panel">
+     <h3>🧬 Control Sint&eacute;tico</h3>
+     <p>Y&#8321;&#8320;^N = &delta;&#8320; + &theta;&#8320;Z&#8321; + &lambda;&#8320;&mu;&#8321; + &epsilon;&#8321;&#8320;. Se construye como combinaci&oacute;n convexa de unidades no tratadas (donor pool).</p>
+     <div class="formula">Y&#8321;&#8320;^synth = &sum;j w&#7522;j &middot; Y&#7522;j&#8320;</div>
+    </div>
+    <div class="info-panel">
+     <h3>🏊 Donor Pool</h3>
+     <p>Conjunto de unidades no tratadas que se usan para construir el control sint&eacute;tico. No deben haber sido afectadas por el tratamiento ni tener eventos similares.</p>
+    </div>
+    <div class="info-panel">
+     <h3>📏 Pre-treatment Fit</h3>
+     <p>Se optimizan los pesos w&#7522;j para que la trayectoria pre-tratamiento del sint&eacute;tico sea lo m&aacute;s cercana posible a la unidad tratada. RMSE pre mide la calidad del ajuste.</p>
+    </div>
+    <div class="info-panel">
+     <h3>🧪 Placebo Tests (Abadie)</h3>
+     <p>Repetir el an&aacute;lisis asignando el tratamiento a cada unidad del donor pool. Si el efecto en la unidad tratada es el m&aacute;s extremo, hay evidencia de efecto causal.</p>
+    </div>
+   </div>
+
+   <div class="sim-area">
+    <div class="section-title"><i class="fas fa-play"></i> Simulaci&oacute;n: Synthetic Control</div>
+    <p style="margin-bottom:0.8rem;color:#b9ccee;">Una unidad tratada + 10 controles. El control sint&eacute;tico se optimiza en pre-tratamiento.</p>
+    <div class="sim-controls">
+     <button id="scSimBtn" class="btn-action" style="margin:0;">🧬 Simular</button>
+     <button id="scPlaceboBtn" class="btn-action" style="margin:0;background:#2c3e66;">🧪 Placebo Test</button>
+    </div>
+    <div id="scResult" style="background:#0a0f1e;border-radius:1rem;padding:1rem;text-align:center;font-size:0.9rem;color:#b9ccee;">
+     Presiona "Simular" para generar datos y construir el control sint&eacute;tico.
+    </div>
+   </div>
+
+   <div class="quiz-area">
+    <div class="quiz-title"><i class="fas fa-question-circle"></i> Mini Quiz: Synthetic Control</div>
+    <div id="quizContainer"></div>
+    <button id="submitQuizBtn" class="btn-action">✅ Verificar respuestas</button>
+    <div id="insigniaArea" class="insignia hidden">
+     <i class="fas fa-medal"></i>
+     <h3>🏅 Sintetizador de Control 🏅</h3>
+     <p>Has dominado el m&eacute;todo de Synthetic Control. &iexcl;Excelente!</p>
+    </div>
+   </div>
+  </div>
+
+  <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre Synthetic Control y donor pool.</div>
+
+  <div class="nav-links">
+   <a href="07-psm.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+   <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
+   <a href="09-late.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+  </div>
+  <footer><i class="fas fa-dice"></i> Causalidad y Evaluaci&oacute;n de Impacto · M&oacute;dulo 8</footer>
+ </div>
+
+ <script>
+  const STORAGE_KEY = 'prog_econ_3_08';
+  const PROGRESS_KEY = 'prog_econ_3_progress';
+  const questions = [
+   { text: "\u00bfQu\u00e9 es el donor pool en Synthetic Control?", options: ["Las unidades tratadas", "Las unidades no tratadas usadas para construir el control sint\u00e9tico", "La variable dependiente", "Los pesos del control sint\u00e9tico"], correct: 1 },
+   { text: "\u00bfC\u00f3mo se eval\u00faa la calidad del control sint\u00e9tico?", options: ["Con el R-cuadrado post-tratamiento", "Con el RMSE en el per\u00edodo pre-tratamiento", "Con una prueba t", "Con el n\u00famero de unidades"], correct: 1 },
+   { text: "\u00bfQu\u00e9 hacen los placebo tests en SC?", options: ["Aumentar la muestra", "Asignar el tratamiento a cada control para ver si el efecto real es el m\u00e1s extremo", "Estimar el ATE", "Calcular la varianza"], correct: 1 },
+   { text: "\u00bfQu\u00e9 restricci\u00f3n tienen los pesos en SC?", options: ["Deben sumar 0", "Deben sumar 1 y ser no negativos", "Deben ser enteros", "No tienen restricciones"], correct: 1 },
+   { text: "Abadie (2010) propone inferencia basada en:", options: ["Errores est\u00e1ndar robustos", "Placebo tests y rank de efectos", "Bootstrapping", "MCMC"], correct: 1 }
+  ];
+  let userAnswers = new Array(questions.length).fill(null);
+  let quizCompleted = false;
+
+  function saveProgress() {
+   let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   if (!p.includes(STORAGE_KEY)) { p.push(STORAGE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
+   localStorage.setItem(STORAGE_KEY, 'true');
+  }
+
+  function updateProgress() {
+   let p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   document.getElementById('progressFill').style.width = Math.round((p.length/12)*100)+'%';
+   document.getElementById('progressText').textContent = 'M\u00f3dulo '+(p.length || 1)+' de 12';
+  }
+
+  function renderQuestions() {
+   const container = document.getElementById('quizContainer');
+   container.innerHTML = '';
+   questions.forEach((q, idx) => {
+    const qDiv = document.createElement('div'); qDiv.classList.add('question');
+    qDiv.innerHTML = '<p>'+q.text+'</p><div class="options" id="options-'+idx+'"></div>';
+    const optsDiv = qDiv.querySelector('.options');
+    q.options.forEach((opt, optIdx) => {
+     const span = document.createElement('div'); span.classList.add('opt');
+     span.textContent = opt; span.dataset.qIdx = idx; span.dataset.optIdx = optIdx;
+     span.addEventListener('click', function() {
+      if (quizCompleted) return;
+      this.parentElement.querySelectorAll('.opt').forEach(c => c.classList.remove('selected'));
+      this.classList.add('selected'); userAnswers[idx] = optIdx; updateBtnState();
+     });
+     optsDiv.appendChild(span);
+    });
+    container.appendChild(qDiv);
+   });
+  }
+
+  function updateBtnState() {
+   document.getElementById('submitQuizBtn').disabled = userAnswers.some(a => a === null) || quizCompleted;
+  }
+
+  function handleSubmit() {
+   if (quizCompleted) return;
+   if (userAnswers.some(a => a === null)) { document.getElementById('feedbackMsg').textContent = I18N.t('fb_0'); return; }
+   let correct = 0;
+   questions.forEach((q, i) => { if (userAnswers[i] === q.correct) correct++; });
+   const total = questions.length; const passed = correct >= Math.ceil(total * 0.6);
+   document.querySelectorAll('.question').forEach((qDiv, idx) => {
+    const opts = qDiv.querySelectorAll('.opt');
+    opts.forEach((o, oi) => {
+     o.classList.remove('selected');
+     if (oi === questions[idx].correct) o.classList.add('correct');
+     else if (oi === userAnswers[idx]) o.classList.add('wrong');
+    });
+   });
+   if (passed) {
+    quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').textContent = I18N.t('fb_1') + correct + '/' + total + ' correctas. \u00a1Dominas Synthetic Control!';
+    saveProgress(); updateProgress();
+   } else {
+    document.getElementById('feedbackMsg').textContent = '\u274c ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. \u00a1Reintenta!';
+   }
+  }
+
+  function restoreProgress() {
+   const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   if (p.includes(STORAGE_KEY)) {
+    quizCompleted = true; document.getElementById('submitQuizBtn').disabled = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('feedbackMsg').textContent = I18N.t('fb_2');
+    document.querySelectorAll('.opt').forEach(o => o.style.pointerEvents = 'none');
+   }
+  }
+
+  function genSCData() {
+   let T = 12;
+   let treatPeriod = 7;
+   let treatEffect = 6;
+   let units = [];
+   for (let u = 0; u < 11; u++) {
+    let base = 40 + Math.random() * 20;
+    let trend = 0.3 + Math.random() * 0.5;
+    let noise = 1;
+    let isTreated = u === 0;
+    let data = [];
+    for (let t = 0; t < T; t++) {
+     let y = base + trend * t + (isTreated && t >= treatPeriod ? treatEffect : 0) + (Math.random() - 0.5) * noise;
+     data.push(y);
+    }
+    units.push({ id: u, treated: isTreated, data });
+   }
+   return { units, treatPeriod };
+  }
+
+  let scData = null;
+
+  function runSC() {
+   scData = genSCData();
+   let treated = scData.units[0];
+   let controls = scData.units.slice(1);
+   let prePeriods = scData.treatPeriod;
+
+   let synthWeights = controls.map(() => Math.random());
+   let sumW = synthWeights.reduce((a,b) => a+b, 0);
+   synthWeights = synthWeights.map(w => w / sumW);
+
+   let synthData = [];
+   for (let t = 0; t < treated.data.length; t++) {
+    let synth = 0;
+    for (let j = 0; j < controls.length; j++) synth += synthWeights[j] * controls[j].data[t];
+    synthData.push(synth);
+   }
+
+   let preRMSE = 0;
+   for (let t = 0; t < prePeriods; t++) preRMSE += (treated.data[t] - synthData[t]) ** 2;
+   preRMSE = Math.sqrt(preRMSE / prePeriods);
+
+   let postGap = 0;
+   for (let t = prePeriods; t < treated.data.length; t++) postGap += (treated.data[t] - synthData[t]);
+   let avgPostGap = postGap / (treated.data.length - prePeriods);
+
+   let html = '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:0.75rem;">';
+   html += '<tr style="border-bottom:1px solid #2c3e66;"><th>Periodo</th>';
+   for (let u = 0; u < scData.units.length; u++) html += '<th>U' + u + (u === 0 ? ' (T)' : '') + '</th>';
+   html += '<th style="color:#5eead4;">Sint&eacute;tico</th><th>Brecha</th></tr>';
+
+   for (let t = 0; t < treated.data.length; t++) {
+    html += '<tr style="border-bottom:1px solid #1a2a4a;"><td>' + (t+1) + (t >= scData.treatPeriod ? '*' : '') + '</td>';
+    for (let u = 0; u < scData.units.length; u++) html += '<td>' + scData.units[u].data[t].toFixed(1) + '</td>';
+    html += '<td style="color:#5eead4;">' + synthData[t].toFixed(1) + '</td>';
+    html += '<td>' + (treated.data[t] - synthData[t]).toFixed(1) + '</td></tr>';
+   }
+   html += '</table></div>';
+
+   html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:0.5rem;margin-top:0.8rem;">' +
+    '<div style="background:#1e2a3e;border-radius:0.8rem;padding:0.5rem;border:1px solid #14b8a6;"><div style="font-weight:700;color:#5eead4;">RMSE Pre</div><div>' + preRMSE.toFixed(2) + '</div></div>' +
+    '<div style="background:#1e2a3e;border-radius:0.8rem;padding:0.5rem;border:1px solid #14b8a6;"><div style="font-weight:700;color:#5eead4;">Brecha Post Prom.</div><div>' + avgPostGap.toFixed(2) + '</div></div>' +
+    '<div style="background:#1e2a3e;border-radius:0.8rem;padding:0.5rem;border:1px solid #00cc88;"><div style="font-weight:700;color:#5eead4;">Efecto real</div><div>6</div></div>' +
+    '</div>';
+
+   document.getElementById('scResult').innerHTML = html;
+  }
+
+  document.getElementById('scSimBtn').addEventListener('click', runSC);
+  document.getElementById('scPlaceboBtn').addEventListener('click', function() {
+   if (!scData) { runSC(); }
+   let treated = scData.units[0];
+   let controls = scData.units.slice(1);
+   let effects = [];
+   for (let u = 0; u < controls.length; u++) {
+    let pre = controls[u].data.slice(0, scData.treatPeriod);
+    let post = controls[u].data.slice(scData.treatPeriod);
+    let avgPre = pre.reduce((a,b) => a+b, 0) / pre.length;
+    let avgPost = post.reduce((a,b) => a+b, 0) / post.length;
+    effects.push({ id: u, effect: avgPost - avgPre });
+   }
+   let treatPre = treated.data.slice(0, scData.treatPeriod);
+   let treatPost = treated.data.slice(scData.treatPeriod);
+   let treatEffect = treatPost.reduce((a,b) => a+b, 0)/treatPost.length - treatPre.reduce((a,b) => a+b, 0)/treatPre.length;
+   effects.push({ id: 0, effect: treatEffect, isTreated: true });
+   effects.sort((a,b) => Math.abs(b.effect) - Math.abs(a.effect));
+   let rank = effects.findIndex(e => e.isTreated) + 1;
+
+   let html = '<p style="font-weight:700;color:#5eead4;margin-bottom:0.5rem;">Placebo Test - Rank de Efectos</p>';
+   html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:0.3rem;">';
+   effects.forEach(e => {
+    let color = e.isTreated ? '#14b8a6' : '#2c3e66';
+    html += '<div style="background:#1e2a3e;border-radius:0.5rem;padding:0.3rem;text-align:center;border:1px solid ' + color + ';"><div style="font-size:0.8rem;color:#5eead4;">U' + e.id + (e.isTreated ? '★' : '') + '</div><div>' + e.effect.toFixed(1) + '</div></div>';
+   });
+   html += '</div><p style="margin-top:0.8rem;color:#8899cc;font-size:0.8rem;">La unidad tratada (★) tiene un efecto de ' + treatEffect.toFixed(1) + '. Rank: ' + rank + '/' + effects.length + '. Si rank=1, el efecto es significativo al ' + (1/effects.length*100).toFixed(0) + '%.</p>';
+   document.getElementById('scResult').innerHTML = html;
+  });
+
+  document.getElementById('submitQuizBtn').addEventListener('click', handleSubmit);
+  renderQuestions(); updateBtnState(); restoreProgress(); updateProgress();
+ </script>
+ <script>
+window.I18N_DATA={
+ "fb_0": {
+  "es": "⚠️ Responde todas las preguntas primero.",
+  "en": "⚠️ Answer todas las preguntas primero."
+ },
+ "fb_1": {
+  "es": "🎉 ",
+  "en": "🎉 "
+ },
+ "fb_2": {
+  "es": "🏆 Ya completaste este m\u00f3dulo.",
+  "en": "🏆 Ya completaste este m\u00f3dulo."
+ }
+};
+</script>
+<script src="../../../assets/js/i18n.js"></script> </body>
+</html>
