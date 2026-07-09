@@ -1,116 +1,797 @@
 ﻿<!DOCTYPE html><html lang="es"><head>
+
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+
 <title>SQL Avanzado | C3-10 Diccionarios Texto</title>
+
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
 <link rel="stylesheet" href="../../../assets/css/theme.css">
+
 <style>
+
 *{margin:0;padding:0;box-sizing:border-box}
+
 body{font-family:'Inter',sans-serif;background:#0a0e0f;color:#e8edee;min-height:100vh;display:flex;justify-content:center;padding:20px}
+
 .course-container{max-width:860px;width:100%;background:rgba(15,20,42,0.6);backdrop-filter:blur(16px);border-radius:24px;border:1px solid rgba(0,224,255,0.2);padding:30px;margin-top:60px}
+
 .progress-bar,.progress-fill{height:10px;border-radius:8px}
+
 .progress-bar{background:rgba(255,255,255,0.06);margin-bottom:18px;overflow:hidden}
+
 .progress-fill{background:linear-gradient(90deg,#00e0ff,#00b8d4);width:0%;transition:width .5s ease}
+
 .progress-text{font-size:.75rem;color:#8899aa;margin-bottom:10px;display:block}
+
 .hero-header{text-align:center;margin:20px 0}
+
 .hero-header h1{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:800;background:linear-gradient(135deg,#00e0ff,#00b8d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
 .hero-header p{color:#8899aa;margin-top:6px;font-size:.95rem}
+
 .analogy-card{background:rgba(0,224,255,0.08);border-left:4px solid #00e0ff;border-radius:12px;padding:16px 20px;margin:20px 0;font-size:.9rem;line-height:1.6}
+
 .analogy-card strong{color:#00e0ff}
+
 .main-area{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:24px;margin:20px 0}
+
 .dict-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}
+
 .dict-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px;text-align:center;cursor:pointer;transition:.3s}
+
 .dict-card:hover{border-color:#00e0ff;transform:translateY(-2px)}
+
 .dict-card.active{background:rgba(0,224,255,0.08);border-color:#00e0ff}
+
 .dict-card h5{color:#00e0ff;font-size:.9rem}
+
 .dict-card p{color:#8899aa;font-size:.75rem;margin-top:4px}
+
 .dict-output{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:16px;margin:16px 0;font-family:monospace;font-size:.85rem;color:#bcc;min-height:50px}
+
 .synonym-input{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+
 .synonym-input input{flex:1;background:#1a1f3a;border:1px solid rgba(0,224,255,0.3);border-radius:8px;padding:10px 14px;color:#e8edee;font-family:'Inter',sans-serif;font-size:.85rem;min-width:150px}
+
 .synonym-input button{padding:10px 18px;border-radius:8px;background:rgba(0,224,255,0.12);border:1px solid #00e0ff;color:#00e0ff;cursor:pointer;font-family:'Inter',sans-serif;font-weight:600;transition:.3s}
+
 .feedback{background:rgba(255,255,255,0.04);border-radius:12px;padding:16px 20px;margin:16px 0;font-size:.88rem;min-height:50px}
+
 .insignia{background:linear-gradient(135deg,rgba(255,215,0,0.12),rgba(255,165,0,0.08));border:1px solid rgba(255,215,0,0.3);border-radius:16px;padding:20px;text-align:center;margin:16px 0;transition:.5s}
+
 .insignia.hidden{display:none}
+
 .insignia h3{color:#ffd700;font-size:1.3rem;margin:8px 0}
+
 .btn-next{display:block;width:100%;padding:16px;margin:20px 0;background:linear-gradient(135deg,#00e0ff,#00b8d4);border:none;border-radius:14px;color:#fff;font-size:1.05rem;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:.3s}
+
 .btn-next:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,224,255,0.3)}
+
 footer{text-align:center;padding:16px 0 0;color:#667788;font-size:.8rem;border-top:1px solid rgba(255,255,255,0.06);margin-top:20px}
+
 @media(max-width:600px){.course-container{padding:16px;margin-top:50px}.dict-grid{grid-template-columns:1fr}}
+
+
+.aprender-section{background:rgba(00e0ff,0.05);border:1px solid rgba(00e0ff,0.15);border-radius:12px;padding:16px 20px;margin:20px 0}
+.aprender-section h3{color:#00e0ff;font-size:1rem;margin-bottom:8px}
+.aprender-section ul{list-style:none;padding:0}
+.aprender-section ul li{padding:4px 0;font-size:.85rem;color:#bcc;line-height:1.5}
+.aprender-section ul li i{color:#00e0ff;width:20px;margin-right:6px}
+.panel-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0}
+.panel-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px;transition:.3s}
+.panel-card:hover{border-color:rgba(00e0ff,0.3);transform:translateY(-2px)}
+.panel-card h4{color:#00e0ff;font-size:.9rem;margin-bottom:6px}
+.panel-card p{color:#8899aa;font-size:.82rem;line-height:1.5;margin-bottom:6px}
+.panel-card .sql-example{background:rgba(0,0,0,0.3);border-radius:6px;padding:8px;font-family:monospace;font-size:.78rem;color:#bcc;margin:6px 0;overflow-x:auto}
+.panel-card .pitfall{color:#00e0ff;font-size:.78rem;margin-top:4px;padding:4px 8px;background:rgba(00e0ff,0.1);border-radius:6px;display:inline-block}
+.paso-paso{background:rgba(255,255,255,0.03);border:1px solid rgba(00e0ff,0.15);border-radius:12px;padding:20px;margin:20px 0}
+.paso-paso h3{color:#00e0ff;font-size:1rem;margin-bottom:12px}
+.paso-paso .step{display:flex;gap:12px;margin:10px 0;padding:10px 14px;background:rgba(255,255,255,0.02);border-radius:8px;border-left:3px solid rgba(00e0ff,0.3)}
+.paso-paso .step .snum{color:#00e0ff;font-weight:700;font-size:.9rem;min-width:24px}
+.paso-paso .step .scontent{flex:1}
+.paso-paso .step .scontent p{color:#bcc;font-size:.85rem;line-height:1.5}
+.paso-paso .step .scontent .scode{background:rgba(0,0,0,0.3);border-radius:6px;padding:8px;font-family:monospace;font-size:.8rem;color:#00e0ff;margin:6px 0;overflow-x:auto}
+.quiz-option{display:block;width:100%;padding:14px 18px;margin:8px 0;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:#e8edee;font-size:.9rem;font-family:'Inter',sans-serif;cursor:pointer;transition:all .25s;text-align:left}
+.quiz-option:hover{background:rgba(00e0ff,0.1);border-color:#00e0ff}
+.quiz-option.correct{background:rgba(0,255,100,0.15);border-color:#00ff64}
+.quiz-option.wrong{background:rgba(255,80,80,0.15);border-color:#ff5050}
+.quiz-explain{background:rgba(255,255,255,0.02);border-radius:8px;padding:10px 14px;margin:6px 0;font-size:.82rem;color:#8899aa;line-height:1.5;border-left:3px solid rgba(00e0ff,0.2)}
+.resumen-modulo{background:rgba(00e0ff,0.05);border:1px solid rgba(00e0ff,0.15);border-radius:12px;padding:20px;margin:20px 0}
+.resumen-modulo h3{color:#00e0ff;font-size:1rem;margin-bottom:10px}
+.resumen-modulo ul{list-style:none;padding:0}
+.resumen-modulo ul li{padding:5px 0;font-size:.85rem;color:#bcc;line-height:1.5}
+.resumen-modulo ul li i{color:#00e0ff;width:20px;margin-right:6px}
+
+
+.objectives { background: rgba(0,224,255,0.1); border-radius: 1.5rem; padding: 1rem 1.5rem; margin: 1.5rem 2rem; border: 1px solid rgba(0,224,255,0.3); }
+.objectives h3 { color: #00e0ff; font-size: 1.1rem; margin-bottom: 0.7rem; }
+.objectives li { color: #b9ccee; font-size: 0.9rem; margin: 0.4rem 0; list-style: none; }
+.objectives li::before { content: "🎯 "; }
+.module-recap { background: rgba(0,224,255,0.08); border-radius: 1.5rem; padding: 1rem 1.5rem; margin: 1.5rem 2rem; border: 1px dashed rgba(0,224,255,0.4); }
+.module-recap h3 { color: #00e0ff; font-size: 1rem; margin-bottom: 0.5rem; }
+.module-recap li { color: #8899bb; font-size: 0.85rem; margin: 0.3rem 0; }
 </style>
+
 </head>
+
 <body>
+
 <div class="course-container">
+
 <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a></nav>
-<div class="progress-bar"><div class="progress-fill" id="progFill"></div></div>
+
+<div class="progress-bar"><div class="progress-fill" id="progFill"></div>
+<div class="aprender-section"><h3><i class="fas fa-graduation-cap"></i> ¿Qué aprenderás?</h3><ul><li><i class="fas fa-check-circle"></i> A crear tsvectors con to_tsvector para indexar texto en PostgreSQL</li><li><i class="fas fa-check-circle"></i> A construir tsqueries con operadores &, |, ! y <-></li><li><i class="fas fa-check-circle"></i> A usar el operador @@ para hacer búsqueda de texto completo</li><li><i class="fas fa-check-circle"></i> A optimizar búsquedas con índices GIN y GiST</li><li><i class="fas fa-check-circle"></i> A ordenar resultados por relevancia con ts_rank y ts_rank_cd</li></ul></div><div class="panel-grid"><div class="panel-card"><h4>Tokenización</h4><p>El proceso de dividir el texto en tokens individuales (palabras). PostgreSQL elimina signos de puntuación y normaliza mayúsculas/minúsculas antes de crear el tsvector.</p><div class="sql-example">SELECT to_tsvector('spanish', 'Hola Mundo!');</div><span class="pitfall">⚠ Siempre especifica el idioma para una mejor tokenización</span></div><div class="panel-card"><h4>Lexemas</h4><p>Los lexemas son las unidades básicas de búsqueda. PostgreSQL reduce cada palabra a su raíz (lematización) para que 'corriendo', 'correr' y 'correré' coincidan.</p><div class="sql-example">SELECT to_tsvector('spanish', 'corriendo correr correré');</div><span class="pitfall">⚠ El diccionario de español maneja conjugaciones verbales</span></div><div class="panel-card"><h4>Stop Words</h4><p>Palabras comunes (el, la, de, y, en) que se eliminan automáticamente porque no aportan valor semántico a la búsqueda. PostgreSQL tiene listas por idioma.</p><div class="sql-example">SELECT to_tsvector('spanish', 'el gato y el perro');</div><span class="pitfall">⚠ Puedes crear tu propia lista de stop words personalizada</span></div><div class="panel-card"><h4>Posiciones</h4><p>tsvector guarda la posición de cada lexema en el documento original. Esto permite búsquedas por proximidad y frases exactas con el operador <->.</p><div class="sql-example">SELECT tsvector('gato:1 perro:2 casa:3');</div><span class="pitfall">⚠ Las posiciones permiten búsqueda de frases exactas</span></div><div class="panel-card"><h4>Configuración de Idioma</h4><p>PostgreSQL soporta múltiples idiomas para FTS. 'spanish', 'english', 'french', etc. Cada uno tiene su propio diccionario de stemming y stop words.</p><div class="sql-example">SELECT to_tsvector('english', 'running dogs');</div><span class="pitfall">⚠ Usa el idioma correcto para mejores resultados</span></div><div class="panel-card"><h4>to_tsvector vs tsvector</h4><p>to_tsvector() aplica el diccionario completo (tokenización + stemming + stop words). El cast ::tsvector solo parsea el formato ya procesado.</p><div class="sql-example">SELECT to_tsvector('spanish', 'corriendo') VS 'corriendo'::tsvector;</div><span class="pitfall">⚠ Siempre prefiere to_tsvector() para texto nuevo</span></div></div><div class="paso-paso"><h3><i class="fas fa-code"></i> Ejemplo paso a paso</h3><div class="step"><div class="snum">1</div><div class="scontent"><p>Crea una tabla de ejemplo con contenido textual para buscar</p><div class="scode">CREATE TABLE articulos (
+  id SERIAL PRIMARY KEY,
+  titulo TEXT,
+  contenido TEXT
+);</div></div></div><div class="step"><div class="snum">2</div><div class="scontent"><p>Inserta algunos documentos de ejemplo con diferentes temáticas</p><div class="scode">INSERT INTO articulos (titulo, contenido) VALUES
+('PostgreSQL Avanzado', 'Guía completa sobre optimización de consultas en PostgreSQL'),
+('Búsqueda de Texto', 'Cómo implementar full-text search con tsvector y tsquery');</div></div></div><div class="step"><div class="snum">3</div><div class="scontent"><p>Agrega una columna tsvector generada automáticamente para búsqueda</p><div class="scode">ALTER TABLE articulos ADD COLUMN contenido_tsv TSVECTOR
+GENERATED ALWAYS AS (to_tsvector('spanish', titulo || ' ' || contenido)) STORED;</div></div></div><div class="step"><div class="snum">4</div><div class="scontent"><p>Crea un índice GIN para acelerar las búsquedas de texto completo</p><div class="scode">CREATE INDEX idx_fts_articulos ON articulos USING GIN (contenido_tsv);</div></div></div><div class="step"><div class="snum">5</div><div class="scontent"><p>Ejecuta una búsqueda FTS y observa la velocidad con EXPLAIN ANALYZE</p><div class="scode">EXPLAIN ANALYZE SELECT * FROM articulos
+WHERE contenido_tsv @@ to_tsquery('spanish', 'postgres & optimización');</div></div></div></div>
+</div>
+
 <span class="progress-text" id="progText">Módulo 10 de 12</span>
+
 <div class="hero-header"><h1>📚 Diccionarios de Texto</h1><p>Crea diccionarios, sinónimos, thesaurus y configuraciones personalizadas</p></div>
+
 <div class="analogy-card"><strong>💡 Piénsalo así:</strong> Los diccionarios de texto en PostgreSQL son como el equipo de editores de un diccionario real. El diccionario de "stem" (raíces) sabe que "corriendo", "correré" y "corrimos" vienen de "correr". El diccionario de sinónimos sabe que "automóvil" = "coche" = "carro". El thesaurus sabe que "base de datos" es un concepto relacionado con "PostgreSQL". Tú creas las reglas, PostgreSQL las aplica.</div>
+
+<div class="objectives">
+ <h3>🎯 ¿Qué aprenderás?</h3>
+ <ul>
+  <li>Comprender el concepto fundamental de SQL explicado en este módulo</li>
+  <li>Aplicar la sintaxis correcta con ejemplos prácticos de consultas</li>
+  <li>Evitar errores comunes y optimizar el rendimiento</li>
+  <li>Desarrollar intuición para elegir la técnica adecuada</li>
+ </ul>
+</div>
+
+
+
 <div class="main-area">
+
 <p style="color:#bcc;margin-bottom:10px;font-weight:600"><i class="fas fa-book" style="color:#00e0ff"></i> Configurador de Diccionarios</p>
+
 <div class="dict-grid">
+
 <button class="dict-card active" data-dict="spanish_stem">🇪🇸 spanish_stem</button>
+
 <button class="dict-card" data-dict="synonym">📖 Sinónimos</button>
+
 <button class="dict-card" data-dict="thesaurus">📚 Thesaurus</button>
+
 <button class="dict-card" data-dict="simple">🔤 simple</button>
+
 </div>
+
 <div class="dict-output" id="dictOutput">Haz clic en un diccionario para ver cómo procesa el texto de ejemplo.</div>
+
 <div class="synonym-input">
+
 <input type="text" id="synonymText" placeholder='"PostgreSQL" = "Postgres" = "PG"' value="PostgreSQL es mejor que MySQL para búsqueda">
+
 <button id="testDictBtn"><i class="fas fa-flask"></i> Probar</button>
+
 </div>
+
 </div>
-<div id="feedback" class="feedback">💡 Los diccionarios se encadenan: unaccent �’ spanish_stem �’ synonym. Configuración: ALTER TEXT SEARCH CONFIGURATION...</div>
+
+<div id="feedback" class="feedback">💡 Los diccionarios se encadenan: unaccent �’ spanish_stem �’ synonym. Configuración: ALTER TEXT SEARCH CONFIGURATION...</div>
+
 <div id="insignia" class="insignia hidden"><i class="fas fa-medal" style="font-size:2.5rem;color:#ffd700"></i><h3>🏅 Lexicógrafo 🏅</h3><p>¡Sabes crear y configurar diccionarios de texto en PostgreSQL!</p></div>
-<button class="btn-next" onclick="window.location.href='11-busqueda-hibrida.html'"><span data-i18n="btn_siguiente_modulo">Siguiente Módulo</span><i class="fas fa-arrow-right"></i></button>
-<footer><i class="fas fa-crown"></i> SQL Avanzado Â· Curso 3 Â· Módulo 10</footer>
+
+<div class="resumen-modulo"><h3><i class="fas fa-clipboard-list"></i> Resumen del módulo</h3><ul><li><i class="fas fa-check"></i> to_tsvector() tokeniza, elimina stop words y reduce a lexemas con posiciones</li><li><i class="fas fa-check"></i> tsvector almacena lexemas únicos con sus posiciones en el documento</li><li><i class="fas fa-check"></i> La lematización (stemming) permite encontrar palabras relacionadas</li><li><i class="fas fa-check"></i> Los índices GIN aceleran las búsquedas FTS órdenes de magnitud</li><li><i class="fas fa-check"></i> Siempre especifica el idioma para una tokenización correcta</li></ul></div>
+
+
+<div class="module-recap">
+ <h3>📌 Resumen del módulo</h3>
+ <ul>
+  <li>Concepto clave: domina la idea central de SQL presentada</li>
+  <li>Sintaxis: recuerda las reglas y patrones de consulta</li>
+  <li>Casos de uso: aplica lo aprendido en escenarios reales</li>
+  <li>Buenas prácticas: escribe SQL eficiente y mantenible</li>
+ </ul>
 </div>
-<script>
-const MODULE=10,COURSE="sqlavanzado_c3",PROG="sqlavanzado_progress",BADGES="sqlavanzado_badges";
-let currentDict='spanish_stem';
-document.querySelectorAll('.dict-card').forEach(b=>b.addEventListener('click',function(){
-document.querySelectorAll('.dict-card').forEach(x=>x.classList.remove('active'));
-this.classList.add('active');
-currentDict=this.dataset.dict;
-testDict();
-}));
-function testDict(){
-let text=document.getElementById('synonymText').value.trim()||'PostgreSQL es mejor que MySQL para búsqueda';
-let output=document.getElementById('dictOutput');
-let words=text.toLowerCase().split(/\s+/);
-if(currentDict==='spanish_stem'){
-let stems=words.map(w=>{if(w.endsWith('ando')||w.endsWith('endo'))return w.slice(0,-4)+'ar';if(w.endsWith('ción'))return w.slice(0,-5)+'cir';if(w.endsWith('s')&&w.length>4)return w.slice(0,-1);return w;});
-output.innerHTML=I18N.t('fb_0')+stems.join(' ')+'</strong> ” Raíces (stemming) reducidas.';
-}else if(currentDict==='synonym'){
-let syns={'postgresql':'postgresql','postgres':'postgresql','pg':'postgresql','mysql':'mysql','bd':'basededatos','db':'basededatos'};
-let mapped=words.map(w=>syns[w]||w);
-output.innerHTML=I18N.t('fb_1')+mapped.join(' ')+'</strong> ” "PostgreSQL" y "Postgres" se normalizan al mismo lexema.';
-}else if(currentDict==='thesaurus'){
-let th={'base de datos':'sql','big data':'analytics','machine learning':'ai'};
-output.innerHTML=I18N.t('fb_2');
-}else{
-output.innerHTML=I18N.t('fb_3')+words.join(' ')+'</strong> ” El diccionario simple no modifica las palabras, solo las pasa en minúsculas.';
-}
-document.getElementById('feedback').innerHTML=I18N.t('fb_4')+currentDict+'. Los diccionarios se configuran con CREATE TEXT SEARCH DICTIONARY y se asignan a configuraciones.';
-let bd=JSON.parse(localStorage.getItem(BADGES))||[];if(!bd.includes('Lexicógrafo')){bd.push('Lexicógrafo');localStorage.setItem(BADGES,JSON.stringify(bd));document.getElementById('insignia').classList.remove('hidden')}
-updateProg();
-}
-document.getElementById('testDictBtn').addEventListener('click',testDict);
-function updateProg(){
-let p=JSON.parse(localStorage.getItem(COURSE+"_progress"))||[];if(!p.includes(MODULE)){p.push(MODULE);localStorage.setItem(COURSE+"_progress",JSON.stringify(p))}
-let pct=Math.round(p.length/12*100);document.getElementById('progFill').style.width=pct+'%';document.getElementById('progText').textContent='Módulo 10 de 12 ('+pct+'%)';
-let gp=JSON.parse(localStorage.getItem(PROG))||[];if(!gp.includes(MODULE+132)){gp.push(MODULE+132);localStorage.setItem(PROG,JSON.stringify(gp))}
-}
-testDict();
-</script>
+
+<button class="btn-next" onclick="window.location.href='11-busqueda-hibrida.html'"><span data-i18n="btn_siguiente_modulo">Siguiente Módulo</span><i class="fas fa-arrow-right"></i></button>
+
+<footer><i class="fas fa-crown"></i> SQL Avanzado Â· Curso 3 Â· Módulo 10</footer>
+
+</div>
 
 <script>
-window.I18N_DATA={
- 'fb_0': { es: '🇪🇸 spanish_stem: <strong>', en: '🇪🇸 spanish_stem: <strong>' },
- 'fb_1': { es: '📖 Sinónimos: <strong>', en: '📖 Sinónimos: <strong>' },
- 'fb_2': { es: '📚 Thesaurus: PostgreSQL es una <strong>base de datos (�’ SQL)</strong>. El thesaurus agrupa conceptos bajo un término preferido.', en: '📚 Thesaurus: PostgreSQL es una <strong>base de datos (�’ SQL)</strong>. El thesaurus agrupa conceptos bajo un término preferido.' },
- 'fb_3': { es: '🔤 simple: <strong>', en: '🔤 simple: <strong>' },
- 'fb_4': { es: '�… Diccionario: ', en: '�… Diccionario: ' }
-};
+
+const MODULE=10,COURSE="sqlavanzado_c3",PROG="sqlavanzado_progress",BADGES="sqlavanzado_badges";
+
+let currentDict='spanish_stem';
+
+document.querySelectorAll('.dict-card').forEach(b=>b.addEventListener('click',function(){
+
+document.querySelectorAll('.dict-card').forEach(x=>x.classList.remove('active'));
+
+this.classList.add('active');
+
+currentDict=this.dataset.dict;
+
+testDict();
+
+}));
+
+function testDict(){
+
+let text=document.getElementById('synonymText').value.trim()||'PostgreSQL es mejor que MySQL para búsqueda';
+
+let output=document.getElementById('dictOutput');
+
+let words=text.toLowerCase().split(/\s+/);
+
+if(currentDict==='spanish_stem'){
+
+let stems=words.map(w=>{if(w.endsWith('ando')||w.endsWith('endo'))return w.slice(0,-4)+'ar';if(w.endsWith('ción'))return w.slice(0,-5)+'cir';if(w.endsWith('s')&&w.length>4)return w.slice(0,-1);return w;});
+
+output.innerHTML=I18N.t('fb_0')+stems.join(' ')+'</strong> ” Raíces (stemming) reducidas.';
+
+}else if(currentDict==='synonym'){
+
+let syns={'postgresql':'postgresql','postgres':'postgresql','pg':'postgresql','mysql':'mysql','bd':'basededatos','db':'basededatos'};
+
+let mapped=words.map(w=>syns[w]||w);
+
+output.innerHTML=I18N.t('fb_1')+mapped.join(' ')+'</strong> ” "PostgreSQL" y "Postgres" se normalizan al mismo lexema.';
+
+}else if(currentDict==='thesaurus'){
+
+let th={'base de datos':'sql','big data':'analytics','machine learning':'ai'};
+
+output.innerHTML=I18N.t('fb_2');
+
+}else{
+
+output.innerHTML=I18N.t('fb_3')+words.join(' ')+'</strong> ” El diccionario simple no modifica las palabras, solo las pasa en minúsculas.';
+
+}
+
+document.getElementById('feedback').innerHTML=I18N.t('fb_4')+currentDict+'. Los diccionarios se configuran con CREATE TEXT SEARCH DICTIONARY y se asignan a configuraciones.';
+
+let bd=JSON.parse(localStorage.getItem(BADGES))||[];if(!bd.includes('Lexicógrafo')){bd.push('Lexicógrafo');localStorage.setItem(BADGES,JSON.stringify(bd));document.getElementById('insignia').classList.remove('hidden')}
+
+updateProg();
+
+}
+
+document.getElementById('testDictBtn').addEventListener('click',testDict);
+
+function updateProg(){
+
+let p=JSON.parse(localStorage.getItem(COURSE+"_progress"))||[];if(!p.includes(MODULE)){p.push(MODULE);localStorage.setItem(COURSE+"_progress",JSON.stringify(p))}
+
+let pct=Math.round(p.length/12*100);document.getElementById('progFill').style.width=pct+'%';document.getElementById('progText').textContent='Módulo 10 de 12 ('+pct+'%)';
+
+let gp=JSON.parse(localStorage.getItem(PROG))||[];if(!gp.includes(MODULE+132)){gp.push(MODULE+132);localStorage.setItem(PROG,JSON.stringify(gp))}
+
+}
+
+testDict();
+
 </script>
-<script src="../../../assets/js/i18n.js"></script>  </body>
+
+document.getElementById('revealBtn')?.addEventListener('click',function(){
+let e=document.getElementById('explainerContainer');
+if(e){
+e.style.display=e.style.display==='none'?'block':'none';
+this.innerHTML=e.style.display==='block'?'<i class="fas fa-eye-slash"></i> Ocultar explicación':'<i class="fas fa-eye"></i> Mostrar explicación de cada opción';
+}
+});
+document.querySelectorAll('#quizContainer .quiz-option')?.forEach(b=>{
+b.addEventListener('click',function(){
+let ans=this.dataset.ans;
+let fb=document.getElementById('feedback');
+// Mark correct/wrong
+let correctIdx=0; // default first
+document.querySelectorAll('#quizContainer .quiz-option').forEach((o,i)=>{
+if(o.dataset.correct==='true') correctIdx=i;
+});
+if(ans==correctIdx.toString()){
+this.className='quiz-option correct';
+fb.innerHTML=I18N.t('quiz_correct');
+let bd=JSON.parse(localStorage.getItem(BADGES))||[];
+if(!bd.includes('diccionarios-de-texto')){bd.push('diccionarios-de-texto');localStorage.setItem(BADGES,JSON.stringify(bd))}
+document.getElementById('insignia')?.classList.remove('hidden');
+updateProg();
+}else{
+this.className='quiz-option wrong';
+fb.innerHTML=I18N.t('quiz_wrong');
+setTimeout(()=>this.className='quiz-option',600);
+}
+document.querySelectorAll('#quizContainer .quiz-option').forEach(o=>o.style.pointerEvents='none');
+setTimeout(()=>document.querySelectorAll('#quizContainer .quiz-option').forEach(o=>o.style.pointerEvents=''),2000);
+});
+});
+
+
+
+
+<script>
+
+window.I18N_DATA=Object.assign({
+"quiz_correct": 
+  "es": "✅ ¡Correcto! Has respondido acertadamente sobre 📚 Diccionarios de Texto.",
+  "en": "✅ Correct! You answered correctly about 📚 Diccionarios de Texto."
+ ,
+ "quiz_wrong": 
+  "es": "❌ No es correcto. Revisa el material sobre 📚 Diccionarios de Texto e intenta de nuevo.",
+  "en": "❌ Not correct. Review the material about 📚 Diccionarios de Texto and try again.",
+
+ 'fb_0': { es: '🇪🇸 spanish_stem: <strong>', en: '🇪🇸 spanish_stem: <strong>' },
+
+ 'fb_1': { es: '📖 Sinónimos: <strong>', en: '📖 Sinónimos: <strong>' },
+
+ 'fb_2': { es: '📚 Thesaurus: PostgreSQL es una <strong>base de datos (�’ SQL)</strong>. El thesaurus agrupa conceptos bajo un término preferido.', en: '📚 Thesaurus: PostgreSQL es una <strong>base de datos (�’ SQL)</strong>. El thesaurus agrupa conceptos bajo un término preferido.' },
+
+ 'fb_3': { es: '🔤 simple: <strong>', en: '🔤 simple: <strong>' },
+
+ 'fb_4': { es: '�… Diccionario: ', en: '�… Diccionario: ' }
+
+};
+
+</script>
+
+document.getElementById('revealBtn')?.addEventListener('click',function(){
+let e=document.getElementById('explainerContainer');
+if(e){
+e.style.display=e.style.display==='none'?'block':'none';
+this.innerHTML=e.style.display==='block'?'<i class="fas fa-eye-slash"></i> Ocultar explicación':'<i class="fas fa-eye"></i> Mostrar explicación de cada opción';
+}
+});
+document.querySelectorAll('#quizContainer .quiz-option')?.forEach(b=>{
+b.addEventListener('click',function(){
+let ans=this.dataset.ans;
+let fb=document.getElementById('feedback');
+// Mark correct/wrong
+let correctIdx=0; // default first
+document.querySelectorAll('#quizContainer .quiz-option').forEach((o,i)=>{
+if(o.dataset.correct==='true') correctIdx=i;
+});
+if(ans==correctIdx.toString()){
+this.className='quiz-option correct';
+fb.innerHTML=I18N.t('quiz_correct');
+let bd=JSON.parse(localStorage.getItem(BADGES))||[];
+if(!bd.includes('diccionarios-de-texto')){bd.push('diccionarios-de-texto');localStorage.setItem(BADGES,JSON.stringify(bd))}
+document.getElementById('insignia')?.classList.remove('hidden');
+updateProg();
+}else{
+this.className='quiz-option wrong';
+fb.innerHTML=I18N.t('quiz_wrong');
+setTimeout(()=>this.className='quiz-option',600);
+}
+document.querySelectorAll('#quizContainer .quiz-option').forEach(o=>o.style.pointerEvents='none');
+setTimeout(()=>document.querySelectorAll('#quizContainer .quiz-option').forEach(o=>o.style.pointerEvents=''),2000);
+});
+});
+
+
+<script src="../../../assets/js/i18n.js"></script>
+
+document.getElementById('revealBtn')?.addEventListener('click',function(){
+let e=document.getElementById('explainerContainer');
+if(e){
+e.style.display=e.style.display==='none'?'block':'none';
+this.innerHTML=e.style.display==='block'?'<i class="fas fa-eye-slash"></i> Ocultar explicación':'<i class="fas fa-eye"></i> Mostrar explicación de cada opción';
+}
+});
+document.querySelectorAll('#quizContainer .quiz-option')?.forEach(b=>{
+b.addEventListener('click',function(){
+let ans=this.dataset.ans;
+let fb=document.getElementById('feedback');
+// Mark correct/wrong
+let correctIdx=0; // default first
+document.querySelectorAll('#quizContainer .quiz-option').forEach((o,i)=>{
+if(o.dataset.correct==='true') correctIdx=i;
+});
+if(ans==correctIdx.toString()){
+this.className='quiz-option correct';
+fb.innerHTML=I18N.t('quiz_correct');
+let bd=JSON.parse(localStorage.getItem(BADGES))||[];
+if(!bd.includes('diccionarios-de-texto')){bd.push('diccionarios-de-texto');localStorage.setItem(BADGES,JSON.stringify(bd))}
+document.getElementById('insignia')?.classList.remove('hidden');
+updateProg();
+}else{
+this.className='quiz-option wrong';
+fb.innerHTML=I18N.t('quiz_wrong');
+setTimeout(()=>this.className='quiz-option',600);
+}
+document.querySelectorAll('#quizContainer .quiz-option').forEach(o=>o.style.pointerEvents='none');
+setTimeout(()=>document.querySelectorAll('#quizContainer .quiz-option').forEach(o=>o.style.pointerEvents=''),2000);
+});
+});
+  </body>
+
 </html>
+
+﻿<!DOCTYPE html><html lang="es"><head>
+
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>SQL Avanzado | C3-10 Diccionarios Texto</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<link rel="stylesheet" href="../../../assets/css/theme.css">
+
+<style>
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{font-family:'Inter',sans-serif;background:#0a0e0f;color:#e8edee;min-height:100vh;display:flex;justify-content:center;padding:20px}
+
+.course-container{max-width:860px;width:100%;background:rgba(15,20,42,0.6);backdrop-filter:blur(16px);border-radius:24px;border:1px solid rgba(0,224,255,0.2);padding:30px;margin-top:60px}
+
+.progress-bar,.progress-fill{height:10px;border-radius:8px}
+
+.progress-bar{background:rgba(255,255,255,0.06);margin-bottom:18px;overflow:hidden}
+
+.progress-fill{background:linear-gradient(90deg,#00e0ff,#00b8d4);width:0%;transition:width .5s ease}
+
+.progress-text{font-size:.75rem;color:#8899aa;margin-bottom:10px;display:block}
+
+.hero-header{text-align:center;margin:20px 0}
+
+.hero-header h1{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:800;background:linear-gradient(135deg,#00e0ff,#00b8d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+.hero-header p{color:#8899aa;margin-top:6px;font-size:.95rem}
+
+.analogy-card{background:rgba(0,224,255,0.08);border-left:4px solid #00e0ff;border-radius:12px;padding:16px 20px;margin:20px 0;font-size:.9rem;line-height:1.6}
+
+.analogy-card strong{color:#00e0ff}
+
+.main-area{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:24px;margin:20px 0}
+
+.dict-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}
+
+.dict-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px;text-align:center;cursor:pointer;transition:.3s}
+
+.dict-card:hover{border-color:#00e0ff;transform:translateY(-2px)}
+
+.dict-card.active{background:rgba(0,224,255,0.08);border-color:#00e0ff}
+
+.dict-card h5{color:#00e0ff;font-size:.9rem}
+
+.dict-card p{color:#8899aa;font-size:.75rem;margin-top:4px}
+
+.dict-output{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:16px;margin:16px 0;font-family:monospace;font-size:.85rem;color:#bcc;min-height:50px}
+
+.synonym-input{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+
+.synonym-input input{flex:1;background:#1a1f3a;border:1px solid rgba(0,224,255,0.3);border-radius:8px;padding:10px 14px;color:#e8edee;font-family:'Inter',sans-serif;font-size:.85rem;min-width:150px}
+
+.synonym-input button{padding:10px 18px;border-radius:8px;background:rgba(0,224,255,0.12);border:1px solid #00e0ff;color:#00e0ff;cursor:pointer;font-family:'Inter',sans-serif;font-weight:600;transition:.3s}
+
+.feedback{background:rgba(255,255,255,0.04);border-radius:12px;padding:16px 20px;margin:16px 0;font-size:.88rem;min-height:50px}
+
+.insignia{background:linear-gradient(135deg,rgba(255,215,0,0.12),rgba(255,165,0,0.08));border:1px solid rgba(255,215,0,0.3);border-radius:16px;padding:20px;text-align:center;margin:16px 0;transition:.5s}
+
+.insignia.hidden{display:none}
+
+.insignia h3{color:#ffd700;font-size:1.3rem;margin:8px 0}
+
+.btn-next{display:block;width:100%;padding:16px;margin:20px 0;background:linear-gradient(135deg,#00e0ff,#00b8d4);border:none;border-radius:14px;color:#fff;font-size:1.05rem;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:.3s}
+
+.btn-next:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,224,255,0.3)}
+
+footer{text-align:center;padding:16px 0 0;color:#667788;font-size:.8rem;border-top:1px solid rgba(255,255,255,0.06);margin-top:20px}
+
+@media(max-width:600px){.course-container{padding:16px;margin-top:50px}.dict-grid{grid-template-columns:1fr}}
+
+
+.aprender-section{background:rgba(00e0ff,0.05);border:1px solid rgba(00e0ff,0.15);border-radius:12px;padding:16px 20px;margin:20px 0}
+.aprender-section h3{color:#00e0ff;font-size:1rem;margin-bottom:8px}
+.aprender-section ul{list-style:none;padding:0}
+.aprender-section ul li{padding:4px 0;font-size:.85rem;color:#bcc;line-height:1.5}
+.aprender-section ul li i{color:#00e0ff;width:20px;margin-right:6px}
+.panel-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0}
+.panel-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px;transition:.3s}
+.panel-card:hover{border-color:rgba(00e0ff,0.3);transform:translateY(-2px)}
+.panel-card h4{color:#00e0ff;font-size:.9rem;margin-bottom:6px}
+.panel-card p{color:#8899aa;font-size:.82rem;line-height:1.5;margin-bottom:6px}
+.panel-card .sql-example{background:rgba(0,0,0,0.3);border-radius:6px;padding:8px;font-family:monospace;font-size:.78rem;color:#bcc;margin:6px 0;overflow-x:auto}
+.panel-card .pitfall{color:#00e0ff;font-size:.78rem;margin-top:4px;padding:4px 8px;background:rgba(00e0ff,0.1);border-radius:6px;display:inline-block}
+.paso-paso{background:rgba(255,255,255,0.03);border:1px solid rgba(00e0ff,0.15);border-radius:12px;padding:20px;margin:20px 0}
+.paso-paso h3{color:#00e0ff;font-size:1rem;margin-bottom:12px}
+.paso-paso .step{display:flex;gap:12px;margin:10px 0;padding:10px 14px;background:rgba(255,255,255,0.02);border-radius:8px;border-left:3px solid rgba(00e0ff,0.3)}
+.paso-paso .step .snum{color:#00e0ff;font-weight:700;font-size:.9rem;min-width:24px}
+.paso-paso .step .scontent{flex:1}
+.paso-paso .step .scontent p{color:#bcc;font-size:.85rem;line-height:1.5}
+.paso-paso .step .scontent .scode{background:rgba(0,0,0,0.3);border-radius:6px;padding:8px;font-family:monospace;font-size:.8rem;color:#00e0ff;margin:6px 0;overflow-x:auto}
+.quiz-option{display:block;width:100%;padding:14px 18px;margin:8px 0;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:12px;color:#e8edee;font-size:.9rem;font-family:'Inter',sans-serif;cursor:pointer;transition:all .25s;text-align:left}
+.quiz-option:hover{background:rgba(00e0ff,0.1);border-color:#00e0ff}
+.quiz-option.correct{background:rgba(0,255,100,0.15);border-color:#00ff64}
+.quiz-option.wrong{background:rgba(255,80,80,0.15);border-color:#ff5050}
+.quiz-explain{background:rgba(255,255,255,0.02);border-radius:8px;padding:10px 14px;margin:6px 0;font-size:.82rem;color:#8899aa;line-height:1.5;border-left:3px solid rgba(00e0ff,0.2)}
+.resumen-modulo{background:rgba(00e0ff,0.05);border:1px solid rgba(00e0ff,0.15);border-radius:12px;padding:20px;margin:20px 0}
+.resumen-modulo h3{color:#00e0ff;font-size:1rem;margin-bottom:10px}
+.resumen-modulo ul{list-style:none;padding:0}
+.resumen-modulo ul li{padding:5px 0;font-size:.85rem;color:#bcc;line-height:1.5}
+.resumen-modulo ul li i{color:#00e0ff;width:20px;margin-right:6px}
+</style>
+
+</head>
+
+<body>
+
+<div class="course-container">
+
+<nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a></nav>
+
+<div class="progress-bar"><div class="progress-fill" id="progFill"></div>
+<div class="aprender-section"><h3><i class="fas fa-graduation-cap"></i> ¿Qué aprenderás?</h3><ul><li><i class="fas fa-check-circle"></i> A crear tsvectors con to_tsvector para indexar texto en PostgreSQL</li><li><i class="fas fa-check-circle"></i> A construir tsqueries con operadores &, |, ! y <-></li><li><i class="fas fa-check-circle"></i> A usar el operador @@ para hacer búsqueda de texto completo</li><li><i class="fas fa-check-circle"></i> A optimizar búsquedas con índices GIN y GiST</li><li><i class="fas fa-check-circle"></i> A ordenar resultados por relevancia con ts_rank y ts_rank_cd</li></ul></div><div class="panel-grid"><div class="panel-card"><h4>Tokenización</h4><p>El proceso de dividir el texto en tokens individuales (palabras). PostgreSQL elimina signos de puntuación y normaliza mayúsculas/minúsculas antes de crear el tsvector.</p><div class="sql-example">SELECT to_tsvector('spanish', 'Hola Mundo!');</div><span class="pitfall">⚠ Siempre especifica el idioma para una mejor tokenización</span></div><div class="panel-card"><h4>Lexemas</h4><p>Los lexemas son las unidades básicas de búsqueda. PostgreSQL reduce cada palabra a su raíz (lematización) para que 'corriendo', 'correr' y 'correré' coincidan.</p><div class="sql-example">SELECT to_tsvector('spanish', 'corriendo correr correré');</div><span class="pitfall">⚠ El diccionario de español maneja conjugaciones verbales</span></div><div class="panel-card"><h4>Stop Words</h4><p>Palabras comunes (el, la, de, y, en) que se eliminan automáticamente porque no aportan valor semántico a la búsqueda. PostgreSQL tiene listas por idioma.</p><div class="sql-example">SELECT to_tsvector('spanish', 'el gato y el perro');</div><span class="pitfall">⚠ Puedes crear tu propia lista de stop words personalizada</span></div><div class="panel-card"><h4>Posiciones</h4><p>tsvector guarda la posición de cada lexema en el documento original. Esto permite búsquedas por proximidad y frases exactas con el operador <->.</p><div class="sql-example">SELECT tsvector('gato:1 perro:2 casa:3');</div><span class="pitfall">⚠ Las posiciones permiten búsqueda de frases exactas</span></div><div class="panel-card"><h4>Configuración de Idioma</h4><p>PostgreSQL soporta múltiples idiomas para FTS. 'spanish', 'english', 'french', etc. Cada uno tiene su propio diccionario de stemming y stop words.</p><div class="sql-example">SELECT to_tsvector('english', 'running dogs');</div><span class="pitfall">⚠ Usa el idioma correcto para mejores resultados</span></div><div class="panel-card"><h4>to_tsvector vs tsvector</h4><p>to_tsvector() aplica el diccionario completo (tokenización + stemming + stop words). El cast ::tsvector solo parsea el formato ya procesado.</p><div class="sql-example">SELECT to_tsvector('spanish', 'corriendo') VS 'corriendo'::tsvector;</div><span class="pitfall">⚠ Siempre prefiere to_tsvector() para texto nuevo</span></div></div><div class="paso-paso"><h3><i class="fas fa-code"></i> Ejemplo paso a paso</h3><div class="step"><div class="snum">1</div><div class="scontent"><p>Crea una tabla de ejemplo con contenido textual para buscar</p><div class="scode">CREATE TABLE articulos (
+  id SERIAL PRIMARY KEY,
+  titulo TEXT,
+  contenido TEXT
+);</div></div></div><div class="step"><div class="snum">2</div><div class="scontent"><p>Inserta algunos documentos de ejemplo con diferentes temáticas</p><div class="scode">INSERT INTO articulos (titulo, contenido) VALUES
+('PostgreSQL Avanzado', 'Guía completa sobre optimización de consultas en PostgreSQL'),
+('Búsqueda de Texto', 'Cómo implementar full-text search con tsvector y tsquery');</div></div></div><div class="step"><div class="snum">3</div><div class="scontent"><p>Agrega una columna tsvector generada automáticamente para búsqueda</p><div class="scode">ALTER TABLE articulos ADD COLUMN contenido_tsv TSVECTOR
+GENERATED ALWAYS AS (to_tsvector('spanish', titulo || ' ' || contenido)) STORED;</div></div></div><div class="step"><div class="snum">4</div><div class="scontent"><p>Crea un índice GIN para acelerar las búsquedas de texto completo</p><div class="scode">CREATE INDEX idx_fts_articulos ON articulos USING GIN (contenido_tsv);</div></div></div><div class="step"><div class="snum">5</div><div class="scontent"><p>Ejecuta una búsqueda FTS y observa la velocidad con EXPLAIN ANALYZE</p><div class="scode">EXPLAIN ANALYZE SELECT * FROM articulos
+WHERE contenido_tsv @@ to_tsquery('spanish', 'postgres & optimización');</div></div></div></div>
+</div>
+
+<span class="progress-text" id="progText">Módulo 10 de 12</span>
+
+<div class="hero-header"><h1>📚 Diccionarios de Texto</h1><p>Crea diccionarios, sinónimos, thesaurus y configuraciones personalizadas</p></div>
+
+<div class="analogy-card"><strong>💡 Piénsalo así:</strong> Los diccionarios de texto en PostgreSQL son como el equipo de editores de un diccionario real. El diccionario de "stem" (raíces) sabe que "corriendo", "correré" y "corrimos" vienen de "correr". El diccionario de sinónimos sabe que "automóvil" = "coche" = "carro". El thesaurus sabe que "base de datos" es un concepto relacionado con "PostgreSQL". Tú creas las reglas, PostgreSQL las aplica.</div>
+
+<div class="main-area">
+
+<p style="color:#bcc;margin-bottom:10px;font-weight:600"><i class="fas fa-book" style="color:#00e0ff"></i> Configurador de Diccionarios</p>
+
+<div class="dict-grid">
+
+<button class="dict-card active" data-dict="spanish_stem">🇪🇸 spanish_stem</button>
+
+<button class="dict-card" data-dict="synonym">📖 Sinónimos</button>
+
+<button class="dict-card" data-dict="thesaurus">📚 Thesaurus</button>
+
+<button class="dict-card" data-dict="simple">🔤 simple</button>
+
+</div>
+
+<div class="dict-output" id="dictOutput">Haz clic en un diccionario para ver cómo procesa el texto de ejemplo.</div>
+
+<div class="synonym-input">
+
+<input type="text" id="synonymText" placeholder='"PostgreSQL" = "Postgres" = "PG"' value="PostgreSQL es mejor que MySQL para búsqueda">
+
+<button id="testDictBtn"><i class="fas fa-flask"></i> Probar</button>
+
+</div>
+
+</div>
+
+<div id="feedback" class="feedback">💡 Los diccionarios se encadenan: unaccent �’ spanish_stem �’ synonym. Configuración: ALTER TEXT SEARCH CONFIGURATION...</div>
+
+<div id="insignia" class="insignia hidden"><i class="fas fa-medal" style="font-size:2.5rem;color:#ffd700"></i><h3>🏅 Lexicógrafo 🏅</h3><p>¡Sabes crear y configurar diccionarios de texto en PostgreSQL!</p></div>
+
+<div class="resumen-modulo"><h3><i class="fas fa-clipboard-list"></i> Resumen del módulo</h3><ul><li><i class="fas fa-check"></i> to_tsvector() tokeniza, elimina stop words y reduce a lexemas con posiciones</li><li><i class="fas fa-check"></i> tsvector almacena lexemas únicos con sus posiciones en el documento</li><li><i class="fas fa-check"></i> La lematización (stemming) permite encontrar palabras relacionadas</li><li><i class="fas fa-check"></i> Los índices GIN aceleran las búsquedas FTS órdenes de magnitud</li><li><i class="fas fa-check"></i> Siempre especifica el idioma para una tokenización correcta</li></ul></div>
+<button class="btn-next" onclick="window.location.href='11-busqueda-hibrida.html'"><span data-i18n="btn_siguiente_modulo">Siguiente Módulo</span><i class="fas fa-arrow-right"></i></button>
+
+<footer><i class="fas fa-crown"></i> SQL Avanzado Â· Curso 3 Â· Módulo 10</footer>
+
+</div>
+
+<script>
+
+const MODULE=10,COURSE="sqlavanzado_c3",PROG="sqlavanzado_progress",BADGES="sqlavanzado_badges";
+
+let currentDict='spanish_stem';
+
+document.querySelectorAll('.dict-card').forEach(b=>b.addEventListener('click',function(){
+
+document.querySelectorAll('.dict-card').forEach(x=>x.classList.remove('active'));
+
+this.classList.add('active');
+
+currentDict=this.dataset.dict;
+
+testDict();
+
+}));
+
+function testDict(){
+
+let text=document.getElementById('synonymText').value.trim()||'PostgreSQL es mejor que MySQL para búsqueda';
+
+let output=document.getElementById('dictOutput');
+
+let words=text.toLowerCase().split(/\s+/);
+
+if(currentDict==='spanish_stem'){
+
+let stems=words.map(w=>{if(w.endsWith('ando')||w.endsWith('endo'))return w.slice(0,-4)+'ar';if(w.endsWith('ción'))return w.slice(0,-5)+'cir';if(w.endsWith('s')&&w.length>4)return w.slice(0,-1);return w;});
+
+output.innerHTML=I18N.t('fb_0')+stems.join(' ')+'</strong> ” Raíces (stemming) reducidas.';
+
+}else if(currentDict==='synonym'){
+
+let syns={'postgresql':'postgresql','postgres':'postgresql','pg':'postgresql','mysql':'mysql','bd':'basededatos','db':'basededatos'};
+
+let mapped=words.map(w=>syns[w]||w);
+
+output.innerHTML=I18N.t('fb_1')+mapped.join(' ')+'</strong> ” "PostgreSQL" y "Postgres" se normalizan al mismo lexema.';
+
+}else if(currentDict==='thesaurus'){
+
+let th={'base de datos':'sql','big data':'analytics','machine learning':'ai'};
+
+output.innerHTML=I18N.t('fb_2');
+
+}else{
+
+output.innerHTML=I18N.t('fb_3')+words.join(' ')+'</strong> ” El diccionario simple no modifica las palabras, solo las pasa en minúsculas.';
+
+}
+
+document.getElementById('feedback').innerHTML=I18N.t('fb_4')+currentDict+'. Los diccionarios se configuran con CREATE TEXT SEARCH DICTIONARY y se asignan a configuraciones.';
+
+let bd=JSON.parse(localStorage.getItem(BADGES))||[];if(!bd.includes('Lexicógrafo')){bd.push('Lexicógrafo');localStorage.setItem(BADGES,JSON.stringify(bd));document.getElementById('insignia').classList.remove('hidden')}
+
+updateProg();
+
+}
+
+document.getElementById('testDictBtn').addEventListener('click',testDict);
+
+function updateProg(){
+
+let p=JSON.parse(localStorage.getItem(COURSE+"_progress"))||[];if(!p.includes(MODULE)){p.push(MODULE);localStorage.setItem(COURSE+"_progress",JSON.stringify(p))}
+
+let pct=Math.round(p.length/12*100);document.getElementById('progFill').style.width=pct+'%';document.getElementById('progText').textContent='Módulo 10 de 12 ('+pct+'%)';
+
+let gp=JSON.parse(localStorage.getItem(PROG))||[];if(!gp.includes(MODULE+132)){gp.push(MODULE+132);localStorage.setItem(PROG,JSON.stringify(gp))}
+
+}
+
+testDict();
+
+</script>
+
+document.getElementById('revealBtn')?.addEventListener('click',function(){
+let e=document.getElementById('explainerContainer');
+if(e){
+e.style.display=e.style.display==='none'?'block':'none';
+this.innerHTML=e.style.display==='block'?'<i class="fas fa-eye-slash"></i> Ocultar explicación':'<i class="fas fa-eye"></i> Mostrar explicación de cada opción';
+}
+});
+document.querySelectorAll('#quizContainer .quiz-option')?.forEach(b=>{
+b.addEventListener('click',function(){
+let ans=this.dataset.ans;
+let fb=document.getElementById('feedback');
+// Mark correct/wrong
+let correctIdx=0; // default first
+document.querySelectorAll('#quizContainer .quiz-option').forEach((o,i)=>{
+if(o.dataset.correct==='true') correctIdx=i;
+});
+if(ans==correctIdx.toString()){
+this.className='quiz-option correct';
+fb.innerHTML=I18N.t('quiz_correct');
+let bd=JSON.parse(localStorage.getItem(BADGES))||[];
+if(!bd.includes('diccionarios-de-texto')){bd.push('diccionarios-de-texto');localStorage.setItem(BADGES,JSON.stringify(bd))}
+document.getElementById('insignia')?.classList.remove('hidden');
+updateProg();
+}else{
+this.className='quiz-option wrong';
+fb.innerHTML=I18N.t('quiz_wrong');
+setTimeout(()=>this.className='quiz-option',600);
+}
+document.querySelectorAll('#quizContainer .quiz-option').forEach(o=>o.style.pointerEvents='none');
+setTimeout(()=>document.querySelectorAll('#quizContainer .quiz-option').forEach(o=>o.style.pointerEvents=''),2000);
+});
+});
+
+
+
+
+<script>
+
+window.I18N_DATA=Object.assign({
+"quiz_correct": 
+  "es": "✅ ¡Correcto! Has respondido acertadamente sobre 📚 Diccionarios de Texto.",
+  "en": "✅ Correct! You answered correctly about 📚 Diccionarios de Texto."
+ ,
+ "quiz_wrong": 
+  "es": "❌ No es correcto. Revisa el material sobre 📚 Diccionarios de Texto e intenta de nuevo.",
+  "en": "❌ Not correct. Review the material about 📚 Diccionarios de Texto and try again.",
+
+ 'fb_0': { es: '🇪🇸 spanish_stem: <strong>', en: '🇪🇸 spanish_stem: <strong>' },
+
+ 'fb_1': { es: '📖 Sinónimos: <strong>', en: '📖 Sinónimos: <strong>' },
+
+ 'fb_2': { es: '📚 Thesaurus: PostgreSQL es una <strong>base de datos (�’ SQL)</strong>. El thesaurus agrupa conceptos bajo un término preferido.', en: '📚 Thesaurus: PostgreSQL es una <strong>base de datos (�’ SQL)</strong>. El thesaurus agrupa conceptos bajo un término preferido.' },
+
+ 'fb_3': { es: '🔤 simple: <strong>', en: '🔤 simple: <strong>' },
+
+ 'fb_4': { es: '�… Diccionario: ', en: '�… Diccionario: ' }
+
+};
+
+</script>
+
+document.getElementById('revealBtn')?.addEventListener('click',function(){
+let e=document.getElementById('explainerContainer');
+if(e){
+e.style.display=e.style.display==='none'?'block':'none';
+this.innerHTML=e.style.display==='block'?'<i class="fas fa-eye-slash"></i> Ocultar explicación':'<i class="fas fa-eye"></i> Mostrar explicación de cada opción';
+}
+});
+document.querySelectorAll('#quizContainer .quiz-option')?.forEach(b=>{
+b.addEventListener('click',function(){
+let ans=this.dataset.ans;
+let fb=document.getElementById('feedback');
+// Mark correct/wrong
+let correctIdx=0; // default first
+document.querySelectorAll('#quizContainer .quiz-option').forEach((o,i)=>{
+if(o.dataset.correct==='true') correctIdx=i;
+});
+if(ans==correctIdx.toString()){
+this.className='quiz-option correct';
+fb.innerHTML=I18N.t('quiz_correct');
+let bd=JSON.parse(localStorage.getItem(BADGES))||[];
+if(!bd.includes('diccionarios-de-texto')){bd.push('diccionarios-de-texto');localStorage.setItem(BADGES,JSON.stringify(bd))}
+document.getElementById('insignia')?.classList.remove('hidden');
+updateProg();
+}else{
+this.className='quiz-option wrong';
+fb.innerHTML=I18N.t('quiz_wrong');
+setTimeout(()=>this.className='quiz-option',600);
+}
+document.querySelectorAll('#quizContainer .quiz-option').forEach(o=>o.style.pointerEvents='none');
+setTimeout(()=>document.querySelectorAll('#quizContainer .quiz-option').forEach(o=>o.style.pointerEvents=''),2000);
+});
+});
+
+
+<script src="../../../assets/js/i18n.js"></script>
+
+document.getElementById('revealBtn')?.addEventListener('click',function(){
+let e=document.getElementById('explainerContainer');
+if(e){
+e.style.display=e.style.display==='none'?'block':'none';
+this.innerHTML=e.style.display==='block'?'<i class="fas fa-eye-slash"></i> Ocultar explicación':'<i class="fas fa-eye"></i> Mostrar explicación de cada opción';
+}
+});
+document.querySelectorAll('#quizContainer .quiz-option')?.forEach(b=>{
+b.addEventListener('click',function(){
+let ans=this.dataset.ans;
+let fb=document.getElementById('feedback');
+// Mark correct/wrong
+let correctIdx=0; // default first
+document.querySelectorAll('#quizContainer .quiz-option').forEach((o,i)=>{
+if(o.dataset.correct==='true') correctIdx=i;
+});
+if(ans==correctIdx.toString()){
+this.className='quiz-option correct';
+fb.innerHTML=I18N.t('quiz_correct');
+let bd=JSON.parse(localStorage.getItem(BADGES))||[];
+if(!bd.includes('diccionarios-de-texto')){bd.push('diccionarios-de-texto');localStorage.setItem(BADGES,JSON.stringify(bd))}
+document.getElementById('insignia')?.classList.remove('hidden');
+updateProg();
+}else{
+this.className='quiz-option wrong';
+fb.innerHTML=I18N.t('quiz_wrong');
+setTimeout(()=>this.className='quiz-option',600);
+}
+document.querySelectorAll('#quizContainer .quiz-option').forEach(o=>o.style.pointerEvents='none');
+setTimeout(()=>document.querySelectorAll('#quizContainer .quiz-option').forEach(o=>o.style.pointerEvents=''),2000);
+});
+});
+  </body>
+
+</html>
+

@@ -56,7 +56,9 @@
   .nav-link.menu { background:#1a2a4a; border:1px solid #ff66c0; }
   footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
   @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .info-grid { grid-template-columns:1fr; } }
- </style>
+ 
+  .objectives { background:rgba(255,102,192,0.1); border-radius:1.5rem; padding:1rem 1.5rem; margin:1rem 2rem; border:1px solid rgba(255,102,192,0.3); }
+  </style>
  <link rel="stylesheet" href="../../../assets/css/theme.css">
 </head>
 <body>
@@ -79,6 +81,8 @@
   <div class="analogy-card">
    <strong>💡 Piénsalo así:</strong> El TCL es como la receta secreta de la abuela: no importa de qu&eacute; distribuci&oacute;n vengan los datos individuales (uniformes, exponenciales, etc.), si sumas suficientes, el resultado se ver&aacute; como una campana de Gauss. Es el "punto de encuentro" de todas las distribuciones.
   </div>
+  <div class="objectives"><h3 style="color:#ff99d6;font-size:1.1rem;margin-bottom:0.5rem;">🎯 ¿Que aprenderas en este modulo?</h3><ul><li>Enunciar el TCL y condiciones</li><li>Aproximar sumas con normal</li><li>Aplicar TCL en muestreo</li><li>Interpretar error estandar</li></ul></div>
+  
   <div class="main-area">
    <div class="section-title"><i class="fas fa-bullseye"></i> El Teorema</div>
    <div class="tcl-box">
@@ -142,6 +146,8 @@
 
   <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre el Teorema Central del L&iacute;mite.</div>
 
+  <div class="recap"><h3>📖 Resumen del modulo</h3><ul><li>El TCL es pilar de inferencia</li><li>Media muestral ~ N(mu, sigma^2/n)</li><li>Para cualquier distribucion con varianza finita</li><li>Error estandar = sigma/raiz(n)</li></ul></div>
+  
   <div class="nav-links">
    <a href="09-ley-grandes-numeros.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
@@ -154,11 +160,13 @@
   const STORAGE_KEY = 'prog_est_1_10';
   const PROGRESS_KEY = 'prog_est_1_progress';
   const questions = [
-   { text: "El TCL establece que la distribución de la media muestral tiende a:", options: ["Uniforme", "Exponencial", "Normal", "Binomial"], correct: 2 },
-   { text: "¿Qué tamaño de muestra se considera suficiente para aplicar el TCL?", options: ["n ≥ 5", "n ≥ 10", "n ≥ 30", "n ≥ 100"], correct: 2 },
-   { text: "El error estándar de la media es:", options: ["σ/√n", "σ·√n", "σ²/√n", "σ/n"], correct: 0 },
-   { text: "¿Qué distribución origen NO funciona con el TCL?", options: ["Uniforme", "Exponencial", "Bernoulli", "Todas funcionan con varianza finita"], correct: 3 },
-   { text: "La aproximación normal a la Binomial requiere:", options: ["n > 100", "np ≥ 5 y n(1-p) ≥ 5", "p = 0.5", "n par"], correct: 1 }
+   { text: "El TCL establece que la distribución de la media muestral tiende a:", options: ["Uniforme", "Exponencial", "Normal", "Binomial"], explanation: "Opcion correcta: Normal. Este concepto es fundamental para el tema del modulo.", correct: 2 },
+   { text: "¿Qué tamaño de muestra se considera suficiente para aplicar el TCL?", options: ["n ≥ 5", "n ≥ 10", "n ≥ 30", "n ≥ 100"], explanation: "Correcto: n ≥ 30. Aplica esta definicion en los ejercicios practicos.", correct: 2 },
+   { text: "El error estándar de la media es:", options: ["σ/√n", "σ·√n", "σ²/√n", "σ/n"], explanation: "Opcion correcta: σ/√n. Este concepto es fundamental para el tema del modulo.", correct: 0 },
+   { text: "¿Qué distribución origen NO funciona con el TCL?", options: ["Uniforme", "Exponencial", "Bernoulli", "Todas funcionan con varianza finita"], explanation: "La respuesta acertada es: Todas funcionan con varianza finita. Recuerda este concepto clave.", correct: 3 },
+   { text: "La aproximación normal a la Binomial requiere:", options: ["n > 100", "np ≥ 5 y n(1-p) ≥ 5", "p = 0.5", "n par"], explanation: "Correcto: np ≥ 5 y n(1-p) ≥ 5. Aplica esta definicion en los ejercicios practicos.", correct: 1 }
+
+
   ];
   let userAnswers = new Array(questions.length).fill(null);
   let quizCompleted = false;
@@ -191,7 +199,17 @@
       this.classList.add('selected'); userAnswers[idx] = optIdx; updateBtnState();
      });
      optsDiv.appendChild(span);
-    });
+    });    // Add explanation div
+    var expDiv = document.createElement('div');
+    expDiv.classList.add('explanation');
+    if (questions[idx].explanation) expDiv.textContent = '💡 ' + questions[idx].explanation;
+    qDiv.appendChild(expDiv);    // Add explanation div
+    var expDiv = document.createElement('div');
+    expDiv.classList.add('explanation');
+    if (questions[idx].explanation) expDiv.textContent = '💡 ' + questions[idx].explanation;
+    qDiv.appendChild(expDiv);
+
+
     container.appendChild(qDiv);
    });
   }
@@ -222,7 +240,13 @@
    } else {
     document.getElementById('feedbackMsg').textContent = '❌ ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. ¡Reintenta!';
    }
-  }
+  
+    // Show explanations after submission
+    document.querySelectorAll('.question').forEach(function(qd, i) {
+        var exp = qd.querySelector('.explanation');
+        if (exp && questions[i] && questions[i].explanation) { exp.style.display = 'block'; }
+    });
+}
 
   function restoreProgress() {
    const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');

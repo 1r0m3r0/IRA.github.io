@@ -59,7 +59,9 @@
   .nav-link.menu { background:#1a2a4a; border:1px solid #ff66c0; }
   footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
   @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .info-grid { grid-template-columns:1fr; } .formula-grid { grid-template-columns:1fr; } }
- </style>
+ 
+  .objectives { background:rgba(255,102,192,0.1); border-radius:1.5rem; padding:1rem 1.5rem; margin:1rem 2rem; border:1px solid rgba(255,102,192,0.3); }
+  </style>
  <link rel="stylesheet" href="../../../assets/css/theme.css">
 </head>
 <body>
@@ -82,6 +84,8 @@
   <div class="analogy-card">
    <strong>💡 Piénsalo así:</strong> La esperanza es como el centro de gravedad de una distribuci&oacute;n: el punto de equilibrio. La varianza es qu&eacute; tan dispersos est&aacute;n los datos alrededor de ese centro. Si la esperanza es la direcci&oacute;n que se&ntilde;ala tu GPS, la varianza es qu&eacute; tan ancha es la carretera.
   </div>
+  <div class="objectives"><h3 style="color:#ff99d6;font-size:1.1rem;margin-bottom:0.5rem;">🎯 ¿Que aprenderas en este modulo?</h3><ul><li>Calcular el valor esperado E[X]</li><li>Calcular varianza y desviacion estandar</li><li>Aplicar linealidad de la esperanza</li><li>Usar desigualdad de Chebyshev</li></ul></div>
+  
   <div class="main-area">
    <div class="section-title"><i class="fas fa-crosshairs"></i> Esperanza (Valor Esperado)</div>
    <div class="info-grid">
@@ -156,6 +160,8 @@
 
   <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre esperanza, varianza y momentos.</div>
 
+  <div class="recap"><h3>📖 Resumen del modulo</h3><ul><li>E[X] es el promedio ponderado</li><li>Var(X) = E[X^2] - mu^2</li><li>E[aX+b] = a*E[X]+b</li><li>Var(aX+b) = a^2*Var(X)</li></ul></div>
+  
   <div class="nav-links">
    <a href="05-variables-continuas.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
@@ -168,11 +174,13 @@
   const STORAGE_KEY = 'prog_est_1_06';
   const PROGRESS_KEY = 'prog_est_1_progress';
   const questions = [
-   { text: "La esperanza E[X] se interpreta como:", options: ["El valor más probable", "El promedio ponderado de X", "La mediana de X", "El mínimo de X"], correct: 1 },
-   { text: "Var(aX + b) = ?", options: ["a Var(X) + b", "a² Var(X)", "a Var(X)", "Var(X) + b"], correct: 1 },
-   { text: "Si E[X] = 5 y E[X²] = 30, ¿Var(X) = ?", options: ["25", "5", "30", "10"], correct: 1 },
-   { text: "La desigualdad de Chebyshev acota:", options: ["P(X = μ)", "P(|X-μ| ≥ kσ)", "P(X > μ)", "P(X < μ)"], correct: 1 },
-   { text: "E[X + Y] = ?", options: ["E[X] + E[Y]", "E[X]·E[Y]", "E[X] - E[Y]", "Depende de la correlación"], correct: 0 }
+   { text: "La esperanza E[X] se interpreta como:", options: ["El valor más probable", "El promedio ponderado de X", "La mediana de X", "El mínimo de X"], explanation: "Correcto: El promedio ponderado de X. Aplica esta definicion en los ejercicios practicos.", correct: 1 },
+   { text: "Var(aX + b) = ?", options: ["a Var(X) + b", "a² Var(X)", "a Var(X)", "Var(X) + b"], explanation: "Correcto: a² Var(X). Aplica esta definicion en los ejercicios practicos.", correct: 1 },
+   { text: "Si E[X] = 5 y E[X²] = 30, ¿Var(X) = ?", options: ["25", "5", "30", "10"], explanation: "5 es la respuesta correcta. Practica con los ejemplos para afianzarlo.", correct: 1 },
+   { text: "La desigualdad de Chebyshev acota:", options: ["P(X = μ)", "P(|X-μ| ≥ kσ)", "P(X > μ)", "P(X < μ)"], explanation: "Opcion correcta: P(|X-μ| ≥ kσ). Este concepto es fundamental para el tema del modulo.", correct: 1 },
+   { text: "E[X + Y] = ?", options: ["E[X] + E[Y]", "E[X]·E[Y]", "E[X] - E[Y]", "Depende de la correlación"], explanation: "Correcto: . Aplica esta definicion en los ejercicios practicos.", correct: 0 }
+
+
   ];
   let userAnswers = new Array(questions.length).fill(null);
   let quizCompleted = false;
@@ -205,7 +213,17 @@
       this.classList.add('selected'); userAnswers[idx] = optIdx; updateBtnState();
      });
      optsDiv.appendChild(span);
-    });
+    });    // Add explanation div
+    var expDiv = document.createElement('div');
+    expDiv.classList.add('explanation');
+    if (questions[idx].explanation) expDiv.textContent = '💡 ' + questions[idx].explanation;
+    qDiv.appendChild(expDiv);    // Add explanation div
+    var expDiv = document.createElement('div');
+    expDiv.classList.add('explanation');
+    if (questions[idx].explanation) expDiv.textContent = '💡 ' + questions[idx].explanation;
+    qDiv.appendChild(expDiv);
+
+
     container.appendChild(qDiv);
    });
   }
@@ -236,7 +254,13 @@
    } else {
     document.getElementById('feedbackMsg').textContent = '❌ ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. ¡Reintenta!';
    }
-  }
+  
+    // Show explanations after submission
+    document.querySelectorAll('.question').forEach(function(qd, i) {
+        var exp = qd.querySelector('.explanation');
+        if (exp && questions[i] && questions[i].explanation) { exp.style.display = 'block'; }
+    });
+}
 
   function restoreProgress() {
    const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');

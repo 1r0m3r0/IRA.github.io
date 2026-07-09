@@ -61,7 +61,9 @@
   .sim-input:focus { outline:none; border-color:#ffd700; box-shadow:0 0 10px #ffd70040; }
   .sim-label { font-size:0.9rem; color:#b9ccee; }
   .canvas-container { background:#0a0f1e; border-radius:1.5rem; padding:1rem; margin:1rem 0; }
- </style>
+ 
+  .objectives { background:rgba(255,215,0,0.1); border-radius:1.5rem; padding:1rem 1.5rem; margin:1rem 2rem; border:1px solid rgba(255,215,0,0.3); }
+  </style>
  <link rel="stylesheet" href="../../../assets/css/theme.css">
 </head>
 <body>
@@ -82,6 +84,8 @@
   <div class="analogy-card">
    <strong>💡 Piénsalo así:</strong> Este módulo es como el chequeo médico antes de empezar un programa de entrenamiento. Vamos a medir tu nivel actual en estadística aplicada para saber desde dónde partimos. No te preocupes por las respuestas incorrectas — son un mapa de lo que aprenderás.
   </div>
+  <div class="objectives"><h3 style="color:#ffed7a;font-size:1.1rem;margin-bottom:0.5rem;">🎯 ¿Que aprenderas en este modulo?</h3><ul><li>Evaluar tu nivel en estadistica aplicada</li><li>Identificar areas de interes</li><li>Prepararte para integracion final</li></ul></div>
+  
   <div class="main-area">
    <div class="section-title"><i class="fas fa-tachometer-alt"></i> Diagnóstico de Conocimientos</div>
    <div class="info-grid">
@@ -107,7 +111,9 @@
    </div>
   </div>
 
-  <div id="feedbackMsg" class="feedback">💡 Responde las 6 preguntas del diagnóstico en 120 segundos.</div>  <div class="nav-links">
+  <div id="feedbackMsg" class="feedback">💡 Responde las 6 preguntas del diagnóstico en 120 segundos.</div>  <div class="recap"><h3>📖 Resumen del modulo</h3><ul><li>Completaste el diagnostico</li><li>Conoces tu punto de partida</li></ul></div>
+  
+  <div class="nav-links">
    
    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
    <a href="02-diseno-experimentos.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
@@ -117,13 +123,15 @@
   const STORAGE_KEY = 'prog_est_6_01';
   const PROGRESS_KEY = 'prog_est_6_progress';
   const questions = [
- { "text": "¿Cuál es el primer paso en un diseño experimental formal?", "options": ["Formular hipótesis", "Recolectar datos", "Aleatorizar tratamientos", "Calcular ANOVA"], "correct": 0 },
- { "text": "¿Qué gráfico se usa para detectar sesgo de publicación en meta-análisis?", "options": ["Forest plot", "Funnel plot", "QQ plot", "Box plot"], "correct": 1 },
- { "text": "En control de calidad, ¿qué índice mide la capacidad potencial del proceso?", "options": ["Cp", "Cpk", "Pp", "Sigma"], "correct": 0 },
- { "text": "¿Qué estadístico no paramétrico es análogo a ANOVA de una vía?", "options": ["Mann-Whitney", "Kruskal-Wallis", "Wilcoxon", "Friedman"], "correct": 1 },
- { "text": "En A/B testing, ¿qué significa MDE?", "options": ["Minimum Detectable Effect", "Maximum Data Error", "Mean Distribution Estimate", "Model Design Efficiency"], "correct": 0 },
- { "text": "¿Qué principio de Tufte aboga por maximizar la tinta de datos sobre la tinta total?", "options": ["Data-ink ratio", "Lie factor", "Chartjunk", "Small multiples"], "correct": 0 }
-];
+{ "text": "¿Cuál es el primer paso en un diseño experimental formal?", "options": ["Formular hipótesis", "Recolectar datos", "Aleatorizar tratamientos", "Calcular ANOVA"], explanation: "Correcto: Formular hipótesis. Aplica esta definicion en los ejercicios practicos.", "correct": 0 },
+{ "text": "¿Qué gráfico se usa para detectar sesgo de publicación en meta-análisis?", "options": ["Forest plot", "Funnel plot", "QQ plot", "Box plot"], explanation: "La respuesta acertada es: Funnel plot. Recuerda este concepto clave.", "correct": 1 },
+{ "text": "En control de calidad, ¿qué índice mide la capacidad potencial del proceso?", "options": ["Cp", "Cpk", "Pp", "Sigma"], explanation: "La respuesta acertada es: Cp. Recuerda este concepto clave.", "correct": 0 },
+{ "text": "¿Qué estadístico no paramétrico es análogo a ANOVA de una vía?", "options": ["Mann-Whitney", "Kruskal-Wallis", "Wilcoxon", "Friedman"], explanation: "Correcto: Kruskal-Wallis. Aplica esta definicion en los ejercicios practicos.", "correct": 1 },
+{ "text": "En A/B testing, ¿qué significa MDE?", "options": ["Minimum Detectable Effect", "Maximum Data Error", "Mean Distribution Estimate", "Model Design Efficiency"], explanation: "La respuesta correcta es: Minimum Detectable Effect. Revisa la teoria del modulo si necesitas mas detalles.", "correct": 0 },
+{ "text": "¿Qué principio de Tufte aboga por maximizar la tinta de datos sobre la tinta total?", "options": ["Data-ink ratio", "Lie factor", "Chartjunk", "Small multiples"], explanation: "Opcion correcta: Data-ink ratio. Este concepto es fundamental para el tema del modulo.", "correct": 0 }
+
+
+  ];
   let userAnswers = new Array(questions.length).fill(null);
   let quizCompleted = false;
 
@@ -156,7 +164,17 @@
       this.classList.add('selected'); userAnswers[idx] = optIdx; updateBtnState();
      });
      optsDiv.appendChild(span);
-    });
+    });    // Add explanation div
+    var expDiv = document.createElement('div');
+    expDiv.classList.add('explanation');
+    if (questions[idx].explanation) expDiv.textContent = '💡 ' + questions[idx].explanation;
+    qDiv.appendChild(expDiv);    // Add explanation div
+    var expDiv = document.createElement('div');
+    expDiv.classList.add('explanation');
+    if (questions[idx].explanation) expDiv.textContent = '💡 ' + questions[idx].explanation;
+    qDiv.appendChild(expDiv);
+
+
     container.appendChild(qDiv);
    });
   }
@@ -189,7 +207,13 @@
    } else {
     document.getElementById('feedbackMsg').textContent = '❌ ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.5) + '. ¡Reintenta!';
    }
-  }
+  
+    // Show explanations after submission
+    document.querySelectorAll('.question').forEach(function(qd, i) {
+        var exp = qd.querySelector('.explanation');
+        if (exp && questions[i] && questions[i].explanation) { exp.style.display = 'block'; }
+    });
+}
 
   function restoreProgress() {
    const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');

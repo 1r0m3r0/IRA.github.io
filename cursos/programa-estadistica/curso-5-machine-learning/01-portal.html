@@ -48,7 +48,9 @@
   .nav-link.menu { background:#1a2a4a; border:1px solid #ff5050; }
   footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
   @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } }
- </style>
+ 
+  .objectives { background:rgba(255,80,80,0.1); border-radius:1.5rem; padding:1rem 1.5rem; margin:1rem 2rem; border:1px solid rgba(255,80,80,0.3); }
+  </style>
  <link rel="stylesheet" href="../../../assets/css/theme.css">
 </head>
 <body>
@@ -69,6 +71,8 @@
   <div class="analogy-card">
    <strong>💡 Piénsalo así:</strong> Este diagnóstico es como la revisión médica antes de empezar un entrenamiento. No importa si sacas 0 o 100 — lo importante es saber desde dónde partes para aprovechar mejor el viaje.
   </div>
+  <div class="objectives"><h3 style="color:#ff8080;font-size:1.1rem;margin-bottom:0.5rem;">🎯 ¿Que aprenderas en este modulo?</h3><ul><li>Evaluar tu nivel en ML estadistico</li><li>Identificar conceptos que conoces</li><li>Prepararte para el curso</li></ul></div>
+  
   <div class="main-area">
    <div class="quiz-area">
     <div class="quiz-title"><i class="fas fa-hourglass-half"></i> Diagnóstico: Conceptos de ML (120s)</div>
@@ -83,6 +87,8 @@
    </div>
   </div>
   <div id="feedbackMsg" class="feedback">💡 Responde las 6 preguntas antes de que se acabe el tiempo.</div>
+  <div class="recap"><h3>📖 Resumen del modulo</h3><ul><li>Completaste el diagnostico</li><li>Conoces tu punto de partida</li></ul></div>
+  
   <div class="nav-links">
    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
    <a href="02-arboles-decision.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
@@ -93,12 +99,14 @@
   const STORAGE_KEY = 'prog_est_5_01';
   const PROGRESS_KEY = 'prog_est_5_progress';
   const questions = [
-   { text: "¿Qué tipo de aprendizaje usa etiquetas en los datos de entrenamiento?", options: ["Supervisado","No supervisado","Por refuerzo","Semi-supervisado"], correct: 0 },
-   { text: "¿Qué métrica es más apropiada para clasificación desbalanceada?", options: ["Accuracy","F1-Score","MSE","R²"], correct: 1 },
-   { text: "¿Cuál es el propósito del conjunto de prueba (test set)?", options: ["Entrenar el modelo","Evaluar rendimiento final","Ajustar hiperparámetros","Aumentar datos"], correct: 1 },
-   { text: "¿Qué algoritmo se basa en promediar múltiples árboles?", options: ["Regresión Logística","Random Forest","K-Means","SVM"], correct: 1 },
-   { text: "¿Qué técnica reduce la dimensionalidad?", options: ["PCA","SMOTE","One-hot encoding","Bagging"], correct: 0 },
-   { text: "¿Qué mide la entropía en un nodo de árbol de decisión?", options: ["La profundidad","La impureza","La varianza","La precisión"], correct: 1 }
+   { text: "¿Qué tipo de aprendizaje usa etiquetas en los datos de entrenamiento?", options: ["Supervisado","No supervisado","Por refuerzo","Semi-supervisado"], explanation: "La respuesta acertada es: Supervisado. Recuerda este concepto clave.", correct: 0 },
+   { text: "¿Qué métrica es más apropiada para clasificación desbalanceada?", options: ["Accuracy","F1-Score","MSE","R²"], explanation: "F1-Score es la respuesta correcta. Practica con los ejemplos para afianzarlo.", correct: 1 },
+   { text: "¿Cuál es el propósito del conjunto de prueba (test set)?", options: ["Entrenar el modelo","Evaluar rendimiento final","Ajustar hiperparámetros","Aumentar datos"], explanation: "La respuesta acertada es: Evaluar rendimiento final. Recuerda este concepto clave.", correct: 1 },
+   { text: "¿Qué algoritmo se basa en promediar múltiples árboles?", options: ["Regresión Logística","Random Forest","K-Means","SVM"], explanation: "La respuesta correcta es: Random Forest. Revisa la teoria del modulo si necesitas mas detalles.", correct: 1 },
+   { text: "¿Qué técnica reduce la dimensionalidad?", options: ["PCA","SMOTE","One-hot encoding","Bagging"], explanation: "La respuesta acertada es: PCA. Recuerda este concepto clave.", correct: 0 },
+   { text: "¿Qué mide la entropía en un nodo de árbol de decisión?", options: ["La profundidad","La impureza","La varianza","La precisión"], explanation: "La impureza es la respuesta correcta. Practica con los ejemplos para afianzarlo.", correct: 1 }
+
+
   ];
   let userAnswers = new Array(questions.length).fill(null);
   let quizCompleted = false;
@@ -137,7 +145,17 @@
       this.classList.add('selected'); userAnswers[idx] = optIdx; updateBtnState();
      });
      optsDiv.appendChild(span);
-    });
+    });    // Add explanation div
+    var expDiv = document.createElement('div');
+    expDiv.classList.add('explanation');
+    if (questions[idx].explanation) expDiv.textContent = '💡 ' + questions[idx].explanation;
+    qDiv.appendChild(expDiv);    // Add explanation div
+    var expDiv = document.createElement('div');
+    expDiv.classList.add('explanation');
+    if (questions[idx].explanation) expDiv.textContent = '💡 ' + questions[idx].explanation;
+    qDiv.appendChild(expDiv);
+
+
     container.appendChild(qDiv);
    });
   }
@@ -167,7 +185,13 @@
    } else {
     document.getElementById('feedbackMsg').textContent = (timeup ? '\u23f0 Tiempo agotado. ' : '\u274c ') + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. \u00a1Reintenta!';
    }
-  }
+  
+    // Show explanations after submission
+    document.querySelectorAll('.question').forEach(function(qd, i) {
+        var exp = qd.querySelector('.explanation');
+        if (exp && questions[i] && questions[i].explanation) { exp.style.display = 'block'; }
+    });
+}
   function restoreProgress() {
    const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
    if (p.includes(STORAGE_KEY)) {

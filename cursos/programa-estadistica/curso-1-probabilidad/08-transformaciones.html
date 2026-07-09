@@ -59,7 +59,9 @@
   .nav-link.menu { background:#1a2a4a; border:1px solid #ff66c0; }
   footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
   @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .info-grid { grid-template-columns:1fr; } .dist-grid { grid-template-columns:1fr; } }
- </style>
+ 
+  .objectives { background:rgba(255,102,192,0.1); border-radius:1.5rem; padding:1rem 1.5rem; margin:1rem 2rem; border:1px solid rgba(255,102,192,0.3); }
+  </style>
  <link rel="stylesheet" href="../../../assets/css/theme.css">
 </head>
 <body>
@@ -82,6 +84,8 @@
   <div class="analogy-card">
    <strong>💡 Piénsalo así:</strong> Transformar una variable aleatoria es como aplicar un filtro de Instagram a una foto. La imagen original (distribuci&oacute;n) cambia seg&uacute;n el filtro (funci&oacute;n). Si el filtro es brillo+10% (lineal), la foto se ve m&aacute;s clara pero igual. Si es un filtro distort (no lineal), la imagen cambia completamente de forma.
   </div>
+  <div class="objectives"><h3 style="color:#ff99d6;font-size:1.1rem;margin-bottom:0.5rem;">🎯 ¿Que aprenderas en este modulo?</h3><ul><li>Aplicar transformaciones lineales</li><li>Usar metodo del cambio de variable</li><li>Calcular distribucion de la suma</li><li>Encontrar distribucion de funciones</li></ul></div>
+  
   <div class="main-area">
    <div class="section-title"><i class="fas fa-exchange-alt"></i> Transformaciones Lineales</div>
    <div class="info-grid">
@@ -141,6 +145,8 @@
 
   <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre transformaciones de variables.</div>
 
+  <div class="recap"><h3>📖 Resumen del modulo</h3><ul><li>Y = aX+b: lineal simple</li><li>Metodo del Jacobiano</li><li>Suma de normales sigue normal</li><li>TCL explica suma de variables</li></ul></div>
+  
   <div class="nav-links">
    <a href="07-distribuciones-conjuntas.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
@@ -153,11 +159,13 @@
   const STORAGE_KEY = 'prog_est_1_08';
   const PROGRESS_KEY = 'prog_est_1_progress';
   const questions = [
-   { text: "Si Y = aX + b, ¿cuál es la relación entre las varianzas?", options: ["Var(Y)=a·Var(X)+b", "Var(Y)=a²·Var(X)", "Var(Y)=Var(X)", "Var(Y)=a·Var(X)"], correct: 1 },
-   { text: "El método del Jacobiano requiere que la transformación sea:", options: ["Lineal", "Biyectiva", "Creciente", "Continua"], correct: 1 },
-   { text: "Si X ~ N(0,1), ¿Y = X² tiene distribución?", options: ["Normal", "Chi-cuadrado", "Exponencial", "Uniforme"], correct: 1 },
-   { text: "La convolución se usa para la distribución de:", options: ["aX+b", "X²", "X+Y (suma)", "e^X"], correct: 2 },
-   { text: "Para Y = g(X) con g creciente, F_Y(y) = ?", options: ["F_X(g(y))", "F_X(g⁻¹(y))", "1 - F_X(g⁻¹(y))", "f_X(g⁻¹(y))"], correct: 1 }
+   { text: "Si Y = aX + b, ¿cuál es la relación entre las varianzas?", options: ["Var(Y)=a·Var(X)+b", "Var(Y)=a²·Var(X)", "Var(Y)=Var(X)", "Var(Y)=a·Var(X)"], explanation: "Var(Y)=a²·Var(X) es la respuesta correcta. Practica con los ejemplos para afianzarlo.", correct: 1 },
+   { text: "El método del Jacobiano requiere que la transformación sea:", options: ["Lineal", "Biyectiva", "Creciente", "Continua"], explanation: "Correcto: Biyectiva. Aplica esta definicion en los ejercicios practicos.", correct: 1 },
+   { text: "Si X ~ N(0,1), ¿Y = X² tiene distribución?", options: ["Normal", "Chi-cuadrado", "Exponencial", "Uniforme"], explanation: "La respuesta acertada es: Chi-cuadrado. Recuerda este concepto clave.", correct: 1 },
+   { text: "La convolución se usa para la distribución de:", options: ["aX+b", "X²", "X+Y (suma)", "e^X"], explanation: "X+Y (suma) es la respuesta correcta. Practica con los ejemplos para afianzarlo.", correct: 2 },
+   { text: "Para Y = g(X) con g creciente, F_Y(y) = ?", options: ["F_X(g(y))", "F_X(g⁻¹(y))", "1 - F_X(g⁻¹(y))", "f_X(g⁻¹(y))"], explanation: "La respuesta correcta es: F_X(g⁻¹(y)). Revisa la teoria del modulo si necesitas mas detalles.", correct: 1 }
+
+
   ];
   let userAnswers = new Array(questions.length).fill(null);
   let quizCompleted = false;
@@ -190,7 +198,17 @@
       this.classList.add('selected'); userAnswers[idx] = optIdx; updateBtnState();
      });
      optsDiv.appendChild(span);
-    });
+    });    // Add explanation div
+    var expDiv = document.createElement('div');
+    expDiv.classList.add('explanation');
+    if (questions[idx].explanation) expDiv.textContent = '💡 ' + questions[idx].explanation;
+    qDiv.appendChild(expDiv);    // Add explanation div
+    var expDiv = document.createElement('div');
+    expDiv.classList.add('explanation');
+    if (questions[idx].explanation) expDiv.textContent = '💡 ' + questions[idx].explanation;
+    qDiv.appendChild(expDiv);
+
+
     container.appendChild(qDiv);
    });
   }
@@ -221,7 +239,13 @@
    } else {
     document.getElementById('feedbackMsg').textContent = '❌ ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. ¡Reintenta!';
    }
-  }
+  
+    // Show explanations after submission
+    document.querySelectorAll('.question').forEach(function(qd, i) {
+        var exp = qd.querySelector('.explanation');
+        if (exp && questions[i] && questions[i].explanation) { exp.style.display = 'block'; }
+    });
+}
 
   function restoreProgress() {
    const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');

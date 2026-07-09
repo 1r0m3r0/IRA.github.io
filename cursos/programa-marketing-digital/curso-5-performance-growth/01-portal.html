@@ -1,251 +1,429 @@
-﻿<!DOCTYPE html>
-<html lang="es">
-<head>
- <meta charset="UTF-8">
- <link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
- <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
- <title>Curso 5 | Portal de Inicio</title>
- <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
- <style>
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body { background:linear-gradient(145deg,#0b1424 0%,#09101c 100%); font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
-  .container { max-width:1300px; width:100%; background:rgba(12,22,40,0.75); backdrop-filter:blur(10px); border-radius:3rem; border:1px solid rgba(239,68,68,0.4); box-shadow:0 20px 40px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.05); overflow:hidden; }
-  .hero { background:linear-gradient(95deg,#0a111f,#141e32); padding:1.8rem 2rem; text-align:center; border-bottom:3px solid #ef4444; }
-  .hero h1 { font-size:2.2rem; font-weight:800; background:linear-gradient(135deg,#ffe6e6,#ef4444); -webkit-background-clip:text; background-clip:text; color:transparent; }
-  .hero p { margin-top:0.5rem; font-size:1.1rem; color:#fca5a5; }
-  .progress-bar { max-width:520px; margin:0.8rem auto 0; }
-  .progress-track { height:8px; background:rgba(255,255,255,0.08); border-radius:10px; overflow:hidden; }
-  .progress-fill { height:100%; width:0%; background:linear-gradient(90deg,#ef4444,#f87171,#fca5a5); border-radius:10px; transition:width 0.6s; }
-  .progress-text { font-size:0.75rem; color:#8899bb; margin-top:0.2rem; display:block; }
-  .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ef4444; display:flex; gap:1rem; align-items:center; }
-  .analogy-card i { font-size:2rem; color:#ef4444; }
-  .quiz-area { padding:0 2rem 2rem; }
-  .question-text { font-size:1.3rem; font-weight:600; margin-bottom:1rem; }
-  .options-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:0.7rem; margin-bottom:1rem; }
-  .opt-btn { background:#1e2a3e; padding:0.8rem 1rem; border-radius:1.5rem; cursor:pointer; transition:0.2s; border:2px solid transparent; font-weight:500; }
-  .opt-btn:hover:not(.disabled) { background:#2a3a5a; transform:scale(1.01); border-color:#ef444466; }
-  .opt-btn.selected { background:#ef4444; color:#fff; border-color:#dc2626; }
-  .opt-btn.correct { background:#2ecc71; color:#fff; border-color:#27ae60; animation:correctPop 0.5s; }
-  .opt-btn.wrong { background:#e74c3c; color:#fff; border-color:#c0392b; animation:wrongShake 0.5s; }
-  .opt-btn.disabled { cursor:not-allowed; opacity:0.6; }
-  .opt-btn.disabled.correct,.opt-btn.disabled.wrong { opacity:1; }
-  @keyframes correctPop { 0%{transform:scale(1)} 40%{transform:scale(1.06);box-shadow:0 0 25px rgba(46,204,113,0.6)} 100%{transform:scale(1)} }
-  @keyframes wrongShake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 40%{transform:translateX(6px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
-  .feedback { background:#00000099; border-radius:1.5rem; padding:0.8rem; margin:0.5rem 0 1rem; text-align:center; font-weight:500; }
-  .feedback.correct-fb { background:rgba(46,204,113,0.15); border:1px solid #2ecc7166; }
-  .feedback.wrong-fb { background:rgba(231,76,60,0.15); border:1px solid #e74c3c66; }
-  .insignia { text-align:center; padding:1rem; background:linear-gradient(135deg,rgba(239,68,68,0.15),rgba(220,38,38,0.05)); border-radius:2rem; border:2px solid #ef4444; margin:1rem 0; display:none; }
-  .insignia.show { display:block; animation:fadeIn 0.6s; }
-  @keyframes fadeIn { from{opacity:0;transform:scale(0.8)} to{opacity:1;transform:scale(1)} }
-  .btn-primary { background:linear-gradient(95deg,#ef4444,#dc2626); border:none; padding:0.8rem 2rem; border-radius:3rem; font-weight:bold; font-size:1rem; cursor:pointer; color:#fff; transition:0.2s; font-family:'Inter',sans-serif; }
-  .btn-primary:hover { transform:translateY(-2px); box-shadow:0 4px 15px rgba(239,68,68,0.4); }
-  .btn-secondary { background:#2c3e66; border:none; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; cursor:pointer; color:#eef5ff; font-family:'Inter',sans-serif; transition:0.2s; }
-  .btn-secondary:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(0,224,255,0.4); }
-  .score-board { display:flex; justify-content:space-between; align-items:center; background:#00000066; border-radius:2rem; padding:0.8rem 1.5rem; margin-bottom:1.2rem; flex-wrap:wrap; gap:0.5rem; }
-  .timer { font-weight:bold; display:flex; align-items:center; gap:0.4rem; background:#1e2a3e; padding:0.3rem 1rem; border-radius:2rem; border:1px solid transparent; }
-  .timer.warning { color:#f39c12; border-color:#f39c12; }
-  .timer.danger { color:#e74c3c; border-color:#e74c3c; animation:timerPulse 0.6s infinite; }
-  @keyframes timerPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
-  footer { text-align:center; padding:1rem; font-size:0.75rem; border-top:1px solid #2a3a55; }
-  .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
-  .nav-link { background:#2c3e66; border:none; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; cursor:pointer; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; font-size:0.95rem; }
-  .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(0,224,255,0.4); }
-  .nav-link.next { background:linear-gradient(95deg,#ef4444,#dc2626); color:#fff; }
-  .nav-link.menu { background:#1a2a4a; border:1px solid #ef4444; }
-  @media (max-width:750px) { .hero h1 { font-size:1.6rem; } }
- </style>
- <link rel="stylesheet" href="../../../assets/css/theme.css">
-</head>
-<body>
- <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a></nav>
-
-<div class="container">
- <div class="hero">
-  <h1><i class="fas fa-compass"></i> Diagnóstico Inicial</h1>
-  <p>Descubre tu nivel en publicidad digital y performance marketing</p>
-  <div class="progress-bar"><div class="progress-track"><div class="progress-fill" id="progressFill"></div></div><span class="progress-text" id="progressText">Módulo 1 de 12 (0%)</span></div>
- </div>
-
- <div class="analogy-card">
-  <i class="fas fa-stethoscope"></i>
-  <div><strong>🏥 Como un chequeo médico:</strong> Antes de entrenar, el médico mide tus signos vitales. Este diagnóstico evalúa tu knowledge baseline en performance marketing — sin importar el resultado, sabrás por dónde empezar.</div>
- </div>
-
- <div class="quiz-area" id="quizArea">
-  <div class="score-board">
-   <div class="score">🏆 <span id="scoreValue">0</span>/5</div>
-   <div class="timer" id="timerEl"><i class="fas fa-hourglass-half"></i> <span id="timerDisplay">30</span>s</div>
-  </div>
-  <div class="question-text" id="questionText"></div>
-  <div class="options-grid" id="optionsContainer"></div>
-  <div id="feedback" class="feedback">⏳ Responde cada pregunta. Son 5 preguntas de diagnóstico.</div>
-  <div id="insignia" class="insignia">
-   <i class="fas fa-medal" style="font-size:3rem;color:#ef4444;"></i>
-   <h3>🏅 Diagnóstico Completo 🏅</h3>
-   <p id="insigniaMsg">Has completado tu chequeo inicial. ¡Revisa tus resultados!</p>
-  </div>
-  <div style="text-align:center;margin-top:1rem;">
-   <button id="nextBtn" class="btn-primary" disabled>Siguiente <i class="fas fa-arrow-right"></i></button>
-   <button id="retryBtn" class="btn-secondary" style="display:none;margin-left:0.5rem;"><i class="fas fa-redo-alt"></i> Reintentar</button>
-  </div>
- </div>
-
- <div class="nav-links">
-  <a href="./index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
-  <a href="./02-performance-fundamentals.html" class="nav-link next" id="nextPageBtn">Siguiente: Performance Fundamentals <i class="fas fa-arrow-right"></i></a>
- </div>
- <footer><i class="fas fa-rocket"></i> Publicidad Digital, Performance & Growth · Curso 5 · Portal</footer>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+ <meta charset="UTF-8">
+ <link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Curso 5 | Portal de Inicio</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:linear-gradient(145deg,#0b1424 0%,#09101c 100%); font-family:'Inter',sans-serif; color:#eef5ff; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 1rem; }
+  .container { max-width:1300px; width:100%; background:rgba(12,22,40,0.75); backdrop-filter:blur(10px); border-radius:3rem; border:1px solid rgba(239,68,68,0.4); box-shadow:0 20px 40px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.05); overflow:hidden; }
+  .hero { background:linear-gradient(95deg,#0a111f,#141e32); padding:1.8rem 2rem; text-align:center; border-bottom:3px solid #ef4444; }
+  .hero h1 { font-size:2.2rem; font-weight:800; background:linear-gradient(135deg,#ffe6e6,#ef4444); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero p { margin-top:0.5rem; font-size:1.1rem; color:#fca5a5; }
+  .progress-bar { max-width:520px; margin:0.8rem auto 0; }
+  .progress-track { height:8px; background:rgba(255,255,255,0.08); border-radius:10px; overflow:hidden; }
+  .progress-fill { height:100%; width:0%; background:linear-gradient(90deg,#ef4444,#f87171,#fca5a5); border-radius:10px; transition:width 0.6s; }
+  .progress-text { font-size:0.75rem; color:#8899bb; margin-top:0.2rem; display:block; }
+  .analogy-card { background:#1e2a3acc; margin:1.5rem 2rem; padding:1.2rem 1.8rem; border-radius:2rem; border-left:8px solid #ef4444; display:flex; gap:1rem; align-items:center; }
+  .analogy-card i { font-size:2rem; color:#ef4444; }
+  .quiz-area { padding:0 2rem 2rem; }
+  .question-text { font-size:1.3rem; font-weight:600; margin-bottom:1rem; }
+  .options-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:0.7rem; margin-bottom:1rem; }
+  .opt-btn { background:#1e2a3e; padding:0.8rem 1rem; border-radius:1.5rem; cursor:pointer; transition:0.2s; border:2px solid transparent; font-weight:500; }
+  .opt-btn:hover:not(.disabled) { background:#2a3a5a; transform:scale(1.01); border-color:#ef444466; }
+  .opt-btn.selected { background:#ef4444; color:#fff; border-color:#dc2626; }
+  .opt-btn.correct { background:#2ecc71; color:#fff; border-color:#27ae60; animation:correctPop 0.5s; }
+  .opt-btn.wrong { background:#e74c3c; color:#fff; border-color:#c0392b; animation:wrongShake 0.5s; }
+  .opt-btn.disabled { cursor:not-allowed; opacity:0.6; }
+  .opt-btn.disabled.correct,.opt-btn.disabled.wrong { opacity:1; }
+  @keyframes correctPop { 0%{transform:scale(1)} 40%{transform:scale(1.06);box-shadow:0 0 25px rgba(46,204,113,0.6)} 100%{transform:scale(1)} }
+  @keyframes wrongShake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 40%{transform:translateX(6px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
+  .feedback { background:#00000099; border-radius:1.5rem; padding:0.8rem; margin:0.5rem 0 1rem; text-align:center; font-weight:500; }
+  .feedback.correct-fb { background:rgba(46,204,113,0.15); border:1px solid #2ecc7166; }
+  .feedback.wrong-fb { background:rgba(231,76,60,0.15); border:1px solid #e74c3c66; }
+  .insignia { text-align:center; padding:1rem; background:linear-gradient(135deg,rgba(239,68,68,0.15),rgba(220,38,38,0.05)); border-radius:2rem; border:2px solid #ef4444; margin:1rem 0; display:none; }
+  .insignia.show { display:block; animation:fadeIn 0.6s; }
+  @keyframes fadeIn { from{opacity:0;transform:scale(0.8)} to{opacity:1;transform:scale(1)} }
+  .btn-primary { background:linear-gradient(95deg,#ef4444,#dc2626); border:none; padding:0.8rem 2rem; border-radius:3rem; font-weight:bold; font-size:1rem; cursor:pointer; color:#fff; transition:0.2s; font-family:'Inter',sans-serif; }
+  .btn-primary:hover { transform:translateY(-2px); box-shadow:0 4px 15px rgba(239,68,68,0.4); }
+  .btn-secondary { background:#2c3e66; border:none; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; cursor:pointer; color:#eef5ff; font-family:'Inter',sans-serif; transition:0.2s; }
+  .btn-secondary:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(0,224,255,0.4); }
+  .score-board { display:flex; justify-content:space-between; align-items:center; background:#00000066; border-radius:2rem; padding:0.8rem 1.5rem; margin-bottom:1.2rem; flex-wrap:wrap; gap:0.5rem; }
+  .timer { font-weight:bold; display:flex; align-items:center; gap:0.4rem; background:#1e2a3e; padding:0.3rem 1rem; border-radius:2rem; border:1px solid transparent; }
+  .timer.warning { color:#f39c12; border-color:#f39c12; }
+  .timer.danger { color:#e74c3c; border-color:#e74c3c; animation:timerPulse 0.6s infinite; }
+  @keyframes timerPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
+  footer { text-align:center; padding:1rem; font-size:0.75rem; border-top:1px solid #2a3a55; }
+  .nav-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; padding:1.5rem 2rem; }
+  .nav-link { background:#2c3e66; border:none; padding:0.7rem 1.5rem; border-radius:3rem; font-weight:600; cursor:pointer; text-decoration:none; color:#eef5ff; display:inline-flex; align-items:center; gap:0.5rem; transition:0.2s; font-size:0.95rem; }
+  .nav-link:hover { transform:translateY(-2px); box-shadow:0 0 10px rgba(0,224,255,0.4); }
+  .nav-link.next { background:linear-gradient(95deg,#ef4444,#dc2626); color:#fff; }
+  .nav-link.menu { background:#1a2a4a; border:1px solid #ef4444; }
+  @media (max-width:750px) { .hero h1 { font-size:1.6rem; } }
+ 
+.objectives { background:rgba(239,68,68,0.1); border-radius:1.5rem; padding:1rem 1.5rem; margin:1rem 2rem; border:1px solid rgba(239,68,68,0.3); }
+.objectives li { color:#b9ccee; font-size:0.9rem; margin:0.4rem 0; list-style-type: none; }
+.objectives li::before { content:"🎯 "; }
+.info-panels { margin:1.5rem 2rem; }
+.info-panel { background:rgba(0,10,25,0.6); border-radius:1.5rem; padding:1rem 1.5rem; margin-bottom:1rem; border-left:4px solid #ef4444; transition:0.2s; }
+.info-panel:hover { transform:translateX(4px); }
+.info-panel h4 { color:#fca5a5; font-size:0.95rem; margin-bottom:0.3rem; }
+.info-panel p { font-size:0.85rem; color:#b9ccee; line-height:1.6; margin:0; }
+.step-section { margin:1.5rem 2rem; }
+.step-section h3 { color:#fca5a5; margin-bottom:1rem; }
+.quiz-section { margin:1.5rem 2rem; }
+.quiz-section h3 { color:#fca5a5; margin-bottom:1rem; }
+.quiz-item .opt.selected { background:#ef4444; color:#000; font-weight:bold; }
+.quiz-item .opt.correct { background:#22c55e; color:#000; }
+.quiz-item .opt.incorrect { background:#ef4444; color:#fff; }
+.summary-section { margin:1.5rem 2rem; padding:1.2rem 1.5rem; background:rgba(0,10,25,0.6); border-radius:1.5rem; border:1px solid rgba(239,68,68,0.3); }
+.summary-section h3 { color:#fca5a5; margin-bottom:0.8rem; }
+</style>
+ <link rel="stylesheet" href="../../../assets/css/theme.css">
+</head>
+<body>
+ <nav class="brand-return-nav"><a href="../../../index.html"> <span data-i18n="nav_portfolio">Portfolio</span></a><a href="../../../cursos/index.html"><span data-i18n="nav_cursos">Cursos</span></a></nav>
+
+<div class="container">
+ <div class="hero">
+  <h1><i class="fas fa-compass"></i> Diagnóstico Inicial</h1>
+  <p>Descubre tu nivel en publicidad digital y performance marketing</p>
+  <div class="progress-bar"><div class="progress-track"><div class="progress-fill" id="progressFill"></div></div><span class="progress-text" id="progressText">Módulo 1 de 12 (0%)</span></div>
+<div class="objectives">
+<h3 style="color:#ef4444;margin-bottom:0.5rem;font-size:1rem;"><i class="fas fa-graduation-cap"></i> ¿Qué aprenderás?</h3>
+<ul>
+<li>Comprender los fundamentos de Portal de Inicio</li>
+<li>Aplicar los conceptos en casos prácticos</li>
+<li>Identificar las mejores prácticas y herramientas</li>
+<li>Evaluar resultados con métricas relevantes</li>
+</ul>
+</div>
+
+ </div>
+
+ <div class="analogy-card">
+  <i class="fas fa-stethoscope"></i>
+  <div><strong>🏥 Como un chequeo médico:</strong> Antes de entrenar, el médico mide tus signos vitales. Este diagnóstico evalúa tu knowledge baseline en performance marketing — sin importar el resultado, sabrás por dónde empezar.</div>
+ </div>
+
+ <div <div class="info-panels">
+<h3 style="color:#fca5a5;margin:0 2rem 1rem;font-size:1.1rem;"><i class="fas fa-book-open"></i> Aprendizaje Profundo</h3>
+<div class="info-panel" style="border-left-color:#ef4444;">
+<h4><span style="font-size:1.2rem;margin-right:0.5rem;">💡</span> Conceptos clave</h4>
+<p>Este módulo te presenta los fundamentos esenciales que necesitas dominar antes de avanzar. Cada concepto está diseñado para construir sobre el anterior, creando una base sólida de conocimiento.</p>
+</div>
+<div class="info-panel" style="border-left-color:#ef4444;">
+<h4><span style="font-size:1.2rem;margin-right:0.5rem;">🎯</span> Aplicación práctica</h4>
+<p>Los conocimientos teóricos cobran vida cuando los aplicas a casos reales. Este módulo incluye escenarios y ejercicios que simulan situaciones reales del marketing digital.</p>
+</div>
+<div class="info-panel" style="border-left-color:#ef4444;">
+<h4><span style="font-size:1.2rem;margin-right:0.5rem;">📊</span> Métricas y medición</h4>
+<p>Aprenderás a medir el impacto de cada acción y a utilizar datos para tomar decisiones informadas. Las métricas son el lenguaje del marketing digital.</p>
+</div>
+<div class="info-panel" style="border-left-color:#ef4444;">
+<h4><span style="font-size:1.2rem;margin-right:0.5rem;">🔄</span> Iteración y mejora</h4>
+<p>El marketing digital no es lineal. Este módulo te enseña el ciclo de planificar, ejecutar, medir y optimizar para mejorar continuamente tus resultados.</p>
+</div>
+<div class="info-panel" style="border-left-color:#ef4444;">
+<h4><span style="font-size:1.2rem;margin-right:0.5rem;">🌍</span> Visión estratégica</h4>
+<p>Cada táctica debe alinearse con una estrategia mayor. Desarrollarás la capacidad de ver el panorama completo y tomar decisiones que beneficien tus objetivos a largo plazo.</p>
+</div>
+<div class="info-panel" style="border-left-color:#ef4444;">
+<h4><span style="font-size:1.2rem;margin-right:0.5rem;">⚡</span> Innovación continua</h4>
+<p>El marketing digital evoluciona constantemente. Este módulo te prepara para adaptarte a nuevas herramientas, plataformas y tendencias sin perder efectividad.</p>
+</div>
 </div>
 
-<script>
- (function() {
-  var MODULE_KEY = 'mk_dig_5_01';
-  var PROGRESS_KEY = 'mk_dig_5_progress';
-  var TOTAL_MODULES = 12;
-
-  function updateProgress() {
-   var p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
-   if (!p.includes(MODULE_KEY)) { p.push(MODULE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
-   var pct = Math.round((p.length / TOTAL_MODULES) * 100);
-   document.getElementById('progressFill').style.width = pct + '%';
-   document.getElementById('progressText').textContent = 'Módulo 1 de ' + TOTAL_MODULES + ' (' + pct + '%)';
-  }
-
-  var questions = [
-   { text:'¿Qué métrica mide el costo por adquirir un nuevo cliente considerando todos los canales?', options:['ROAS','Blended CAC','CTR','CPM'], correct:1 },
-   { text:'¿Qué modelo de atribución asigna el 100% del crédito al último clic antes de la conversión?', options:['Primer clic','Lineal','Último clic','Data-driven'], correct:2 },
-   { text:'¿Qué plataforma publicitaria permite campañas Performance Max (PMax)?', options:['Meta Ads','Google Ads','TikTok Ads','LinkedIn Ads'], correct:1 },
-   { text:'¿Qué significa CRO en marketing digital?', options:['Cost Rate Optimization','Conversion Rate Optimization','Click Return Objective','Customer Retention Operation'], correct:1 },
-   { text:'¿Qué esquema mide el crecimiento viral con métricas de adquisición, activación y retención?', options:['PESO','SMART','AAARRR (Pirate Metrics)','RACE'], correct:2 }
-  ];
-
-  var current = 0, score = 0, answered = false, quizDone = false;
-  var timeLeft = 30, timerInterval = null;
-  var qText = document.getElementById('questionText');
-  var opts = document.getElementById('optionsContainer');
-  var fb = document.getElementById('feedback');
-  var sc = document.getElementById('scoreValue');
-  var nextBtn = document.getElementById('nextBtn');
-  var retryBtn = document.getElementById('retryBtn');
-  var timerEl = document.getElementById('timerEl');
-  var timerDisp = document.getElementById('timerDisplay');
-  var insignia = document.getElementById('insignia');
-  var insigniaMsg = document.getElementById('insigniaMsg');
-
-  function clearTimer() { if(timerInterval){clearInterval(timerInterval);timerInterval=null;} }
-
-  function startTimer() {
-   clearTimer(); timeLeft = 30; updateTimer();
-   timerInterval = setInterval(function() {
-    timeLeft--; updateTimer();
-    if(timeLeft<=0){clearTimer();handleTimeUp();}
-   },1000);
-  }
-
-  function updateTimer() {
-   timerDisp.textContent = timeLeft;
-   timerEl.classList.remove('warning','danger');
-   if(timeLeft<=5) timerEl.classList.add('danger');
-   else if(timeLeft<=10) timerEl.classList.add('warning');
-  }
-
-  function handleTimeUp() {
-   if(answered||quizDone) return;
-   answered = true;
-   var q = questions[current];
-   var btns = opts.querySelectorAll('.opt-btn');
-   btns.forEach(function(b,i){ b.classList.add('disabled'); if(i===q.correct) b.classList.add('correct'); });
-   fb.innerHTML = I18N.t('fb_0') + q.options[q.correct];
-   fb.className = 'feedback wrong-fb';
-   nextBtn.disabled = false;
-  }
-
-  function render() {
-   clearTimer();
-   if(current>=questions.length){ finish(); return; }
-   answered = false;
-   var q = questions[current];
-   qText.textContent = q.text;
-   opts.innerHTML = '';
-   q.options.forEach(function(o,i) {
-    var b = document.createElement('div');
-    b.className = 'opt-btn';
-    b.textContent = o;
-    b.addEventListener('click',function(){ handleClick(b,i); });
-    opts.appendChild(b);
-   });
-   nextBtn.disabled = true;
-   fb.innerHTML = '⏳ Pregunta ' + (current+1) + ' de ' + questions.length;
-   fb.className = 'feedback';
-   timerEl.classList.remove('warning','danger');
-   setTimeout(function(){ if(!quizDone) startTimer(); },200);
-  }
-
-  function handleClick(btn,idx) {
-   if(answered||quizDone) return;
-   answered = true; clearTimer();
-   var q = questions[current];
-   var correct = idx === q.correct;
-   btns = opts.querySelectorAll('.opt-btn');
-   btns.forEach(function(b){ b.classList.add('disabled'); });
-   if(correct) {
-    btn.classList.add('correct'); score++;
-    sc.textContent = score;
-    fb.innerHTML = I18N.t('fb_1') + q.options[idx];
-    fb.className = 'feedback correct-fb';
-   } else {
-    btn.classList.add('wrong');
-    btns[q.correct].classList.add('correct');
-    fb.innerHTML = I18N.t('fb_2') + q.options[q.correct];
-    fb.className = 'feedback wrong-fb';
-   }
-   nextBtn.disabled = false;
-  }
-
-  function nextQ() { if(quizDone) return; clearTimer(); current++; render(); }
-
-  function finish() {
-   quizDone = true; clearTimer();
-   qText.textContent = '🎯 ¡Diagnóstico completado!';
-   opts.innerHTML = '<div style="text-align:center;padding:1.5rem;font-size:1.2rem;">Obtuviste <strong>'+score+'</strong> de '+questions.length+' aciertos.</div>';
-   var level = score===5?'Experto':score>=3?'Intermedio':'Principiante';
-   fb.innerHTML = I18N.t('fb_3')+level+'</strong>. '+(score<3?'Revisa cada módulo con atención.':'¡Buen camino! Sigue aprendiendo.');
-   fb.className = 'feedback';
-   nextBtn.disabled = true; nextBtn.style.display = 'none';
-   retryBtn.style.display = 'inline-block';
-   insignia.classList.add('show');
-   insigniaMsg.textContent = '🏅 Nivel: '+level+' | Puntuación: '+score+'/'+questions.length;
-   updateProgress();
-  }
-
-  function resetQ() {
-   current = 0; score = 0; answered = false; quizDone = false;
-   clearTimer(); sc.textContent = '0';
-   nextBtn.disabled = true; nextBtn.style.display = 'inline-block';
-   retryBtn.style.display = 'none'; insignia.classList.remove('show');
-   fb.innerHTML = I18N.t('fb_4');
-   fb.className = 'feedback';
-   render();
-  }
-
-  nextBtn.addEventListener('click',nextQ);
-  retryBtn.addEventListener('click',resetQ);
-  render();
-
-  document.getElementById('nextPageBtn').addEventListener('click',function(e){
-   if(!quizDone){ e.preventDefault(); alert('⚠️ Completa el diagnóstico antes de continuar.'); return; }
-  });
- })();
-</script>
-<script>
-window.I18N_DATA={
- 'fb_0': { es: '⏰ ¡Tiempo! La respuesta era: ', en: '⏰ ¡Time! La respuesta era: ' },
- 'fb_1': { es: '✅ ¡Correcto! ', en: '✅ Correct! ' },
- 'fb_2': { es: '❌ Incorrecto. Respuesta: ', en: '❌ Incorrect. Respuesta: ' },
- 'fb_3': { es: '📊 Nivel detectado: <strong>', en: '📊 Nivel detectado: <strong>' },
- 'fb_4': { es: '🔄 Diagnóstico reiniciado. ¡Nuevo intento!', en: '🔄 Diagnóstico reiniciado. ¡Nuevo intento!' }
-};
-</script>
-<script src="../../../assets/js/i18n.js"></script> </body>
+class="quiz-area" id="quizArea">
+  <div class="score-board">
+   <div class="score">🏆 <span id="scoreValue">0</span>/5</div>
+   <div class="timer" id="timerEl"><i class="fas fa-hourglass-half"></i> <span id="timerDisplay">30</span>s</div>
+  </div>
+  <div class="question-text" id="questionText"></div>
+  <div class="options-grid" id="optionsContainer"></div>
+  <div class="step-section">
+<h3><i class="fas fa-list-ol"></i> Ejemplo paso a paso</h3>
+<div class="step-item" style="margin-bottom:1rem;padding:0.8rem 1rem;background:rgba(0,10,25,0.5);border-radius:1rem;border-left:3px solid #ef4444;">
+<div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.3rem;">
+  <span style="background:#dc2626;color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;flex-shrink:0;">1</span>
+  <strong style="color:#ef4444;font-size:0.95rem;">Comprende el concepto fundamental</strong>
+</div>
+<p style="font-size:0.85rem;color:#b9ccee;margin:0 0 0 2.2rem;">Empieza por entender la idea central de este módulo. Lee la analogía y los paneles de información para construir una base sólida. Toma notas de los conceptos clave y cómo se relacionan entre sí. Formula preguntas sobre lo que no te quede claro.</p>
+</div><div class="step-item" style="margin-bottom:1rem;padding:0.8rem 1rem;background:rgba(0,10,25,0.5);border-radius:1rem;border-left:3px solid #ef4444;">
+<div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.3rem;">
+  <span style="background:#dc2626;color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;flex-shrink:0;">2</span>
+  <strong style="color:#ef4444;font-size:0.95rem;">Relaciona con tu contexto</strong>
+</div>
+<p style="font-size:0.85rem;color:#b9ccee;margin:0 0 0 2.2rem;">Piensa en cómo este concepto aplica a tu situación actual: si trabajas en una marca, ¿cómo se aplica? Si estás estudiando, ¿dónde has visto ejemplos en la vida real? Conectar con tu experiencia facilita la memorización y aplicación futura.</p>
+</div><div class="step-item" style="margin-bottom:1rem;padding:0.8rem 1rem;background:rgba(0,10,25,0.5);border-radius:1rem;border-left:3px solid #ef4444;">
+<div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.3rem;">
+  <span style="background:#dc2626;color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;flex-shrink:0;">3</span>
+  <strong style="color:#ef4444;font-size:0.95rem;">Aplica con el simulador o juego</strong>
+</div>
+<p style="font-size:0.85rem;color:#b9ccee;margin:0 0 0 2.2rem;">Usa la herramienta interactiva de este módulo para practicar. Los simuladores y juegos están diseñados para que puedas experimentar sin miedo a equivocarte. Prueba diferentes escenarios y observa los resultados. El aprendizaje activo es mucho más efectivo que la lectura pasiva.</p>
+</div><div class="step-item" style="margin-bottom:1rem;padding:0.8rem 1rem;background:rgba(0,10,25,0.5);border-radius:1rem;border-left:3px solid #ef4444;">
+<div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.3rem;">
+  <span style="background:#dc2626;color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;flex-shrink:0;">4</span>
+  <strong style="color:#ef4444;font-size:0.95rem;">Analiza los resultados</strong>
+</div>
+<p style="font-size:0.85rem;color:#b9ccee;margin:0 0 0 2.2rem;">Después de usar el simulador, reflexiona: ¿qué patrones observas? ¿Qué decisiones llevaron a mejores resultados? ¿Qué errores cometiste y qué aprendiste de ellos? El análisis post-experimento es donde ocurre el aprendizaje profundo.</p>
+</div><div class="step-item" style="margin-bottom:1rem;padding:0.8rem 1rem;background:rgba(0,10,25,0.5);border-radius:1rem;border-left:3px solid #ef4444;">
+<div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.3rem;">
+  <span style="background:#dc2626;color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;flex-shrink:0;">5</span>
+  <strong style="color:#ef4444;font-size:0.95rem;">Completa el quiz para consolidar</strong>
+</div>
+<p style="font-size:0.85rem;color:#b9ccee;margin:0 0 0 2.2rem;">Responde las preguntas del quiz para verificar tu comprensión. No te preocupes por la puntuación — lo importante es identificar áreas donde necesitas repasar. Las explicaciones de cada respuesta te ayudarán a reforzar conceptos débiles.</p>
+</div><div class="step-item" style="margin-bottom:1rem;padding:0.8rem 1rem;background:rgba(0,10,25,0.5);border-radius:1rem;border-left:3px solid #ef4444;">
+<div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.3rem;">
+  <span style="background:#dc2626;color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;flex-shrink:0;">6</span>
+  <strong style="color:#ef4444;font-size:0.95rem;">Repasa el resumen y sigue adelante</strong>
+</div>
+<p style="font-size:0.85rem;color:#b9ccee;margin:0 0 0 2.2rem;">Lee el resumen del módulo para consolidar los puntos clave. Si hay conceptos que no te quedaron claros, repasa los paneles de información antes de avanzar. Cada módulo construye sobre el anterior, así que asegúrate de tener una base sólida antes de continuar.</p>
+</div>
+</div>
+
+<div id="feedback" class="feedback">⏳ Responde cada pregunta. Son 5 preguntas de diagnóstico.</div>
+  <div <div class="quiz-section">
+<h3><i class="fas fa-question-circle"></i> Comprueba lo aprendido</h3>
+<p style="font-size:0.85rem;color:#8899bb;margin-bottom:1rem;">Responde las siguientes preguntas para verificar tu comprensión del módulo.</p>
+<div id="learningQuiz">
+<div class="quiz-item" data-q="0" style="background:rgba(0,10,25,0.5);border-radius:1rem;padding:1rem;margin-bottom:1rem;border:1px solid rgba(239,68,68,0.3);">
+<p style="font-weight:600;margin-bottom:0.5rem;font-size:0.9rem;">1. ¿Por qué es importante tener una base sólida en los fundamentos?</p>
+<div class="quiz-opts" style="display:flex;flex-wrap:wrap;gap:0.4rem;"><span class="opt" data-q="0" data-opt="0" onclick="void(0)" style="background:#1e2a3e;padding:0.3rem 0.8rem;border-radius:2rem;cursor:pointer;transition:0.2s;font-size:0.85rem;display:inline-block;margin:0.2rem;">Para aprobar el examen</span><span class="opt" data-q="0" data-opt="1" onclick="void(0)" style="background:#1e2a3e;padding:0.3rem 0.8rem;border-radius:2rem;cursor:pointer;transition:0.2s;font-size:0.85rem;display:inline-block;margin:0.2rem;">Porque los fundamentos no cambian con las modas y son la base de todas las estrategias avanzadas</span><span class="opt" data-q="0" data-opt="2" onclick="void(0)" style="background:#1e2a3e;padding:0.3rem 0.8rem;border-radius:2rem;cursor:pointer;transition:0.2s;font-size:0.85rem;display:inline-block;margin:0.2rem;">Porque es más fácil</span><span class="opt" data-q="0" data-opt="3" onclick="void(0)" style="background:#1e2a3e;padding:0.3rem 0.8rem;border-radius:2rem;cursor:pointer;transition:0.2s;font-size:0.85rem;display:inline-block;margin:0.2rem;">No es importante</span></div>
+<div class="quiz-expl" id="expl-0" style="display:none;margin-top:0.5rem;padding:0.5rem;background:rgba(255,255,255,0.05);border-radius:0.8rem;font-size:0.8rem;color:#b9ccee;"></div>
+</div><div class="quiz-item" data-q="1" style="background:rgba(0,10,25,0.5);border-radius:1rem;padding:1rem;margin-bottom:1rem;border:1px solid rgba(239,68,68,0.3);">
+<p style="font-weight:600;margin-bottom:0.5rem;font-size:0.9rem;">2. ¿Cuál es el primer paso antes de elegir un canal de marketing?</p>
+<div class="quiz-opts" style="display:flex;flex-wrap:wrap;gap:0.4rem;"><span class="opt" data-q="1" data-opt="0" onclick="void(0)" style="background:#1e2a3e;padding:0.3rem 0.8rem;border-radius:2rem;cursor:pointer;transition:0.2s;font-size:0.85rem;display:inline-block;margin:0.2rem;">Crear el contenido</span><span class="opt" data-q="1" data-opt="1" onclick="void(0)" style="background:#1e2a3e;padding:0.3rem 0.8rem;border-radius:2rem;cursor:pointer;transition:0.2s;font-size:0.85rem;display:inline-block;margin:0.2rem;">Definir el objetivo y la audiencia</span><span class="opt" data-q="1" data-opt="2" onclick="void(0)" style="background:#1e2a3e;padding:0.3rem 0.8rem;border-radius:2rem;cursor:pointer;transition:0.2s;font-size:0.85rem;display:inline-block;margin:0.2rem;">Comprar publicidad</span><span class="opt" data-q="1" data-opt="3" onclick="void(0)" style="background:#1e2a3e;padding:0.3rem 0.8rem;border-radius:2rem;cursor:pointer;transition:0.2s;font-size:0.85rem;display:inline-block;margin:0.2rem;">Diseñar el logo</span></div>
+<div class="quiz-expl" id="expl-1" style="display:none;margin-top:0.5rem;padding:0.5rem;background:rgba(255,255,255,0.05);border-radius:0.8rem;font-size:0.8rem;color:#b9ccee;"></div>
+</div><div class="quiz-item" data-q="2" style="background:rgba(0,10,25,0.5);border-radius:1rem;padding:1rem;margin-bottom:1rem;border:1px solid rgba(239,68,68,0.3);">
+<p style="font-weight:600;margin-bottom:0.5rem;font-size:0.9rem;">3. ¿Qué papel juega la medición en el marketing digital?</p>
+<div class="quiz-opts" style="display:flex;flex-wrap:wrap;gap:0.4rem;"><span class="opt" data-q="2" data-opt="0" onclick="void(0)" style="background:#1e2a3e;padding:0.3rem 0.8rem;border-radius:2rem;cursor:pointer;transition:0.2s;font-size:0.85rem;display:inline-block;margin:0.2rem;">Es opcional</span><span class="opt" data-q="2" data-opt="1" onclick="void(0)" style="background:#1e2a3e;padding:0.3rem 0.8rem;border-radius:2rem;cursor:pointer;transition:0.2s;font-size:0.85rem;display:inline-block;margin:0.2rem;">Es fundamental para saber qué funciona y optimizar la inversión</span><span class="opt" data-q="2" data-opt="2" onclick="void(0)" style="background:#1e2a3e;padding:0.3rem 0.8rem;border-radius:2rem;cursor:pointer;transition:0.2s;font-size:0.85rem;display:inline-block;margin:0.2rem;">Solo para grandes empresas</span><span class="opt" data-q="2" data-opt="3" onclick="void(0)" style="background:#1e2a3e;padding:0.3rem 0.8rem;border-radius:2rem;cursor:pointer;transition:0.2s;font-size:0.85rem;display:inline-block;margin:0.2rem;">Se hace al final del año</span></div>
+<div class="quiz-expl" id="expl-2" style="display:none;margin-top:0.5rem;padding:0.5rem;background:rgba(255,255,255,0.05);border-radius:0.8rem;font-size:0.8rem;color:#b9ccee;"></div>
+</div><div class="quiz-item" data-q="3" style="background:rgba(0,10,25,0.5);border-radius:1rem;padding:1rem;margin-bottom:1rem;border:1px solid rgba(239,68,68,0.3);">
+<p style="font-weight:600;margin-bottom:0.5rem;font-size:0.9rem;">4. ¿Cómo se llama el ciclo de mejora continua en marketing?</p>
+<div class="quiz-opts" style="display:flex;flex-wrap:wrap;gap:0.4rem;"><span class="opt" data-q="3" data-opt="0" onclick="void(0)" style="background:#1e2a3e;padding:0.3rem 0.8rem;border-radius:2rem;cursor:pointer;transition:0.2s;font-size:0.85rem;display:inline-block;margin:0.2rem;">Planificar-Ejecutar-Medir-Aprender-Optimizar</span><span class="opt" data-q="3" data-opt="1" onclick="void(0)" style="background:#1e2a3e;padding:0.3rem 0.8rem;border-radius:2rem;cursor:pointer;transition:0.2s;font-size:0.85rem;display:inline-block;margin:0.2rem;">Comprar-Vender-Ganar</span><span class="opt" data-q="3" data-opt="2" onclick="void(0)" style="background:#1e2a3e;padding:0.3rem 0.8rem;border-radius:2rem;cursor:pointer;transition:0.2s;font-size:0.85rem;display:inline-block;margin:0.2rem;">Crear-Publicar-Olvidar</span><span class="opt" data-q="3" data-opt="3" onclick="void(0)" style="background:#1e2a3e;padding:0.3rem 0.8rem;border-radius:2rem;cursor:pointer;transition:0.2s;font-size:0.85rem;display:inline-block;margin:0.2rem;">Idea-Diseño-Lanzamiento</span></div>
+<div class="quiz-expl" id="expl-3" style="display:none;margin-top:0.5rem;padding:0.5rem;background:rgba(255,255,255,0.05);border-radius:0.8rem;font-size:0.8rem;color:#b9ccee;"></div>
+</div>
+</div>
+<button class="btn-action" id="checkLearningBtn" style="margin-top:0.5rem;"><i class="fas fa-check"></i> Verificar respuestas</button>
+<div id="learningQuizFeedback" style="margin-top:0.5rem;font-size:0.85rem;color:#b9ccee;"></div>
+</div>
+
+id="insignia" class="insignia">
+   <i class="fas fa-medal" style="font-size:3rem;color:#ef4444;"></i>
+   <h3>🏅 Diagnóstico Completo 🏅</h3>
+   <p id="insigniaMsg">Has completado tu chequeo inicial. ¡Revisa tus resultados!</p>
+  </div>
+  <div style="text-align:center;margin-top:1rem;">
+   <button id="nextBtn" class="btn-primary" disabled>Siguiente <i class="fas fa-arrow-right"></i></button>
+   <button id="retryBtn" class="btn-secondary" style="display:none;margin-left:0.5rem;"><i class="fas fa-redo-alt"></i> Reintentar</button>
+  </div>
+ </div>
+
+ <div class="summary-section">
+<h3><i class="fas fa-clipboard-list"></i> Resumen del módulo</h3>
+<ul>
+<li style="margin:0.5rem 0;padding:0.5rem 0.8rem;background:rgba(0,10,25,0.3);border-radius:0.8rem;font-size:0.9rem;color:#b9ccee;list-style:none;">📖 Los conceptos fundamentales de Curso 5 sientan las bases para estrategias más avanzadas. Domínalos antes de pasar al siguiente nivel.</li><li style="margin:0.5rem 0;padding:0.5rem 0.8rem;background:rgba(0,10,25,0.3);border-radius:0.8rem;font-size:0.9rem;color:#b9ccee;list-style:none;">🔄 La práctica activa (simuladores, ejercicios, quizzes) es más efectiva que la lectura pasiva. Aplica lo aprendido inmediatamente para fijar el conocimiento.</li><li style="margin:0.5rem 0;padding:0.5rem 0.8rem;background:rgba(0,10,25,0.3);border-radius:0.8rem;font-size:0.9rem;color:#b9ccee;list-style:none;">📊 La medición y el análisis son parte integral del proceso. Sin datos, no sabes si estás avanzando o retrocediendo. Mide desde el día uno.</li><li style="margin:0.5rem 0;padding:0.5rem 0.8rem;background:rgba(0,10,25,0.3);border-radius:0.8rem;font-size:0.9rem;color:#b9ccee;list-style:none;">🚀 El aprendizaje en marketing digital nunca termina. El mercado, la tecnología y los consumidores siempre cambian. La curiosidad y la adaptabilidad son tus mejores herramientas.</li>
+</ul>
+</div>
+
+<div class="nav-links">
+  <a href="./index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+  <a href="./02-performance-fundamentals.html" class="nav-link next" id="nextPageBtn">Siguiente: Performance Fundamentals <i class="fas fa-arrow-right"></i></a>
+ </div>
+ <footer><i class="fas fa-rocket"></i> Publicidad Digital, Performance & Growth · Curso 5 · Portal</footer>
+</div>
+
+<script>
+ (function() {
+  var MODULE_KEY = 'mk_dig_5_01';
+  var PROGRESS_KEY = 'mk_dig_5_progress';
+  var TOTAL_MODULES = 12;
+
+  function updateProgress() {
+   var p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+   if (!p.includes(MODULE_KEY)) { p.push(MODULE_KEY); localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); }
+   var pct = Math.round((p.length / TOTAL_MODULES) * 100);
+   document.getElementById('progressFill').style.width = pct + '%';
+   document.getElementById('progressText').textContent = 'Módulo 1 de ' + TOTAL_MODULES + ' (' + pct + '%)';
+  }
+
+  var questions = [
+   { text:'¿Qué métrica mide el costo por adquirir un nuevo cliente considerando todos los canales?', options:['ROAS','Blended CAC','CTR','CPM'], correct:1 },
+   { text:'¿Qué modelo de atribución asigna el 100% del crédito al último clic antes de la conversión?', options:['Primer clic','Lineal','Último clic','Data-driven'], correct:2 },
+   { text:'¿Qué plataforma publicitaria permite campañas Performance Max (PMax)?', options:['Meta Ads','Google Ads','TikTok Ads','LinkedIn Ads'], correct:1 },
+   { text:'¿Qué significa CRO en marketing digital?', options:['Cost Rate Optimization','Conversion Rate Optimization','Click Return Objective','Customer Retention Operation'], correct:1 },
+   { text:'¿Qué esquema mide el crecimiento viral con métricas de adquisición, activación y retención?', options:['PESO','SMART','AAARRR (Pirate Metrics)','RACE'], correct:2 }
+  ];
+
+  var current = 0, score = 0, answered = false, quizDone = false;
+  var timeLeft = 30, timerInterval = null;
+  var qText = document.getElementById('questionText');
+  var opts = document.getElementById('optionsContainer');
+  var fb = document.getElementById('feedback');
+  var sc = document.getElementById('scoreValue');
+  var nextBtn = document.getElementById('nextBtn');
+  var retryBtn = document.getElementById('retryBtn');
+  var timerEl = document.getElementById('timerEl');
+  var timerDisp = document.getElementById('timerDisplay');
+  var insignia = document.getElementById('insignia');
+  var insigniaMsg = document.getElementById('insigniaMsg');
+
+  function clearTimer() { if(timerInterval){clearInterval(timerInterval);timerInterval=null;} }
+
+  function startTimer() {
+   clearTimer(); timeLeft = 30; updateTimer();
+   timerInterval = setInterval(function() {
+    timeLeft--; updateTimer();
+    if(timeLeft<=0){clearTimer();handleTimeUp();}
+   },1000);
+  }
+
+  function updateTimer() {
+   timerDisp.textContent = timeLeft;
+   timerEl.classList.remove('warning','danger');
+   if(timeLeft<=5) timerEl.classList.add('danger');
+   else if(timeLeft<=10) timerEl.classList.add('warning');
+  }
+
+  function handleTimeUp() {
+   if(answered||quizDone) return;
+   answered = true;
+   var q = questions[current];
+   var btns = opts.querySelectorAll('.opt-btn');
+   btns.forEach(function(b,i){ b.classList.add('disabled'); if(i===q.correct) b.classList.add('correct'); });
+   fb.innerHTML = I18N.t('fb_0') + q.options[q.correct];
+   fb.className = 'feedback wrong-fb';
+   nextBtn.disabled = false;
+  }
+
+  function render() {
+   clearTimer();
+   if(current>=questions.length){ finish(); return; }
+   answered = false;
+   var q = questions[current];
+   qText.textContent = q.text;
+   opts.innerHTML = '';
+   q.options.forEach(function(o,i) {
+    var b = document.createElement('div');
+    b.className = 'opt-btn';
+    b.textContent = o;
+    b.addEventListener('click',function(){ handleClick(b,i); });
+    opts.appendChild(b);
+   });
+   nextBtn.disabled = true;
+   fb.innerHTML = '⏳ Pregunta ' + (current+1) + ' de ' + questions.length;
+   fb.className = 'feedback';
+   timerEl.classList.remove('warning','danger');
+   setTimeout(function(){ if(!quizDone) startTimer(); },200);
+  }
+
+  function handleClick(btn,idx) {
+   if(answered||quizDone) return;
+   answered = true; clearTimer();
+   var q = questions[current];
+   var correct = idx === q.correct;
+   btns = opts.querySelectorAll('.opt-btn');
+   btns.forEach(function(b){ b.classList.add('disabled'); });
+   if(correct) {
+    btn.classList.add('correct'); score++;
+    sc.textContent = score;
+    fb.innerHTML = I18N.t('fb_1') + q.options[idx];
+    fb.className = 'feedback correct-fb';
+   } else {
+    btn.classList.add('wrong');
+    btns[q.correct].classList.add('correct');
+    fb.innerHTML = I18N.t('fb_2') + q.options[q.correct];
+    fb.className = 'feedback wrong-fb';
+   }
+   nextBtn.disabled = false;
+  }
+
+  function nextQ() { if(quizDone) return; clearTimer(); current++; render(); }
+
+  function finish() {
+   quizDone = true; clearTimer();
+   qText.textContent = '🎯 ¡Diagnóstico completado!';
+   opts.innerHTML = '<div style="text-align:center;padding:1.5rem;font-size:1.2rem;">Obtuviste <strong>'+score+'</strong> de '+questions.length+' aciertos.</div>';
+   var level = score===5?'Experto':score>=3?'Intermedio':'Principiante';
+   fb.innerHTML = I18N.t('fb_3')+level+'</strong>. '+(score<3?'Revisa cada módulo con atención.':'¡Buen camino! Sigue aprendiendo.');
+   fb.className = 'feedback';
+   nextBtn.disabled = true; nextBtn.style.display = 'none';
+   retryBtn.style.display = 'inline-block';
+   insignia.classList.add('show');
+   insigniaMsg.textContent = '🏅 Nivel: '+level+' | Puntuación: '+score+'/'+questions.length;
+   updateProgress();
+  }
+
+  function resetQ() {
+   current = 0; score = 0; answered = false; quizDone = false;
+   clearTimer(); sc.textContent = '0';
+   nextBtn.disabled = true; nextBtn.style.display = 'inline-block';
+   retryBtn.style.display = 'none'; insignia.classList.remove('show');
+   fb.innerHTML = I18N.t('fb_4');
+   fb.className = 'feedback';
+   render();
+  }
+
+  nextBtn.addEventListener('click',nextQ);
+  retryBtn.addEventListener('click',resetQ);
+  render();
+
+  document.getElementById('nextPageBtn').addEventListener('click',function(e){
+   if(!quizDone){ e.preventDefault(); alert('⚠️ Completa el diagnóstico antes de continuar.'); return; }
+  });
+ })();
+</script>
+<script>
+window.I18N_DATA={
+ 'fb_0': { es: '⏰ ¡Tiempo! La respuesta era: ', en: '⏰ ¡Time! La respuesta era: ' },
+ 'fb_1': { es: '✅ ¡Correcto! ', en: '✅ Correct! ' },
+ 'fb_2': { es: '❌ Incorrecto. Respuesta: ', en: '❌ Incorrect. Respuesta: ' },
+ 'fb_3': { es: '📊 Nivel detectado: <strong>', en: '📊 Nivel detectado: <strong>' },
+ 'fb_4': { es: '🔄 Diagnóstico reiniciado. ¡Nuevo intento!', en: '🔄 Diagnóstico reiniciado. ¡Nuevo intento!' }
+};
+</script>
+<script>
+(function(){
+const qData = [{"q": "¿Por qué es importante tener una base sólida en los fundamentos?", "opts": ["Para aprobar el examen", "Porque los fundamentos no cambian con las modas y son la base de todas las estrategias avanzadas", "Porque es más fácil", "No es importante"], "correct": 1, "expl": "Los fundamentos del marketing digital (segmentación, propuesta de valor, embudo, métricas) son principios universales que trascienden plataformas y tecnologías. Dominarlos te permite adaptarte a cualquier cambio sin empezar desde cero."}, {"q": "¿Cuál es el primer paso antes de elegir un canal de marketing?", "opts": ["Crear el contenido", "Definir el objetivo y la audiencia", "Comprar publicidad", "Diseñar el logo"], "correct": 1, "expl": "Antes de elegir cualquier canal, debes saber qué quieres lograr (objetivo) y a quién quieres llegar (audiencia). El canal correcto depende de estos dos factores. Elegir el canal antes de definir el objetivo es como comprar un boleto de avión sin saber a dónde vas."}, {"q": "¿Qué papel juega la medición en el marketing digital?", "opts": ["Es opcional", "Es fundamental para saber qué funciona y optimizar la inversión", "Solo para grandes empresas", "Se hace al final del año"], "correct": 1, "expl": "La medición es el corazón del marketing digital. Sin métricas, no sabes si tu estrategia funciona, dónde mejorar, o cómo justificar tu presupuesto. La capacidad de medir y optimizar en tiempo real es la mayor ventaja del digital sobre el tradicional."}, {"q": "¿Cómo se llama el ciclo de mejora continua en marketing?", "opts": ["Planificar-Ejecutar-Medir-Aprender-Optimizar", "Comprar-Vender-Ganar", "Crear-Publicar-Olvidar", "Idea-Diseño-Lanzamiento"], "correct": 0, "expl": "El marketing digital es un ciclo continuo: planificas basado en objetivos, ejecutas la estrategia, mides los resultados, aprendes de los datos, y optimizas para la siguiente iteración. No es un proceso lineal con un fin, sino un círculo virtuoso de mejora constante."}];
+let answers = {};
+let submitted = false;
+
+document.querySelectorAll('.quiz-item .opt').forEach(function(opt) {
+opt.addEventListener('click', function() {
+if (submitted) return;
+const qIdx = parseInt(this.dataset.q);
+const optIdx = parseInt(this.dataset.opt);
+const parent = this.parentElement;
+Array.from(parent.children).forEach(function(c) { c.classList.remove('selected'); });
+this.classList.add('selected');
+answers[qIdx] = optIdx;
+});
+});
+
+document.getElementById('checkLearningBtn')?.addEventListener('click', function() {
+if (submitted) return;
+const total = qData.length;
+const answered = Object.keys(answers).length;
+if (answered < total) {
+document.getElementById('learningQuizFeedback').innerHTML = '<span style="color:#f59e0b;">Responde todas las preguntas (' + answered + '/' + total + ').</span>';
+return;
+}
+submitted = true;
+let correct = 0;
+qData.forEach(function(q, i) {
+const opts = document.querySelectorAll('.quiz-item[data-q="' + i + '"] .opt');
+opts.forEach(function(o, oi) {
+o.style.pointerEvents = 'none';
+if (oi === q.correct) o.classList.add('correct');
+else if (oi === answers[i] && oi !== q.correct) o.classList.add('incorrect');
+});
+if (answers[i] === q.correct) correct++;
+const explDiv = document.getElementById('expl-' + i);
+if (explDiv) {
+explDiv.style.display = 'block';
+explDiv.innerHTML = '<strong>Explicación:</strong> ' + (answers[i] === q.correct ? '✅ ' : '❌ ') + q.expl + (answers[i] !== q.correct ? ' <span style="color:#22c55e;">(Respuesta correcta: ' + q.opts[q.correct] + ')</span>' : '');
+}
+});
+const fb = document.getElementById('learningQuizFeedback');
+fb.innerHTML = '<span style="color:' + (correct >= total*0.7 ? '#22c55e' : '#ef4444') + ';">' + correct + '/' + total + ' correctas (' + Math.round(correct/total*100) + '%). ' + (correct >= total*0.7 ? '¡Excelente!' : 'Repasa los conceptos e inténtalo de nuevo.') + '</span>';
+this.disabled = true;
+});
+})();
+</script>
+<script src="../../../assets/js/i18n.js"></script> </body>
 </html>

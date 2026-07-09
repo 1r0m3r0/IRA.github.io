@@ -59,7 +59,9 @@
   .nav-link.menu { background:#1a2a4a; border:1px solid #ff66c0; }
   footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
   @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .info-grid { grid-template-columns:1fr; } }
- </style>
+ 
+  .objectives { background:rgba(255,102,192,0.1); border-radius:1.5rem; padding:1rem 1.5rem; margin:1rem 2rem; border:1px solid rgba(255,102,192,0.3); }
+  </style>
  <link rel="stylesheet" href="../../../assets/css/theme.css">
 </head>
 <body>
@@ -82,6 +84,8 @@
   <div class="analogy-card">
    <strong>💡 Piénsalo así:</strong> Una cadena de Markov es como un juego de mesa donde tu pr&oacute;xima posici&oacute;n depende solo de d&oacute;nde est&aacute;s ahora, no de c&oacute;mo llegaste all&iacute;. No importa si ca&iacute;ste en la casilla 12 por un 6+6 o por un 4+4+4 &iexcl;el pr&oacute;ximo movimiento solo mira la casilla 12! Es la "memoria corta" de los procesos estoc&aacute;sticos.
   </div>
+  <div class="objectives"><h3 style="color:#ff99d6;font-size:1.1rem;margin-bottom:0.5rem;">🎯 ¿Que aprenderas en este modulo?</h3><ul><li>Definir proceso estocastico</li><li>Construir matriz de transicion</li><li>Calcular estado estacionario</li><li>Clasificar estados</li></ul></div>
+  
   <div class="main-area">
    <div class="section-title"><i class="fas fa-project-diagram"></i> Conceptos de Cadenas de Markov</div>
    <div class="info-grid">
@@ -149,6 +153,8 @@
 
   <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre cadenas de Markov.</div>
 
+  <div class="recap"><h3>📖 Resumen del modulo</h3><ul><li>Futuro solo depende del presente</li><li>Matriz P: filas suman 1</li><li>Estado estacionario: pi*P = pi</li><li>Aplicaciones: PageRank, genetica</li></ul></div>
+  
   <div class="nav-links">
    <a href="10-teorema-central-limite.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
@@ -161,11 +167,13 @@
   const STORAGE_KEY = 'prog_est_1_11';
   const PROGRESS_KEY = 'prog_est_1_progress';
   const questions = [
-   { text: "La propiedad de Markov dice que el futuro depende:", options: ["De todo el pasado", "Solo del presente", "Solo del primer estado", "Del promedio histórico"], correct: 1 },
-   { text: "En una matriz de transición, cada fila debe sumar:", options: ["0", "1", "El n\u00famero de estados", "Depende"], correct: 1 },
-   { text: "Un estado absorbente es aquel en el que:", options: ["Siempre sales", "Nunca sales una vez que entras", "Recibes muchos visitantes", "Tiene alta probabilidad"], correct: 1 },
-   { text: "La distribución estacionaria π satisface:", options: ["π = P·π", "π = π·P", "π = P²", "π = I"], correct: 1 },
-   { text: "¿Cuántos parámetros tiene una cadena de Markov con k estados?", options: ["k", "k²", "k² - k", "k - 1"], correct: 1 }
+   { text: "La propiedad de Markov dice que el futuro depende:", options: ["De todo el pasado", "Solo del presente", "Solo del primer estado", "Del promedio histórico"], explanation: "La respuesta correcta es: Solo del presente. Revisa la teoria del modulo si necesitas mas detalles.", correct: 1 },
+   { text: "En una matriz de transición, cada fila debe sumar:", options: ["0", "1", "El n\u00famero de estados", "Depende"], explanation: "Correcto: 1. Aplica esta definicion en los ejercicios practicos.", correct: 1 },
+   { text: "Un estado absorbente es aquel en el que:", options: ["Siempre sales", "Nunca sales una vez que entras", "Recibes muchos visitantes", "Tiene alta probabilidad"], explanation: "Correcto: Nunca sales una vez que entras. Aplica esta definicion en los ejercicios practicos.", correct: 1 },
+   { text: "La distribución estacionaria π satisface:", options: ["π = P·π", "π = π·P", "π = P²", "π = I"], explanation: "Correcto: π = π·P. Aplica esta definicion en los ejercicios practicos.", correct: 1 },
+   { text: "¿Cuántos parámetros tiene una cadena de Markov con k estados?", options: ["k", "k²", "k² - k", "k - 1"], explanation: "Correcto: k². Aplica esta definicion en los ejercicios practicos.", correct: 1 }
+
+
   ];
   let userAnswers = new Array(questions.length).fill(null);
   let quizCompleted = false;
@@ -198,7 +206,17 @@
       this.classList.add('selected'); userAnswers[idx] = optIdx; updateBtnState();
      });
      optsDiv.appendChild(span);
-    });
+    });    // Add explanation div
+    var expDiv = document.createElement('div');
+    expDiv.classList.add('explanation');
+    if (questions[idx].explanation) expDiv.textContent = '💡 ' + questions[idx].explanation;
+    qDiv.appendChild(expDiv);    // Add explanation div
+    var expDiv = document.createElement('div');
+    expDiv.classList.add('explanation');
+    if (questions[idx].explanation) expDiv.textContent = '💡 ' + questions[idx].explanation;
+    qDiv.appendChild(expDiv);
+
+
     container.appendChild(qDiv);
    });
   }
@@ -229,7 +247,13 @@
    } else {
     document.getElementById('feedbackMsg').textContent = '❌ ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. ¡Reintenta!';
    }
-  }
+  
+    // Show explanations after submission
+    document.querySelectorAll('.question').forEach(function(qd, i) {
+        var exp = qd.querySelector('.explanation');
+        if (exp && questions[i] && questions[i].explanation) { exp.style.display = 'block'; }
+    });
+}
 
   function restoreProgress() {
    const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');

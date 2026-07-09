@@ -54,7 +54,9 @@
   .nav-link.menu { background:#1a2a4a; border:1px solid #ff66c0; }
   footer { text-align:center; padding:1.2rem; font-size:0.8rem; border-top:1px solid #2c3e66; }
   @media (max-width:800px) { .hero-header h1 { font-size:1.9rem; } .info-grid { grid-template-columns:1fr; } }
- </style>
+ 
+  .objectives { background:rgba(255,102,192,0.1); border-radius:1.5rem; padding:1rem 1.5rem; margin:1rem 2rem; border:1px solid rgba(255,102,192,0.3); }
+  </style>
  <link rel="stylesheet" href="../../../assets/css/theme.css">
 </head>
 <body>
@@ -77,6 +79,8 @@
   <div class="analogy-card">
    <strong>💡 Piénsalo así:</strong> La Ley de Grandes N&uacute;meros es como tomarle el pulso a una ciudad. Si preguntas a 5 personas cu&aacute;nto gastan en transporte, tu estimado puede variar mucho. Pero si preguntas a 10,000 personas, el promedio se acerca mucho al verdadero gasto promedio. M&aacute;s datos = m&aacute;s precisi&oacute;n.
   </div>
+  <div class="objectives"><h3 style="color:#ff99d6;font-size:1.1rem;margin-bottom:0.5rem;">🎯 ¿Que aprenderas en este modulo?</h3><ul><li>Comprender ley debil y fuerte</li><li>Aplicar Monte Carlo</li><li>Relacionar convergencia en probabilidad</li></ul></div>
+  
   <div class="main-area">
    <div class="section-title"><i class="fas fa-weight"></i> Leyes de Grandes N&uacute;meros</div>
    <div class="info-grid">
@@ -128,6 +132,8 @@
 
   <div id="feedbackMsg" class="feedback">💡 Responde las preguntas sobre la Ley de Grandes N&uacute;meros.</div>
 
+  <div class="recap"><h3>📖 Resumen del modulo</h3><ul><li>Promedio muestral converge a mu</li><li>Ley debil: convergencia en prob.</li><li>Ley fuerte: convergencia casi segura</li><li>Monte Carlo usa LGN</li></ul></div>
+  
   <div class="nav-links">
    <a href="08-transformaciones.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
    <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Men&uacute;</a>
@@ -140,11 +146,13 @@
   const STORAGE_KEY = 'prog_est_1_09';
   const PROGRESS_KEY = 'prog_est_1_progress';
   const questions = [
-   { text: "La Ley de Grandes Números dice que el promedio muestral converge a:", options: ["0", "La mediana", "El valor esperado", "La moda"], correct: 2 },
-   { text: "La ley fuerte de grandes números implica convergencia:", options: ["En probabilidad", "Casi segura", "En media", "En distribución"], correct: 1 },
-   { text: "¿Qué condición necesitan las variables en la LGN?", options: ["Ser normales", "Ser i.i.d. con media finita", "Tener varianza infinita", "Ser independientes de la media"], correct: 1 },
-   { text: "El método de Monte Carlo se basa en:", options: ["El TCL", "La LGN", "La desigualdad de Chebyshev", "El teorema de Bayes"], correct: 1 },
-   { text: "Si lanzas una moneda 1000 veces y obtienes 530 caras, ¿qué dice la LGN?", options: ["La moneda está cargada", "La proporción se acerca a 0.5", "El dado está sesgado", "Ninguna de las anteriores"], correct: 1 }
+   { text: "La Ley de Grandes Números dice que el promedio muestral converge a:", options: ["0", "La mediana", "El valor esperado", "La moda"], explanation: "La respuesta correcta es: El valor esperado. Revisa la teoria del modulo si necesitas mas detalles.", correct: 2 },
+   { text: "La ley fuerte de grandes números implica convergencia:", options: ["En probabilidad", "Casi segura", "En media", "En distribución"], explanation: "La respuesta correcta es: Casi segura. Revisa la teoria del modulo si necesitas mas detalles.", correct: 1 },
+   { text: "¿Qué condición necesitan las variables en la LGN?", options: ["Ser normales", "Ser i.i.d. con media finita", "Tener varianza infinita", "Ser independientes de la media"], explanation: "Ser i.i.d. con media finita es la respuesta correcta. Practica con los ejemplos para afianzarlo.", correct: 1 },
+   { text: "El método de Monte Carlo se basa en:", options: ["El TCL", "La LGN", "La desigualdad de Chebyshev", "El teorema de Bayes"], explanation: "Opcion correcta: La LGN. Este concepto es fundamental para el tema del modulo.", correct: 1 },
+   { text: "Si lanzas una moneda 1000 veces y obtienes 530 caras, ¿qué dice la LGN?", options: ["La moneda está cargada", "La proporción se acerca a 0.5", "El dado está sesgado", "Ninguna de las anteriores"], explanation: "La respuesta correcta es: La proporción se acerca a 0.5. Revisa la teoria del modulo si necesitas mas detalles.", correct: 1 }
+
+
   ];
   let userAnswers = new Array(questions.length).fill(null);
   let quizCompleted = false;
@@ -177,7 +185,17 @@
       this.classList.add('selected'); userAnswers[idx] = optIdx; updateBtnState();
      });
      optsDiv.appendChild(span);
-    });
+    });    // Add explanation div
+    var expDiv = document.createElement('div');
+    expDiv.classList.add('explanation');
+    if (questions[idx].explanation) expDiv.textContent = '💡 ' + questions[idx].explanation;
+    qDiv.appendChild(expDiv);    // Add explanation div
+    var expDiv = document.createElement('div');
+    expDiv.classList.add('explanation');
+    if (questions[idx].explanation) expDiv.textContent = '💡 ' + questions[idx].explanation;
+    qDiv.appendChild(expDiv);
+
+
     container.appendChild(qDiv);
    });
   }
@@ -208,7 +226,13 @@
    } else {
     document.getElementById('feedbackMsg').textContent = '❌ ' + correct + '/' + total + ' correctas. Necesitas al menos ' + Math.ceil(total*0.6) + '. ¡Reintenta!';
    }
-  }
+  
+    // Show explanations after submission
+    document.querySelectorAll('.question').forEach(function(qd, i) {
+        var exp = qd.querySelector('.explanation');
+        if (exp && questions[i] && questions[i].explanation) { exp.style.display = 'block'; }
+    });
+}
 
   function restoreProgress() {
    const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');

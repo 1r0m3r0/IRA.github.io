@@ -35,7 +35,22 @@
   .next-btn:hover { transform:translateY(-3px); box-shadow:0 8px 25px rgba(43,158,255,0.25); }
   .footer-text { text-align:center; margin-top:3rem; color:#6a7f9f; font-size:0.85rem; }
   @media(max-width:600px){ .hero-header h1 { font-size:1.4rem; } .hero-header .emoji { font-size:2.2rem; } }
- </style>
+ 
+.objectives { background:rgba(43,158,255,0.1); border:1px solid rgba(43,158,255,0.3); border-radius:1.5rem; padding:1rem 1.5rem; margin:1rem 2rem; }
+.objectives h3 { color:#2b9eff; margin-bottom:0.5rem; font-size:1.05rem; }
+.objectives ul { list-style:none; padding:0; }
+.objectives li { padding:0.35rem 0; font-size:0.92rem; }
+.objectives li::before { content:"🎯 "; }
+.info-grid { display:grid; gap:1rem; margin:1.5rem 0; }
+.info-panel { background:rgba(43,158,255,0.05); border:1px solid rgba(43,158,255,0.15); border-radius:1rem; padding:1rem 1.2rem; }
+.info-panel h4 { color:#2b9eff; font-size:1rem; margin-bottom:0.5rem; }
+.info-panel p { color:#b4c8e0; font-size:0.9rem; line-height:1.6; margin-bottom:0.5rem; }
+.info-panel p:last-child { margin-bottom:0; }
+.step-section { background:rgba(43,158,255,0.06); border:1px solid rgba(43,158,255,0.2); border-radius:1.2rem; padding:1.2rem; margin:1.5rem 0; }
+.step-section h3 { color:#2b9eff; margin-bottom:0.8rem; font-size:1.05rem; }
+.summary-box { background:linear-gradient(135deg,rgba(43,158,255,0.12),rgba(43,158,255,0.04)); border:1px solid rgba(43,158,255,0.3); border-radius:1.2rem; padding:1.2rem 1.5rem; margin:1.5rem 0; }
+.summary-box h3 { color:#2b9eff; margin-bottom:0.5rem; font-size:1.05rem; }
+.summary-box p { color:#b4c8e0; font-size:0.92rem; line-height:1.6; }</style>
 </head>
 <body>
  <nav class="brand-return-nav">
@@ -49,7 +64,11 @@
    <span class="emoji"><i class="fas fa-ban"></i></span>
    <h1>Anti-Joins</h1>
    <p style="color:#b4c8e0; margin-top:0.5rem;">Módulo 11 Â· Joins</p>
-  </div>
+  
+<div class="objectives"><h3><i class="fas fa-bullseye"></i> ¿Qué aprenderás?</h3><ul><li>Entender qué son los anti-joins</li><li>Usar NOT EXISTS y NOT IN</li><li>Usar LEFT JOIN ... IS NULL</li><li>Aplicar anti-joins para exclusión</li></ul></div>
+<div class="info-grid"><div class="info-panel"><h4>🧠 Intuición</h4><p>Anti-join es lo opuesto a INNER JOIN: encuentra filas que NO tienen correspondencia. 'Dame los clientes que NO han hecho pedidos'.</p><p>Hay tres formas: NOT EXISTS, NOT IN, y LEFT JOIN ... IS NULL. Cada una tiene sus ventajas y riesgos.</p><p>NOT EXISTS es la más segura y recomendada.</p></div><div class="info-panel"><h4>📝 Sintaxis</h4><p>SELECT * FROM a WHERE NOT EXISTS (SELECT 1 FROM b WHERE a.id = b.a_id);</p><p>SELECT * FROM a WHERE id NOT IN (SELECT a_id FROM b);</p><p>SELECT a.* FROM a LEFT JOIN b ON a.id = b.a_id WHERE b.id IS NULL;</p></div><div class="info-panel"><h4>💻 Ejemplo</h4><p>-- Clientes sin pedidos (recomendado)<br>SELECT * FROM clientes c WHERE NOT EXISTS (SELECT 1 FROM pedidos p WHERE p.cliente_id = c.id);</p><p>-- Productos nunca vendidos<br>SELECT * FROM productos p WHERE NOT EXISTS (SELECT 1 FROM ventas v WHERE v.producto_id = p.id);</p></div><div class="info-panel"><h4>⚠️ Errores</h4><p>NOT IN con NULL: si la subconsulta devuelve NULL, el resultado es vacío. Siempre.</p><p>LEFT JOIN ... IS NULL puede ser más lento en tablas grandes.</p><p>NOT EXISTS es generalmente la más segura y eficiente.</p></div><div class="info-panel"><h4>🔍 Dato</h4><p>NOT EXISTS corta la ejecución en cuanto encuentra la primera coincidencia.</p><p>PostgreSQL optimiza NOT EXISTS muy bien.</p><p>En SQL Server, NOT IN puede ser problemático con NULL.</p></div><div class="info-panel"><h4>🎯 Clave</h4><p>Anti-join = filas que NO se corresponden.</p><p>NOT EXISTS es la forma recomendada.</p><p>NOT IN es peligroso con NULL.</p><p>LEFT JOIN ... IS NULL es la forma visual.</p></div></div>
+<div class="step-section"><h3><i class="fas fa-laptop-code"></i> Ejemplo Paso a Paso</h3><div class="code-block">-- Las 3 formas de anti-join:<br><br>-- Forma 1: NOT EXISTS (recomendada)<br>SELECT * FROM clientes c WHERE NOT EXISTS (SELECT 1 FROM pedidos p WHERE p.cliente_id = c.id);<br><br>-- Forma 2: LEFT JOIN ... IS NULL<br>SELECT c.* FROM clientes c LEFT JOIN pedidos p ON c.id = p.cliente_id WHERE p.id IS NULL;<br><br>-- Forma 3: NOT IN (cuidado con NULL)<br>SELECT * FROM clientes WHERE id NOT IN (SELECT cliente_id FROM pedidos);</div></div>
+</div>
   <div class="section-card">
    <h2><i class="fas fa-book-open"></i> Concepto</h2>
    <p>Un Anti-Join encuentra filas en una tabla que NO tienen correspondencia en la otra. Se logra con <code>LEFT JOIN ... WHERE ... IS NULL</code> o <code>NOT EXISTS</code>.</p>
@@ -57,7 +76,11 @@
   </div>
   <div class="analogy-card">
    <i class="fas fa-lightbulb"></i> <strong>Analogía:</strong> Anti-Join es como buscar estudiantes que NO entregaron la tarea: tienes la lista de todos los estudiantes (izquierda), buscas quiénes tienen tarea (derecha), y te quedas con los que NO aparecen en la lista de tareas.
-  </div>
+  
+<div class="objectives"><h3><i class="fas fa-bullseye"></i> ¿Qué aprenderás?</h3><ul><li>Entender qué son los anti-joins</li><li>Usar NOT EXISTS y NOT IN</li><li>Usar LEFT JOIN ... IS NULL</li><li>Aplicar anti-joins para exclusión</li></ul></div>
+<div class="info-grid"><div class="info-panel"><h4>🧠 Intuición</h4><p>Anti-join es lo opuesto a INNER JOIN: encuentra filas que NO tienen correspondencia. 'Dame los clientes que NO han hecho pedidos'.</p><p>Hay tres formas: NOT EXISTS, NOT IN, y LEFT JOIN ... IS NULL. Cada una tiene sus ventajas y riesgos.</p><p>NOT EXISTS es la más segura y recomendada.</p></div><div class="info-panel"><h4>📝 Sintaxis</h4><p>SELECT * FROM a WHERE NOT EXISTS (SELECT 1 FROM b WHERE a.id = b.a_id);</p><p>SELECT * FROM a WHERE id NOT IN (SELECT a_id FROM b);</p><p>SELECT a.* FROM a LEFT JOIN b ON a.id = b.a_id WHERE b.id IS NULL;</p></div><div class="info-panel"><h4>💻 Ejemplo</h4><p>-- Clientes sin pedidos (recomendado)<br>SELECT * FROM clientes c WHERE NOT EXISTS (SELECT 1 FROM pedidos p WHERE p.cliente_id = c.id);</p><p>-- Productos nunca vendidos<br>SELECT * FROM productos p WHERE NOT EXISTS (SELECT 1 FROM ventas v WHERE v.producto_id = p.id);</p></div><div class="info-panel"><h4>⚠️ Errores</h4><p>NOT IN con NULL: si la subconsulta devuelve NULL, el resultado es vacío. Siempre.</p><p>LEFT JOIN ... IS NULL puede ser más lento en tablas grandes.</p><p>NOT EXISTS es generalmente la más segura y eficiente.</p></div><div class="info-panel"><h4>🔍 Dato</h4><p>NOT EXISTS corta la ejecución en cuanto encuentra la primera coincidencia.</p><p>PostgreSQL optimiza NOT EXISTS muy bien.</p><p>En SQL Server, NOT IN puede ser problemático con NULL.</p></div><div class="info-panel"><h4>🎯 Clave</h4><p>Anti-join = filas que NO se corresponden.</p><p>NOT EXISTS es la forma recomendada.</p><p>NOT IN es peligroso con NULL.</p><p>LEFT JOIN ... IS NULL es la forma visual.</p></div></div>
+<div class="step-section"><h3><i class="fas fa-laptop-code"></i> Ejemplo Paso a Paso</h3><div class="code-block">-- Las 3 formas de anti-join:<br><br>-- Forma 1: NOT EXISTS (recomendada)<br>SELECT * FROM clientes c WHERE NOT EXISTS (SELECT 1 FROM pedidos p WHERE p.cliente_id = c.id);<br><br>-- Forma 2: LEFT JOIN ... IS NULL<br>SELECT c.* FROM clientes c LEFT JOIN pedidos p ON c.id = p.cliente_id WHERE p.id IS NULL;<br><br>-- Forma 3: NOT IN (cuidado con NULL)<br>SELECT * FROM clientes WHERE id NOT IN (SELECT cliente_id FROM pedidos);</div></div>
+</div>
   <div class="section-card">
    <h2><i class="fas fa-question-circle"></i> Opción Múltiple</h2>
    <div class="activity-area" id="activityArea"></div>
@@ -66,7 +89,8 @@
     <i class="fas fa-medal"></i> <h3>¡Insignia Desbloqueada!</h3><p>Anti-Join Specialist Â· Completaste el Módulo 11</p>
    </div>
    <button class="next-btn" id="nextBtn" onclick="goNext()" style="display:none;"><i class="fas fa-arrow-right"></i> Siguiente Módulo</button>
-  </div>
+  <div class="summary-box"><h3><i class="fas fa-check-double"></i> Resumen del Módulo</h3><p>Los anti-joins encuentran filas sin correspondencia. NOT EXISTS es la forma más segura y recomendada. NOT IN es riesgoso con NULL. LEFT JOIN ... IS NULL es clara visualmente. Anti-joins son esenciales para encontrar datos huérfanos o excluir categorías.</p></div>
+</div>
   <div class="footer-text"><i class="fas fa-database"></i> SQL Básico Â· Curso 3 Â· Módulo 11 de 12</div>
  </div>
  <script>
