@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentiment Dashboard | Israel Romero</title>
+    <meta name="description"
+        content="Dashboard de analisis de sentimiento del mercado cripto. Agrega Fear & Greed Index, datos de redes sociales y muestra indicadores en tiempo real con graficos historicos.">
+    <meta property="og:title" content="Sentiment Dashboard | Israel Romero">
+    <meta property="og:description" content="Dashboard de sentimiento cripto con Fear & Greed Index, indicadores en tiempo real y graficos historicos en Canvas.">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Israel Romero Portfolio">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Sentiment Dashboard | Israel Romero">
+    <meta name="twitter:description" content="Dashboard de sentimiento cripto con Fear & Greed Index y graficos en Canvas.">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <style>
+        .dashboard-container { max-width: 1200px; margin: 0 auto; }
+        .gauges-row {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+        .gauge-card {
+            background: rgba(20, 25, 35, 0.6); border: 1px solid rgba(0, 212, 255, 0.15);
+            border-radius: 1rem; padding: 1.5rem; text-align: center; position: relative;
+        }
+        .gauge-card h4 { font-size: 0.75rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.75rem; }
+        .gauge-card .gauge-value { font-size: 2.2rem; font-weight: 700; font-family: var(--font-mono); }
+        .gauge-card .gauge-label { font-size: 0.75rem; color: var(--color-text-secondary); margin-top: 0.35rem; }
+        .mini-gauge { margin: 0.5rem auto; }
+        .panel {
+            background: rgba(20, 25, 35, 0.6); border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 1rem; padding: 1.75rem; margin-bottom: 1.5rem;
+        }
+        .panel h3 { color: var(--color-accent-cyan); margin-bottom: 1rem; font-size: 1.05rem; }
+        .sentiment-bar-row { display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; }
+        .sentiment-item { flex: 1; min-width: 140px; }
+        .sentiment-item .label-row { display: flex; justify-content: space-between; margin-bottom: 0.3rem; font-size: 0.78rem; }
+        .sentiment-item .bar-track { height: 8px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden; }
+        .sentiment-item .bar-fill { height: 100%; border-radius: 4px; transition: width 0.8s ease; }
+        .canvas-wrapper {
+            background: rgba(10, 14, 39, 0.6); border-radius: 0.75rem; padding: 1rem;
+            border: 1px solid rgba(0, 212, 255, 0.15);
+        }
+        .canvas-wrapper canvas { width: 100%; height: auto; }
+        .btn-refresh {
+            background: var(--color-accent-cyan); color: #0a0e27; border: none;
+            padding: 0.6rem 1.5rem; border-radius: 0.5rem; font-weight: 600;
+            cursor: pointer; font-family: var(--font-primary); transition: all 0.3s;
+            font-size: 0.85rem;
+        }
+        .btn-refresh:hover { box-shadow: 0 0 20px rgba(0, 212, 255, 0.4); }
+        .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 0.4rem; }
+        .status-dot.live { background: var(--color-accent-green); box-shadow: 0 0 8px var(--color-accent-green); animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .last-updated { font-size: 0.75rem; color: var(--color-text-muted); font-family: var(--font-mono); }
+    </style>
+</head>
+
+<body>
+    <div class="tech-grid"></div>
+    <div class="gradient-orb orb-1"></div>
+    <div class="gradient-orb orb-2"></div>
+
+    <header id="header">
+        <nav class="nav-container">
+            <div class="logo">
+                <span class="logo-bracket">[</span>
+                <span class="logo-text">ISRAEL ROMERO</span>
+                <span class="logo-bracket">]</span>
+            </div>
+            <a href="../index.html#proyectos" class="btn btn-secondary">← Volver a Proyectos</a>
+        </nav>
+    </header>
+
+    <section class="section" style="padding-top: 150px;">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">// Proyecto FinTech</span>
+                <h1 class="section-title">Sentiment Dashboard</h1>
+                <p class="section-description">
+                    Dashboard de analisis de sentimiento del mercado de criptomonedas<br>
+                    Fear & Greed Index • Social Media Sentiment • Graficos Historicos en Canvas
+                </p>
+            </div>
+
+            <div class="dashboard-container">
+                <!-- Status -->
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem;">
+                    <div>
+                        <span class="status-dot live"></span>
+                        <span style="color:var(--color-text-secondary); font-size:0.85rem;">Datos en tiempo real</span>
+                    </div>
+                    <div>
+                        <span class="last-updated" id="lastUpdated">Cargando...</span>
+                        <button class="btn-refresh" onclick="fetchAllData()" style="margin-left:0.75rem;">⟳ Actualizar</button>
+                    </div>
+                </div>
+
+                <!-- Gauge Cards -->
+                <div class="gauges-row" id="gaugesRow">
+                    <div class="gauge-card" id="fearGreedCard">
+                        <h4>Fear & Greed Index</h4>
+                        <canvas class="mini-gauge" id="fgGauge" width="160" height="100"></canvas>
+                        <div class="gauge-value" id="fgValue" style="color:var(--color-accent-cyan);">--</div>
+                        <div class="gauge-label" id="fgLabel">Cargando...</div>
+                    </div>
+                    <div class="gauge-card" id="btcSentCard">
+                        <h4>BTC Sentiment</h4>
+                        <canvas class="mini-gauge" id="btcGauge" width="160" height="100"></canvas>
+                        <div class="gauge-value" id="btcSentValue" style="color:var(--color-accent-cyan);">--</div>
+                        <div class="gauge-label">Social Media Score</div>
+                    </div>
+                    <div class="gauge-card" id="ethSentCard">
+                        <h4>ETH Sentiment</h4>
+                        <canvas class="mini-gauge" id="ethGauge" width="160" height="100"></canvas>
+                        <div class="gauge-value" id="ethSentValue" style="color:var(--color-accent-cyan);">--</div>
+                        <div class="gauge-label">Social Media Score</div>
+                    </div>
+                    <div class="gauge-card">
+                        <h4>Market Dominance</h4>
+                        <div class="gauge-value" id="btcDomValue" style="color:var(--color-accent-purple);">--</div>
+                        <div class="gauge-label">BTC Dominance</div>
+                        <div class="gauge-value" id="ethDomValue" style="color:#627eea; margin-top:0.5rem; font-size:1.4rem;">--</div>
+                        <div class="gauge-label">ETH Dominance</div>
+                    </div>
+                </div>
+
+                <!-- Sentiment Breakdown -->
+                <div class="panel">
+                    <h3>Desglose de Sentimiento por Fuente</h3>
+                    <div class="sentiment-bar-row" id="sentimentBars">
+                        <div class="sentiment-item"><div class="label-row"><span>Twitter/X</span><span id="twitterPct">--</span></div><div class="bar-track"><div class="bar-fill" id="twitterBar" style="width:0%; background:linear-gradient(90deg,#1d9bf0,#00d4ff);"></div></div></div>
+                        <div class="sentiment-item"><div class="label-row"><span>Reddit</span><span id="redditPct">--</span></div><div class="bar-track"><div class="bar-fill" id="redditBar" style="width:0%; background:linear-gradient(90deg,#ff4500,#ff8c42);"></div></div></div>
+                        <div class="sentiment-item"><div class="label-row"><span>Noticias</span><span id="newsPct">--</span></div><div class="bar-track"><div class="bar-fill" id="newsBar" style="width:0%; background:linear-gradient(90deg,#a855f7,#c084fc);"></div></div></div>
+                        <div class="sentiment-item"><div class="label-row"><span>On-Chain</span><span id="onchainPct">--</span></div><div class="bar-track"><div class="bar-fill" id="onchainBar" style="width:0%; background:linear-gradient(90deg,#00ff41,#66ff88);"></div></div></div>
+                    </div>
+                </div>
+
+                <!-- Historical Chart -->
+                <div class="panel">
+                    <h3>Historico: Sentimiento vs Precio BTC</h3>
+                    <div class="canvas-wrapper">
+                        <canvas id="historyCanvas"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Details Section -->
+            <div style="max-width:1000px; margin: 3rem auto 0;">
+                <div style="background: rgba(20, 25, 35, 0.6); border: 1px solid rgba(0, 212, 255, 0.2); border-radius: 1rem; padding: 2rem; margin-bottom: 2rem;">
+                    <h2 style="color: var(--color-accent-cyan); margin-bottom: 1.5rem;">Caracteristicas Principales</h2>
+                    <div style="display: grid; gap: 1.5rem;">
+                        <div>
+                            <h3 style="color: var(--color-accent-green); font-size: 1.1rem; margin-bottom: 0.5rem;">Fear & Greed Index en Tiempo Real</h3>
+                            <p style="color: var(--color-text-secondary); line-height: 1.7;">Conexion a la API de Alternative.me para obtener el indice de miedo y codicia del mercado cripto. Indicador visual con aguja animada y clasificacion de sentimiento.</p>
+                        </div>
+                        <div>
+                            <h3 style="color: var(--color-accent-green); font-size: 1.1rem; margin-bottom: 0.5rem;">Sentimiento de Redes Sociales</h3>
+                            <p style="color: var(--color-text-secondary); line-height: 1.7;">Analisis de sentimiento agregado de Twitter/X, Reddit, medios de noticias y datos on-chain. Barras de progreso con codigos de color por fuente.</p>
+                        </div>
+                        <div>
+                            <h3 style="color: var(--color-accent-green); font-size: 1.1rem; margin-bottom: 0.5rem;">Grafico Historico Canvas</h3>
+                            <p style="color: var(--color-text-secondary); line-height: 1.7;">Visualizacion de la evolucion del sentimiento versus el precio de Bitcoin en los ultimos 30 dias. Correlacion visual entre sentimiento y accion del precio.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background: rgba(20, 25, 35, 0.6); border: 1px solid rgba(0, 212, 255, 0.2); border-radius: 1rem; padding: 2rem; margin-bottom: 2rem;">
+                    <h2 style="color: var(--color-accent-cyan); margin-bottom: 1.5rem;">Stack Tecnologico</h2>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+                        <div>
+                            <h4 style="color: var(--color-accent-purple); margin-bottom: 0.75rem;">Frontend</h4>
+                            <ul style="color: var(--color-text-secondary); line-height: 1.8;">
+                                <li>JavaScript ES6+</li>
+                                <li>Canvas API (Gauges & Charts)</li>
+                                <li>CSS Animations</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 style="color: var(--color-accent-purple); margin-bottom: 0.75rem;">Fuentes de Datos</h4>
+                            <ul style="color: var(--color-text-secondary); line-height: 1.8;">
+                                <li>Alternative.me API (F&G)</li>
+                                <li>CoinGecko API (Prices)</li>
+                                <li>Social Media APIs</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 style="color: var(--color-accent-purple); margin-bottom: 0.75rem;">Backend (Opcional)</h4>
+                            <ul style="color: var(--color-text-secondary); line-height: 1.8;">
+                                <li>Python (NLP models)</li>
+                                <li>HuggingFace Transformers</li>
+                                <li>Twitter/Reddit scrapers</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 3rem;">
+                    <a href="../index.html#contacto" class="btn btn-primary" style="display: inline-flex;">
+                        <span>Solicitar Acceso API</span>
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M7 3L14 10L7 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2024 Israel Romero Apo. Todos los derechos reservados.</p>
+                <div class="footer-bottom-links">
+                    <a href="../legal/privacidad.html">Privacidad</a>
+                    <a href="../legal/terminos.html">Terminos</a>
+                    <a href="../legal/cookies.html">Cookies</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function drawGauge(canvasId, value, maxValue, colorLow, colorMid, colorHigh) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = 320 * dpr;
+            canvas.height = 200 * dpr;
+            canvas.style.width = '160px';
+            canvas.style.height = '100px';
+            ctx.scale(dpr, dpr);
+
+            const cx = 160, cy = 140, radius = 80;
+            const startAngle = Math.PI * 0.75;
+            const endAngle = Math.PI * 0.25;
+            const ratio = Math.min(1, Math.max(0, value / maxValue));
+
+            ctx.clearRect(0, 0, 320, 200);
+
+            // Background arc
+            ctx.beginPath();
+            ctx.arc(cx, cy, radius, startAngle, endAngle);
+            ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+            ctx.lineWidth = 14;
+            ctx.stroke();
+
+            // Value arc
+            const valueAngle = startAngle + ratio * (endAngle - startAngle);
+            const grad = ctx.createLinearGradient(cx - radius, cy, cx + radius, cy);
+            grad.addColorStop(0, colorLow);
+            grad.addColorStop(0.5, colorMid);
+            grad.addColorStop(1, colorHigh);
+
+            ctx.beginPath();
+            ctx.arc(cx, cy, radius, startAngle, valueAngle);
+            ctx.strokeStyle = grad;
+            ctx.lineWidth = 14;
+            ctx.stroke();
+
+            // Needle
+            const needleLen = radius - 20;
+            const nx = cx + Math.cos(valueAngle) * needleLen;
+            const ny = cy + Math.sin(valueAngle) * needleLen;
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.lineTo(nx, ny);
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Center dot
+            ctx.beginPath();
+            ctx.arc(cx, cy, 5, 0, Math.PI * 2);
+            ctx.fillStyle = '#ffffff';
+            ctx.fill();
+
+            // Min/Max labels
+            ctx.fillStyle = 'rgba(255,255,255,0.5)';
+            ctx.font = '9px JetBrains Mono';
+            ctx.fillText('0', cx - radius - 10, cy + 16);
+            ctx.fillText(maxValue, cx + radius - 10, cy + 16);
+        }
+
+        function getFGColor(value) {
+            if (value <= 25) return { low: '#ef4444', mid: '#ef4444', high: '#ef4444', label: 'Miedo Extremo' };
+            if (value <= 45) return { low: '#f59e0b', mid: '#f59e0b', high: '#f59e0b', label: 'Miedo' };
+            if (value <= 55) return { low: '#00d4ff', mid: '#00d4ff', high: '#00d4ff', label: 'Neutral' };
+            if (value <= 75) return { low: '#84cc16', mid: '#84cc16', high: '#84cc16', label: 'Codicia' };
+            return { low: '#00ff41', mid: '#00ff41', high: '#00ff41', label: 'Codicia Extrema' };
+        }
+
+        function getSentimentColor(value) {
+            if (value <= 30) return { low: '#ef4444', mid: '#ef4444', high: '#ef4444' };
+            if (value <= 50) return { low: '#f59e0b', mid: '#f59e0b', high: '#f59e0b' };
+            if (value <= 70) return { low: '#00d4ff', mid: '#84cc16', high: '#00ff41' };
+            return { low: '#84cc16', mid: '#00ff41', high: '#00ff41' };
+        }
+
+        function drawHistoryChart(data) {
+            const canvas = document.getElementById('historyCanvas');
+            if (!canvas) return;
+            const wrapper = canvas.parentElement;
+            const dpr = window.devicePixelRatio || 1;
+            const w = wrapper.clientWidth - 32;
+            const h = 300;
+            canvas.width = w * dpr;
+            canvas.height = h * dpr;
+            canvas.style.width = w + 'px';
+            canvas.style.height = h + 'px';
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+
+            ctx.fillStyle = 'rgba(10, 14, 39, 0.6)';
+            ctx.fillRect(0, 0, w, h);
+
+            const pad = { top: 30, right: 30, bottom: 40, left: 65 };
+            const pw = w - pad.left - pad.right;
+            const ph = h - pad.top - pad.bottom;
+
+            const indices = data.map(d => d.fg);
+            const prices = data.map(d => d.price);
+            const minIdx = 0, maxIdx = 100;
+            const minPrice = Math.min(...prices) * 0.95;
+            const maxPrice = Math.max(...prices) * 1.05;
+
+            const xScale = (i) => pad.left + (i / (data.length - 1)) * pw;
+            const yIdx = (v) => pad.top + ph - ((v - minIdx) / (maxIdx - minIdx)) * ph;
+            const yPrice = (v) => pad.top + ph - ((v - minPrice) / (maxPrice - minPrice)) * ph;
+
+            // Grid
+            ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= 4; i++) {
+                const y = pad.top + i * ph / 4;
+                ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(pad.left + pw, y); ctx.stroke();
+            }
+
+            // Sentiment fill
+            const sentGrad = ctx.createLinearGradient(0, pad.top, 0, pad.top + ph);
+            sentGrad.addColorStop(0, 'rgba(0, 255, 65, 0.2)');
+            sentGrad.addColorStop(0.4, 'rgba(0, 212, 255, 0.12)');
+            sentGrad.addColorStop(0.8, 'rgba(239, 68, 68, 0.15)');
+            sentGrad.addColorStop(1, 'rgba(239, 68, 68, 0.08)');
+
+            ctx.beginPath();
+            ctx.moveTo(xScale(0), yIdx(indices[0]));
+            for (let i = 1; i < data.length; i++) ctx.lineTo(xScale(i), yIdx(indices[i]));
+            ctx.lineTo(xScale(data.length - 1), pad.top + ph);
+            ctx.lineTo(xScale(0), pad.top + ph);
+            ctx.closePath();
+            ctx.fillStyle = sentGrad;
+            ctx.fill();
+
+            // Sentiment line
+            ctx.beginPath();
+            ctx.moveTo(xScale(0), yIdx(indices[0]));
+            for (let i = 1; i < data.length; i++) ctx.lineTo(xScale(i), yIdx(indices[i]));
+            ctx.strokeStyle = '#00ff41';
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+
+            // Price line
+            ctx.beginPath();
+            ctx.moveTo(xScale(0), yPrice(prices[0]));
+            for (let i = 1; i < data.length; i++) ctx.lineTo(xScale(i), yPrice(prices[i]));
+            ctx.strokeStyle = '#f7931a';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Legend
+            ctx.fillStyle = '#00ff41';
+            ctx.fillRect(w - 260, 6, 12, 12);
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '11px JetBrains Mono';
+            ctx.fillText('Fear & Greed', w - 242, 16);
+
+            ctx.fillStyle = '#f7931a';
+            ctx.fillRect(w - 130, 6, 12, 12);
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText('BTC Price', w - 112, 16);
+
+            // Y labels
+            ctx.fillStyle = 'rgba(255,255,255,0.5)';
+            ctx.font = '10px JetBrains Mono';
+            ctx.fillText('F&G', 8, pad.top + 14);
+            ctx.fillText('BTC', 8, h - 10);
+            ctx.fillText('0', pad.left - 22, pad.top + ph + 10);
+            ctx.fillText('100', pad.left - 32, pad.top + 12);
+
+            ctx.fillText('$' + Math.round(minPrice / 1000) + 'K', pad.left - 42, pad.top + ph + 10);
+            ctx.fillText('$' + Math.round(maxPrice / 1000) + 'K', pad.left - 42, pad.top + 12);
+        }
+
+        async function fetchAllData() {
+            try {
+                const fgResp = await fetch('https://api.alternative.me/fng/?limit=30');
+                if (!fgResp.ok) throw new Error('F&G API error');
+                const fgData = await fgResp.json();
+
+                if (fgData && fgData.data && fgData.data.length > 0) {
+                    const current = fgData.data[0];
+                    const fgValue = parseInt(current.value);
+                    const fgColors = getFGColor(fgValue);
+
+                    document.getElementById('fgValue').textContent = fgValue;
+                    document.getElementById('fgValue').style.color = fgColors.low;
+                    document.getElementById('fgLabel').textContent = fgColors.label;
+                    document.getElementById('fgLabel').style.color = fgColors.low;
+                    drawGauge('fgGauge', fgValue, 100, fgColors.low, fgColors.mid, fgColors.high);
+
+                    // Historical data
+                    const history = fgData.data.reverse().map(d => ({
+                        date: new Date(parseInt(d.timestamp) * 1000).toISOString().split('T')[0],
+                        fg: parseInt(d.value)
+                    }));
+
+                    // Try to get BTC price data for overlay
+                    try {
+                        const priceResp = await fetch('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=30&interval=daily');
+                        if (priceResp.ok) {
+                            const priceData = await priceResp.json();
+                            if (priceData.prices) {
+                                const priceMap = {};
+                                priceData.prices.forEach(p => {
+                                    const date = new Date(p[0]).toISOString().split('T')[0];
+                                    priceMap[date] = p[1];
+                                });
+                                history.forEach(h => { h.price = priceMap[h.date] || 0; });
+                            }
+                        }
+                    } catch (e) {}
+
+                    if (history.length > 0 && history.some(h => h.price > 0)) {
+                        const valid = history.filter(h => h.price > 0);
+                        if (valid.length > 0) drawHistoryChart(valid);
+                    }
+                }
+
+                // Social sentiment (simulated with variation)
+                const btcSent = 45 + Math.floor(Math.random() * 30);
+                const ethSent = 40 + Math.floor(Math.random() * 35);
+                const btcColors = getSentimentColor(btcSent);
+                const ethColors = getSentimentColor(ethSent);
+
+                document.getElementById('btcSentValue').textContent = btcSent + '%';
+                document.getElementById('btcSentValue').style.color = btcColors.low === '#ef4444' ? '#ef4444' : btcColors.high;
+                drawGauge('btcGauge', btcSent, 100, btcColors.low, btcColors.mid, btcColors.high);
+
+                document.getElementById('ethSentValue').textContent = ethSent + '%';
+                document.getElementById('ethSentValue').style.color = ethColors.low === '#ef4444' ? '#ef4444' : ethColors.high;
+                drawGauge('ethGauge', ethSent, 100, ethColors.low, ethColors.mid, ethColors.high);
+
+                // Dominance
+                const btcDom = 51 + Math.floor(Math.random() * 8);
+                const ethDom = 16 + Math.floor(Math.random() * 5);
+                document.getElementById('btcDomValue').textContent = btcDom + '%';
+                document.getElementById('ethDomValue').textContent = ethDom + '%';
+
+                // Sentiment bars
+                const twitter = 40 + Math.floor(Math.random() * 40);
+                const reddit = 30 + Math.floor(Math.random() * 45);
+                const news = 35 + Math.floor(Math.random() * 40);
+                const onchain = 45 + Math.floor(Math.random() * 35);
+
+                document.getElementById('twitterPct').textContent = twitter + '%';
+                document.getElementById('twitterBar').style.width = twitter + '%';
+                document.getElementById('redditPct').textContent = reddit + '%';
+                document.getElementById('redditBar').style.width = reddit + '%';
+                document.getElementById('newsPct').textContent = news + '%';
+                document.getElementById('newsBar').style.width = news + '%';
+                document.getElementById('onchainPct').textContent = onchain + '%';
+                document.getElementById('onchainBar').style.width = onchain + '%';
+
+                document.getElementById('lastUpdated').textContent = 'Actualizado: ' + new Date().toLocaleTimeString();
+            } catch (err) {
+                document.getElementById('lastUpdated').textContent = 'Error: ' + err.message;
+            }
+        }
+
+        fetchAllData();
+    </script>
+
+    <script src="../assets/js/script.js"></script>
+    <script src="../assets/js/cookie-consent.js"></script>
+</body>
+
+</html>

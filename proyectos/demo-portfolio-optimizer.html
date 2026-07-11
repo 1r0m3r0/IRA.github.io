@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Optimizer | Israel Romero</title>
+    <meta name="description"
+        content="Optimizador de portfolios basado en la Teoria Moderna de Markowitz. Simulacion Monte Carlo, frontera eficiente en Canvas y pesos optimos para max Sharpe ratio.">
+    <meta property="og:title" content="Portfolio Optimizer | Israel Romero">
+    <meta property="og:description" content="Optimizador de portfolios con simulacion Monte Carlo y frontera eficiente en Canvas API. Teoria Moderna de Portafolios de Markowitz.">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Israel Romero Portfolio">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Portfolio Optimizer | Israel Romero">
+    <meta name="twitter:description" content="Optimizador de portfolios con simulacion Monte Carlo y frontera eficiente en Canvas API.">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <style>
+        .optimizer-container { max-width: 1100px; margin: 0 auto; }
+        .panel {
+            background: rgba(20, 25, 35, 0.6); border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 1rem; padding: 1.75rem; margin-bottom: 1.5rem;
+        }
+        .panel h3 { color: var(--color-accent-cyan); margin-bottom: 1rem; font-size: 1.05rem; }
+        .asset-selector { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem; }
+        .asset-chip {
+            display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.85rem;
+            border-radius: 2rem; background: rgba(10,14,39,0.6); border: 1px solid rgba(255,255,255,0.1);
+            cursor: pointer; transition: all 0.3s; font-size: 0.85rem; user-select: none;
+        }
+        .asset-chip:hover { border-color: rgba(0,212,255,0.4); }
+        .asset-chip.selected { border-color: var(--color-accent-cyan); background: rgba(0,212,255,0.1); }
+        .asset-chip .dot { width: 10px; height: 10px; border-radius: 50%; }
+        .slider-group { margin: 1rem 0; }
+        .slider-group label { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--color-text-secondary); margin-bottom: 0.4rem; }
+        .slider-group label span { color: var(--color-accent-cyan); font-family: var(--font-mono); }
+        .slider-group input[type="range"] {
+            width: 100%; height: 6px; -webkit-appearance: none; appearance: none;
+            background: rgba(255,255,255,0.1); border-radius: 3px; outline: none;
+        }
+        .slider-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%;
+            background: var(--color-accent-cyan); cursor: pointer;
+        }
+        .btn-run {
+            background: linear-gradient(135deg, var(--color-accent-cyan), var(--color-accent-purple));
+            color: #0a0e27; border: none; padding: 0.75rem 2rem; border-radius: 0.5rem;
+            font-weight: 700; cursor: pointer; font-family: var(--font-primary);
+            font-size: 0.95rem; transition: all 0.3s; width: 100%;
+        }
+        .btn-run:hover { box-shadow: 0 0 25px rgba(0, 212, 255, 0.5); transform: translateY(-2px); }
+        .btn-run:disabled { opacity: 0.5; cursor: not-allowed; }
+        .metrics-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem;
+        }
+        .metric-card {
+            background: rgba(10, 14, 39, 0.6); border-radius: 0.75rem; padding: 1.25rem;
+            text-align: center; border: 1px solid rgba(255,255,255,0.06);
+        }
+        .metric-card .metric-value { font-size: 1.6rem; font-weight: 700; font-family: var(--font-mono); }
+        .metric-card .metric-label { font-size: 0.7rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 0.35rem; }
+        .weights-table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.85rem; }
+        .weights-table th { padding: 0.5rem; text-align: left; color: var(--color-accent-cyan); font-family: var(--font-mono); font-size: 0.75rem; border-bottom: 1px solid rgba(0,212,255,0.2); }
+        .weights-table td { padding: 0.6rem 0.5rem; color: var(--color-text-secondary); border-bottom: 1px solid rgba(255,255,255,0.05); font-family: var(--font-mono); }
+        .weight-bar { height: 8px; border-radius: 4px; background: rgba(255,255,255,0.1); overflow: hidden; min-width: 80px; }
+        .weight-bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s; }
+        .canvas-wrapper {
+            background: rgba(10, 14, 39, 0.6); border-radius: 0.75rem; padding: 1rem;
+            border: 1px solid rgba(0, 212, 255, 0.15);
+        }
+        .canvas-wrapper canvas { width: 100%; height: auto; }
+    </style>
+</head>
+
+<body>
+    <div class="tech-grid"></div>
+    <div class="gradient-orb orb-1"></div>
+    <div class="gradient-orb orb-2"></div>
+
+    <header id="header">
+        <nav class="nav-container">
+            <div class="logo">
+                <span class="logo-bracket">[</span>
+                <span class="logo-text">ISRAEL ROMERO</span>
+                <span class="logo-bracket">]</span>
+            </div>
+            <a href="../index.html#proyectos" class="btn btn-secondary">← Volver a Proyectos</a>
+        </nav>
+    </header>
+
+    <section class="section" style="padding-top: 150px;">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">// Proyecto FinTech</span>
+                <h1 class="section-title">Portfolio Optimizer</h1>
+                <p class="section-description">
+                    Optimizador de portfolios con Teoria Moderna de Markowitz<br>
+                    Simulacion Monte Carlo • Frontera Eficiente • Max Sharpe Ratio en Canvas
+                </p>
+            </div>
+
+            <div class="optimizer-container">
+                <div class="panel">
+                    <h3>1. Seleccion de Activos</h3>
+                    <div class="asset-selector" id="assetSelector">
+                        <div class="asset-chip selected" data-asset="BTC">
+                            <span class="dot" style="background:#f7931a;"></span> BTC
+                        </div>
+                        <div class="asset-chip selected" data-asset="ETH">
+                            <span class="dot" style="background:#627eea;"></span> ETH
+                        </div>
+                        <div class="asset-chip selected" data-asset="SOL">
+                            <span class="dot" style="background:#9945ff;"></span> SOL
+                        </div>
+                        <div class="asset-chip" data-asset="BNB">
+                            <span class="dot" style="background:#f0b90b;"></span> BNB
+                        </div>
+                        <div class="asset-chip" data-asset="ADA">
+                            <span class="dot" style="background:#0033ad;"></span> ADA
+                        </div>
+                        <div class="asset-chip" data-asset="DOT">
+                            <span class="dot" style="background:#e6007a;"></span> DOT
+                        </div>
+                        <div class="asset-chip" data-asset="MATIC">
+                            <span class="dot" style="background:#8247e5;"></span> MATIC
+                        </div>
+                        <div class="asset-chip" data-asset="LINK">
+                            <span class="dot" style="background:#2a5ada;"></span> LINK
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3>2. Parametros de Simulacion</h3>
+                    <div class="slider-group">
+                        <label>Simulaciones Monte Carlo: <span id="simCountLabel">10,000</span></label>
+                        <input type="range" id="simCount" min="1000" max="50000" step="1000" value="10000">
+                    </div>
+                    <div class="slider-group">
+                        <label>Tasa Libre de Riesgo (anual): <span id="rfLabel">4.5%</span></label>
+                        <input type="range" id="riskFree" min="0" max="15" step="0.25" value="4.5">
+                    </div>
+                    <button class="btn-run" id="btnRun" onclick="runOptimization()">▶ Ejecutar Optimizacion</button>
+                </div>
+
+                <div class="panel" id="resultsPanel" style="display:none;">
+                    <h3>3. Resultados</h3>
+                    <div class="metrics-grid" id="metricsGrid"></div>
+                    <div style="margin-top: 1.5rem;">
+                        <h4 style="color:var(--color-accent-purple); margin-bottom:0.75rem; font-size:0.9rem;">Pesos Optimos (Max Sharpe Ratio)</h4>
+                        <table class="weights-table" id="weightsTable"><tbody></tbody></table>
+                    </div>
+                    <div class="canvas-wrapper" style="margin-top:1.5rem;">
+                        <canvas id="frontierCanvas"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div style="max-width:1000px; margin: 3rem auto 0;">
+                <div style="background: rgba(20, 25, 35, 0.6); border: 1px solid rgba(0, 212, 255, 0.2); border-radius: 1rem; padding: 2rem; margin-bottom: 2rem;">
+                    <h2 style="color: var(--color-accent-cyan); margin-bottom: 1.5rem;">Caracteristicas Principales</h2>
+                    <div style="display: grid; gap: 1.5rem;">
+                        <div>
+                            <h3 style="color: var(--color-accent-green); font-size: 1.1rem; margin-bottom: 0.5rem;">Simulacion Monte Carlo</h3>
+                            <p style="color: var(--color-text-secondary); line-height: 1.7;">Genera miles de combinaciones aleatorias de pesos para encontrar la distribucion optima de activos. Cuantas mas simulaciones, mas precisa la frontera eficiente.</p>
+                        </div>
+                        <div>
+                            <h3 style="color: var(--color-accent-green); font-size: 1.1rem; margin-bottom: 0.5rem;">Frontera Eficiente en Canvas</h3>
+                            <p style="color: var(--color-text-secondary); line-height: 1.7;">Grafico interactivo que muestra la relacion riesgo-retorno de cada portfolio simulado. La frontera eficiente marca los portfolios optimos para cada nivel de riesgo.</p>
+                        </div>
+                        <div>
+                            <h3 style="color: var(--color-accent-green); font-size: 1.1rem; margin-bottom: 0.5rem;">Optimizacion Sharpe Ratio</h3>
+                            <p style="color: var(--color-text-secondary); line-height: 1.7;">Identifica automaticamente el portfolio con el maximo Sharpe Ratio (mejor retorno ajustado por riesgo) y muestra los pesos optimos para cada activo.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background: rgba(20, 25, 35, 0.6); border: 1px solid rgba(0, 212, 255, 0.2); border-radius: 1rem; padding: 2rem; margin-bottom: 2rem;">
+                    <h2 style="color: var(--color-accent-cyan); margin-bottom: 1.5rem;">Stack Tecnologico</h2>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+                        <div>
+                            <h4 style="color: var(--color-accent-purple); margin-bottom: 0.75rem;">Frontend</h4>
+                            <ul style="color: var(--color-text-secondary); line-height: 1.8;">
+                                <li>Vanilla JavaScript</li>
+                                <li>Canvas API (Charts)</li>
+                                <li>CSS Custom Properties</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 style="color: var(--color-accent-purple); margin-bottom: 0.75rem;">Algoritmos</h4>
+                            <ul style="color: var(--color-text-secondary); line-height: 1.8;">
+                                <li>Markowitz MPT</li>
+                                <li>Monte Carlo Simulation</li>
+                                <li>Sharpe Ratio Optimization</li>
+                                <li>Efficient Frontier</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 style="color: var(--color-accent-purple); margin-bottom: 0.75rem;">Backend (Opcional)</h4>
+                            <ul style="color: var(--color-text-secondary); line-height: 1.8;">
+                                <li>Python (numpy, scipy)</li>
+                                <li>cvxopt / cvxpy</li>
+                                <li>pandas dataloader</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 3rem;">
+                    <a href="../index.html#contacto" class="btn btn-primary" style="display: inline-flex;">
+                        <span>Solicitar Version Avanzada</span>
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M7 3L14 10L7 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2024 Israel Romero Apo. Todos los derechos reservados.</p>
+                <div class="footer-bottom-links">
+                    <a href="../legal/privacidad.html">Privacidad</a>
+                    <a href="../legal/terminos.html">Terminos</a>
+                    <a href="../legal/cookies.html">Cookies</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const ASSET_DATA = {
+            BTC: { name: 'Bitcoin', ret: 0.82, risk: 0.65, color: '#f7931a' },
+            ETH: { name: 'Ethereum', ret: 0.65, risk: 0.72, color: '#627eea' },
+            SOL: { name: 'Solana', ret: 0.95, risk: 0.95, color: '#9945ff' },
+            BNB: { name: 'BNB', ret: 0.45, risk: 0.58, color: '#f0b90b' },
+            ADA: { name: 'Cardano', ret: 0.35, risk: 0.70, color: '#0033ad' },
+            DOT: { name: 'Polkadot', ret: 0.28, risk: 0.68, color: '#e6007a' },
+            MATIC: { name: 'Polygon', ret: 0.40, risk: 0.75, color: '#8247e5' },
+            LINK: { name: 'Chainlink', ret: 0.38, risk: 0.62, color: '#2a5ada' }
+        };
+
+        const CORRELATION_MATRIX = {
+            'BTC,ETH':0.78, 'BTC,SOL':0.62, 'BTC,BNB':0.55, 'BTC,ADA':0.48, 'BTC,DOT':0.52, 'BTC,MATIC':0.50, 'BTC,LINK':0.55,
+            'ETH,SOL':0.72, 'ETH,BNB':0.65, 'ETH,ADA':0.55, 'ETH,DOT':0.60, 'ETH,MATIC':0.68, 'ETH,LINK':0.70,
+            'SOL,BNB':0.50, 'SOL,ADA':0.42, 'SOL,DOT':0.48, 'SOL,MATIC':0.52, 'SOL,LINK':0.50,
+            'BNB,ADA':0.40, 'BNB,DOT':0.44, 'BNB,MATIC':0.46, 'BNB,LINK':0.48,
+            'ADA,DOT':0.45, 'ADA,MATIC':0.42, 'ADA,LINK':0.40,
+            'DOT,MATIC':0.50, 'DOT,LINK':0.48,
+            'MATIC,LINK':0.52
+        };
+
+        function getCorrelation(a, b) {
+            if (a === b) return 1;
+            const key1 = a + ',' + b;
+            const key2 = b + ',' + a;
+            return CORRELATION_MATRIX[key1] || CORRELATION_MATRIX[key2] || 0.4;
+        }
+
+        function portfolioReturn(weights, assets) {
+            let r = 0;
+            for (let i = 0; i < assets.length; i++) r += weights[i] * ASSET_DATA[assets[i]].ret;
+            return r;
+        }
+
+        function portfolioRisk(weights, assets) {
+            let variance = 0;
+            for (let i = 0; i < assets.length; i++) {
+                for (let j = 0; j < assets.length; j++) {
+                    const corr = getCorrelation(assets[i], assets[j]);
+                    variance += weights[i] * weights[j] * ASSET_DATA[assets[i]].risk * ASSET_DATA[assets[j]].risk * corr;
+                }
+            }
+            return Math.sqrt(variance);
+        }
+
+        function randomWeights(n) {
+            const raw = Array.from({ length: n }, () => Math.random());
+            const sum = raw.reduce((a, b) => a + b, 0);
+            return raw.map(r => r / sum);
+        }
+
+        function runOptimization() {
+            const selected = [];
+            document.querySelectorAll('.asset-chip.selected').forEach(chip => selected.push(chip.dataset.asset));
+            if (selected.length < 2) { alert('Selecciona al menos 2 activos.'); return; }
+
+            const btn = document.getElementById('btnRun');
+            btn.disabled = true;
+            btn.textContent = '⏳ Optimizando...';
+
+            setTimeout(() => {
+                const simCount = parseInt(document.getElementById('simCount').value);
+                const rf = parseFloat(document.getElementById('riskFree').value) / 100;
+                const portfolios = [];
+
+                for (let i = 0; i < simCount; i++) {
+                    const weights = randomWeights(selected.length);
+                    const ret = portfolioReturn(weights, selected);
+                    const risk = portfolioRisk(weights, selected);
+                    const sharpe = (ret - rf) / risk;
+                    portfolios.push({ weights, ret, risk, sharpe });
+                }
+
+                portfolios.sort((a, b) => b.sharpe - a.sharpe);
+                const best = portfolios[0];
+
+                const annualRet = best.ret * 100;
+                const annualRisk = best.risk * 100;
+
+                document.getElementById('metricsGrid').innerHTML = `
+                    <div class="metric-card"><div class="metric-value" style="color:var(--color-accent-green)">${annualRet.toFixed(2)}%</div><div class="metric-label">Retorno Esperado</div></div>
+                    <div class="metric-card"><div class="metric-value" style="color:#ef4444">${annualRisk.toFixed(2)}%</div><div class="metric-label">Riesgo (Volatilidad)</div></div>
+                    <div class="metric-card"><div class="metric-value" style="color:var(--color-accent-cyan)">${best.sharpe.toFixed(3)}</div><div class="metric-label">Sharpe Ratio</div></div>
+                    <div class="metric-card"><div class="metric-value" style="color:var(--color-accent-purple)">${(best.ret/best.risk).toFixed(2)}</div><div class="metric-label">Retorno/Riesgo</div></div>
+                    <div class="metric-card"><div class="metric-value" style="color:var(--color-accent-cyan)">${simCount.toLocaleString()}</div><div class="metric-label">Simulaciones</div></div>
+                    <div class="metric-card"><div class="metric-value" style="color:var(--color-accent-green)">${rf*100}%</div><div class="metric-label">Risk-Free Rate</div></div>
+                `;
+
+                let weightsHTML = '';
+                selected.forEach((asset, i) => {
+                    const pct = (best.weights[i] * 100).toFixed(1);
+                    const color = ASSET_DATA[asset].color;
+                    weightsHTML += `<tr>
+                        <td><span style="color:${color}; margin-right:0.5rem;">●</span>${ASSET_DATA[asset].name} (${asset})</td>
+                        <td>${pct}%</td>
+                        <td><div class="weight-bar"><div class="weight-bar-fill" style="width:${pct}%; background:${color};"></div></div></td>
+                    </tr>`;
+                });
+                document.querySelector('#weightsTable tbody').innerHTML = weightsHTML;
+
+                document.getElementById('resultsPanel').style.display = 'block';
+                drawEfficientFrontier(portfolios, selected, best, rf);
+                document.getElementById('resultsPanel').scrollIntoView({ behavior: 'smooth' });
+                btn.disabled = false;
+                btn.textContent = '▶ Ejecutar Optimizacion';
+            }, 50);
+        }
+
+        function drawEfficientFrontier(portfolios, assets, best, rf) {
+            const canvas = document.getElementById('frontierCanvas');
+            const wrapper = canvas.parentElement;
+            const dpr = window.devicePixelRatio || 1;
+            const w = wrapper.clientWidth - 32;
+            const h = 400;
+            canvas.width = w * dpr;
+            canvas.height = h * dpr;
+            canvas.style.width = w + 'px';
+            canvas.style.height = h + 'px';
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+
+            ctx.fillStyle = 'rgba(10, 14, 39, 0.6)';
+            ctx.fillRect(0, 0, w, h);
+
+            const pad = { top: 40, right: 30, bottom: 50, left: 70 };
+            const pw = w - pad.left - pad.right;
+            const ph = h - pad.top - pad.bottom;
+
+            const risks = portfolios.map(p => p.risk * 100);
+            const rets = portfolios.map(p => p.ret * 100);
+            const minRisk = Math.max(0, Math.min(...risks) * 0.8);
+            const maxRisk = Math.max(...risks) * 1.1;
+            const minRet = Math.min(...rets) * 0.9;
+            const maxRet = Math.max(...rets) * 1.1;
+
+            const xScale = (v) => pad.left + ((v - minRisk) / (maxRisk - minRisk)) * pw;
+            const yScale = (v) => pad.top + ph - ((v - minRet) / (maxRet - minRet)) * ph;
+
+            // Grid
+            ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= 6; i++) {
+                const y = pad.top + (i * ph / 6);
+                ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(pad.left + pw, y); ctx.stroke();
+                ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.font = '10px JetBrains Mono';
+                ctx.fillText((maxRet - (i * (maxRet - minRet) / 6)).toFixed(1) + '%', 6, y + 4);
+            }
+            for (let i = 0; i <= 6; i++) {
+                const x = pad.left + (i * pw / 6);
+                ctx.beginPath(); ctx.moveTo(x, pad.top); ctx.lineTo(x, pad.top + ph); ctx.stroke();
+                ctx.fillStyle = 'rgba(255,255,255,0.5)';
+                ctx.fillText((minRisk + (i * (maxRisk - minRisk) / 6)).toFixed(1) + '%', x - 12, pad.top + ph + 16);
+            }
+
+            // Axis labels
+            ctx.fillStyle = '#b4bcd0';
+            ctx.font = '11px Inter, sans-serif';
+            ctx.fillText('Riesgo (Volatilidad Anual)', w / 2 - 70, h - 6);
+            ctx.save();
+            ctx.translate(12, h / 2 + 50);
+            ctx.rotate(-Math.PI / 2);
+            ctx.fillText('Retorno Esperado Anual', 0, 0);
+            ctx.restore();
+
+            // Simulated portfolios
+            const maxSR = portfolios[0].sharpe;
+            portfolios.forEach(p => {
+                const x = xScale(p.risk * 100);
+                const y = yScale(p.ret * 100);
+                const intensity = Math.min(1, p.sharpe / maxSR);
+                const r = Math.round(0 + intensity * 0);
+                const g = Math.round(212 + intensity * 43);
+                const b = Math.round(255 - intensity * 188);
+                ctx.fillStyle = `rgba(${r},${g},${b},${0.15 + intensity * 0.3})`;
+                ctx.beginPath();
+                ctx.arc(x, y, 2.5, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            // Best portfolio (max Sharpe)
+            const bx = xScale(best.risk * 100);
+            const by = yScale(best.ret * 100);
+            ctx.fillStyle = '#00ff41';
+            ctx.beginPath();
+            ctx.arc(bx, by, 7, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#00ff41';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.fillStyle = '#00ff41';
+            ctx.font = 'bold 12px JetBrains Mono';
+            ctx.fillText('Max Sharpe', bx + 12, by + 4);
+
+            // Risk free rate line
+            const rfY = yScale(rf * 100);
+            ctx.strokeStyle = 'rgba(168, 85, 247, 0.5)';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([6, 4]);
+            ctx.beginPath();
+            ctx.moveTo(pad.left, rfY);
+            ctx.lineTo(pad.left + pw, rfY);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.fillStyle = '#a855f7';
+            ctx.font = '10px JetBrains Mono';
+            ctx.fillText('Risk-Free (' + (rf * 100).toFixed(2) + '%)', pad.left + 8, rfY - 6);
+
+            // Title
+            ctx.fillStyle = '#00d4ff';
+            ctx.font = 'bold 13px JetBrains Mono';
+            ctx.fillText('Frontera Eficiente - Simulacion Monte Carlo', w / 2 - 160, 20);
+        }
+
+        document.querySelectorAll('.asset-chip').forEach(chip => {
+            chip.addEventListener('click', function() {
+                this.classList.toggle('selected');
+            });
+        });
+
+        document.getElementById('simCount').addEventListener('input', function() {
+            document.getElementById('simCountLabel').textContent = parseInt(this.value).toLocaleString();
+        });
+        document.getElementById('riskFree').addEventListener('input', function() {
+            document.getElementById('rfLabel').textContent = parseFloat(this.value).toFixed(2) + '%';
+        });
+
+        runOptimization();
+    </script>
+
+    <script src="../assets/js/script.js"></script>
+    <script src="../assets/js/cookie-consent.js"></script>
+</body>
+
+</html>

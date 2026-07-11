@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Screener Pro | Israel Romero</title>
+    <meta name="description"
+        content="Screener de criptomonedas con datos en tiempo real de CoinGecko. Filtrado por cambio de precio 24h, volumen, market cap y niveles RSI con indicadores de color.">
+    <meta property="og:title" content="Crypto Screener Pro | Israel Romero">
+    <meta property="og:description" content="Screener de criptomonedas con datos en tiempo real de CoinGecko. Filtrado avanzado con RSI y métricas de mercado.">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Israel Romero Portfolio">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Crypto Screener Pro | Israel Romero">
+    <meta name="twitter:description" content="Screener de criptomonedas con datos en tiempo real de CoinGecko.">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <style>
+        .screener-container { max-width: 1200px; margin: 0 auto; }
+        .filters-bar {
+            display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;
+            padding: 1.25rem; background: rgba(20, 25, 35, 0.6);
+            border: 1px solid rgba(0, 212, 255, 0.2); border-radius: 1rem;
+        }
+        .filter-group { display: flex; flex-direction: column; gap: 0.35rem; }
+        .filter-group label { font-size: 0.8rem; color: var(--color-accent-cyan); font-family: var(--font-mono); }
+        .filter-group select, .filter-group input {
+            background: rgba(10, 14, 39, 0.8); border: 1px solid rgba(0, 212, 255, 0.3);
+            color: var(--color-text-primary); padding: 0.5rem 0.75rem; border-radius: 0.5rem;
+            font-family: var(--font-mono); font-size: 0.85rem; min-width: 140px;
+        }
+        .filter-group select:focus, .filter-group input:focus { outline: none; border-color: var(--color-accent-cyan); }
+        .btn-refresh {
+            background: var(--color-accent-cyan); color: #0a0e27; border: none;
+            padding: 0.5rem 1.25rem; border-radius: 0.5rem; font-weight: 600;
+            cursor: pointer; font-family: var(--font-primary); transition: all 0.3s;
+            align-self: flex-end; margin-left: auto;
+        }
+        .btn-refresh:hover { box-shadow: 0 0 20px rgba(0, 212, 255, 0.4); transform: translateY(-1px); }
+        .btn-refresh:disabled { opacity: 0.5; cursor: not-allowed; }
+        .table-wrapper { overflow-x: auto; border-radius: 0.75rem; border: 1px solid rgba(0, 212, 255, 0.2); }
+        .screener-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        .screener-table th {
+            background: rgba(0, 212, 255, 0.08); padding: 0.85rem 1rem; text-align: left;
+            font-family: var(--font-mono); color: var(--color-accent-cyan); font-size: 0.75rem;
+            text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; user-select: none;
+            border-bottom: 2px solid rgba(0, 212, 255, 0.2);
+        }
+        .screener-table th:hover { background: rgba(0, 212, 255, 0.15); }
+        .screener-table th .sort-arrow { margin-left: 0.3rem; font-size: 0.65rem; }
+        .screener-table td {
+            padding: 0.75rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--color-text-secondary);
+        }
+        .screener-table tr:hover td { background: rgba(0, 212, 255, 0.03); }
+        .price-positive { color: var(--color-accent-green) !important; font-weight: 600; }
+        .price-negative { color: #ef4444 !important; font-weight: 600; }
+        .rsi-overbought { color: #ef4444 !important; }
+        .rsi-oversold { color: var(--color-accent-green) !important; }
+        .rsi-neutral { color: var(--color-accent-cyan) !important; }
+        .coin-name { display: flex; align-items: center; gap: 0.6rem; }
+        .coin-name img { width: 24px; height: 24px; border-radius: 50%; }
+        .coin-name strong { color: var(--color-text-primary); }
+        .coin-name span { color: var(--color-text-muted); font-size: 0.75rem; }
+        .loading-overlay {
+            display: flex; align-items: center; justify-content: center; padding: 3rem;
+            color: var(--color-accent-cyan); font-family: var(--font-mono);
+        }
+        .loading-overlay .spinner {
+            width: 28px; height: 28px; border: 3px solid rgba(0,212,255,0.2);
+            border-top-color: var(--color-accent-cyan); border-radius: 50%;
+            animation: spin 0.8s linear infinite; margin-right: 0.75rem;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .stat-badge {
+            display: inline-block; padding: 0.2rem 0.6rem; border-radius: 0.3rem;
+            font-size: 0.7rem; font-weight: 600; font-family: var(--font-mono);
+        }
+        .stat-badge.bullish { background: rgba(0,255,65,0.12); color: var(--color-accent-green); }
+        .stat-badge.bearish { background: rgba(239,68,68,0.12); color: #ef4444; }
+        .stat-badge.neutral { background: rgba(0,212,255,0.12); color: var(--color-accent-cyan); }
+        .stats-bar {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .stats-bar .mini-stat {
+            background: rgba(20, 25, 35, 0.6); border: 1px solid rgba(0, 212, 255, 0.15);
+            border-radius: 0.75rem; padding: 1rem; text-align: center;
+        }
+        .mini-stat .value { font-size: 1.4rem; font-weight: 700; font-family: var(--font-mono); }
+        .mini-stat .label { font-size: 0.7rem; color: var(--color-text-muted); margin-top: 0.25rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    </style>
+</head>
+
+<body>
+    <div class="tech-grid"></div>
+    <div class="gradient-orb orb-1"></div>
+    <div class="gradient-orb orb-2"></div>
+
+    <header id="header">
+        <nav class="nav-container">
+            <div class="logo">
+                <span class="logo-bracket">[</span>
+                <span class="logo-text">ISRAEL ROMERO</span>
+                <span class="logo-bracket">]</span>
+            </div>
+            <a href="../index.html#proyectos" class="btn btn-secondary">← Volver a Proyectos</a>
+        </nav>
+    </header>
+
+    <section class="section" style="padding-top: 150px;">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">// Proyecto FinTech</span>
+                <h1 class="section-title">Crypto Screener Pro</h1>
+                <p class="section-description">
+                    Scanner de criptomonedas con datos en tiempo real de CoinGecko<br>
+                    Filtrado avanzado • RSI dinámico • Indicadores de color • Ordenamiento multi-columna
+                </p>
+            </div>
+
+            <div class="screener-container">
+                <div class="stats-bar" id="statsBar">
+                    <div class="mini-stat"><div class="value" style="color:var(--color-accent-cyan);" id="statTotal">--</div><div class="label">Coins Scanned</div></div>
+                    <div class="mini-stat"><div class="value" style="color:var(--color-accent-green);" id="statGainers">--</div><div class="label">Gainers 24h</div></div>
+                    <div class="mini-stat"><div class="value" style="color:#ef4444;" id="statLosers">--</div><div class="label">Losers 24h</div></div>
+                    <div class="mini-stat"><div class="value" style="color:var(--color-accent-purple);" id="statAvgVol">--</div><div class="label">Avg Volume (USD)</div></div>
+                </div>
+
+                <div class="filters-bar">
+                    <div class="filter-group">
+                        <label>Ordenar por</label>
+                        <select id="sortBy">
+                            <option value="market_cap_rank">Market Cap Rank</option>
+                            <option value="price_change_percentage_24h" selected>Change 24h</option>
+                            <option value="total_volume">Volume 24h</option>
+                            <option value="market_cap">Market Cap</option>
+                            <option value="current_price">Price (USD)</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Dirección</label>
+                        <select id="sortDir">
+                            <option value="desc" selected>Descendente</option>
+                            <option value="asc">Ascendente</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Cambio 24h min (%)</label>
+                        <input type="number" id="filterChangeMin" value="" placeholder="Sin mínimo" step="0.1">
+                    </div>
+                    <div class="filter-group">
+                        <label>Volumen min (USD)</label>
+                        <input type="number" id="filterVolMin" value="1000000" placeholder="Ej: 1000000">
+                    </div>
+                    <div class="filter-group">
+                        <label>Market Cap min (USD)</label>
+                        <input type="number" id="filterMcMin" value="" placeholder="Sin mínimo">
+                    </div>
+                    <button class="btn-refresh" id="btnRefresh" onclick="fetchData()">⟳ Actualizar Datos</button>
+                </div>
+
+                <div class="table-wrapper">
+                    <div id="tableContainer">
+                        <div class="loading-overlay">
+                            <div class="spinner"></div>
+                            <span>Cargando datos de CoinGecko...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Features -->
+            <div style="max-width:1000px; margin: 3rem auto 0;">
+                <div style="background: rgba(20, 25, 35, 0.6); border: 1px solid rgba(0, 212, 255, 0.2); border-radius: 1rem; padding: 2rem; margin-bottom: 2rem;">
+                    <h2 style="color: var(--color-accent-cyan); margin-bottom: 1.5rem;">Características Principales</h2>
+                    <div style="display: grid; gap: 1.5rem;">
+                        <div>
+                            <h3 style="color: var(--color-accent-green); font-size: 1.1rem; margin-bottom: 0.5rem;">Datos en Tiempo Real</h3>
+                            <p style="color: var(--color-text-secondary); line-height: 1.7;">Conexión directa a la API pública de CoinGecko. Datos de precios, volumen, market cap y cambios porcentuales actualizados cada 60 segundos para las top 100 criptomonedas.</p>
+                        </div>
+                        <div>
+                            <h3 style="color: var(--color-accent-green); font-size: 1.1rem; margin-bottom: 0.5rem;">Cálculo de RSI en Tiempo Real</h3>
+                            <p style="color: var(--color-text-secondary); line-height: 1.7;">Relative Strength Index (RSI) calculado automáticamente usando datos de sparkline de 7 días. Indicadores visuales: sobrecompra (&gt;70) en rojo, sobreventa (&lt;30) en verde.</p>
+                        </div>
+                        <div>
+                            <h3 style="color: var(--color-accent-green); font-size: 1.1rem; margin-bottom: 0.5rem;">Filtros Avanzados</h3>
+                            <p style="color: var(--color-text-secondary); line-height: 1.7;">Filtra por cambio de precio 24h, volumen mínimo de trading, market cap, y ordena por cualquiera de las columnas en dirección ascendente o descendente.</p>
+                        </div>
+                        <div>
+                            <h3 style="color: var(--color-accent-green); font-size: 1.1rem; margin-bottom: 0.5rem;">Indicadores de Color</h3>
+                            <p style="color: var(--color-text-secondary); line-height: 1.7;">Cambios positivos en verde, negativos en rojo. RSI con código de colores para identificar condiciones de sobrecompra/sobreventa de un vistazo. Badges de tendencia alcista/bajista/neutral.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background: rgba(20, 25, 35, 0.6); border: 1px solid rgba(0, 212, 255, 0.2); border-radius: 1rem; padding: 2rem; margin-bottom: 2rem;">
+                    <h2 style="color: var(--color-accent-cyan); margin-bottom: 1.5rem;">Stack Tecnológico</h2>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+                        <div>
+                            <h4 style="color: var(--color-accent-purple); margin-bottom: 0.75rem;">Frontend</h4>
+                            <ul style="color: var(--color-text-secondary); line-height: 1.8;">
+                                <li>Vanilla JavaScript ES6+</li>
+                                <li>Fetch API</li>
+                                <li>CSS Custom Properties</li>
+                                <li>CSS Grid / Flexbox</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 style="color: var(--color-accent-purple); margin-bottom: 0.75rem;">Datos</h4>
+                            <ul style="color: var(--color-text-secondary); line-height: 1.8;">
+                                <li>CoinGecko API v3</li>
+                                <li>Sparkline 7d data</li>
+                                <li>Real-time prices</li>
+                                <li>Market analytics</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 style="color: var(--color-accent-purple); margin-bottom: 0.75rem;">Indicadores</h4>
+                            <ul style="color: var(--color-text-secondary); line-height: 1.8;">
+                                <li>RSI (14-period)</li>
+                                <li>Price change %</li>
+                                <li>Volume analysis</li>
+                                <li>Market cap ranking</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 3rem;">
+                    <a href="../index.html#contacto" class="btn btn-primary" style="display: inline-flex;">
+                        <span>Solicitar Acceso Premium</span>
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M7 3L14 10L7 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2024 Israel Romero Apo. Todos los derechos reservados.</p>
+                <div class="footer-bottom-links">
+                    <a href="../legal/privacidad.html">Privacidad</a>
+                    <a href="../legal/terminos.html">Terminos</a>
+                    <a href="../legal/cookies.html">Cookies</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        let allCoins = [];
+        let currentSort = { field: 'price_change_percentage_24h', dir: 'desc' };
+
+        function calculateRSI(sparklineData) {
+            if (!sparklineData || sparklineData.length < 15) return null;
+            const prices = sparklineData.slice(-15);
+            let gains = 0, losses = 0;
+            for (let i = 1; i < prices.length; i++) {
+                const diff = prices[i] - prices[i - 1];
+                if (diff > 0) gains += diff; else losses += Math.abs(diff);
+            }
+            const avgGain = gains / 14;
+            const avgLoss = losses / 14;
+            if (avgLoss === 0) return 100;
+            const rs = avgGain / avgLoss;
+            return 100 - (100 / (1 + rs));
+        }
+
+        function getRSIClass(rsi) {
+            if (rsi === null) return 'rsi-neutral';
+            if (rsi >= 70) return 'rsi-overbought';
+            if (rsi <= 30) return 'rsi-oversold';
+            return 'rsi-neutral';
+        }
+
+        function getRSILabel(rsi) {
+            if (rsi === null) return 'N/A';
+            if (rsi >= 70) return 'Sobrec.';
+            if (rsi <= 30) return 'Sobreventa';
+            return 'Neutral';
+        }
+
+        function formatUSD(num) {
+            if (num === null || num === undefined) return '--';
+            if (num >= 1e12) return '$' + (num / 1e12).toFixed(2) + 'T';
+            if (num >= 1e9) return '$' + (num / 1e9).toFixed(2) + 'B';
+            if (num >= 1e6) return '$' + (num / 1e6).toFixed(2) + 'M';
+            if (num >= 1e3) return '$' + (num / 1e3).toFixed(2) + 'K';
+            return '$' + num.toFixed(2);
+        }
+
+        function formatPrice(num) {
+            if (num === null || num === undefined) return '--';
+            if (num < 0.01) return '$' + num.toFixed(6);
+            if (num < 1) return '$' + num.toFixed(4);
+            if (num < 1000) return '$' + num.toFixed(2);
+            return formatUSD(num);
+        }
+
+        function getTrendBadge(change) {
+            if (change === null) return '<span class="stat-badge neutral">N/A</span>';
+            if (change > 5) return '<span class="stat-badge bullish">MUY ALCISTA</span>';
+            if (change > 0) return '<span class="stat-badge bullish">ALCISTA</span>';
+            if (change < -5) return '<span class="stat-badge bearish">MUY BAJISTA</span>';
+            if (change < 0) return '<span class="stat-badge bearish">BAJISTA</span>';
+            return '<span class="stat-badge neutral">NEUTRAL</span>';
+        }
+
+        function renderTable() {
+            const container = document.getElementById('tableContainer');
+            if (allCoins.length === 0) {
+                container.innerHTML = '<div class="loading-overlay"><span>No se encontraron resultados con los filtros actuales.</span></div>';
+                updateStats();
+                return;
+            }
+
+            let html = '<table class="screener-table"><thead><tr>';
+            html += '<th onclick="sortTable(\'market_cap_rank\')"># <span class="sort-arrow">' + (currentSort.field === 'market_cap_rank' ? (currentSort.dir === 'desc' ? '▼' : '▲') : '') + '</span></th>';
+            html += '<th>Moneda</th>';
+            html += '<th onclick="sortTable(\'current_price\')">Precio USD <span class="sort-arrow">' + (currentSort.field === 'current_price' ? (currentSort.dir === 'desc' ? '▼' : '▲') : '') + '</span></th>';
+            html += '<th onclick="sortTable(\'price_change_percentage_24h\')">24h % <span class="sort-arrow">' + (currentSort.field === 'price_change_percentage_24h' ? (currentSort.dir === 'desc' ? '▼' : '▲') : '') + '</span></th>';
+            html += '<th onclick="sortTable(\'total_volume\')">Volumen 24h <span class="sort-arrow">' + (currentSort.field === 'total_volume' ? (currentSort.dir === 'desc' ? '▼' : '▲') : '') + '</span></th>';
+            html += '<th onclick="sortTable(\'market_cap\')">Market Cap <span class="sort-arrow">' + (currentSort.field === 'market_cap' ? (currentSort.dir === 'desc' ? '▼' : '▲') : '') + '</span></th>';
+            html += '<th>RSI (14)</th>';
+            html += '<th>Tendencia</th>';
+            html += '</tr></thead><tbody>';
+
+            allCoins.forEach(coin => {
+                const change = coin.price_change_percentage_24h;
+                const changeClass = change !== null && change >= 0 ? 'price-positive' : 'price-negative';
+                const changeSign = change !== null && change >= 0 ? '+' : '';
+                const rsi = coin.rsi;
+                const rsiClass = getRSIClass(rsi);
+                const rsiVal = rsi !== null ? rsi.toFixed(1) : 'N/A';
+
+                html += '<tr>';
+                html += '<td style="color:var(--color-text-muted);">' + (coin.market_cap_rank || '--') + '</td>';
+                html += '<td><div class="coin-name"><img src="' + (coin.image || '') + '" alt="" onerror="this.style.display=\'none\'"><strong>' + coin.name + '</strong><span>' + (coin.symbol || '').toUpperCase() + '</span></div></td>';
+                html += '<td style="font-family:var(--font-mono);">' + formatPrice(coin.current_price) + '</td>';
+                html += '<td class="' + changeClass + '" style="font-family:var(--font-mono);">' + (change !== null ? changeSign + change.toFixed(2) + '%' : '--') + '</td>';
+                html += '<td style="font-family:var(--font-mono);">' + formatUSD(coin.total_volume) + '</td>';
+                html += '<td style="font-family:var(--font-mono);">' + formatUSD(coin.market_cap) + '</td>';
+                html += '<td><span class="' + rsiClass + '" style="font-family:var(--font-mono); font-weight:600;">' + rsiVal + '</span> <span style="font-size:0.7rem;color:var(--color-text-muted);">' + getRSILabel(rsi) + '</span></td>';
+                html += '<td>' + getTrendBadge(change) + '</td>';
+                html += '</tr>';
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+            updateStats();
+        }
+
+        function updateStats() {
+            const total = allCoins.length;
+            const gainers = allCoins.filter(c => c.price_change_percentage_24h !== null && c.price_change_percentage_24h > 0).length;
+            const losers = allCoins.filter(c => c.price_change_percentage_24h !== null && c.price_change_percentage_24h < 0).length;
+            const volumes = allCoins.filter(c => c.total_volume !== null).map(c => c.total_volume);
+            const avgVol = volumes.length > 0 ? volumes.reduce((a, b) => a + b, 0) / volumes.length : 0;
+
+            document.getElementById('statTotal').textContent = total;
+            document.getElementById('statGainers').textContent = gainers;
+            document.getElementById('statLosers').textContent = losers;
+            document.getElementById('statAvgVol').textContent = formatUSD(avgVol);
+        }
+
+        function sortTable(field) {
+            if (currentSort.field === field) {
+                currentSort.dir = currentSort.dir === 'desc' ? 'asc' : 'desc';
+            } else {
+                currentSort.field = field;
+                currentSort.dir = 'desc';
+            }
+            document.getElementById('sortBy').value = field;
+            document.getElementById('sortDir').value = currentSort.dir;
+            applyAll();
+        }
+
+        function applyFilters() {
+            const changeMin = parseFloat(document.getElementById('filterChangeMin').value) || null;
+            const volMin = parseFloat(document.getElementById('filterVolMin').value) || null;
+            const mcMin = parseFloat(document.getElementById('filterMcMin').value) || null;
+
+            let filtered = [...allCoins];
+
+            if (changeMin !== null) {
+                const min = changeMin;
+                filtered = filtered.filter(c => c.price_change_percentage_24h !== null && c.price_change_percentage_24h >= min);
+            }
+            if (volMin !== null) {
+                filtered = filtered.filter(c => c.total_volume !== null && c.total_volume >= volMin);
+            }
+            if (mcMin !== null) {
+                filtered = filtered.filter(c => c.market_cap !== null && c.market_cap >= mcMin);
+            }
+
+            return filtered;
+        }
+
+        function applyAll() {
+            const filtered = applyFilters();
+            const field = currentSort.field;
+            const dir = currentSort.dir;
+
+            filtered.sort((a, b) => {
+                let valA = a[field], valB = b[field];
+                if (valA === null || valA === undefined) valA = -Infinity;
+                if (valB === null || valB === undefined) valB = -Infinity;
+                if (typeof valA === 'string') valA = valA.toLowerCase();
+                if (typeof valB === 'string') valB = valB.toLowerCase();
+                if (valA < valB) return dir === 'desc' ? 1 : -1;
+                if (valA > valB) return dir === 'desc' ? -1 : 1;
+                return 0;
+            });
+
+            allCoins = filtered;
+            renderTable();
+        }
+
+        async function fetchData() {
+            const container = document.getElementById('tableContainer');
+            const btn = document.getElementById('btnRefresh');
+            container.innerHTML = '<div class="loading-overlay"><div class="spinner"></div><span>Cargando datos de CoinGecko...</span></div>';
+            btn.disabled = true;
+
+            try {
+                const resp = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=true&price_change_percentage=24h');
+                if (!resp.ok) throw new Error('API error: ' + resp.status);
+                const data = await resp.json();
+
+                allCoins = data.map(coin => ({
+                    id: coin.id,
+                    name: coin.name,
+                    symbol: coin.symbol,
+                    image: coin.image,
+                    current_price: coin.current_price,
+                    market_cap: coin.market_cap,
+                    market_cap_rank: coin.market_cap_rank,
+                    total_volume: coin.total_volume,
+                    price_change_percentage_24h: coin.price_change_percentage_24h,
+                    high_24h: coin.high_24h,
+                    low_24h: coin.low_24h,
+                    sparkline: coin.sparkline_in_7d ? coin.sparkline_in_7d.price : null,
+                    rsi: calculateRSI(coin.sparkline_in_7d ? coin.sparkline_in_7d.price : null)
+                }));
+
+                applyAll();
+            } catch (err) {
+                container.innerHTML = '<div class="loading-overlay"><span style="color:#ef4444;">Error al cargar datos: ' + err.message + '<br><small>Intenta de nuevo en unos segundos. La API de CoinGecko tiene rate limiting.</small></span></div>';
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        document.getElementById('sortBy').addEventListener('change', function() {
+            currentSort.field = this.value;
+            applyAll();
+        });
+        document.getElementById('sortDir').addEventListener('change', function() {
+            currentSort.dir = this.value;
+            applyAll();
+        });
+        document.getElementById('filterChangeMin').addEventListener('input', applyAll);
+        document.getElementById('filterVolMin').addEventListener('input', applyAll);
+        document.getElementById('filterMcMin').addEventListener('input', applyAll);
+
+        fetchData();
+    </script>
+
+    <script src="../assets/js/script.js"></script>
+    <script src="../assets/js/cookie-consent.js"></script>
+</body>
+
+</html>

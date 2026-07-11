@@ -650,3 +650,11 @@ console.log('%cInterested in the code? Check out the GitHub repo!', 'color: #a85
   var enActive = lang === 'en' ? ' active' : '';
   container.innerHTML = '<div class="lang-switcher"><button class="lang-btn' + esActive + '" onclick="I18N.setLanguage(\'es\')" title="Español">ES</button><button class="lang-btn' + enActive + '" onclick="I18N.setLanguage(\'en\')" title="English">EN</button></div>';
 })();
+
+// ============================================
+// DYNAMIC COPYRIGHT YEAR
+// ============================================
+(function(){
+  var y = document.getElementById('currentYear');
+  if (y) { y.textContent = new Date().getFullYear(); }
+})();
