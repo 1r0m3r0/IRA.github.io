@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Sentiment Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<header class="header">
+    <div>
+        <h1>Crypto Sentiment Dashboard <span>| Real-time Market Intelligence</span></h1>
+        <span class="status-text">
+            <span class="status-dot"></span> Last updated: <span id="last-update">--</span>
+        </span>
+    </div>
+    <button class="refresh-btn" id="refresh-btn">Refresh Data</button>
+</header>
+
+<div class="ticker-wrap">
+    <div class="ticker" id="ticker"></div>
+</div>
+
+<main class="grid">
+
+    <!-- Fear & Greed Index -->
+    <section class="card">
+        <div class="card-header">
+            <h3>Fear &amp; Greed Index</h3>
+            <span class="card-badge">LIVE</span>
+        </div>
+        <div class="gauge-container">
+            <div class="gauge-value" id="fg-value">--</div>
+            <div class="gauge-label" id="fg-label">Loading...</div>
+            <div class="gauge-bar-bg">
+                <div class="gauge-bar-fill" id="fg-pointer" style="left: 50%"></div>
+            </div>
+            <div class="gauge-labels">
+                <span>Extreme Fear</span><span>Fear</span><span>Neutral</span><span>Greed</span><span>Extreme Greed</span>
+            </div>
+            <span class="status-text" id="fg-timestamp">--</span>
+        </div>
+    </section>
+
+    <!-- Market Metrics -->
+    <section class="card">
+        <div class="card-header">
+            <h3>Global Market Metrics</h3>
+            <span class="card-badge">LIVE</span>
+        </div>
+        <div class="metrics-row">
+            <div class="metric-item">
+                <div class="metric-value" id="metric-mcap">--</div>
+                <div class="metric-label">Total Market Cap</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-value" id="metric-volume">--</div>
+                <div class="metric-label">24h Volume</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-value" id="metric-btc-dom">--</div>
+                <div class="metric-label">BTC Dominance</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-value" id="metric-eth-dom">--</div>
+                <div class="metric-label">ETH Dominance</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-value" id="metric-cryptos">--</div>
+                <div class="metric-label">Active Cryptos</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-value" id="metric-mcap-change">--</div>
+                <div class="metric-label">24h Change</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- BTC 7-Day Chart -->
+    <section class="card">
+        <div class="card-header">
+            <h3>BTC/USD &mdash; 7-Day Price</h3>
+            <span class="card-badge">LIVE</span>
+        </div>
+        <div class="chart-container">
+            <canvas id="chart-line"></canvas>
+        </div>
+    </section>
+
+    <!-- Top 10 Market Cap Distribution -->
+    <section class="card">
+        <div class="card-header">
+            <h3>Top 10 Market Cap Distribution</h3>
+            <span class="card-badge">LIVE</span>
+        </div>
+        <div class="chart-container">
+            <canvas id="chart-pie"></canvas>
+        </div>
+    </section>
+
+    <!-- Top Gainers & Losers (Bar Chart) -->
+    <section class="card">
+        <div class="card-header">
+            <h3>Top Gainers &amp; Losers (24h)</h3>
+            <span class="card-badge">LIVE</span>
+        </div>
+        <div class="chart-container">
+            <canvas id="chart-bar"></canvas>
+        </div>
+    </section>
+
+    <!-- Exchange Volume Distribution -->
+    <section class="card">
+        <div class="card-header">
+            <h3>Exchange Volume Distribution</h3>
+            <span class="card-badge">LIVE</span>
+        </div>
+        <div class="chart-container">
+            <canvas id="chart-donut"></canvas>
+        </div>
+    </section>
+
+    <!-- Trending Coins -->
+    <section class="card">
+        <div class="card-header">
+            <h3>Top 10 Trending Coins</h3>
+            <span class="card-badge">LIVE</span>
+        </div>
+        <table class="coin-table" id="trending-table">
+            <thead>
+                <tr>
+                    <th>Coin</th>
+                    <th>Rank</th>
+                    <th>Price</th>
+                    <th>24h Change</th>
+                    <th>Sentiment</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <span class="status-text" id="trending-timestamp" style="display:block;margin-top:8px">--</span>
+    </section>
+
+    <!-- Market Dominance -->
+    <section class="card">
+        <div class="card-header">
+            <h3>Market Dominance</h3>
+            <span class="card-badge">LIVE</span>
+        </div>
+        <div class="dom-bar-wrap">
+            <div class="dom-bar-label"><span>BTC</span><span id="dom-btc-val">--</span></div>
+            <div class="dom-bar-track"><div class="dom-bar-fill btc" id="dom-btc-bar" style="width: 0%"></div></div>
+        </div>
+        <div class="dom-bar-wrap">
+            <div class="dom-bar-label"><span>ETH</span><span id="dom-eth-val">--</span></div>
+            <div class="dom-bar-track"><div class="dom-bar-fill eth" id="dom-eth-bar" style="width: 0%"></div></div>
+        </div>
+        <div class="dom-bar-wrap">
+            <div class="dom-bar-label"><span>Others</span><span id="dom-other-val">--</span></div>
+            <div class="dom-bar-track"><div class="dom-bar-fill other" id="dom-other-bar" style="width: 0%"></div></div>
+        </div>
+    </section>
+
+    <!-- Fear & Greed History -->
+    <section class="card">
+        <div class="card-header">
+            <h3>Fear &amp; Greed History (per refresh)</h3>
+            <span class="card-badge">TRACKING</span>
+        </div>
+        <div class="chart-container">
+            <canvas id="chart-history"></canvas>
+        </div>
+    </section>
+
+</main>
+
+<footer class="footer">
+    <p>Crypto Sentiment Dashboard &mdash; Created by <a href="https://israelromero.xyz" target="_blank" rel="noopener">Israel Romero Apo</a> | israelromero.xyz</p>
+    <p>Data provided by CoinGecko and Alternative.me. Not financial advice.</p>
+</footer>
+
+<script src="dashboard.js"></script>
+</body>
+</html>
