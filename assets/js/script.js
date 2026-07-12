@@ -658,3 +658,306 @@ console.log('%cInterested in the code? Check out the GitHub repo!', 'color: #a85
   var y = document.getElementById('currentYear');
   if (y) { y.textContent = new Date().getFullYear(); }
 })();
+
+// ============================================
+// FEATURE 1: TERMINAL INTERACTIVA
+// ============================================
+(function(){
+  var termBody = document.getElementById('terminalBody');
+  var termInput = document.getElementById('termInput');
+  var termInputLine = document.getElementById('termInputLine');
+  if (!termBody || !termInput) return;
+
+  var commands = {
+    help: function(){
+      return '<span class="term-success">Comandos disponibles:</span><br>' +
+        '  <span class="term-highlight">help</span>      — Muestra esta ayuda<br>' +
+        '  <span class="term-highlight">whoami</span>    — ¿Quién soy?<br>' +
+        '  <span class="term-highlight">skills</span>    — Habilidades técnicas<br>' +
+        '  <span class="term-highlight">projects</span>  — Proyectos destacados<br>' +
+        '  <span class="term-highlight">courses</span>   — Catálogo de cursos<br>' +
+        '  <span class="term-highlight">contact</span>   — Información de contacto<br>' +
+        '  <span class="term-highlight">clear</span>     — Limpiar terminal<br>' +
+        '  <span class="term-highlight">date</span>      — Fecha actual<br>' +
+        '  <span class="term-highlight">neofetch</span>  — Información del sistema<br>' +
+        '  <span class="term-highlight">matrix</span>    — Wake up, Neo...<br>' +
+        '  <span class="term-highlight">sudo</span>      — Modo superusuario';
+    },
+    whoami: function(){
+      return 'Israel Romero Apo — FinTech Developer. 5+ años en trading algorítmico, blockchain y DeFi.';
+    },
+    skills: function(){
+      return '<span class="term-highlight">Lenguajes:</span> Python (95%), JavaScript/TS (85%), Solidity (80%), MQL5 (85%), C++ (70%), SQL (90%)<br>' +
+        '<span class="term-highlight">Frameworks:</span> React/Next.js (75%), Node.js (80%)<br>' +
+        '<span class="term-highlight">Especialidades:</span> Trading Algorítmico, Blockchain, DeFi, IA Financiera';
+    },
+    projects: function(){
+      return 'Proyectos destacados:<br>' +
+        '  • <a href="proyectos/demo-trading-bot.html" style="color:#00d4ff;">Trading Bot AI</a> — Sistema de trading con ML<br>' +
+        '  • <a href="proyectos/demo-defi-dashboard.html" style="color:#00d4ff;">DeFi Dashboard</a> — Análisis multi-chain<br>' +
+        '  • <a href="proyectos/demo-risk-analytics.html" style="color:#00d4ff;">Risk Analytics Engine</a> — Motor de riesgo financiero<br>' +
+        '  • <a href="proyectos/demo-crypto-screener.html" style="color:#00d4ff;">Crypto Screener Pro</a> — Scanner de criptomonedas';
+    },
+    courses: function(){
+      return 'Catálogo de cursos: <a href="cursos/index.html" style="color:#00d4ff;">Ver catálogo completo →</a>';
+    },
+    contact: function(){
+      return '<span class="term-highlight">WhatsApp:</span> +591 7485 6380<br>' +
+        '<span class="term-highlight">Email:</span> israelromeroapo@gmail.com';
+    },
+    date: function(){
+      return new Date().toString();
+    },
+    neofetch: function(){
+      return '<pre style="color:#00ff41;font-size:.75rem;line-height:1.3;margin:0;">' +
+        '      ████████████      <span style="color:#00d4ff;">israel</span><span style="color:#fff;">@</span><span style="color:#00d4ff;">portfolio</span>\n' +
+        '    ██            ██    <span style="color:#00d4ff;">-------------------</span>\n' +
+        '  ██    ██    ██    ██  <span style="color:#fff;">OS:</span> FinTech OS v5.0\n' +
+        '  ██  ██  ██  ██  ██  <span style="color:#fff;">Host:</span> Blockchain Node\n' +
+        '  ██            ██  <span style="color:#fff;">Kernel:</span> 15.0.0-finance\n' +
+        '    ██  ██████  ██    <span style="color:#fff;">Uptime:</span> 5+ years\n' +
+        '      ██      ██      <span style="color:#fff;">Shell:</span> zsh 5.9\n' +
+        '        ████████        <span style="color:#fff;">CPU:</span> Brain v1.0 @ 3.2GHz\n' +
+        '                        <span style="color:#fff;">RAM:</span> 16GB / 32GB\n' +
+        '</pre>';
+    },
+    matrix: function(){
+      triggerMatrixEffect();
+      return '<span class="term-success">Wake up, Neo... The Matrix has you.</span>';
+    },
+    sudo: function(){
+      return '<span class="term-error">⛔ Acceso root concedido... es broma 😄</span>';
+    }
+  };
+
+  function addOutput(html, cls){
+    var div = document.createElement('div');
+    div.className = 'term-output' + (cls ? ' ' + cls : '');
+    div.innerHTML = html;
+    termBody.insertBefore(div, termInputLine);
+  }
+
+  function addHistory(cmd){
+    var div = document.createElement('div');
+    div.className = 'term-line';
+    div.innerHTML = '<span class="term-prompt">guest@portfolio:~$</span> <span class="term-cmd">' + cmd + '</span>';
+    termBody.insertBefore(div, termInputLine);
+  }
+
+  function clearTerminal(){
+    var lines = termBody.querySelectorAll('.term-line,.term-output');
+    var inputs = termBody.querySelectorAll('.term-line');
+    for(var i = 0; i < lines.length; i++){
+      if(lines[i] !== termInputLine) lines[i].remove();
+    }
+  }
+
+  function handleCommand(cmd){
+    cmd = cmd.trim().toLowerCase();
+    if(!cmd) return;
+    addHistory(cmd);
+    if(cmd === 'clear'){
+      clearTerminal();
+    } else if(commands[cmd]){
+      addOutput(commands[cmd]());
+    } else {
+      addOutput('<span class="term-error">Comando no encontrado: ' + cmd + '</span>. Escribe <span class="term-highlight">help</span> para ver los comandos disponibles.');
+    }
+    termBody.scrollTop = termBody.scrollHeight;
+  }
+
+  termInput.addEventListener('keydown', function(e){
+    if(e.key === 'Enter'){
+      e.preventDefault();
+      var cmd = termInput.value;
+      termInput.value = '';
+      handleCommand(cmd);
+    }
+  });
+
+  // Keep focus on terminal input
+  termBody.addEventListener('click', function(){
+    termInput.focus();
+  });
+
+  // Focus input on load
+  termInput.focus();
+})();
+
+// ============================================
+// FEATURE 2: RADAR CHART DE SKILLS
+// ============================================
+(function(){
+  function createRadarChart(){
+    var canvas = document.getElementById('skillsRadar');
+    if(!canvas || typeof Chart === 'undefined') return;
+    var ctx = canvas.getContext('2d');
+    new Chart(ctx, {
+      type: 'radar',
+      data: {
+        labels: ['Python', 'JavaScript/TS', 'Solidity', 'MQL5', 'C++', 'SQL', 'React/Next.js', 'Node.js'],
+        datasets: [{
+          label: 'Nivel de Habilidad',
+          data: [95, 85, 80, 85, 70, 90, 75, 80],
+          backgroundColor: 'rgba(0,212,255,0.15)',
+          borderColor: 'rgba(0,212,255,0.8)',
+          borderWidth: 2,
+          pointBackgroundColor: 'rgba(0,255,65,0.9)',
+          pointBorderColor: '#00ff41',
+          pointHoverBackgroundColor: '#a855f7',
+          pointHoverBorderColor: '#a855f7',
+          pointRadius: 4,
+          pointHoverRadius: 6
+        }]
+      },
+      options: {
+        animation: { duration: 1500, easing: 'easeOutQuart' },
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: { legend: { display: false } },
+        scales: {
+          r: {
+            beginAtZero: true,
+            max: 100,
+            ticks: { display: false, stepSize: 20 },
+            pointLabels: { color: '#aaa', font: { size: 11, family: "'JetBrains Mono', monospace" } },
+            grid: { color: 'rgba(255,255,255,0.08)' },
+            angleLines: { color: 'rgba(255,255,255,0.08)' }
+          }
+        }
+      }
+    });
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', createRadarChart);
+  } else {
+    createRadarChart();
+  }
+})();
+
+// ============================================
+// FEATURE 3: EASTER EGGS — KONAMI CODE + SUDO
+// ============================================
+(function(){
+  if(sessionStorage.getItem('konamiActivated') === 'true') return;
+
+  var konamiCode = [38,38,40,40,37,39,37,39,66,65]; // ↑↑↓↓←→←→BA
+  var konamiIndex = 0;
+  var konamiTimer = null;
+
+  document.addEventListener('keydown', function(e){
+    if(e.keyCode === konamiCode[konamiIndex]){
+      konamiIndex++;
+      if(konamiTimer) clearTimeout(konamiTimer);
+      konamiTimer = setTimeout(function(){ konamiIndex = 0; }, 2000);
+      if(konamiIndex === konamiCode.length){
+        sessionStorage.setItem('konamiActivated', 'true');
+        showKonamiOverlay();
+        konamiIndex = 0;
+      }
+    } else {
+      konamiIndex = 0;
+    }
+  });
+
+  function showKonamiOverlay(){
+    var overlay = document.createElement('div');
+    overlay.className = 'konami-overlay';
+    overlay.innerHTML = '<h2>🏆 MODO HACKER ACTIVADO 🏆</h2><p>Código Konami detectado. Bienvenido al modo secreto.</p><button id="konamiClose">CERRAR</button>';
+    document.body.appendChild(overlay);
+    document.getElementById('konamiClose').addEventListener('click', function(){
+      overlay.style.animation = 'konamiFadeIn .3s ease reverse';
+      setTimeout(function(){ overlay.remove(); }, 300);
+    });
+  }
+})();
+
+// ============================================
+// FEATURE 4: EFECTO PARALLAX EN ORBES DEL HERO
+// ============================================
+(function(){
+  var origHandler = null;
+  document.addEventListener('mousemove', function(e){
+    var orb1 = document.querySelector('.orb-1');
+    var orb2 = document.querySelector('.orb-2');
+    var orb3 = document.querySelector('.orb-3');
+    if(orb1){
+      var x1 = (e.clientX / window.innerWidth - 0.5) * 20;
+      var y1 = (e.clientY / window.innerHeight - 0.5) * 20;
+      orb1.style.transform = 'translate(' + x1 + 'px, ' + y1 + 'px)';
+    }
+    if(orb2){
+      var x2 = (e.clientX / window.innerWidth - 0.5) * -30;
+      var y2 = (e.clientY / window.innerHeight - 0.5) * -30;
+      orb2.style.transform = 'translate(' + x2 + 'px, ' + y2 + 'px)';
+    }
+    if(orb3){
+      var x3 = (e.clientX / window.innerWidth - 0.5) * 15;
+      var y3 = (e.clientY / window.innerHeight - 0.5) * -20;
+      orb3.style.transform = 'translate(' + x3 + 'px, ' + y3 + 'px)';
+    }
+  });
+})();
+
+// ============================================
+// FEATURE 5: CONTADOR DE VISITAS SIMULADO
+// ============================================
+(function(){
+  var el = document.getElementById('learnerCount');
+  if(!el) return;
+  function updateCount(){
+    var base = 1200;
+    var variation = Math.floor(Math.random() * 200);
+    var count = base + variation;
+    el.textContent = count.toLocaleString();
+  }
+  updateCount();
+  setInterval(updateCount, 30000);
+})();
+
+// ============================================
+// MATRIX RAIN EFFECT (for terminal matrix cmd)
+// ============================================
+function triggerMatrixEffect(){
+  var canvas = document.createElement('canvas');
+  canvas.style.position = 'fixed';
+  canvas.style.top = '0';
+  canvas.style.left = '0';
+  canvas.style.width = '100%';
+  canvas.style.height = '100%';
+  canvas.style.zIndex = '99998';
+  canvas.style.pointerEvents = 'none';
+  document.body.appendChild(canvas);
+
+  var ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  var chars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789';
+  var drops = [];
+  var fontSize = 14;
+  var columns = Math.floor(canvas.width / fontSize);
+  for(var i = 0; i < columns; i++) drops[i] = Math.random() * -100;
+
+  function draw(){
+    ctx.fillStyle = 'rgba(0,0,0,0.05)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#0F0';
+    ctx.font = fontSize + 'px monospace';
+    for(var i = 0; i < drops.length; i++){
+      var char = chars[Math.floor(Math.random() * chars.length)];
+      ctx.fillText(char, i * fontSize, drops[i] * fontSize);
+      if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+      drops[i]++;
+    }
+  }
+
+  var interval = setInterval(draw, 35);
+  setTimeout(function(){
+    clearInterval(interval);
+    canvas.style.transition = 'opacity 0.5s';
+    canvas.style.opacity = '0';
+    setTimeout(function(){ canvas.remove(); }, 500);
+  }, 4000);
+}
