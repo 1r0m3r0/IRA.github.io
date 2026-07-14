@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Israel Romero — Tablero de Logros y Badges">
+    <meta name="author" content="Israel Romero Apo">
+    <title>Logros y Badges | Israel Romero</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="assets/css/styles.css">
+
+    <style>
+        .badges-page { max-width: 900px; margin: 0 auto; padding: 3rem 1.5rem; }
+        .badges-header { text-align: center; margin-bottom: 3rem; }
+        .badges-header h1 { font-family: var(--font-mono); font-size: 2rem; color: #00ff41; margin-bottom: 0.5rem; }
+        .badges-header p { color: #8899bb; font-size: 0.9rem; }
+        .badges-stats { display: flex; justify-content: center; gap: 2rem; margin-bottom: 2rem; flex-wrap: wrap; }
+        .badges-stat { text-align: center; background: rgba(0,212,255,0.05); border: 1px solid rgba(0,212,255,0.15); border-radius: 1rem; padding: 1rem 1.5rem; min-width: 100px; }
+        .badges-stat .num { font-family: var(--font-mono); font-size: 2rem; color: #ffd700; }
+        .badges-stat .label { font-size: 0.75rem; color: #8899bb; }
+        .program-section { margin-bottom: 2rem; }
+        .program-title { font-family: var(--font-mono); font-size: 1.1rem; color: #00d4ff; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(0,212,255,0.15); }
+        .badges-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 1rem; }
+        .badge-card { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 1rem; padding: 1rem; text-align: center; transition: all 0.3s; }
+        .badge-card.bronze { border-color: #cd7f32; box-shadow: 0 0 15px rgba(205,127,50,0.2); }
+        .badge-card.silver { border-color: #c0c0c0; box-shadow: 0 0 15px rgba(192,192,192,0.2); }
+        .badge-card.gold { border-color: #ffd700; box-shadow: 0 0 15px rgba(255,215,0,0.25); }
+        .badge-card.platinum { border-color: #00d4ff; box-shadow: 0 0 20px rgba(0,212,255,0.3); }
+        .badge-card .badge-icon { font-size: 2rem; margin-bottom: 0.3rem; }
+        .badge-card .badge-name { font-size: 0.8rem; font-weight: 600; color: #eef5ff; margin-bottom: 0.2rem; }
+        .badge-card .badge-tier { font-size: 0.65rem; color: #8899bb; text-transform: uppercase; letter-spacing: 0.05em; }
+        .badge-card .badge-desc { font-size: 0.65rem; color: #667799; margin-top: 0.3rem; }
+        .brand-return-nav { position: fixed; top: 1rem; left: 1rem; z-index: 100; }
+        .brand-return-nav a { color: #00d4ff; text-decoration: none; font-family: var(--font-mono); font-size: 0.85rem; background: rgba(0,0,0,0.7); padding: 0.5rem 1rem; border-radius: 0.5rem; border: 1px solid rgba(0,212,255,0.3); transition: all 0.3s; }
+        .brand-return-nav a:hover { background: rgba(0,212,255,0.15); }
+        .empty-state { text-align: center; padding: 3rem; color: #667799; }
+        .empty-state h3 { color: #ffd700; margin-bottom: 0.5rem; }
+    </style>
+</head>
+<body style="background: var(--color-bg-primary); color: var(--color-text-primary); font-family: var(--font-primary); min-height: 100vh;">
+
+    <div class="tech-grid"></div>
+
+    <div class="brand-return-nav">
+        <a href="index.html">← Portfolio</a>
+        <a href="cursos/index.html" style="margin-left:0.5rem;">← Cursos</a>
+    </div>
+
+    <div class="badges-page">
+        <div class="badges-header">
+            <h1>🏆 Tablero de Logros</h1>
+            <p>Insignias desbloqueadas en todos los programas de estudio</p>
+        </div>
+
+        <div class="badges-stats" id="badgesStats"></div>
+
+        <div id="badgesContent"></div>
+
+        <div style="text-align:center;margin-top:3rem;padding-top:2rem;border-top:1px solid rgba(0,212,255,0.15);">
+            <a href="index.html#cursos" class="btn btn-primary" style="display:inline-block;">Explorar más cursos →</a>
+        </div>
+    </div>
+
+    <script>
+    (function(){
+        var programs = {
+            'taller-blockchain': { name: 'Blockchain Adventure', icon: '⛓️', slug: 'cursos/taller-blockchain/index.html' },
+            'trading-bots': { name: 'Trading Bots con Python & ML', icon: '🤖', slug: 'cursos/trading-bots/index.html' },
+            'smart-contracts': { name: 'Smart Contracts DeFi', icon: '📜', slug: 'cursos/smart-contracts/index.html' },
+            'docencia': { name: 'Análisis Cuantitativo', icon: '📊', slug: 'cursos/docencia/index.html' },
+            'mql5': { name: 'Trading con MQL5', icon: '📈', slug: 'cursos/mql5-trading-algoritmico/index.html' },
+            'ia-investigacion': { name: 'IA para Investigación', icon: '🧠', slug: 'cursos/ia-investigacion/index.html' },
+            'quant-trading': { name: 'Quant Trading', icon: '📉', slug: 'cursos/quant-trading/index.html' },
+            'microeconomia': { name: 'Microeconomía', icon: '💰', slug: 'cursos/microeconomia/index.html' },
+            'macroeconomia': { name: 'Macroeconomía', icon: '🌎', slug: 'cursos/macroeconomia/index.html' },
+            'estadistica-descriptiva': { name: 'Estadística Descriptiva', icon: '📋', slug: 'cursos/estadistica-descriptiva/index.html' },
+            'estadistica-inferencial': { name: 'Estadística Inferencial', icon: '🔬', slug: 'cursos/estadistica-inferencial/index.html' },
+            'probabilidades': { name: 'Probabilidades', icon: '🎲', slug: 'cursos/probabilidades/index.html' },
+            'markestrated': { name: 'MARKESTRATED', icon: '🎯', slug: 'cursos/markestrated/index.html' },
+            'tenpomatic': { name: 'TENPOMATIC', icon: '🏭', slug: 'cursos/tenpomatic/index.html' },
+            'programa-python-basico': { name: 'Python Básico', icon: '🐍', slug: 'cursos/programa-python-basico/index.html' },
+            'programa-python-medio': { name: 'Python Medio', icon: '🐍', slug: 'cursos/programa-python-medio/index.html' },
+            'programa-python-avanzado': { name: 'Python Avanzado', icon: '🐍', slug: 'cursos/programa-python-avanzado/index.html' },
+            'programa-sql-basico': { name: 'SQL Básico', icon: '🗄️', slug: 'cursos/programa-sql-basico/index.html' },
+            'programa-sql-medio': { name: 'SQL Medio', icon: '🗄️', slug: 'cursos/programa-sql-medio/index.html' },
+            'programa-sql-avanzado': { name: 'SQL Avanzado', icon: '🗄️', slug: 'cursos/programa-sql-avanzado/index.html' },
+            'programa-datos-fundamentos': { name: 'Data Science I', icon: '📊', slug: 'cursos/programa-datos-fundamentos/index.html' },
+            'programa-datos-machine-learning': { name: 'Data Science II', icon: '🤖', slug: 'cursos/programa-datos-machine-learning/index.html' },
+            'programa-datos-ingenieria': { name: 'Data Science III', icon: '⚙️', slug: 'cursos/programa-datos-ingenieria/index.html' },
+            'programa-datos-aplicaciones': { name: 'Data Science IV', icon: '🚀', slug: 'cursos/programa-datos-aplicaciones/index.html' },
+            'programa-econometria': { name: 'Econometría Aplicada', icon: '🧮', slug: 'cursos/programa-econometria/index.html' },
+            'trading-algoritmico-python': { name: 'Trading con Python', icon: '🐍', slug: 'cursos/trading-algoritmico-python/index.html' },
+            'programa-estadistica': { name: 'Estadística Integral', icon: '📈', slug: 'cursos/programa-estadistica/index.html' },
+            'programa-metodologia': { name: 'Metodología', icon: '📝', slug: 'cursos/programa-metodologia/index.html' },
+            'programa-blockchain': { name: 'Blockchain y Cripto', icon: '⛓️', slug: 'cursos/programa-blockchain/index.html' },
+            'programa-marketing-digital': { name: 'Marketing Digital', icon: '📱', slug: 'cursos/programa-marketing-digital/index.html' },
+            'programa-finanzas': { name: 'Finanzas Integral', icon: '💵', slug: 'cursos/programa-finanzas/index.html' }
+        };
+
+        function getTier(count, total) {
+            if (total > 0 && count >= total) return 'platinum';
+            if (count >= 10) return 'gold';
+            if (count >= 5) return 'silver';
+            if (count >= 1) return 'bronze';
+            return null;
+        }
+
+        function getTierName(tier) {
+            if (tier === 'bronze') return 'Bronce';
+            if (tier === 'silver') return 'Plata';
+            if (tier === 'gold') return 'Oro';
+            if (tier === 'platinum') return 'Platino';
+            return '';
+        }
+
+        function getTierIcon(tier) {
+            if (tier === 'bronze') return '🥉';
+            if (tier === 'silver') return '🥈';
+            if (tier === 'gold') return '🥇';
+            if (tier === 'platinum') return '💎';
+            return '⭐';
+        }
+
+        var allBadges = [];
+        var totalBronze = 0, totalSilver = 0, totalGold = 0, totalPlatinum = 0;
+
+        for (var slug in programs) {
+            var prog = programs[slug];
+            var progressKey = null;
+            for (var i = 0; i < localStorage.length; i++) {
+                var key = localStorage.key(i);
+                if (key.indexOf(slug) !== -1 && (key.indexOf('_progress') > 0 || key.indexOf('prog_') === 0)) {
+                    progressKey = key;
+                    break;
+                }
+            }
+            if (!progressKey) continue;
+            try {
+                var data = JSON.parse(localStorage.getItem(progressKey));
+                var count = Array.isArray(data) ? data.length : 0;
+                var tier = getTier(count, 12);
+                if (tier) {
+                    allBadges.push({ program: prog, count: count, tier: tier });
+                    if (tier === 'bronze') totalBronze++;
+                    else if (tier === 'silver') totalSilver++;
+                    else if (tier === 'gold') totalGold++;
+                    else if (tier === 'platinum') totalPlatinum++;
+                }
+            } catch(e) {}
+        }
+
+        var statsHtml = '';
+        if (totalBronze > 0) statsHtml += '<div class="badges-stat"><div class="num">🥉 ' + totalBronze + '</div><div class="label">Bronce</div></div>';
+        if (totalSilver > 0) statsHtml += '<div class="badges-stat"><div class="num">🥈 ' + totalSilver + '</div><div class="label">Plata</div></div>';
+        if (totalGold > 0) statsHtml += '<div class="badges-stat"><div class="num">🥇 ' + totalGold + '</div><div class="label">Oro</div></div>';
+        if (totalPlatinum > 0) statsHtml += '<div class="badges-stat"><div class="num">💎 ' + totalPlatinum + '</div><div class="label">Platino</div></div>';
+        if (allBadges.length > 0) statsHtml += '<div class="badges-stat"><div class="num">' + allBadges.length + '</div><div class="label">Total Badges</div></div>';
+        document.getElementById('badgesStats').innerHTML = statsHtml;
+
+        if (allBadges.length === 0) {
+            document.getElementById('badgesContent').innerHTML = '<div class="empty-state"><h3>🔒 Sin logros aún</h3><p>Completa módulos en los cursos para desbloquear insignias aquí.</p><a href="index.html#cursos" class="btn btn-primary" style="display:inline-block;margin-top:1rem;">Empezar un curso →</a></div>';
+            return;
+        }
+
+        var contentHtml = '';
+        for (var j = 0; j < allBadges.length; j++) {
+            var b = allBadges[j];
+            var tierName = getTierName(b.tier);
+            var tierIcon = getTierIcon(b.tier);
+            contentHtml += '<div class="badge-card ' + b.tier + '"><div class="badge-icon">' + b.program.icon + ' ' + tierIcon + '</div><div class="badge-name">' + b.program.name + '</div><div class="badge-tier">' + tierName + '</div><div class="badge-desc">' + b.count + ' módulos completados</div></div>';
+        }
+        document.getElementById('badgesContent').innerHTML = '<div class="badges-grid">' + contentHtml + '</div>';
+    })();
+    </script>
+</body>
+</html>

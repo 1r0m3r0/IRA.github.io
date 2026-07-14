@@ -292,7 +292,7 @@ style.textContent = `
 document.head.appendChild(style);
 
 // ============================================
-// SCROLL ANIMATIONS
+// SCROLL ANIMATIONS (ENHANCED: REVEAL + STAGGER)
 // ============================================
 const observerOptions = {
     threshold: 0.1,
@@ -302,7 +302,11 @@ const observerOptions = {
 const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
-            entry.target.classList.add('fade-in');
+            if (entry.target.classList.contains('reveal-section')) {
+                entry.target.classList.add('visible');
+            } else {
+                entry.target.classList.add('fade-in');
+            }
             observer.unobserve(entry.target);
         }
     });
@@ -311,6 +315,20 @@ const observer = new IntersectionObserver((entries) => {
 // Observe elements for scroll animations
 const animateOnScroll = document.querySelectorAll('.project-card, .course-card, .blog-card, .contact-item');
 animateOnScroll.forEach(el => observer.observe(el));
+
+// FEATURE 2: Observe section-level reveals
+const revealSections = document.querySelectorAll('.reveal-section');
+revealSections.forEach(el => observer.observe(el));
+
+// FEATURE 2: Observe staggered children with delay
+const staggerContainers = document.querySelectorAll('.reveal-stagger');
+staggerContainers.forEach(container => {
+    const children = container.children;
+    Array.from(children).forEach((child, i) => {
+        child.style.transitionDelay = (i * 0.08) + 's';
+        observer.observe(child);
+    });
+});
 
 // ============================================
 // TICKER ANIMATION WITH LIVE PRICES
@@ -648,7 +666,7 @@ console.log('%cInterested in the code? Check out the GitHub repo!', 'color: #a85
   var lang = localStorage.getItem('lang') || 'es';
   var esActive = lang === 'es' ? ' active' : '';
   var enActive = lang === 'en' ? ' active' : '';
-  container.innerHTML = '<div class="lang-switcher"><button class="lang-btn' + esActive + '" onclick="I18N.setLanguage(\'es\')" title="Español">ES</button><button class="lang-btn' + enActive + '" onclick="I18N.setLanguage(\'en\')" title="English">EN</button></div>';
+  container.innerHTML = '<div class="lang-switcher"><button class="lang-btn' + esActive + '" onclick="I18N.setLanguage(\'es\')" title="Español" aria-label="Cambiar idioma a español">ES</button><button class="lang-btn' + enActive + '" onclick="I18N.setLanguage(\'en\')" title="English" aria-label="Switch language to English">EN</button></div>';
 })();
 
 // ============================================
@@ -877,7 +895,6 @@ console.log('%cInterested in the code? Check out the GitHub repo!', 'color: #a85
 // FEATURE 4: EFECTO PARALLAX EN ORBES DEL HERO
 // ============================================
 (function(){
-  var origHandler = null;
   document.addEventListener('mousemove', function(e){
     var orb1 = document.querySelector('.orb-1');
     var orb2 = document.querySelector('.orb-2');
@@ -961,3 +978,407 @@ function triggerMatrixEffect(){
     setTimeout(function(){ canvas.remove(); }, 500);
   }, 4000);
 }
+
+// ============================================
+// NUEVA FEATURE 1: THREE.JS PARTICLE NETWORK (CANVAS HERO)
+// ============================================
+(function(){
+  if (typeof THREE === 'undefined') return;
+
+  var canvas = document.getElementById('heroCanvas');
+  if (!canvas) return;
+
+  var scene, camera, renderer, particleSystem, linesMesh;
+  var mouseTargetX = 0, mouseTargetY = 0;
+  var currentMouseX = 0, currentMouseY = 0;
+  var PARTICLE_COUNT = 100;
+  var CONNECT_DISTANCE = 80;
+  var particles = [];
+
+  function createGlowTexture(colorHex) {
+    var texCanvas = document.createElement('canvas');
+    texCanvas.width = 32;
+    texCanvas.height = 32;
+    var ctx = texCanvas.getContext('2d');
+    var gradient = ctx.createRadialGradient(16, 16, 0, 16, 16, 16);
+    gradient.addColorStop(0, colorHex);
+    gradient.addColorStop(0.2, colorHex);
+    gradient.addColorStop(0.5, 'rgba(0,0,0,0)');
+    gradient.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 32, 32);
+    return new THREE.CanvasTexture(texCanvas);
+  }
+
+  function init() {
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 200);
+    camera.position.z = 50;
+
+    renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setClearColor(0x000000, 0);
+
+    var accentColors = ['#00d4ff', '#00ff41', '#a855f7'];
+    var threeColors = [
+      new THREE.Color('#00d4ff'),
+      new THREE.Color('#00ff41'),
+      new THREE.Color('#a855f7')
+    ];
+
+    var positions = new Float32Array(PARTICLE_COUNT * 3);
+    var colorsAttr = new Float32Array(PARTICLE_COUNT * 3);
+
+    for (var i = 0; i < PARTICLE_COUNT; i++) {
+      var x = (Math.random() - 0.5) * 80;
+      var y = (Math.random() - 0.5) * 50;
+      var z = (Math.random() - 0.5) * 40;
+
+      positions[i * 3] = x;
+      positions[i * 3 + 1] = y;
+      positions[i * 3 + 2] = z;
+
+      var col = threeColors[Math.floor(Math.random() * threeColors.length)];
+      colorsAttr[i * 3] = col.r;
+      colorsAttr[i * 3 + 1] = col.g;
+      colorsAttr[i * 3 + 2] = col.b;
+
+      particles.push({
+        x: x, y: y, z: z,
+        vx: (Math.random() - 0.5) * 0.03,
+        vy: (Math.random() - 0.5) * 0.03,
+        vz: (Math.random() - 0.5) * 0.03
+      });
+    }
+
+    var geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('color', new THREE.BufferAttribute(colorsAttr, 3));
+
+    var texture = createGlowTexture('rgba(0,212,255,1)');
+
+    var material = new THREE.PointsMaterial({
+      size: 1.2,
+      map: texture,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.85
+    });
+
+    particleSystem = new THREE.Points(geometry, material);
+    scene.add(particleSystem);
+
+    // Lines geometry (pre-allocate)
+    var maxLines = PARTICLE_COUNT * PARTICLE_COUNT;
+    var lineGeometry = new THREE.BufferGeometry();
+    var linePositionsArr = new Float32Array(maxLines * 6);
+    lineGeometry.setAttribute('position', new THREE.BufferAttribute(linePositionsArr, 3));
+    lineGeometry.setDrawRange(0, 0);
+
+    var lineMaterial = new THREE.LineBasicMaterial({
+      color: 0x00d4ff,
+      transparent: true,
+      opacity: 0.12,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+
+    linesMesh = new THREE.LineSegments(lineGeometry, lineMaterial);
+    scene.add(linesMesh);
+
+    document.addEventListener('mousemove', function(e) {
+      mouseTargetX = (e.clientX / window.innerWidth) * 2 - 1;
+      mouseTargetY = -(e.clientY / window.innerHeight) * 2 + 1;
+    });
+
+    window.addEventListener('resize', onResize);
+
+    animate();
+  }
+
+  function onResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  }
+
+  function animate() {
+    requestAnimationFrame(animate);
+
+    currentMouseX += (mouseTargetX - currentMouseX) * 0.05;
+    currentMouseY += (mouseTargetY - currentMouseY) * 0.05;
+
+    var posArr = particleSystem.geometry.attributes.position.array;
+    var screenPositions = [];
+
+    for (var i = 0; i < PARTICLE_COUNT; i++) {
+      var p = particles[i];
+      var idx = i * 3;
+
+      p.x += p.vx;
+      p.y += p.vy;
+      p.z += p.vz;
+
+      if (Math.abs(p.x) > 40) p.vx *= -1;
+      if (Math.abs(p.y) > 25) p.vy *= -1;
+      if (Math.abs(p.z) > 20) p.vz *= -1;
+
+      p.x += currentMouseX * 0.015;
+      p.y += currentMouseY * 0.015;
+
+      posArr[idx] = p.x;
+      posArr[idx + 1] = p.y;
+      posArr[idx + 2] = p.z;
+
+      var vector = new THREE.Vector3(p.x, p.y, p.z);
+      vector.project(camera);
+      var sx = (vector.x * window.innerWidth) / 2 + window.innerWidth / 2;
+      var sy = -(vector.y * window.innerHeight) / 2 + window.innerHeight / 2;
+      screenPositions.push({ x: sx, y: sy });
+    }
+
+    particleSystem.geometry.attributes.position.needsUpdate = true;
+
+    var lineArr = linesMesh.geometry.attributes.position.array;
+    var lineIdx = 0;
+    var lineCount = 0;
+    var maxLineElements = Math.floor(lineArr.length / 6);
+
+    for (var i = 0; i < PARTICLE_COUNT; i++) {
+      for (var j = i + 1; j < PARTICLE_COUNT; j++) {
+        var dx = screenPositions[i].x - screenPositions[j].x;
+        var dy = screenPositions[i].y - screenPositions[j].y;
+        var dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist < CONNECT_DISTANCE && lineCount < maxLineElements) {
+          var pi = particles[i];
+          var pj = particles[j];
+          lineArr[lineIdx] = pi.x;
+          lineArr[lineIdx + 1] = pi.y;
+          lineArr[lineIdx + 2] = pi.z;
+          lineArr[lineIdx + 3] = pj.x;
+          lineArr[lineIdx + 4] = pj.y;
+          lineArr[lineIdx + 5] = pj.z;
+          lineIdx += 6;
+          lineCount++;
+        }
+      }
+    }
+
+    for (var k = lineIdx; k < lineArr.length; k++) {
+      lineArr[k] = 0;
+    }
+
+    linesMesh.geometry.setDrawRange(0, lineCount * 2);
+    linesMesh.geometry.attributes.position.needsUpdate = true;
+
+    scene.rotation.y += 0.0003;
+    scene.rotation.x += 0.0001;
+
+    renderer.render(scene, camera);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+
+// ============================================
+// FEATURE: AI TUTOR — KNOWLEDGE BASE
+// ============================================
+var AI_KNOWLEDGE = {
+  'mco':'Mínimos Cuadrados Ordinarios: método para estimar la recta que mejor se ajusta a los datos minimizando la suma de errores al cuadrado. Fórmula: β̂ = (X\'X)⁻¹X\'Y. Se estudia en Econometría → Curso 1.',
+  'regresion':'La regresión lineal modela la relación entre una variable dependiente Y y variables independientes X. Y = β₀ + β₁X + ε. Curso: Econometría Fundamentos.',
+  'r2':'R² (Coeficiente de Determinación): mide qué proporción de la variabilidad de Y es explicada por el modelo. R²=1 significa ajuste perfecto.',
+  'hipotesis':'Una prueba de hipótesis evalúa si hay suficiente evidencia para rechazar una afirmación sobre un parámetro. Se usa el p-value: si p<0.05 se rechaza H₀.',
+  'bitcoin':'Bitcoin: primera criptomoneda descentralizada creada en 2009 por Satoshi Nakamoto. Usa Proof-of-Work. Suministro máximo: 21 millones. Curso: Blockchain → Fundamentos.',
+  'ethereum':'Ethereum: plataforma blockchain con smart contracts. Segunda criptomoneda por capitalización. Usa Proof-of-Stake desde The Merge (2022). Curso: Blockchain → Curso 2.',
+  'blockchain':'Blockchain: cadena de bloques descentralizada e inmutable. Base de criptomonedas, DeFi, NFTs y tokenización. Programa completo de 6 cursos disponible.',
+  'defi':'DeFi (Finanzas Descentralizadas): ecosistema de apps financieras sin intermediarios. Préstamos, exchanges descentralizados, yield farming. Curso: Blockchain → Curso 2.',
+  'python':'Python: lenguaje de programación interpretado de alto nivel. Ideal para data science, finanzas y automatización. Programas: Python Básico → Medio → Avanzado.',
+  'pandas':'Pandas: librería Python para análisis de datos. DataFrames, Series, groupby, merge. Curso: Python Básico → Datos y Data Science I.',
+  'sql':'SQL: Structured Query Language para gestionar bases de datos relacionales. SELECT, INSERT, UPDATE, DELETE. Programas: SQL Básico → Medio → Avanzado.',
+  'solidity':'Solidity: lenguaje de programación para smart contracts en Ethereum. Similar a JavaScript/C++. Se usa con Hardhat o Foundry. Curso: Blockchain y Smart Contracts.',
+  'garch':'GARCH: modelo para volatilidad en series financieras. Captura el "volatility clustering" donde alta volatilidad tiende a persistir. Curso: Econometría Financiera.',
+  'var':'VaR (Value at Risk): medida que estima la pérdida máxima de una inversión en un horizonte dado con cierto nivel de confianza (ej: 95%, 99%). Curso: Finanzas.',
+  'sharpe':'Ratio de Sharpe: mide retorno ajustado por riesgo = (Retorno - Tasa libre de riesgo) / Volatilidad. Sharpe > 1 es bueno, > 2 excelente. Curso: Trading y Finanzas.',
+  'markowitz':'Teoría de Markowitz: optimización de portafolios maximizando retorno para un nivel de riesgo. La frontera eficiente muestra combinaciones óptimas. Curso: Finanzas.',
+  'machine learning':'Machine Learning: rama de IA donde algoritmos aprenden patrones de datos. Árboles, Random Forest, XGBoost, redes neuronales. Cursos: Data Science II y Trading Algorítmico.',
+  'deep learning':'Deep Learning: subcampo de ML con redes neuronales profundas. LSTM para series, CNN para imágenes, Transformers para NLP. Curso: Data Science II.',
+  'api':'API: Interfaz de Programación de Aplicaciones. REST, GraphQL, WebSockets. FastAPI en Python. Curso: Python Medio → APIs Web.',
+  'docker':'Docker: plataforma de contenedores para empaquetar apps. Imágenes, Dockerfiles, docker-compose. Curso: Python Avanzado → DevOps Cloud.',
+  'backtesting':'Backtesting: simular estrategia de trading con datos históricos. Métricas: Sharpe ratio, max drawdown, win rate. Curso: Trading Algorítmico.',
+  'estadistica':'Estadística: ciencia de recopilar, analizar e interpretar datos. Descriptiva e inferencial. Programa completo de 6 cursos: Probabilidad → Descriptiva → Inferencia → Predictivos → ML → Aplicada.',
+  'econometria':'Econometría: aplicación de métodos estadísticos a datos económicos. Programa de 8 cursos: MCO, Avanzada, Causalidad, ML, Series de Tiempo, Micro, Macro y Financiera. Basado en currícula de LSE y Chicago.',
+  'metodologia':'Metodología de la Investigación: estudio sistemático de métodos para generar conocimiento. Enfoques cualitativo, cuantitativo y mixto. Programa de 6 cursos con IMRyD y ciencia abierta.',
+  'ia':'Inteligencia Artificial: simulación de inteligencia humana por máquinas. Incluye machine learning, deep learning, NLP, agentes autónomos. Cursos: IA para Investigación y Data Science.',
+  'tokenizacion':'Tokenización RWA: representación de activos reales en blockchain. Mercado de $31B en 2025. Permite fraccionar propiedades, bonos y arte. Curso: Blockchain → RWA.',
+  'solana':'Solana: blockchain de alta velocidad (65K TPS). Usa Proof-of-History. Popular para DeFi y NFTs. Competidor principal de Ethereum.',
+  'react':'React: biblioteca JavaScript para interfaces de usuario. Componentes, hooks, estado. Usado con Next.js para SSR. Parte del stack de desarrollo moderno.'
+};
+
+// Hook into terminal to support AI queries
+(function(){
+  var origHandler = window.handleTerminalCommand;
+  window.handleTerminalCommand = function(cmd) {
+    if (origHandler && typeof origHandler === 'function') {
+      var result = origHandler(cmd);
+      if (result !== undefined && result !== false) return result;
+    }
+    // AI knowledge matching
+    var input = cmd.toLowerCase().trim();
+    for (var key in AI_KNOWLEDGE) {
+      if (input.indexOf(key) !== -1 || key.indexOf(input) !== -1) {
+        return { type: 'ai', text: AI_KNOWLEDGE[key] };
+      }
+    }
+    return { type: 'unknown', text: 'No tengo información sobre eso. Prueba con: MCO, R², regresión, Bitcoin, Python, SQL, GARCH, DeFi, IA, estadística, econometría...' };
+  };
+})();
+
+// ============================================
+// FEATURE: DAILY STREAK TRACKER
+// ============================================
+window.updateDailyStreak = function(){
+  var key = 'portfolio_streak';
+  var data = JSON.parse(localStorage.getItem(key) || '{"lastDate":"","streak":0,"bestStreak":0}');
+  var today = new Date().toISOString().split('T')[0];
+  var yesterday = new Date(Date.now()-86400000).toISOString().split('T')[0];
+  if (data.lastDate === today) return data;
+  data.streak = (data.lastDate === yesterday) ? data.streak + 1 : 1;
+  data.lastDate = today;
+  if (data.streak > data.bestStreak) data.bestStreak = data.streak;
+  localStorage.setItem(key, JSON.stringify(data));
+  var streakEl = document.getElementById('streakDisplay');
+  if (streakEl) streakEl.innerHTML = ' | <span style="color:#ffd700;">🔥 Racha: ' + data.streak + ' día(s)</span>';
+  return data;
+};
+
+(function(){
+  var data = JSON.parse(localStorage.getItem('portfolio_streak') || '{"streak":0}');
+  var el = document.getElementById('streakDisplay');
+  if (el && data.streak > 0) {
+    el.innerHTML = ' | <span style="color:#ffd700;">🔥 Racha: ' + data.streak + ' día(s)</span>';
+  }
+})();
+
+// ============================================
+// FEATURE: LEADERBOARD SIMULATION
+// ============================================
+(function(){
+  var list = document.getElementById('leaderboardList');
+  var you = document.getElementById('leaderboardYou');
+  if (!list) return;
+  var names = ['CryptoTrader99','QuantMaster','DataWizard','BlockchainDev','PyAlgo','ML_Fenix','FinTechPro','StatGenius','TradingBotX','Sol_Sage'];
+  var userPoints = 0;
+  for (var i=0; i<localStorage.length; i++) {
+    var k = localStorage.key(i);
+    if (k.indexOf('_progress')>0) { try{ userPoints += JSON.parse(localStorage.getItem(k)).length*10; }catch(e){} }
+  }
+  userPoints = Math.max(userPoints, 30);
+  var entries = names.map(function(n){ return {name:n,pts:Math.floor(Math.random()*2000)+200}; });
+  entries.push({name:'TÚ',pts:userPoints,isYou:true});
+  entries.sort(function(a,b){return b.pts-a.pts;});
+  entries.slice(0,5).forEach(function(e,i){
+    var row = document.createElement('div');
+    row.className = 'leaderboard-row';
+    if (e.isYou){ row.style.color='#00d4ff'; row.style.fontWeight='700'; }
+    row.innerHTML = '<span class="rank">#'+(i+1)+'</span><span class="name">'+(e.isYou?'👉 ':'')+e.name+'</span><span class="pts">'+e.pts+' pts</span>';
+    list.appendChild(row);
+  });
+  var rank = entries.findIndex(function(e){return e.isYou;})+1;
+  if (you) you.textContent = 'Tu posición: #'+rank+' — ¡Sigue aprendiendo para subir!';
+})();
+
+// ============================================
+// FEATURE: QUICK PRACTICE MODE
+// ============================================
+var QUICK_QUESTIONS = [
+  {q:'¿Qué mide el coeficiente R²?', opts:['La varianza del error','La proporción de varianza explicada','El tamaño de la muestra','El valor p'], ans:1, course:'Econometría'},
+  {q:'¿Qué es un smart contract?', opts:['Un contrato físico digitalizado','Código auto-ejecutable en blockchain','Un acuerdo legal en PDF','Una wallet digital'], ans:1, course:'Blockchain'},
+  {q:'¿Cuál es el comando SQL para obtener datos?', opts:['GET','SELECT','FETCH','QUERY'], ans:1, course:'SQL Básico'},
+  {q:'En Python, ¿qué hace pandas?', opts:['Análisis de datos con DataFrames','Crear gráficos 3D','Minar criptomonedas','Enviar emails'], ans:0, course:'Python Básico'},
+  {q:'¿Qué es el Sharpe Ratio?', opts:['Medida de liquidez','Retorno ajustado por riesgo','Indicador de volumen','Tasa de interés'], ans:1, course:'Finanzas'},
+  {q:'¿Qué significa GARCH?', opts:['General Algorithm for Risk Control','Heterocedasticidad Condicional Autorregresiva Generalizada','Global Asset Risk Control Hub','Geometric Average Return'], ans:1, course:'Econometría Financiera'},
+  {q:'¿Quién creó Bitcoin?', opts:['Vitalik Buterin','Satoshi Nakamoto','Elon Musk','Hal Finney'], ans:1, course:'Blockchain'},
+  {q:'¿Qué optimiza Markowitz?', opts:['Velocidad de ejecución','Retorno vs Riesgo del portafolio','Consumo de memoria','Número de transacciones'], ans:1, course:'Finanzas'},
+  {q:'¿Cuál NO es un lenguaje de programación?', opts:['Python','Solidity','HTML','MQL5'], ans:2, course:'Desarrollo'},
+  {q:'¿Qué mide el p-value?', opts:['Probabilidad del resultado si H₀ es cierta','Tamaño del efecto','Correlación','Error estándar'], ans:0, course:'Estadística'}
+];
+
+window.startQuickPractice = function(){
+  var qs = QUICK_QUESTIONS.sort(function(){return Math.random()-0.5}).slice(0,3);
+  var idx=0, score=0, time=30, timer;
+  var modal = document.createElement('div');
+  modal.className = 'quick-practice-modal';
+  modal.innerHTML = '<div class="quick-practice-card"><h3>🎲 Práctica Rápida</h3><div class="quick-timer" id="qtimer">30s</div><div id="qcontent"></div></div>';
+  document.body.appendChild(modal);
+  function showQ(){
+    if (idx>=qs.length){ showResult(); return; }
+    var q=qs[idx];
+    var h='<div class="quick-question">Pregunta '+(idx+1)+'/3: '+q.q+'</div><div class="quick-options">';
+    q.opts.forEach(function(o,i){ h+='<div class="quick-opt" onclick="window.quickAnswer('+i+')">'+o+'</div>'; });
+    document.getElementById('qcontent').innerHTML=h+'</div>';
+  }
+  window.quickAnswer = function(i){
+    var q=qs[idx]; var opts=document.querySelectorAll('.quick-opt');
+    opts.forEach(function(o,j){ if(j===q.ans) o.classList.add('correct'); else if(j===i) o.classList.add('wrong'); o.style.pointerEvents='none'; });
+    if(i===q.ans) score++; idx++; setTimeout(showQ,800);
+  };
+  function showResult(){
+    clearInterval(timer); var pct=score/3;
+    var cls=pct>=0.66?'good':(pct>=0.33?'ok':'bad');
+    var msg=pct>=0.66?'¡Excelente! 🎉':(pct>=0.33?'¡Bien! 👍':'Sigue practicando 💪');
+    document.getElementById('qtimer').textContent='';
+    document.getElementById('qcontent').innerHTML='<div class="quick-result '+cls+'"><h3>'+msg+'</h3><p>Acertaste '+score+' de 3</p><p>📚 Curso: <strong>'+qs[0].course+'</strong></p></div><button class="btn btn-primary" onclick="this.closest(\'.quick-practice-modal\').remove()" style="margin-top:1rem;">Cerrar</button>';
+    if(window.updateDailyStreak) window.updateDailyStreak();
+  }
+  timer=setInterval(function(){time--;document.getElementById('qtimer').textContent=time+'s';if(time<=0){clearInterval(timer);showResult();}},1000);
+  showQ();
+  modal.addEventListener('click',function(e){if(e.target===modal){clearInterval(timer);modal.remove();}});
+};
+
+// ============================================
+// FEATURE: SOCIAL SHARE FOR CERTIFICATES
+// ============================================
+window.shareCertificate = function(title, score){
+  var text = '🎓 ¡Completé el curso "' + title + '" con ' + score + '! en israelromero.xyz';
+  var url = encodeURIComponent(window.location.href);
+  var h = '<div class="quick-practice-modal" onclick="this.remove()"><div class="quick-practice-card"><h3>Compartir Certificado</h3><div style="display:flex;gap:0.8rem;justify-content:center;margin:1.5rem 0;flex-wrap:wrap;">';
+  h += '<a href="https://www.linkedin.com/sharing/share-offsite/?url='+url+'" target="_blank" class="btn btn-primary" style="background:#0077b5;">LinkedIn</a>';
+  h += '<a href="https://twitter.com/intent/tweet?text='+encodeURIComponent(text)+'&url='+url+'" target="_blank" class="btn btn-primary" style="background:#1da1f2;">Twitter</a>';
+  h += '<a href="https://wa.me/?text='+encodeURIComponent(text+' '+url)+'" target="_blank" class="btn btn-primary" style="background:#25d366;">WhatsApp</a>';
+  h += '</div><button class="btn btn-secondary" onclick="this.closest(\'.quick-practice-modal\').remove()">Cerrar</button></div></div>';
+  document.body.insertAdjacentHTML('beforeend', h);
+};
+
+// ============================================
+// FEATURE: QR CODE + LAST UPDATED
+// ============================================
+(function(){
+  var canvas = document.getElementById('contactQR');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  canvas.width = 150; canvas.height = 150;
+  ctx.fillStyle = '#000'; var m=6;
+  [[0,0],[150-m*7,0],[0,150-m*7]].forEach(function(p){
+    ctx.fillRect(p[0],p[1],m*7,m*7); ctx.fillStyle='#fff';
+    ctx.fillRect(p[0]+m,p[1]+m,m*5,m*5); ctx.fillStyle='#000';
+    ctx.fillRect(p[0]+m*2,p[1]+m*2,m*3,m*3);
+  });
+  for (var i=0;i<40;i++){ var x=Math.floor(Math.random()*130),y=Math.floor(Math.random()*130); ctx.fillRect(x,y,m,m); }
+  ctx.fillStyle='#fff'; ctx.fillRect(4,4,55,14); ctx.fillStyle='#000'; ctx.font='9px monospace'; ctx.fillText('QR Contacto',6,13);
+})();
+
+(function(){
+  var el = document.getElementById('lastUpdated');
+  if (!el) return;
+  var months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  var d = new Date();
+  el.textContent = months[d.getMonth()] + ' ' + d.getFullYear();
+})();
