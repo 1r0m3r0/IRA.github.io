@@ -855,26 +855,35 @@ console.log('%cInterested in the code? Check out the GitHub repo!', 'color: #a85
 })();
 
 // ============================================
-// FEATURE 3: EASTER EGGS — KONAMI CODE + SUDO
+// FEATURE 3: EASTER EGGS — KONAMI CODE
 // ============================================
 (function(){
-  if(sessionStorage.getItem('konamiActivated') === 'true') return;
-
-  var konamiCode = [38,38,40,40,37,39,37,39,66,65]; // ↑↑↓↓←→←→BA
+  var konamiSequence = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
   var konamiIndex = 0;
   var konamiTimer = null;
+  var alreadyTriggered = sessionStorage.getItem('konamiDone') === '1';
 
   document.addEventListener('keydown', function(e){
-    if(e.keyCode === konamiCode[konamiIndex]){
+    var expected = konamiSequence[konamiIndex];
+    var pressed = e.key || e.code || String.fromCharCode(e.keyCode);
+    
+    // Normalize: 'B' vs 'b', 'ArrowUp' vs 'Up'
+    if (expected.length === 1) {
+      pressed = pressed.toLowerCase();
+      expected = expected.toLowerCase();
+    }
+    
+    if (pressed === expected || pressed === expected.replace('Arrow','')) {
       konamiIndex++;
-      if(konamiTimer) clearTimeout(konamiTimer);
+      if (konamiTimer) clearTimeout(konamiTimer);
       konamiTimer = setTimeout(function(){ konamiIndex = 0; }, 2000);
-      if(konamiIndex === konamiCode.length){
-        sessionStorage.setItem('konamiActivated', 'true');
+      if (konamiIndex === konamiSequence.length && !alreadyTriggered) {
+        alreadyTriggered = true;
+        sessionStorage.setItem('konamiDone', '1');
         showKonamiOverlay();
         konamiIndex = 0;
       }
-    } else {
+    } else if (e.key !== 'Shift' && e.key !== 'Control' && e.key !== 'Alt' && e.key !== 'Meta') {
       konamiIndex = 0;
     }
   });
@@ -882,11 +891,17 @@ console.log('%cInterested in the code? Check out the GitHub repo!', 'color: #a85
   function showKonamiOverlay(){
     var overlay = document.createElement('div');
     overlay.className = 'konami-overlay';
-    overlay.innerHTML = '<h2>🏆 MODO HACKER ACTIVADO 🏆</h2><p>Código Konami detectado. Bienvenido al modo secreto.</p><button id="konamiClose">CERRAR</button>';
+    overlay.innerHTML = '<h2>🏆 MODO HACKER ACTIVADO 🏆</h2><p>Código Konami detectado. Bienvenido al modo secreto.</p><p style="font-size:0.8rem;color:#555;">↑↑↓↓←→←→ B A</p><button id="konamiClose">CERRAR</button>';
     document.body.appendChild(overlay);
     document.getElementById('konamiClose').addEventListener('click', function(){
-      overlay.style.animation = 'konamiFadeIn .3s ease reverse';
+      overlay.style.animation = 'konamiFadeIn 0.3s ease reverse';
       setTimeout(function(){ overlay.remove(); }, 300);
+    });
+    overlay.addEventListener('click', function(e){
+      if (e.target === overlay) {
+        overlay.style.animation = 'konamiFadeIn 0.3s ease reverse';
+        setTimeout(function(){ overlay.remove(); }, 300);
+      }
     });
   }
 })();
