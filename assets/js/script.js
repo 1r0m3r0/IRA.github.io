@@ -1358,21 +1358,22 @@ window.shareCertificate = function(title, score){
 };
 
 // ============================================
-// FEATURE: QR CODE + LAST UPDATED
+// FEATURE: QR CODE GENERATOR
 // ============================================
 (function(){
-  var canvas = document.getElementById('contactQR');
-  if (!canvas) return;
-  var ctx = canvas.getContext('2d');
-  canvas.width = 150; canvas.height = 150;
-  ctx.fillStyle = '#000'; var m=6;
-  [[0,0],[150-m*7,0],[0,150-m*7]].forEach(function(p){
-    ctx.fillRect(p[0],p[1],m*7,m*7); ctx.fillStyle='#fff';
-    ctx.fillRect(p[0]+m,p[1]+m,m*5,m*5); ctx.fillStyle='#000';
-    ctx.fillRect(p[0]+m*2,p[1]+m*2,m*3,m*3);
-  });
-  for (var i=0;i<40;i++){ var x=Math.floor(Math.random()*130),y=Math.floor(Math.random()*130); ctx.fillRect(x,y,m,m); }
-  ctx.fillStyle='#fff'; ctx.fillRect(4,4,55,14); ctx.fillStyle='#000'; ctx.font='9px monospace'; ctx.fillText('QR Contacto',6,13);
+  var el = document.getElementById('contactQR');
+  if (!el) return;
+  if (typeof QRCode !== 'undefined') {
+    new QRCode(el, {
+      text: 'https://wa.me/59174856380?text=Hola%20Israel%2C%20vi%20tu%20portfolio',
+      width: 130,
+      height: 130,
+      colorDark: '#000000',
+      colorLight: '#ffffff'
+    });
+  } else {
+    el.innerHTML = '<img src="https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=https://wa.me/59174856380" alt="QR WhatsApp" style="display:block;">';
+  }
 })();
 
 (function(){
