@@ -686,6 +686,22 @@ console.log('%cInterested in the code? Check out the GitHub repo!', 'color: #a85
   var termInputLine = document.getElementById('termInputLine');
   if (!termBody || !termInput) return;
 
+  // Floating terminal toggle
+  var termFloatBtn = document.getElementById('termFloatBtn');
+  var terminal = document.getElementById('terminal');
+  if (termFloatBtn && terminal) {
+    termFloatBtn.addEventListener('click', function(){
+      terminal.classList.toggle('terminal-hidden');
+      if (!terminal.classList.contains('terminal-hidden')) termInput.focus();
+    });
+    // Close on Escape
+    document.addEventListener('keydown', function(e){
+      if (e.key === 'Escape' && !terminal.classList.contains('terminal-hidden')) {
+        terminal.classList.add('terminal-hidden');
+      }
+    });
+  }
+
   var commands = {
     help: function(){
       return '<span class="term-success">Comandos disponibles:</span><br>' +
