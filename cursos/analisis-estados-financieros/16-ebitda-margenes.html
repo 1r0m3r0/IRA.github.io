@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+ <meta charset="UTF-8">
+ <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Análisis de Estados Financieros | EBITDA y Márgenes Operativos</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+   background: linear-gradient(135deg, #0a1a14 0%, #0c1f18 100%);
+   font-family: 'Inter', sans-serif;
+   color: #eef5ff;
+   min-height: 100vh;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   padding: 2rem 1rem;
+  }
+  .course-container {
+   max-width: 1300px;
+   width: 100%;
+   background: rgba(10, 30, 22, 0.7);
+   backdrop-filter: blur(12px);
+   border-radius: 3rem;
+   border: 1px solid rgba(16, 185, 129, 0.25);
+   box-shadow: 0 25px 45px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(16, 185, 129, 0.1) inset;
+   overflow: hidden;
+  }
+  .hero-header {
+   background: linear-gradient(95deg, #091a12 0%, #0f2a1e 100%);
+   padding: 2rem 2rem 1.5rem 2rem;
+   text-align: center;
+   border-bottom: 2px solid #10b981;
+  }
+  .hero-header h1 {
+   font-size: 2.8rem;
+   font-weight: 800;
+   background: linear-gradient(135deg, #FFF, #6ee7b7, #10b981);
+   -webkit-background-clip: text;
+   background-clip: text;
+   color: transparent;
+   letter-spacing: -0.01em;
+   text-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  }
+  .hero-header p { font-size: 1.2rem; color: #a7f3d0; margin-top: 0.5rem; font-weight: 500; }
+  .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1.2rem; flex-wrap: wrap; }
+  .chip {
+   background: rgba(16, 185, 129, 0.15);
+   border: 1px solid #10b981;
+   padding: 0.4rem 1rem;
+   border-radius: 40px;
+   font-size: 0.8rem;
+   font-weight: 600;
+   backdrop-filter: blur(4px);
+   color: #6ee7b7;
+  }
+  .section-card {
+   background: rgba(0, 15, 10, 0.7);
+   border-radius: 2rem;
+   padding: 1.5rem;
+   margin: 1.5rem 2rem;
+   border: 1px solid rgba(16, 185, 129, 0.3);
+   backdrop-filter: blur(8px);
+  }
+  .section-card h2 { font-size: 1.5rem; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.6rem; color: #6ee7b7; }
+  .section-card h3 { color: #34d399; margin: 0.8rem 0 0.4rem; font-size: 1.15rem; }
+  .section-card p, .section-card li { color: #b9ccee; line-height: 1.6; font-size: 0.95rem; }
+  .section-card ul, .section-card ol { padding-left: 1.5rem; margin: 0.4rem 0; }
+  .section-card ul li, .section-card ol li { margin: 0.3rem 0; }
+  .formula-box {
+   background: rgba(16, 185, 129, 0.1);
+   border: 1px solid #10b981;
+   border-radius: 1rem;
+   padding: 0.8rem 1rem;
+   margin: 0.6rem 0;
+   text-align: center;
+   font-weight: 600;
+   color: #6ee7b7;
+   font-size: 1.05rem;
+  }
+  .analogy-box {
+   background: linear-gradient(135deg, #0f231a, #152e22);
+   border-left: 4px solid #10b981;
+   border-radius: 1.2rem;
+   padding: 1rem 1.2rem;
+   margin: 1rem 0;
+   font-style: italic;
+   color: #a7f3d0;
+  }
+  .analogy-box i { color: #10b981; margin-right: 0.5rem; }
+  .objectives {
+   background: rgba(16, 185, 129, 0.1);
+   border-radius: 1.5rem;
+   padding: 1rem 1.5rem;
+   margin: 1rem 0;
+   border: 1px solid rgba(16, 185, 129, 0.3);
+  }
+  .objectives h3 { color: #10b981; font-size: 1.1rem; margin-bottom: 0.7rem; }
+  .objectives li { color: #b9ccee; font-size: 0.9rem; margin: 0.4rem 0; list-style: none; }
+  .objectives li::before { content: "🎯 "; }
+  .question {
+   background: #0f1a2c;
+   margin: 1rem 0;
+   padding: 1rem;
+   border-radius: 1.2rem;
+   border: 1px solid rgba(16, 185, 129, 0.15);
+  }
+  .question p { font-weight: 600; margin-bottom: 0.5rem; }
+  .options { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+  .opt {
+   background: #1e2a3e;
+   padding: 0.4rem 1rem;
+   border-radius: 2rem;
+   cursor: pointer;
+   transition: 0.2s;
+   font-size: 0.9rem;
+   color: #eef5ff;
+  }
+  .opt:hover { background: #2c3e66; transform: translateY(-2px); }
+  .opt.selected { background: #10b981; color: #000; font-weight: bold; box-shadow: 0 0 8px #10b981; }
+  .opt.correct { background: #00e676; color: #000; }
+  .opt.wrong { background: #ff5252; color: #fff; }
+  .btn-submit {
+   background: linear-gradient(95deg, #10b981, #34d399);
+   border: none;
+   padding: 0.8rem 1.8rem;
+   font-weight: bold;
+   border-radius: 3rem;
+   margin-top: 1rem;
+   cursor: pointer;
+   font-size: 1rem;
+   transition: 0.2s;
+   font-family: 'Inter', sans-serif;
+   color: #000;
+  }
+  .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-submit:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); }
+  .insignia {
+   text-align: center;
+   background: #0c1b2f;
+   border-radius: 2rem;
+   margin-top: 1.5rem;
+   padding: 1.2rem;
+   border: 2px dashed gold;
+   animation: pulsegold 2s infinite;
+  }
+  @keyframes pulsegold {
+   0%, 100% { box-shadow: 0 0 10px rgba(255,215,0,0.3); }
+   50% { box-shadow: 0 0 25px rgba(255,215,0,0.6); }
+  }
+  .insignia i { font-size: 2.5rem; color: gold; }
+  .insignia h3 { color: gold; margin: 0.5rem 0; }
+  .insignia p { color: #b9ccee; }
+  .hidden { display: none; }
+  .next-btn {
+   background: #10b981;
+   border: none;
+   padding: 0.8rem 2rem;
+   border-radius: 3rem;
+   font-weight: bold;
+   color: #000;
+   margin-top: 1rem;
+   width: 100%;
+   cursor: pointer;
+   font-family: 'Inter', sans-serif;
+   font-size: 1rem;
+   transition: 0.2s;
+  }
+  .next-btn:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); }
+  .simulator-box {
+   background: #0f1a2c;
+   border-radius: 1.5rem;
+   padding: 1.2rem;
+   margin: 1rem 0;
+   border: 1px solid rgba(16, 185, 129, 0.3);
+  }
+  .simulator-box label { color: #a7f3d0; font-weight: 600; font-size: 0.9rem; min-width: 180px; }
+  .simulator-box input[type="number"] {
+   background: #1e2a3e;
+   border: 1px solid rgba(16, 185, 129, 0.3);
+   color: #eef5ff;
+   padding: 0.4rem 0.8rem;
+   border-radius: 0.6rem;
+   font-family: 'Inter', sans-serif;
+   font-size: 0.9rem;
+   width: 140px;
+  }
+  .simulator-box select {
+   background: #1e2a3e;
+   border: 1px solid rgba(16, 185, 129, 0.3);
+   color: #eef5ff;
+   padding: 0.4rem 0.8rem;
+   border-radius: 0.6rem;
+   font-family: 'Inter', sans-serif;
+   font-size: 0.9rem;
+  }
+  .sim-btn {
+   background: #10b981;
+   color: #000;
+   font-weight: 700;
+   border: none;
+   padding: 0.5rem 1.2rem;
+   border-radius: 2rem;
+   cursor: pointer;
+   transition: 0.2s;
+   font-family: 'Inter', sans-serif;
+  }
+  .sim-btn:hover { transform: scale(1.05); box-shadow: 0 0 10px rgba(16, 185, 129, 0.4); }
+  .result-display {
+   background: rgba(16, 185, 129, 0.1);
+   border-radius: 1rem;
+   padding: 0.8rem 1rem;
+   margin: 0.5rem 0;
+   font-weight: 600;
+   color: #6ee7b7;
+   font-size: 0.95rem;
+  }
+  .company-card {
+   background: rgba(0,0,0,0.4);
+   border-radius: 1rem;
+   padding: 1rem;
+   margin: 0.6rem 0;
+   border: 1px solid rgba(16, 185, 129, 0.2);
+  }
+  .company-card h4 { color: #34d399; margin-bottom: 0.4rem; }
+  .comparison-bar {
+   height: 28px;
+   background: linear-gradient(90deg, #10b981, #34d399);
+   border-radius: 0.5rem;
+   margin: 0.3rem 0;
+   display: flex;
+   align-items: center;
+   padding-left: 0.5rem;
+   font-weight: 700;
+   font-size: 0.85rem;
+   color: #000;
+   transition: width 0.5s;
+  }
+  .info-panel {
+   background: rgba(0, 0, 0, 0.3);
+   border-radius: 1rem;
+   padding: 1rem;
+   margin: 0.8rem 0;
+   border: 1px solid rgba(16, 185, 129, 0.15);
+  }
+  .info-panel h4 { color: #34d399; margin-bottom: 0.5rem; font-size: 1rem; }
+  .info-panel p, .info-panel li { color: #b9ccee; line-height: 1.6; font-size: 0.9rem; }
+  .example-step {
+   background: rgba(0,0,0,0.4);
+   border-left: 3px solid #34d399;
+   border-radius: 0.5rem;
+   padding: 0.6rem 0.8rem;
+   margin: 0.5rem 0;
+   color: #a7f3d0;
+   font-size: 0.9rem;
+  }
+  footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid rgba(16, 185, 129, 0.2); }
+  .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
+  .nav-link {
+   background: #1a2e26;
+   border: none;
+   padding: 0.7rem 1.5rem;
+   border-radius: 3rem;
+   font-weight: 600;
+   cursor: pointer;
+   text-decoration: none;
+   color: #eef5ff;
+   display: inline-flex;
+   align-items: center;
+   gap: 0.5rem;
+   transition: 0.2s;
+   font-size: 0.95rem;
+  }
+  .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(16, 185, 129, 0.4); }
+  .nav-link.prev { background: #1a2e26; color: #eef5ff; border: 1px solid rgba(16, 185, 129, 0.3); }
+  .nav-link.next { background: linear-gradient(95deg, #10b981, #34d399); color: #000; }
+  .nav-link.menu { background: #15261f; border: 1px solid #10b981; }
+  .feedback-msg { margin-top: 0.8rem; padding: 0.6rem 1rem; border-radius: 1rem; font-weight: 600; font-size: 0.9rem; }
+  .feedback-msg.pass { background: rgba(0, 230, 118, 0.2); color: #00e676; border: 1px solid #00e676; }
+  .feedback-msg.fail { background: rgba(255, 82, 82, 0.2); color: #ff5252; border: 1px solid #ff5252; }
+  .module-recap {
+   background: rgba(16, 185, 129, 0.08);
+   border-radius: 1.5rem;
+   padding: 1rem 1.5rem;
+   margin: 1.5rem 2rem;
+   border: 1px dashed rgba(16, 185, 129, 0.4);
+  }
+  .module-recap h3 { color: #10b981; font-size: 1rem; margin-bottom: 0.5rem; }
+  .module-recap li { color: #8899bb; font-size: 0.85rem; margin: 0.3rem 0; }
+  @media (max-width: 800px) {
+   .hero-header h1 { font-size: 1.9rem; }
+   .section-card { margin: 1rem; padding: 1rem; }
+  }
+ </style>
+ <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+ <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+
+<div class="course-container">
+ <div class="hero-header">
+  <h1><i class="fas fa-chart-simple"></i> EBITDA Y MÁRGENES OPERATIVOS</h1>
+  <p>Midiendo la verdadera capacidad de generar caja operativa</p>
+  <div class="badge-area">
+   <span class="chip"><i class="fas fa-calculator"></i> Cálculo paso a paso</span>
+   <span class="chip"><i class="fas fa-building"></i> Sectores bolivianos</span>
+   <span class="chip"><i class="fas fa-medal"></i> Insignia al completar</span>
+  </div>
+ </div>
+
+ <div class="section-card">
+  <div class="analogy-box">
+   <i class="fas fa-lightbulb"></i> <strong>Analogía:</strong> El EBITDA es como ver el motor sin la carrocería: mide la capacidad de generar caja operativa sin que te distraigan la depreciación, intereses o impuestos. Imagina que evalúas dos autos. Uno tiene un motor de 300 HP pero pesa 2 toneladas (mucha depreciación). El otro tiene 250 HP y pesa 1 tonelada. Si solo miras los HP brutos (Utilidad Neta), el primer auto parece mejor. Pero si miras la relación peso/potencia (EBITDA), el segundo es más eficiente. Así funciona el EBITDA: te muestra la potencia pura del negocio.
+  </div>
+
+  <div class="objectives">
+   <h3>🎯 ¿Qué aprenderás?</h3>
+   <ul>
+    <li>Calcular el EBITDA paso a paso desde el Estado de Resultados</li>
+    <li>Interpretar el Margen EBITDA como indicador de eficiencia operativa</li>
+    <li>Identificar ajustes necesarios al EBITDA (partidas no recurrentes, diferencia de cambio)</li>
+    <li>Conocer los márgenes EBITDA típicos en sectores bolivianos (banca, industria, comercio)</li>
+    <li>Usar el múltiplo EV/EBITDA para valoración de empresas</li>
+   </ul>
+  </div>
+ </div>
+
+ <div class="section-card">
+  <h2><i class="fas fa-calculator"></i> Panel 1: Cálculo del EBITDA Paso a Paso</h2>
+  <div class="formula-box">
+   EBITDA = Utilidad Operativa + Depreciación + Amortización
+  </div>
+  <p>El EBITDA (Earnings Before Interest, Taxes, Depreciation and Amortization) se puede calcular de dos formas: partiendo de la Utilidad Operativa (más común) o partiendo de la Utilidad Neta.</p>
+
+  <div class="info-panel">
+   <h4>🧮 Método 1: Desde la Utilidad Operativa (EBIT)</h4>
+   <p><strong>Empresa "Cervecera del Sur SA" (datos anuales en Bs):</strong></p>
+   <div class="example-step"><strong>Paso 1:</strong> Ventas Netas: <strong>Bs 8,000,000</strong></div>
+   <div class="example-step"><strong>Paso 2:</strong> (-) Costo de Ventas: <strong>Bs 3,600,000</strong><br>= <strong>Utilidad Bruta: Bs 4,400,000</strong> (Margen Bruto 55%)</div>
+   <div class="example-step"><strong>Paso 3:</strong> (-) Gastos Operativos (administración, ventas): <strong>Bs 1,600,000</strong><br>= <strong>Utilidad Operativa (EBIT): Bs 2,800,000</strong></div>
+   <div class="example-step"><strong>Paso 4:</strong> (+) Depreciación del ejercicio: <strong>Bs 400,000</strong></div>
+   <div class="example-step"><strong>Paso 5:</strong> (+) Amortización de intangibles: <strong>Bs 50,000</strong></div>
+   <div class="result-display">
+    <strong>EBITDA = 2,800,000 + 400,000 + 50,000 = Bs 3,250,000</strong>
+   </div>
+  </div>
+
+  <div class="info-panel">
+   <h4>🧮 Método 2: Desde la Utilidad Neta (reconstruyendo hacia arriba)</h4>
+   <p>Si solo tienes la Utilidad Neta, debes "deshacer" el camino sumando hacia atrás:</p>
+   <div class="example-step">Utilidad Neta: Bs 1,800,000</div>
+   <div class="example-step">(+) IUE (25%): Bs 600,000 → Utilidad antes de impuestos: Bs 2,400,000</div>
+   <div class="example-step">(+) Gastos Financieros: Bs 400,000 → EBIT: Bs 2,800,000</div>
+   <div class="example-step">(+) Depreciación: Bs 400,000 + Amortización: Bs 50,000 → <strong>EBITDA: Bs 3,250,000</strong></div>
+   <p>La ventaja de calcular desde la Utilidad Neta es que puedes verificar que no te falte ninguna partida. Ambos métodos deben dar el mismo resultado.</p>
+  </div>
+</div>
+
+ <div class="section-card">
+  <h2><i class="fas fa-percent"></i> Panel 2: Margen EBITDA</h2>
+  <div class="formula-box">
+   Margen EBITDA = EBITDA / Ventas × 100
+  </div>
+  <p>El Margen EBITDA expresa el EBITDA como <strong>porcentaje de las ventas</strong>, permitiendo comparar empresas de diferente tamaño. Es el indicador más usado para medir eficiencia operativa pura.</p>
+
+  <div class="info-panel">
+   <h4>🧮 Siguiendo el ejemplo de Cervecera del Sur SA</h4>
+   <p>EBITDA = Bs 3,250,000 / Ventas = Bs 8,000,000 × 100 = <strong>40.6%</strong></p>
+   <p>Esto significa que por cada Bs 100 que vende, la empresa genera Bs 40.60 de caja operativa (antes de intereses, impuestos e inversiones). Es un margen excelente, típico de empresas con marcas fuertes y poder de fijación de precios.</p>
+  </div>
+
+  <div class="info-panel">
+   <h4>🔎 Interpretación general del Margen EBITDA</h4>
+   <p><strong>&gt; 40%:</strong> Margen excepcional. Empresas con ventajas competitivas muy fuertes (marcas premium, patentes, monopolios naturales). En Bolivia, solo banca, telecomunicaciones y algunas industrias de bebidas alcanzan este nivel.</p>
+   <p><strong>20-40%:</strong> Margen saludable. La empresa genera buena caja operativa y tiene espacio para invertir, pagar deuda y distribuir dividendos. La mayoría de empresas industriales bien gestionadas están en este rango.</p>
+   <p><strong>10-20%:</strong> Margen moderado. Sectores competitivos donde el precio es el principal diferenciador. La empresa debe cuidar mucho sus costos operativos. Comercio mayorista, construcción, transporte.</p>
+   <p><strong>5-10%:</strong> Margen bajo. La empresa vive al límite. Pequeños aumentos en costos de materia prima o caídas en ventas pueden volver el EBITDA negativo. Supermercados, distribución de combustibles.</p>
+   <p><strong>&lt; 5%:</strong> Muy bajo. La empresa apenas genera caja operativa. Urge analizar si el modelo de negocio es viable o si hay ineficiencias graves.</p>
+  </div>
+</div>
+
+ <div class="section-card">
+  <h2><i class="fas fa-sliders-h"></i> Panel 3: Ajustes al EBITDA</h2>
+  <p>El EBITDA "crudo" del estado de resultados a veces necesita ajustes para reflejar la <strong>capacidad recurrente</strong> de generar caja. Las partidas no recurrentes distorsionan la foto real.</p>
+
+  <div class="info-panel">
+   <h4>🔧 Ajustes comunes en Bolivia</h4>
+   <ul>
+    <li><strong>Diferencia de cambio:</strong> En Bolivia, con la dolarización parcial, las empresas pueden tener ganancias o pérdidas por diferencia de cambio que distorsionan el EBITDA. Si el boliviano se deprecia, las deudas en USD generan una pérdida contable que reduce la utilidad neta pero no es un gasto operativo recurrente. Se debe ajustar el EBITDA sumando estas pérdidas cambiarias no realizadas.</li>
+    <li><strong>Venta de activos fijos:</strong> Si la empresa vendió un terreno o maquinaria, esa ganancia no es operativa y no se repetirá. Se resta del EBITDA.</li>
+    <li><strong>Indemnizaciones por despidos masivos:</strong> Si la empresa reestructuró y pagó indemnizaciones elevadas, ese gasto es no recurrente y debe sumarse al EBITDA ajustado.</li>
+    <li><strong>Gastos de constitución o reorganización:</strong> Honorarios legales, gastos notariales por fusión o escisión. No recurrentes.</li>
+    <li><strong>Contingencias fiscales:</strong> Multas del SIN o ajustes de fiscalización. No son parte de la operación normal.</li>
+  </ul>
+  </div>
+
+  <div class="info-panel">
+   <h4>📐 EBITDA Ajustado vs Reportado</h4>
+   <p>EBITDA Reportado: Bs 3,250,000 (del Panel 1)<br>
+   (+) Pérdida por diferencia de cambio (no realizada): Bs 120,000<br>
+   (-) Ganancia por venta de terreno: Bs 0<br>
+   <strong>EBITDA Ajustado = Bs 3,370,000</strong></p>
+   <p>El EBITDA Ajustado (Bs 3,370,000) es un 3.7% mayor que el reportado. Esta diferencia puede ser significativa al valorar la empresa, especialmente si se usa un múltiplo EV/EBITDA de 6-8x.</p>
+  </div>
+</div>
+
+ <div class="section-card">
+  <h2><i class="fas fa-exclamation-triangle"></i> Panel 4: Limitaciones del EBITDA</h2>
+
+  <div class="info-panel">
+   <h4>⛔ Lo que el EBITDA NO te dice</h4>
+   <ul>
+    <li><strong>No considera CAPEX:</strong> Una empresa puede tener EBITDA positivo pero necesitar inversiones enormes en maquinaria para mantenerse. Una aerolínea puede mostrar EBITDA de Bs 50 MM pero necesitar Bs 60 MM en aviones nuevos cada año. El EBITDA solo no muestra esto.</li>
+    <li><strong>No considera cambios en capital de trabajo:</strong> Si las cuentas por cobrar crecen más rápido que las ventas, el EBITDA se ve bien pero la caja real está disminuyendo. Empresas que crecen rápido pueden tener EBITDA récord y quedarse sin caja.</li>
+    <li><strong>No considera servicio de deuda:</strong> Una empresa muy apalancada puede tener un EBITDA decente pero estar al borde del default porque los intereses consumen todo el flujo.</li>
+    <li><strong>Puede ser manipulado:</strong> Capitalizar gastos (activarlos en vez de gastarlos) infla artificialmente el EBITDA. Por ejemplo, tratar gastos de mantenimiento como "mejoras" y activarlos en vez de llevarlos al gasto.</li>
+    <li><strong>Ignora calidad de ingresos:</strong> El EBITDA no distingue entre ingresos en efectivo e ingresos devengados que quizás nunca se cobren.</li>
+  </ul>
+  </div>
+
+  <div class="info-panel">
+   <h4>✅ Complementos indispensables al EBITDA</h4>
+   <p>Para una visión completa, el EBITDA debe complementarse con:</p>
+   <ul>
+    <li><strong>FCFF</strong> (ya lo estudiaste en el Módulo 15): incluye CAPEX y ΔCTN.</li>
+    <li><strong>Deuda Neta / EBITDA:</strong> mide el apalancamiento en función de la capacidad de pago. Un ratio &gt; 4x se considera alto.</li>
+    <li><strong>(CAPEX / EBITDA):</strong> qué porcentaje del EBITDA se consume en inversiones de capital. Si es &gt; 80%, la empresa retiene poco efectivo libre.</li>
+  </ul>
+  </div>
+</div>
+
+ <div class="section-card">
+  <h2><i class="fas fa-building-columns"></i> Panel 5: EBITDA en Sectores Bolivianos</h2>
+
+  <div class="info-panel">
+   <h4>🏦 Banca (BNB, BCP, Mercantil Santa Cruz, BancoSol)</h4>
+   <p><strong>Margen EBITDA: 40-55%</strong><br>
+   La banca boliviana tiene los márgenes operativos más altos del país. ¿Por qué? Su "materia prima" es el dinero (captan depósitos a tasas bajas y prestan a tasas más altas). Tienen economías de escala enormes: agregar un cliente más cuesta casi cero. Además, el oligopolio bancario (los 5 bancos más grandes controlan &gt;80% del mercado) les da poder de fijación de tasas.</p>
+   <p><strong>EV/EBITDA típico:</strong> 5-8x para bancos bolivianos.</p>
+  </div>
+
+  <div class="info-panel">
+   <h4>🏭 Industria (CBN, PIL Andina, Soboce, Embol)</h4>
+   <p><strong>Margen EBITDA: 20-35%</strong><br>
+   La industria manufacturera boliviana tiene márgenes decentes. Las empresas grandes (CBN con ~30% de margen EBITDA) tienen poder de marca y economías de escala. Las medianas tienen márgenes más ajustados (15-20%) porque compiten con importaciones (contrabando) y tienen costos de energía y transporte elevados.</p>
+   <p><strong>EV/EBITDA típico:</strong> 6-10x para industria de consumo masivo.</p>
+  </div>
+
+  <div class="info-panel">
+   <h4>🛒 Comercio (supermercados, distribuidores, retail)</h4>
+   <p><strong>Margen EBITDA: 5-12%</strong><br>
+   El comercio tiene los márgenes más bajos. Los supermercados operan con 6-10% de margen EBITDA (Hipermaxi, Ketal). Compensan los márgenes bajos con altísima rotación (una góndola de supermercado se vacía y repone varias veces al mes). Los distribuidores mayoristas tienen márgenes aún más bajos (4-7%).</p>
+   <p><strong>EV/EBITDA típico:</strong> 5-8x para retail.</p>
+  </div>
+</div>
+
+ <div class="section-card">
+  <h2><i class="fas fa-tags"></i> Panel 6: EV/EBITDA como Múltiplo de Valoración</h2>
+  <div class="formula-box">
+   EV / EBITDA = Enterprise Value / EBITDA
+  </div>
+  <div class="formula-box">
+   Enterprise Value (EV) = Valor de Mercado del Patrimonio + Deuda Neta
+  </div>
+
+  <p>El múltiplo EV/EBITDA es el <strong>método de valoración relativa más usado en finanzas corporativas</strong>. Mide cuántas veces el EBITDA está dispuesto a pagar el mercado por una empresa.</p>
+
+  <div class="info-panel">
+   <h4>🧮 Ejemplo en Bs: Valorando "Cervecera del Sur SA"</h4>
+   <div class="example-step"><strong>EBITDA:</strong> Bs 3,250,000</div>
+   <div class="example-step"><strong>Múltiplo EV/EBITDA del sector:</strong> 7.5x (promedio de empresas comparables en Latinoamérica)</div>
+   <div class="example-step"><strong>EV estimado:</strong> 3,250,000 × 7.5 = <strong>Bs 24,375,000</strong></div>
+   <div class="example-step"><strong>Deuda Neta:</strong> Deuda total (Bs 5,000,000) - Caja (Bs 1,500,000) = <strong>Bs 3,500,000</strong></div>
+   <div class="example-step"><strong>Valor del Patrimonio:</strong> 24,375,000 - 3,500,000 = <strong>Bs 20,875,000</strong></div>
+   <p>Interpretación: El 100% de las acciones de Cervecera del Sur SA valdría aproximadamente Bs 20.9 millones según este método. Si la empresa tiene 100,000 acciones, cada acción valdría Bs 208.75.</p>
+  </div>
+
+  <div class="info-panel">
+   <h4>📊 Ventajas del EV/EBITDA sobre otros múltiplos</h4>
+   <ul>
+    <li>Es independiente de la estructura de capital (a diferencia del P/E, que varía con el nivel de deuda).</li>
+    <li>Permite comparar empresas de distintos países con diferentes tasas impositivas.</li>
+    <li>No se ve afectado por políticas de depreciación (a diferencia de múltiplos basados en Utilidad Neta).</li>
+    <li>Es el múltiplo preferido en fusiones y adquisiciones (M&A).</li>
+  </ul>
+  </div>
+</div>
+
+ <div class="section-card">
+  <h2><i class="fas fa-calculator"></i> Simulación: Calculadora de EBITDA para Empresas Bolivianas</h2>
+  <p style="color:#a7f3d0; margin-bottom:1rem;">Selecciona una empresa tipo o ingresa tus propios datos. Calcula EBITDA, Margen EBITDA y EV estimado.</p>
+  <div class="simulator-box">
+   <h3 style="color:#34d399; margin-bottom:0.8rem;">📋 Selección de empresa</h3>
+   <div style="margin-bottom:0.8rem;">
+    <select id="empresaSelect" style="background:#1e2a3e;color:#eef5ff;padding:0.4rem 0.8rem;border-radius:0.6rem;border:1px solid rgba(16,185,129,0.3);font-family:'Inter',sans-serif;font-size:0.9rem;">
+     <option value="custom">Personalizado</option>
+     <option value="cervecera">Cervecera del Sur SA (Industria)</option>
+     <option value="comercial">Comercial Andina SRL (Comercio)</option>
+     <option value="textiles">Textiles del Valle (Manufactura)</option>
+    </select>
+    <button class="sim-btn" id="cargarBtn" style="margin-left:0.5rem;">Cargar</button>
+   </div>
+   <div style="display:flex; flex-wrap:wrap; gap:0.6rem; align-items:center; margin:0.4rem 0;"><label>Ventas Netas (Bs):</label><input type="number" id="ebVentas" value="8000000" step="100000"></div>
+   <div style="display:flex; flex-wrap:wrap; gap:0.6rem; align-items:center; margin:0.4rem 0;"><label>Costo de Ventas (Bs):</label><input type="number" id="ebCmv" value="3600000" step="50000"></div>
+   <div style="display:flex; flex-wrap:wrap; gap:0.6rem; align-items:center; margin:0.4rem 0;"><label>Gastos Operativos (Bs):</label><input type="number" id="ebGastosOp" value="1600000" step="50000"></div>
+   <div style="display:flex; flex-wrap:wrap; gap:0.6rem; align-items:center; margin:0.4rem 0;"><label>Depreciación (Bs):</label><input type="number" id="ebDep" value="400000" step="10000"></div>
+   <div style="display:flex; flex-wrap:wrap; gap:0.6rem; align-items:center; margin:0.4rem 0;"><label>Amortización (Bs):</label><input type="number" id="ebAmort" value="50000" step="5000"></div>
+   <div style="display:flex; flex-wrap:wrap; gap:0.6rem; align-items:center; margin:0.4rem 0;"><label>Deuda Neta (Bs):</label><input type="number" id="ebDeuda" value="3500000" step="100000"></div>
+   <div style="display:flex; flex-wrap:wrap; gap:0.6rem; align-items:center; margin:0.4rem 0;"><label>Múltiplo EV/EBITDA:</label><input type="number" id="ebMultiplo" value="7.5" step="0.1"></div>
+   <br>
+   <button class="sim-btn" id="calcEbitdaBtn"><i class="fas fa-play"></i> Calcular EBITDA</button>
+   <button class="sim-btn" id="resetEbitdaBtn" style="background:#ff5252;color:#fff;"><i class="fas fa-redo"></i> Valores iniciales</button>
+   <div id="ebitdaResult" style="margin-top:1rem;"></div>
+  </div>
+ </div>
+
+ <div class="section-card">
+  <h2><i class="fas fa-pencil-alt"></i> Quiz: EBITDA y Márgenes Operativos</h2>
+  <p style="color:#a7f3d0; margin-bottom:0.8rem;">Responde las 5 preguntas. Necesitas al menos 4 correctas para ganar la insignia.</p>
+
+  <div id="quizContainer">
+   <div class="question">
+    <p>1. ¿Qué significa EBITDA?</p>
+    <div class="options" data-q="0">
+     <div class="opt" data-a="0">Earnings Before Income Tax and Dividends</div>
+     <div class="opt" data-a="1">Earnings Before Interest, Taxes, Depreciation and Amortization</div>
+     <div class="opt" data-a="2">Estimated Business Income Tax and Depreciation Adjustment</div>
+     <div class="opt" data-a="3">Equity Before Interest, Taxes and Depreciation</div>
+    </div>
+   </div>
+   <div class="question">
+    <p>2. ¿Qué partidas debes SUMAR a la Utilidad Operativa para obtener el EBITDA?</p>
+    <div class="options" data-q="1">
+     <div class="opt" data-a="0">Intereses e Impuestos</div>
+     <div class="opt" data-a="1">Ventas y Costo de Ventas</div>
+     <div class="opt" data-a="2">Depreciación y Amortización</div>
+     <div class="opt" data-a="3">Dividendos y Reservas</div>
+    </div>
+   </div>
+   <div class="question">
+    <p>3. ¿Cuál de estos sectores tiene típicamente el MARGEN EBITDA MÁS ALTO en Bolivia?</p>
+    <div class="options" data-q="2">
+     <div class="opt" data-a="0">Comercio minorista (supermercados)</div>
+     <div class="opt" data-a="1">Banca</div>
+     <div class="opt" data-a="2">Transporte de carga</div>
+     <div class="opt" data-a="3">Agricultura</div>
+    </div>
+   </div>
+   <div class="question">
+    <p>4. ¿Qué LIMITACIÓN importante tiene el EBITDA?</p>
+    <div class="options" data-q="3">
+     <div class="opt" data-a="0">No existe; el EBITDA es perfecto</div>
+     <div class="opt" data-a="1">No considera inversiones en activos fijos (CAPEX) ni cambios en capital de trabajo</div>
+     <div class="opt" data-a="2">No se puede calcular en empresas bolivianas</div>
+     <div class="opt" data-a="3">Solo sirve para empresas grandes</div>
+    </div>
+   </div>
+   <div class="question">
+    <p>5. Si una empresa tiene EBITDA de Bs 2,000,000, Deuda Neta de Bs 3,000,000 y un múltiplo EV/EBITDA del sector de 6x, ¿cuál es su Valor del Patrimonio?</p>
+    <div class="options" data-q="4">
+     <div class="opt" data-a="0">Bs 12,000,000</div>
+     <div class="opt" data-a="1">Bs 15,000,000</div>
+     <div class="opt" data-a="2">Bs 9,000,000</div>
+     <div class="opt" data-a="3">Bs 6,000,000</div>
+    </div>
+   </div>
+  </div>
+  <button id="submitQuizBtn" class="btn-submit">Validar respuestas</button>
+  <div id="feedbackArea" class="hidden"></div>
+
+  <div id="insigniaArea" class="insignia hidden">
+   <i class="fas fa-medal"></i>
+   <h3>📊 ¡INSIGNIA: EBITDA ANALYST! 📊</h3>
+   <p>Dominas el cálculo del EBITDA, sus ajustes y su uso en valoración. Sabes ver más allá de la utilidad contable para entender la verdadera capacidad de generar caja operativa de una empresa.</p>
+  </div>
+
+  <button id="nextPageBtn" class="next-btn hidden" onclick="window.location.href='index.html'">🎓 Ir al Menú del Curso</button>
+ </div>
+
+ <div class="module-recap">
+  <h3>📌 Resumen del módulo</h3>
+  <ul>
+   <li><strong>EBITDA:</strong> Utilidad Operativa + Depreciación + Amortización. Mide la generación operativa de caja.</li>
+   <li><strong>Margen EBITDA:</strong> EBITDA/Ventas. &gt;20% es saludable. Banca 40-55%, Industria 20-35%, Comercio 5-12%.</li>
+   <li><strong>Ajustes:</strong> Eliminar partidas no recurrentes (diferencia de cambio, venta de activos, indemnizaciones).</li>
+   <li><strong>Limitaciones:</strong> No considera CAPEX, ΔCTN, ni servicio de deuda. Complementar con FCFF.</li>
+   <li><strong>EV/EBITDA:</strong> Múltiplo de valoración líder. EV = EBITDA × múltiplo. Valor Patrimonio = EV - Deuda Neta.</li>
+   <li><strong>Bolivia:</strong> Banca 5-8x, Industria consumo 6-10x, Retail 5-8x.</li>
+  </ul>
+ </div>
+
+ <div class="nav-links">
+  <a href="15-flujo-caja-libre.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+  <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+  <a href="index.html" class="nav-link next">Menú del Curso <i class="fas fa-home"></i></a>
+ </div>
+
+ <footer>
+  <i class="fas fa-chart-bar"></i> Aprende Jugando · Análisis e Interpretación de Estados Financieros · Módulo 16
+ </footer>
+</div>
+
+<script>
+(function() {
+  var correctAnswers = { 0: 1, 1: 2, 2: 1, 3: 1, 4: 2 };
+  var userAnswers = {};
+  var quizCompleted = false;
+  var PROGRESS_KEY = 'aef_progress';
+  var MODULE_KEY = 'aef_m16';
+
+  document.querySelectorAll('.opt').forEach(function(el) {
+    el.addEventListener('click', function() {
+      if (quizCompleted) return;
+      var parent = el.closest('.options');
+      parent.querySelectorAll('.opt').forEach(function(o) { o.classList.remove('selected'); });
+      el.classList.add('selected');
+      userAnswers[parseInt(parent.dataset.q)] = parseInt(el.dataset.a);
+    });
+  });
+
+  document.getElementById('submitQuizBtn').addEventListener('click', function() {
+    if (quizCompleted) return;
+    var allAnswered = Object.keys(correctAnswers).every(function(k) { return userAnswers[k] !== undefined; });
+    if (!allAnswered) { alert("Responde todas las preguntas antes de validar."); return; }
+    var correct = 0;
+    Object.keys(correctAnswers).forEach(function(k) {
+      if (userAnswers[k] === correctAnswers[k]) correct++;
+    });
+    var passed = correct >= 4;
+    var fa = document.getElementById('feedbackArea');
+    fa.classList.remove('hidden');
+    document.querySelectorAll('.opt').forEach(function(o) {
+      var q = parseInt(o.closest('.options').dataset.q);
+      var a = parseInt(o.dataset.a);
+      if (a === correctAnswers[q]) o.classList.add('correct');
+      if (o.classList.contains('selected') && a !== correctAnswers[q]) o.classList.add('wrong');
+    });
+    if (passed) {
+      fa.innerHTML = '<div class="feedback-msg pass"><i class="fas fa-check-circle"></i> ' + correct + ' de 5 correctas. ¡Eres un EBITDA Analyst!</div>';
+      quizCompleted = true;
+      document.getElementById('insigniaArea').classList.remove('hidden');
+      document.getElementById('nextPageBtn').classList.remove('hidden');
+      document.getElementById('submitQuizBtn').disabled = true;
+      localStorage.setItem(MODULE_KEY, 'true');
+      var progress = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '{}');
+      progress['m16'] = true;
+      localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress));
+    } else {
+      fa.innerHTML = '<div class="feedback-msg fail"><i class="fas fa-times-circle"></i> ' + correct + ' de 5 correctas. Necesitas al menos 4.</div>';
+      setTimeout(function() {
+        document.querySelectorAll('.opt').forEach(function(o) { o.classList.remove('correct','wrong','selected'); });
+        userAnswers = {};
+        fa.classList.add('hidden');
+      }, 2500);
+    }
+  });
+
+  var empresas = {
+    cervecera: { ventas: 8000000, cmv: 3600000, gastosOp: 1600000, dep: 400000, amort: 50000, deuda: 3500000, multiplo: 7.5 },
+    comercial: { ventas: 5000000, cmv: 3800000, gastosOp: 750000, dep: 80000, amort: 10000, deuda: 800000, multiplo: 6.0 },
+    textiles: { ventas: 3000000, cmv: 1950000, gastosOp: 600000, dep: 150000, amort: 20000, deuda: 1200000, multiplo: 5.5 }
+  };
+
+  function calcularEBITDA() {
+    var ventas = parseFloat(document.getElementById('ebVentas').value) || 0;
+    var cmv = parseFloat(document.getElementById('ebCmv').value) || 0;
+    var gastosOp = parseFloat(document.getElementById('ebGastosOp').value) || 0;
+    var dep = parseFloat(document.getElementById('ebDep').value) || 0;
+    var amort = parseFloat(document.getElementById('ebAmort').value) || 0;
+    var deuda = parseFloat(document.getElementById('ebDeuda').value) || 0;
+    var multiplo = parseFloat(document.getElementById('ebMultiplo').value) || 0;
+
+    var utilBruta = ventas - cmv;
+    var ebit = utilBruta - gastosOp;
+    var ebitda = ebit + dep + amort;
+    var margenBruto = ventas > 0 ? (utilBruta / ventas * 100) : 0;
+    var margenEbitda = ventas > 0 ? (ebitda / ventas * 100) : 0;
+    var ev = ebitda * multiplo;
+    var valorPatrimonio = ev - deuda;
+
+    var colorMargen = margenEbitda > 30 ? '#00e676' : margenEbitda > 15 ? '#ffd600' : '#ff5252';
+
+    var html = '<div style="font-size:0.9rem; margin-bottom:0.5rem; color:#b9ccee;">';
+    html += 'Ventas: Bs ' + ventas.toLocaleString('es-BO') + ' → Utilidad Bruta: Bs ' + utilBruta.toLocaleString('es-BO') + ' (' + margenBruto.toFixed(1) + '%)<br>';
+    html += '→ EBIT: Bs ' + ebit.toLocaleString('es-BO') + ' + Dep (' + dep.toLocaleString('es-BO') + ') + Amort (' + amort.toLocaleString('es-BO') + ')';
+    html += '</div>';
+
+    html += '<div class="result-display" style="font-size:1.1rem; border:2px solid ' + colorMargen + ';">';
+    html += '<strong>EBITDA = Bs ' + ebitda.toLocaleString('es-BO') + '</strong> | Margen EBITDA: <strong style="color:' + colorMargen + ';">' + margenEbitda.toFixed(1) + '%</strong>';
+    html += '</div>';
+
+    html += '<div class="comparison-bar" style="width:' + Math.max(8, Math.min(100, margenEbitda)) + '%; margin-top:0.5rem;">' + margenEbitda.toFixed(1) + '% Margen EBITDA</div>';
+
+    html += '<div class="result-display" style="margin-top:0.8rem;">';
+    html += '<strong>EV (Enterprise Value):</strong> Bs ' + ev.toLocaleString('es-BO') + ' (EBITDA × ' + multiplo.toFixed(1) + 'x) | ';
+    html += '<strong>Valor Patrimonio:</strong> Bs ' + valorPatrimonio.toLocaleString('es-BO') + ' (EV - Deuda Neta)';
+    html += '</div>';
+
+    document.getElementById('ebitdaResult').innerHTML = html;
+  }
+
+  document.getElementById('cargarBtn').addEventListener('click', function() {
+    var empresa = document.getElementById('empresaSelect').value;
+    if (empresa === 'custom') return;
+    var d = empresas[empresa];
+    document.getElementById('ebVentas').value = d.ventas;
+    document.getElementById('ebCmv').value = d.cmv;
+    document.getElementById('ebGastosOp').value = d.gastosOp;
+    document.getElementById('ebDep').value = d.dep;
+    document.getElementById('ebAmort').value = d.amort;
+    document.getElementById('ebDeuda').value = d.deuda;
+    document.getElementById('ebMultiplo').value = d.multiplo;
+    calcularEBITDA();
+  });
+
+  document.getElementById('calcEbitdaBtn').addEventListener('click', calcularEBITDA);
+
+  document.getElementById('resetEbitdaBtn').addEventListener('click', function() {
+    document.getElementById('ebVentas').value = '8000000';
+    document.getElementById('ebCmv').value = '3600000';
+    document.getElementById('ebGastosOp').value = '1600000';
+    document.getElementById('ebDep').value = '400000';
+    document.getElementById('ebAmort').value = '50000';
+    document.getElementById('ebDeuda').value = '3500000';
+    document.getElementById('ebMultiplo').value = '7.5';
+    document.getElementById('empresaSelect').value = 'custom';
+    document.getElementById('ebitdaResult').innerHTML = '';
+  });
+
+  if (localStorage.getItem(MODULE_KEY) === 'true') {
+    quizCompleted = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('nextPageBtn').classList.remove('hidden');
+    document.getElementById('submitQuizBtn').disabled = true;
+  }
+
+  calcularEBITDA();
+})();
+</script>
+</body>
+</html>

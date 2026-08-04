@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+ <meta charset="UTF-8">
+ <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Análisis EEFF | Análisis Vertical y Horizontal</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:linear-gradient(135deg,#0a1a12 0%,#0c1f18 100%);font-family:'Inter',sans-serif;color:#eef5ff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
+  .course-container{max-width:1300px;width:100%;background:rgba(8,28,21,0.7);backdrop-filter:blur(12px);border-radius:3rem;border:1px solid rgba(16,185,129,0.25);box-shadow:0 25px 45px rgba(0,0,0,0.5),0 0 0 1px rgba(16,185,129,0.1) inset;overflow:hidden}
+  .hero-header{background:linear-gradient(95deg,#061a12 0%,#0f2a1e 100%);padding:2rem 2rem 1.5rem 2rem;text-align:center;border-bottom:2px solid #10b981}
+  .hero-header h1{font-size:2.8rem;font-weight:800;background:linear-gradient(135deg,#FFF,#6ee7b7,#34d399,#10b981);-webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:-0.01em}
+  .hero-header p{font-size:1.2rem;color:#a7f3d0;margin-top:0.5rem;font-weight:500}
+  .badge-area{display:flex;justify-content:center;gap:1rem;margin-top:1.2rem;flex-wrap:wrap}
+  .chip{background:rgba(16,185,129,0.15);border:1px solid #10b981;padding:0.4rem 1rem;border-radius:40px;font-size:0.8rem;font-weight:600;backdrop-filter:blur(4px);color:#a7f3d0}
+  .section-card{background:rgba(0,10,18,0.7);border-radius:2rem;padding:1.5rem;margin:1.5rem 2rem;border:1px solid rgba(16,185,129,0.3);backdrop-filter:blur(8px)}
+  .section-card h2{font-size:1.5rem;margin-bottom:0.8rem;display:flex;align-items:center;gap:0.6rem;color:#6ee7b7}
+  .analogy-box{background:linear-gradient(135deg,#0a1f15,#102c20);border-left:4px solid #10b981;border-radius:1.2rem;padding:1rem 1.2rem;margin:1rem 0;font-style:italic;color:#a7f3d0}
+  .analogy-box i{color:#10b981;margin-right:0.5rem}
+  .info-panel{background:rgba(6,26,18,0.8);border-radius:1.5rem;padding:1.2rem;margin:1rem 0;border:1px solid rgba(16,185,129,0.2);transition:0.3s}
+  .info-panel:hover{border-color:#10b981;box-shadow:0 0 15px rgba(16,185,129,0.1)}
+  .info-panel h3{color:#34d399;font-size:1.1rem;margin-bottom:0.5rem;display:flex;align-items:center;gap:0.5rem}
+  .info-panel p{color:#a7c4b8;font-size:0.9rem;line-height:1.6;margin-bottom:0.4rem}
+  .formula-box{background:rgba(6,26,18,0.8);border-radius:1.2rem;padding:1rem;margin:0.5rem 0;border:1px solid rgba(16,185,129,0.3);text-align:center}
+  .formula-box .formula{font-size:1.2rem;font-weight:700;color:#34d399}
+  .formula-box .desc{font-size:0.8rem;color:#8899bb;margin-top:0.3rem}
+  .analysis-table{width:100%;border-collapse:collapse;font-size:0.8rem;margin:0.8rem 0}
+  .analysis-table th{background:rgba(16,185,129,0.15);padding:0.4rem;color:#34d399;border:1px solid rgba(16,185,129,0.2);font-size:0.75rem}
+  .analysis-table td{padding:0.35rem 0.4rem;border:1px solid rgba(16,185,129,0.1);color:#a7c4b8}
+  .analysis-table td.amt{text-align:right}
+  .analysis-table tr.section td{color:#ffb347;font-weight:600;background:rgba(255,179,71,0.05)}
+  .analysis-table tr.total td{font-weight:700;color:#6ee7b7;background:rgba(16,185,129,0.08)}
+  .green-up{color:#00e676!important;font-weight:700}
+  .red-down{color:#ff5252!important;font-weight:700}
+  .highlight{animation:pulse 1s}
+  @keyframes pulse{0%{background:rgba(16,185,129,0.2)}100%{background:transparent}}
+  .tab-buttons{display:flex;gap:0.5rem;margin-bottom:1rem;flex-wrap:wrap}
+  .tab-btn{padding:0.5rem 1.2rem;border-radius:2rem;cursor:pointer;font-weight:600;font-size:0.85rem;border:1px solid rgba(16,185,129,0.3);background:rgba(16,185,129,0.1);color:#a7f3d0;font-family:'Inter',sans-serif;transition:0.2s}
+  .tab-btn.active{background:#10b981;color:#000;border-color:#10b981}
+  .tab-btn:hover{background:rgba(16,185,129,0.25)}
+  .question{background:rgba(6,26,18,0.8);margin:1rem 0;padding:1rem;border-radius:1.2rem;border:1px solid rgba(16,185,129,0.1)}
+  .question p{font-weight:600;margin-bottom:0.5rem}
+  .options{display:flex;flex-wrap:wrap;gap:0.6rem}
+  .opt{background:rgba(16,185,129,0.1);padding:0.5rem 1rem;border-radius:2rem;cursor:pointer;transition:0.2s;font-size:0.9rem;border:1px solid rgba(16,185,129,0.2)}
+  .opt:hover{background:rgba(16,185,129,0.25);transform:translateY(-2px)}
+  .opt.selected{background:#10b981;color:#000;font-weight:bold;box-shadow:0 0 8px rgba(16,185,129,0.6)}
+  .opt.correct{background:#00e676;color:#000}
+  .opt.wrong{background:#ff5252;color:#fff}
+  .btn-submit{background:linear-gradient(95deg,#10b981,#059669);border:none;padding:0.8rem 1.8rem;font-weight:bold;border-radius:3rem;margin-top:1rem;cursor:pointer;font-size:1rem;transition:0.2s;font-family:'Inter',sans-serif;color:#000}
+  .btn-submit:disabled{opacity:0.5;cursor:not-allowed}
+  .insignia{text-align:center;background:rgba(6,26,18,0.8);border-radius:2rem;margin-top:1.5rem;padding:1rem;border:1px dashed gold}
+  .insignia i{font-size:2.5rem;color:gold}
+  .hidden{display:none}
+  .next-btn{background:#10b981;border:none;padding:0.8rem 2rem;border-radius:3rem;font-weight:bold;color:#000;margin-top:1rem;width:100%;cursor:pointer;font-family:'Inter',sans-serif;font-size:1rem}
+  footer{text-align:center;padding:1.2rem;font-size:0.8rem;border-top:1px solid rgba(16,185,129,0.2);color:#6ee7b7}
+  .nav-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;padding:1.5rem 2rem}
+  .nav-link{background:rgba(16,185,129,0.12);border:none;padding:0.7rem 1.5rem;border-radius:3rem;font-weight:600;cursor:pointer;text-decoration:none;color:#eef5ff;display:inline-flex;align-items:center;gap:0.5rem;transition:0.2s;font-size:0.95rem}
+  .nav-link:hover{transform:translateY(-2px);box-shadow:0 0 10px rgba(16,185,129,0.4)}
+  .nav-link.prev{background:rgba(16,185,129,0.12);color:#eef5ff}
+  .nav-link.next{background:linear-gradient(95deg,#10b981,#059669);color:#000}
+  .nav-link.menu{background:rgba(6,26,18,0.8);border:1px solid #10b981}
+  .feedback-msg{margin-top:0.8rem;padding:0.6rem 1rem;border-radius:1rem;font-weight:600;font-size:0.9rem}
+  .feedback-msg.pass{background:rgba(0,230,118,0.2);color:#00e676;border:1px solid #00e676}
+  .feedback-msg.fail{background:rgba(255,82,82,0.2);color:#ff5252;border:1px solid #ff5252}
+  .objectives{background:rgba(16,185,129,0.1);border-radius:1.5rem;padding:1rem 1.5rem;margin:1.5rem 2rem;border:1px solid rgba(16,185,129,0.3)}
+  .objectives h3{color:#34d399;font-size:1.1rem;margin-bottom:0.7rem}
+  .objectives li{color:#a7c4b8;font-size:0.9rem;margin:0.4rem 0;list-style:none}
+  .objectives li::before{content:"🎯 "}
+  .module-recap{background:rgba(16,185,129,0.08);border-radius:1.5rem;padding:1rem 1.5rem;margin:1.5rem 2rem;border:1px dashed rgba(16,185,129,0.4)}
+  .module-recap h3{color:#34d399;font-size:1rem;margin-bottom:0.5rem}
+  .module-recap li{color:#a7c4b8;font-size:0.85rem;margin:0.3rem 0}
+  @media(max-width:800px){.hero-header h1{font-size:1.7rem}.analysis-table{font-size:0.7rem}}
+ </style>
+ <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+ <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+
+<div class="course-container">
+ <div class="hero-header">
+  <h1><i class="fas fa-search-percent"></i> ANÁLISIS VERTICAL Y HORIZONTAL</h1>
+  <p>Cómo leer las proporciones y las tendencias en los estados financieros</p>
+  <div class="badge-area">
+   <span class="chip"><i class="fas fa-chart-pie"></i> Vertical (AV)</span>
+   <span class="chip"><i class="fas fa-chart-line"></i> Horizontal (AH)</span>
+   <span class="chip"><i class="fas fa-industry"></i> Caso Boliviano</span>
+  </div>
+ </div>
+
+ <div class="section-card">
+  <div class="analogy-box">
+   <i class="fas fa-lightbulb"></i> <strong>Analogía:</strong> El análisis vertical es como mirar una pizza por sus ingredientes: ¿qué porcentaje es queso? ¿qué porcentaje es pepperoni? Te dice la composición. El análisis horizontal es como comparar cuánta pizza comiste este mes versus el mes pasado: ¿comiste 20% más o 15% menos? Te dice la tendencia. Juntos, te dan una visión completa de qué está pasando y hacia dónde va la empresa.
+  </div>
+<div class="objectives">
+ <h3>🎯 ¿Qué aprenderás?</h3>
+ <ul>
+  <li>Calcular e interpretar el Análisis Vertical (cada cuenta como porcentaje de una base)</li>
+  <li>Calcular e interpretar el Análisis Horizontal (tasa de crecimiento interanual)</li>
+  <li>Identificar variaciones significativas que requieren investigación</li>
+  <li>Aplicar estas herramientas a un caso real boliviano: Industrias Bolivianas S.A.</li>
+ </ul>
+</div>
+
+
+  <div style="display:flex;flex-wrap:wrap;gap:1rem;">
+   <div class="formula-box" style="flex:1;min-width:220px;">
+    <div class="formula">AV = (Cuenta / Base) × 100</div>
+    <div class="desc"><strong>Análisis Vertical:</strong> qué porcentaje representa cada cuenta respecto a una base.<br>BG → base = Activo Total<br>EERR → base = Ventas Netas</div>
+   </div>
+   <div class="formula-box" style="flex:1;min-width:220px;">
+    <div class="formula">AH = ((Año₂ − Año₁) / Año₁) × 100</div>
+    <div class="desc"><strong>Análisis Horizontal:</strong> cuánto creció (o decreció) cada cuenta respecto al año anterior.</div>
+   </div>
+  </div>
+
+  <h2 style="margin-top:1.2rem;"><i class="fas fa-info-circle"></i> Información Detallada</h2>
+
+  <div class="info-panel">
+   <h3><i class="fas fa-chart-pie"></i> 1. Análisis Vertical del Balance General</h3>
+   <p>En el análisis vertical del Balance General, cada cuenta se expresa como <strong>porcentaje del Activo Total</strong>. Esto permite responder preguntas como: ¿qué tan líquida es la empresa? (si caja y bancos es el 5% del activo total vs 25%, la estructura es muy distinta), ¿cuánto de su activo está inmovilizado en activos fijos? (una empresa industrial típicamente tendrá alto porcentaje en propiedades, planta y equipo; una empresa de servicios tendrá bajo porcentaje), ¿cuán endeudada está? (pasivo total como % del activo total = razón de endeudamiento).</p>
+   <p>Ejemplo: Si el Activo Total es Bs 1,000,000 y Caja es Bs 50,000, el AV de Caja = (50,000 / 1,000,000) × 100 = <strong>5%</strong>. Esto significa que solo el 5% de los recursos de la empresa está en efectivo. Si comparamos con el año anterior donde Caja era el 12%, vemos un deterioro de liquidez que amerita investigación. Para el pasivo y patrimonio, también se calculan como % del total de Pasivo + Patrimonio, pero lo más común es usar el Activo Total como base para todo el balance.</p>
+   <p>En la práctica boliviana, el análisis vertical del balance revela patrones sectoriales: una empresa comercial típicamente tendrá 60-70% de su activo en inventarios y cuentas por cobrar; una empresa industrial tendrá 40-50% en activos fijos; un banco (regulado por ASFI) tendrá más del 70% en cartera de créditos. Conocer estos patrones permite al analista detectar desviaciones que pueden indicar problemas o estrategias diferentes.</p>
+  </div>
+
+  <div class="info-panel">
+   <h3><i class="fas fa-percent"></i> 2. Análisis Vertical del Estado de Resultados</h3>
+   <p>En el análisis vertical del EERR, cada cuenta se expresa como <strong>porcentaje de las Ventas Netas</strong>. Esto genera los famosos <strong>márgenes</strong>: Margen Bruto = Utilidad Bruta / Ventas, Margen Operativo = Utilidad Operativa / Ventas, Margen Neto = Utilidad Neta / Ventas. Estos porcentajes permiten comparar empresas de diferentes tamaños (una PYME que vende Bs 500,000 con una multinacional que vende Bs 500,000,000) y evaluar la eficiencia operativa.</p>
+   <p>Un análisis vertical del EERR típico en Bolivia podría mostrar: Ventas Netas 100%, CMV 60% (Margen Bruto 40%), Gastos de Administración 12%, Gastos de Ventas 8%, IT 3%, Depreciación 4% (Margen Operativo 13%), Gastos Financieros 3% (Utilidad Antes de IUE 10%), IUE 2.5% (Margen Neto 7.5%). Si en el año siguiente el CMV sube a 68%, el analista debe preguntar: ¿subieron los costos de los insumos? ¿hubo que bajar precios para mantener ventas? ¿se cambió de proveedor?</p>
+   <p>Una ventaja adicional del AV: permite hacer <strong>benchmarking sectorial</strong>. Si el margen bruto promedio en la industria de alimentos en Bolivia es 35% y nuestra empresa tiene 25%, hay un problema de competitividad (costos altos o precios bajos). Si los gastos administrativos promedio son 10% y los nuestros son 18%, hay ineficiencia en la estructura administrativa. El CTNAC y las NIFs no definen estos benchmarks, pero el analista los construye comparando empresas del mismo sector.</p>
+  </div>
+
+  <div class="info-panel">
+   <h3><i class="fas fa-chart-line"></i> 3. Análisis Horizontal (Tasas de Crecimiento)</h3>
+   <p>El análisis horizontal calcula el <strong>cambio porcentual de cada cuenta entre dos períodos</strong>. La fórmula es simple: AH = ((Valor Año 2 − Valor Año 1) / |Valor Año 1|) × 100. Un resultado positivo indica crecimiento; uno negativo, decrecimiento. El análisis horizontal responde preguntas como: ¿crecieron más las ventas o los gastos? ¿la deuda aumentó más rápido que el patrimonio? ¿los inventarios crecieron desproporcionadamente respecto a las ventas?</p>
+   <p>Reglas de interpretación: (a) <strong>Ventas creciendo +20% y CMV creciendo +25%</strong> → el margen bruto se está erosionando (los costos crecen más rápido que los ingresos). (b) <strong>Ventas +10% pero Cuentas por Cobrar +40%</strong> → la empresa está vendiendo pero otorgando demasiado crédito y posiblemente a clientes de menor calidad. (c) <strong>Gastos financieros +80%</strong> → la deuda aumentó significativamente o las tasas de interés subieron; investigar el nivel de endeudamiento. (d) <strong>Utilidad Neta +5% pero Ventas +25%</strong> → los márgenes se desplomaron; algo está pasando con los costos o gastos.</p>
+   <p>En el contexto boliviano, el análisis horizontal debe considerar el efecto de la <strong>inflación</strong>: un crecimiento de ventas del 8% cuando la inflación fue del 6% significa un crecimiento real de solo 2%. La NIF 3 (ajuste por inflación) busca corregir estas distorsiones, pero no todas las empresas lo aplican. Por eso, al comparar años, el analista debe preguntarse si los cambios reflejan crecimiento real o simplemente el efecto de precios más altos. También debe considerar cambios en el tipo de cambio si las ventas son en dólares.</p>
+  </div>
+
+  <div class="info-panel">
+   <h3><i class="fas fa-exclamation-triangle"></i> 4. Interpretación de Variaciones Significativas</h3>
+   <p>No toda variación merece investigación. Como regla general del análisis financiero, se consideran <strong>significativas</strong> las variaciones que superan el <strong>10% en monto y el 5% en porcentaje</strong> respecto a la base. También son significativas las variaciones que <strong>rompen una tendencia</strong>: si una cuenta venía creciendo 3% anual y de repente crece 35%, hay que investigar. Y son significativas las variaciones que <strong>contradicen la lógica del negocio</strong>: si las ventas bajan 20% pero los inventarios suben 30%, algo no cuadra (¿acumulación de stock no vendido?).</p>
+   <p>Frente a una variación significativa, el analista debe hacerse tres preguntas: <strong>¿Qué causó este cambio?</strong> (factor interno como cambio de política, o externo como nueva regulación), <strong>¿Es sostenible o puntual?</strong> (un ingreso extraordinario por venta de un terreno no se repetirá; una mejora en el margen bruto por renegociación con proveedores sí puede ser sostenible), <strong>¿Qué implicancias tiene para el futuro?</strong> (una reducción de gastos de mantenimiento puede mejorar la utilidad hoy pero generar problemas en los activos mañana).</p>
+   <p>Las variaciones también se analizan en conjunto. Por ejemplo: Ventas +15%, CMV +18%, Gastos Administrativos -5% → el margen bruto cae pero se compensa con eficiencia administrativa. Hay que ver el efecto neto en la utilidad operativa. O bien: Ventas +10%, Cuentas por Cobrar +35%, Efectivo -40% → están vendiendo más pero no están cobrando, y la caja se está vaciando. Es una combinación peligrosa que el análisis horizontal revela inmediatamente.</p>
+  </div>
+
+  <div class="info-panel">
+   <h3><i class="fas fa-industry"></i> 5. Caso Práctico: Industrias Bolivianas S.A.</h3>
+   <p>Para ilustrar ambas herramientas, analizaremos los estados financieros de <strong>Industrias Bolivianas S.A.</strong>, una empresa industrial mediana con sede en La Paz que fabrica envases plásticos. Presentamos dos años de su Balance General y Estado de Resultados (2023 y 2024). Los datos están en la simulación interactiva más abajo. Al aplicar el AV veremos que la estructura de activos es típicamente industrial: 45% en activos fijos, 40% en activos corrientes. Al aplicar el AH, detectaremos patrones interesantes: las ventas crecieron 25% pero los gastos financieros subieron 60%, lo que sugiere un mayor endeudamiento para financiar el crecimiento.</p>
+   <p>Un hallazgo particular en esta empresa: los inventarios crecieron 40% mientras las ventas crecieron 25%. Esta diferencia sugiere acumulación de inventario, posiblemente por sobreproducción o por una desaceleración no anticipada de la demanda. El analista debería investigar: ¿hay productos obsoletos en el inventario? ¿se compró materia prima en exceso aprovechando un precio bajo? Las Notas a los EEFF (NIF 5) deberían revelar la política de valoración de inventarios y cualquier ajuste por obsolescencia.</p>
+   <p>La simulación interactiva abajo te permite ver ambos análisis (vertical y horizontal) sobre los datos de esta empresa. Las variaciones superiores a ±10% se resaltan automáticamente en verde (crecimiento positivo saludable) o rojo (decrecimiento o crecimiento excesivo que requiere atención).</p>
+  </div>
+
+  <div class="info-panel">
+   <h3><i class="fas fa-ban"></i> 6. Limitaciones del Análisis Vertical y Horizontal</h3>
+   <p>Aunque poderosas, estas herramientas tienen <strong>limitaciones importantes</strong> que el analista debe conocer. Primero, el <strong>efecto de la inflación</strong>: en economías con alta inflación, el análisis horizontal puede mostrar "crecimientos" que solo reflejan el aumento general de precios, no una expansión real del negocio. En Bolivia, donde la inflación ha sido variable históricamente, es crucial deflactar las cifras (expresarlas en moneda constante, por ejemplo en UFV) antes de calcular las variaciones.</p>
+   <p>Segundo, la <strong>estacionalidad</strong>: muchas empresas tienen patrones estacionales marcados (una embotelladora vende más en verano, una juguetería en Navidad). Comparar un trimestre contra otro sin ajustar por estacionalidad puede llevar a conclusiones erróneas. El análisis horizontal es más confiable cuando se comparan períodos equivalentes (año contra año, o mismo trimestre del año anterior). Tercero, los <strong>cambios en políticas contables</strong>: si la empresa cambió el método de depreciación o el método de valoración de inventarios entre un año y otro, las cifras no son comparables y el análisis horizontal reflejará el cambio contable, no el cambio económico real.</p>
+   <p>Finalmente, el <strong>tamaño de la base</strong>: cuando una cuenta es muy pequeña, variaciones absolutas mínimas generan porcentajes enormes. Si "Otros Activos" pasó de Bs 1,000 a Bs 3,000, el AH muestra +200%, lo cual es estadísticamente espectacular pero económicamente insignificante. El analista debe combinar el análisis de porcentajes con el de valores absolutos: "esta cuenta creció 200%, pero representa solo el 0.01% del activo total, por lo cual su impacto es irrelevante".</p>
+  </div>
+ </div>
+
+ <div class="section-card">
+  <h2><i class="fas fa-cogs"></i> Simulación: Industrias Bolivianas S.A. — Análisis Vertical y Horizontal</h2>
+  <p style="color:#a7c4b8;margin-bottom:0.5rem;">Selecciona el tipo de análisis y observa los cálculos automáticos. Las variaciones >±10% se resaltan en color.</p>
+
+  <div class="tab-buttons">
+   <button class="tab-btn active" data-tab="vertical">📊 Análisis Vertical (BG)</button>
+   <button class="tab-btn" data-tab="vertical_err">📊 Análisis Vertical (EERR)</button>
+   <button class="tab-btn" data-tab="horizontal_bg">📈 Análisis Horizontal (BG)</button>
+   <button class="tab-btn" data-tab="horizontal_err">📈 Análisis Horizontal (EERR)</button>
+  </div>
+  <div id="analysisContainer" style="overflow-x:auto;"></div>
+ </div>
+
+ <div class="section-card">
+  <h2><i class="fas fa-pencil-alt"></i> Evaluación del Módulo</h2>
+  <p style="color:#a7c4b8;margin-bottom:1rem;">5 preguntas sobre análisis vertical y horizontal.</p>
+  <div id="quizContainer">
+   <div class="question">
+    <p>1. En el análisis vertical del Balance General, ¿cuál es la base sobre la que se calculan los porcentajes?</p>
+    <div class="options" id="q0opts">
+     <div class="opt" data-q="0" data-a="0">Las Ventas Netas</div>
+     <div class="opt" data-q="0" data-a="1">El Activo Total</div>
+     <div class="opt" data-q="0" data-a="2">La Utilidad Neta</div>
+     <div class="opt" data-q="0" data-a="3">El Patrimonio</div>
+    </div>
+   </div>
+   <div class="question">
+    <p>2. ¿Cuál es la fórmula del Análisis Horizontal?</p>
+    <div class="options" id="q1opts">
+     <div class="opt" data-q="1" data-a="0">(Año₂ − Año₁) / Año₁ × 100</div>
+     <div class="opt" data-q="1" data-a="1">Año₂ / Año₁ × 100</div>
+     <div class="opt" data-q="1" data-a="2">(Año₁ − Año₂) / Año₂ × 100</div>
+     <div class="opt" data-q="1" data-a="3">Cuenta / Activo Total × 100</div>
+    </div>
+   </div>
+   <div class="question">
+    <p>3. Si las Ventas crecen 25% pero los Gastos Financieros crecen 80%, ¿qué podría estar ocurriendo?</p>
+    <div class="options" id="q2opts">
+     <div class="opt" data-q="2" data-a="0">La empresa bajó sus precios de venta</div>
+     <div class="opt" data-q="2" data-a="1">La empresa probablemente se endeudó más para financiar el crecimiento</div>
+     <div class="opt" data-q="2" data-a="2">Los empleados recibieron un aumento salarial</div>
+     <div class="opt" data-q="2" data-a="3">Los inventarios disminuyeron significativamente</div>
+    </div>
+   </div>
+   <div class="question">
+    <p>4. Una limitación importante del análisis horizontal en Bolivia es:</p>
+    <div class="options" id="q3opts">
+     <div class="opt" data-q="3" data-a="0">Que solo funciona para empresas grandes</div>
+     <div class="opt" data-q="3" data-a="1">El efecto de la inflación puede distorsionar las tasas de crecimiento reales</div>
+     <div class="opt" data-q="3" data-a="2">Que no se puede aplicar a estados financieros en bolivianos</div>
+     <div class="opt" data-q="3" data-a="3">Que está prohibido por las NIFs</div>
+    </div>
+   </div>
+   <div class="question">
+    <p>5. ¿Qué indica un aumento desproporcionado de Cuentas por Cobrar respecto al crecimiento de Ventas?</p>
+    <div class="options" id="q4opts">
+     <div class="opt" data-q="4" data-a="0">Que los clientes están pagando más rápido</div>
+     <div class="opt" data-q="4" data-a="1">Posibles problemas de cobranza o políticas de crédito demasiado flexibles</div>
+     <div class="opt" data-q="4" data-a="2">Que la empresa está vendiendo menos</div>
+     <div class="opt" data-q="4" data-a="3">Que la empresa redujo sus precios</div>
+    </div>
+   </div>
+  </div>
+  <button id="submitQuizBtn" class="btn-submit">✅ Validar respuestas</button>
+  <div id="feedbackArea" class="hidden"></div>
+
+  <div id="insigniaArea" class="insignia hidden">
+   <i class="fas fa-medal"></i>
+   <h3>🔍 ¡INSIGNIA: DETECTIVE DE TENDENCIAS!</h3>
+   <p>Dominas el análisis vertical y horizontal. Puedes diseccionar estados financieros, detectar anomalías y entender la historia que los números intentan contar.</p>
+  </div>
+
+  <button id="nextPageBtn" class="next-btn hidden" onclick="window.location.href='index.html'">⬅️ Volver al Menú del Curso</button>
+ </div>
+
+ 
+<div class="module-recap">
+ <h3>📌 Resumen del módulo</h3>
+ <ul>
+  <li>AV Balance: cada cuenta como % del Activo Total. AV EERR: cada cuenta como % de Ventas</li>
+  <li>AH: ((Año₂ − Año₁) / |Año₁|) × 100 — mide la tasa de crecimiento interanual</li>
+  <li>Variaciones >±10% merecen investigación: buscar la causa, evaluar sostenibilidad</li>
+  <li>Inflación y estacionalidad pueden distorsionar el análisis → ajustar antes de concluir</li>
+  <li>Caso Industrias Bolivianas S.A.: ventas +25%, gastos financieros +60% → crecimiento apalancado con deuda</li>
+ </ul>
+</div>
+<div class="nav-links">
+  <a href="07-flujo-efectivo.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+  <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+ </div>
+</div>
+
+<script>
+(function() {
+ // --- Data for Industrias Bolivianas S.A. ---
+ var bgData = [
+  {label:'ACTIVO', isSection:true},
+  {label:'Activo Corriente', isSub:true},
+  {label:'Caja y Bancos', y2023:42000, y2024:38000, base:'activo'},
+  {label:'Cuentas por Cobrar', y2023:165000, y2024:225000, base:'activo'},
+  {label:'Inventarios', y2023:280000, y2024:392000, base:'activo'},
+  {label:'Total Activo Corriente', y2023:487000, y2024:655000, isTotal:true, base:'activo'},
+  {label:'Activo No Corriente', isSub:true},
+  {label:'Propiedades, Planta y Equipo (neto)', y2023:520000, y2024:610000, base:'activo'},
+  {label:'Otros Activos LP', y2023:33000, y2024:41000, base:'activo'},
+  {label:'Total Activo No Corriente', y2023:553000, y2024:651000, isTotal:true, base:'activo'},
+  {label:'TOTAL ACTIVO', y2023:1040000, y2024:1306000, isTotal:true, isMain:true, base:'activo'},
+  {label:'PASIVO', isSection:true},
+  {label:'Pasivo Corriente', isSub:true},
+  {label:'Proveedores', y2023:120000, y2024:155000, base:'activo'},
+  {label:'Préstamos CP', y2023:75000, y2024:110000, base:'activo'},
+  {label:'Impuestos por Pagar', y2023:38000, y2024:48000, base:'activo'},
+  {label:'Total Pasivo Corriente', y2023:233000, y2024:313000, isTotal:true, base:'activo'},
+  {label:'Pasivo No Corriente', isSub:true},
+  {label:'Préstamos LP', y2023:310000, y2024:410000, base:'activo'},
+  {label:'Total Pasivo No Corriente', y2023:310000, y2024:410000, isTotal:true, base:'activo'},
+  {label:'TOTAL PASIVO', y2023:543000, y2024:723000, isTotal:true, isMain:true, base:'activo'},
+  {label:'PATRIMONIO', isSection:true},
+  {label:'Capital Social', y2023:300000, y2024:300000, base:'activo'},
+  {label:'Reserva Legal', y2023:30000, y2024:42000, base:'activo'},
+  {label:'Resultados Acumulados', y2023:167000, y2024:241000, base:'activo'},
+  {label:'TOTAL PATRIMONIO', y2023:497000, y2024:583000, isTotal:true, isMain:true, base:'activo'},
+  {label:'TOTAL PASIVO + PATRIMONIO', y2023:1040000, y2024:1306000, isTotal:true, isMain:true, base:'activo'}
+ ];
+
+ var errData = [
+  {label:'INGRESOS', isSection:true},
+  {label:'Ventas Netas', y2023:1450000, y2024:1812500, base:'ventas'},
+  {label:'(-) Costo de Ventas', y2023:870000, y2024:1123750, base:'ventas'},
+  {label:'UTILIDAD BRUTA', y2023:580000, y2024:688750, isTotal:true, base:'ventas'},
+  {label:'GASTOS OPERATIVOS', isSection:true},
+  {label:'Gastos de Administración', y2023:175000, y2024:195000, base:'ventas'},
+  {label:'Gastos de Ventas', y2023:110000, y2024:132000, base:'ventas'},
+  {label:'IT (3%)', y2023:43500, y2024:54375, base:'ventas'},
+  {label:'Depreciación', y2023:52000, y2024:65000, base:'ventas'},
+  {label:'UTILIDAD OPERATIVA', y2023:199500, y2024:242375, isTotal:true, base:'ventas'},
+  {label:'RESULTADO FINANCIERO', isSection:true},
+  {label:'(-) Gastos Financieros', y2023:42500, y2024:68000, base:'ventas'},
+  {label:'UTILIDAD ANTES DE IUE', y2023:157000, y2024:174375, isTotal:true, base:'ventas'},
+  {label:'(-) IUE (25%)', y2023:39250, y2024:43594, base:'ventas'},
+  {label:'UTILIDAD NETA', y2023:117750, y2024:130781, isTotal:true, isMain:true, base:'ventas'}
+ ];
+
+ var activeTab = 'vertical';
+
+ function fmtNum(n) { return n.toLocaleString('es-BO'); }
+
+ function fmtPct(n) { return n >= 0 ? '+' + n.toFixed(1) + '%' : n.toFixed(1) + '%'; }
+
+ function buildVerticalBG() {
+  var totalActivo = bgData[10].y2024; // TOTAL ACTIVO y2024 = 1,306,000
+  var table = '<table class="analysis-table"><tr><th>Cuenta</th><th>2023 (Bs)</th><th>2024 (Bs)</th><th>AV 2023</th><th>AV 2024</th></tr>';
+  var total2023 = bgData[10].y2023; // 1,040,000
+  bgData.forEach(function(r) {
+   if (r.isSection) {
+    table += '<tr class="section"><td colspan="5">'+r.label+'</td></tr>';
+    return;
+   }
+   if (r.isSub) {
+    table += '<tr><td style="color:#6ee7b7;font-weight:600;">'+r.label+'</td><td></td><td></td><td></td><td></td></tr>';
+    return;
+   }
+   var av23 = r.y2023 ? ((r.y2023 / total2023)*100).toFixed(1)+'%' : '-';
+   var av24 = r.y2024 ? ((r.y2024 / totalActivo)*100).toFixed(1)+'%' : '-';
+   var cls = r.isTotal ? 'total' : '';
+   table += '<tr class="'+cls+'"><td>'+r.label+'</td><td class="amt">'+fmtNum(r.y2023||0)+'</td><td class="amt">'+fmtNum(r.y2024||0)+'</td><td class="amt">'+av23+'</td><td class="amt">'+av24+'</td></tr>';
+  });
+  table += '</table>';
+  table += '<p style="color:#8899bb;font-size:0.8rem;margin-top:0.5rem;">Base AV: Activo Total (2023: Bs '+fmtNum(total2023)+', 2024: Bs '+fmtNum(totalActivo)+')</p>';
+  return table;
+ }
+
+ function buildVerticalERR() {
+  var ventas2024 = errData[1].y2024; // 1,812,500
+  var ventas2023 = errData[1].y2023; // 1,450,000
+  var table = '<table class="analysis-table"><tr><th>Cuenta</th><th>2023 (Bs)</th><th>2024 (Bs)</th><th>AV 2023</th><th>AV 2024</th></tr>';
+  errData.forEach(function(r) {
+   if (r.isSection) {
+    table += '<tr class="section"><td colspan="5">'+r.label+'</td></tr>';
+    return;
+   }
+   var av23 = r.y2023 ? ((r.y2023 / ventas2023)*100).toFixed(1)+'%' : '-';
+   var av24 = r.y2024 ? ((r.y2024 / ventas2024)*100).toFixed(1)+'%' : '-';
+   var cls = r.isTotal ? 'total' : '';
+   var labelCls = r.isMain ? 'color:#6ee7b7;' : '';
+   table += '<tr class="'+cls+'"><td style="'+labelCls+'">'+r.label+'</td><td class="amt">'+fmtNum(r.y2023||0)+'</td><td class="amt">'+fmtNum(r.y2024||0)+'</td><td class="amt">'+av23+'</td><td class="amt">'+av24+'</td></tr>';
+  });
+  table += '</table>';
+  table += '<p style="color:#8899bb;font-size:0.8rem;margin-top:0.5rem;">Base AV: Ventas Netas (2023: Bs '+fmtNum(ventas2023)+', 2024: Bs '+fmtNum(ventas2024)+')</p>';
+  return table;
+ }
+
+ function buildHorizontalBG() {
+  var table = '<table class="analysis-table"><tr><th>Cuenta</th><th>2023 (Bs)</th><th>2024 (Bs)</th><th>Δ Absoluta</th><th>AH (%)</th></tr>';
+  bgData.forEach(function(r) {
+   if (r.isSection || r.isSub) {
+    var cls = r.isSection ? 'section' : '';
+    var style = r.isSub ? 'color:#6ee7b7;font-weight:600;' : '';
+    table += '<tr class="'+cls+'"><td style="'+style+'">'+r.label+'</td><td></td><td></td><td></td><td></td></tr>';
+    return;
+   }
+   if (!r.y2023 || !r.y2024) return;
+   var diff = r.y2024 - r.y2023;
+   var pct = r.y2023 !== 0 ? ((diff / Math.abs(r.y2023)) * 100) : 0;
+   var pctStr = fmtPct(pct);
+   var diffStr = (diff >= 0 ? '+' : '') + fmtNum(diff);
+   var colorClass = '';
+   if (Math.abs(pct) > 10) {
+    colorClass = pct >= 0 ? 'green-up' : 'red-down';
+   }
+   var cls = r.isTotal ? 'total' : '';
+   table += '<tr class="'+cls+'"><td>'+r.label+'</td><td class="amt">'+fmtNum(r.y2023)+'</td><td class="amt">'+fmtNum(r.y2024)+'</td><td class="amt '+colorClass+'">'+diffStr+'</td><td class="amt '+colorClass+'">'+pctStr+'</td></tr>';
+  });
+  table += '</table>';
+  return table;
+ }
+
+ function buildHorizontalERR() {
+  var table = '<table class="analysis-table"><tr><th>Cuenta</th><th>2023 (Bs)</th><th>2024 (Bs)</th><th>Δ Absoluta</th><th>AH (%)</th></tr>';
+  errData.forEach(function(r) {
+   if (r.isSection) {
+    table += '<tr class="section"><td colspan="5">'+r.label+'</td></tr>';
+    return;
+   }
+   if (!r.y2023 || !r.y2024) return;
+   var diff = r.y2024 - r.y2023;
+   var pct = r.y2023 !== 0 ? ((diff / Math.abs(r.y2023)) * 100) : 0;
+   var pctStr = fmtPct(pct);
+   var diffStr = (diff >= 0 ? '+' : '') + fmtNum(diff);
+   var colorClass = '';
+   if (Math.abs(pct) > 10) {
+    colorClass = pct >= 0 ? 'green-up' : 'red-down';
+   }
+   var cls = r.isTotal ? 'total' : '';
+   table += '<tr class="'+cls+'"><td>'+r.label+'</td><td class="amt">'+fmtNum(r.y2023)+'</td><td class="amt">'+fmtNum(r.y2024)+'</td><td class="amt '+colorClass+'">'+diffStr+'</td><td class="amt '+colorClass+'">'+pctStr+'</td></tr>';
+  });
+  table += '</table>';
+  return table;
+ }
+
+ function renderAnalysis(tab) {
+  var container = document.getElementById('analysisContainer');
+  switch(tab) {
+   case 'vertical': container.innerHTML = buildVerticalBG(); break;
+   case 'vertical_err': container.innerHTML = buildVerticalERR(); break;
+   case 'horizontal_bg': container.innerHTML = buildHorizontalBG(); break;
+   case 'horizontal_err': container.innerHTML = buildHorizontalERR(); break;
+  }
+ }
+
+ document.querySelectorAll('.tab-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+   document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+   btn.classList.add('active');
+   activeTab = btn.dataset.tab;
+   renderAnalysis(activeTab);
+  });
+ });
+
+ renderAnalysis('vertical');
+
+ // --- Quiz ---
+ var correctAnswers = { 0:1, 1:0, 2:1, 3:1, 4:1 };
+ var userAnswers = {};
+ var quizCompleted = false;
+
+ document.querySelectorAll('.opt').forEach(function(el) {
+  el.addEventListener('click', function() {
+   if (quizCompleted) return;
+   var parent = el.parentElement;
+   parent.querySelectorAll('.opt').forEach(function(o) { o.classList.remove('selected'); });
+   el.classList.add('selected');
+   userAnswers[el.dataset.q] = parseInt(el.dataset.a);
+  });
+ });
+
+ document.getElementById('submitQuizBtn').addEventListener('click', function() {
+  if (quizCompleted) return;
+  var keys = Object.keys(correctAnswers);
+  var allAnswered = keys.every(function(k) { return userAnswers[k] !== undefined; });
+  if (!allAnswered) { alert('Responde todas las preguntas.'); return; }
+  quizCompleted = true;
+  var correct = 0;
+  keys.forEach(function(k) { if (userAnswers[k] === correctAnswers[k]) correct++; });
+  keys.forEach(function(k) {
+   var qIdx = parseInt(k);
+   document.querySelectorAll('[data-q="'+qIdx+'"]').forEach(function(opt) {
+    var a = parseInt(opt.dataset.a);
+    if (a === correctAnswers[k]) opt.classList.add('correct');
+    if (userAnswers[k] === a && a !== correctAnswers[k]) opt.classList.add('wrong');
+   });
+  });
+  var passed = correct >= 3;
+  var fa = document.getElementById('feedbackArea');
+  fa.classList.remove('hidden');
+  if (passed) {
+   fa.innerHTML = '<div class="feedback-msg pass"><i class="fas fa-check-circle"></i> ' + correct + ' de 5 correctas. ¡Análisis vertical y horizontal dominado!</div>';
+   document.getElementById('insigniaArea').classList.remove('hidden');
+   document.getElementById('nextPageBtn').classList.remove('hidden');
+   document.getElementById('submitQuizBtn').disabled = true;
+   localStorage.setItem('aef_08', 'true');
+  } else {
+   fa.innerHTML = '<div class="feedback-msg fail"><i class="fas fa-times-circle"></i> ' + correct + ' de 5 correctas. Necesitas 3.</div>';
+   quizCompleted = false;
+  }
+ });
+
+ if (localStorage.getItem('aef_08') === 'true') {
+  quizCompleted = true;
+  document.getElementById('insigniaArea').classList.remove('hidden');
+  document.getElementById('nextPageBtn').classList.remove('hidden');
+  document.getElementById('submitQuizBtn').disabled = true;
+  document.getElementById('feedbackArea').classList.remove('hidden');
+  document.getElementById('feedbackArea').innerHTML = '<div class="feedback-msg pass"><i class="fas fa-check-circle"></i> Ya completaste este módulo.</div>';
+ }
+})();
+</script>
+</body>
+</html>
