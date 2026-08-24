@@ -819,58 +819,6 @@ console.log('%cInterested in the code? Check out the GitHub repo!', 'color: #a85
 })();
 
 // ============================================
-// FEATURE 2: RADAR CHART DE SKILLS
-// ============================================
-(function(){
-  function createRadarChart(){
-    var canvas = document.getElementById('skillsRadar');
-    if(!canvas || typeof Chart === 'undefined') return;
-    var ctx = canvas.getContext('2d');
-    new Chart(ctx, {
-      type: 'radar',
-      data: {
-        labels: ['Python', 'JavaScript/TS', 'Solidity', 'MQL5', 'C++', 'SQL', 'React/Next.js', 'Node.js'],
-        datasets: [{
-          label: 'Nivel de Habilidad',
-          data: [95, 85, 80, 85, 70, 90, 75, 80],
-          backgroundColor: 'rgba(0,212,255,0.15)',
-          borderColor: 'rgba(0,212,255,0.8)',
-          borderWidth: 2,
-          pointBackgroundColor: 'rgba(0,255,65,0.9)',
-          pointBorderColor: '#00ff41',
-          pointHoverBackgroundColor: '#a855f7',
-          pointHoverBorderColor: '#a855f7',
-          pointRadius: 4,
-          pointHoverRadius: 6
-        }]
-      },
-      options: {
-        animation: { duration: 1500, easing: 'easeOutQuart' },
-        responsive: true,
-        maintainAspectRatio: true,
-        plugins: { legend: { display: false } },
-        scales: {
-          r: {
-            beginAtZero: true,
-            max: 100,
-            ticks: { display: false, stepSize: 20 },
-            pointLabels: { color: '#aaa', font: { size: 11, family: "'JetBrains Mono', monospace" } },
-            grid: { color: 'rgba(255,255,255,0.08)' },
-            angleLines: { color: 'rgba(255,255,255,0.08)' }
-          }
-        }
-      }
-    });
-  }
-
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', createRadarChart);
-  } else {
-    createRadarChart();
-  }
-})();
-
-// ============================================
 // FEATURE 3: EASTER EGGS — KONAMI CODE
 // ============================================
 (function(){
