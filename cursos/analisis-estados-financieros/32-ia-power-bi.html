@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+ <meta charset="UTF-8">
+ <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Análisis de Estados Financieros | IA y Power BI Aplicadas al Análisis</title>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+   background: linear-gradient(135deg, #0a1a14 0%, #0c1f18 100%);
+   font-family: 'Inter', sans-serif;
+   color: #eef5ff;
+   min-height: 100vh;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   padding: 2rem 1rem;
+  }
+  .course-container {
+   max-width: 1300px;
+   width: 100%;
+   background: rgba(10, 30, 22, 0.7);
+   backdrop-filter: blur(12px);
+   border-radius: 3rem;
+   border: 1px solid rgba(16, 185, 129, 0.25);
+   box-shadow: 0 25px 45px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(16, 185, 129, 0.1) inset;
+   overflow: hidden;
+  }
+  .hero-header {
+   background: linear-gradient(95deg, #091a12 0%, #0f2a1e 100%);
+   padding: 2rem 2rem 1.5rem 2rem;
+   text-align: center;
+   border-bottom: 2px solid #10b981;
+  }
+  .hero-header h1 {
+   font-size: 2.2rem;
+   font-weight: 800;
+   background: linear-gradient(135deg, #FFF, #6ee7b7, #10b981);
+   -webkit-background-clip: text;
+   background-clip: text;
+   color: transparent;
+   letter-spacing: -0.01em;
+   text-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  }
+  .hero-header p { font-size: 1.2rem; color: #a7f3d0; margin-top: 0.5rem; font-weight: 500; }
+  .badge-area { display: flex; justify-content: center; gap: 1rem; margin-top: 1.2rem; flex-wrap: wrap; }
+  .chip {
+   background: rgba(16, 185, 129, 0.15);
+   border: 1px solid #10b981;
+   padding: 0.4rem 1rem;
+   border-radius: 40px;
+   font-size: 0.8rem;
+   font-weight: 600;
+   backdrop-filter: blur(4px);
+   color: #6ee7b7;
+  }
+  .section-card {
+   background: rgba(0, 15, 10, 0.7);
+   border-radius: 2rem;
+   padding: 1.5rem;
+   margin: 1.5rem 2rem;
+   border: 1px solid rgba(16, 185, 129, 0.3);
+   backdrop-filter: blur(8px);
+  }
+  .section-card h2 { font-size: 1.5rem; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.6rem; color: #6ee7b7; }
+  .section-card h3 { color: #34d399; margin: 0.8rem 0 0.4rem; font-size: 1.15rem; }
+  .section-card p, .section-card li { color: #b9ccee; line-height: 1.6; font-size: 0.95rem; }
+  .section-card ul, .section-card ol { padding-left: 1.5rem; margin: 0.4rem 0; }
+  .section-card ul li, .section-card ol li { margin: 0.3rem 0; }
+  .formula-box {
+   background: rgba(16, 185, 129, 0.1);
+   border: 1px solid #10b981;
+   border-radius: 1rem;
+   padding: 0.8rem 1rem;
+   margin: 0.6rem 0;
+   text-align: center;
+   font-weight: 600;
+   color: #6ee7b7;
+   font-size: 1.05rem;
+  }
+  .analogy-box {
+   background: linear-gradient(135deg, #0f231a, #152e22);
+   border-left: 4px solid #10b981;
+   border-radius: 1.2rem;
+   padding: 1rem 1.2rem;
+   margin: 1rem 0;
+   font-style: italic;
+   color: #a7f3d0;
+  }
+  .analogy-box i { color: #10b981; margin-right: 0.5rem; }
+  .objectives {
+   background: rgba(16, 185, 129, 0.1);
+   border-radius: 1.5rem;
+   padding: 1rem 1.5rem;
+   margin: 1rem 0;
+   border: 1px solid rgba(16, 185, 129, 0.3);
+  }
+  .objectives h3 { color: #10b981; font-size: 1.1rem; margin-bottom: 0.7rem; }
+  .objectives li { color: #b9ccee; font-size: 0.9rem; margin: 0.4rem 0; list-style: none; }
+  .objectives li::before { content: "🎯 "; }
+  .question {
+   background: #0f1a2c;
+   margin: 1rem 0;
+   padding: 1rem;
+   border-radius: 1.2rem;
+   border: 1px solid rgba(16, 185, 129, 0.15);
+  }
+  .question p { font-weight: 600; margin-bottom: 0.5rem; }
+  .options { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+  .opt {
+   background: #1e2a3e;
+   padding: 0.4rem 1rem;
+   border-radius: 2rem;
+   cursor: pointer;
+   transition: 0.2s;
+   font-size: 0.9rem;
+   color: #eef5ff;
+  }
+  .opt:hover { background: #2c3e66; transform: translateY(-2px); }
+  .opt.selected { background: #10b981; color: #000; font-weight: bold; box-shadow: 0 0 8px #10b981; }
+  .opt.correct { background: #00e676; color: #000; }
+  .opt.wrong { background: #ff5252; color: #fff; }
+  .btn-submit {
+   background: linear-gradient(95deg, #10b981, #34d399);
+   border: none;
+   padding: 0.8rem 1.8rem;
+   font-weight: bold;
+   border-radius: 3rem;
+   margin-top: 1rem;
+   cursor: pointer;
+   font-size: 1rem;
+   transition: 0.2s;
+   font-family: 'Inter', sans-serif;
+   color: #000;
+  }
+  .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-submit:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); }
+  .insignia {
+   text-align: center;
+   background: #0c1b2f;
+   border-radius: 2rem;
+   margin-top: 1.5rem;
+   padding: 1.2rem;
+   border: 2px dashed gold;
+   animation: pulsegold 2s infinite;
+  }
+  @keyframes pulsegold {
+   0%, 100% { box-shadow: 0 0 10px rgba(255,215,0,0.3); }
+   50% { box-shadow: 0 0 25px rgba(255,215,0,0.6); }
+  }
+  .insignia i { font-size: 2.5rem; color: gold; }
+  .insignia h3 { color: gold; margin: 0.5rem 0; }
+  .insignia p { color: #b9ccee; }
+  .hidden { display: none; }
+  .next-btn {
+   background: #10b981;
+   border: none;
+   padding: 0.8rem 2rem;
+   border-radius: 3rem;
+   font-weight: bold;
+   color: #000;
+   margin-top: 1rem;
+   width: 100%;
+   cursor: pointer;
+   font-family: 'Inter', sans-serif;
+   font-size: 1rem;
+   transition: 0.2s;
+  }
+  .next-btn:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); }
+  .simulator-box {
+   background: #0f1a2c;
+   border-radius: 1.5rem;
+   padding: 1.2rem;
+   margin: 1rem 0;
+   border: 1px solid rgba(16, 185, 129, 0.3);
+  }
+  .simulator-box label { color: #a7f3d0; font-weight: 600; font-size: 0.9rem; min-width: 200px; }
+  .simulator-box select, .simulator-box input[type="text"] {
+   background: #1e2a3e;
+   border: 1px solid rgba(16, 185, 129, 0.3);
+   color: #eef5ff;
+   padding: 0.4rem 0.8rem;
+   border-radius: 0.6rem;
+   font-family: 'Inter', sans-serif;
+   font-size: 0.9rem;
+   max-width: 100%;
+  }
+  .sim-btn {
+   background: #10b981;
+   color: #000;
+   font-weight: 700;
+   border: none;
+   padding: 0.5rem 1.2rem;
+   border-radius: 2rem;
+   cursor: pointer;
+   transition: 0.2s;
+   font-family: 'Inter', sans-serif;
+  }
+  .sim-btn:hover { transform: scale(1.05); box-shadow: 0 0 10px rgba(16, 185, 129, 0.4); }
+  .result-display {
+   background: rgba(16, 185, 129, 0.1);
+   border-radius: 1rem;
+   padding: 0.8rem 1rem;
+   margin: 0.5rem 0;
+   font-weight: 600;
+   color: #6ee7b7;
+   font-size: 0.95rem;
+  }
+  .prompt-out {
+   background: #0a0f1e;
+   border: 1px solid rgba(16,185,129,0.3);
+   border-radius: 0.8rem;
+   padding: 0.8rem 1rem;
+   margin: 0.6rem 0;
+   font-size: 0.88rem;
+   color: #d1fae5;
+   line-height: 1.6;
+   white-space: pre-wrap;
+  }
+  .example-step {
+   background: rgba(0,0,0,0.4);
+   border-left: 3px solid #34d399;
+   border-radius: 0.5rem;
+   padding: 0.6rem 0.8rem;
+   margin: 0.5rem 0;
+   color: #a7f3d0;
+   font-size: 0.9rem;
+  }
+  .info-panel {
+   background: rgba(0, 0, 0, 0.3);
+   border-radius: 1rem;
+   padding: 1rem;
+   margin: 0.8rem 0;
+   border: 1px solid rgba(16, 185, 129, 0.15);
+  }
+  .info-panel h4 { color: #34d399; margin-bottom: 0.5rem; font-size: 1rem; }
+  .info-panel p, .info-panel li { color: #b9ccee; line-height: 1.6; font-size: 0.9rem; }
+  .code-box {
+   background: #0a0f1e;
+   border: 1px solid rgba(16,185,129,0.3);
+   border-radius: 0.8rem;
+   padding: 0.8rem 1rem;
+   margin: 0.6rem 0;
+   font-family: Consolas, monospace;
+   font-size: 0.85rem;
+   color: #6ee7b7;
+   overflow-x: auto;
+   white-space: pre;
+  }
+  footer { text-align: center; padding: 1.2rem; font-size: 0.8rem; border-top: 1px solid rgba(16, 185, 129, 0.2); }
+  .nav-links { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; padding: 1.5rem 2rem; }
+  .nav-link {
+   background: #1a2e26;
+   border: none;
+   padding: 0.7rem 1.5rem;
+   border-radius: 3rem;
+   font-weight: 600;
+   cursor: pointer;
+   text-decoration: none;
+   color: #eef5ff;
+   display: inline-flex;
+   align-items: center;
+   gap: 0.5rem;
+   transition: 0.2s;
+   font-size: 0.95rem;
+  }
+  .nav-link:hover { transform: translateY(-2px); box-shadow: 0 0 10px rgba(16, 185, 129, 0.4); }
+  .nav-link.prev { background: #1a2e26; color: #eef5ff; border: 1px solid rgba(16, 185, 129, 0.3); }
+  .nav-link.next { background: linear-gradient(95deg, #10b981, #34d399); color: #000; }
+  .nav-link.menu { background: #15261f; border: 1px solid #10b981; }
+  .feedback-msg { margin-top: 0.8rem; padding: 0.6rem 1rem; border-radius: 1rem; font-weight: 600; font-size: 0.9rem; }
+  .feedback-msg.pass { background: rgba(0, 230, 118, 0.2); color: #00e676; border: 1px solid #00e676; }
+  .feedback-msg.fail { background: rgba(255, 82, 82, 0.2); color: #ff5252; border: 1px solid #ff5252; }
+  .module-recap {
+   background: rgba(16, 185, 129, 0.08);
+   border-radius: 1.5rem;
+   padding: 1rem 1.5rem;
+   margin: 1.5rem 2rem;
+   border: 1px dashed rgba(16, 185, 129, 0.4);
+  }
+  .module-recap h3 { color: #10b981; font-size: 1rem; margin-bottom: 0.5rem; }
+  .module-recap li { color: #8899bb; font-size: 0.85rem; margin: 0.3rem 0; }
+  @media (max-width: 800px) {
+   .hero-header h1 { font-size: 1.7rem; }
+   .section-card { margin: 1rem; padding: 1rem; }
+  }
+ </style>
+ <link rel="stylesheet" href="../../assets/css/theme.css">
+</head>
+<body>
+ <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+
+<div class="course-container">
+ <div class="hero-header">
+  <h1><i class="fas fa-robot"></i> IA Y POWER BI EN ACCIÓN</h1>
+  <p>Del Excel al dashboard: analiza con IA y presenta como un profesional</p>
+  <div class="badge-area">
+   <span class="chip"><i class="fas fa-brain"></i> Prompts de analista</span>
+   <span class="chip"><i class="fas fa-chart-bar"></i> DAX esencial</span>
+   <span class="chip"><i class="fas fa-medal"></i> Insignia al completar</span>
+  </div>
+ </div>
+
+ <div class="section-card">
+  <div class="analogy-box">
+   <i class="fas fa-lightbulb"></i> <strong>Analogía:</strong> La IA es tu pasante brillante pero recién llegado: rapidísimo, incansable… y capaz de inventar datos con total seguridad si no lo supervisas. Power BI es tu sala de juntas: convierte tus tablas en gráficos que un directorio entiende en 30 segundos. Tú sigues siendo el analista senior: la IA propone, Power BI muestra, <strong>tú firmas</strong>.
+  </div>
+
+  <div class="objectives">
+   <h3>🎯 ¿Qué aprenderás?</h3>
+   <ul>
+    <li>Escribir prompts efectivos para analizar EEFF con IA (y verificar sus respuestas)</li>
+    <li>Armar el modelo de datos y las medidas DAX esenciales de un dashboard financiero</li>
+    <li>Seguir el flujo guiado: de Excel a un dashboard de KPIs con semáforos</li>
+    <li>Aplicar reglas de seguridad: confidencialidad, validación humana y ética</li>
+   </ul>
+  </div>
+ </div>
+
+ <div class="section-card">
+  <h2><i class="fas fa-brain"></i> Panel 1: IA como Asistente del Analista</h2>
+  <div class="info-panel">
+   <h4>💬 La fórmula de un buen prompt financiero</h4>
+   <p><strong>Rol + Datos + Tarea + Formato + Contexto.</strong> Ejemplo: "Actúa como analista financiero senior. Con estos EEFF 2020–2024 de una empresa boliviana de alimentos [pegar tabla], calcula CAGR, márgenes y D/P por año, identifica 3 riesgos 🔴 y redacta un diagnóstico en 4 frases. Usa bolivianos y menciona IUE 25% donde aplique."</p>
+   <h4>✅ Qué SÍ pedirle</h4>
+   <ul>
+    <li>Primer borrador del informe, del resumen ejecutivo o de la lista de riesgos.</li>
+    <li>Explicaciones didácticas ("explícame el GAF como si tuviera 15 años").</li>
+    <li>Revisión de tu propio análisis ("¿qué estoy pasando por alto en estos ratios?").</li>
+    <li>Código DAX, fórmulas de Excel o scripts para automatizar (Módulo 31).</li>
+   </ul>
+   <h4>⛔ Qué NO pedirle (ni creerle sin verificar)</h4>
+   <ul>
+    <li>Cifras "de memoria" (tasas, benchmarks, normas): <strong>alucina con seguridad</strong>. Todo número que dé la IA se verifica contra BBV, ASFI o tus EEFF.</li>
+    <li>El veredicto final sin tu revisión: la IA no conoce el contrabando de tu rubro ni que tu cliente principal está por quebrar.</li>
+    <li>Subir EEFF reales con datos sensibles a servicios públicos (ver Panel 4).</li>
+   </ul>
+  </div>
+ </div>
+
+ <div class="section-card">
+  <h2><i class="fas fa-chart-bar"></i> Panel 2: Power BI — Modelo y DAX Esencial</h2>
+  <div class="info-panel">
+   <h4>🧱 El modelo mínimo (3 tablas)</h4>
+   <ul>
+    <li><strong>Hechos:</strong> una fila por cuenta-año (Cuenta, Año, Monto). Sale directo de tu Power Query del Módulo 31.</li>
+    <li><strong>Cuentas:</strong> catálogo (Código, Nombre, Tipo: Activo/Pasivo/Resultado).</li>
+    <li><strong>Calendario:</strong> tabla de años/períodos para inteligencia de tiempo (imprescindible para comparar vs año anterior).</li>
+   </ul>
+   <h4>📐 4 medidas DAX que resuelven el 80%</h4>
+   <div class="code-box">Ventas = CALCULATE(SUM(Hechos[Monto]), Cuentas[Tipo]="Ventas")
+Margen Neto = DIVIDE([Utilidad Neta], [Ventas])
+Ventas Año Ant = CALCULATE([Ventas], SAMEPERIODLASTYEAR(Calendario[Fecha]))
+Var % Ventas = DIVIDE([Ventas] - [Ventas Año Ant], [Ventas Año Ant])</div>
+   <p><strong>DIVIDE</strong> evita los errores de división entre cero; <strong>CALCULATE</strong> cambia el contexto (filtra por tipo de cuenta); <strong>SAMEPERIODLASTYEAR</strong> habilita las comparaciones interanuales de tus tendencias (Módulo 29).</p>
+  </div>
+ </div>
+
+ <div class="section-card">
+  <h2><i class="fas fa-route"></i> Panel 3: Flujo Guiado — De Excel al Dashboard en 5 Pasos</h2>
+  <div class="example-step"><strong>Paso 1 — Preparar:</strong> tabla de hechos limpia desde Power Query (Módulo 31): Cuenta | Año | Monto, 5 años.</div>
+  <div class="example-step"><strong>Paso 2 — Modelar:</strong> importar a Power BI Desktop (gratuito), relacionar Hechos→Cuentas y Hechos→Calendario.</div>
+  <div class="example-step"><strong>Paso 3 — Medir:</strong> crear las 4 medidas DAX del Panel 2 + tus ratios (liquidez, D/P, ROE, cobertura).</div>
+  <div class="example-step"><strong>Paso 4 — Visualizar:</strong> una página, 6 objetos: tarjetas KPI (ROE, margen, D/P) con semáforo · gráfico de líneas (tendencia 5 años) · barras (vs sector) · matriz de riesgos · tabla de EEFF · segmentador de año.</div>
+  <div class="example-step"><strong>Paso 5 — Contar la historia:</strong> publica, programa actualización mensual y presenta con la plantilla de 4 frases (Módulo 29): tendencia + sector + riesgo + veredicto.</div>
+  <div class="result-display"><strong>Regla de diseño:</strong> si el directorio no entiende el dashboard en 30 segundos, sobran objetos. Un KPI por tarjeta, un mensaje por gráfico, semáforo en todo lo crítico.</div>
+ </div>
+
+ <div class="section-card">
+  <h2><i class="fas fa-user-shield"></i> Panel 4: Seguridad, Privacidad y Ética</h2>
+  <div class="info-panel">
+   <h4>🔒 Tres reglas innegociables</h4>
+   <ul>
+    <li><strong>Confidencialidad:</strong> anonimiza antes de subir a una IA pública (Empresa "X", cifras en miles, sin NIT ni nombres). Para datos reales de clientes, usa herramientas con contrato de privacidad o modelos locales.</li>
+    <li><strong>Validación humana:</strong> recalcula una muestra de cada resultado de la IA (un CAGR, un ratio). Si la muestra falla, se descarta todo el lote.</li>
+    <li><strong>Transparencia:</strong> en tu informe, declara qué partes apoyó la IA y qué verificaste tú. La responsabilidad profesional es tuya: la firma es tu matrícula, no la del chatbot.</li>
+   </ul>
+  </div>
+ </div>
+
+ <div class="section-card">
+  <h2><i class="fas fa-sliders-h"></i> Simulación: Generador de Prompts del Analista</h2>
+  <p style="color:#a7f3d0; margin-bottom:1rem;">Elige el objetivo, el foco y el período. El generador arma un prompt profesional listo para copiar y pegar en tu IA favorita.</p>
+  <div class="simulator-box">
+   <div style="display:flex; flex-wrap:wrap; gap:0.6rem; align-items:center; margin:0.4rem 0;"><label>Objetivo del análisis:</label><select id="prObj"><option value="diagnóstico integral con tendencias, benchmark y riesgos">Diagnóstico integral</option><option value="detección de riesgos financieros con semáforo">Detección de riesgos</option><option value="análisis de tendencias multianual con CAGR e índices">Análisis de tendencias</option><option value="primer borrador del informe ejecutivo">Borrador de informe</option></select></div>
+   <div style="display:flex; flex-wrap:wrap; gap:0.6rem; align-items:center; margin:0.4rem 0;"><label>Empresa / sector:</label><input type="text" id="prEmp" value="empresa boliviana de alimentos" style="width:280px"></div>
+   <div style="display:flex; flex-wrap:wrap; gap:0.6rem; align-items:center; margin:0.4rem 0;"><label>Foco especial:</label><select id="prFoco"><option value="liquidez y capital de trabajo">Liquidez y capital de trabajo</option><option value="endeudamiento y cobertura">Endeudamiento y cobertura</option><option value="rentabilidad y DuPont">Rentabilidad y DuPont</option><option value="punto de equilibrio y apalancamientos">Equilibrio y apalancamientos</option></select></div>
+   <div style="display:flex; flex-wrap:wrap; gap:0.6rem; align-items:center; margin:0.4rem 0;"><label>Período (años):</label><select id="prPer"><option value="5">5 años</option><option value="3">3 años</option><option value="10">10 años</option></select></div>
+   <br>
+   <button class="sim-btn" id="genPromptBtn"><i class="fas fa-wand-magic-sparkles"></i> Generar prompt</button>
+   <button class="sim-btn" id="copyPromptBtn" style="background:#2c3e66;color:#eef5ff;"><i class="fas fa-copy"></i> Copiar</button>
+   <div class="prompt-out" id="promptOut" style="margin-top:1rem;"></div>
+  </div>
+ </div>
+
+ <div class="section-card">
+  <h2><i class="fas fa-pencil-alt"></i> Quiz: IA y Power BI</h2>
+  <p style="color:#a7f3d0; margin-bottom:0.8rem;">Responde las 5 preguntas. Necesitas al menos 4 correctas para ganar la insignia.</p>
+
+  <div id="quizContainer">
+   <div class="question">
+    <p>1. ¿Cuál es el mejor uso de la IA para un analista financiero?</p>
+    <div class="options" data-q="0">
+     <div class="opt" data-a="0">Que audite los EEFF sin que nadie los revise</div>
+     <div class="opt" data-a="1">Generar un primer borrador y verificar cada cifra contra fuentes reales</div>
+     <div class="opt" data-a="2">Reemplazar los estados financieros oficiales</div>
+     <div class="opt" data-a="3">Publicar su respuesta sin leerla</div>
+    </div>
+   </div>
+   <div class="question">
+    <p>2. ¿Para qué sirve DAX en Power BI?</p>
+    <div class="options" data-q="1">
+     <div class="opt" data-a="0">Para diseñar logos del reporte</div>
+     <div class="opt" data-a="1">Para conectar la impresora</div>
+     <div class="opt" data-a="2">Para crear medidas y cálculos (ratios, variaciones, acumulados)</div>
+     <div class="opt" data-a="3">Para instalar Excel</div>
+    </div>
+   </div>
+   <div class="question">
+    <p>3. ¿Qué visual es ideal para mostrar una tendencia de 5 años?</p>
+    <div class="options" data-q="2">
+     <div class="opt" data-a="0">Gráfico de torta en 3D</div>
+     <div class="opt" data-a="1">Gráfico de líneas o de área</div>
+     <div class="opt" data-a="2">Tabla sin formato</div>
+     <div class="opt" data-a="3">Un solo velocímetro</div>
+    </div>
+   </div>
+   <div class="question">
+    <p>4. ¿Para qué se usa SAMEPERIODLASTYEAR en DAX?</p>
+    <div class="options" data-q="3">
+     <div class="opt" data-a="0">Para comparar contra el mismo período del año anterior</div>
+     <div class="opt" data-a="1">Para sumar toda la tabla</div>
+     <div class="opt" data-a="2">Para borrar datos duplicados</div>
+     <div class="opt" data-a="3">Para cambiar los colores del gráfico</div>
+    </div>
+   </div>
+   <div class="question">
+    <p>5. ¿Cuál es el principal riesgo de usar IA con EEFF reales?</p>
+    <div class="options" data-q="4">
+     <div class="opt" data-a="0">Que responda muy rápido</div>
+     <div class="opt" data-a="1">Filtrar datos confidenciales a servicios externos sin control</div>
+     <div class="opt" data-a="2">Que use demasiados decimales</div>
+     <div class="opt" data-a="3">Que responda en inglés</div>
+    </div>
+   </div>
+  </div>
+  <button id="submitQuizBtn" class="btn-submit">Validar respuestas</button>
+  <div id="feedbackArea" class="hidden"></div>
+
+  <div id="insigniaArea" class="insignia hidden">
+   <i class="fas fa-medal"></i>
+   <h3>🤖 ¡INSIGNIA: AI POWER ANALYST! 🤖</h3>
+   <p>Operas el dúo moderno del analista: prompts que sí sirven, DAX esencial, dashboards que se entienden en 30 segundos y ética de datos.</p>
+  </div>
+
+  <button id="nextPageBtn" class="next-btn hidden" onclick="window.location.href='33-certificado.html'">➡️ Siguiente: Certificado Final</button>
+ </div>
+
+ <div class="module-recap">
+  <h3>📌 Resumen del módulo</h3>
+  <ul>
+   <li><strong>Prompt:</strong> Rol + Datos + Tarea + Formato + Contexto. La IA propone, tú verificas y firmas.</li>
+   <li><strong>Modelo BI:</strong> Hechos + Cuentas + Calendario, relacionados.</li>
+   <li><strong>DAX esencial:</strong> CALCULATE, DIVIDE, SAMEPERIODLASTYEAR para KPIs y variaciones.</li>
+   <li><strong>Dashboard:</strong> 1 página, 6 objetos, semáforo en lo crítico, 30 segundos para entenderlo.</li>
+   <li><strong>Ética:</strong> anonimizar, validar muestras, declarar el apoyo de IA.</li>
+  </ul>
+ </div>
+
+ <div style="border:1px solid rgba(16,185,129,0.45);border-radius:16px;padding:1.1rem;margin:1rem 2rem;background:rgba(5,25,15,0.6);">
+  <h2 style="color:#34d399;font-size:1.1rem;margin-bottom:0.6rem;"><i class="fas fa-book-open"></i> Fuentes verificables</h2>
+  <ul style="list-style:none;padding:0;margin:0;font-size:0.85rem;color:rgba(255,255,255,0.85);">
+   <li style="margin:0.4rem 0;"><a href="https://learn.microsoft.com/es-es/power-bi/" target="_blank" rel="noopener" style="color:#34d399;text-decoration:none;font-weight:600;">Microsoft Learn &mdash; Documentación de Power BI</a> <span style="color:rgba(255,255,255,0.55);">&mdash; modelo de datos, DAX y visualizaciones (fuente oficial).</span></li>
+   <li style="margin:0.4rem 0;"><a href="https://support.microsoft.com/es-es/excel" target="_blank" rel="noopener" style="color:#34d399;text-decoration:none;font-weight:600;">Soporte de Microsoft Excel</a> <span style="color:rgba(255,255,255,0.55);">&mdash; base para preparar los datos que alimentan Power BI.</span></li>
+   <li style="margin:0.4rem 0;"><a href="https://www.bcb.gob.bo/?q=cotizaciones_tc" target="_blank" rel="noopener" style="color:#34d399;text-decoration:none;font-weight:600;">Banco Central de Bolivia &mdash; Cotizaciones del dólar</a> <span style="color:rgba(255,255,255,0.55);">&mdash; tipo de cambio oficial diario (régimen flexible desde junio de 2026).</span></li>
+   <li style="margin:0.4rem 0;"><a href="https://www.bbv.com.bo/" target="_blank" rel="noopener" style="color:#34d399;text-decoration:none;font-weight:600;">Bolsa Boliviana de Valores (BBV)</a> <span style="color:rgba(255,255,255,0.55);">&mdash; datos reales para practicar tu primer dashboard.</span></li>
+  </ul>
+ </div>
+
+ <div class="nav-links">
+  <a href="31-herramientas-digitales.html" class="nav-link prev"><i class="fas fa-arrow-left"></i> Anterior</a>
+  <a href="index.html" class="nav-link menu"><i class="fas fa-home"></i> Menú</a>
+  <a href="33-certificado.html" class="nav-link next">Siguiente <i class="fas fa-arrow-right"></i></a>
+ </div>
+
+ <footer>
+  <i class="fas fa-chart-bar"></i> Aprende Jugando · Análisis e Interpretación de Estados Financieros · Módulo 32
+ </footer>
+</div>
+
+<script>
+(function() {
+  var correctAnswers = { 0: 1, 1: 2, 2: 1, 3: 0, 4: 1 };
+  var userAnswers = {};
+  var quizCompleted = false;
+  var PROGRESS_KEY = 'aef_progress';
+  var MODULE_KEY = 'aef_32';
+
+  document.querySelectorAll('.opt').forEach(function(el) {
+    el.addEventListener('click', function() {
+      if (quizCompleted) return;
+      var parent = el.closest('.options');
+      parent.querySelectorAll('.opt').forEach(function(o) { o.classList.remove('selected'); });
+      el.classList.add('selected');
+      userAnswers[parseInt(parent.dataset.q)] = parseInt(el.dataset.a);
+    });
+  });
+
+  document.getElementById('submitQuizBtn').addEventListener('click', function() {
+    if (quizCompleted) return;
+    var allAnswered = Object.keys(correctAnswers).every(function(k) { return userAnswers[k] !== undefined; });
+    if (!allAnswered) { alert("Responde todas las preguntas antes de validar."); return; }
+    var correct = 0;
+    Object.keys(correctAnswers).forEach(function(k) {
+      if (userAnswers[k] === correctAnswers[k]) correct++;
+    });
+    var passed = correct >= 4;
+    var fa = document.getElementById('feedbackArea');
+    fa.classList.remove('hidden');
+    document.querySelectorAll('.opt').forEach(function(o) {
+      var q = parseInt(o.closest('.options').dataset.q);
+      var a = parseInt(o.dataset.a);
+      if (a === correctAnswers[q]) o.classList.add('correct');
+      if (o.classList.contains('selected') && a !== correctAnswers[q]) o.classList.add('wrong');
+    });
+    if (passed) {
+      fa.innerHTML = '<div class="feedback-msg pass"><i class="fas fa-check-circle"></i> ' + correct + ' de 5 correctas. ¡Eres un AI Power Analyst!</div>';
+      quizCompleted = true;
+      document.getElementById('insigniaArea').classList.remove('hidden');
+      document.getElementById('nextPageBtn').classList.remove('hidden');
+      document.getElementById('submitQuizBtn').disabled = true;
+      localStorage.setItem(MODULE_KEY, 'true');
+      var progress = JSON.parse(localStorage.getItem(PROGRESS_KEY) || '[]');
+      if (!progress.includes(MODULE_KEY)) progress.push(MODULE_KEY);
+      localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress));
+    } else {
+      fa.innerHTML = '<div class="feedback-msg fail"><i class="fas fa-times-circle"></i> ' + correct + ' de 5 correctas. Necesitas al menos 4. ¡Revisa y reintenta!</div>';
+      setTimeout(function() {
+        document.querySelectorAll('.opt').forEach(function(o) { o.classList.remove('correct','wrong','selected'); });
+        userAnswers = {};
+        fa.classList.add('hidden');
+      }, 2500);
+    }
+  });
+
+  function genPrompt() {
+    var obj = document.getElementById('prObj').value;
+    var emp = (document.getElementById('prEmp').value || 'una empresa').trim();
+    var foco = document.getElementById('prFoco').value;
+    var per = document.getElementById('prPer').value;
+    var txt = 'Actúa como analista financiero senior en Bolivia.\n\n';
+    txt += 'TAREA: Haz un ' + obj + ' de ' + emp + ' con ' + per + ' años de EEFF (pegaré la tabla abajo).\n\n';
+    txt += 'INCLUYE:\n1) Tabla año por año: ventas, margen neto, ROE, deuda/patrimonio y cobertura de intereses.\n';
+    txt += '2) Foco especial en ' + foco + '.\n';
+    txt += '3) Diagnóstico en 4 frases: tendencia + sector + riesgo (semáforo) + veredicto.\n';
+    txt += '4) Tres recomendaciones priorizadas.\n\n';
+    txt += 'CONTEXTO: cifras en bolivianos, IUE 25%, tipo de cambio oficial flexible (≈Bs 11 por USD en 2026).\n';
+    txt += 'REGLA: si un dato no está en mi tabla, dilo explícitamente; no inventes cifras.\n\n';
+    txt += '[Pega aquí tu tabla: Cuenta | Año 1 | ... | Año ' + per + ']';
+    document.getElementById('promptOut').textContent = txt;
+  }
+  document.getElementById('genPromptBtn').addEventListener('click', genPrompt);
+  document.getElementById('copyPromptBtn').addEventListener('click', function() {
+    var t = document.getElementById('promptOut').textContent;
+    if (!t) { alert('Primero genera el prompt.'); return; }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(t).then(function() { alert('Prompt copiado. Pégalo en tu IA favorita.'); });
+    } else {
+      var ta = document.createElement('textarea');
+      ta.value = t; document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); alert('Prompt copiado.'); } catch (e) { alert('Copia el texto manualmente.'); }
+      document.body.removeChild(ta);
+    }
+  });
+
+  if (localStorage.getItem(MODULE_KEY) === 'true') {
+    quizCompleted = true;
+    document.getElementById('insigniaArea').classList.remove('hidden');
+    document.getElementById('nextPageBtn').classList.remove('hidden');
+    document.getElementById('submitQuizBtn').disabled = true;
+  }
+
+  genPrompt();
+})();
+</script>
+</body>
+</html>
