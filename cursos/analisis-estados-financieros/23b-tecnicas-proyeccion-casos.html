@@ -1,0 +1,1517 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+ <meta charset="UTF-8">
+ <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+ <title>Análisis EEFF | Taller de Técnicas de Proyección (Módulo 23-B)</title>
+ <meta name="description" content="Taller paso a paso de 9 técnicas de proyección financiera con un caso boliviano: CAGR, regresión, deflactación con IPC, estacionalidad, suavizado exponencial, presupuesto maestro, FER, presupuesto de caja con IUE-IT y Monte Carlo.">
+ <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+ <link rel="stylesheet" href="../../assets/css/theme.css">
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" integrity="sha384-bs/nf9FbdNouRbMiFcrcZfLXYPKiPaGVGplVbv7dLGECccEXDW+S3zjqSKR5ZEaD" crossorigin="anonymous"></script>
+ <style>
+  :root {
+   --bg1:#0a1a12; --bg2:#0f1f15; --panel:rgba(5,25,15,0.72); --panel2:rgba(0,0,0,0.22);
+   --line:rgba(16,185,129,0.22); --line2:rgba(16,185,129,0.45);
+   --g1:#34d399; --g2:#10b981; --g3:#059669; --mint:#a7f3d0; --text:#eef5ee; --soft:#b9cec0; --dim:rgba(255,255,255,0.55);
+   --amber:#fbbf24; --red:#f87171; --blue:#60a5fa; --violet:#a78bfa;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { background:linear-gradient(145deg,var(--bg1),#0c1a0f,var(--bg2)); font-family:'Inter',sans-serif; color:var(--text); min-height:100vh; padding:3.5rem 1rem 2rem; }
+  .course-container { max-width:1180px; margin:0 auto; background:rgba(10,30,20,0.88); backdrop-filter:blur(12px); border-radius:2.2rem; border:1px solid rgba(16,185,129,0.3); box-shadow:0 25px 50px rgba(0,0,0,0.55); overflow:hidden; overflow:clip; }
+  .progress-bar { display:flex; align-items:center; gap:0.75rem; padding:0.6rem 2rem; background:rgba(0,0,0,0.25); }
+  .progress-outer { flex:1; height:8px; background:rgba(255,255,255,0.08); border-radius:10px; overflow:hidden; }
+  .progress-fill { height:100%; width:0; background:linear-gradient(90deg,var(--g1),var(--g2),var(--g3)); border-radius:10px; transition:width 0.5s; }
+  .progress-text { font-size:0.78rem; color:var(--dim); white-space:nowrap; }
+  .hero-header { background:linear-gradient(95deg,#0a1f14,#0d2a1a); padding:2.2rem 2rem 1.6rem; text-align:center; border-bottom:3px solid var(--g2); }
+  .hero-header .kicker { font-size:0.75rem; letter-spacing:3px; text-transform:uppercase; color:var(--g2); font-weight:700; }
+  .hero-header h1 { font-size:2.1rem; font-weight:800; line-height:1.15; margin-top:0.4rem; background:linear-gradient(135deg,#fff,var(--g1),var(--g2)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero-header p { margin:0.6rem auto 0; max-width:780px; font-size:1rem; color:var(--mint); line-height:1.5; }
+  .chips { display:flex; justify-content:center; flex-wrap:wrap; gap:0.5rem; margin-top:1rem; }
+  .chip { background:rgba(16,185,129,0.13); border:1px solid var(--g2); padding:0.3rem 0.85rem; border-radius:40px; font-size:0.75rem; font-weight:600; color:#6ee7b7; }
+  section.block { margin:1.4rem 2rem; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:1.4rem; padding:1.3rem 1.4rem; }
+  .card h2 { font-size:1.3rem; color:var(--g1); margin-bottom:0.7rem; display:flex; align-items:center; gap:0.55rem; }
+  .card h3 { font-size:1.02rem; color:var(--g1); margin:1rem 0 0.45rem; }
+  .card p, .card li { color:var(--soft); font-size:0.92rem; line-height:1.6; }
+  .card ul, .card ol { padding-left:1.3rem; margin:0.35rem 0; }
+  .card li { margin:0.25rem 0; }
+  strong.hl { color:var(--g1); }
+  .analogy { background:linear-gradient(135deg,#0f231a,#152e22); border-left:4px solid var(--g2); border-radius:1rem; padding:0.95rem 1.15rem; margin:0.8rem 0; color:var(--mint); font-size:0.92rem; line-height:1.55; }
+  .analogy i { color:var(--g2); margin-right:0.35rem; }
+  .callout { border-radius:1rem; padding:0.85rem 1.1rem; margin:0.8rem 0; font-size:0.88rem; line-height:1.55; }
+  .callout b { display:block; margin-bottom:0.2rem; }
+  .callout.bo { background:rgba(251,191,36,0.07); border:1px solid rgba(251,191,36,0.35); color:#fde68a; }
+  .callout.bo b { color:var(--amber); }
+  .callout.warn { background:rgba(248,113,113,0.07); border:1px solid rgba(248,113,113,0.35); color:#fecaca; }
+  .callout.warn b { color:var(--red); }
+  .callout.info { background:rgba(96,165,250,0.07); border:1px solid rgba(96,165,250,0.35); color:#dbeafe; }
+  .callout.info b { color:var(--blue); }
+  .formula { background:rgba(16,185,129,0.1); border:1px solid var(--g2); border-radius:0.9rem; padding:0.75rem 1rem; margin:0.7rem 0; text-align:center; font-family:'JetBrains Mono',monospace; font-size:0.95rem; color:#6ee7b7; overflow-x:auto; }
+  .formula small { display:block; font-family:'Inter',sans-serif; color:var(--dim); font-size:0.74rem; margin-top:0.35rem; }
+  .table-wrap { overflow-x:auto; margin:0.6rem 0; border-radius:0.8rem; border:1px solid var(--line); }
+  table.dt { width:100%; border-collapse:collapse; font-size:0.82rem; min-width:460px; }
+  table.dt th { background:rgba(16,185,129,0.14); color:var(--g1); font-weight:700; padding:0.5rem 0.6rem; text-align:right; white-space:nowrap; }
+  table.dt th:first-child, table.dt td:first-child { text-align:left; }
+  table.dt td { padding:0.42rem 0.6rem; border-top:1px solid rgba(255,255,255,0.05); color:#dbe7df; text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  table.dt tr.tot td { font-weight:700; color:var(--g1); border-top:1px solid var(--line2); background:rgba(16,185,129,0.05); }
+  table.dt tr.sub td { color:var(--dim); font-size:0.76rem; }
+  table.dt td.neg { color:var(--red); }
+  table.dt td.pos { color:var(--g1); }
+  table.dt tr.hl td { background:rgba(251,191,36,0.08); }
+  /* macro board */
+  .macro-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:0.7rem; margin-top:0.6rem; }
+  .macro { background:var(--panel2); border:1px solid var(--line); border-radius:1rem; padding:0.8rem 0.9rem; cursor:pointer; transition:0.2s; }
+  .macro:hover { border-color:var(--line2); transform:translateY(-2px); }
+  .macro .lbl { font-size:0.7rem; text-transform:uppercase; letter-spacing:1px; color:var(--dim); }
+  .macro .val { font-size:1.45rem; font-weight:800; color:var(--g1); margin:0.15rem 0; }
+  .macro .src { font-size:0.7rem; color:var(--dim); }
+  .macro .use { display:none; margin-top:0.45rem; padding-top:0.45rem; border-top:1px dashed var(--line); font-size:0.78rem; color:var(--mint); line-height:1.45; }
+  .macro.open .use { display:block; }
+  .macro.warn .val { color:var(--amber); }
+  .macro.bad .val { color:var(--red); }
+  /* case sheet */
+  .case-sheet { display:grid; grid-template-columns:1.2fr 1fr; gap:1rem; }
+  .facts { display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; }
+  .fact { background:var(--panel2); border-radius:0.8rem; padding:0.55rem 0.7rem; font-size:0.8rem; color:var(--soft); }
+  .fact b { display:block; color:var(--g1); font-size:0.92rem; }
+  /* map */
+  .selector { display:grid; grid-template-columns:repeat(3,1fr); gap:0.7rem; margin:0.6rem 0; }
+  .selector label { font-size:0.78rem; color:var(--dim); display:block; margin-bottom:0.25rem; }
+  select, input[type=number], input[type=text] { width:100%; background:#0b1d14; color:var(--text); border:1px solid var(--line2); border-radius:0.6rem; padding:0.45rem 0.6rem; font-family:inherit; font-size:0.88rem; }
+  .reco { background:rgba(16,185,129,0.08); border:1px solid var(--line2); border-radius:0.9rem; padding:0.75rem 1rem; font-size:0.88rem; color:var(--mint); line-height:1.5; }
+  .reco a { color:var(--amber); cursor:pointer; text-decoration:underline; }
+  /* tabs */
+  .tabs-wrap { position:sticky; top:3.1rem; z-index:20; background:rgba(8,24,16,0.96); backdrop-filter:blur(8px); border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:0.55rem 1.2rem; }
+  .tabs { display:flex; gap:0.4rem; overflow-x:auto; scrollbar-width:thin; padding-bottom:2px; }
+  .tab-btn { flex:0 0 auto; background:rgba(5,25,15,0.8); border:1px solid var(--line); color:var(--soft); border-radius:2rem; padding:0.42rem 0.85rem; font-size:0.78rem; font-weight:600; cursor:pointer; font-family:inherit; transition:0.2s; }
+  .tab-btn:hover { border-color:var(--g2); color:#fff; }
+  .tab-btn.active { background:linear-gradient(95deg,var(--g2),var(--g3)); color:#052e16; border-color:transparent; }
+  .tab-btn.done::after { content:" ✓"; color:var(--amber); font-weight:800; }
+  .tab-btn.active.done::after { color:#052e16; }
+  .tech-progress { display:flex; align-items:center; gap:0.6rem; margin-top:0.45rem; font-size:0.72rem; color:var(--dim); }
+  .tech-progress .bar { flex:1; height:5px; background:rgba(255,255,255,0.07); border-radius:5px; overflow:hidden; }
+  .tech-progress .bar div { height:100%; width:0; background:var(--amber); transition:width 0.4s; }
+  .tech { display:none; scroll-margin-top:8.5rem; }
+  #cierre { scroll-margin-top:8.5rem; }
+  .tech.active { display:block; animation:fade 0.35s ease; }
+  @keyframes fade { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+  .tech-head { display:flex; gap:1rem; align-items:flex-start; flex-wrap:wrap; }
+  .tech-num { width:3rem; height:3rem; flex:0 0 3rem; border-radius:50%; background:linear-gradient(135deg,var(--g1),var(--g3)); color:#052e16; font-weight:800; font-size:1.3rem; display:flex; align-items:center; justify-content:center; }
+  .tech-head h2 { margin:0; }
+  .tech-head .meta { display:flex; flex-wrap:wrap; gap:0.35rem; margin-top:0.35rem; }
+  .tag { font-size:0.7rem; padding:0.15rem 0.55rem; border-radius:1rem; border:1px solid var(--line2); color:#6ee7b7; }
+  .tag.amber { border-color:rgba(251,191,36,0.5); color:var(--amber); }
+  /* steps */
+  .steps { margin:0.8rem 0; }
+  .step { display:none; gap:0.8rem; padding:0.8rem 0.9rem; margin-bottom:0.55rem; background:var(--panel2); border:1px solid var(--line); border-radius:1rem; }
+  .step.shown { display:flex; animation:fade 0.35s ease; }
+  .step-n { flex:0 0 1.9rem; height:1.9rem; border-radius:50%; border:2px solid var(--g2); color:var(--g1); font-weight:800; font-size:0.85rem; display:flex; align-items:center; justify-content:center; }
+  .step-b { flex:1; min-width:0; }
+  .step-b h4 { color:#d1fae5; font-size:0.93rem; margin-bottom:0.3rem; }
+  .step-b p { font-size:0.87rem; }
+  .calc { font-family:'JetBrains Mono',monospace; font-size:0.82rem; color:var(--amber); background:rgba(0,0,0,0.25); border-radius:0.6rem; padding:0.45rem 0.7rem; margin:0.35rem 0; overflow-x:auto; white-space:pre; line-height:1.55; }
+  .step-ctrl { display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap; }
+  .btn { background:linear-gradient(95deg,var(--g2),var(--g3)); color:#052e16; border:none; padding:0.5rem 1.05rem; border-radius:2rem; font-weight:700; font-size:0.82rem; cursor:pointer; font-family:inherit; transition:0.2s; }
+  .btn:hover { transform:translateY(-1px); box-shadow:0 4px 14px rgba(16,185,129,0.3); }
+  .btn.ghost { background:transparent; color:var(--g1); border:1px solid var(--line2); }
+  .btn.amber { background:linear-gradient(95deg,#fbbf24,#f59e0b); }
+  .btn:disabled { opacity:0.45; cursor:default; transform:none; box-shadow:none; }
+  .step-count { font-size:0.75rem; color:var(--dim); }
+  /* lab */
+  .lab { margin-top:1rem; border:1px solid var(--line2); border-radius:1.2rem; padding:1.1rem; background:linear-gradient(160deg,rgba(16,185,129,0.06),rgba(0,0,0,0.2)); }
+  .lab h3 { margin-top:0 !important; }
+  .lab-grid { display:grid; grid-template-columns:minmax(240px,1fr) minmax(0,2fr); gap:1rem; align-items:start; }
+  .lab-grid > *, .case-sheet > * { min-width:0; }
+  .ctrl { margin-bottom:0.65rem; }
+  .ctrl label { display:flex; justify-content:space-between; gap:0.5rem; font-size:0.78rem; color:var(--dim); margin-bottom:0.2rem; }
+  .ctrl label span { color:var(--g1); font-weight:700; font-variant-numeric:tabular-nums; }
+  .ctrl input[type=range] { width:100%; accent-color:var(--g2); }
+  .toggle { display:flex; align-items:center; gap:0.45rem; font-size:0.8rem; color:var(--soft); margin:0.35rem 0; cursor:pointer; }
+  .toggle input { accent-color:var(--g2); width:1rem; height:1rem; }
+  .presets { display:flex; flex-wrap:wrap; gap:0.35rem; margin:0.3rem 0 0.6rem; }
+  .presets .btn { padding:0.32rem 0.7rem; font-size:0.72rem; }
+  .kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:0.5rem; margin-bottom:0.7rem; }
+  .kpi { background:var(--panel2); border:1px solid var(--line); border-radius:0.8rem; padding:0.55rem 0.65rem; }
+  .kpi .k { font-size:0.68rem; color:var(--dim); text-transform:uppercase; letter-spacing:0.5px; }
+  .kpi .v { font-size:1.1rem; font-weight:800; color:var(--g1); font-variant-numeric:tabular-nums; }
+  .kpi .v.neg { color:var(--red); } .kpi .v.amb { color:var(--amber); }
+  .chart-box { position:relative; height:290px; background:rgba(0,0,0,0.18); border-radius:0.9rem; padding:0.5rem; }
+  .chart-box.tall { height:340px; }
+  .insight { margin-top:0.6rem; font-size:0.84rem; color:var(--mint); line-height:1.5; background:rgba(16,185,129,0.06); border-radius:0.7rem; padding:0.55rem 0.75rem; }
+  /* challenge */
+  .challenge { margin-top:1rem; border:2px dashed rgba(251,191,36,0.45); border-radius:1.2rem; padding:1rem 1.1rem; background:rgba(251,191,36,0.04); }
+  .challenge h4 { color:var(--amber); font-size:1rem; margin-bottom:0.35rem; }
+  .challenge p { color:#fde68a; font-size:0.88rem; line-height:1.55; }
+  .ch-row { display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap; margin-top:0.6rem; }
+  .ch-row input { max-width:200px; }
+  .ch-row .unit { color:var(--dim); font-size:0.85rem; }
+  .ch-hint { margin-top:0.5rem; font-size:0.82rem; color:var(--soft); background:rgba(0,0,0,0.25); border-radius:0.6rem; padding:0.5rem 0.7rem; }
+  .ch-fb { margin-top:0.5rem; font-size:0.86rem; font-weight:600; }
+  .ch-fb.ok { color:var(--g1); } .ch-fb.no { color:var(--red); }
+  .next-tech { display:flex; justify-content:flex-end; gap:0.5rem; margin-top:1rem; flex-wrap:wrap; }
+  /* checklist */
+  .check-list { display:grid; grid-template-columns:1fr 1fr; gap:0.4rem 1rem; }
+  .check-list label { display:flex; gap:0.5rem; align-items:flex-start; font-size:0.85rem; color:var(--soft); cursor:pointer; line-height:1.4; }
+  .check-list input { accent-color:var(--g2); margin-top:0.2rem; }
+  /* quiz */
+  .quiz-item { background:var(--panel2); border:1px solid var(--line); border-radius:1rem; padding:0.9rem 1rem; margin-bottom:0.65rem; }
+  .quiz-item h4 { font-size:0.9rem; color:#d1fae5; margin-bottom:0.5rem; line-height:1.45; }
+  .quiz-opts { display:flex; flex-direction:column; gap:0.35rem; }
+  .quiz-opt { background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.08); padding:0.5rem 0.85rem; border-radius:0.6rem; cursor:pointer; font-size:0.84rem; color:#cbd5d1; transition:0.2s; text-align:left; font-family:inherit; }
+  .quiz-opt:hover { background:rgba(16,185,129,0.1); border-color:rgba(16,185,129,0.3); }
+  .quiz-opt.correct { border-color:var(--g2); background:rgba(16,185,129,0.22); color:var(--g1); font-weight:600; }
+  .quiz-opt.wrong { border-color:#ef4444; background:rgba(239,68,68,0.1); color:#fca5a5; }
+  .quiz-explain { display:none; margin-top:0.5rem; padding:0.5rem 0.75rem; background:rgba(16,185,129,0.06); border-radius:0.6rem; font-size:0.8rem; color:var(--soft); line-height:1.45; }
+  .quiz-explain.visible { display:block; }
+  .insignia { text-align:center; background:linear-gradient(135deg,rgba(16,185,129,0.12),rgba(5,150,105,0.05)); border:2px solid var(--g1); border-radius:1.4rem; padding:1.5rem; }
+  .insignia i { font-size:2.8rem; color:var(--amber); }
+  .insignia h3 { color:var(--g1); margin:0.5rem 0 0.3rem; font-size:1.2rem; }
+  .insignia p { color:var(--soft); font-size:0.86rem; }
+  .status-line { font-size:0.85rem; color:var(--soft); text-align:center; margin-bottom:0.8rem; }
+  .sources li { margin:0.35rem 0; font-size:0.83rem; }
+  .sources a { color:var(--g1); text-decoration:none; font-weight:600; }
+  .sources a:hover { text-decoration:underline; }
+  .hidden { display:none !important; }
+  .nav-links { display:flex; justify-content:center; gap:0.8rem; flex-wrap:wrap; padding:0 2rem 1.25rem; }
+  .nav-link { background:rgba(5,25,15,0.7); border:1px solid rgba(16,185,129,0.2); padding:0.6rem 1.2rem; border-radius:2rem; font-weight:600; text-decoration:none; color:#d1fae5; display:inline-flex; align-items:center; gap:0.4rem; transition:0.2s; font-size:0.88rem; }
+  .nav-link:hover { background:rgba(16,185,129,0.15); border-color:var(--g2); transform:translateY(-2px); }
+  .nav-link.next { background:linear-gradient(95deg,var(--g2),var(--g3)); color:#052e16; border:none; }
+  footer { text-align:center; padding:0.8rem; font-size:0.72rem; border-top:1px solid rgba(16,185,129,0.12); color:rgba(255,255,255,0.4); }
+  footer i { color:var(--g2); }
+  @media (max-width:900px) {
+   .lab-grid, .case-sheet { grid-template-columns:minmax(0,1fr); }
+   .selector { grid-template-columns:1fr; }
+  }
+  @media (max-width:640px) {
+   body { padding:3.2rem 0.5rem 1rem; }
+   .course-container { border-radius:1.4rem; }
+   section.block { margin:1rem 0.75rem; }
+   .card { padding:1rem; }
+   .hero-header { padding:1.6rem 1rem 1.2rem; }
+   .hero-header h1 { font-size:1.45rem; }
+   .progress-bar { padding:0.6rem 1rem; }
+   .tabs-wrap { padding:0.5rem 0.6rem; }
+   .facts, .check-list { grid-template-columns:1fr; }
+   .step { padding:0.7rem; gap:0.55rem; }
+   .chart-box { height:250px; }
+   .nav-links { padding:0 0.75rem 1rem; }
+  }
+ </style>
+</head>
+<body>
+ <nav class="brand-return-nav"><a href="../../index.html">&larr; Portfolio</a><a href="../../cursos/index.html">Cursos</a></nav>
+
+<div class="course-container">
+ <div class="progress-bar">
+  <div class="progress-outer"><div class="progress-fill" id="courseFill"></div></div>
+  <span class="progress-text" id="courseText">Módulo 23-B</span>
+ </div>
+
+ <div class="hero-header">
+  <div class="kicker">Módulo 23-B · Ampliación del Módulo 23</div>
+  <h1><i class="fas fa-flask"></i> Taller de Técnicas de Proyección<br>Casos paso a paso con datos bolivianos</h1>
+  <p>Nueve técnicas, un mismo caso empresarial y la macroeconomía boliviana real de 2026. En cada técnica: concepto, fórmula, resolución paso a paso, laboratorio interactivo y un reto para que lo resuelvas tú.</p>
+  <div class="chips">
+   <span class="chip"><i class="fas fa-industry"></i> Caso: Valle Alto Alimentos S.A.</span>
+   <span class="chip"><i class="fas fa-layer-group"></i> 9 técnicas</span>
+   <span class="chip"><i class="fas fa-vial"></i> 9 laboratorios</span>
+   <span class="chip"><i class="fas fa-puzzle-piece"></i> 9 retos + quiz</span>
+   <span class="chip"><i class="fas fa-clock"></i> ≈ 3 a 4 horas</span>
+  </div>
+ </div>
+
+ <!-- ===================== INTRO ===================== -->
+ <section class="block">
+  <div class="card">
+   <h2><i class="fas fa-route"></i> Antes de empezar</h2>
+   <div class="analogy"><i class="fas fa-mountain"></i><strong>Piénsalo así:</strong> proyectar es como planificar un viaje de La Paz a Santa Cruz por la carretera nueva. No hay un solo instrumento: miras el historial de viajes (tendencia), la temporada (estacionalidad), el precio del combustible (inflación y tipo de cambio), armas el presupuesto del viaje (presupuesto maestro), calculas cuánta plata llevar en efectivo y cuándo (presupuesto de caja) y te preguntas "¿y si hay bloqueo?" (sensibilidad y escenarios). Cada técnica de este taller es uno de esos instrumentos.</div>
+   <h3>¿Qué lograrás al terminar?</h3>
+   <ul>
+    <li>Calcular y explicar la diferencia entre <strong class="hl">crecimiento promedio y CAGR</strong>, y por qué la base elegida cambia la respuesta.</li>
+    <li>Ajustar una <strong class="hl">regresión lineal</strong> a mano (mínimos cuadrados), interpretar R² y leer los residuos.</li>
+    <li><strong class="hl">Separar precio de volumen</strong> deflactando con el IPC del INE: clave tras la inflación de 20,40% de 2025.</li>
+    <li>Construir <strong class="hl">índices estacionales</strong> y pronósticos de corto plazo con <strong class="hl">suavizado exponencial</strong> medidos con MAPE.</li>
+    <li>Armar un <strong class="hl">presupuesto maestro por drivers</strong> con el tipo de cambio oficial flexible y el nuevo salario mínimo.</li>
+    <li>Calcular los <strong class="hl">Fondos Externos Requeridos</strong>, el crecimiento autofinanciable y un balance proforma que cuadra.</li>
+    <li>Elaborar un <strong class="hl">presupuesto de caja mensual</strong> con el calendario tributario y laboral boliviano (IUE, compensación IUE–IT, aguinaldo).</li>
+    <li>Cuantificar el riesgo con <strong class="hl">tornado, escenarios ponderados y Monte Carlo</strong>.</li>
+   </ul>
+  </div>
+ </section>
+
+ <!-- MACRO BOARD -->
+ <section class="block">
+  <div class="card">
+   <h2><i class="fas fa-globe-americas"></i> Tablero macro Bolivia 2026: los supuestos de partida</h2>
+   <p>Datos verificados al <strong class="hl">22 de octubre de 2026</strong>. Haz clic en cada tarjeta para ver <em>cómo se usa ese dato en una proyección</em>. Toda proyección seria cita la fuente y la fecha de cada supuesto: los datos cambian, y quien lea tu informe debe poder actualizarlos.</p>
+   <div class="macro-grid">
+    <div class="macro bad" onclick="this.classList.toggle('open')"><div class="lbl">Inflación 2025 (dic–dic)</div><div class="val">20,40%</div><div class="src">INE · la más alta en 36 años</div><div class="use">Infla las ventas nominales de 2025. Si no la descuentas, confundirás "subir precios" con "vender más". Se usa en la técnica 3 para deflactar.</div></div>
+    <div class="macro warn" onclick="this.classList.toggle('open')"><div class="lbl">Inflación 12 meses (sep-2026)</div><div class="val">5,70%</div><div class="src">INE · acumulada ene–sep: 3,88%</div><div class="use">Es el piso razonable para el supuesto de inflación 2026–2027. Úsala para indexar precios de venta, costos locales y gastos fijos.</div></div>
+    <div class="macro warn" onclick="this.classList.toggle('open')"><div class="lbl">Inflación promedio proyectada</div><div class="val">12,7% / 15,8%</div><div class="src">FMI, WEO oct-2026 (2026 / 2027)</div><div class="use">Es el techo del rango. Nota que el FMI espera un repunte en 2027: tu escenario pesimista debe considerarlo (por ejemplo, ajuste de precios de combustibles).</div></div>
+    <div class="macro bad" onclick="this.classList.toggle('open')"><div class="lbl">Crecimiento del PIB 2026</div><div class="val">−3,0%</div><div class="src">FMI · BM −2,8% · CEPAL +0,5%</div><div class="use">Es el "viento de cola" (o en contra) del volumen. Una empresa que proyecta +15% real en un país que decrece 3% debe justificar de dónde sale cada boliviano extra.</div></div>
+    <div class="macro warn" onclick="this.classList.toggle('open')"><div class="lbl">Tipo de cambio oficial (TCO)</div><div class="val">Bs 11,75</div><div class="src">BCB · 22-oct-2026 · arrancó en 9,73 el 29-jun</div><div class="use">Régimen flexible desde junio de 2026: el TCO lo calcula el BCB a diario. Afecta insumos importados, deudas en dólares y exportaciones. Ya no es una constante: es una variable que hay que sensibilizar.</div></div>
+    <div class="macro" onclick="this.classList.toggle('open')"><div class="lbl">Salario Mínimo Nacional</div><div class="val">Bs 3.300</div><div class="src">DS 5516 · +20% vs 2025</div><div class="use">Desde 2026 solo es obligatorio nivelar al mínimo; los salarios superiores se negocian. Proyecta la planilla por segmento: quienes ganaban menos de Bs 3.300 suben de golpe.</div></div>
+    <div class="macro" onclick="this.classList.toggle('open')"><div class="lbl">Tasa máx. crédito productivo</div><div class="val">7% – 11,5%</div><div class="src">DS 5403 · pequeña 7%, mediana 8%, grande 10%, micro 11,5%</div><div class="use">Para el gasto financiero proyectado de la deuda productiva nueva. Para crédito no productivo o en moneda extranjera usa tasas de mercado (más altas).</div></div>
+    <div class="macro" onclick="this.classList.toggle('open')"><div class="lbl">Impuestos clave</div><div class="val">IUE 25% · IT 3%</div><div class="src">Ley 843 · IVA 13% · compensación IUE–IT</div><div class="use">El IUE pagado se compensa como pago a cuenta del IT siguiente: en el presupuesto de caja eso libera liquidez durante meses (técnica 8).</div></div>
+    <div class="macro" onclick="this.classList.toggle('open')"><div class="lbl">UFV</div><div class="val">3,36181</div><div class="src">BCB · 22-oct-2026</div><div class="use">Índice diario ligado al IPC. Sirve como deflactor alternativo para comparar montos de fechas distintas y para contratos indexados.</div></div>
+   </div>
+  </div>
+ </section>
+
+ <!-- CASE -->
+ <section class="block">
+  <div class="card">
+   <h2><i class="fas fa-industry"></i> El caso: Valle Alto Alimentos S.A.</h2>
+   <div class="case-sheet">
+    <div>
+     <p>Empresa <strong class="hl">ficticia</strong> con fines didácticos, ubicada en el eje industrial de Cochabamba. Produce galletas y snacks (incluida una línea de quinua) y vende en cajas de 24 paquetes a supermercados, mayoristas y tiendas de barrio de todo el país. Clasifica como <strong class="hl">mediana empresa</strong>.</p>
+     <p style="margin-top:0.5rem;">El Directorio te encarga preparar las proyecciones 2026 para dos usos: (1) presentarlas al banco para renovar su línea de crédito y (2) decidir si lanza una nueva línea de producción. Usarás las nueve técnicas sobre la misma empresa: así verás cómo se conectan.</p>
+     <div class="callout bo"><b><i class="fas fa-flag"></i> Detalle boliviano</b>Como empresa industrial, su gestión fiscal cierra el <strong>31 de marzo</strong> (el IUE vence 120 días después). Para gestión interna y para el banco, el Directorio presupuesta en año calendario; por eso en la técnica 8 verás el pago del IUE en pleno segundo semestre.</div>
+    </div>
+    <div class="facts">
+     <div class="fact"><b>Bs 28,42 MM</b>Ventas 2025</div>
+     <div class="fact"><b>252.000 cajas</b>Volumen presupuestado 2026</div>
+     <div class="fact"><b>Bs 120 / caja</b>Precio promedio 2026</div>
+     <div class="fact"><b>USD 2,40 / caja</b>Insumos importados</div>
+     <div class="fact"><b>Bs 6,0 MM</b>Deuda financiera</div>
+     <div class="fact"><b>8% anual</b>Tasa (tope mediana empresa)</div>
+     <div class="fact"><b>40%</b>Política de dividendos</div>
+     <div class="fact"><b>Bs 3.600</b>Sueldo base operario</div>
+    </div>
+   </div>
+  </div>
+ </section>
+
+ <!-- MAP + SELECTOR -->
+ <section class="block">
+  <div class="card">
+   <h2><i class="fas fa-map-signs"></i> Mapa de técnicas: ¿cuál uso y cuándo?</h2>
+   <div class="table-wrap">
+    <table class="dt" style="min-width:760px;">
+     <tr><th>#</th><th style="text-align:left;">Técnica</th><th style="text-align:left;">Familia</th><th style="text-align:left;">Horizonte</th><th style="text-align:left;">Necesita</th><th style="text-align:left;">Riesgo principal</th></tr>
+     <tr><td>1</td><td style="text-align:left;">Promedio y CAGR</td><td style="text-align:left;">Serie de tiempo</td><td style="text-align:left;">1–3 años</td><td style="text-align:left;">3–5 años de ventas</td><td style="text-align:left;">Elegir mal el año base</td></tr>
+     <tr><td>2</td><td style="text-align:left;">Regresión lineal</td><td style="text-align:left;">Serie de tiempo / causal</td><td style="text-align:left;">1–3 años</td><td style="text-align:left;">≥ 5 observaciones</td><td style="text-align:left;">Forzar una recta a algo que no es lineal</td></tr>
+     <tr><td>3</td><td style="text-align:left;">Nominal vs real (IPC)</td><td style="text-align:left;">Ajuste macro</td><td style="text-align:left;">Cualquiera</td><td style="text-align:left;">IPC del INE</td><td style="text-align:left;">Mezclar inflación con crecimiento</td></tr>
+     <tr><td>4</td><td style="text-align:left;">Índices estacionales</td><td style="text-align:left;">Serie de tiempo</td><td style="text-align:left;">Trimestres / meses</td><td style="text-align:left;">≥ 2–3 años trimestrales</td><td style="text-align:left;">Patrón que cambia (p. ej. fechas de carnaval)</td></tr>
+     <tr><td>5</td><td style="text-align:left;">Suavizado exponencial + MAPE</td><td style="text-align:left;">Serie de tiempo</td><td style="text-align:left;">1–3 meses</td><td style="text-align:left;">Serie mensual</td><td style="text-align:left;">Perseguir el ruido con α alto</td></tr>
+     <tr><td>6</td><td style="text-align:left;">Presupuesto maestro por drivers</td><td style="text-align:left;">Contable / operativo</td><td style="text-align:left;">1 año</td><td style="text-align:left;">Datos operativos</td><td style="text-align:left;">Supuestos optimistas de precio o volumen</td></tr>
+     <tr><td>7</td><td style="text-align:left;">% de ventas + FER</td><td style="text-align:left;">Contable / financiera</td><td style="text-align:left;">1–2 años</td><td style="text-align:left;">Balance y EERR</td><td style="text-align:left;">Suponer que todo crece proporcional</td></tr>
+     <tr><td>8</td><td style="text-align:left;">Presupuesto de caja mensual</td><td style="text-align:left;">Financiera</td><td style="text-align:left;">3–12 meses</td><td style="text-align:left;">Políticas de cobro y pago</td><td style="text-align:left;">Olvidar pagos estacionales (IUE, aguinaldo)</td></tr>
+     <tr><td>9</td><td style="text-align:left;">Sensibilidad, escenarios, Monte Carlo</td><td style="text-align:left;">Riesgo</td><td style="text-align:left;">Cualquiera</td><td style="text-align:left;">Un modelo base</td><td style="text-align:left;">Rangos arbitrarios sin sustento</td></tr>
+    </table>
+   </div>
+   <h3><i class="fas fa-compass"></i> Asistente: ¿qué técnica necesitas?</h3>
+   <div class="selector">
+    <div><label>¿Qué quieres proyectar?</label>
+     <select id="selObj"><option value="ventas">Ventas / demanda</option><option value="financ">Necesidad de financiamiento</option><option value="caja">Liquidez mes a mes</option><option value="riesgo">Riesgo / rango de resultados</option><option value="eeff">Estados financieros completos</option></select></div>
+    <div><label>¿Qué horizonte?</label>
+     <select id="selHor"><option value="corto">Próximos 1–3 meses</option><option value="medio" selected>Próximo año</option><option value="largo">2 a 5 años</option></select></div>
+    <div><label>¿Qué datos tienes?</label>
+     <select id="selDat"><option value="mensual">Serie mensual de ventas</option><option value="anual" selected>Ventas anuales de varios años</option><option value="eeff">Estados financieros + plan operativo</option></select></div>
+   </div>
+   <div class="reco" id="recoBox"></div>
+  </div>
+ </section>
+
+ <!-- ===================== TABS ===================== -->
+ <div class="tabs-wrap" id="tabsTop">
+  <div class="tabs" id="tabs">
+   <button class="tab-btn active" data-tab="t1">1 · CAGR</button>
+   <button class="tab-btn" data-tab="t2">2 · Regresión</button>
+   <button class="tab-btn" data-tab="t3">3 · Nominal vs real</button>
+   <button class="tab-btn" data-tab="t4">4 · Estacionalidad</button>
+   <button class="tab-btn" data-tab="t5">5 · Suavizado</button>
+   <button class="tab-btn" data-tab="t6">6 · Presupuesto maestro</button>
+   <button class="tab-btn" data-tab="t7">7 · % ventas y FER</button>
+   <button class="tab-btn" data-tab="t8">8 · Caja mensual</button>
+   <button class="tab-btn" data-tab="t9">9 · Riesgo</button>
+  </div>
+  <div class="tech-progress"><span id="techCount">0 de 9 técnicas dominadas</span><div class="bar"><div id="techBar"></div></div></div>
+ </div>
+
+ <!-- ============ T1 ============ -->
+ <section class="block tech active" id="t1">
+  <div class="card">
+   <div class="tech-head"><div class="tech-num">1</div><div><h2>Crecimiento histórico: promedio simple vs CAGR</h2><div class="meta"><span class="tag">Serie de tiempo</span><span class="tag">Horizonte 1–3 años</span><span class="tag amber">Nivel básico</span></div></div></div>
+   <div class="analogy"><i class="fas fa-car"></i>Si en un viaje vas a 60 km/h la primera hora y a 120 km/h la segunda, tu "velocidad promedio" no es simplemente 90: depende de cómo se componen los tramos. Con el crecimiento pasa igual: los crecimientos se <strong>multiplican</strong>, no se suman. El CAGR es la "velocidad constante" que te habría llevado del punto de partida al de llegada en el mismo tiempo.</div>
+   <div class="formula">g<sub>t</sub> = V<sub>t</sub> / V<sub>t−1</sub> − 1 &nbsp;&nbsp;|&nbsp;&nbsp; CAGR = (V<sub>final</sub> / V<sub>inicial</sub>)<sup>1/n</sup> − 1<small>n = número de períodos de crecimiento (años entre el inicial y el final, no el número de datos)</small></div>
+   <h3>Datos del caso: ventas de Valle Alto (Bs miles, nominales)</h3>
+   <div class="table-wrap"><table class="dt"><tr><th>Año</th><th>2021</th><th>2022</th><th>2023</th><th>2024</th><th>2025</th></tr><tr><td>Ventas</td><td>18.400</td><td>19.830</td><td>21.260</td><td>23.960</td><td>28.420</td></tr></table></div>
+
+   <div class="steps">
+    <div class="step"><div class="step-n">1</div><div class="step-b"><h4>Calcula la tasa de crecimiento de cada año</h4><p>Cada tasa compara un año con el anterior.</p><div class="calc">2022: 19.830 / 18.400 − 1 = 7,77%
+2023: 21.260 / 19.830 − 1 = 7,21%
+2024: 23.960 / 21.260 − 1 = 12,70%
+2025: 28.420 / 23.960 − 1 = 18,61%</div><p>Observa que el crecimiento <strong class="hl">se acelera</strong> justo en los años de mayor inflación (2024: 9,97%; 2025: 20,40%). Guarda esa sospecha para la técnica 3.</p></div></div>
+    <div class="step"><div class="step-n">2</div><div class="step-b"><h4>Promedio aritmético simple</h4><div class="calc">(7,77% + 7,21% + 12,70% + 18,61%) / 4 = 11,57%</div><p>Es fácil, pero sobrestima: el promedio aritmético de tasas siempre es mayor o igual que la tasa compuesta real (desigualdad de medias aritmética–geométrica). Mientras más volátiles sean las tasas, mayor la diferencia.</p></div></div>
+    <div class="step"><div class="step-n">3</div><div class="step-b"><h4>CAGR (tasa de crecimiento anual compuesta)</h4><p>De 2021 a 2025 hay <strong class="hl">4 períodos</strong> de crecimiento (no 5).</p><div class="calc">CAGR = (28.420 / 18.400)^(1/4) − 1
+     = (1,54457)^(0,25) − 1
+     = 1,11481 − 1 = 11,48%</div><p>Comprobación: 18.400 × 1,1148<sup>4</sup> ≈ 28.420 ✓. El promedio simple (11,57%) no pasa esta prueba.</p></div></div>
+    <div class="step"><div class="step-n">4</div><div class="step-b"><h4>Proyecta 2026 con cada método</h4><div class="calc">Con CAGR:      28.420 × 1,1148 = 31.683
+Con promedio:  28.420 × 1,1157 = 31.709</div><p>La diferencia parece pequeña en un año, pero se agranda con el horizonte: a 5 años la brecha ya supera Bs 400 mil.</p></div></div>
+    <div class="step"><div class="step-n">5</div><div class="step-b"><h4>Diagnóstico crítico: ¿es creíble +11,5% en 2026?</h4><p>No sin más análisis. Ese 11,5% mezcla <strong class="hl">volumen</strong> con <strong class="hl">precio</strong> y está inflado por la inflación excepcional de 2024–2025, mientras el FMI proyecta que el PIB caerá 3,0% en 2026 y la inflación interanual ya bajó a 5,70%. Extrapolar el CAGR nominal sería repetir una inflación que ya no está ocurriendo. Conclusión: el CAGR es un <em>punto de partida</em>, no la respuesta.</p></div></div>
+    <div class="step-ctrl"><button class="btn" data-next>Siguiente paso ▸</button><button class="btn ghost" data-all>Ver todos</button><span class="step-count"></span></div>
+   </div>
+
+   <div class="lab">
+    <h3><i class="fas fa-vial"></i> Laboratorio: ¿cómo cambia el CAGR según el año base?</h3>
+    <div class="lab-grid">
+     <div>
+      <div class="ctrl"><label>Año inicial</label><select id="t1Start"><option value="0">2021</option><option value="1">2022</option><option value="2">2023</option><option value="3">2024</option></select></div>
+      <label class="toggle"><input type="checkbox" id="t1Real"> Usar ventas reales (sin inflación, de la técnica 3)</label>
+      <div class="ctrl" style="margin-top:0.6rem;"><label>Años a proyectar <span id="t1HorV">3</span></label><input type="range" id="t1Hor" min="1" max="5" value="3"></div>
+     </div>
+     <div>
+      <div class="kpis"><div class="kpi"><div class="k">CAGR</div><div class="v" id="t1Cagr">–</div></div><div class="kpi"><div class="k">Promedio simple</div><div class="v" id="t1Avg">–</div></div><div class="kpi"><div class="k">Brecha al final</div><div class="v amb" id="t1Gap">–</div></div></div>
+      <div class="chart-box"><canvas id="t1Chart"></canvas></div>
+     </div>
+    </div>
+    <div class="insight" id="t1Insight"></div>
+   </div>
+
+   <div class="challenge" data-tech="t1" data-answer="12.75" data-tol="0.06">
+    <h4><i class="fas fa-puzzle-piece"></i> Tu turno</h4>
+    <p>Calcula el CAGR de las ventas nominales entre <strong>2022 y 2025</strong> (Bs 19.830 → Bs 28.420). Responde en % con dos decimales.</p>
+    <div class="ch-row"><input type="text" inputmode="decimal" placeholder="Ej.: 9,50"><span class="unit">%</span><button class="btn" data-check>Comprobar</button><button class="btn ghost" data-hint>Pista</button></div>
+    <div class="ch-hint hidden">Son 3 períodos (2022→2023→2024→2025). Calcula (28.420/19.830)^(1/3) − 1.</div>
+    <div class="ch-fb"></div>
+   </div>
+
+   <div class="callout warn"><b><i class="fas fa-exclamation-triangle"></i> Error común</b>Usar n = número de datos (5) en lugar de número de períodos (4). Con n = 5 el CAGR saldría 9,08% y subestimarías todo el plan.</div>
+   <div class="next-tech"><button class="btn" data-go="t2">Siguiente técnica: Regresión ▸</button></div>
+  </div>
+ </section>
+
+ <!-- ============ T2 ============ -->
+ <section class="block tech" id="t2">
+  <div class="card">
+   <div class="tech-head"><div class="tech-num">2</div><div><h2>Regresión lineal por mínimos cuadrados</h2><div class="meta"><span class="tag">Serie de tiempo / causal</span><span class="tag">Horizonte 1–3 años</span><span class="tag amber">Nivel intermedio</span></div></div></div>
+   <div class="analogy"><i class="fas fa-ruler"></i>Imagina que pones cinco puntos en un papel y tratas de pasar una regla por el medio de todos, de modo que la suma de las distancias (al cuadrado) entre los puntos y la regla sea la menor posible. Esa regla es la recta de regresión: resume la tendencia y te permite "prolongarla" hacia el futuro.</div>
+   <div class="formula">ŷ = a + b·t &nbsp;&nbsp;|&nbsp;&nbsp; b = (nΣty − ΣtΣy) / (nΣt² − (Σt)²) &nbsp;&nbsp;|&nbsp;&nbsp; a = ȳ − b·t̄<small>t = período codificado (1, 2, 3…), y = ventas, n = número de observaciones</small></div>
+
+   <div class="steps">
+    <div class="step"><div class="step-n">1</div><div class="step-b"><h4>Codifica el tiempo</h4><p>En vez de usar 2021, 2022… (números grandes que complican el cálculo), asigna t = 1, 2, 3, 4, 5. El año 2026 será t = 6 y 2027, t = 7.</p></div></div>
+    <div class="step"><div class="step-n">2</div><div class="step-b"><h4>Arma la tabla auxiliar</h4><div class="table-wrap"><table class="dt" id="t2Aux"></table></div></div></div>
+    <div class="step"><div class="step-n">3</div><div class="step-b"><h4>Calcula la pendiente b</h4><div class="calc">b = (5 × 359.780 − 15 × 111.870) / (5 × 55 − 15²)
+  = (1.798.900 − 1.678.050) / (275 − 225)
+  = 120.850 / 50 = 2.417</div><p><strong class="hl">Interpretación:</strong> según la tendencia lineal, las ventas aumentan en promedio Bs 2.417 miles por año.</p></div></div>
+    <div class="step"><div class="step-n">4</div><div class="step-b"><h4>Calcula la intersección a</h4><div class="calc">ȳ = 111.870 / 5 = 22.374     t̄ = 15 / 5 = 3
+a = 22.374 − 2.417 × 3 = 15.123</div><p>La ecuación queda: <strong class="hl">ŷ = 15.123 + 2.417·t</strong></p></div></div>
+    <div class="step"><div class="step-n">5</div><div class="step-b"><h4>Proyecta</h4><div class="calc">2026 (t = 6): 15.123 + 2.417 × 6 = 29.625
+2027 (t = 7): 15.123 + 2.417 × 7 = 32.042</div></div></div>
+    <div class="step"><div class="step-n">6</div><div class="step-b"><h4>Evalúa el ajuste: R² y residuos</h4><p>R² = 1 − SCE/SCT = <strong class="hl">0,9336</strong>: la recta "explica" el 93% de la variación. Parece excelente… pero mira los residuos (real − estimado):</p><div class="calc">2021: +860   2022: −127   2023: −1.114   2024: −831   2025: +1.212</div><p>Forman una <strong class="hl">"U"</strong>: positivos en los extremos y negativos en el medio. Residuos con patrón significan que la relación <em>no es lineal</em>: la serie se curva hacia arriba (por la inflación). Un R² alto no garantiza un buen modelo; los residuos deben verse aleatorios.</p></div></div>
+    <div class="step"><div class="step-n">7</div><div class="step-b"><h4>Conclusión para el caso</h4><p>La recta nominal (29.625 para 2026) queda por debajo del CAGR (31.683). Ninguna de las dos es "la verdad": son lecturas distintas del pasado. En el laboratorio verás que si haces la regresión sobre las <strong class="hl">ventas reales</strong> la recta cambia por completo y muestra un estancamiento desde 2023.</p></div></div>
+    <div class="step-ctrl"><button class="btn" data-next>Siguiente paso ▸</button><button class="btn ghost" data-all>Ver todos</button><span class="step-count"></span></div>
+   </div>
+
+   <div class="lab">
+    <h3><i class="fas fa-vial"></i> Laboratorio: regresión en vivo</h3>
+    <div class="lab-grid">
+     <div>
+      <div class="ctrl"><label>Serie</label><select id="t2Serie"><option value="nom">Ventas nominales</option><option value="real">Ventas reales (Bs de 2021)</option></select></div>
+      <label class="toggle"><input type="checkbox" id="t2Ex25"> Excluir 2025 (año atípico)</label>
+      <div class="ctrl" style="margin-top:0.5rem;"><label>Proyectar hasta <span id="t2HorV">2027</span></label><input type="range" id="t2Hor" min="2026" max="2029" value="2027"></div>
+     </div>
+     <div>
+      <div class="kpis"><div class="kpi"><div class="k">Ecuación</div><div class="v" id="t2Eq" style="font-size:0.9rem;">–</div></div><div class="kpi"><div class="k">R²</div><div class="v" id="t2R2">–</div></div><div class="kpi"><div class="k">ŷ 2026</div><div class="v" id="t2F26">–</div></div></div>
+      <div class="chart-box"><canvas id="t2Chart"></canvas></div>
+     </div>
+    </div>
+    <div class="insight" id="t2Insight"></div>
+   </div>
+
+   <div class="challenge" data-tech="t2" data-answer="34459" data-tol="2">
+    <h4><i class="fas fa-puzzle-piece"></i> Tu turno</h4>
+    <p>Con la ecuación ŷ = 15.123 + 2.417·t, ¿cuánto proyecta la tendencia lineal para <strong>2028</strong>? (Bs miles)</p>
+    <div class="ch-row"><input type="text" inputmode="decimal" placeholder="Ej.: 30.000"><span class="unit">Bs miles</span><button class="btn" data-check>Comprobar</button><button class="btn ghost" data-hint>Pista</button></div>
+    <div class="ch-hint hidden">2028 corresponde a t = 8.</div>
+    <div class="ch-fb"></div>
+   </div>
+
+   <div class="callout bo"><b><i class="fas fa-flag"></i> En Bolivia</b>Con pocas observaciones anuales y quiebres estructurales (fin del tipo de cambio fijo en 2026, inflación de 2025), una regresión de 5 puntos es frágil. Úsala como referencia y combínala con regresiones causales: por ejemplo, ventas del sector vs consumo de los hogares o vs PIB no extractivo del INE.</div>
+   <div class="callout warn"><b><i class="fas fa-exclamation-triangle"></i> Error común</b>Extrapolar muy lejos. Con 5 datos, proyectar 5 años hacia adelante es pedirle a la regla que siga siendo recta fuera del papel.</div>
+   <div class="next-tech"><button class="btn ghost" data-go="t1">◂ Anterior</button><button class="btn" data-go="t3">Siguiente técnica: Nominal vs real ▸</button></div>
+  </div>
+ </section>
+
+ <!-- ============ T3 ============ -->
+ <section class="block tech" id="t3">
+  <div class="card">
+   <div class="tech-head"><div class="tech-num">3</div><div><h2>Proyección nominal vs real: deflactar con el IPC</h2><div class="meta"><span class="tag">Ajuste macroeconómico</span><span class="tag">Cualquier horizonte</span><span class="tag amber">Imprescindible en Bolivia 2026</span></div></div></div>
+   <div class="analogy"><i class="fas fa-shopping-basket"></i>Si en 2021 llenabas tu canasta en el mercado Rodríguez con Bs 100 y hoy gastas Bs 139 por la misma canasta, no estás comiendo 39% más: estás pagando más por lo mismo. Las ventas de una empresa funcionan igual. Deflactar es preguntar: <strong>¿cuántas "canastas" vendimos realmente?</strong></div>
+   <div class="formula">Ventas reales<sub>t</sub> = Ventas nominales<sub>t</sub> / (Índice<sub>t</sub> / 100) &nbsp;&nbsp;|&nbsp;&nbsp; (1 + g<sub>nominal</sub>) = (1 + g<sub>real</sub>) × (1 + π)<small>La segunda es la ecuación de Fisher aplicada a ventas: proyecta volumen y precio por separado y luego combínalos.</small></div>
+   <h3>Inflación oficial dic–dic (INE)</h3>
+   <div class="table-wrap"><table class="dt"><tr><th>Año</th><th>2022</th><th>2023</th><th>2024</th><th>2025</th></tr><tr><td>Inflación</td><td>3,12%</td><td>2,12%</td><td>9,97%</td><td>20,40%</td></tr></table></div>
+
+   <div class="steps">
+    <div class="step"><div class="step-n">1</div><div class="step-b"><h4>Construye un índice de precios con base 2021 = 100</h4><p>Encadena las inflaciones: cada índice es el anterior multiplicado por (1 + inflación).</p><div class="calc">2022: 100,00 × 1,0312 = 103,12
+2023: 103,12 × 1,0212 = 105,31
+2024: 105,31 × 1,0997 = 115,81
+2025: 115,81 × 1,2040 = 139,43</div><p>Lectura: lo que costaba Bs 100 en 2021 costaba Bs 139,43 a fines de 2025.</p></div></div>
+    <div class="step"><div class="step-n">2</div><div class="step-b"><h4>Deflacta cada año</h4><div class="table-wrap"><table class="dt" id="t3Tab"></table></div></div></div>
+    <div class="step"><div class="step-n">3</div><div class="step-b"><h4>Calcula el crecimiento real y compáralo con el nominal</h4><div class="calc">            Nominal    Real
+2022         7,77%     4,51%
+2023         7,21%     4,99%
+2024        12,70%     2,48%
+2025        18,61%    −1,48%   ← ¡cayó en volumen!</div><p>El "mejor año" en nominal (2025, +18,6%) fue en realidad el <strong class="hl">peor</strong>: la empresa vendió menos cajas que en 2024. Todo el crecimiento fue precio.</p></div></div>
+    <div class="step"><div class="step-n">4</div><div class="step-b"><h4>Define los dos supuestos por separado</h4><p><strong class="hl">Crecimiento real 2026: −1,0%.</strong> El PIB caería 3,0% (FMI) o 2,8% (BM); la CEPAL espera +0,5%. Alimentos de consumo masivo son menos sensibles al ciclo que la construcción o los autos, así que se asume una caída leve del volumen.</p><p><strong class="hl">Inflación 2026: 8,0%.</strong> Punto medio prudente entre la inflación interanual a septiembre (5,70%, INE) y la inflación promedio que proyecta el FMI (12,7%). Esto refleja que los precios subieron mucho al inicio del año y se están moderando.</p></div></div>
+    <div class="step"><div class="step-n">5</div><div class="step-b"><h4>Combina con Fisher</h4><div class="calc">(1 + g_nominal) = (1 − 0,01) × (1 + 0,08) = 1,0692  →  +6,92%
+Ventas 2026 = 28.420 × 1,0692 = 30.387 (Bs miles)</div></div></div>
+    <div class="step"><div class="step-n">6</div><div class="step-b"><h4>Triangula los tres métodos vistos hasta ahora</h4><div class="calc">CAGR nominal (técnica 1):        31.683
+Regresión nominal (técnica 2):   29.625
+Real + inflación (técnica 3):    30.387   ← más defendible</div><p>El método real + inflación es el más defendible ante un banco porque cada supuesto tiene una fuente explícita y se puede actualizar por separado cuando el INE publique un nuevo dato.</p></div></div>
+    <div class="step-ctrl"><button class="btn" data-next>Siguiente paso ▸</button><button class="btn ghost" data-all>Ver todos</button><span class="step-count"></span></div>
+   </div>
+
+   <div class="lab">
+    <h3><i class="fas fa-vial"></i> Laboratorio: separa precio y volumen</h3>
+    <div class="lab-grid">
+     <div>
+      <div class="presets"><button class="btn ghost" data-t3p="0.057">π INE 12m (5,7%)</button><button class="btn ghost" data-t3p="0.08">π intermedio (8%)</button><button class="btn ghost" data-t3p="0.127">π FMI prom. (12,7%)</button></div>
+      <div class="ctrl"><label>Crecimiento real 2026 <span id="t3gV">−1,0%</span></label><input type="range" id="t3g" min="-8" max="8" step="0.5" value="-1"></div>
+      <div class="ctrl"><label>Inflación 2026 (π) <span id="t3pV">8,0%</span></label><input type="range" id="t3p" min="0" max="25" step="0.1" value="8"></div>
+     </div>
+     <div>
+      <div class="kpis"><div class="kpi"><div class="k">Crec. nominal</div><div class="v" id="t3Nom">–</div></div><div class="kpi"><div class="k">Ventas 2026</div><div class="v" id="t3V26">–</div></div><div class="kpi"><div class="k">Efecto precio</div><div class="v amb" id="t3EfP">–</div></div><div class="kpi"><div class="k">Efecto volumen</div><div class="v" id="t3EfV">–</div></div></div>
+      <div class="chart-box"><canvas id="t3Chart"></canvas></div>
+     </div>
+    </div>
+    <div class="insight" id="t3Insight"></div>
+   </div>
+
+   <div class="challenge" data-tech="t3" data-answer="14.95" data-tol="0.03">
+    <h4><i class="fas fa-puzzle-piece"></i> Tu turno</h4>
+    <p>El gerente comercial propone para 2026 un crecimiento real de <strong>+2%</strong> (por la nueva línea de quinua) y Finanzas asume una <strong>inflación de 12,7%</strong> (FMI). Con la ecuación de Fisher, ¿cuál es el crecimiento <strong>nominal</strong> de las ventas? (en %, dos decimales)</p>
+    <div class="ch-row"><input type="text" inputmode="decimal" placeholder="Ej.: 10,50"><span class="unit">%</span><button class="btn" data-check>Comprobar</button><button class="btn ghost" data-hint>Pista</button></div>
+    <div class="ch-hint hidden">(1 + 0,02) × (1 + 0,127) − 1. Fíjate que la suma simple (14,7%) no es la respuesta exacta.</div>
+    <div class="ch-fb"></div>
+   </div>
+
+   <div class="callout bo"><b><i class="fas fa-flag"></i> En Bolivia</b>En rigor, los flujos anuales (ventas de todo el año) se deflactan con el <strong>IPC promedio anual</strong>; aquí usamos la variación dic–dic por simplicidad didáctica. Para montos de fechas puntuales puedes usar la <strong>UFV</strong> del BCB (3,36181 al 22-oct-2026), que se publica a diario y sigue al IPC.</div>
+   <div class="callout warn"><b><i class="fas fa-exclamation-triangle"></i> Error común</b>Sumar en vez de multiplicar: −1% + 8% = 7% es una aproximación; lo correcto es 0,99 × 1,08 − 1 = 6,92%. Con inflaciones altas la diferencia deja de ser despreciable.</div>
+   <div class="next-tech"><button class="btn ghost" data-go="t2">◂ Anterior</button><button class="btn" data-go="t4">Siguiente técnica: Estacionalidad ▸</button></div>
+  </div>
+ </section>
+
+ <!-- ============ T4 ============ -->
+ <section class="block tech" id="t4">
+  <div class="card">
+   <div class="tech-head"><div class="tech-num">4</div><div><h2>Estacionalidad: índices estacionales trimestrales</h2><div class="meta"><span class="tag">Serie de tiempo</span><span class="tag">Trimestres o meses</span><span class="tag amber">Nivel intermedio</span></div></div></div>
+   <div class="analogy"><i class="fas fa-calendar-alt"></i>Un vendedor de api en El Alto sabe que vende más en invierno y en las mañanas frías. No necesita una fórmula para saberlo, pero sí la necesita para responder <strong>cuánto más</strong>. El índice estacional dice: "este trimestre suele vender X% más (o menos) que un trimestre promedio".</div>
+   <div class="formula">Índice<sub>q</sub> = promedio de ( Ventas<sub>q,año</sub> / Promedio trimestral<sub>año</sub> ) &nbsp;&nbsp;|&nbsp;&nbsp; Ventas<sub>q,2026</sub> = (Ventas anuales 2026 / 4) × Índice<sub>q</sub><small>Los cuatro índices deben sumar 4,00 (si no suman, se normalizan multiplicando por 4 / suma)</small></div>
+   <h3>Datos del caso: ventas trimestrales (Bs miles)</h3>
+   <div class="table-wrap"><table class="dt" id="t4Data"></table></div>
+
+   <div class="steps">
+    <div class="step"><div class="step-n">1</div><div class="step-b"><h4>Calcula el promedio trimestral de cada año</h4><div class="calc">2023: 21.260 / 4 = 5.315
+2024: 23.960 / 4 = 5.990
+2025: 28.420 / 4 = 7.105</div><p>Dividir por el promedio de <em>su propio año</em> elimina la tendencia y la inflación: así comparamos solo la "forma" del año.</p></div></div>
+    <div class="step"><div class="step-n">2</div><div class="step-b"><h4>Divide cada trimestre entre su promedio anual</h4><div class="table-wrap"><table class="dt" id="t4Ratios"></table></div></div></div>
+    <div class="step"><div class="step-n">3</div><div class="step-b"><h4>Promedia las razones por trimestre → índice estacional</h4><div class="calc">T1: (0,9605 + 0,9356 + 0,9502) / 3 = 0,9487
+T2: (0,8920 + 0,9088 + 0,8957) / 3 = 0,8989
+T3: (0,9661 + 0,9698 + 0,9799) / 3 = 0,9719
+T4: (1,1814 + 1,1858 + 1,1742) / 3 = 1,1805
+Suma = 4,0000 ✓ (no requiere normalizar)</div></div></div>
+    <div class="step"><div class="step-n">4</div><div class="step-b"><h4>Interpreta en clave boliviana</h4><p><strong class="hl">T4 = 1,18:</strong> el cuarto trimestre vende 18% más que un trimestre promedio: pago del aguinaldo (hasta el 20 de diciembre), fiestas de fin de año y canastas navideñas. <strong class="hl">T1 = 0,95:</strong> carnaval y retorno a clases empujan las ventas de febrero, pero enero es flojo. <strong class="hl">T2 = 0,90:</strong> el trimestre más débil, sin fechas comerciales fuertes. <strong class="hl">T3 = 0,97:</strong> recuperación gradual con fiestas patrias y regionales (Día de la Madre, 6 de agosto).</p></div></div>
+    <div class="step"><div class="step-n">5</div><div class="step-b"><h4>Distribuye la proyección anual 2026</h4><p>Usamos Bs 30.240 miles (el presupuesto por drivers de la técnica 6, coherente con los 30.387 de la técnica 3).</p><div class="calc">Promedio trimestral = 30.240 / 4 = 7.560
+T1: 7.560 × 0,9487 ≈ 7.172,5
+T2: 7.560 × 0,8989 ≈ 6.795,3
+T3: 7.560 × 0,9719 ≈ 7.347,8
+T4: 7.560 × 1,1805 ≈ 8.924,4
+Total = 30.240 ✓   (calculado con los índices sin redondear)</div></div></div>
+    <div class="step"><div class="step-n">6</div><div class="step-b"><h4>Usa los índices al revés: desestacionalizar</h4><p>Si en T2-2026 se venden Bs 6.900 miles, ¿es buena noticia? Desestacionaliza: 6.900 / 0,8989 = 7.676 &gt; 7.560. Sí: va <strong class="hl">1,5% por encima</strong> del ritmo anual presupuestado, aunque en términos absolutos sea el trimestre más bajo. Así se evita alarmarse (o celebrar) por efectos de calendario.</p></div></div>
+    <div class="step-ctrl"><button class="btn" data-next>Siguiente paso ▸</button><button class="btn ghost" data-all>Ver todos</button><span class="step-count"></span></div>
+   </div>
+
+   <div class="lab">
+    <h3><i class="fas fa-vial"></i> Laboratorio: distribuye y desestacionaliza</h3>
+    <div class="lab-grid">
+     <div>
+      <div class="ctrl"><label>Ventas anuales 2026 (Bs miles) <span id="t4AV">30.240</span></label><input type="range" id="t4A" min="26000" max="34000" step="10" value="30240"></div>
+      <label class="toggle"><input type="checkbox" id="t4Des"> Ver series desestacionalizadas</label>
+      <div class="ctrl" style="margin-top:0.6rem;"><label>Venta real observada en T2-2026 <span id="t4ObsV">6.900</span></label><input type="range" id="t4Obs" min="6000" max="7800" step="10" value="6900"></div>
+     </div>
+     <div>
+      <div class="kpis"><div class="kpi"><div class="k">T4 proyectado</div><div class="v" id="t4Q4">–</div></div><div class="kpi"><div class="k">T2 desestac.</div><div class="v" id="t4Ds">–</div></div><div class="kpi"><div class="k">Vs ritmo anual</div><div class="v" id="t4Vs">–</div></div></div>
+      <div class="chart-box"><canvas id="t4Chart"></canvas></div>
+     </div>
+    </div>
+   </div>
+
+   <div class="challenge" data-tech="t4" data-answer="8920.8" data-tol="2">
+    <h4><i class="fas fa-puzzle-piece"></i> Tu turno</h4>
+    <p>Usando el índice redondeado <strong>T4 = 1,18</strong> y ventas anuales 2026 de Bs 30.240 miles, ¿cuánto se proyecta vender en el cuarto trimestre? (Bs miles, un decimal)</p>
+    <div class="ch-row"><input type="text" inputmode="decimal" placeholder="Ej.: 8.000,0"><span class="unit">Bs miles</span><button class="btn" data-check>Comprobar</button><button class="btn ghost" data-hint>Pista</button></div>
+    <div class="ch-hint hidden">(30.240 / 4) × 1,18</div>
+    <div class="ch-fb"></div>
+   </div>
+   <div class="callout warn"><b><i class="fas fa-exclamation-triangle"></i> Error común</b>Fechas móviles: carnaval puede caer en febrero o en marzo, y eso mueve ventas entre T1 de un año y otro. Si tu serie es mensual, revisa en qué mes cayó carnaval antes de promediar.</div>
+   <div class="next-tech"><button class="btn ghost" data-go="t3">◂ Anterior</button><button class="btn" data-go="t5">Siguiente técnica: Suavizado ▸</button></div>
+  </div>
+ </section>
+
+ <!-- ============ T5 ============ -->
+ <section class="block tech" id="t5">
+  <div class="card">
+   <div class="tech-head"><div class="tech-num">5</div><div><h2>Promedio móvil, suavizado exponencial y MAPE</h2><div class="meta"><span class="tag">Serie de tiempo</span><span class="tag">Horizonte 1–3 meses</span><span class="tag amber">Nivel intermedio</span></div></div></div>
+   <div class="analogy"><i class="fas fa-thermometer-half"></i>El suavizado exponencial funciona como tu memoria del clima: el tiempo de ayer pesa mucho en lo que esperas para mañana; el de la semana pasada, menos; y el del mes pasado, casi nada. El parámetro α decide qué tan "olvidadizo" eres.</div>
+   <div class="formula">PM<sub>3</sub>: F<sub>t+1</sub> = (A<sub>t</sub> + A<sub>t−1</sub> + A<sub>t−2</sub>) / 3 &nbsp;&nbsp;|&nbsp;&nbsp; SES: F<sub>t+1</sub> = α·A<sub>t</sub> + (1 − α)·F<sub>t</sub> &nbsp;&nbsp;|&nbsp;&nbsp; MAPE = (1/n) Σ |A − F| / A<small>A = venta real, F = pronóstico, 0 &lt; α &lt; 1. MAPE = error porcentual absoluto medio: menor es mejor.</small></div>
+   <h3>Datos del caso: línea "Quinua Crunch", cajas por mes</h3>
+   <div class="table-wrap"><table class="dt" id="t5Data"></table></div>
+
+   <div class="steps">
+    <div class="step"><div class="step-n">1</div><div class="step-b"><h4>Promedio móvil de 3 meses para octubre 2026</h4><div class="calc">F(oct-26) = (jul 4.310 + ago 4.450 + sep 4.380) / 3 = 4.380 cajas</div><p>Todos los meses pesan igual (1/3) y los anteriores a julio pesan cero.</p></div></div>
+    <div class="step"><div class="step-n">2</div><div class="step-b"><h4>Inicializa el suavizado exponencial</h4><p>Necesitamos un primer pronóstico. Convención simple: F(nov-25) = A(oct-25) = 4.100.</p></div></div>
+    <div class="step"><div class="step-n">3</div><div class="step-b"><h4>Itera la fórmula con α = 0,3</h4><div class="calc">F(dic-25) = 0,3 × 4.320 + 0,7 × 4.100   = 4.166,0
+F(ene-26) = 0,3 × 5.150 + 0,7 × 4.166,0 = 4.461,2
+F(feb-26) = 0,3 × 3.980 + 0,7 × 4.461,2 = 4.316,8
+… (la tabla completa está en el laboratorio)</div><p>Observa que el pico de diciembre (aguinaldo) "contamina" el pronóstico de enero, que sale alto justo cuando las ventas caen.</p></div></div>
+    <div class="step"><div class="step-n">4</div><div class="step-b"><h4>Mide el error con MAPE</h4><p>Para cada mes con pronóstico: |A − F| / A. Luego promedias. Un MAPE de 5% significa que, en promedio, te equivocas en 5% del volumen real. En consumo masivo, un MAPE mensual menor a 10% suele considerarse bueno.</p></div></div>
+    <div class="step"><div class="step-n">5</div><div class="step-b"><h4>Elige α comparando errores</h4><p>Prueba varios α y quédate con el de menor MAPE <em>en datos que el modelo no usó para calibrarse</em>. En el laboratorio, el botón "Buscar α óptimo" lo hace por ti. Ojo: con estacionalidad fuerte conviene desestacionalizar primero (técnica 4), suavizar, y luego volver a multiplicar por el índice.</p></div></div>
+    <div class="step-ctrl"><button class="btn" data-next>Siguiente paso ▸</button><button class="btn ghost" data-all>Ver todos</button><span class="step-count"></span></div>
+   </div>
+
+   <div class="lab">
+    <h3><i class="fas fa-vial"></i> Laboratorio: compite contra el promedio móvil</h3>
+    <div class="lab-grid">
+     <div>
+      <div class="ctrl"><label>α (suavizado) <span id="t5aV">0,30</span></label><input type="range" id="t5a" min="0.05" max="0.95" step="0.05" value="0.3"></div>
+      <button class="btn amber" id="t5Opt">Buscar α óptimo</button>
+      <div class="table-wrap" style="margin-top:0.7rem;"><table class="dt" id="t5Err" style="min-width:0;"></table></div>
+     </div>
+     <div>
+      <div class="kpis"><div class="kpi"><div class="k">Pronóstico oct-26 (SES)</div><div class="v" id="t5Fc">–</div></div><div class="kpi"><div class="k">Pronóstico oct-26 (PM3)</div><div class="v" id="t5Fm">–</div></div></div>
+      <div class="chart-box"><canvas id="t5Chart"></canvas></div>
+     </div>
+    </div>
+    <div class="table-wrap"><table class="dt" id="t5Full"></table></div>
+    <div class="insight" id="t5Insight"></div>
+   </div>
+
+   <div class="challenge" data-tech="t5" data-answer="4324" data-tol="1">
+    <h4><i class="fas fa-puzzle-piece"></i> Tu turno</h4>
+    <p>La venta real de septiembre fue <strong>4.380 cajas</strong> y el pronóstico para septiembre había sido <strong>4.300</strong>. Con α = 0,3, ¿cuál es el pronóstico de octubre?</p>
+    <div class="ch-row"><input type="text" inputmode="decimal" placeholder="Ej.: 4.200"><span class="unit">cajas</span><button class="btn" data-check>Comprobar</button><button class="btn ghost" data-hint>Pista</button></div>
+    <div class="ch-hint hidden">0,3 × 4.380 + 0,7 × 4.300</div>
+    <div class="ch-fb"></div>
+   </div>
+   <div class="callout bo"><b><i class="fas fa-flag"></i> En Bolivia</b>Los bloqueos de carreteras generan caídas bruscas de uno o dos meses que no son "tendencia". Márcalos como atípicos: si los dejas en la serie, un α alto los convertirá en tu nuevo pronóstico.</div>
+   <div class="next-tech"><button class="btn ghost" data-go="t4">◂ Anterior</button><button class="btn" data-go="t6">Siguiente técnica: Presupuesto maestro ▸</button></div>
+  </div>
+ </section>
+
+ <!-- ============ T6 ============ -->
+ <section class="block tech" id="t6">
+  <div class="card">
+   <div class="tech-head"><div class="tech-num">6</div><div><h2>Presupuesto maestro por drivers (de abajo hacia arriba)</h2><div class="meta"><span class="tag">Contable / operativo</span><span class="tag">Horizonte 1 año</span><span class="tag amber">Nivel avanzado</span></div></div></div>
+   <div class="analogy"><i class="fas fa-utensils"></i>Las técnicas 1 a 5 miran el pasado "desde arriba". El presupuesto maestro es como cocinar una salteña: no estimas el costo "por intuición", sino que sumas cada ingrediente (masa, jigote, caldo) por su cantidad y precio. Aquí cada línea del Estado de Resultados se arma desde sus <strong>drivers</strong>: cajas, precios, kilos, horas, tipo de cambio.</div>
+   <div class="formula">Producción = Ventas + Inventario final deseado − Inventario inicial &nbsp;|&nbsp; Costo unitario = MP + MOD + CIF variables + CIF fijos / Producción</div>
+
+   <div class="steps">
+    <div class="step"><div class="step-n">1</div><div class="step-b"><h4>Cédula 1 · Presupuesto de ventas</h4><p>252.000 cajas distribuidas con los índices estacionales (0,95 / 0,90 / 0,97 / 1,18) × Bs 120 por caja.</p><div class="table-wrap"><table class="dt" id="t6C1"></table></div></div></div>
+    <div class="step"><div class="step-n">2</div><div class="step-b"><h4>Cédula 2 · Presupuesto de producción</h4><p>Política: inventario final de cada trimestre = <strong class="hl">20% de las ventas del trimestre siguiente</strong>. Inventario inicial de T1 = 11.500 cajas; ventas esperadas de T1-2027 = 62.000 cajas.</p><div class="table-wrap"><table class="dt" id="t6C2"></table></div><p>Fíjate: en T3 se produce <em>más</em> de lo que se vende para preparar la campaña de fin de año.</p></div></div>
+    <div class="step"><div class="step-n">3</div><div class="step-b"><h4>Cédula 3 · Materia prima (con tipo de cambio oficial flexible)</h4><div class="calc">MP nacional (harina, azúcar, quinua):   Bs 22,00 / caja
+MP importada (aceite, saborizantes, empaque): USD 2,40 × TCO 11,75 = Bs 28,20 / caja
+MP total por caja                                         = Bs 50,20</div><p>Antes del régimen flexible, con Bs 6,96, el mismo insumo importado costaba Bs 16,70: <strong class="hl">+68,8%</strong> en bolivianos sin que el proveedor haya subido su precio en dólares. Por eso el TCO es una de las variables más sensibles del modelo.</p><div class="table-wrap"><table class="dt" id="t6C3"></table></div></div></div>
+    <div class="step"><div class="step-n">4</div><div class="step-b"><h4>Cédula 4 · Mano de obra directa (con el nuevo salario mínimo)</h4><div class="calc">Sueldo operario (sobre el SMN de Bs 3.300):        Bs 3.600,00
++ Aportes patronales 16,71% (CNS 10%, riesgo prof. 1,71%,
+  pro vivienda 2%, solidario 3%):                    Bs   601,56
++ Provisión aguinaldo (1/12 = 8,33%):                Bs   300,00
++ Provisión indemnización (1/12 = 8,33%):            Bs   300,00
+= Costo mensual por operario                         Bs 4.801,56
+÷ 192 horas productivas al mes                     = Bs 25,01 / hora
+× 0,40 horas por caja                              = Bs 10,00 / caja</div><div class="table-wrap"><table class="dt" id="t6C4"></table></div></div></div>
+    <div class="step"><div class="step-n">5</div><div class="step-b"><h4>Cédula 5 · Costos indirectos de fabricación</h4><div class="calc">CIF variables (energía, gas, mantenimiento):  Bs 4,00 / caja
+CIF fijos: Bs 900.000 / trimestre (incluye depreciación Bs 250.000)
+CIF fijos anuales = 3.600.000 ÷ 252.900 cajas producidas = Bs 14,23 / caja</div></div></div>
+    <div class="step"><div class="step-n">6</div><div class="step-b"><h4>Costo unitario de producción (costeo por absorción, NC)</h4><div class="calc">MP 50,20 + MOD 10,00 + CIF var. 4,00 + CIF fijo 14,23 = Bs 78,44 / caja</div><p>Simplificación: el inventario inicial se valora al mismo costo unitario del año.</p></div></div>
+    <div class="step"><div class="step-n">7</div><div class="step-b"><h4>Estado de Resultados proforma 2026</h4><div class="table-wrap"><table class="dt" id="t6Eerr"></table></div><p>Gastos de administración y ventas: fijos Bs 1.050.000 por trimestre; comisiones y fletes 4% de ventas; IT 3% de ventas (en el modelo lo tratamos como gasto). Intereses: Bs 6,0 MM × 8%. IUE 25% sobre la utilidad antes de impuestos (simplificación: en la práctica la base imponible tiene ajustes).</p></div></div>
+    <div class="step"><div class="step-n">8</div><div class="step-b"><h4>Control de coherencia (top-down vs bottom-up)</h4><div class="calc">Ventas por drivers (técnica 6):        30.240
+Ventas real + inflación (técnica 3):   30.387
+Diferencia:                             −0,5%  ✓ coherentes</div><p>Si la diferencia superara ±5%, uno de los dos enfoques tiene un supuesto que hay que revisar (precio demasiado alto, volumen irreal, etc.). Este cruce es lo primero que mira un analista de crédito.</p></div></div>
+    <div class="step-ctrl"><button class="btn" data-next>Siguiente paso ▸</button><button class="btn ghost" data-all>Ver todos</button><span class="step-count"></span></div>
+   </div>
+
+   <div class="lab">
+    <h3><i class="fas fa-vial"></i> Laboratorio: mueve los drivers y mira el EERR</h3>
+    <div class="lab-grid">
+     <div>
+      <div class="ctrl"><label>Tipo de cambio oficial (Bs/USD) <span id="t6tcoV">11,75</span></label><input type="range" id="t6tco" min="6.96" max="16" step="0.01" value="11.75"></div>
+      <div class="ctrl"><label>Precio por caja (Bs) <span id="t6pV">120</span></label><input type="range" id="t6p" min="100" max="140" step="1" value="120"></div>
+      <div class="ctrl"><label>Volumen vs plan <span id="t6vV">0%</span></label><input type="range" id="t6v" min="-20" max="20" step="1" value="0"></div>
+      <div class="ctrl"><label>Sueldo base operario (Bs) <span id="t6sV">3.600</span></label><input type="range" id="t6s" min="3300" max="4500" step="50" value="3600"></div>
+      <div class="presets"><button class="btn ghost" data-t6="base">Base</button><button class="btn ghost" data-t6="dev">Devaluación a 14</button><button class="btn ghost" data-t6="old">TC antiguo 6,96</button></div>
+      <div class="insight" id="t6Break"></div>
+     </div>
+     <div>
+      <div class="kpis"><div class="kpi"><div class="k">Utilidad neta</div><div class="v" id="t6UN">–</div></div><div class="kpi"><div class="k">Margen neto</div><div class="v" id="t6MN">–</div></div><div class="kpi"><div class="k">Costo unitario</div><div class="v" id="t6CU">–</div></div><div class="kpi"><div class="k">EBITDA</div><div class="v" id="t6EB">–</div></div></div>
+      <div class="chart-box"><canvas id="t6Chart"></canvas></div>
+     </div>
+    </div>
+    <div class="table-wrap"><table class="dt" id="t6Live"></table></div>
+   </div>
+
+   <div class="challenge" data-tech="t6" data-answer="57582" data-tol="0.5">
+    <h4><i class="fas fa-puzzle-piece"></i> Tu turno</h4>
+    <p>Sin mirar la cédula 2: ventas T2 = 56.700 cajas; ventas T3 = 61.110 cajas; inventario inicial de T2 = 11.340 cajas; política de inventario final = 20% de las ventas del trimestre siguiente. ¿Cuántas cajas hay que <strong>producir en T2</strong>?</p>
+    <div class="ch-row"><input type="text" inputmode="decimal" placeholder="Ej.: 55.000"><span class="unit">cajas</span><button class="btn" data-check>Comprobar</button><button class="btn ghost" data-hint>Pista</button></div>
+    <div class="ch-hint hidden">Producción = 56.700 + (20% × 61.110) − 11.340</div>
+    <div class="ch-fb"></div>
+   </div>
+   <div class="callout bo"><b><i class="fas fa-flag"></i> En Bolivia</b>Además del precio en dólares, presupuesta la <strong>disponibilidad</strong> de divisas y los plazos de importación: en 2024–2026 muchas empresas tuvieron que adelantar compras o pagar sobreprecios. Un buen supuesto incluye "meses de inventario de seguridad" de insumos importados.</div>
+   <div class="next-tech"><button class="btn ghost" data-go="t5">◂ Anterior</button><button class="btn" data-go="t7">Siguiente técnica: % de ventas y FER ▸</button></div>
+  </div>
+ </section>
+
+ <!-- ============ T7 ============ -->
+ <section class="block tech" id="t7">
+  <div class="card">
+   <div class="tech-head"><div class="tech-num">7</div><div><h2>Porcentaje de ventas y Fondos Externos Requeridos (FER)</h2><div class="meta"><span class="tag">Contable / financiera</span><span class="tag">Horizonte 1–2 años</span><span class="tag amber">Nivel avanzado</span></div></div></div>
+   <div class="analogy"><i class="fas fa-home"></i>Si tu familia crece, necesitas una casa más grande, más muebles y más comida. Parte se cubre "solo" (el almacenero te fía más porque compras más), parte con tus ahorros, y lo que falte… lo pides prestado. El FER es exactamente ese faltante: <strong>cuánto financiamiento nuevo exige crecer</strong>.</div>
+   <div class="formula">FER = (A*/S₀)·ΔS − (L*/S₀)·ΔS − M·S₁·(1 − d)<small>A* = activos que crecen con ventas · L* = pasivos espontáneos (proveedores, provisiones) · M = margen neto · d = % de dividendos · S₀, S₁ = ventas actuales y proyectadas</small></div>
+   <h3>Balance de Valle Alto al 31-dic-2025 (Bs miles) — ventas 2025: 28.420</h3>
+   <div class="table-wrap"><table class="dt" id="t7Bal"></table></div>
+
+   <div class="steps">
+    <div class="step"><div class="step-n">1</div><div class="step-b"><h4>Clasifica las cuentas: ¿cuáles crecen solas con las ventas?</h4><p><strong class="hl">Espontáneas (varían con ventas):</strong> caja operativa, cuentas por cobrar, inventarios, activo fijo (si la planta está al tope), proveedores y provisiones (sueldos, aguinaldo, impuestos por pagar). <strong class="hl">No espontáneas (decisiones):</strong> deuda bancaria, capital social, reservas (cambian por decisiones de financiamiento y dividendos).</p><div class="calc">A*/S₀ = 21.320 / 28.420 = 75,02%
+L*/S₀ = (2.560 + 1.140) / 28.420 = 13,02%</div></div></div>
+    <div class="step"><div class="step-n">2</div><div class="step-b"><h4>Plantea el escenario de expansión</h4><p>El Directorio evalúa lanzar la línea de snacks de quinua, que llevaría las ventas a <strong class="hl">+18%</strong>.</p><div class="calc">S₁ = 28.420 × 1,18 = 33.535,6     ΔS = 5.115,6</div></div></div>
+    <div class="step"><div class="step-n">3</div><div class="step-b"><h4>Activos adicionales necesarios</h4><div class="calc">0,7502 × 5.115,6 = 3.837,6</div><p>Para vender 18% más necesitas más cuentas por cobrar, más inventario y más capacidad instalada.</p></div></div>
+    <div class="step"><div class="step-n">4</div><div class="step-b"><h4>Financiamiento espontáneo</h4><div class="calc">0,1302 × 5.115,6 = 666,0</div><p>Los proveedores y las provisiones crecen solos: es financiamiento "gratis".</p></div></div>
+    <div class="step"><div class="step-n">5</div><div class="step-b"><h4>Utilidades retenidas</h4><p>Margen neto M = 9,12% (del EERR proforma de la técnica 6). Dividendos d = 40%.</p><div class="calc">0,0912 × 33.535,6 × (1 − 0,40) = 1.835,1</div></div></div>
+    <div class="step"><div class="step-n">6</div><div class="step-b"><h4>Fondos externos requeridos</h4><div class="calc">FER = 3.837,6 − 666,0 − 1.835,1 = 1.336,5  (Bs miles)</div><p>La expansión requiere <strong class="hl">≈ Bs 1,34 millones</strong> de financiamiento nuevo: crédito bancario, aporte de socios o reducir dividendos.</p></div></div>
+    <div class="step"><div class="step-n">7</div><div class="step-b"><h4>Balance proforma: el FER como "cuenta de cierre"</h4><p>Proyecta cada cuenta y coloca el FER como nueva deuda. Si el balance cuadra, el cálculo es correcto. Revisa la tabla del laboratorio (con los valores base del escenario de +18%).</p></div></div>
+    <div class="step"><div class="step-n">8</div><div class="step-b"><h4>Crecimiento autofinanciable (FER = 0)</h4><div class="calc">g* = M·b / (A*/S₀ − L*/S₀ − M·b)       con b = 1 − d = 0,60
+   = 0,05472 / (0,7502 − 0,1302 − 0,05472) = 9,68%</div><p>Valle Alto puede crecer hasta <strong class="hl">9,68%</strong> sin pedir un solo boliviano prestado. El plan base de 2026 (+6,4%) está dentro de ese límite; la expansión (+18%), no.</p></div></div>
+    <div class="step-ctrl"><button class="btn" data-next>Siguiente paso ▸</button><button class="btn ghost" data-all>Ver todos</button><span class="step-count"></span></div>
+   </div>
+
+   <div class="lab">
+    <h3><i class="fas fa-vial"></i> Laboratorio: ¿cuánto financiamiento exige crecer?</h3>
+    <div class="lab-grid">
+     <div>
+      <div class="ctrl"><label>Crecimiento de ventas <span id="t7gV">18%</span></label><input type="range" id="t7g" min="0" max="35" step="0.5" value="18"></div>
+      <div class="ctrl"><label>Margen neto <span id="t7mV">9,12%</span></label><input type="range" id="t7m" min="1" max="16" step="0.01" value="9.12"></div>
+      <div class="ctrl"><label>Dividendos (% de la utilidad) <span id="t7dV">40%</span></label><input type="range" id="t7d" min="0" max="100" step="5" value="40"></div>
+      <label class="toggle"><input type="checkbox" id="t7Oc"> Hay capacidad ociosa: el activo fijo no crece</label>
+     </div>
+     <div>
+      <div class="kpis"><div class="kpi"><div class="k">FER</div><div class="v" id="t7Fer">–</div></div><div class="kpi"><div class="k">Crec. autofinanciable</div><div class="v amb" id="t7G">–</div></div><div class="kpi"><div class="k">Deuda / Patrimonio</div><div class="v" id="t7De">–</div></div></div>
+      <div class="chart-box"><canvas id="t7Chart"></canvas></div>
+     </div>
+    </div>
+    <div class="table-wrap"><table class="dt" id="t7Pro"></table></div>
+    <div class="insight" id="t7Insight"></div>
+   </div>
+
+   <div class="challenge" data-tech="t7" data-answer="1948.2" data-tol="6">
+    <h4><i class="fas fa-puzzle-piece"></i> Tu turno</h4>
+    <p>Los socios piden subir los dividendos al <strong>60%</strong>. Con crecimiento de 18% y margen de 9,12%, ¿cuál es el nuevo FER? (Bs miles, un decimal)</p>
+    <div class="ch-row"><input type="text" inputmode="decimal" placeholder="Ej.: 1.500,0"><span class="unit">Bs miles</span><button class="btn" data-check>Comprobar</button><button class="btn ghost" data-hint>Pista</button></div>
+    <div class="ch-hint hidden">Solo cambian las utilidades retenidas: 0,0912 × 33.535,6 × 0,40. Luego 3.837,6 − 666,0 − ese valor.</div>
+    <div class="ch-fb"></div>
+   </div>
+   <div class="callout bo"><b><i class="fas fa-flag"></i> En Bolivia</b>Opciones para cubrir el FER: crédito productivo con tasa tope (8% para mediana empresa, DS 5403), pagarés o bonos en la Bolsa Boliviana de Valores, leasing para maquinaria, o reinversión de utilidades. Si los socios están en el exterior, los dividendos remesados pagan IUE-BE del 12,5%: otro motivo para reinvertir.</div>
+   <div class="callout warn"><b><i class="fas fa-exclamation-triangle"></i> Error común</b>Proyectar el activo fijo proporcional a las ventas cuando la planta tiene capacidad ociosa. Las inversiones son "escalones": prueba el interruptor del laboratorio y verás cómo el FER se desploma.</div>
+   <div class="next-tech"><button class="btn ghost" data-go="t6">◂ Anterior</button><button class="btn" data-go="t8">Siguiente técnica: Caja mensual ▸</button></div>
+  </div>
+ </section>
+
+ <!-- ============ T8 ============ -->
+ <section class="block tech" id="t8">
+  <div class="card">
+   <div class="tech-head"><div class="tech-num">8</div><div><h2>Presupuesto de caja mensual con calendario boliviano</h2><div class="meta"><span class="tag">Financiera</span><span class="tag">Horizonte 3–12 meses</span><span class="tag amber">Nivel avanzado</span></div></div></div>
+   <div class="analogy"><i class="fas fa-wallet"></i>Una empresa puede ganar dinero y aun así quedarse sin efectivo, igual que una familia con buen sueldo que en diciembre paga colegio, regalos y deudas el mismo mes. El presupuesto de caja responde: <strong>¿en qué mes me falta plata, cuánto y por qué?</strong></div>
+   <div class="formula">Saldo final = Saldo inicial + Cobranzas − Pagos ± Financiamiento &nbsp;|&nbsp; Si Saldo &lt; mínimo → usar línea de crédito</div>
+
+   <div class="steps">
+    <div class="step"><div class="step-n">1</div><div class="step-b"><h4>Ventas mensuales en Bs</h4><p>Desagregamos los trimestres de la técnica 6 en meses (cajas × Bs 120):</p><div class="table-wrap"><table class="dt" id="t8Sales"></table></div></div></div>
+    <div class="step"><div class="step-n">2</div><div class="step-b"><h4>Cédula de cobranzas</h4><p>Patrón de cobro histórico: <strong class="hl">40% al contado, 50% al mes siguiente, 10% a los 60 días</strong>.</p><div class="calc">Cobranza de julio = 40% × ventas jul + 50% × ventas jun + 10% × ventas may
+                 = 0,40 × 2.376.000 + 0,50 × 2.220.000 + 0,10 × 2.268.000
+                 = 950.400 + 1.110.000 + 226.800 = Bs 2.287.200</div></div></div>
+    <div class="step"><div class="step-n">3</div><div class="step-b"><h4>Pagos a proveedores de materia prima</h4><p>Se compra la MP un mes antes de usarla (Bs 50,20 por caja del mes siguiente) y se paga <strong class="hl">60% al contado y 40% a 30 días</strong>.</p></div></div>
+    <div class="step"><div class="step-n">4</div><div class="step-b"><h4>Pagos fijos y variables</h4><div class="calc">Planilla (MOD + administrativos, con aportes):  Bs 430.000 / mes
+Otros fijos (energía, alquileres, servicios):    Bs 330.000 / mes
+Comisiones y fletes:                             4% de las ventas del mes
+Intereses de la deuda existente:                 Bs  40.000 / mes</div></div></div>
+    <div class="step"><div class="step-n">5</div><div class="step-b"><h4>Calendario tributario: IUE y compensación con el IT</h4><p>El IUE de la gestión cerrada al 31-mar-2026 (Bs 919.000) vence 120 días después del cierre: <strong class="hl">fines de julio</strong>. En 2026 el SIN prorrogó ese vencimiento hasta el 31 de agosto (RND 102600000027); en el laboratorio puedes simular esa prórroga.</p><p>El IT (3%) se paga el mes siguiente a la venta. Pero el IUE pagado se puede <strong class="hl">compensar como pago a cuenta del IT</strong> desde el mes siguiente a su pago (Ley 843; el DS 5563 de 2026 eliminó la restricción de pagar antes del vencimiento para compensar). Resultado: de agosto a diciembre Valle Alto <strong class="hl">no desembolsa IT</strong>, porque lo cubre con el crédito del IUE.</p></div></div>
+    <div class="step"><div class="step-n">6</div><div class="step-b"><h4>Calendario laboral: aguinaldo</h4><p>Aguinaldo de Navidad: un sueldo, pagadero <strong class="hl">hasta el 20 de diciembre</strong> (Bs 370.000). El segundo aguinaldo "Esfuerzo por Bolivia" solo procede si el PIB crece más de 4,5%; con las proyecciones de 2026 (FMI −3,0%) <strong class="hl">no se presupuesta</strong>, pero un analista prudente lo menciona como riesgo regulatorio.</p></div></div>
+    <div class="step"><div class="step-n">7</div><div class="step-b"><h4>Partidas no operativas</h4><div class="calc">Agosto:      dividendos               Bs 1.000.000
+Sept. y dic.: amortización deuda CP     Bs   375.000 c/u
+Oct. y nov.:  nuevo horno (CAPEX)       Bs   600.000 c/u</div></div></div>
+    <div class="step"><div class="step-n">8</div><div class="step-b"><h4>Saldo mínimo y línea de crédito</h4><p>Saldo inicial al 1-jul: Bs 1.150.000. Saldo mínimo de seguridad: Bs 800.000. Si el saldo cae por debajo, se usa una línea de crédito rotativa al 8% anual (tope de crédito productivo para mediana empresa); si sobra, se amortiza la línea. Intereses de la línea: 8%/12 sobre el saldo del mes anterior.</p><p><strong class="hl">Resultado:</strong> la línea llega a su máximo en noviembre (≈ Bs 930 mil). Sin la compensación IUE–IT, ese pico subiría a ≈ Bs 1,23 millones. ¡Conocer la norma tributaria vale plata!</p></div></div>
+    <div class="step-ctrl"><button class="btn" data-next>Siguiente paso ▸</button><button class="btn ghost" data-all>Ver todos</button><span class="step-count"></span></div>
+   </div>
+
+   <div class="lab">
+    <h3><i class="fas fa-vial"></i> Laboratorio: tesorero por un semestre</h3>
+    <div class="lab-grid">
+     <div>
+      <div class="ctrl"><label>Cobro contado / 30 d / 60 d <span id="t8cV">40%</span></label><input type="range" id="t8c" min="20" max="80" step="5" value="40"></div>
+      <div class="ctrl"><label>Dividendos de agosto (Bs) <span id="t8dV">1.000.000</span></label><input type="range" id="t8d" min="0" max="1500000" step="50000" value="1000000"></div>
+      <div class="ctrl"><label>Saldo mínimo (Bs) <span id="t8mV">800.000</span></label><input type="range" id="t8m" min="300000" max="1200000" step="50000" value="800000"></div>
+      <label class="toggle"><input type="checkbox" id="t8Comp" checked> Aplicar compensación IUE–IT</label>
+      <label class="toggle"><input type="checkbox" id="t8Pro"> Pagar el IUE en agosto (prórroga 2026)</label>
+      <label class="toggle"><input type="checkbox" id="t8Cap" checked> Ejecutar CAPEX del horno</label>
+      <label class="toggle"><input type="checkbox" id="t8Seg"> Simular segundo aguinaldo (si el PIB creciera &gt; 4,5%)</label>
+     </div>
+     <div>
+      <div class="kpis"><div class="kpi"><div class="k">Pico de la línea</div><div class="v" id="t8Peak">–</div></div><div class="kpi"><div class="k">Mes crítico</div><div class="v amb" id="t8Mon">–</div></div><div class="kpi"><div class="k">Línea al 31-dic</div><div class="v" id="t8End">–</div></div><div class="kpi"><div class="k">Intereses de la línea</div><div class="v" id="t8Int">–</div></div></div>
+      <div class="chart-box"><canvas id="t8Chart"></canvas></div>
+     </div>
+    </div>
+    <div class="table-wrap"><table class="dt" id="t8Tab" style="min-width:820px;"></table></div>
+    <div class="insight" id="t8Insight"></div>
+   </div>
+
+   <div class="challenge" data-tech="t8" data-answer="2384400" data-tol="1">
+    <h4><i class="fas fa-puzzle-piece"></i> Tu turno</h4>
+    <p>Ahora calcula la <strong>cobranza de agosto</strong>. Ventas: junio Bs 2.220.000, julio Bs 2.376.000, agosto Bs 2.436.000. Patrón 40% / 50% / 10%.</p>
+    <div class="ch-row"><input type="text" inputmode="decimal" placeholder="Ej.: 2.300.000"><span class="unit">Bs</span><button class="btn" data-check>Comprobar</button><button class="btn ghost" data-hint>Pista</button></div>
+    <div class="ch-hint hidden">0,40 × 2.436.000 + 0,50 × 2.376.000 + 0,10 × 2.220.000</div>
+    <div class="ch-fb"></div>
+   </div>
+   <div class="callout info"><b><i class="fas fa-info-circle"></i> Simplificación declarada</b>Las cifras están sin IVA. En la práctica el IVA (13%) cobrado y pagado pasa por caja, y el saldo neto (débito − crédito fiscal) se paga al mes siguiente; en empresas que importan mucho, el crédito fiscal puede generar saldos a favor que conviene proyectar.</div>
+   <div class="next-tech"><button class="btn ghost" data-go="t7">◂ Anterior</button><button class="btn" data-go="t9">Siguiente técnica: Riesgo ▸</button></div>
+  </div>
+ </section>
+
+ <!-- ============ T9 ============ -->
+ <section class="block tech" id="t9">
+  <div class="card">
+   <div class="tech-head"><div class="tech-num">9</div><div><h2>Sensibilidad, escenarios ponderados y Monte Carlo</h2><div class="meta"><span class="tag">Riesgo</span><span class="tag">Cualquier horizonte</span><span class="tag amber">Nivel experto</span></div></div></div>
+   <div class="analogy"><i class="fas fa-cloud-sun-rain"></i>El pronóstico del clima no dice "mañana lloverá"; dice "70% de probabilidad de lluvia". Una proyección madura hace lo mismo: no entrega un número, entrega un <strong>rango con probabilidades</strong>. Esta técnica convierte el modelo de la técnica 6 en un mapa de riesgo.</div>
+   <div class="formula">Valor esperado = Σ pᵢ · UNᵢ &nbsp;|&nbsp; Punto de quiebre: valor de la variable donde UN = 0 &nbsp;|&nbsp; Monte Carlo: repetir el modelo miles de veces con variables aleatorias</div>
+
+   <div class="steps">
+    <div class="step"><div class="step-n">1</div><div class="step-b"><h4>Elige las variables críticas</h4><p>Las que combinan <strong class="hl">mucho peso</strong> en el resultado y <strong class="hl">mucha incertidumbre</strong>: volumen, precio, tipo de cambio, salarios, materia prima nacional y tasa de interés. Cada una con un rango sustentado (no "±10% porque sí"): el TCO, por ejemplo, entre 10,00 y 14,00, ya que pasó de 9,73 a 11,75 en cuatro meses.</p></div></div>
+    <div class="step"><div class="step-n">2</div><div class="step-b"><h4>Sensibilidad univariada: una variable a la vez</h4><p>Mueve cada variable a su extremo bajo y alto dejando todo lo demás en el caso base (UN base = Bs 2.757.594). La tabla del laboratorio muestra el resultado.</p></div></div>
+    <div class="step"><div class="step-n">3</div><div class="step-b"><h4>Ordena en un gráfico tornado</h4><p>La barra más ancha arriba. En Valle Alto, las tres primeras son <strong class="hl">precio, volumen y tipo de cambio</strong> (estas dos últimas casi empatadas): ahí debe concentrarse la gestión (coberturas, contratos, política comercial).</p></div></div>
+    <div class="step"><div class="step-n">4</div><div class="step-b"><h4>Calcula puntos de quiebre</h4><div class="calc">TCO de quiebre:     ≈ Bs 17,83 / USD   (UN = 0)
+Volumen de quiebre: ≈ 69% del plan     (las ventas pueden caer ~31%)</div><p>Esto dice cuánta "distancia" hay al abismo. Un banco lo traduce en: "aun con el dólar a 17 la empresa no pierde".</p></div></div>
+    <div class="step"><div class="step-n">5</div><div class="step-b"><h4>Escenarios coherentes (varias variables a la vez)</h4><div class="calc">Pesimista (25%): volumen −8%, precio −3%, TCO 13,50, sueldos +10%  → UN ≈   402.142
+Base      (50%): plan                                              → UN ≈ 2.757.594
+Optimista (25%): volumen +6%, precio +2%, TCO 10,50                → UN ≈ 4.350.159</div><p>Un escenario es una <em>historia coherente</em>: en el pesimista la devaluación y la caída de demanda llegan juntas, como suele ocurrir.</p></div></div>
+    <div class="step"><div class="step-n">6</div><div class="step-b"><h4>Valor esperado</h4><div class="calc">VE = 0,25 × 402.142 + 0,50 × 2.757.594 + 0,25 × 4.350.159 = Bs 2.566.873</div><p>El valor esperado es <strong class="hl">menor que el base</strong>: el riesgo es asimétrico (hay más para perder que para ganar).</p></div></div>
+    <div class="step"><div class="step-n">7</div><div class="step-b"><h4>Monte Carlo: miles de escenarios</h4><p>Asigna a cada variable una distribución triangular (mínimo, más probable, máximo), simula 5.000 años posibles y obtén la distribución completa de la utilidad: probabilidad de pérdida, percentiles 5% y 95%. Así puedes decir: "con 90% de confianza, la UN 2026 estará entre X e Y".</p></div></div>
+    <div class="step-ctrl"><button class="btn" data-next>Siguiente paso ▸</button><button class="btn ghost" data-all>Ver todos</button><span class="step-count"></span></div>
+   </div>
+
+   <div class="lab">
+    <h3><i class="fas fa-vial"></i> Laboratorio A: tornado</h3>
+    <div class="chart-box tall"><canvas id="t9Tor"></canvas></div>
+    <div class="table-wrap"><table class="dt" id="t9TorTab"></table></div>
+   </div>
+
+   <div class="lab">
+    <h3><i class="fas fa-vial"></i> Laboratorio B: escenarios ponderados</h3>
+    <div class="table-wrap"><table class="dt" id="t9Esc" style="min-width:640px;"></table></div>
+    <div class="kpis" style="margin-top:0.6rem;"><div class="kpi"><div class="k">Valor esperado</div><div class="v" id="t9VE">–</div></div><div class="kpi"><div class="k">Rango (opt − pes)</div><div class="v amb" id="t9Ran">–</div></div><div class="kpi"><div class="k">Suma de probabilidades</div><div class="v" id="t9Sum">–</div></div></div>
+   </div>
+
+   <div class="lab">
+    <h3><i class="fas fa-vial"></i> Laboratorio C: Monte Carlo (5.000 simulaciones)</h3>
+    <div class="lab-grid">
+     <div>
+      <p style="font-size:0.82rem;">Distribuciones triangulares (mín · moda · máx):</p>
+      <div class="ctrl"><label>Volumen: −12% · 0 · <span id="t9vMaxV">+8%</span></label><input type="range" id="t9vMax" min="0" max="20" value="8"></div>
+      <div class="ctrl"><label>TCO: 10,00 · 11,75 · <span id="t9tMaxV">14,50</span></label><input type="range" id="t9tMax" min="12" max="20" step="0.25" value="14.5"></div>
+      <div class="ctrl"><label>Precio: −4% · 0 · +3%</label></div>
+      <div class="ctrl"><label>Sueldos: 0 · 0 · <span id="t9sMaxV">+15%</span></label><input type="range" id="t9sMax" min="0" max="30" value="15"></div>
+      <button class="btn amber" id="t9Run"><i class="fas fa-dice"></i> Simular</button>
+     </div>
+     <div>
+      <div class="kpis"><div class="kpi"><div class="k">P(pérdida)</div><div class="v" id="t9Pl">–</div></div><div class="kpi"><div class="k">P5</div><div class="v" id="t9P5">–</div></div><div class="kpi"><div class="k">Mediana</div><div class="v" id="t9P50">–</div></div><div class="kpi"><div class="k">P95</div><div class="v" id="t9P95">–</div></div></div>
+      <div class="chart-box"><canvas id="t9Mc"></canvas></div>
+     </div>
+    </div>
+    <div class="insight" id="t9Insight"></div>
+   </div>
+
+   <div class="challenge" data-tech="t9" data-answer="2566.9" data-tol="1">
+    <h4><i class="fas fa-puzzle-piece"></i> Tu turno</h4>
+    <p>Con las utilidades por escenario (Bs miles): pesimista 402,1; base 2.757,6; optimista 4.350,2 y probabilidades 25% / 50% / 25%, ¿cuál es el valor esperado? (Bs miles, un decimal)</p>
+    <div class="ch-row"><input type="text" inputmode="decimal" placeholder="Ej.: 2.000,0"><span class="unit">Bs miles</span><button class="btn" data-check>Comprobar</button><button class="btn ghost" data-hint>Pista</button></div>
+    <div class="ch-hint hidden">0,25 × 402,1 + 0,50 × 2.757,6 + 0,25 × 4.350,2</div>
+    <div class="ch-fb"></div>
+   </div>
+   <div class="callout bo"><b><i class="fas fa-flag"></i> En Bolivia</b>Variables de riesgo que no deberían faltar en 2026–2027: el tipo de cambio flexible, la disponibilidad de divisas, el repunte de inflación que proyecta el FMI para 2027, cambios en el precio de los combustibles (el acuerdo con el FMI contempla eliminar la subvención) y los bloqueos de carreteras que cortan la distribución.</div>
+   <div class="next-tech"><button class="btn ghost" data-go="t8">◂ Anterior</button><a class="btn" href="#cierre" style="text-decoration:none;">Ir al cierre del taller ▾</a></div>
+  </div>
+ </section>
+
+ <!-- ===================== CLOSING ===================== -->
+ <section class="block" id="cierre">
+  <div class="card">
+   <h2><i class="fas fa-clipboard-check"></i> Checklist del proyeccionista boliviano</h2>
+   <p>Antes de entregar una proyección al Directorio o al banco, marca cada punto. Tu avance se guarda en este navegador.</p>
+   <div class="check-list" id="checkList">
+    <label><input type="checkbox"> Separé volumen y precio (real vs nominal) con el IPC del INE.</label>
+    <label><input type="checkbox"> Cité fuente y fecha de cada supuesto macro (INE, BCB, FMI, decretos).</label>
+    <label><input type="checkbox"> Usé el TCO del BCB vigente y sensibilicé el tipo de cambio.</label>
+    <label><input type="checkbox"> Proyecté la planilla con el SMN vigente y los aportes patronales.</label>
+    <label><input type="checkbox"> Distribuí ventas y costos según la estacionalidad (aguinaldo, carnaval).</label>
+    <label><input type="checkbox"> Crucé el método top-down con el bottom-up (diferencia &lt; 5%).</label>
+    <label><input type="checkbox"> El balance proforma cuadra y el FER está identificado y financiado.</label>
+    <label><input type="checkbox"> El presupuesto de caja incluye IUE, compensación IUE–IT, IT y aguinaldo.</label>
+    <label><input type="checkbox"> La caja nunca queda por debajo del saldo mínimo sin financiamiento previsto.</label>
+    <label><input type="checkbox"> Presenté escenarios, puntos de quiebre y un rango probabilístico.</label>
+   </div>
+   <div class="tech-progress"><span id="checkCount">0 de 10</span><div class="bar"><div id="checkBar"></div></div></div>
+  </div>
+ </section>
+
+ <section class="block">
+  <div class="card">
+   <h2><i class="fas fa-question-circle"></i> Quiz integrador (10 preguntas)</h2>
+   <p class="status-line">Necesitas al menos <strong class="hl">7 de 10</strong> y dominar las 9 técnicas para obtener la insignia.</p>
+   <div id="quizBox"></div>
+   <p id="quizResult" style="text-align:center;font-weight:700;margin-top:0.5rem;"></p>
+   <div style="text-align:center;"><button class="btn ghost hidden" id="quizReset"><i class="fas fa-redo"></i> Reintentar quiz</button></div>
+  </div>
+ </section>
+
+ <section class="block">
+  <div id="badgeStatus" class="status-line"></div>
+  <div class="insignia hidden" id="insignia">
+   <i class="fas fa-medal"></i>
+   <h3>Arquitecto de Proyecciones</h3>
+   <p>Dominas nueve técnicas de proyección y sabes adaptarlas a la realidad boliviana: inflación, tipo de cambio flexible, calendario tributario y riesgo.</p>
+  </div>
+ </section>
+
+ <section class="block">
+  <div class="card">
+   <h2><i class="fas fa-list-ul"></i> Resumen del taller</h2>
+   <ul>
+    <li><strong class="hl">CAGR &gt; promedio simple</strong>: los crecimientos se componen; cuenta períodos, no datos.</li>
+    <li><strong class="hl">Regresión</strong>: un R² alto no basta; residuos con patrón indican no linealidad.</li>
+    <li><strong class="hl">Nominal = real × inflación</strong>: en 2025 Valle Alto "creció" 18,6% nominal y cayó 1,5% real.</li>
+    <li><strong class="hl">Índices estacionales</strong>: T4 ≈ 1,18 por aguinaldo y fiestas; sirven para distribuir y para desestacionalizar.</li>
+    <li><strong class="hl">Suavizado exponencial</strong>: α controla la memoria; se elige midiendo MAPE.</li>
+    <li><strong class="hl">Presupuesto maestro</strong>: ventas → producción → MP (con TCO) → MOD (con SMN) → CIF → EERR proforma.</li>
+    <li><strong class="hl">FER</strong>: crecer cuesta; Valle Alto se autofinancia hasta ≈ 9,7% de crecimiento.</li>
+    <li><strong class="hl">Caja mensual</strong>: IUE, compensación IUE–IT y aguinaldo definen los meses críticos.</li>
+    <li><strong class="hl">Riesgo</strong>: tornado, puntos de quiebre, escenarios ponderados y Monte Carlo convierten un número en un rango.</li>
+   </ul>
+  </div>
+ </section>
+
+ <section class="block">
+  <div class="card">
+   <h2><i class="fas fa-book-open"></i> Fuentes verificables (consultadas el 22-oct-2026)</h2>
+   <ul class="sources">
+    <li><a href="https://www.ine.gob.bo/" target="_blank" rel="noopener">INE Bolivia</a> — IPC y PIB oficiales. Inflación sept-2026: <a href="https://www.opinion.com.bo/pais/ine-inflacion-septiembre-alcanza-085-acumulado-llega-388/20261007095541997287.html" target="_blank" rel="noopener">Opinión: 0,85% mensual, 3,88% acumulada, 5,70% a 12 meses</a>.</li>
+    <li><a href="https://correodelsur.com/economia/20260107/inflacion-del-2025-fue-la-mas-alta-en-36-anos.html" target="_blank" rel="noopener">Correo del Sur — Inflación 2025: 20,40%, la más alta en 36 años</a>.</li>
+    <li><a href="https://www.bcb.gob.bo/" target="_blank" rel="noopener">Banco Central de Bolivia</a> — Tipo de cambio oficial (Bs 11,75 al 22-oct-2026) y UFV (3,36181).</li>
+    <li><a href="https://correodelsur.com/economia/20260626/el-banco-central-de-bolivia-establece-en-bs-9-73-el-nuevo-tipo-de-cambio-flexible.html" target="_blank" rel="noopener">Correo del Sur — El BCB establece en Bs 9,73 el nuevo tipo de cambio flexible</a> · <a href="https://www.ferrere.com/es/novedades/bolivia-adopta-un-regimen-cambiario-flexible-principales-cambios-e-implicancias-para-las-empresas/" target="_blank" rel="noopener">Ferrere — Implicancias para las empresas</a>.</li>
+    <li><a href="https://correodelsur.com/economia/20261014/fmi-bolivia-decrecera-un-3-en-2026-y-otro-1-5-en-2027.html" target="_blank" rel="noopener">Correo del Sur — FMI: Bolivia decrecerá 3% en 2026 y 1,5% en 2027</a> · <a href="https://tribunadosertao.com.br/geral/2026/10/14/996623-fmi-projeta-queda-no-pib-da-bolivia-em-2026-e-2027" target="_blank" rel="noopener">inflación proyectada 12,7% (2026) y 15,8% (2027)</a>.</li>
+    <li><a href="https://www.reduno.com.bo/economia/cepal-proyecta-que-bolivia-crecera-solo-0-5-en-2026-que-pasara-en-2027-202682112629" target="_blank" rel="noopener">Red Uno — CEPAL proyecta crecimiento de 0,5% en 2026</a>.</li>
+    <li><a href="https://unitel.bo/noticias/economia/decreto-el-salario-minimo-sube-a-bs-3300-su-aplicacion-es-obligatoria-y-rige-desde-el-2-de-enero-de-2026-CM18639182" target="_blank" rel="noopener">Unitel — DS 5516: salario mínimo de Bs 3.300</a>.</li>
+    <li><a href="https://www.lexivox.org/norms/BO-DS-N5403.xhtml" target="_blank" rel="noopener">DS 5403 — Tasas máximas del crédito productivo</a>.</li>
+    <li><a href="https://boliviaimpuestos.com/ds-5563-incentivos-tributarios-2026-bolivia-resumen/" target="_blank" rel="noopener">Bolivia Impuestos — DS 5563 y compensación IUE–IT</a> · <a href="https://regfollower.com/bolivia-sin-extends-corporate-income-tax-payment-filing-deadlines/" target="_blank" rel="noopener">Prórroga del IUE (cierre marzo 2026) al 31-ago-2026</a>.</li>
+    <li><a href="https://pages.stern.nyu.edu/~adamodar/" target="_blank" rel="noopener">Damodaran Online</a> — Proyección de ventas, márgenes y simulación.</li>
+   </ul>
+   <div class="callout info"><b><i class="fas fa-info-circle"></i> Aviso</b>Valle Alto Alimentos S.A. es una empresa ficticia. Las cifras de la empresa son didácticas; los datos macroeconómicos y normativos son reales a la fecha indicada y deben actualizarse antes de usarse en una proyección profesional.</div>
+  </div>
+ </section>
+
+ <div class="nav-links">
+  <a href="23-proyecciones-financieras.html" class="nav-link"><i class="fas fa-arrow-left"></i> Módulo 23: Proyecciones</a>
+  <a href="index.html" class="nav-link" style="color:rgba(255,255,255,0.5);"><i class="fas fa-home"></i> Menú</a>
+  <a href="24-toma-decisiones.html" class="nav-link next">Siguiente: Toma de Decisiones <i class="fas fa-arrow-right"></i></a>
+ </div>
+ <footer><i class="fas fa-chart-bar"></i> Análisis e Interpretación de EEFF · Módulo 23-B · Taller de Técnicas de Proyección</footer>
+</div>
+
+<script>
+(function () {
+ 'use strict';
+ // ---------- helpers ----------
+ var store = {
+  get: function (k, d) { try { var v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set: function (k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+ };
+ function nf(x, d) { d = d || 0; return Number(x).toLocaleString('es-BO', { minimumFractionDigits: d, maximumFractionDigits: d }); }
+ function pct(x, d) { return nf(x * 100, d === undefined ? 2 : d) + '%'; }
+ function bs(x) { return 'Bs ' + nf(Math.round(x)); }
+ function bsM(x) { return 'Bs ' + nf(x / 1e6, 2) + ' MM'; }
+ function $(id) { return document.getElementById(id); }
+ function row(cells, cls) { return '<tr' + (cls ? ' class="' + cls + '"' : '') + '>' + cells.map(function (c) { return '<td>' + c + '</td>'; }).join('') + '</tr>'; }
+ function head(cells) { return '<tr>' + cells.map(function (c) { return '<th>' + c + '</th>'; }).join('') + '</tr>'; }
+ function parseNum(s) {
+  s = String(s).trim().replace(/\s|%|Bs/gi, '');
+  if (!s) return NaN;
+  if (s.indexOf(',') >= 0 && s.indexOf('.') >= 0) s = s.replace(/\./g, '').replace(',', '.');
+  else if (s.indexOf(',') >= 0) s = s.replace(',', '.');
+  else if (/^-?\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, '');
+  return parseFloat(s);
+ }
+ var hasChart = typeof window.Chart !== 'undefined';
+ if (hasChart) {
+  Chart.defaults.color = '#b9cec0';
+  Chart.defaults.borderColor = 'rgba(255,255,255,0.07)';
+  Chart.defaults.font.family = 'Inter, sans-serif';
+  Chart.defaults.font.size = 11;
+ }
+ var charts = {};
+ function draw(id, cfg) {
+  if (!hasChart) return;
+  var el = $(id); if (!el) return;
+  cfg.options = cfg.options || {};
+  cfg.options.responsive = true; cfg.options.maintainAspectRatio = false;
+  if (charts[id]) { charts[id].data = cfg.data; charts[id].options = cfg.options; charts[id].update('none'); }
+  else charts[id] = new Chart(el, cfg);
+ }
+ var C = { g: '#34d399', g2: '#10b981', a: '#fbbf24', r: '#f87171', b: '#60a5fa', v: '#a78bfa', dim: 'rgba(255,255,255,0.35)' };
+
+ // ---------- course progress ----------
+ var PROGRESS_KEY = 'aef_progress', MODULE_KEY = 'aef_23b', TOTAL_MODULES = 34;
+ function courseProgress() {
+  var p = store.get(PROGRESS_KEY, []); if (!Array.isArray(p)) p = [];
+  var pc = Math.min(100, Math.round(p.length / TOTAL_MODULES * 100));
+  $('courseFill').style.width = pc + '%';
+  $('courseText').textContent = 'Módulo 23-B · curso ' + p.length + ' de ' + TOTAL_MODULES + ' (' + pc + '%)';
+ }
+
+ // ---------- data ----------
+ var YEARS = [2021, 2022, 2023, 2024, 2025];
+ var NOM = [18400, 19830, 21260, 23960, 28420];
+ var INF = [0, 0.0312, 0.0212, 0.0997, 0.2040];
+ var IDX = [100]; for (var i = 1; i < 5; i++) IDX.push(IDX[i - 1] * (1 + INF[i]));
+ var REAL = NOM.map(function (v, i) { return v / IDX[i] * 100; });
+ var QDATA = { 2023: [5105, 4741, 5135, 6279], 2024: [5604, 5444, 5809, 7103], 2025: [6751, 6364, 6962, 8343] };
+ var MONTHS5 = ['oct-25', 'nov-25', 'dic-25', 'ene-26', 'feb-26', 'mar-26', 'abr-26', 'may-26', 'jun-26', 'jul-26', 'ago-26', 'sep-26'];
+ var M5 = [4100, 4320, 5150, 3980, 4550, 4200, 4020, 4180, 4090, 4310, 4450, 4380];
+
+ // ---------- tabs ----------
+ var renderers = {};
+ function showTab(id, scroll) {
+  document.querySelectorAll('.tech').forEach(function (s) { s.classList.toggle('active', s.id === id); });
+  document.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.toggle('active', b.dataset.tab === id); });
+  store.set('aef_23b_tab', id);
+  if (renderers[id]) renderers[id]();
+  if (scroll) $(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
+  var act = document.querySelector('.tab-btn.active'), bar = $('tabs');
+  if (act && bar) bar.scrollLeft = act.offsetLeft - bar.clientWidth / 2 + act.clientWidth / 2;
+ }
+ document.querySelectorAll('.tab-btn').forEach(function (b) { b.addEventListener('click', function () { showTab(b.dataset.tab, false); }); });
+ document.querySelectorAll('[data-go]').forEach(function (b) { b.addEventListener('click', function () { showTab(b.dataset.go, true); }); });
+
+ // ---------- steps ----------
+ document.querySelectorAll('.steps').forEach(function (box) {
+  var steps = Array.prototype.slice.call(box.querySelectorAll('.step'));
+  var n = 1, next = box.querySelector('[data-next]'), all = box.querySelector('[data-all]'), cnt = box.querySelector('.step-count');
+  function upd() {
+   steps.forEach(function (s, i) { s.classList.toggle('shown', i < n); });
+   cnt.textContent = 'Paso ' + n + ' de ' + steps.length;
+   next.disabled = n >= steps.length; all.disabled = n >= steps.length;
+   if (n >= steps.length) next.textContent = '✓ Resolución completa';
+  }
+  next.addEventListener('click', function () { if (n < steps.length) { n++; upd(); steps[n - 1].scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } });
+  all.addEventListener('click', function () { n = steps.length; upd(); });
+  upd();
+ });
+
+ // ---------- challenges ----------
+ var TECH_KEY = 'aef_23b_tecnicas';
+ var done = store.get(TECH_KEY, []); if (!Array.isArray(done)) done = [];
+ function refreshTech() {
+  document.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.toggle('done', done.indexOf(b.dataset.tab) >= 0); });
+  $('techCount').textContent = done.length + ' de 9 técnicas dominadas';
+  $('techBar').style.width = (done.length / 9 * 100) + '%';
+  checkBadge();
+ }
+ document.querySelectorAll('.challenge').forEach(function (ch) {
+  var inp = ch.querySelector('input'), fb = ch.querySelector('.ch-fb'), hint = ch.querySelector('.ch-hint');
+  var ans = parseFloat(ch.dataset.answer), tol = parseFloat(ch.dataset.tol), tech = ch.dataset.tech;
+  if (done.indexOf(tech) >= 0) { fb.className = 'ch-fb ok'; fb.innerHTML = '<i class="fas fa-check-circle"></i> Reto ya resuelto anteriormente. Respuesta: ' + nf(ans, ans % 1 ? 2 : 0); }
+  function check() {
+   var v = parseNum(inp.value);
+   if (isNaN(v)) { fb.className = 'ch-fb no'; fb.textContent = 'Escribe un número (puedes usar coma decimal).'; return; }
+   if (Math.abs(v - ans) <= tol) {
+    fb.className = 'ch-fb ok'; fb.innerHTML = '<i class="fas fa-check-circle"></i> ¡Correcto! Técnica dominada.';
+    if (done.indexOf(tech) < 0) { done.push(tech); store.set(TECH_KEY, done); refreshTech(); }
+   } else {
+    fb.className = 'ch-fb no';
+    var dir = v > ans ? 'alto' : 'bajo';
+    fb.innerHTML = '<i class="fas fa-times-circle"></i> No es correcto (tu valor está ' + dir + '). Revisa la pista o vuelve a los pasos.';
+   }
+  }
+  ch.querySelector('[data-check]').addEventListener('click', check);
+  inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+  ch.querySelector('[data-hint]').addEventListener('click', function () { hint.classList.toggle('hidden'); });
+ });
+
+ // ---------- selector ----------
+ function reco() {
+  var o = $('selObj').value, h = $('selHor').value, d = $('selDat').value, r = [];
+  if (o === 'ventas') {
+   if (h === 'corto' || d === 'mensual') r.push(['t5', 'Suavizado exponencial + MAPE'], ['t4', 'Índices estacionales']);
+   else r.push(['t3', 'Nominal vs real (Fisher)'], ['t1', 'CAGR'], ['t2', 'Regresión']);
+   if (d === 'eeff') r.push(['t6', 'Presupuesto por drivers']);
+  } else if (o === 'financ') r.push(['t7', '% de ventas + FER'], ['t6', 'Presupuesto maestro']);
+  else if (o === 'caja') r.push(['t8', 'Presupuesto de caja mensual'], ['t4', 'Estacionalidad']);
+  else if (o === 'riesgo') r.push(['t9', 'Sensibilidad, escenarios y Monte Carlo']);
+  else r.push(['t6', 'Presupuesto maestro'], ['t7', 'Balance proforma y FER'], ['t8', 'Caja mensual']);
+  if (h === 'largo') r.push(['t3', 'Separar inflación (imprescindible a largo plazo)']);
+  var seen = {}, html = '<i class="fas fa-lightbulb"></i> <strong>Recomendación:</strong> ';
+  html += r.filter(function (x) { if (seen[x[0]]) return false; seen[x[0]] = 1; return true; }).map(function (x) { return '<a data-goto="' + x[0] + '">' + x[1] + '</a>'; }).join(' → ');
+  html += '. Siempre cierra con la técnica 9 para cuantificar el riesgo.';
+  $('recoBox').innerHTML = html;
+  $('recoBox').querySelectorAll('[data-goto]').forEach(function (a) { a.addEventListener('click', function () { showTab(a.dataset.goto, true); }); });
+ }
+ ['selObj', 'selHor', 'selDat'].forEach(function (id) { $(id).addEventListener('change', reco); });
+
+ // ================= T1 =================
+ renderers.t1 = function () {
+  var s = parseInt($('t1Start').value, 10), real = $('t1Real').checked, H = parseInt($('t1Hor').value, 10);
+  $('t1HorV').textContent = H;
+  var ser = real ? REAL : NOM, n = 4 - s;
+  var cagr = Math.pow(ser[4] / ser[s], 1 / n) - 1, gs = [];
+  for (var i = s + 1; i < 5; i++) gs.push(ser[i] / ser[i - 1] - 1);
+  var avg = gs.reduce(function (a, b) { return a + b; }, 0) / gs.length;
+  var labels = YEARS.map(String), hist = ser.slice(), pc = [], pa = [];
+  for (var k = 0; k < 5; k++) { pc.push(k === 4 ? ser[4] : null); pa.push(k === 4 ? ser[4] : null); }
+  for (var j = 1; j <= H; j++) { labels.push(String(2025 + j)); hist.push(null); pc.push(ser[4] * Math.pow(1 + cagr, j)); pa.push(ser[4] * Math.pow(1 + avg, j)); }
+  $('t1Cagr').textContent = pct(cagr); $('t1Avg').textContent = pct(avg);
+  $('t1Gap').textContent = nf(pa[pa.length - 1] - pc[pc.length - 1]);
+  $('t1Insight').innerHTML = (real ? '<strong>Serie real:</strong> sin el efecto de la inflación, el CAGR ' + YEARS[s] + '–2025 es apenas ' + pct(cagr) + '. El crecimiento "de verdad" (volumen) es mucho menor que el nominal.' : '<strong>Serie nominal:</strong> el CAGR ' + YEARS[s] + '–2025 es ' + pct(cagr) + '.') + ' Cambia el año inicial: ' + (s >= 2 ? 'al empezar en ' + YEARS[s] + ' la tasa queda dominada por los años inflacionarios.' : 'con más años la tasa se "diluye" pero es más representativa.') + ' La brecha muestra cuánto sobrestima el promedio simple al final del horizonte (Bs miles).';
+  draw('t1Chart', { type: 'bar', data: { labels: labels, datasets: [
+   { type: 'bar', label: real ? 'Ventas reales' : 'Ventas nominales', data: hist, backgroundColor: 'rgba(52,211,153,0.55)', borderRadius: 6 },
+   { type: 'line', label: 'Proyección CAGR', data: pc, borderColor: C.a, backgroundColor: C.a, tension: 0.2, spanGaps: true },
+   { type: 'line', label: 'Proyección promedio simple', data: pa, borderColor: C.r, borderDash: [5, 4], backgroundColor: C.r, tension: 0.2, spanGaps: true }
+  ] }, options: { plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: function (c) { return c.dataset.label + ': ' + nf(c.parsed.y); } } } }, scales: { y: { title: { display: true, text: 'Bs miles' } } } } });
+ };
+ ['t1Start', 't1Real', 't1Hor'].forEach(function (id) { $(id).addEventListener('input', renderers.t1); $(id).addEventListener('change', renderers.t1); });
+
+ // ================= T2 =================
+ function linreg(xs, ys) {
+  var n = xs.length, sx = 0, sy = 0, sxx = 0, sxy = 0;
+  for (var i = 0; i < n; i++) { sx += xs[i]; sy += ys[i]; sxx += xs[i] * xs[i]; sxy += xs[i] * ys[i]; }
+  var b = (n * sxy - sx * sy) / (n * sxx - sx * sx), a = (sy - b * sx) / n, ym = sy / n, sst = 0, sse = 0;
+  for (var j = 0; j < n; j++) { sst += Math.pow(ys[j] - ym, 2); sse += Math.pow(ys[j] - (a + b * xs[j]), 2); }
+  return { a: a, b: b, r2: 1 - sse / sst, sx: sx, sy: sy, sxx: sxx, sxy: sxy };
+ }
+ (function () {
+  var h = head(['Año', 't', 'y (ventas)', 't²', 't · y']), st = 0, sy = 0, stt = 0, sty = 0;
+  for (var i = 0; i < 5; i++) { var t = i + 1; st += t; sy += NOM[i]; stt += t * t; sty += t * NOM[i]; h += row([YEARS[i], t, nf(NOM[i]), t * t, nf(t * NOM[i])]); }
+  h += row(['Σ', st, nf(sy), stt, nf(sty)], 'tot');
+  $('t2Aux').innerHTML = h;
+ })();
+ renderers.t2 = function () {
+  var real = $('t2Serie').value === 'real', ex = $('t2Ex25').checked, H = parseInt($('t2Hor').value, 10);
+  $('t2HorV').textContent = H;
+  var ser = real ? REAL : NOM, m = ex ? 4 : 5, xs = [], ys = [];
+  for (var i = 0; i < m; i++) { xs.push(i + 1); ys.push(ser[i]); }
+  var r = linreg(xs, ys);
+  $('t2Eq').textContent = 'ŷ = ' + nf(r.a) + ' + ' + nf(r.b) + '·t';
+  $('t2R2').textContent = nf(r.r2, 4);
+  $('t2F26').textContent = nf(r.a + r.b * 6);
+  var labels = [], pts = [], fit = [];
+  for (var y = 2021; y <= H; y++) { var t = y - 2020; labels.push(String(y)); pts.push(t <= 5 ? ser[t - 1] : null); fit.push(r.a + r.b * t); }
+  var resid = ys.map(function (v, k) { return v - (r.a + r.b * xs[k]); });
+  $('t2Insight').innerHTML = 'Residuos: ' + resid.map(function (e, k) { return YEARS[k] + ' <strong style="color:' + (e >= 0 ? C.g : C.r) + '">' + (e >= 0 ? '+' : '') + nf(e) + '</strong>'; }).join(' · ') + '. ' + (real ? 'En términos reales la pendiente es solo ' + nf(r.b) + ' por año: la empresa casi no crece en volumen desde 2023.' : (ex ? 'Sin 2025, la recta es más plana: ese único año inflacionario mueve mucho la proyección.' : 'Los residuos forman una "U": la serie nominal se curva por la inflación.'));
+  draw('t2Chart', { type: 'line', data: { labels: labels, datasets: [
+   { label: real ? 'Ventas reales' : 'Ventas nominales', data: pts, showLine: false, pointRadius: 6, pointBackgroundColor: C.g, borderColor: C.g },
+   { label: 'Recta de regresión', data: fit, borderColor: C.a, borderDash: [6, 4], pointRadius: 2, pointBackgroundColor: C.a }
+  ] }, options: { plugins: { legend: { position: 'bottom' } }, scales: { y: { title: { display: true, text: 'Bs miles' } } } } });
+ };
+ ['t2Serie', 't2Ex25', 't2Hor'].forEach(function (id) { $(id).addEventListener('input', renderers.t2); $(id).addEventListener('change', renderers.t2); });
+
+ // ================= T3 =================
+ (function () {
+  var h = head(['Año', 'Nominal', 'Índice', 'Real (Bs 2021)', 'Cálculo']);
+  for (var i = 0; i < 5; i++) h += row([YEARS[i], nf(NOM[i]), nf(IDX[i], 2), nf(REAL[i]), nf(NOM[i]) + ' / ' + nf(IDX[i] / 100, 4)]);
+  $('t3Tab').innerHTML = h;
+ })();
+ renderers.t3 = function () {
+  var g = parseFloat($('t3g').value) / 100, p = parseFloat($('t3p').value) / 100;
+  $('t3gV').textContent = (g >= 0 ? '+' : '') + nf(g * 100, 1) + '%'; $('t3pV').textContent = nf(p * 100, 1) + '%';
+  var gn = (1 + g) * (1 + p) - 1, v26 = NOM[4] * (1 + gn), d = v26 - NOM[4];
+  var efV = NOM[4] * g, efP = d - efV;
+  $('t3Nom').textContent = pct(gn); $('t3V26').textContent = nf(v26);
+  $('t3EfP').textContent = (efP >= 0 ? '+' : '') + nf(efP); $('t3EfV').textContent = (efV >= 0 ? '+' : '') + nf(efV);
+  $('t3EfV').className = 'v' + (efV < 0 ? ' neg' : '');
+  $('t3Insight').innerHTML = 'De los Bs ' + nf(d) + ' miles de aumento nominal, <strong>' + nf(efP) + '</strong> son efecto precio y <strong>' + nf(efV) + '</strong> efecto volumen. ' + (gn > 0 && g < 0 ? 'Ojo: las ventas nominales suben aunque se vendan <strong>menos cajas</strong>. Eso no es crecimiento: es inflación.' : (g > 0.04 ? 'Un crecimiento real tan alto en un país cuyo PIB cae exige un plan comercial concreto que lo respalde.' : 'Supuestos razonables para el contexto 2026.'));
+  var labels = YEARS.map(String).concat(['2026p']), nomS = NOM.concat([v26]), idx26 = IDX[4] * (1 + p), realS = REAL.concat([v26 / idx26 * 100]);
+  draw('t3Chart', { type: 'line', data: { labels: labels, datasets: [
+   { label: 'Nominal', data: nomS, borderColor: C.a, backgroundColor: 'rgba(251,191,36,0.15)', fill: true, tension: 0.25 },
+   { label: 'Real (Bs de 2021)', data: realS, borderColor: C.g, backgroundColor: 'rgba(52,211,153,0.12)', fill: true, tension: 0.25 }
+  ] }, options: { plugins: { legend: { position: 'bottom' } }, scales: { y: { title: { display: true, text: 'Bs miles' } } } } });
+ };
+ ['t3g', 't3p'].forEach(function (id) { $(id).addEventListener('input', renderers.t3); });
+ document.querySelectorAll('[data-t3p]').forEach(function (b) { b.addEventListener('click', function () { $('t3p').value = parseFloat(b.dataset.t3p) * 100; renderers.t3(); }); });
+
+ // ================= T4 =================
+ var SIDX = [0, 0, 0, 0];
+ (function () {
+  var h = head(['Año', 'T1', 'T2', 'T3', 'T4', 'Total']), hr = head(['Año', 'T1', 'T2', 'T3', 'T4', 'Promedio trim.']);
+  [2023, 2024, 2025].forEach(function (y) {
+   var q = QDATA[y], tot = q.reduce(function (a, b) { return a + b; }, 0), av = tot / 4;
+   h += row([y].concat(q.map(function (x) { return nf(x); })).concat([nf(tot)]));
+   hr += row([y].concat(q.map(function (x) { return nf(x / av, 4); })).concat([nf(av)]));
+   q.forEach(function (x, k) { SIDX[k] += x / av / 3; });
+  });
+  hr += row(['Índice'].concat(SIDX.map(function (x) { return nf(x, 4); })).concat(['Σ = ' + nf(SIDX.reduce(function (a, b) { return a + b; }, 0), 4)]), 'tot');
+  $('t4Data').innerHTML = h; $('t4Ratios').innerHTML = hr;
+ })();
+ renderers.t4 = function () {
+  var A = parseFloat($('t4A').value), des = $('t4Des').checked, obs = parseFloat($('t4Obs').value);
+  $('t4AV').textContent = nf(A); $('t4ObsV').textContent = nf(obs);
+  var q26 = SIDX.map(function (s) { return A / 4 * s; });
+  $('t4Q4').textContent = nf(q26[3]);
+  var ds = obs / SIDX[1], vs = ds / (A / 4) - 1;
+  $('t4Ds').textContent = nf(ds); $('t4Vs').textContent = (vs >= 0 ? '+' : '') + pct(vs, 1); $('t4Vs').className = 'v' + (vs < 0 ? ' neg' : '');
+  var labels = [], data = [], col = [];
+  [2023, 2024, 2025].forEach(function (y) { QDATA[y].forEach(function (x, k) { labels.push('T' + (k + 1) + '-' + String(y).slice(2)); data.push(des ? x / SIDX[k] : x); col.push('rgba(52,211,153,0.55)'); }); });
+  q26.forEach(function (x, k) { labels.push('T' + (k + 1) + '-26p'); data.push(des ? x / SIDX[k] : x); col.push('rgba(251,191,36,0.7)'); });
+  draw('t4Chart', { type: 'bar', data: { labels: labels, datasets: [{ label: des ? 'Ventas desestacionalizadas' : 'Ventas trimestrales (verde: real · ámbar: proyectado)', data: data, backgroundColor: col, borderRadius: 4 }] }, options: { plugins: { legend: { position: 'bottom' } }, scales: { y: { title: { display: true, text: 'Bs miles' } } } } });
+ };
+ ['t4A', 't4Des', 't4Obs'].forEach(function (id) { $(id).addEventListener('input', renderers.t4); $(id).addEventListener('change', renderers.t4); });
+
+ // ================= T5 =================
+ (function () {
+  $('t5Data').innerHTML = head(['Mes'].concat(MONTHS5.slice(0, 6))) + row(['Cajas'].concat(M5.slice(0, 6).map(function (x) { return nf(x); }))) + head(['Mes'].concat(MONTHS5.slice(6))) + row(['Cajas'].concat(M5.slice(6).map(function (x) { return nf(x); })));
+ })();
+ function ses(alpha) {
+  var F = [null, M5[0]];
+  for (var t = 1; t < M5.length; t++) F.push(alpha * M5[t] + (1 - alpha) * F[t]);
+  return F; // F[t] = forecast for month t; F[12] = oct-26
+ }
+ function ma3() { var F = [null, null, null]; for (var t = 3; t <= M5.length; t++) F.push((M5[t - 1] + M5[t - 2] + M5[t - 3]) / 3); return F; }
+ function mape(F, from) { var s = 0, n = 0; for (var t = from; t < M5.length; t++) { if (F[t] !== null) { s += Math.abs(M5[t] - F[t]) / M5[t]; n++; } } return s / n; }
+ renderers.t5 = function () {
+  var a = parseFloat($('t5a').value); $('t5aV').textContent = nf(a, 2);
+  var F = ses(a), P = ma3(), eS = mape(F, 3), eP = mape(P, 3);
+  $('t5Fc').textContent = nf(F[12], 1); $('t5Fm').textContent = nf(P[12], 1);
+  $('t5Err').innerHTML = head(['Método', 'MAPE (ene–sep)']) + row(['Suavizado α=' + nf(a, 2), pct(eS)], eS <= eP ? 'tot' : '') + row(['Promedio móvil 3m', pct(eP)], eP < eS ? 'tot' : '');
+  var h = head(['Mes', 'Real', 'F (SES)', '|A−F|/A', 'F (PM3)', '|A−F|/A']);
+  for (var t = 0; t <= 12; t++) {
+   var A = t < 12 ? M5[t] : null;
+   h += row([t < 12 ? MONTHS5[t] : 'oct-26', A === null ? '—' : nf(A), F[t] === null || F[t] === undefined ? '—' : nf(F[t], 1), (A && F[t]) ? pct(Math.abs(A - F[t]) / A, 1) : '—', P[t] === null || P[t] === undefined ? '—' : nf(P[t], 1), (A && P[t]) ? pct(Math.abs(A - P[t]) / A, 1) : '—'], t === 12 ? 'hl' : '');
+  }
+  $('t5Full').innerHTML = h;
+  $('t5Insight').innerHTML = 'Con α = ' + nf(a, 2) + ' el pronóstico ' + (a >= 0.6 ? '<strong>persigue</strong> cada movimiento: el pico de diciembre se traslada a enero y el error sube.' : (a <= 0.15 ? 'es muy <strong>lento</strong>: casi ignora los datos recientes.' : 'equilibra memoria y reacción.')) + ' El MAPE se mide de enero a septiembre para comparar ambos métodos en los mismos meses.';
+  var labels = MONTHS5.concat(['oct-26']);
+  draw('t5Chart', { type: 'line', data: { labels: labels, datasets: [
+   { label: 'Real', data: M5.concat([null]), borderColor: C.g, backgroundColor: C.g, tension: 0.2, pointRadius: 4 },
+   { label: 'Suavizado exponencial', data: F.slice(0, 13), borderColor: C.a, borderDash: [5, 3], tension: 0.2, pointRadius: 2 },
+   { label: 'Promedio móvil 3m', data: P.slice(0, 13), borderColor: C.b, borderDash: [2, 3], tension: 0.2, pointRadius: 2 }
+  ] }, options: { plugins: { legend: { position: 'bottom' } }, scales: { y: { title: { display: true, text: 'Cajas' } } } } });
+ };
+ $('t5a').addEventListener('input', renderers.t5);
+ $('t5Opt').addEventListener('click', function () {
+  var best = 0.05, be = 9;
+  for (var a = 0.05; a <= 0.951; a += 0.05) { var e = mape(ses(a), 3); if (e < be) { be = e; best = a; } }
+  $('t5a').value = best.toFixed(2); renderers.t5();
+ });
+
+ // ================= T6 model =================
+ var BASE_U = [59850, 56700, 61110, 74340], NEXT_Q = 62000, II0 = 11500;
+ var CARGA = 0.1671 + 2 / 12;
+ function presupuesto(p) {
+  p = Object.assign({ vol: 1, precio: 120, tco: 11.75, sal: 3600, mpn: 22, tasa: 0.08 }, p || {});
+  var U = BASE_U.map(function (x) { return x * p.vol; }), nxt = NEXT_Q * p.vol;
+  var IF = [U[1], U[2], U[3], nxt].map(function (x) { return 0.2 * x; });
+  var II = [II0, IF[0], IF[1], IF[2]];
+  var prod = U.map(function (u, k) { return u + IF[k] - II[k]; });
+  var units = U.reduce(function (a, b) { return a + b; }, 0), P = prod.reduce(function (a, b) { return a + b; }, 0);
+  var mpi = 2.40 * p.tco, mpu = p.mpn + mpi, costoMes = p.sal * (1 + CARGA), hora = costoMes / 192, modu = 0.40 * hora;
+  var cifv = 4, cff = 3600000, cifFu = cff / P, cu = mpu + modu + cifv + cifFu;
+  var V = units * p.precio, CV = units * cu, MB = V - CV;
+  var gaf = 4200000 * (0.55 + 0.45 * p.sal / 3600), gvar = 0.04 * V, it = 0.03 * V;
+  var ebit = MB - gaf - gvar - it, dep = 1000000, intr = 6000000 * p.tasa, uai = ebit - intr, iue = Math.max(0, 0.25 * uai), un = uai - iue;
+  return { p: p, U: U, IF: IF, II: II, prod: prod, units: units, P: P, mpi: mpi, mpu: mpu, costoMes: costoMes, hora: hora, modu: modu, cifv: cifv, cifFu: cifFu, cu: cu, V: V, CV: CV, MB: MB, gaf: gaf, gvar: gvar, it: it, ebit: ebit, ebitda: ebit + dep, intr: intr, uai: uai, iue: iue, un: un };
+ }
+ function eerrRows(r, base) {
+  var rows = [['Ventas netas', r.V], ['(−) Costo de ventas', -r.CV], ['= Utilidad bruta', r.MB, 'tot'], ['(−) Gastos fijos de adm. y ventas', -r.gaf], ['(−) Comisiones y fletes (4%)', -r.gvar], ['(−) Impuesto a las Transacciones (3%)', -r.it], ['= Utilidad operativa (EBIT)', r.ebit, 'tot'], ['(−) Intereses', -r.intr], ['= Utilidad antes del IUE', r.uai, 'tot'], ['(−) IUE 25%', -r.iue], ['= Utilidad neta', r.un, 'tot']];
+  var h = head(['Concepto', 'Bs', '% ventas'].concat(base ? ['Δ vs base'] : []));
+  var keys = ['V', 'CV', 'MB', 'gaf', 'gvar', 'it', 'ebit', 'intr', 'uai', 'iue', 'un'], sg = [1, -1, 1, -1, -1, -1, 1, -1, 1, -1, 1];
+  rows.forEach(function (x, k) {
+   var cells = [x[0], nf(x[1]), pct(x[1] / r.V, 1)];
+   if (base) { var dd = x[1] - sg[k] * base[keys[k]]; cells.push('<span style="color:' + (Math.abs(dd) < 1 ? C.dim : dd > 0 ? C.g : C.r) + '">' + (Math.abs(dd) < 1 ? '—' : (dd > 0 ? '+' : '') + nf(dd)) + '</span>'); }
+   h += row(cells, x[2] || '');
+  });
+  return h;
+ }
+ var B = presupuesto();
+ (function () {
+  var q = ['T1', 'T2', 'T3', 'T4', 'Total'];
+  $('t6C1').innerHTML = head(['Concepto'].concat(q)) + row(['Cajas'].concat(B.U.map(nf2)).concat([nf(B.units)])) + row(['Precio (Bs)', '120', '120', '120', '120', '120']) + row(['Ventas (Bs)'].concat(B.U.map(function (u) { return nf(u * 120); })).concat([nf(B.V)]), 'tot');
+  $('t6C2').innerHTML = head(['Cajas'].concat(q)) + row(['Ventas'].concat(B.U.map(nf2)).concat([nf(B.units)])) + row(['+ Inventario final deseado'].concat(B.IF.map(nf2)).concat([nf(B.IF[3])])) + row(['= Necesidad total'].concat(B.U.map(function (u, k) { return nf(u + B.IF[k]); })).concat(['—'])) + row(['− Inventario inicial'].concat(B.II.map(nf2)).concat([nf(B.II[0])])) + row(['= Producción'].concat(B.prod.map(nf2)).concat([nf(B.P)]), 'tot');
+  $('t6C3').innerHTML = head(['Bs'].concat(q)) + row(['MP nacional (22,00)'].concat(B.prod.map(function (x) { return nf(x * 22); })).concat([nf(B.P * 22)])) + row(['MP importada (28,20)'].concat(B.prod.map(function (x) { return nf(x * B.mpi); })).concat([nf(B.P * B.mpi)])) + row(['Consumo de MP'].concat(B.prod.map(function (x) { return nf(x * B.mpu); })).concat([nf(B.P * B.mpu)]), 'tot') + row(['  de lo cual en USD'].concat(B.prod.map(function (x) { return nf(x * 2.4); })).concat([nf(B.P * 2.4)]), 'sub');
+  $('t6C4').innerHTML = head(['Concepto'].concat(q)) + row(['Producción (cajas)'].concat(B.prod.map(nf2)).concat([nf(B.P)])) + row(['Horas MOD (× 0,40)'].concat(B.prod.map(function (x) { return nf(x * 0.4); })).concat([nf(B.P * 0.4)])) + row(['Costo MOD (Bs)'].concat(B.prod.map(function (x) { return nf(x * B.modu); })).concat([nf(B.P * B.modu)]), 'tot') + row(['Operarios equivalentes'].concat(B.prod.map(function (x) { return nf(x * 0.4 / 192 / 3, 1); })).concat(['—']), 'sub');
+  $('t6Eerr').innerHTML = eerrRows(B);
+ })();
+ function nf2(x) { return nf(x); }
+ function breakeven(key, lo, hi, up) {
+  for (var i = 0; i < 80; i++) { var m = (lo + hi) / 2, o = {}; o[key] = m; var u = presupuesto(Object.assign({}, cur6(), o)).un; if ((u > 0) === up) lo = m; else hi = m; }
+  return (lo + hi) / 2;
+ }
+ function cur6() { return { tco: parseFloat($('t6tco').value), precio: parseFloat($('t6p').value), vol: 1 + parseFloat($('t6v').value) / 100, sal: parseFloat($('t6s').value) }; }
+ renderers.t6 = function () {
+  var c = cur6(), r = presupuesto(c);
+  $('t6tcoV').textContent = nf(c.tco, 2); $('t6pV').textContent = nf(c.precio); $('t6vV').textContent = (c.vol >= 1 ? '+' : '') + nf((c.vol - 1) * 100) + '%'; $('t6sV').textContent = nf(c.sal);
+  $('t6UN').textContent = bsM(r.un); $('t6UN').className = 'v' + (r.un < 0 ? ' neg' : '');
+  $('t6MN').textContent = pct(r.un / r.V, 1); $('t6CU').textContent = 'Bs ' + nf(r.cu, 2); $('t6EB').textContent = bsM(r.ebitda);
+  $('t6Live').innerHTML = eerrRows(r, B);
+  var tcoB = breakeven('tco', 5, 40, true);
+  $('t6Break').innerHTML = '<strong>Punto de quiebre del tipo de cambio:</strong> con los demás supuestos actuales, la utilidad neta llega a cero con un TCO de <strong>Bs ' + nf(tcoB, 2) + '</strong>. Cada Bs 1 adicional en el dólar cuesta ≈ ' + bs(252000 * c.vol * 2.4 * 0.75) + ' de utilidad neta.';
+  draw('t6Chart', { type: 'bar', data: { labels: ['MP nacional', 'MP importada', 'MOD', 'CIF variables', 'CIF fijos'], datasets: [{ label: 'Costo unitario por caja (Bs)', data: [c.mpn || 22, r.mpi, r.modu, r.cifv, r.cifFu], backgroundColor: [C.g, C.a, C.b, C.v, 'rgba(255,255,255,0.35)'], borderRadius: 6 }] }, options: { indexAxis: 'y', plugins: { legend: { display: false }, tooltip: { callbacks: { label: function (x) { return 'Bs ' + nf(x.parsed.x, 2) + ' (' + pct(x.parsed.x / r.cu, 1) + ' del costo)'; } } } }, scales: { x: { title: { display: true, text: 'Bs por caja · total ' + nf(r.cu, 2) } } } } });
+ };
+ ['t6tco', 't6p', 't6v', 't6s'].forEach(function (id) { $(id).addEventListener('input', renderers.t6); });
+ document.querySelectorAll('[data-t6]').forEach(function (b) { b.addEventListener('click', function () {
+  var k = b.dataset.t6; $('t6p').value = 120; $('t6v').value = 0; $('t6s').value = 3600;
+  $('t6tco').value = k === 'dev' ? 14 : (k === 'old' ? 6.96 : 11.75);
+  renderers.t6();
+ }); });
+
+ // ================= T7 =================
+ var S0 = 28420;
+ var BAL = { caja: 1420, cxc: 3980, inv: 4550, af: 11370, cxp: 2560, acum: 1140, dcp: 1500, dlp: 4500, cap: 8000, res: 3620 };
+ (function () {
+  var h = head(['Activo', 'Bs miles', '% ventas', 'Pasivo y patrimonio', 'Bs miles', '% ventas']);
+  var L = [['Caja y bancos', BAL.caja], ['Cuentas por cobrar', BAL.cxc], ['Inventarios', BAL.inv], ['Activo fijo neto', BAL.af], ['', null], ['', null]];
+  var R = [['Proveedores', BAL.cxp, 1], ['Provisiones y acumulados', BAL.acum, 1], ['Deuda bancaria CP', BAL.dcp, 0], ['Deuda bancaria LP', BAL.dlp, 0], ['Capital social', BAL.cap, 0], ['Reservas y resultados acum.', BAL.res, 0]];
+  for (var i = 0; i < 6; i++) h += row([L[i][0], L[i][1] === null ? '' : nf(L[i][1]), L[i][1] === null ? '' : pct(L[i][1] / S0, 1), R[i][0], nf(R[i][1]), R[i][2] ? pct(R[i][1] / S0, 1) : '<span style="color:' + C.dim + '">no espontáneo</span>']);
+  h += row(['Total activo', nf(21320), pct(21320 / S0, 2), 'Total pasivo y patrimonio', nf(21320), ''], 'tot');
+  $('t7Bal').innerHTML = h;
+ })();
+ function fer(g, M, d, oc) {
+  var S1 = S0 * (1 + g), dS = S1 - S0;
+  var Aspont = BAL.caja + BAL.cxc + BAL.inv + (oc ? 0 : BAL.af), Lsp = BAL.cxp + BAL.acum;
+  var dA = Aspont / S0 * dS, dL = Lsp / S0 * dS, RE = M * S1 * (1 - d), F = dA - dL - RE;
+  var b = 1 - d, gstar = (M * b) / (Aspont / S0 - Lsp / S0 - M * b);
+  return { S1: S1, dS: dS, dA: dA, dL: dL, RE: RE, F: F, gstar: gstar, Aspont: Aspont };
+ }
+ renderers.t7 = function () {
+  var g = parseFloat($('t7g').value) / 100, M = parseFloat($('t7m').value) / 100, d = parseFloat($('t7d').value) / 100, oc = $('t7Oc').checked;
+  $('t7gV').textContent = nf(g * 100, 1) + '%'; $('t7mV').textContent = nf(M * 100, 2) + '%'; $('t7dV').textContent = nf(d * 100) + '%';
+  var r = fer(g, M, d, oc), f = 1 + g;
+  $('t7Fer').textContent = (r.F >= 0 ? '' : '−') + 'Bs ' + nf(Math.abs(r.F), 1) + ' mil'; $('t7Fer').className = 'v' + (r.F > 0 ? ' amb' : '');
+  $('t7G').textContent = r.gstar > 0 ? pct(r.gstar) : 'n/a';
+  var A = { caja: BAL.caja * f, cxc: BAL.cxc * f, inv: BAL.inv * f, af: oc ? BAL.af : BAL.af * f };
+  var TA = A.caja + A.cxc + A.inv + A.af;
+  var nuevo = Math.max(0, r.F), exced = Math.max(0, -r.F);
+  if (exced > 0) { A.caja += exced; TA += exced; }
+  var P = { cxp: BAL.cxp * f, acum: BAL.acum * f, dcp: BAL.dcp, dlp: BAL.dlp, nuevo: nuevo, cap: BAL.cap, res: BAL.res + r.RE };
+  var TP = P.cxp + P.acum + P.dcp + P.dlp + P.nuevo + P.cap + P.res;
+  var deuda = P.dcp + P.dlp + P.nuevo, pat = P.cap + P.res;
+  $('t7De').textContent = nf(deuda / pat, 2) + 'x';
+  var h = head(['Cuenta', '2025', '2026 proforma', 'Regla']);
+  h += row(['Caja y bancos', nf(BAL.caja), nf(A.caja, 1), exced > 0 ? '% ventas + excedente' : '% ventas']);
+  h += row(['Cuentas por cobrar', nf(BAL.cxc), nf(A.cxc, 1), '% ventas']);
+  h += row(['Inventarios', nf(BAL.inv), nf(A.inv, 1), '% ventas']);
+  h += row(['Activo fijo neto', nf(BAL.af), nf(A.af, 1), oc ? 'constante (capacidad ociosa)' : '% ventas']);
+  h += row(['Total activo', nf(21320), nf(TA, 1), ''], 'tot');
+  h += row(['Proveedores', nf(BAL.cxp), nf(P.cxp, 1), '% ventas']);
+  h += row(['Provisiones y acumulados', nf(BAL.acum), nf(P.acum, 1), '% ventas']);
+  h += row(['Deuda bancaria CP + LP', nf(BAL.dcp + BAL.dlp), nf(P.dcp + P.dlp, 1), 'constante']);
+  h += row(['<strong>Nuevo financiamiento (FER)</strong>', '—', nf(P.nuevo, 1), 'cuenta de cierre'], 'hl');
+  h += row(['Capital social', nf(BAL.cap), nf(P.cap, 1), 'constante']);
+  h += row(['Reservas y resultados acum.', nf(BAL.res), nf(P.res, 1), '+ utilidades retenidas']);
+  h += row(['Total pasivo y patrimonio', nf(21320), nf(TP, 1), Math.abs(TA - TP) < 0.5 ? '✓ cuadra' : '✗'], 'tot');
+  $('t7Pro').innerHTML = h;
+  $('t7Insight').innerHTML = 'Ventas 2026: ' + nf(r.S1, 1) + ' · ΔS ' + nf(r.dS, 1) + '. Activos adicionales ' + nf(r.dA, 1) + ' − pasivos espontáneos ' + nf(r.dL, 1) + ' − utilidades retenidas ' + nf(r.RE, 1) + ' = <strong>FER ' + nf(r.F, 1) + '</strong> (Bs miles). ' + (r.F > 0 ? 'Necesitas financiamiento externo: con crédito productivo al 8% costaría ≈ Bs ' + nf(r.F * 0.08, 1) + ' mil de intereses al año.' : 'No necesitas financiamiento externo: la empresa genera un excedente que puede reducir deuda o pagar más dividendos.') + (g > r.gstar ? ' Estás creciendo por encima de tu tasa autofinanciable (' + pct(r.gstar) + ').' : '');
+  draw('t7Chart', { type: 'bar', data: { labels: ['Usos: más activos', 'Fuente: pasivos espontáneos', 'Fuente: utilidades retenidas', 'Fuente: FER'], datasets: [{ data: [r.dA, r.dL, r.RE, r.F], backgroundColor: [C.r, C.g, C.b, r.F > 0 ? C.a : C.dim], borderRadius: 6 }] }, options: { plugins: { legend: { display: false }, tooltip: { callbacks: { label: function (x) { return 'Bs ' + nf(x.parsed.y, 1) + ' mil'; } } } }, scales: { y: { title: { display: true, text: 'Bs miles' } } } } });
+ };
+ ['t7g', 't7m', 't7d', 't7Oc'].forEach(function (id) { $(id).addEventListener('input', renderers.t7); $(id).addEventListener('change', renderers.t7); });
+
+ // ================= T8 =================
+ var MN8 = ['May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic', 'Ene'];
+ var U8 = [18900, 18500, 19800, 20300, 21010, 22500, 23340, 28500, 20500];
+ (function () {
+  $('t8Sales').innerHTML = head(['Concepto'].concat(MN8.slice(0, 8))) + row(['Cajas'].concat(U8.slice(0, 8).map(nf2))) + row(['Ventas (Bs)'].concat(U8.slice(0, 8).map(function (u) { return nf(u * 120); })), 'tot');
+ })();
+ function caja(o) {
+  var V = U8.map(function (u) { return u * 120; }), mpu = 50.2, compras = [];
+  for (var i = 0; i < U8.length - 1; i++) compras.push(U8[i + 1] * mpu);
+  var c0 = o.c0, c2 = 0.10, c1 = Math.max(0, 1 - c0 - c2);
+  var saldo = 1150000, linea = 0, credit = 0, res = [], iueMes = o.prorroga ? 'Ago' : 'Jul', totInt = 0;
+  for (var k = 2; k <= 7; k++) {
+   var m = MN8[k], cob = c0 * V[k] + c1 * V[k - 1] + c2 * V[k - 2];
+   var it = 0.03 * V[k - 1], comp = 0;
+   if (o.comp && credit > 0) { comp = Math.min(it, credit); credit -= comp; }
+   var it_cash = it - comp;
+   var out = { mp: 0.6 * compras[k] + 0.4 * compras[k - 1], planilla: 430000, fijos: 330000, gvar: 0.04 * V[k], intr: 40000, it: it_cash, iue: 0, div: 0, amort: 0, capex: 0, agu: 0, intl: linea * 0.08 / 12 };
+   if (m === iueMes) { out.iue = 919000; credit = 919000; }
+   if (m === 'Ago') out.div = o.div;
+   if (m === 'Sep' || m === 'Dic') out.amort = 375000;
+   if (o.capex && (m === 'Oct' || m === 'Nov')) out.capex = 600000;
+   if (m === 'Dic') out.agu = 370000 * (o.seg ? 2 : 1);
+   totInt += out.intl;
+   var tot = 0; for (var key in out) tot += out[key];
+   var ini = saldo, neto = cob - tot, pre = ini + neto, draw = 0;
+   if (pre < o.min) draw = o.min - pre; else if (linea > 0) draw = -Math.min(linea, pre - o.min);
+   linea += draw; saldo = pre + draw;
+   res.push({ m: m, ini: ini, cob: cob, out: out, tot: tot, neto: neto, pre: pre, draw: draw, saldo: saldo, linea: linea, comp: comp });
+  }
+  return { rows: res, totInt: totInt };
+ }
+ renderers.t8 = function () {
+  var o = { c0: parseFloat($('t8c').value) / 100, div: parseFloat($('t8d').value), min: parseFloat($('t8m').value), comp: $('t8Comp').checked, prorroga: $('t8Pro').checked, capex: $('t8Cap').checked, seg: $('t8Seg').checked };
+  $('t8cV').textContent = nf(o.c0 * 100) + '% / ' + nf(Math.max(0, 90 - o.c0 * 100)) + '% / 10%';
+  $('t8dV').textContent = nf(o.div); $('t8mV').textContent = nf(o.min);
+  var r = caja(o), R = r.rows, peak = 0, pm = '—';
+  R.forEach(function (x) { if (x.linea > peak + 0.5) { peak = x.linea; pm = x.m; } });
+  $('t8Peak').textContent = bs(peak); $('t8Mon').textContent = pm; $('t8End').textContent = bs(R[R.length - 1].linea); $('t8Int').textContent = bs(r.totInt);
+  var lines = [['Saldo inicial', 'ini'], ['(+) Cobranzas', 'cob', 'pos'], ['(−) Proveedores MP', 'mp'], ['(−) Planilla', 'planilla'], ['(−) Otros fijos', 'fijos'], ['(−) Comisiones y fletes', 'gvar'], ['(−) Intereses deuda', 'intr'], ['(−) Intereses línea', 'intl'], ['(−) IT (neto de compensación)', 'it'], ['(−) IUE', 'iue'], ['(−) Dividendos', 'div'], ['(−) Amortización deuda', 'amort'], ['(−) CAPEX horno', 'capex'], ['(−) Aguinaldo', 'agu'], ['= Flujo neto del mes', 'neto', 'tot'], ['Saldo antes de financiar', 'pre'], ['(+) Uso / (−) repago de línea', 'draw', 'hl'], ['= Saldo final', 'saldo', 'tot'], ['Saldo de la línea de crédito', 'linea']];
+  var h = head(['Bs'].concat(R.map(function (x) { return x.m; })));
+  lines.forEach(function (L) {
+   var cells = [L[0]].concat(R.map(function (x) { var v = x[L[1]] !== undefined ? x[L[1]] : x.out[L[1]]; var neg = (L[1] === 'neto' || L[1] === 'pre') && v < 0; return '<span style="' + (neg ? 'color:' + C.r : '') + '">' + (Math.abs(v) < 0.5 ? '—' : nf(v)) + '</span>'; }));
+   h += row(cells, L[2] === 'tot' ? 'tot' : (L[2] === 'hl' ? 'hl' : ''));
+  });
+  h += row(['IT compensado con IUE'].concat(R.map(function (x) { return x.comp > 0 ? nf(x.comp) : '—'; })), 'sub');
+  $('t8Tab').innerHTML = h;
+  var savings = caja(Object.assign({}, o, { comp: false })).rows.reduce(function (mx, x) { return Math.max(mx, x.linea); }, 0) - peak;
+  $('t8Insight').innerHTML = 'La empresa es rentable (UN ≈ Bs 2,76 MM en el año), pero en este semestre llega a necesitar hasta <strong>' + bs(peak) + '</strong> de la línea de crédito, sobre todo por ' + (o.prorroga ? 'el IUE de agosto (con la prórroga se junta con los dividendos)' : 'el IUE de julio') + (o.div > 0 ? ', los dividendos' : '') + (o.capex ? ' y el CAPEX' : '') + '. ' + (o.comp ? 'La compensación IUE–IT reduce el pico en ≈ <strong>' + bs(savings) + '</strong>.' : 'Activa la compensación IUE–IT y observa cuánto baja el pico.') + (o.seg ? ' El segundo aguinaldo agrega Bs 370.000 en diciembre: por eso se presupuesta como riesgo aunque hoy no corresponda.' : '');
+  draw('t8Chart', { type: 'bar', data: { labels: R.map(function (x) { return x.m; }), datasets: [
+   { type: 'bar', label: 'Flujo neto del mes', data: R.map(function (x) { return x.neto; }), backgroundColor: R.map(function (x) { return x.neto < 0 ? 'rgba(248,113,113,0.65)' : 'rgba(52,211,153,0.6)'; }), borderRadius: 5 },
+   { type: 'line', label: 'Saldo de la línea de crédito', data: R.map(function (x) { return x.linea; }), borderColor: C.a, backgroundColor: C.a, tension: 0.25 }
+  ] }, options: { plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: function (c) { return c.dataset.label + ': Bs ' + nf(c.parsed.y); } } } }, scales: { y: { ticks: { callback: function (v) { return nf(v / 1000) + 'k'; } } } } } });
+ };
+ ['t8c', 't8d', 't8m', 't8Comp', 't8Pro', 't8Cap', 't8Seg'].forEach(function (id) { $(id).addEventListener('input', renderers.t8); $(id).addEventListener('change', renderers.t8); });
+
+ // ================= T9 =================
+ var VARS = [
+  { k: 'vol', n: 'Volumen (±10%)', lo: 0.9, hi: 1.1, fmt: function (v) { return pct(v - 1, 0); } },
+  { k: 'precio', n: 'Precio (±5%)', lo: 114, hi: 126, fmt: function (v) { return 'Bs ' + nf(v); } },
+  { k: 'tco', n: 'Tipo de cambio (10,00–14,00)', lo: 14.0, hi: 10.0, fmt: function (v) { return nf(v, 2); } },
+  { k: 'sal', n: 'Sueldos (0 a +15%)', lo: 4140, hi: 3600, fmt: function (v) { return 'Bs ' + nf(v); } },
+  { k: 'mpn', n: 'MP nacional (±10%)', lo: 24.2, hi: 19.8, fmt: function (v) { return 'Bs ' + nf(v, 2); } },
+  { k: 'tasa', n: 'Tasa de interés (6%–11%)', lo: 0.11, hi: 0.06, fmt: function (v) { return pct(v, 0); } }
+ ];
+ function renderTornado() {
+  var base = B.un, data = VARS.map(function (v) { var o1 = {}, o2 = {}; o1[v.k] = v.lo; o2[v.k] = v.hi; return { v: v, low: presupuesto(o1).un, high: presupuesto(o2).un }; });
+  data.sort(function (a, b) { return Math.abs(b.high - b.low) - Math.abs(a.high - a.low); });
+  var h = head(['Variable', 'Valor desfavorable', 'UN', 'Valor favorable', 'UN', 'Amplitud']);
+  data.forEach(function (d) { h += row([d.v.n, d.v.fmt(d.v.lo), bs(d.low), d.v.fmt(d.v.hi), bs(d.high), bs(Math.abs(d.high - d.low))]); });
+  $('t9TorTab').innerHTML = h;
+  draw('t9Tor', { type: 'bar', data: { labels: data.map(function (d) { return d.v.n; }), datasets: [
+   { label: 'Escenario desfavorable', data: data.map(function (d) { return [d.low / 1e6, base / 1e6]; }), backgroundColor: 'rgba(248,113,113,0.7)', borderRadius: 4 },
+   { label: 'Escenario favorable', data: data.map(function (d) { return [base / 1e6, d.high / 1e6]; }), backgroundColor: 'rgba(52,211,153,0.7)', borderRadius: 4 }
+  ] }, options: { indexAxis: 'y', plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: function (c) { var r = c.raw; return c.dataset.label + ': Bs ' + nf(Math.min(r[0], r[1]), 2) + ' – ' + nf(Math.max(r[0], r[1]), 2) + ' MM'; } } } }, scales: { x: { stacked: false, title: { display: true, text: 'Utilidad neta (Bs millones) · línea base ' + nf(base / 1e6, 2) } }, y: { stacked: true } } } });
+ }
+ var ESC = [
+  { n: 'Pesimista', p: 25, o: { vol: 0.92, precio: 116.4, tco: 13.5, sal: 3960 }, d: 'Vol −8%, precio −3%, TCO 13,50, sueldos +10%' },
+  { n: 'Base', p: 50, o: {}, d: 'Plan 2026' },
+  { n: 'Optimista', p: 25, o: { vol: 1.06, precio: 122.4, tco: 10.5 }, d: 'Vol +6%, precio +2%, TCO 10,50' }
+ ];
+ function renderEsc() {
+  var h = head(['Escenario', 'Supuestos', 'Ventas', 'Utilidad neta', 'Margen', 'Probabilidad (%)']);
+  ESC.forEach(function (e, i) { var r = presupuesto(e.o); e.un = r.un; h += row([e.n, '<span style="white-space:normal;">' + e.d + '</span>', bsM(r.V), bs(r.un), pct(r.un / r.V, 1), '<input type="number" min="0" max="100" step="5" value="' + e.p + '" data-esc="' + i + '" style="width:80px;">']); });
+  $('t9Esc').innerHTML = h;
+  $('t9Esc').querySelectorAll('[data-esc]').forEach(function (inp) { inp.addEventListener('input', function () { ESC[+inp.dataset.esc].p = parseFloat(inp.value) || 0; escKpi(); }); });
+  escKpi();
+ }
+ function escKpi() {
+  var s = ESC.reduce(function (a, e) { return a + e.p; }, 0), ve = ESC.reduce(function (a, e) { return a + e.p / 100 * e.un; }, 0);
+  $('t9Sum').textContent = nf(s) + '%'; $('t9Sum').className = 'v' + (Math.abs(s - 100) > 0.01 ? ' neg' : '');
+  $('t9VE').textContent = Math.abs(s - 100) > 0.01 ? 'deben sumar 100%' : bs(ve);
+  $('t9Ran').textContent = bs(ESC[2].un - ESC[0].un);
+ }
+ function tri(a, c, b) { var u = Math.random(), f = (c - a) / (b - a); return u < f ? a + Math.sqrt(u * (b - a) * (c - a)) : b - Math.sqrt((1 - u) * (b - a) * (b - c)); }
+ function runMC() {
+  var vMax = parseFloat($('t9vMax').value) / 100, tMax = parseFloat($('t9tMax').value), sMax = parseFloat($('t9sMax').value) / 100;
+  $('t9vMaxV').textContent = '+' + nf(vMax * 100) + '%'; $('t9tMaxV').textContent = nf(tMax, 2); $('t9sMaxV').textContent = '+' + nf(sMax * 100) + '%';
+  var N = 5000, out = [];
+  for (var i = 0; i < N; i++) {
+   var o = { vol: tri(0.88, 1, 1 + Math.max(vMax, 0.0001)), tco: tri(10, 11.75, Math.max(tMax, 11.76)), precio: 120 * tri(0.96, 1, 1.03), sal: 3600 * (sMax > 0 ? tri(1, 1, 1 + sMax) : 1) };
+   out.push(presupuesto(o).un);
+  }
+  out.sort(function (a, b) { return a - b; });
+  var q = function (p) { return out[Math.floor(p * (N - 1))]; }, loss = out.filter(function (x) { return x < 0; }).length / N;
+  $('t9Pl').textContent = pct(loss, 1); $('t9Pl').className = 'v' + (loss > 0.05 ? ' neg' : '');
+  $('t9P5').textContent = bsM(q(0.05)); $('t9P50').textContent = bsM(q(0.5)); $('t9P95').textContent = bsM(q(0.95));
+  var mn = out[0], mx = out[N - 1], bins = 24, w = (mx - mn) / bins, cnt = new Array(bins).fill(0), lab = [];
+  out.forEach(function (x) { cnt[Math.min(bins - 1, Math.floor((x - mn) / w))]++; });
+  for (var b = 0; b < bins; b++) lab.push(nf((mn + w * (b + 0.5)) / 1e6, 2));
+  var mean = out.reduce(function (a, b) { return a + b; }, 0) / N;
+  $('t9Insight').innerHTML = 'Con 90% de confianza, la utilidad neta 2026 estará entre <strong>' + bsM(q(0.05)) + '</strong> y <strong>' + bsM(q(0.95)) + '</strong>. Media simulada: ' + bsM(mean) + ' (por debajo del caso base de ' + bsM(B.un) + ' porque las distribuciones son asimétricas: el dólar tiene más espacio para subir que para bajar). Cada clic en "Simular" genera 5.000 escenarios nuevos; los resultados cambian levemente porque son aleatorios.';
+  draw('t9Mc', { type: 'bar', data: { labels: lab, datasets: [{ label: 'Frecuencia (de 5.000 simulaciones)', data: cnt, backgroundColor: lab.map(function (l, i) { return (mn + w * (i + 0.5)) < 0 ? 'rgba(248,113,113,0.75)' : 'rgba(52,211,153,0.6)'; }), borderRadius: 3, barPercentage: 1, categoryPercentage: 1 }] }, options: { plugins: { legend: { position: 'bottom' } }, scales: { x: { title: { display: true, text: 'Utilidad neta (Bs millones)' } }, y: { title: { display: true, text: 'Frecuencia' } } } } });
+ }
+ renderers.t9 = function () { renderTornado(); renderEsc(); runMC(); };
+ $('t9Run').addEventListener('click', runMC);
+ ['t9vMax', 't9tMax', 't9sMax'].forEach(function (id) { $(id).addEventListener('change', runMC); $(id).addEventListener('input', function () { $('t9vMaxV').textContent = '+' + $('t9vMax').value + '%'; $('t9tMaxV').textContent = nf(parseFloat($('t9tMax').value), 2); $('t9sMaxV').textContent = '+' + $('t9sMax').value + '%'; }); });
+
+ // ================= checklist =================
+ var CK = 'aef_23b_checklist', ck = store.get(CK, []); if (!Array.isArray(ck)) ck = [];
+ var boxes = document.querySelectorAll('#checkList input');
+ function ckUpd() { var n = 0; boxes.forEach(function (b, i) { if (b.checked) n++; }); $('checkCount').textContent = n + ' de 10'; $('checkBar').style.width = (n * 10) + '%'; }
+ boxes.forEach(function (b, i) { b.checked = ck.indexOf(i) >= 0; b.addEventListener('change', function () { ck = []; boxes.forEach(function (x, j) { if (x.checked) ck.push(j); }); store.set(CK, ck); ckUpd(); }); });
+ ckUpd();
+
+ // ================= quiz =================
+ var QUIZ = [
+  { q: 'Las ventas pasaron de Bs 18.400 (2021) a Bs 28.420 (2025). ¿Cuántos períodos usas para el CAGR?', o: ['5, porque hay cinco datos', '4, porque hay cuatro intervalos de crecimiento', '1, porque solo importa el último año', 'Depende del promedio simple'], c: 1, e: 'El CAGR usa el número de períodos entre el dato inicial y el final: 2021→2025 son 4 años de crecimiento.' },
+  { q: 'Una regresión tiene R² = 0,93 pero los residuos forman una "U". ¿Qué concluyes?', o: ['El modelo es excelente y se puede extrapolar sin problema', 'La relación probablemente no es lineal: hay que revisar el modelo', 'Hay que eliminar el año con mayor residuo', 'El R² está mal calculado'], c: 1, e: 'Residuos con patrón (no aleatorios) indican que la forma funcional es incorrecta, aunque el R² sea alto.' },
+  { q: 'En 2025 las ventas de Valle Alto crecieron 18,61% nominal y la inflación fue 20,40%. ¿Qué pasó con el volumen?', o: ['Creció cerca de 18%', 'Creció cerca de 2%', 'Cayó cerca de 1,5%', 'No se puede saber'], c: 2, e: '1,1861 / 1,2040 − 1 = −1,48%. Todo el crecimiento nominal fue precio; el volumen cayó.' },
+  { q: '¿Qué dato de inflación es más razonable como supuesto central para proyectar 2026–2027 en Bolivia?', o: ['El 1–3% histórico de la década pasada', 'Un rango entre la inflación interanual reciente del INE (5,70% a sept-2026) y la proyección del FMI (12,7% promedio 2026; 15,8% en 2027)', '0%, porque el tipo de cambio es fijo', 'El 20,40% de 2025, para ser conservador'], c: 1, e: 'Los supuestos se basan en datos vigentes con fuente y fecha. El 1–3% ya no aplica y el tipo de cambio ya no es fijo.' },
+  { q: 'Si el índice estacional de T4 es 1,18 y las ventas anuales proyectadas son Bs 30.240 miles, las ventas de T4 son:', o: ['Bs 7.560 miles', 'Bs 8.920,8 miles', 'Bs 35.683 miles', 'Bs 1.360,8 miles'], c: 1, e: '(30.240 / 4) × 1,18 = 8.920,8.' },
+  { q: 'En el suavizado exponencial, un α cercano a 1 significa que el pronóstico:', o: ['Ignora los datos recientes', 'Reacciona casi por completo al último dato real (y persigue el ruido)', 'Es igual al promedio de todo el historial', 'Elimina la estacionalidad'], c: 1, e: 'Con α alto, F(t+1) ≈ A(t): el pronóstico copia el último dato, incluidos los picos atípicos.' },
+  { q: 'Con el tipo de cambio oficial flexible, un insumo de USD 2,40 que antes costaba Bs 16,70 (a 6,96) pasa a costar con TCO 11,75:', o: ['Bs 16,70 (no cambia)', 'Bs 23,52', 'Bs 28,20', 'Bs 11,75'], c: 2, e: '2,40 × 11,75 = Bs 28,20, un aumento de 68,8% en bolivianos.' },
+  { q: 'El FER de Valle Alto con +18% de ventas es Bs 1.336,5 miles. Si los socios suben los dividendos de 40% a 60%, el FER:', o: ['Baja', 'Sube, porque se retienen menos utilidades', 'No cambia', 'Se vuelve negativo'], c: 1, e: 'Menos utilidades retenidas implica más financiamiento externo: el FER sube a ≈ 1.948,2.' },
+  { q: '¿Por qué la compensación IUE–IT importa en el presupuesto de caja?', o: ['Porque elimina el IUE', 'Porque el IUE pagado se usa como pago a cuenta del IT siguiente, reduciendo los pagos de IT por varios meses', 'Porque duplica el IT', 'Porque solo aplica a bancos'], c: 1, e: 'Tras pagar el IUE, el IT de los meses siguientes se cubre con ese crédito, liberando liquidez.' },
+  { q: 'En los escenarios de Valle Alto, el valor esperado (≈ Bs 2,57 MM) es menor que el caso base (≈ Bs 2,76 MM). Esto indica:', o: ['Un error de cálculo', 'Que el riesgo es asimétrico: los escenarios malos restan más de lo que suman los buenos', 'Que el escenario base es pesimista', 'Que las probabilidades no suman 100%'], c: 1, e: 'Cuando la pérdida potencial en el pesimista es mayor que la ganancia en el optimista, el valor esperado cae por debajo del base.' }
+ ];
+ var QA = 'aef_23b_quiz', qa = store.get(QA, {}); if (typeof qa !== 'object' || qa === null) qa = {};
+ function renderQuiz() {
+  var h = '';
+  QUIZ.forEach(function (q, i) {
+   h += '<div class="quiz-item" id="qz' + i + '"><h4>' + (i + 1) + '. ' + q.q + '</h4><div class="quiz-opts">';
+   q.o.forEach(function (o, j) { h += '<button class="quiz-opt" data-q="' + i + '" data-o="' + j + '">' + String.fromCharCode(65 + j) + '. ' + o + '</button>'; });
+   h += '</div><div class="quiz-explain">' + q.e + '</div></div>';
+  });
+  $('quizBox').innerHTML = h;
+  $('quizBox').querySelectorAll('.quiz-opt').forEach(function (b) { b.addEventListener('click', function () { var i = +b.dataset.q; if (qa[i] !== undefined) return; qa[i] = +b.dataset.o; store.set(QA, qa); paintQuiz(); }); });
+  paintQuiz();
+ }
+ function quizScore() { var s = 0, n = 0; QUIZ.forEach(function (q, i) { if (qa[i] !== undefined) { n++; if (qa[i] === q.c) s++; } }); return { s: s, n: n }; }
+ function paintQuiz() {
+  QUIZ.forEach(function (q, i) {
+   if (qa[i] === undefined) return;
+   var opts = document.querySelectorAll('#qz' + i + ' .quiz-opt');
+   opts[q.c].classList.add('correct'); if (qa[i] !== q.c) opts[qa[i]].classList.add('wrong');
+   document.querySelector('#qz' + i + ' .quiz-explain').classList.add('visible');
+  });
+  var sc = quizScore();
+  if (sc.n === QUIZ.length) {
+   $('quizResult').textContent = 'Quiz completado: ' + sc.s + ' de 10 correctas ' + (sc.s >= 7 ? '✓ aprobado' : '— necesitas 7; puedes reintentar');
+   $('quizResult').style.color = sc.s >= 7 ? C.g : C.r;
+   $('quizReset').classList.toggle('hidden', sc.s >= 7);
+  } else { $('quizResult').textContent = sc.n ? 'Respondidas: ' + sc.n + ' de 10' : ''; $('quizReset').classList.add('hidden'); }
+  checkBadge();
+ }
+ $('quizReset').addEventListener('click', function () { qa = {}; store.set(QA, qa); renderQuiz(); $('quizResult').textContent = ''; });
+
+ function checkBadge() {
+  var sc = quizScore(), qok = sc.n === QUIZ.length && sc.s >= 7, tok = done.length >= 9;
+  var el = $('badgeStatus'); if (!el) return;
+  if (qok && tok) {
+   $('insignia').classList.remove('hidden');
+   el.innerHTML = '<i class="fas fa-trophy" style="color:#fbbf24"></i> <strong>¡Módulo 23-B completado!</strong>';
+   var p = store.get(PROGRESS_KEY, []); if (!Array.isArray(p)) p = [];
+   if (p.indexOf(MODULE_KEY) < 0) { p.push(MODULE_KEY); store.set(PROGRESS_KEY, p); }
+   try { localStorage.setItem(MODULE_KEY, 'true'); } catch (e) {}
+   courseProgress();
+  } else {
+   el.innerHTML = '<i class="fas fa-info-circle"></i> Para la insignia <strong>Arquitecto de Proyecciones</strong>: técnicas ' + done.length + '/9 · quiz ' + (sc.n === QUIZ.length ? sc.s + '/10' : 'pendiente') + '.';
+  }
+ }
+
+ // ---------- init ----------
+ courseProgress();
+ reco();
+ renderQuiz();
+ refreshTech();
+ var startTab = store.get('aef_23b_tab', 't1');
+ if (!document.getElementById(startTab)) startTab = 't1';
+ showTab(startTab, false);
+})();
+</script>
+</body>
+</html>
